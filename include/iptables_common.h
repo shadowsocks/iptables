@@ -14,6 +14,14 @@ extern int string_to_number(const char *,
 			    unsigned int, 
 			    unsigned int,
 			    unsigned int *);
+extern int string_to_number_l(const char *, 
+			    unsigned long int, 
+			    unsigned long int,
+			    unsigned long *);
+extern int string_to_number_ll(const char *, 
+			    unsigned long long int, 
+			    unsigned long long int,
+			    unsigned long long *);
 extern int iptables_insmod(const char *modname, const char *modprobe);
 void exit_error(enum exittype, char *, ...)__attribute__((noreturn,
 							  format(printf,2,3)));

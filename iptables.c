@@ -900,23 +900,48 @@ mask_to_dotted(const struct in_addr *mask)
 }
 
 int
-string_to_number(const char *s, unsigned int min, unsigned int max,
-		 unsigned int *ret)
+string_to_number_ll(const char *s, unsigned long long min, unsigned long long max,
+		 unsigned long long *ret)
 {
-	long number;
+	unsigned long long number;
 	char *end;
 
 	/* Handle hex, octal, etc. */
 	errno = 0;
-	number = strtol(s, &end, 0);
+	number = strtoull(s, &end, 0);
 	if (*end == '\0' && end != s) {
 		/* we parsed a number, let's see if we want this */
-		if (errno != ERANGE && min <= number && number <= max) {
+		if (errno != ERANGE && min <= number && (!max || number <= max)) {
 			*ret = number;
 			return 0;
 		}
 	}
 	return -1;
+}
+
+int
+string_to_number_l(const char *s, unsigned long min, unsigned long max,
+		 unsigned long *ret)
+{
+	int result;
+	unsigned long long number;
+
+	result = string_to_number_ll(s, min, max, &number);
+	*ret = (unsigned long)number;
+
+	return result;
+}
+
+int string_to_number(const char *s, unsigned int min, unsigned int max,
+		unsigned int *ret)
+{
+	int result;
+	unsigned long number;
+
+	result = string_to_number_l(s, min, max, &number);
+	*ret = (unsigned int)number;
+
+	return result;
 }
 
 static void
