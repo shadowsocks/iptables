@@ -30,10 +30,12 @@ else 	# NO_SHARED_LIBS
 EXT_OBJS+=$(foreach T,$(PF_EXT_SLIB),extensions/libipt_$(T).o)
 EXT_FUNC+=$(foreach T,$(PF_EXT_SLIB),ipt_$(T))
 EXT_OBJS+= extensions/initext.o
+ifeq ($(DO_IPV6), 1)
 EXT6_OBJS+=$(foreach T,$(PF6_EXT_SLIB),extensions/libip6t_$(T).o)
 EXT6_FUNC+=$(foreach T,$(PF6_EXT_SLIB),ip6t_$(T))
 EXT6_OBJS+= extensions/initext6.o
-endif
+endif	# DO_IPV6
+endif	# NO_SHARED_LIBS
 
 ifndef TOPLEVEL_INCLUDED
 local:
