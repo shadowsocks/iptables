@@ -4,7 +4,7 @@
  *
  * This coude is distributed under the terms of GNU GPL
  *
- * $Id: iptables-restore.c,v 1.14 2001/08/06 18:50:22 laforge Exp $
+ * $Id: iptables-restore.c,v 1.15 2001/10/16 07:53:34 laforge Exp $
  */
 
 #include <getopt.h>
@@ -361,7 +361,7 @@ int main(int argc, char *argv[])
 			DEBUGP("calling do_command(%u, argv, &%s, handle):\n",
 				newargc, curtable);
 
-			for (a = 0; a <= newargc; a++)
+			for (a = 0; a < newargc; a++)
 				DEBUGP("argv[%u]: %s\n", a, newargv[a]);
 
 			ret = do_command(newargc, newargv, 
