@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.42 2001/07/23 00:28:56 jamesm Exp $
+CVS ID: $Id: TODO,v 1.43 2001/07/23 00:31:50 jamesm Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -12,7 +12,7 @@ IMPORTANT issues:
 - multiple related connections [HW]
 - ip_conntrack rmmod loop (sometimes, Yan's patch?)
 - conntrack helper not called for first packet (udp!)
-- why is nat_helper's expect() function called for all helpers? [HW]
+X why is nat_helper's expect() function called for all helpers? [HW]
 X full tcp window tracking incompatibility with nat helpers [HW]
 - mangle table should use all five netfilter hooks [BC]
 X merge EPRT / EPSV ftp stuff [RR] (reimplemented in ftp-fixes, included 2.4.4)
@@ -21,10 +21,10 @@ X runme error with IPv6 stuff! [HW]
 X SMP conntrack race [RR] (ftp-fixes, included in 2.4.4)
 - static compiling/linking of iptables (for router-on-a-disk) [HW]
   (what about the patch from David McCullough? -- JM)
-- IPv6 testing (MARK, LOG, REJECT) [HW]
+X IPv6 testing (MARK, LOG, REJECT) [HW]
 x iptables-save doesn't work with eth+ style multiple IF stuff [HW]
 X reject-with on REJECT target doesn't work [HW]
-- IPv6 REJECT target doesn't have extension plugin ?!?
+X IPv6 REJECT target doesn't have extension plugin ?!?
 - colon inside prefix doesn't work
 X pending minor ip_queue updates [JM]
 - --mac-source not working in FORWARD (manpage bug?)
@@ -53,7 +53,7 @@ X integrate PSD target / port it as match [HW]
 - provide daily CVS snapshots via ftp [HW]
 - 10.1.2.3.4 is accepted as a valid IP address by iptables -s / -d ?
 - make iptables / ip6tables use the same codebase (as libiptc) [KA]
-- string_to_number() does not work correctly for unsigned ints [JM]
+X string_to_number() does not work correctly for unsigned ints [JM]
 - REJECT optionally generates port unreachable with faked SOURCE
 - libipq reentrancy [JM]
 - libipq asynchronousness [JM]
