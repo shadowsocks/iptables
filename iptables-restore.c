@@ -4,7 +4,7 @@
  *
  * This coude is distributed under the terms of GNU GPL
  *
- * $Id: iptables-restore.c,v 1.15 2001/10/16 07:53:34 laforge Exp $
+ * $Id: iptables-restore.c,v 1.16 2001/10/16 09:51:33 laforge Exp $
  */
 
 #include <getopt.h>
@@ -81,6 +81,7 @@ static int newargc;
 /* function adding one argument to newargv, updating newargc 
  * returns true if argument added, false otherwise */
 static int add_argv(char *what) {
+	DEBUGP("add_argv: %s\n", what);
 	if (what && ((newargc + 1) < sizeof(newargv)/sizeof(char *))) {
 		newargv[newargc] = strdup(what);
 		newargc++;
@@ -289,22 +290,6 @@ int main(int argc, char *argv[])
 				parsestart = buffer;
 			}
 
-			/* prevent iptables-restore from crashing in do_command
-			 * when someone passes a "-t" on the line.
-			 *  - Ben Reser <ben@reser.org> */
-			if (strstr(buffer, "-t")) {
-				exit_error(PARAMETER_PROBLEM, 
-					   "Line %u seems to have a "
-					   " -t table option.\n", line);
-				exit(1);
-			}
-			if (!strlen((char *) &curtable)) {
-				exit_error(PARAMETER_PROBLEM,
-					   "Line %u seems to to have a "
-					   " zero-length table name.\n", line);
-				exit(1);
-			} 
-			
 			add_argv(argv[0]);
 			add_argv("-t");
 			add_argv((char *) &curtable);
@@ -351,6 +336,15 @@ int main(int argc, char *argv[])
 					strncpy(param_buffer, param_start,
 						param_len);
 					*(param_buffer+param_len) = '\0';
+
+					/* check if table name specified */
+					if (!strncmp(param_buffer, "-t", 3)) {
+						exit_error(PARAMETER_PROBLEM, 
+						   "Line %u seems to have a "
+						   "-t table option.\n", line);
+						exit(1);
+					}
+
 					add_argv(param_buffer);
 					param_start += param_len + 1;
 				} else {

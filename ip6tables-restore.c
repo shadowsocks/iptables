@@ -293,22 +293,6 @@ int main(int argc, char *argv[])
                                 /* start command parsing at start of line */
                                 parsestart = buffer;
                         }
-
-			/* prevent iptables-restore from crashing in do_command
-			 * when someone passes a "-t" on the line.
-			 *  - Ben Reser <ben@reser.org> */
-			if (strstr(buffer, "-t")) {
-				exit_error(PARAMETER_PROBLEM, 
-					   "Line %u seems to have a "
-					   " -t table option.\n", line);
-				exit(1);
-			}
-			if (!strlen((char *) &curtable)) {
-				exit_error(PARAMETER_PROBLEM,
-					   "Line %u seems to to have a "
-					   " zero-length table name.\n", line);
-				exit(1);
-			} 
 			
                         add_argv(argv[0]);
                         add_argv("-t");
@@ -358,6 +342,14 @@ int main(int argc, char *argv[])
                                         strncpy(param_buffer, param_start,
                                                 param_len);
                                         *(param_buffer+param_len) = '\0';
+
+					if (!strncmp(param_buffer, "-t", 3)) {
+						exit_error(PARAMETER_PROBLEM, 
+						   "Line %u seems to have a "
+						   "-t table option.\n", line);
+						exit(1);
+					}
+
                                         add_argv(param_buffer);
                                         param_start += param_len + 1;
                                 } else {
