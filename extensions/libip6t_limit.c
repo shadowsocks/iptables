@@ -177,20 +177,18 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 		printf("--limit-burst %u ", r->burst);
 }
 
-static
-struct ip6tables_match limit
-= { NULL,
-    "limit",
-    IPTABLES_VERSION,
-    IP6T_ALIGN(sizeof(struct ip6t_rateinfo)),
-    offsetof(struct ip6t_rateinfo, prev),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct ip6tables_match limit = {
+	.name 		= "limit",
+	.version	= IPTABLES_VERSION,
+	.size		= IP6T_ALIGN(sizeof(struct ip6t_rateinfo)),
+	.userspacesize	= offsetof(struct ip6t_rateinfo, prev),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts,
 };
 
 void _init(void)

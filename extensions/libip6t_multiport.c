@@ -249,20 +249,18 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 	printf(" ");
 }
 
-static
-struct ip6tables_match multiport
-= { NULL,
-    "multiport",
-    IPTABLES_VERSION,
-    IP6T_ALIGN(sizeof(struct ip6t_multiport)),
-    IP6T_ALIGN(sizeof(struct ip6t_multiport)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct ip6tables_match multiport = {
+	.name		= "multiport",
+	.version	= IPTABLES_VERSION,
+	.size		= IP6T_ALIGN(sizeof(struct ip6t_multiport)),
+	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_multiport)),
+	.help		= &help,
+	.init		= &init,
+	.parase		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts,
 };
 
 void

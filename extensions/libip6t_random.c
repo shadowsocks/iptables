@@ -131,19 +131,18 @@ save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match)
 	printf("--average %u ", result.quot);
 }
 
-struct ip6tables_match rand_match
-= { NULL,
-    "random",
-    IPTABLES_VERSION,
-    IP6T_ALIGN(sizeof(struct ip6t_rand_info)),
-    IP6T_ALIGN(sizeof(struct ip6t_rand_info)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+struct ip6tables_match rand_match = {
+	.name		= "random",
+	.version	= IPTABLES_VERSION,
+	.size		= IP6T_ALIGN(sizeof(struct ip6t_rand_info)),
+	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_rand_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print
+	.save		= &save,
+	.extra_opts	= opts,
 };
 
 void _init(void)
