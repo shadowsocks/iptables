@@ -119,7 +119,7 @@ static struct option original_opts[] = {
 	{ "zero", 2, 0,  'Z' },
 	{ "new-chain", 1, 0,  'N' },
 	{ "delete-chain", 2, 0,  'X' },
-	{ "rename-chain", 2, 0,  'E' },
+	{ "rename-chain", 1, 0,  'E' },
 	{ "policy", 1, 0,  'P' },
 	{ "source", 1, 0, 's' },
 	{ "destination", 1, 0,  'd' },
