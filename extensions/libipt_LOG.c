@@ -225,12 +225,21 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 {
 	const struct ipt_log_info *loginfo
 		= (const struct ipt_log_info *)target->data;
+	unsigned int i = 0;
 
 	if (strcmp(loginfo->prefix, "") != 0)
 		printf("--log-prefix \"%s\" ", loginfo->prefix);
 
-	if (loginfo->level != LOG_DEFAULT_LEVEL)
-		printf("--log-level %u ", loginfo->level);
+	if (loginfo->level != LOG_DEFAULT_LEVEL) {
+		for (i = 0;
+		     i < sizeof(ipt_log_names) / sizeof(struct ipt_log_names);
+		     i++) {
+			if (loginfo->level == ipt_log_names[i].level) {
+				printf("--log-level %s ", ipt_log_names[i].name);
+				break;
+			}
+        }
+    }
 
 	if (loginfo->logflags & IPT_LOG_TCPSEQ)
 		printf("--log-tcp-sequence ");

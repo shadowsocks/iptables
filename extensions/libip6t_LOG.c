@@ -225,12 +225,21 @@ save(const struct ip6t_ip6 *ip, const struct ip6t_entry_target *target)
 {
 	const struct ip6t_log_info *loginfo
 		= (const struct ip6t_log_info *)target->data;
+	unsigned int i = 0;
 
 	if (strcmp(loginfo->prefix, "") != 0)
 		printf("--log-prefix \"%s\" ", loginfo->prefix);
 
-	if (loginfo->level != LOG_DEFAULT_LEVEL)
-		printf("--log-level %u ", loginfo->level);
+	if (loginfo->level != LOG_DEFAULT_LEVEL) {
+		for (i = 0;
+		     i < sizeof(ip6t_log_names) / sizeof(struct ip6t_log_names);
+		     i++) {
+			if (loginfo->level == ip6t_log_names[i].level) {
+				printf("--log-level %s ", ip6t_log_names[i].name);
+				break;
+			}
+        }
+    }
 
 	if (loginfo->logflags & IP6T_LOG_TCPSEQ)
 		printf("--log-tcp-sequence ");
