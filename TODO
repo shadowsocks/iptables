@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.41 2001/07/14 19:21:47 laforge Exp $
+CVS ID: $Id: TODO,v 1.42 2001/07/23 00:28:56 jamesm Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -20,7 +20,7 @@ X runme error with IPv6 stuff! [HW]
 - wrong 'Out of window' error message from tcp-windowtracking [HW]
 X SMP conntrack race [RR] (ftp-fixes, included in 2.4.4)
 - static compiling/linking of iptables (for router-on-a-disk) [HW]
-  (what about the patch from David McCulloguh? -- JM)
+  (what about the patch from David McCullough? -- JM)
 - IPv6 testing (MARK, LOG, REJECT) [HW]
 x iptables-save doesn't work with eth+ style multiple IF stuff [HW]
 X reject-with on REJECT target doesn't work [HW]
