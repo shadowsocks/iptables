@@ -1,0 +1,95 @@
+.TH IPQ_READ 3 "18 November 2000" "Linux iptables 1.1.3+" "Linux Programmer's Manual" 
+.\"
+.\" $Id: $
+.\"
+.\"     Copyright (c) 2000 Netfilter Core Team
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.\"
+.SH NAME
+ipq_read - wait for queue messages from ip_queue and read into supplied buffer
+.SH SYNOPSIS
+.B #include <linux/netfilter.h>
+.br
+.B #include <libipq.h>
+.sp
+.BI "ssize_t ipq_read(const struct ipq_handle *" h ", unsigned char *" buf ", size_t " len ", int " timeout ");"
+.SH DESCRIPTION
+The
+.B ipq_read
+function waits for a queue message to arrive from the kernel and copies it to
+the memory pointed to by 
+.I buf
+to a maximum length of
+. I len .
+.PP
+The
+.I h
+parameter is a context handle which must previously have been returned 
+successfully from a call to
+.B ipq_create_handle .
+.PP
+The caller is responsible for ensuring that the memory pointed to by
+.I buf
+is large enough to contain
+.I len
+bytes.
+.PP
+The
+.I timeout
+parameter is not currently implemented.
+.PP
+Data returned via
+.I buf
+should not be accessed directly.  Use the 
+.BR ipq_message_type ,
+.BR ipq_get_packet ", and"
+.BR ipq_get_msgerr
+functions to access the queue message in the buffer.
+.SH RETURN VALUE
+On failure, -1 is returned.
+.br
+On success, a non-zero positive value is returned.
+.SH ERRORS
+On error, a descriptive error message will be available
+via the
+.B ipq_errstr
+function.
+.SH DIAGNOSTICS
+While the
+.B ipq_read
+function may return successfully, the queue message copied to the buffer
+may itself be an error message from a higher level kernel component.  Use
+.B ipq_message_type
+to determine if it is an error message, and
+.B ipq_get_msgerr
+to access the value of the message.
+.SH TODO
+Implement
+.I timeout
+as part of a non-blocking interface.
+.SH BUGS
+None known.
+.SH AUTHOR
+James Morris <jmorris@intercode.com.au>
+.SH COPYRIGHT
+Copyright (c) 2000 Netfilter Core Team.
+.PP
+Distributed under the GNU General Public License.
+.SH SEE ALSO
+.BR iptables (8),
+.BR libipq (3).
+
