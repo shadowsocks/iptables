@@ -28,7 +28,10 @@
 #include <ctype.h>
 #include <stdarg.h>
 #include <limits.h>
+#include <unistd.h>
 #include <iptables.h>
+#include <fcntl.h>
+#include <sys/wait.h>
 
 #ifndef TRUE
 #define TRUE 1
@@ -39,6 +42,10 @@
 
 #ifndef IPT_LIB_DIR
 #define IPT_LIB_DIR "/usr/local/lib/iptables"
+#endif
+
+#ifndef PROC_SYS_MODPROBE
+#define PROC_SYS_MODPROBE "/proc/sys/kernel/modprobe"
 #endif
 
 #define FMT_NUMERIC	0x0001
@@ -122,6 +129,7 @@ static struct option original_opts[] = {
 	{ "version", 0, 0, 'V' },
 	{ "help", 2, 0, 'h' },
 	{ "line-numbers", 0, 0, '0' },
+	{ "modprobe", 1, 0, 'M' },
 	{ 0 }
 };
 
@@ -375,8 +383,10 @@ exit_printhelp(void)
 "				network interface name ([+] for wildcard)\n"
 "  --table	-t table	table to manipulate (default: `filter')\n"
 "  --verbose	-v		verbose mode\n"
+"  --line-numbers		print line numbers when listing\n"
 "  --exact	-x		expand numbers (display exact values)\n"
 "[!] --fragment	-f		match second or further fragments only\n"
+"  --modprobe=<command>		try to insert modules using this commandx\n"
 "[!] --version	-V		print package version.\n");
 
 	/* Print out any special helps. A user might like to be able
@@ -1509,6 +1519,62 @@ list_entries(const ipt_chainlabel chain, int verbose, int numeric,
 	return found;
 }
 
+static char *get_modprobe(void)
+{
+	int procfile;
+	char *ret;
+
+	procfile = open(PROC_SYS_MODPROBE, O_RDONLY);
+	if (procfile < 0)
+		return NULL;
+
+	ret = malloc(1024);
+	if (ret) {
+		switch (read(procfile, ret, 1024)) {
+		case -1: goto fail;
+		case 1024: goto fail; /* Partial read.  Wierd */
+		}
+		return ret;
+	}
+ fail:
+	free(ret);
+	close(procfile);
+	return NULL;
+}
+
+static int iptables_insmod(const char *modname, const char *modprobe)
+{
+	char *buf = NULL;
+	char *argv[3];
+
+	/* If they don't explicitly set it, read out of kernel */
+	if (!modprobe) {
+		buf = get_modprobe();
+		if (!buf)
+			return -1;
+		modprobe = buf;
+	}
+
+	switch (fork()) {
+	case 0:
+		argv[0] = (char *)modprobe;
+		argv[1] = (char *)modname;
+		argv[2] = NULL;
+		execv(argv[0], argv);
+
+		/* not usually reached */
+		exit(0);
+	case -1:
+		return -1;
+
+	default: /* parent */
+		wait(NULL);
+	}
+
+	free(buf);
+	return 0;
+}
+
 static struct ipt_entry *
 generate_entry(const struct ipt_entry *fw,
 	       struct iptables_match *matches,
@@ -1555,6 +1621,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	struct iptables_target *t;
 	const char *jumpto = "";
 	char *protocol = NULL;
+	const char *modprobe = NULL;
 
 	memset(&fw, 0, sizeof(fw));
 
@@ -1855,6 +1922,10 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				   invert);
 			break;
 
+		case 'M':
+			modprobe = optarg;
+			break;
+
 		case 1: /* non option */
 			if (optarg[0] == '!' && optarg[1] == '\0') {
 				if (invert)
@@ -1972,6 +2043,12 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	/* only allocate handle if we weren't called with a handle */
 	if (!*handle)
 		*handle = iptc_init(*table);
+
+	if (!*handle) {
+		/* try to insmod the module if iptc_init failed */
+		iptables_insmod("ip_tables", modprobe);
+		*handle = iptc_init(*table);
+	}
 
 	if (!*handle)
 		exit_error(VERSION_PROBLEM,
