@@ -1456,10 +1456,28 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	int ret = 1;
 	struct ip6tables_match *m;
 	struct ip6tables_target *target = NULL;
+	struct ip6tables_target *t;
 	const char *jumpto = "";
 	char *protocol = NULL;
 
 	memset(&fw, 0, sizeof(fw));
+
+	opts = original_opts;
+	global_option_offset = 0;
+
+        /* re-set optind to 0 in case do_command gets called
+	 * a second time */
+	optind = 0;
+
+        /* clear mflags in case do_command gets called a second time
+         * (we clear the global list of all matches for security)*/
+        for (m = ip6tables_matches; m; m = m->next) {
+                m->mflags = 0;
+        }
+
+        for (t = ip6tables_targets; t; t = t->next) {
+                t->tflags = 0;
+        }
 
 	/* Suppress error messages: we may add new options if we
            demand-load a protocol. */
@@ -1655,6 +1673,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 				target->t->u.target_size = size;
 				strcpy(target->t->u.user.name, jumpto);
 				target->init(target->t, &fw.nfcache);
+				opts = merge_options(opts, target->extra_opts, &target->option_offset);
 			}
 			break;
 
@@ -1702,6 +1721,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			m->m->u.match_size = size;
 			strcpy(m->m->u.user.name, m->name);
 			m->init(m->m, &fw.nfcache);
+			opts = merge_options(opts, m->extra_opts, &m->option_offset);
 		}
 		break;
 
@@ -1785,6 +1805,9 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 					strcpy(m->m->u.user.name, m->name);
 					m->init(m->m, &fw.nfcache);
 
+                                        opts = merge_options(opts,
+                                            m->extra_opts, &m->option_offset);
+
 					optind--;
 					continue;
 				}
@@ -1797,8 +1820,9 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 		invert = FALSE;
 	}
 
-	for (m = ip6tables_matches; m; m = m->next)
+	for (m = ip6tables_matches; m; m = m->next) 
 		m->final_check(m->mflags);
+
 	if (target)
 		target->final_check(target->tflags);
 
@@ -1849,36 +1873,51 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			   "chain name `%s' too long (must be under %i chars)",
 			   chain, IP6T_FUNCTION_MAXNAMELEN);
 
-	*handle = ip6tc_init(*table);
-	if (!*handle)
-		exit_error(VERSION_PROBLEM,
-			   "can't initialize iptables table `%s': %s",
-			   *table, ip6tc_strerror(errno));
+        /* only allocate handle if we weren't called with a handle */
+        if (!*handle)
+                *handle = ip6tc_init(*table);
+
+        if (!*handle)
+                exit_error(VERSION_PROBLEM,
+                           "can't initialize ip6tables table `%s': %s",
+                           *table, ip6tc_strerror(errno));
 
 	if (command == CMD_CHECK
 	    || command == CMD_APPEND
 	    || command == CMD_DELETE
 	    || command == CMD_INSERT
 	    || command == CMD_REPLACE) {
-		/* -o not valid with incoming packets. */
-		if (options & OPT_VIANAMEOUT)
-			if (strcmp(chain, "PREROUTING") == 0
-		    	    || strcmp(chain, "INPUT") == 0) {
-				exit_error(PARAMETER_PROBLEM,
-					   "Can't use -%c with %s\n",
-					   opt2char(OPT_VIANAMEOUT),
-					   chain);
-		}
+                if (strcmp(chain, "PREROUTING") == 0
+                    || strcmp(chain, "INPUT") == 0) {
+                        /* -o not valid with incoming packets. */
+                        if (options & OPT_VIANAMEOUT)
+                                exit_error(PARAMETER_PROBLEM,
+                                           "Can't use -%c with %s\n",
+                                           opt2char(OPT_VIANAMEOUT),
+                                           chain);
+                        /* -i required with -C */
+                        if (command == CMD_CHECK && !(options & OPT_VIANAMEIN))
+                                exit_error(PARAMETER_PROBLEM,
+                                           "Need -%c with %s\n",
+                                           opt2char(OPT_VIANAMEIN),
+                                           chain);
+                }
 
-		/* -i not valid with outgoing packets */
-		if (options & OPT_VIANAMEIN)
-			if (strcmp(chain, "POSTROUTING") == 0
-			    || strcmp(chain, "OUTPUT") == 0) {
-				exit_error(PARAMETER_PROBLEM,
-					   "Can't use -%c with %s\n",
-					   opt2char(OPT_VIANAMEIN),
-					   chain);
-		}
+                if (strcmp(chain, "POSTROUTING") == 0
+                    || strcmp(chain, "OUTPUT") == 0) {
+                        /* -i not valid with outgoing packets */
+                        if (options & OPT_VIANAMEIN)
+                                exit_error(PARAMETER_PROBLEM,
+                                           "Can't use -%c with %s\n",
+                                           opt2char(OPT_VIANAMEIN),
+                                           chain);
+                        /* -o required with -C */
+                        if (command == CMD_CHECK && !(options&OPT_VIANAMEOUT))
+                                exit_error(PARAMETER_PROBLEM,
+                                           "Need -%c with %s\n",
+                                           opt2char(OPT_VIANAMEOUT),
+                                           chain);
+                }
 
 		if (target && ip6tc_is_chain(jumpto, *handle)) {
 			printf("Warning: using chain %s, not extension\n",
