@@ -210,7 +210,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 		    != udpinfo->spts[1])
 			printf("--sport %u:%u ",
 			       udpinfo->spts[0],
-			       (udpinfo->spts[1]);
+			       udpinfo->spts[1]);
 		else
 			printf("--sport %u ",
 			       udpinfo->spts[0]);
