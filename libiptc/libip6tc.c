@@ -382,6 +382,19 @@ do_check(TC_HANDLE_T h, unsigned int line)
 			assert(h->info.hook_entry[NF_IP6_POST_ROUTING] == n);
 			user_offset = h->info.hook_entry[NF_IP6_POST_ROUTING];
 		}
+	} else if (strcmp(h->info.name, "raw") == 0) {
+		assert(h->info.valid_hooks
+		       == (1 << NF_IP6_PRE_ROUTING
+			   | 1 << NF_IP6_LOCAL_OUT));
+
+		/* Hooks should be first three */
+		assert(h->info.hook_entry[NF_IP6_PRE_ROUTING] == 0);
+
+		n = get_chain_end(h, n);
+		n += get_entry(h, n)->next_offset;
+		assert(h->info.hook_entry[NF_IP6_LOCAL_OUT] == n);
+
+		user_offset = h->info.hook_entry[NF_IP6_LOCAL_OUT];
 	} else {
                 fprintf(stderr, "Unknown table `%s'\n", h->info.name);
 		abort();
