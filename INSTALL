@@ -1,0 +1,29 @@
+FOLLOW THESE STEPS:
+===================
+
+Make sure /usr/src/linux contains the kernel headers you're building
+against.  If /usr/src/linux is an older kernel, set the KERNEL_DIR
+environment variable to point to the current kernel sources.
+
+If you forget the above step, a bogus dependency files with a ".d"
+extension may be created.  If you see messages like:
+	make: *** No rule to make target `include/linux/netfilter_ipv4/ipt_limit.h',
+	needed by `iptables.d'.  Stop.
+
+then you have these bogus dependency files. Do this:
+
+	% make distclean
+
+To build, just do:
+
+	% make
+
+If you want to specify alternate directories for installation (instead
+of /usr/local/  bin lib man), do this:
+
+	% make BINDIR=/usr/bin LIBDIR=/usr/lib MANDIR=/usr/man
+	% make BINDIR=/usr/bin LIBDIR=/usr/lib MANDIR=/usr/man install
+
+NOTE: make sure you build with at least the correct LIBDIR=
+specification, otherwise iptables(8) won't know where to find the
+dynamic objects.
