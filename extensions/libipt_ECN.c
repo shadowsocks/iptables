@@ -6,7 +6,7 @@
  *
  * libipt_ECN.c borrowed heavily from libipt_DSCP.c
  *
- * $Id: libipt_ECN.c,v 1.6 2002/05/29 13:08:16 laforge Exp $
+ * $Id: libipt_ECN.c,v 1.7 2002/05/29 15:11:36 laforge Exp $
  */
 #include <stdio.h>
 #include <string.h>
@@ -92,6 +92,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 				   "ECN target: Value out of range");
 		einfo->operation |= IPT_ECN_OP_SET_IP;
 		einfo->ip_ect = result;
+		*flags |= IPT_ECN_OP_SET_IP;
+		break;
 	default:
 		return 0;
 	}
