@@ -343,7 +343,8 @@ int main(int argc, char *argv[])
                                                 param_len);
                                         *(param_buffer+param_len) = '\0';
 
-					if (!strncmp(param_buffer, "-t", 3)) {
+					if (!strncmp(param_buffer, "-t", 3)
+                                            || !strncmp(param_buffer, "--table", 8)) {
 						exit_error(PARAMETER_PROBLEM, 
 						   "Line %u seems to have a "
 						   "-t table option.\n", line);

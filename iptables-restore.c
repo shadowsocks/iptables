@@ -4,7 +4,7 @@
  *
  * This coude is distributed under the terms of GNU GPL
  *
- * $Id: iptables-restore.c,v 1.16 2001/10/16 09:51:33 laforge Exp $
+ * $Id: iptables-restore.c,v 1.17 2001/10/21 14:11:54 laforge Exp $
  */
 
 #include <getopt.h>
@@ -338,7 +338,8 @@ int main(int argc, char *argv[])
 					*(param_buffer+param_len) = '\0';
 
 					/* check if table name specified */
-					if (!strncmp(param_buffer, "-t", 3)) {
+					if (!strncmp(param_buffer, "-t", 3)
+                                            || !strncmp(param_buffer, "--table", 8)) {
 						exit_error(PARAMETER_PROBLEM, 
 						   "Line %u seems to have a "
 						   "-t table option.\n", line);
