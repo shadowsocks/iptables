@@ -40,16 +40,17 @@ parse_range(const char *arg, struct ipt_connbytes_info *si)
 {
 	char *colon,*p;
 
-	si->from = strtoul(arg,&colon,10);
+	si->count.from = strtoul(arg,&colon,10);
 	if (*colon != ':') 
 		exit_error(PARAMETER_PROBLEM, "Bad range `%s'", arg);
-	si->to = strtoul(colon+1,&p,10);
+	si->count.to = strtoul(colon+1,&p,10);
 	if (p == colon+1) {
 		/* second number omited */
-		si->to = 0xffffffff;
+		si->count.to = 0xffffffff;
 	}
-	if (si->from > si->to)
-		exit_error(PARAMETER_PROBLEM, "%lu should be less than %lu", si->from,si->to);
+	if (si->count.from > si->count.to)
+		exit_error(PARAMETER_PROBLEM, "%llu should be less than %llu",
+			   si->count.from, si->count.to);
 }
 
 /* Function which parses command options; returns true if it
@@ -65,13 +66,13 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (check_inverse(optarg, &invert, optind, 0))
+		if (check_inverse(optarg, &invert, &optind, 0))
 			optind++;
 
 		parse_range(argv[optind-1], sinfo);
 		if (invert) {
 			i = sinfo->count.from;
-			sinfo->count.from = sinfo->to;
+			sinfo->count.from = sinfo->count.to;
 			sinfo->count.to = i;
 		}
 		*flags |= 1;
@@ -90,7 +91,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= 2;
 		break;
 	case '3':
-		if (!stcmp(optarg, "packets"))
+		if (!strcmp(optarg, "packets"))
 			sinfo->what = IPT_CONNBYTES_WHAT_PKTS;
 		else if (!strcmp(optarg, "bytes"))
 			sinfo->what = IPT_CONNBYTES_WHAT_BYTES;
@@ -126,8 +127,9 @@ static void print_mode(struct ipt_connbytes_info *sinfo)
 		case IPT_CONNBYTES_WHAT_AVGPKT:
 			fputs("avgpkt ", stdout);
 			break;
-		case default:
+		default:
 			fputs("unknown ", stdout);
+			break;
 	}
 }
 
@@ -135,13 +137,16 @@ static void print_direction(struct ipt_connbytes_info *sinfo)
 {
 	switch (sinfo->direction) {
 		case IPT_CONNBYTES_DIR_ORIGINAL:
-			fputs("original ");
+			fputs("original ", stdout);
 			break;
 		case IPT_CONNBYTES_DIR_REPLY:
-			fputs("reply ");
+			fputs("reply ", stdout);
 			break;
 		case IPT_CONNBYTES_DIR_BOTH:
-			fputs("both ");
+			fputs("both ", stdout);
+			break;
+		default:
+			fputs("unknown ", stdout);
 			break;
 	}
 }
@@ -154,10 +159,12 @@ print(const struct ipt_ip *ip,
 {
 	struct ipt_connbytes_info *sinfo = (struct ipt_connbytes_info *)match->data;
 
-	if (sinfo->from > sinfo->to) 
-		printf("connbytes ! %lu:%lu ",sinfo->to,sinfo->from);
+	if (sinfo->count.from > sinfo->count.to) 
+		printf("connbytes ! %llu:%llu ", sinfo->count.to,
+			sinfo->count.from);
 	else
-		printf("connbytes %lu:%lu ",sinfo->from,sinfo->to);
+		printf("connbytes %llu:%llu ",sinfo->count.from,
+			sinfo->count.to);
 
 	fputs("connbytes mode ", stdout);
 	print_mode(sinfo);
@@ -172,10 +179,10 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	struct ipt_connbytes_info *sinfo = (struct ipt_connbytes_info *)match->data;
 
 	if (sinfo->count.from > sinfo->count.to) 
-		printf("! --connbytes %lu:%lu ", sinfo->count.to,
+		printf("! --connbytes %llu:%llu ", sinfo->count.to,
 			sinfo->count.from);
 	else
-		printf("--connbytes %lu:%lu ", sinfo->count.from,
+		printf("--connbytes %llu:%llu ", sinfo->count.from,
 			sinfo->count.to);
 
 	fputs("--connbytes-mode ", stdout);
