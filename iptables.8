@@ -382,9 +382,10 @@ ICMP type, or one of the ICMP type names shown by the command
 Match source MAC address.  It must be of the form XX:XX:XX:XX:XX:XX.
 Note that this only makes sense for packets entering the
 .BR PREROUTING ,
+.B FORWARD
 or
 .B INPUT
-chains from an ethernet device.
+chains for packets coming from an ethernet device.
 .SS limit
 This module matches at a limited rate using a token bucket filter: it
 can be used in combination with the LOG target to give limited
