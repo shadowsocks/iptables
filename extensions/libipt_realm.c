@@ -70,12 +70,9 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static void
-print_realm(unsigned long id, unsigned long mask, int invert, int numeric)
+print_realm(unsigned long id, unsigned long mask)
 {
-	if (invert)
-		printf("! ");
-
-	if(mask != 0xffffffff)
+	if (mask != 0xffffffff)
 		printf("0x%lx/0x%lx ", id, mask);
 	else
 		printf("0x%lx ", id);
@@ -87,10 +84,13 @@ print(const struct ipt_ip *ip,
       const struct ipt_entry_match *match,
       int numeric)
 {
+	struct ipt_realm_info *ri = (struct ipt_realm_info *) match->data;
+
+	if (ri->invert)
+		printf("! ");
+
 	printf("REALM match ");
-	print_realm(((struct ipt_realm_info *)match->data)->id,
-		   ((struct ipt_realm_info *)match->data)->mask,
-		   ((struct ipt_realm_info *)match->data)->invert, numeric);
+	print_realm(ri->id, ri->mask);
 }
 
 
@@ -98,10 +98,13 @@ print(const struct ipt_ip *ip,
 static void
 save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 {
+	struct ipt_realm_info *ri = (struct ipt_realm_info *) match->data;
+
+	if (ri->invert)
+		printf("! ");
+
 	printf("--realm ");
-	print_realm(((struct ipt_realm_info *)match->data)->id,
-		   ((struct ipt_realm_info *)match->data)->mask,
-		   ((struct ipt_realm_info *)match->data)->invert, 0);
+	print_realm(ri->id, ri->mask);
 }
 
 /* Final check; must have specified --mark. */
