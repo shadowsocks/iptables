@@ -67,6 +67,7 @@ static u_int8_t
 parse_level(const char *level)
 {
 	unsigned int lev = -1;
+	unsigned int set = 0;
 
 	if (string_to_number(level, 0, 7, &lev) == -1) {
 		unsigned int i = 0;
