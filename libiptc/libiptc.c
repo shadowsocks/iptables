@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.38 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.40 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -471,16 +471,20 @@ correct_cache(TC_HANDLE_T h, unsigned int offset, int delta)
 
 		if (delta < 0) {
 			/* take care about deleted chains */
-			if (cc->start_off >= offset+delta
-			    && cc->end_off <= offset) {
+			if (cc->start_off > offset+delta
+			    && cc->end_off < offset) {
 				/* this chain is within the deleted range,
 				 * let's remove it from the cache */
 				void *start;
 				unsigned int size;
 
 				h->cache_num_chains--;
-				if (i+1 >= h->cache_num_chains)
+
+				/* no need for memmove since we are 
+				 * removing the last entry */
+				if (i >= h->cache_num_chains)
 					continue;
+
 				start = &h->cache_chain_heads[i+1];
 				size = (h->cache_num_chains-i)
 					* sizeof(struct chain_cache);
@@ -943,7 +947,7 @@ delete_rules(unsigned int num_rules, unsigned int rules_size,
 	(*handle)->entries.size -= rules_size;
 
 	/* Fix the chain cache */
-	if (!correct_cache(*handle, offset, -(int)rules_size))
+	if (!correct_cache(*handle, offset+rules_size, -(int)rules_size))
 		return 0;
 
 	return set_verdict(offset, -(int)rules_size, handle);
