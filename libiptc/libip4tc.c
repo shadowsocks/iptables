@@ -382,7 +382,7 @@ do_check(TC_HANDLE_T h, unsigned int line)
 		       == (1 << NF_IP_PRE_ROUTING
 			   | 1 << NF_IP_LOCAL_OUT));
 
-		/* Hooks should be first three */
+		/* Hooks should be first two */
 		assert(h->info.hook_entry[NF_IP_PRE_ROUTING] == 0);
 
 		n = get_chain_end(h, 0);
@@ -390,8 +390,18 @@ do_check(TC_HANDLE_T h, unsigned int line)
 		assert(h->info.hook_entry[NF_IP_LOCAL_OUT] == n);
 
 		user_offset = h->info.hook_entry[NF_IP_LOCAL_OUT];
-	} else
+#ifdef NF_IP_DROPPING
+	} else if (strcmp(h->info.name, "drop") == 0) {
+		assert(h->info.valid_hooks == (1 << NF_IP_DROPPING));
+
+		/* Hook should be first */
+		assert(h->info.hook_entry[NF_IP_DROPPING] == 0);
+		user_offset = 0;
+#endif
+	} else {
+		fprintf(stderr, "Unknown table `s'\n", h->info.name);
 		abort();
+	}
 
 	/* User chain == end of last builtin + policy entry */
 	user_offset = get_chain_end(h, user_offset);
