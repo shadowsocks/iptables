@@ -21,6 +21,12 @@ DEPFILES := $(SHARED_LIBS:%.so=%.d)
 EXTRAS+=iptables iptables.o #iptables-save iptables-restore
 EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables $(DESTDIR)$(MANDIR)/man8/iptables.8 #$(DESTDIR)$(BINDIR)/iptables-save $(DESTDIR)$(BINDIR)/iptables-restore
 
+# Sparc64 hack
+ifeq ($(shell uname -m),sparc64)
+# The kernel is 64-bit, even though userspace is 32.
+CFLAGS+=-DIPT_MIN_MATCH_ALIGN=8 -DIPT_MIN_ENTRY_ALIGN=8
+endif
+
 ifndef IPT_LIBDIR
 IPT_LIBDIR:=$(LIBDIR)/iptables
 endif
