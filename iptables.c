@@ -637,7 +637,8 @@ find_match(const char *name, enum ipt_tryload tryload)
 					   name);
 		} else if (tryload == LOAD_MUST_SUCCEED)
 			exit_error(PARAMETER_PROBLEM,
-				   "Couldn't load match `%s'\n", name);
+				   "Couldn't load match `%s':%s\n", 
+				   name, dlerror());
 	}
 
 	return ptr;
@@ -885,7 +886,8 @@ find_target(const char *name, enum ipt_tryload tryload)
 					   name);
 		} else if (tryload == LOAD_MUST_SUCCEED)
 			exit_error(PARAMETER_PROBLEM,
-				   "Couldn't load target `%s'\n", name);
+				   "Couldn't load target `%s':%s\n", 
+				   name, dlerror());
 	}
 
 	return ptr;
@@ -1717,7 +1719,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			set_option(&options, OPT_JUMP, &fw.ip.invflags,
 				   invert);
 			jumpto = parse_target(optarg);
-			target = find_target(jumpto, TRY_LOAD);
+			target = find_target(jumpto, LOAD_MUST_SUCCEED);
 
 			if (target) {
 				size_t size;
