@@ -7,7 +7,7 @@ experimental: $(EXTRAS_EXP)
 # Have to handle extensions which no longer exist.
 clean: $(EXTRA_CLEANS)
 	rm -f $(SHARED_LIBS) $(EXTRAS) $(EXTRAS_EXP) $(SHARED_LIBS:%.so=%_sh.o)
-	@find . -name '*.[ao]' -name '*.so' | xargs rm -f
+	@find . -name '*.[ao]' -o -name '*.so' | xargs rm -f
 
 install: all $(EXTRA_INSTALLS)
 	@if [ -f /usr/local/bin/iptables -a "$(BINDIR)" = "/usr/local/sbin" ];\
