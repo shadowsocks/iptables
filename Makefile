@@ -10,7 +10,7 @@ OLD_NETFILTER_VERSION:=1.2
 # Waiting for inclusions in the kernel tree.
 PENDING_PATCHES:=dropped-table.patch seqoffset.patch irc-conntrack-nat.patch
 # These went in previous kernels.
-PENDING_PATCHES+=ipv6-fixes.patch.ipv6 masquerade+fwmark.patch nat-overlap.patch ppc-sparc-mangle.patch tos-fix.patch
+PENDING_PATCHES+=ipv6-fixes.patch.ipv6 masquerade+fwmark.patch nat-overlap.patch ppc-sparc-mangle.patch tos-fix.patch masq-dynaddr.patch
 
 LIBDIR:=/usr/local/lib
 BINDIR:=/usr/local/sbin
