@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
 	init_extensions();
 #endif
 
-	while ((c = getopt_long(argc, argv, "bc", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "bcdt:", options, NULL)) != -1) {
 		switch (c) {
 		case 'b':
 			binary = 1;
