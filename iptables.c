@@ -1011,6 +1011,28 @@ register_target(struct iptables_target *me)
 }
 
 static void
+print_num(u_int64_t number, unsigned int format)
+{
+	if (format & FMT_KILOMEGAGIGA) {
+		if (number > 99999) {
+			number = (number + 500) / 1000;
+			if (number > 9999) {
+				number = (number + 500) / 1000;
+				if (number > 9999) {
+					number = (number + 500) / 1000;
+					printf(FMT("%4lluG ","%lluG "),number);
+				}
+				else printf(FMT("%4lluM ","%lluM "), number);
+			} else
+				printf(FMT("%4lluK ","%lluK "), number);
+		} else
+			printf(FMT("%5llu ","%llu "), number);
+	} else
+		printf(FMT("%8llu ","%llu "), number);
+}
+
+
+static void
 print_header(unsigned int format, const char *chain, iptc_handle_t *handle)
 {
 	struct ipt_counters counters;
@@ -1018,9 +1040,13 @@ print_header(unsigned int format, const char *chain, iptc_handle_t *handle)
 	printf("Chain %s", chain);
 	if (pol) {
 		printf(" (policy %s", pol);
-		if (!(format & FMT_NOCOUNTS))
-			printf(" %llu packets, %llu bytes",
-			       counters.pcnt, counters.bcnt);
+		if (!(format & FMT_NOCOUNTS)) {
+			fputc(' ', stdout);
+			print_num(counters.pcnt, (format|FMT_NOTABLE));
+			fputs("packets, ", stdout);
+			print_num(counters.bcnt, (format|FMT_NOTABLE));
+			fputs("bytes", stdout);
+		}
 		printf(")\n");
 	} else {
 		unsigned int refs;
@@ -1055,26 +1081,6 @@ print_header(unsigned int format, const char *chain, iptc_handle_t *handle)
 	printf("\n");
 }
 
-static void
-print_num(u_int64_t number, unsigned int format)
-{
-	if (format & FMT_KILOMEGAGIGA) {
-		if (number > 99999) {
-			number = (number + 500) / 1000;
-			if (number > 9999) {
-				number = (number + 500) / 1000;
-				if (number > 9999) {
-					number = (number + 500) / 1000;
-					printf(FMT("%4lluG ","%lluG "),number);
-				}
-				else printf(FMT("%4lluM ","%lluM "), number);
-			} else
-				printf(FMT("%4lluK ","%lluK "), number);
-		} else
-			printf(FMT("%5llu ","%llu "), number);
-	} else
-		printf(FMT("%8llu ","%llu "), number);
-}
 
 static int
 print_match(const struct ipt_entry_match *m,
