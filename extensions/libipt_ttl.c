@@ -1,7 +1,7 @@
 /* Shared library add-on to iptables to add TTL matching support 
  * (C) 2000 by Harald Welte <laforge@gnumonks.org>
  *
- * libipt_ttl.c,v 1.4 2000/11/13 11:16:08 laforge Exp
+ * $Id: libipt_ttl.c,v 1.4 2000/11/13 11:16:08 laforge Exp $
  *
  * This program is released under the terms of GNU GPL */
 
