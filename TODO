@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.27 2001/04/12 22:24:29 laforge Exp $
+CVS ID: $Id: TODO,v 1.28 2001/04/23 15:25:52 rusty Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -16,7 +16,9 @@ X full tcp window tracking incompatibility with nat helpers [HW]
 - Hard lockup with ip_queue under heavy load (still valid ???)
 - mangle table should use all five netfilter hooks [HW]
 - merge EPRT / EPSV ftp stuff
-- runme error with IPv6 stuff!
+X runme error with IPv6 stuff! [HW]
+- wrong 'Out of window' error message from tcp-windowtracking [HW]
+- SMP conntrack race [RR]
 
 NICE to have:
 - multicast connection tracking
