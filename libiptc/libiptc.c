@@ -356,12 +356,6 @@ static void iptcc_delete_rule(struct rule_head *r)
  * RULESET PARSER (blob -> cache)
  **********************************************************************/
 
-static int alphasort(const void *a, const void *b)
-{
-	return strcmp(((struct chain_head *)a)->name,
-		      ((struct chain_head *)b)->name);
-}
-
 /* Delete policy rule of previous chain, since cache doesn't contain
  * chain policy rules.
  * WARNING: This function has ugly design and relies on a lot of context, only
@@ -397,6 +391,22 @@ static int __iptcc_p_del_policy(TC_HANDLE_T h, unsigned int num)
 	return 0;
 }
 
+/* alphabetically insert a chain into the list */
+static inline void iptc_insert_chain(TC_HANDLE_T h, struct chain_head *c)
+{
+	struct chain_head *tmp;
+
+	list_for_each_entry(tmp, &h->chains, list) {
+		if (strcmp(c->name, tmp->name) <= 0) {
+			list_add(&c->list, tmp->list.prev);
+			return;
+		}
+	}
+
+	/* survived till end of list: add at tail */
+	list_add_tail(&c->list, &h->chains);
+}
+
 /* Another ugly helper function split out of cache_add_entry to make it less
  * spaghetti code */
 static void __iptcc_p_add_chain(TC_HANDLE_T h, struct chain_head *c,
@@ -407,7 +417,8 @@ static void __iptcc_p_add_chain(TC_HANDLE_T h, struct chain_head *c,
 	c->head_offset = offset;
 	c->index = *num;
 
-	list_add_tail(&c->list, &h->chains);
+	iptc_insert_chain(h, c);
+	
 	h->chain_iterator_cur = c;
 }
 
