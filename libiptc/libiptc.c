@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.57 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.56 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -1262,13 +1262,20 @@ TC_INSERT_ENTRY(const IPT_CHAINLABEL chain,
 		return 0;
 	}
 
-	/* Try to get the rule we want to insert after.
-	   In case of no rules, insert after chain head. */
-	r = iptcc_get_rule_num(c, rulenum + 1);
-	if (r)
-		prev = &r->list;
-	else
+	/* If we are inserting at the end just take advantage of the
+	   double linked list, insert will happen before the entry
+	   prev points to. */
+	if (rulenum == c->num_rules) {
 		prev = &c->rules;
+	} else {
+		r = iptcc_get_rule_num(c, rulenum + 1);
+		if (!r) {
+			/* Shouldn't happen */
+			errno = ENOENT;
+			return 0;
+		}
+		prev = &r->list;
+	}
 
 	if (!(r = iptcc_alloc_rule(c, e->next_offset))) {
 		errno = ENOMEM;
@@ -1497,7 +1504,15 @@ TC_DELETE_NUM_ENTRY(const IPT_CHAINLABEL chain,
 		return 0;
 	}
 
-	if (!(r = iptcc_get_rule_num(c, rulenum + 1))) {
+	if (c->num_rules == 0) {
+		errno = E2BIG;
+		return 0;
+	}
+
+	/* Take advantage of the double linked list if possible. */
+	if (rulenum == c->num_rules - 1)
+		r = list_entry(c->rules.prev, struct rule_head, list);
+	else if (!(r = iptcc_get_rule_num(c, rulenum + 1))) {
 		errno = E2BIG;
 		return 0;
 	}
