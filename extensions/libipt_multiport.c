@@ -144,6 +144,10 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 static const char *
 check_proto(const struct ipt_entry *entry)
 {
+	if (entry->ip.invflags & IPT_INV_PROTO)
+		exit_error(PARAMETER_PROBLEM,
+			   "multiport only works with TCP or UDP");
+
 	if (entry->ip.proto == IPPROTO_TCP)
 		return "tcp";
 	else if (entry->ip.proto == IPPROTO_UDP)
