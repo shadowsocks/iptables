@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.31 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.32 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -233,6 +233,9 @@ TC_INIT(const char *tablename)
 	socklen_t s;
 
 	iptc_fn = TC_INIT;
+
+	if (sockfd != -1)
+		close(sockfd);
 
 	sockfd = socket(TC_AF, SOCK_RAW, IPPROTO_RAW);
 	if (sockfd < 0)
