@@ -377,12 +377,12 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 			printf("! ");
 		if (tcpinfo->spts[0]
 		    != tcpinfo->spts[1])
-			printf("--sport %u-%u ",
-			       ntohs(tcpinfo->spts[0]),
-			       ntohs(tcpinfo->spts[1]));
+			printf("--sport %u:%u ",
+			       tcpinfo->spts[0],
+			       tcpinfo->spts[1]);
 		else
 			printf("--sport %u ",
-			       ntohs(tcpinfo->spts[0]));
+			       tcpinfo->spts[0]);
 	}
 
 	if (tcpinfo->dpts[0] != 0
@@ -391,12 +391,12 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 			printf("! ");
 		if (tcpinfo->dpts[0]
 		    != tcpinfo->dpts[1])
-			printf("--dport %u-%u ",
-			       ntohs(tcpinfo->dpts[0]),
-			       ntohs(tcpinfo->dpts[1]));
+			printf("--dport %u:%u ",
+			       tcpinfo->dpts[0],
+			       tcpinfo->dpts[1]);
 		else
 			printf("--dport %u ",
-			       ntohs(tcpinfo->dpts[0]));
+			       tcpinfo->dpts[0]);
 	}
 
 	if (tcpinfo->option
