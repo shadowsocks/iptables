@@ -557,8 +557,7 @@ Matches if the packet was created by a process with the given command name.
 supporting this feature)
 .SS physdev
 This module matches on the bridge port input and output devices enslaved
-to a bridge device. This is only useful if the input device or output device
-is a bridge device. This module is a part of the infrastructure that enables
+to a bridge device. This module is a part of the infrastructure that enables
 a transparent bridging IP firewall and is only useful for kernel versions
 above version 2.5.44.
 .TP
@@ -570,7 +569,8 @@ packets entering the
 and
 .B PREROUTING
 chains). If the interface name ends in a "+", then any
-interface which begins with this name will match.
+interface which begins with this name will match. If the packet didn't arrive
+through a bridge device, this packet won't match this option, unless '!' is used.
 .TP
 .B --physdev-out name
 Name of a bridge port via which a packet is going to be sent (for packets
@@ -585,7 +585,19 @@ interface which begins with this name will match. Note that in the
 .B OUTPUT
 chains one cannot match on the bridge output port, however one can in the
 .B "filter OUTPUT"
-chain.
+chain. If the packet won't leave by a bridge device or it is yet unknown what
+the output device will be, then the packet won't match this option, unless
+'!' is used.
+.TP
+.B --physdev-is-in
+Matches if the packet has entered through a bridge interface.
+.TP
+.B --physdev-is-out
+Matches if the packet will leave through a bridge interface.
+.TP
+.B --physdev-is-bridged
+Matches if the packet is being bridged and therefore is not being routed.
+This is only useful in the FORWARD and POSTROUTING chains.
 .SS pkttype
 This module matches the link-layer packet type.
 .TP

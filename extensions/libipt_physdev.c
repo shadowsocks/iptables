@@ -17,14 +17,20 @@ help(void)
 {
 	printf(
 "physdev v%s options:\n"
-" --physdev-in [!] input name[+]	bridge port name ([+] for wildcard)\n"
+" --physdev-in [!] input name[+]		bridge port name ([+] for wildcard)\n"
 " --physdev-out [!] output name[+]	bridge port name ([+] for wildcard)\n"
+" [!] --physdev-is-in			arrived on a bridge device\n"
+" [!] --physdev-is-out			will leave on a bridge device\n"
+" [!] --physdev-is-bridged		it's a bridged packet\n"
 "\n", IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
 	{ "physdev-in", 1, 0, '1' },
 	{ "physdev-out", 1, 0, '2' },
+	{ "physdev-is-in", 0, 0, '3' },
+	{ "physdev-is-out", 0, 0, '4' },
+	{ "physdev-is-bridged", 0, 0, '5' },
 	{0}
 };
 
@@ -83,26 +89,56 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (*flags & IPT_PHYSDEV_OP_MATCH_IN)
-			exit_error(PARAMETER_PROBLEM,
-				   "multiple --physdev-in not allowed");
+		if (*flags & IPT_PHYSDEV_OP_IN)
+			goto multiple_use;
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_interface(argv[optind-1], info->physindev, info->in_mask);
 		if (invert)
-			info->invert |= IPT_PHYSDEV_OP_MATCH_IN;
-		*flags |= IPT_PHYSDEV_OP_MATCH_IN;
+			info->invert |= IPT_PHYSDEV_OP_IN;
+		info->bitmask |= IPT_PHYSDEV_OP_IN;
+		*flags |= IPT_PHYSDEV_OP_IN;
 		break;
 
 	case '2':
-		if (*flags & IPT_PHYSDEV_OP_MATCH_OUT)
-			exit_error(PARAMETER_PROBLEM,
-				   "multiple --physdev-out not allowed");
+		if (*flags & IPT_PHYSDEV_OP_OUT)
+			goto multiple_use;
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_interface(argv[optind-1], info->physoutdev,
 				info->out_mask);
 		if (invert)
-			info->invert |= IPT_PHYSDEV_OP_MATCH_OUT;
-		*flags |= IPT_PHYSDEV_OP_MATCH_OUT;
+			info->invert |= IPT_PHYSDEV_OP_OUT;
+		info->bitmask |= IPT_PHYSDEV_OP_OUT;
+		*flags |= IPT_PHYSDEV_OP_OUT;
+		break;
+
+	case '3':
+		if (*flags & IPT_PHYSDEV_OP_ISIN)
+			goto multiple_use;
+		check_inverse(optarg, &invert, &optind, 0);
+		info->bitmask |= IPT_PHYSDEV_OP_ISIN;
+		if (invert)
+			info->invert |= IPT_PHYSDEV_OP_ISIN;
+		*flags |= IPT_PHYSDEV_OP_ISIN;
+		break;
+
+	case '4':
+		if (*flags & IPT_PHYSDEV_OP_ISOUT)
+			goto multiple_use;
+		check_inverse(optarg, &invert, &optind, 0);
+		info->bitmask |= IPT_PHYSDEV_OP_ISOUT;
+		if (invert)
+			info->invert |= IPT_PHYSDEV_OP_ISOUT;
+		*flags |= IPT_PHYSDEV_OP_ISOUT;
+		break;
+
+	case '5':
+		if (*flags & IPT_PHYSDEV_OP_BRIDGED)
+			goto multiple_use;
+		check_inverse(optarg, &invert, &optind, 0);
+		if (invert)
+			info->invert |= IPT_PHYSDEV_OP_BRIDGED;
+		*flags |= IPT_PHYSDEV_OP_BRIDGED;
+		info->bitmask |= IPT_PHYSDEV_OP_BRIDGED;
 		break;
 
 	default:
@@ -110,26 +146,16 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	}
 
 	return 1;
+multiple_use:
+	exit_error(PARAMETER_PROBLEM,
+	   "multiple use of the same physdev option is not allowed");
+
 }
 
 static void final_check(unsigned int flags)
 {
-}
-
-static void print_iface(u_int8_t invert, char *dev, char *prefix)
-{
-	char iface[IFNAMSIZ+2];
-
-	if (invert) {
-		iface[0] = '!';
-		iface[1] = '\0';
-	} else
-		iface[0] = '\0';
-
-	if (dev[0] != '\0') {
-		strcat(iface, dev);
-		printf("%s%s", prefix, iface);
-	}
+	if (flags == 0)
+		exit_error(PARAMETER_PROBLEM, "PHYSDEV: no physdev option specified");
 }
 
 static void
@@ -141,10 +167,22 @@ print(const struct ipt_ip *ip,
 		(struct ipt_physdev_info*)match->data;
 
 	printf("PHYSDEV match");
-	print_iface(info->invert & IPT_PHYSDEV_OP_MATCH_IN, info->physindev,
-		    " physindev=");
-	print_iface(info->invert & IPT_PHYSDEV_OP_MATCH_OUT, info->physoutdev,
-		    " physoutdev=");
+	if (info->bitmask & IPT_PHYSDEV_OP_ISIN)
+		printf("%s --physdev-is-in",
+		       info->invert & IPT_PHYSDEV_OP_ISIN ? " !":"");
+	if (info->bitmask & IPT_PHYSDEV_OP_IN)
+		printf("%s --physdev-in %s",
+		(info->invert & IPT_PHYSDEV_OP_IN) ? " !":"", info->physindev);
+
+	if (info->bitmask & IPT_PHYSDEV_OP_ISOUT)
+		printf("%s --physdev-is-out",
+		       info->invert & IPT_PHYSDEV_OP_ISOUT ? " !":"");
+	if (info->bitmask & IPT_PHYSDEV_OP_OUT)
+		printf("%s --physdev-out %s",
+		(info->invert & IPT_PHYSDEV_OP_OUT) ? " !":"", info->physoutdev);
+	if (info->bitmask & IPT_PHYSDEV_OP_BRIDGED)
+		printf("%s --physdev-is-bridged",
+		       info->invert & IPT_PHYSDEV_OP_BRIDGED ? " !":"");
 	printf(" ");
 }
 
@@ -153,10 +191,22 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	struct ipt_physdev_info *info =
 		(struct ipt_physdev_info*)match->data;
 
-	print_iface(info->invert & IPT_PHYSDEV_OP_MATCH_IN, info->physindev,
-		    "--physdev-in ");
-	print_iface(info->invert & IPT_PHYSDEV_OP_MATCH_OUT, info->physoutdev,
-		    "--physdev-out ");
+	if (info->bitmask & IPT_PHYSDEV_OP_ISIN)
+		printf("%s --physdev-is-in",
+		       info->invert & IPT_PHYSDEV_OP_ISIN ? " !":"");
+	if (info->bitmask & IPT_PHYSDEV_OP_IN)
+		printf("%s --physdev-in %s",
+		(info->invert & IPT_PHYSDEV_OP_IN) ? " !":"", info->physindev);
+
+	if (info->bitmask & IPT_PHYSDEV_OP_ISOUT)
+		printf("%s --physdev-is-out",
+		       info->invert & IPT_PHYSDEV_OP_ISOUT ? " !":"");
+	if (info->bitmask & IPT_PHYSDEV_OP_OUT)
+		printf("%s --physdev-out %s",
+		(info->invert & IPT_PHYSDEV_OP_OUT) ? " !":"", info->physoutdev);
+	if (info->bitmask & IPT_PHYSDEV_OP_BRIDGED)
+		printf("%s --physdev-is-bridged",
+		       info->invert & IPT_PHYSDEV_OP_BRIDGED ? " !":"");
 	printf(" ");
 }
 
