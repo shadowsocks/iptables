@@ -10,6 +10,7 @@
 #include <netinet/udp.h>
 #include <net/if.h>
 #include <sys/types.h>
+#include <limits.h>
 #else /* libc5 */
 #include <sys/socket.h>
 #include <linux/ip.h>
