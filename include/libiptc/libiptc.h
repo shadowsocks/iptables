@@ -118,12 +118,29 @@ int iptc_rename_chain(const ipt_chainlabel oldname,
 /* Sets the policy on a built-in chain. */
 int iptc_set_policy(const ipt_chainlabel chain,
 		    const ipt_chainlabel policy,
+		    struct ipt_counters *counters,
 		    iptc_handle_t *handle);
 
 /* Get the number of references to this chain */
 int iptc_get_references(unsigned int *ref,
 			const ipt_chainlabel chain,
 			iptc_handle_t *handle);
+
+/* read packet and byte counters for a specific rule */
+struct ipt_counters *iptc_read_counter(const ipt_chainlabel chain,
+				       unsigned int rulenum,
+				       iptc_handle_t *handle);
+
+/* zero packet and byte counters for a specific rule */
+int iptc_zero_counter(const ipt_chainlabel chain,
+		      unsigned int rulenum,
+		      iptc_handle_t *handle);
+
+/* set packet and byte counters for a specific rule */
+int iptc_set_counter(const ipt_chainlabel chain,
+		     unsigned int rulenum,
+		     struct ipt_counters *counters,
+		     iptc_handle_t *handle);
 
 /* Makes the actual changes. */
 int iptc_commit(iptc_handle_t *handle);

@@ -113,11 +113,28 @@ int ip6tc_rename_chain(const ip6t_chainlabel oldname,
 /* Sets the policy on a built-in chain. */
 int ip6tc_set_policy(const ip6t_chainlabel chain,
 		     const ip6t_chainlabel policy,
+		     struct ip6t_counters *counters,
 		     ip6tc_handle_t *handle);
 
 /* Get the number of references to this chain */
 int ip6tc_get_references(unsigned int *ref, const ip6t_chainlabel chain,
 			 ip6tc_handle_t *handle);
+
+/* read packet and byte counters for a specific rule */
+struct ip6t_counters *ip6tc_read_counter(const ip6t_chainlabel chain,
+					unsigned int rulenum,
+					ip6tc_handle_t *handle);
+
+/* zero packet and byte counters for a specific rule */
+int ip6tc_zero_counter(const ip6t_chainlabel chain,
+		       unsigned int rulenum,
+		       ip6tc_handle_t *handle);
+
+/* set packet and byte counters for a specific rule */
+int ip6tc_set_counter(const ip6t_chainlabel chain,
+		      unsigned int rulenum,
+		      struct ip6t_counters *counters,
+		      ip6tc_handle_t *handle);
 
 /* Makes the actual changes. */
 int ip6tc_commit(ip6tc_handle_t *handle);
