@@ -409,7 +409,7 @@ matchinfo_print(const struct ipt_ip *ip, const struct ipt_entry_match *match, in
 	if(sinfo->flags & IPT_CONNTRACK_STATE) {
 		printf("%sctstate ", optpfx);
         	if (sinfo->invflags & IPT_CONNTRACK_STATE)
-                	fputc('!', stdout);
+                	printf("! ");
 		print_state(sinfo->statemask);
 	}
 
@@ -456,14 +456,14 @@ matchinfo_print(const struct ipt_ip *ip, const struct ipt_entry_match *match, in
 	if(sinfo->flags & IPT_CONNTRACK_STATUS) {
 		printf("%sctstatus ", optpfx);
         	if (sinfo->invflags & IPT_CONNTRACK_STATE)
-                	fputc('!', stdout);
+                	printf("! ");
 		print_status(sinfo->statusmask);
 	}
 
 	if(sinfo->flags & IPT_CONNTRACK_EXPIRES) {
 		printf("%sctexpire ", optpfx);
         	if (sinfo->invflags & IPT_CONNTRACK_EXPIRES)
-                	fputc('!', stdout);
+                	printf("! ");
 
         	if (sinfo->expires_max == sinfo->expires_min)
                 	printf("%lu ", sinfo->expires_min);
