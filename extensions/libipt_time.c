@@ -9,6 +9,8 @@
 #include <linux/netfilter_ipv4/ipt_time.h>
 #include <time.h>
 
+static int globaldays;
+
 /* Function which prints out usage message. */
 static void
 help(void)
@@ -35,8 +37,8 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 {
 	/* caching not yet implemented */
         *nfcache |= NFC_UNKNOWN;
+	globaldays = 0;
 }
-
 
 /**
  * param: part1, a pointer on a string 2 chars maximum long string, that will contain the hours.
@@ -90,9 +92,9 @@ parse_time_string(unsigned int *hour, unsigned int *minute, const char *time)
 	{
                 /* if the number starts with 0, replace it with a space else
                    this string_to_number will interpret it as octal !! */
-                if (hours[0] == '0')
+                if ((hours[0] == '0') && (hours[1] != '\0'))
 			hours[0] = ' ';
-		if (minutes[0] == '0')
+		if ((minutes[0] == '0') && (minutes[1] != '\0'))
 			minutes[0] = ' ';
 
 		if((string_to_number(hours, 0, 23, hour) == -1) ||
@@ -172,7 +174,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       struct ipt_entry_match **match)
 {
 	struct ipt_time_info *timeinfo = (struct ipt_time_info *)(*match)->data;
-	int hours, minutes, days;
+	int hours, minutes;
 
 	switch (c)
 	{
@@ -209,8 +211,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_TIME_DAYS)
                         exit_error(PARAMETER_PROBLEM,
                                    "Can't specify --days twice");
-		parse_days_string(&days, optarg);
-		timeinfo->days_match = days;
+		parse_days_string(&globaldays, optarg);
+		timeinfo->days_match = globaldays;
 		*flags |= IPT_TIME_DAYS;
 		break;
 	default:
