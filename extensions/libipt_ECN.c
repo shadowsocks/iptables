@@ -6,7 +6,7 @@
  *
  * libipt_ECN.c borrowed heavily from libipt_DSCP.c
  *
- * $Id: libipt_ECN.c,v 1.5 2002/05/29 12:43:34 laforge Exp $
+ * $Id: libipt_ECN.c,v 1.6 2002/05/29 13:08:16 laforge Exp $
  */
 #include <stdio.h>
 #include <string.h>
@@ -118,18 +118,19 @@ print(const struct ipt_ip *ip,
 
 	printf("ECN ");
 
-	switch (einfo->operation) {
-		case IPT_ECN_OP_SET_ECE:
+	if (einfo->operation == (IPT_ECN_OP_SET_ECE|IPT_ECN_OP_SET_CWR)
+	    && einfo->proto.tcp.ece == 0
+	    && einfo->proto.tcp.cwr == 0)
+		printf("TCP remove ");
+	else {
+		if (einfo->operation & IPT_ECN_OP_SET_ECE)
 			printf("ECE=%u ", einfo->proto.tcp.ece);
-			break;
-		case IPT_ECN_OP_SET_CWR:
+
+		if (einfo->operation & IPT_ECN_OP_SET_CWR)
 			printf("CWR=%u ", einfo->proto.tcp.cwr);
-			break;
-		case IPT_ECN_OP_SET_IP:
+
+		if (einfo->operation & IPT_ECN_OP_SET_IP)
 			printf("ECT codepoint=%u ", einfo->ip_ect);
-		default:
-			printf("unsupported_ecn_operation ");
-			break;
 	}
 }
 
@@ -140,16 +141,20 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	const struct ipt_ECN_info *einfo =
 		(const struct ipt_ECN_info *)target->data;
 
-	if (einfo->operation & IPT_ECN_OP_SET_ECE) {
-		printf("--ecn-tcp-ece %d ", einfo->proto.tcp.ece);
-	}
+	if (einfo->operation == (IPT_ECN_OP_SET_ECE|IPT_ECN_OP_SET_CWR)
+	    && einfo->proto.tcp.ece == 0
+	    && einfo->proto.tcp.cwr == 0)
+		printf("--ecn-tcp-remove ");
+	else {
 
-	if (einfo->operation & IPT_ECN_OP_SET_CWR) {
-		printf("--ecn-tcp-cwr %d ", einfo->proto.tcp.cwr);
-	}
+		if (einfo->operation & IPT_ECN_OP_SET_ECE)
+			printf("--ecn-tcp-ece %d ", einfo->proto.tcp.ece);
 
-	if (einfo->operation & IPT_ECN_OP_SET_IP) {
-		printf("--ecn-ip-ect %d ", einfo->ip_ect);
+		if (einfo->operation & IPT_ECN_OP_SET_CWR)
+			printf("--ecn-tcp-cwr %d ", einfo->proto.tcp.cwr);
+
+		if (einfo->operation & IPT_ECN_OP_SET_IP)
+			printf("--ecn-ip-ect %d ", einfo->ip_ect);
 	}
 }
 
