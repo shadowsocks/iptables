@@ -196,6 +196,14 @@ struct pprot {
 	u_int8_t num;
 };
 
+/* Primitive headers... */
+#ifndef IPPROTO_ESP
+#define IPPROTO_ESP 50
+#endif
+#ifndef IPPROTO_AH
+#define IPPROTO_AH 51
+#endif
+
 static const struct pprot chain_protos[] = {
 	{ "tcp", IPPROTO_TCP },
 	{ "udp", IPPROTO_UDP },
