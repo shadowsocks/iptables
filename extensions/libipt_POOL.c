@@ -15,6 +15,9 @@
 #include <libippool/ip_pool_support.h>
 
 /* FIXME --RR */
+#define ip_pool_init           ip_POOL_init
+#define ip_pool_get_index      ip_POOL_get_index
+#define ip_pool_get_name       ip_POOL_get_name
 #include "../ippool/libippool.c"
 
 /* Function which prints out usage message. */
