@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.60 2002/03/25 13:54:17 laforge Exp $
+CVS ID: $Id: TODO,v 1.61 2002/03/26 12:54:35 laforge Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -20,12 +20,14 @@ x fix apparent output nat + slip oops bug; see thread at
   http://lists.samba.org/pipermail/netfilter/2001-December/017747.html
 x TFTP helper: works only on second packet?
 x necessary structures for helper match in newnat [HW]
-- port old conntrack/nat helpers to newnat [HW]
+x port old conntrack/nat helpers to newnat [HW]
 - update NAT part of netfilter-hacking-HOWTO to newnat [HW]
 - update packet traversal schematics to represent 5hook-mangle
 - update manpages to include recently submitted extensions
+- remove manually-specified source IP for reject-fakesource patch
 
 TO BE INVESTIGATED:
+- packet counters on ultrasparc platform (32bit userspace/64bit kernel issue)
 - token ring crashes ??
 - iptables-save/restore problems with log-level
 - ip_conntrack rmmod loop (sometimes, Yan's patch?)
@@ -54,6 +56,7 @@ x REJECT optionally generates port unreachable with faked SOURCE
 x add more information like original addresses to the state match
 - libipq runtime version, do before 1.2.5 [JM]
 - add ICMP type-3-code-13 option to REJECT
+- export list of matches/targets via proc-fs
 
 FUTURE extensions:
 - dealing with fragmented expectation-causes (i.e. DCC chat split
