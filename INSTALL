@@ -1,12 +1,8 @@
 FOLLOW THESE STEPS:
-===================
-0) If you want to try some fun extensions, try:
-	% make patch-o-matic KERNEL_DIR=<<where-your-kernel-is>>
 
 1) If /usr/src/linux contains the kernel headers of a recent 2.4
    kernel:
 	% make
-
    Otherwise:
 	% make KERNEL_DIR=<<where-your-kernel-is>>
 
@@ -15,11 +11,28 @@ FOLLOW THESE STEPS:
    Or
 	# make install KERNEL_DIR=<<where-your-kernel-is>>
 
-That's it!
-================
-Problems you may encounter:
+If you are a developer, you can install the libipq headers, like:
+	# make install-devel
 
-1) This package requires a 2.4.0 test9 kernel, or above.
+That's it!
+================================================================
+FEELING BRAVE?
+
+1) If you want to try some extensions, you can do the following:
+	% make patch-o-matic KERNEL_DIR=<<where-your-kernel-is>>
+
+This offers you a collection of maybe-broken maybe-cool third-part
+extensions.  It will modify you kernel source (so back it up first!).
+
+2) If you want to test out `iptables-save' and `iptables-restore', you
+can use
+	% make experimental
+	% make install-experimental
+
+================================================================
+PROBLEMS YOU MAY ENCOUNTER:
+
+1) This package requires a 2.4.0 kernel, or above.
 
 2) If you get the kernel directory wrong, you may see a message like:
 	Please try `make KERNEL_DIR=path-to-correct-kernel'
@@ -33,17 +46,3 @@ Problems you may encounter:
 NOTE: make sure you build with at least the correct LIBDIR=
 specification, otherwise iptables(8) won't know where to find the
 dynamic objects.
-
-
-DEVELOPERS:
-===========
-
-0) If you wish to install iptables development libraries
-   and related components, type:
-   	% make install-devel
-   	
-Development libraries currently installed by the above are:
-  libipq: Userspace packet queueing API
-  
-
-  
