@@ -5,9 +5,10 @@ table, in the
 and
 .B OUTPUT
 chains, and user-defined chains which are only called from those
-chains.  It alters the destination IP address to send the packet to
-the machine itself (locally-generated packets are mapped to the
-127.0.0.1 address).  It takes one option:
+chains.  It redirects the packet to the machine itself by changing the
+destination IP to the primary address of the incoming interface
+(locally-generated packets are mapped to the 127.0.0.1 address).  It
+takes one option:
 .TP
 .BR "--to-ports " "\fIport\fP[-\fIport\fP]"
 This specifies a destination port or range of ports to use: without
