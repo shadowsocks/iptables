@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.30 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.31 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -1734,13 +1734,10 @@ TC_STRERROR(int err)
 		int err;
 		const char *message;
 	} table [] =
-	  { { NULL, 0, "Incompatible with this kernel" },
-	    { NULL, ENOPROTOOPT, "iptables who? (do you need to insmod?)" },
-	    { NULL, ENOSYS, "Will be implemented real soon.  I promise." },
-	    { NULL, ENOMEM, "Memory allocation problem" },
-	    { TC_INIT, EPERM, "Permission denied (you must be root)" },
+	  { { TC_INIT, EPERM, "Permission denied (you must be root)" },
 	    { TC_INIT, EINVAL, "Module is wrong version" },
-	    { TC_INIT, ENOENT, "Table does not exist (do you need to insmod?)" },
+	    { TC_INIT, ENOENT, 
+		    "Table does not exist (do you need to insmod?)" },
 	    { TC_DELETE_CHAIN, ENOTEMPTY, "Chain is not empty" },
 	    { TC_DELETE_CHAIN, EINVAL, "Can't delete built-in chain" },
 	    { TC_DELETE_CHAIN, EMLINK,
@@ -1756,6 +1753,8 @@ TC_STRERROR(int err)
 	    /* EINVAL for CHECK probably means bad interface. */
 	    { TC_CHECK_PACKET, EINVAL,
 	      "Bad arguments (does that interface exist?)" },
+	    { TC_CHECK_PACKET, ENOSYS,
+	      "Checking will most likely never get implemented" },
 	    /* ENOENT for DELETE probably means no matching rule */
 	    { TC_DELETE_ENTRY, ENOENT,
 	      "Bad rule (does a matching rule exist in that chain?)" },
@@ -1763,7 +1762,12 @@ TC_STRERROR(int err)
 	      "Bad built-in chain name" },
 	    { TC_SET_POLICY, EINVAL,
 	      "Bad policy name" },
-	    { NULL, ENOENT, "No chain/target/match by that name" }
+
+	    { NULL, 0, "Incompatible with this kernel" },
+	    { NULL, ENOPROTOOPT, "iptables who? (do you need to insmod?)" },
+	    { NULL, ENOSYS, "Will be implemented real soon.  I promise ;)" },
+	    { NULL, ENOMEM, "Memory allocation problem" },
+	    { NULL, ENOENT, "No chain/target/match by that name" },
 	  };
 
 	for (i = 0; i < sizeof(table)/sizeof(struct table_struct); i++) {
