@@ -26,6 +26,9 @@ int ip6tc_is_chain(const char *chain, const ip6tc_handle_t handle);
 /* Take a snapshot of the rules. Returns NULL on error. */
 ip6tc_handle_t ip6tc_init(const char *tablename);
 
+/* Cleanup after ip6tc_init(). */
+void ip6tc_free(ip6tc_handle_t *h);
+
 /* Iterator functions to run through the chains.  Returns NULL at end. */
 const char *ip6tc_first_chain(ip6tc_handle_t *handle);
 const char *ip6tc_next_chain(ip6tc_handle_t *handle);
