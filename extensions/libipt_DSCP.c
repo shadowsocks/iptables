@@ -7,6 +7,7 @@
  *
  * libipt_DSCP.c borrowed heavily from libipt_TOS.c
  *
+ * --set-class added by Iain Barnes
  */
 #include <stdio.h>
 #include <string.h>
@@ -16,6 +17,40 @@
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_DSCP.h>
+
+
+/* see http://www.iana.org/assignments/dscp-registry */
+
+static struct ds_class 
+{
+	char *class;
+	unsigned int dscp;
+} ds_classes[] = 
+{
+	{ "CS0",   0 },
+	{ "CS1",  0x08 },
+	{ "CS2",  0x10 },
+	{ "CS3",  0x18 },
+	{ "CS3",  0x18 },
+	{ "CS4",  0x20 },
+	{ "CS5",  0x28 },
+	{ "CS6",  0x30 },
+	{ "CS6",  0x38 },
+	{ "BE",    0 },
+	{ "AF11", 0x0a },
+	{ "AF12", 0x0c },
+	{ "AF13", 0x0e },
+	{ "AF21", 0x12 },
+	{ "AF22", 0x14 },
+	{ "AF23", 0x16 },
+	{ "AF31", 0x1a },
+	{ "AF32", 0x1c },
+	{ "AF33", 0x1e },
+	{ "AF41", 0x22 },
+	{ "AF42", 0x24 },
+	{ "AF43", 0x26 },
+	{ "EF",   0x2e }
+};
 
 static void init(struct ipt_entry_target *t, unsigned int *nfcache) 
 {
@@ -28,11 +63,18 @@ static void help(void)
 "  --set-dscp value		Set DSCP field in packet header to value\n"
 "  		                This value can be in decimal (ex: 32)\n"
 "               		or in hex (ex: 0x20)\n"
+"  --set-class class		Set the DSCP field in packet header to the value\n"
+"				represented by the DiffServ class value.\n"
+"				This class may be EF,BE or any of the CSxx "
+"				or AFxx classes.\n"
+"\n"
+"				These two options are mutually exclusive !\n"
 );
 }
 
 static struct option opts[] = {
 	{ "set-dscp", 1, 0, 'F' },
+	{ "set-class", 1, 0, 'G' },
 	{ 0 }
 };
 
@@ -53,6 +95,24 @@ parse_dscp(const unsigned char *s, struct ipt_DSCP_info *dinfo)
     	return;
 }
 
+
+static void
+parse_class(const unsigned char *s, struct ipt_DSCP_info *dinfo)
+{
+	int i;
+
+	for (i = 0; i < sizeof(ds_classes) / sizeof(struct ds_class); i++) {
+		if (!strncasecmp(s, ds_classes[i].class, 
+				strlen(ds_classes[i].class))) {
+			dinfo->dscp = (u_int8_t)ds_classes[i].dscp;
+			return;
+		}
+	}
+
+	exit_error(PARAMETER_PROBLEM, "Invalid DSCP class value '%s'", s);
+}
+
+
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
@@ -67,6 +127,13 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 			           "DSCP target: Only use --set-dscp ONCE!");
 		parse_dscp(optarg, dinfo);
+		*flags = 1;
+		break;
+	case 'G':
+		if (*flags)
+			exit_error(PARAMETER_PROBLEM,
+				   "DSCP target: Only use --set-class ONCE!");
+		parse_class(optarg, dinfo);
 		*flags = 1;
 		break;
 
