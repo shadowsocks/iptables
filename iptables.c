@@ -611,7 +611,7 @@ parse_hostnetworkmask(const char *name, struct in_addr **addrpp,
 }
 
 struct iptables_match *
-find_match(const char *name, int tryload)
+find_match(const char *name, enum ipt_tryload tryload)
 {
 	struct iptables_match *ptr;
 
@@ -620,19 +620,22 @@ find_match(const char *name, int tryload)
 			break;
 	}
 
-	if (!ptr && tryload) {
+	if (!ptr && tryload != DONT_LOAD) {
 		char path[sizeof(IPT_LIB_DIR) + sizeof("/libipt_.so")
 			 + strlen(name)];
 		sprintf(path, IPT_LIB_DIR "/libipt_%s.so", name);
 		if (dlopen(path, RTLD_NOW)) {
 			/* Found library.  If it didn't register itself,
 			   maybe they specified target as match. */
-			ptr = find_match(name, 0);
+			ptr = find_match(name, DONT_LOAD);
+
 			if (!ptr)
 				exit_error(PARAMETER_PROBLEM,
 					   "Couldn't load match `%s'\n",
 					   name);
-		}
+		} else if (tryload == LOAD_MUST_SUCCEED)
+			exit_error(PARAMETER_PROBLEM,
+				   "Couldn't load match `%s'\n", name);
 	}
 
 	return ptr;
@@ -836,7 +839,7 @@ set_option(unsigned int *options, unsigned int option, u_int8_t *invflg,
 }
 
 struct iptables_target *
-find_target(const char *name, int tryload)
+find_target(const char *name, enum ipt_tryload tryload)
 {
 	struct iptables_target *ptr;
 
@@ -853,19 +856,21 @@ find_target(const char *name, int tryload)
 			break;
 	}
 
-	if (!ptr && tryload) {
+	if (!ptr && tryload != DONT_LOAD) {
 		char path[sizeof(IPT_LIB_DIR) + sizeof("/libipt_.so")
 			 + strlen(name)];
 		sprintf(path, IPT_LIB_DIR "/libipt_%s.so", name);
 		if (dlopen(path, RTLD_NOW)) {
 			/* Found library.  If it didn't register itself,
 			   maybe they specified match as a target. */
-			ptr = find_target(name, 0);
+			ptr = find_target(name, DONT_LOAD);
 			if (!ptr)
 				exit_error(PARAMETER_PROBLEM,
 					   "Couldn't load target `%s'\n",
 					   name);
-		}
+		} else if (tryload == LOAD_MUST_SUCCEED)
+			exit_error(PARAMETER_PROBLEM,
+				   "Couldn't load target `%s'\n", name);
 	}
 
 	return ptr;
@@ -904,7 +909,7 @@ register_match(struct iptables_match *me)
 		exit(1);
 	}
 
-	if (find_match(me->name, 0)) {
+	if (find_match(me->name, DONT_LOAD)) {
 		fprintf(stderr, "%s: match `%s' already registered.\n",
 			program_name, me->name);
 		exit(1);
@@ -928,7 +933,7 @@ register_target(struct iptables_target *me)
 		exit(1);
 	}
 
-	if (find_target(me->name, 0)) {
+	if (find_target(me->name, DONT_LOAD)) {
 		fprintf(stderr, "%s: target `%s' already registered.\n",
 			program_name, me->name);
 		exit(1);
@@ -1014,7 +1019,7 @@ print_match(const struct ipt_entry_match *m,
 	    const struct ipt_ip *ip,
 	    int numeric)
 {
-	struct iptables_match *match = find_match(m->u.user.name, 1);
+	struct iptables_match *match = find_match(m->u.user.name, TRY_LOAD);
 
 	if (match) {
 		if (match->print)
@@ -1044,9 +1049,9 @@ print_firewall(const struct ipt_entry *fw,
 	   `REJECT' target module.  Keep feeding them rope until the
 	   revolution... Bwahahahahah */
 	if (!iptc_is_chain(targname, handle))
-		target = find_target(targname, 1);
+		target = find_target(targname, TRY_LOAD);
 	else
-		target = find_target(IPT_STANDARD_TARGET, 1);
+		target = find_target(IPT_STANDARD_TARGET, LOAD_MUST_SUCCEED);
 
 	t = ipt_get_target((struct ipt_entry *)fw);
 	flags = fw->ip.flags;
@@ -1626,7 +1631,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 
 			/* iptables -p icmp -h */
 			if (!iptables_matches && protocol)
-			    find_match(protocol, 1);
+				find_match(protocol, TRY_LOAD);
 
 			exit_printhelp();
 
@@ -1675,7 +1680,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			set_option(&options, OPT_JUMP, &fw.ip.invflags,
 				   invert);
 			jumpto = parse_target(optarg);
-			target = find_target(jumpto, 1);
+			target = find_target(jumpto, TRY_LOAD);
 
 			if (target) {
 				size_t size;
@@ -1727,26 +1732,22 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			verbose++;
 			break;
 
-		case 'm':
+		case 'm': {
+			size_t size;
+
 			if (invert)
 				exit_error(PARAMETER_PROBLEM,
 					   "unexpected ! flag before --match");
 
-			m = find_match(optarg, 1);
-			if (!m)
-				exit_error(PARAMETER_PROBLEM,
-					   "Couldn't load match `%s'", optarg);
-			else {
-				size_t size;
-
-				size = IPT_ALIGN(sizeof(struct ipt_entry_match)
-						 + m->size);
-				m->m = fw_calloc(1, size);
-				m->m->u.match_size = size;
-				strcpy(m->m->u.user.name, optarg);
-				m->init(m->m, &fw.nfcache);
-			}
-			break;
+			m = find_match(optarg, LOAD_MUST_SUCCEED);
+			size = IPT_ALIGN(sizeof(struct ipt_entry_match)
+					 + m->size);
+			m->m = fw_calloc(1, size);
+			m->m->u.match_size = size;
+			strcpy(m->m->u.user.name, optarg);
+			m->init(m->m, &fw.nfcache);
+		}
+		break;
 
 		case 'n':
 			set_option(&options, OPT_NUMERIC, &fw.ip.invflags,
@@ -1813,8 +1814,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				   acually hear this code suck. */
 				if (m == NULL
 				    && protocol
-				    && !find_match(protocol, 0)
-				    && (m = find_match(protocol, 1))) {
+				    && !find_match(protocol, DONT_LOAD)
+				    && (m = find_match(protocol, TRY_LOAD))) {
 					/* Try loading protocol */
 					size_t size;
 
@@ -1934,11 +1935,9 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		    && (strlen(jumpto) == 0
 			|| iptc_is_chain(jumpto, *handle))) {
 			size_t size;
-			target = find_target(IPT_STANDARD_TARGET, 1);
 
-			if (!target)
-				exit_error(OTHER_PROBLEM,
-					   "Can't find standard target\n");
+			target = find_target(IPT_STANDARD_TARGET,
+					     LOAD_MUST_SUCCEED);
 
 			size = sizeof(struct ipt_entry_target)
 				+ target->size;

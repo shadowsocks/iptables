@@ -123,7 +123,8 @@ static void print_rule(const struct ipt_entry *e, int counters)
 
 	/* Print matchinfo part */
 	if (e->match_name[0]) {
-		struct iptables_match *match = find_match(e->match_name, 1);
+		struct iptables_match *match
+			= find_match(e->match_name, TRY_LOAD);
 
 		if (match)
 			match->save(e);
@@ -142,7 +143,7 @@ static void print_rule(const struct ipt_entry *e, int counters)
 	/* Print targinfo part */
 	if (e->target_name[0]) {
 		struct iptables_target *target
-			= find_target(e->target_name, 1);
+			= find_target(e->target_name, TRY_LOAD);
 
 		if (target)
 			target->save(e);
