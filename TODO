@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.21 2001/02/07 16:27:20 laforge Exp $
+CVS ID: $Id: TODO,v 1.22 2001/02/18 16:12:45 laforge Exp $
 
 IMPORTANT before iptables-1.2.1 release:
 X generic tcp sequence number offset support for nat helpers [HW]
@@ -39,6 +39,8 @@ X port matches (owner, limit, multiport, owner) to IPv6 [RJ]
 - integrate the ipt_NETLINK target from gianni@ecsc.co.uk
 X integrate PSD target / port it as match [HW]
 - various NAT performance optimizations possible! (which? ask HW)
+- ip_nat_ident module
+- provide daily CVS snapshots via fto [HW]
 
 ======================================================================
 [RR]	Paul 'Rusty' Russel <rusty@linuxcare.com.au>
