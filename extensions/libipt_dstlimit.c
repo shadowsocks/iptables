@@ -295,7 +295,7 @@ print(const struct ipt_ip *ip,
 		printf("htable-size %u ", r->cfg.size);
 	if (r->cfg.max)
 		printf("htable-max %u ", r->cfg.max);
-	if (r->cfg.gc_interval != IPT_DSTLIMIT_GCINTEVAL)
+	if (r->cfg.gc_interval != IPT_DSTLIMIT_GCINTERVAL)
 		printf("htable-gcinterval %u ", r->cfg.gc_interval);
 	if (r->cfg.expire != IPT_DSTLIMIT_EXPIRE)
 		printf("htable-expire %u ", r->cfg.expire);
