@@ -46,9 +46,9 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		= (struct ipt_mark_target_info *)(*target)->data;
 
 	switch (c) {
-		char *end;
 	case '1':
-		if (string_to_number(optarg, 0, 0xfffff, &markinfo->mark))
+		if (string_to_number(optarg, 0, 0xffffffff, 
+				     (unsigned int *)&markinfo->mark))
 			exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
