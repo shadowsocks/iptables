@@ -1231,17 +1231,16 @@ delete_entry(const ip6t_chainlabel chain,
 {
 	unsigned int i, j;
 	int ret = 1;
-	struct ip6t_entry ipfw = *fw;
 	unsigned char *mask;
 
 	mask = make_delete_mask(fw);
 	for (i = 0; i < nsaddrs; i++) {
-		ipfw.ipv6.src = saddrs[i];
+		fw->ipv6.src = saddrs[i];
 		for (j = 0; j < ndaddrs; j++) {
-			ipfw.ipv6.dst = daddrs[j];
+			fw->ipv6.dst = daddrs[j];
 			if (verbose)
 				print_firewall_line(fw, *handle);
-			ret &= ip6tc_delete_entry(chain, &ipfw, mask, handle);
+			ret &= ip6tc_delete_entry(chain, fw, mask, handle);
 		}
 	}
 	return ret;

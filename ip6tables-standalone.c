@@ -43,7 +43,7 @@ main(int argc, char *argv[])
 		ret = ip6tc_commit(&handle);
 
 	if (!ret)
-		fprintf(stderr, "iptables: %s\n",
+		fprintf(stderr, "ip6tables: %s\n",
 			ip6tc_strerror(errno));
 
 	exit(!ret);
