@@ -191,7 +191,7 @@ iptables.8: iptables.8.in extensions/libipt_matches.man extensions/libipt_target
 	sed -e '/@MATCH@/ r extensions/libipt_matches.man' -e '/@TARGET@/ r extensions/libipt_targets.man' iptables.8.in >iptables.8
 
 ip6tables.8: ip6tables.8.in extensions/libip6t_matches.man extensions/libip6t_targets.man
-	sed -e '/@MATCH@/ r extensions/libip6t_matches.man' -e '/@TARGET@/ r extensions/libiptt_targets.man' ip6tables.8.in >ip6tables.8
+	sed -e '/@MATCH@/ r extensions/libip6t_matches.man' -e '/@TARGET@/ r extensions/libip6t_targets.man' ip6tables.8.in >ip6tables.8
 
 # Development Targets
 .PHONY: install-devel-man3
