@@ -840,7 +840,7 @@ parse_interface(const char *arg, char *vianame, unsigned char *mask)
 			   " (%i)", arg, IFNAMSIZ-1);
 
 	strcpy(vianame, arg);
-	if (vialen == 0)
+	if ((vialen == 0) || (vialen == 1 && vianame[0] == '+'))
 		memset(mask, 0, IFNAMSIZ);
 	else if (vianame[vialen - 1] == '+') {
 		memset(mask, 0xFF, vialen - 1);
