@@ -189,7 +189,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '2':
-		check_inverse(optarg, &invert, &optdind, 0);
+		check_inverse(optarg, &invert, &optind, 0);
 
 		if(invert)
 			sinfo->invflags |= IPT_CONNTRACK_PROTO;
