@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.46 2001/09/02 14:03:02 laforge Exp $
+CVS ID: $Id: TODO,v 1.47 2001/09/21 11:59:23 jamesm Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -30,6 +30,7 @@ X IPv6 REJECT target doesn't have extension plugin ?!?
 X pending minor ip_queue updates [JM]
 - --mac-source not working in FORWARD (manpage bug?)
 - netfilter hooks should give error if same function registers twice [HW]
+- speed issues (mark_source_chains, Robert Olsson)
 
 NICE to have:
 - make RPC conntrack work again
