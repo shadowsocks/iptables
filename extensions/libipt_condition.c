@@ -41,11 +41,11 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	check_inverse(optarg, &invert, &optind, 0);
 
-	if (*flags)
-		exit_error(PARAMETER_PROBLEM,
-			   "Can't specify multiple conditions");
-
 	if (c == 'X') {
+		if (*flags)
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify multiple conditions");
+
 		if (strlen(argv[optind - 1]) < CONDITION_NAME_LEN)
 			strcpy(info->name, argv[optind - 1]);
 		else
