@@ -6,7 +6,7 @@
  *
  * libipt_ECN.c borrowed heavily from libipt_DSCP.c
  *
- * $Id: libipt_ECN.c,v 1.2 2002/02/18 21:32:56 laforge Exp $
+ * $Id: libipt_ECN.c,v 1.3 2002/04/10 13:12:53 laforge Exp $
  */
 #include <stdio.h>
 #include <string.h>
@@ -25,13 +25,20 @@ static void help(void)
 {
 	printf(
 "ECN target options\n"
-"  --ecn-remove			Remove all ECN bits which may be present\n"
+"  --ecn-tcp-remove		Remove all ECN bits which may be present\n"
 "  		                in the IPv4 header\n"
+"ECN target EXPERIMENTAL options (use with extreme care!)\n"
+"  --ecn-ip-ect			Set the IPv4 ECT codepoint (0 to 3)\n"
+"  --ecn-tcp-cwr		Set the IPv4 CWR bit (0 or 1)\n"
+"  --ecn-tcp-ece		Set the IPv4 CWR bit (0 or 1)\n"
 );
 }
 
 static struct option opts[] = {
-	{ "ecn-remove", 1, 0, 'F' },
+	{ "ecn-tcp-remove", 0, 0, 'F' },
+	{ "ecn-tcp-cwr", 1, 0, 'G' },
+	{ "ecn-tcp-ece", 1, 0, 'H' },
+	{ "ecn-ip-ect", 1, 0, '9' },
 	{ 0 }
 };
 
@@ -40,6 +47,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
       struct ipt_entry_target **target)
 {
+	unsigned int result;
 	struct ipt_ECN_info *einfo
 		= (struct ipt_ECN_info *)(*target)->data;
 
@@ -47,11 +55,43 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	case 'F':
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
-			           "ECN target: Only use --ecn-remove ONCE!");
-		einfo->operation = IPT_ECN_OP_REMOVE;
+			        "ECN target: Only use --ecn-tcp-remove ONCE!");
+		einfo->operation = IPT_ECN_OP_SET_ECE | IPT_ECN_OP_SET_CWR;
+		einfo->proto.tcp.ece = 0;
+		einfo->proto.tcp.cwr = 0;
 		*flags = 1;
 		break;
-
+	case 'G':
+		if (*flags & IPT_ECN_OP_SET_CWR)
+			exit_error(PARAMETER_PROBLEM,
+				"ECN target: Only use --ecn-tcp-cwr ONCE!");
+		if (string_to_number(optarg, 0, 1, &result))
+			exit_error(PARAMETER_PROBLEM,
+				   "ECN target: Value out of range");
+		einfo->operation |= IPT_ECN_OP_SET_CWR;
+		einfo->proto.tcp.cwr = result;
+		*flags |= IPT_ECN_OP_SET_CWR;
+		break;
+	case 'H':
+		if (*flags & IPT_ECN_OP_SET_ECE)
+			exit_error(PARAMETER_PROBLEM,
+				"ECN target: Only use --ecn-tcp-ece ONCE!");
+		if (string_to_number(optarg, 0, 1, &result))
+			exit_error(PARAMETER_PROBLEM,
+				   "ECN target: Value out of range");
+		einfo->operation |= IPT_ECN_OP_SET_ECE;
+		einfo->proto.tcp.ece = result;
+		*flags |= IPT_ECN_OP_SET_ECE;
+		break;
+	case '9':
+		if (*flags & IPT_ECN_OP_SET_IP)
+			exit_error(PARAMETER_PROBLEM,
+				"ECN target: Only use --ecn-ip-ect ONCE!");
+		if (string_to_number(optarg, 0, 3, &result))
+			exit_error(PARAMETER_PROBLEM,
+				   "ECN target: Value out of range");
+		einfo->operation |= IPT_ECN_OP_SET_IP;
+		einfo->ip_ect = result;
 	default:
 		return 0;
 	}
@@ -79,9 +119,14 @@ print(const struct ipt_ip *ip,
 	printf("ECN ");
 
 	switch (einfo->operation) {
-		case IPT_ECN_OP_REMOVE:
-			printf("remove ");
+		case IPT_ECN_OP_SET_ECE:
+			printf("ECE=%u ", einfo->proto.tcp.ece);
 			break;
+		case IPT_ECN_OP_SET_CWR:
+			printf("CWR=%u ", einfo->proto.tcp.cwr);
+			break;
+		case IPT_ECN_OP_SET_IP:
+			printf("ECT codepoint=%u ", einfo->ip_ect);
 		default:
 			printf("unsupported_ecn_operation ");
 			break;
@@ -95,10 +140,16 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	const struct ipt_ECN_info *einfo =
 		(const struct ipt_ECN_info *)target->data;
 
-	switch (einfo->operation) {
-		case IPT_ECN_OP_REMOVE:
-			printf("--ecn-remove ");
-			break;
+	if (einfo->operation & IPT_ECN_OP_SET_ECE) {
+		printf("--ecn-tcp-ece %d ", einfo->proto.tcp.ece);
+	}
+
+	if (einfo->operation & IPT_ECN_OP_SET_CWR) {
+		printf("--ecn-tcp-cwr %d ", einfo->proto.tcp.cwr);
+	}
+
+	if (einfo->operation & IPT_ECN_OP_SET_IP) {
+		printf("--ecn-ip-ect %d ", einfo->ip_ect);
 	}
 }
 

@@ -4,22 +4,28 @@
  *
  * This software is distributed under GNU GPL v2, 1991
  * 
- * ipt_ECN.h,v 1.1 2002/02/17 21:30:16 laforge Exp
+ * $Id: ipt_ECN.h,v 1.2 2002/04/17 19:52:26 laforge Exp $
 */
-#ifndef _IPT_DSCP_H
-#define _IPT_DSCP_H
+#ifndef _IPT_ECN_TARGET_H
+#define _IPT_ECN_TARGET_H
 #include <linux/netfilter_ipv4/ipt_DSCP.h>
 
-#define IPT_ECN_MASK	(~IPT_DSCP_MASK)
+#define IPT_ECN_IP_MASK	(~IPT_DSCP_MASK)
 
-enum ipt_ecn_operation {
-	IPT_ECN_OP_NONE = 0,
-	IPT_ECN_OP_REMOVE,
-};
-#define IPT_ECN_OP_MAX	IPT_ECN_OP_REMOVE
+#define IPT_ECN_OP_SET_IP	0x01	/* set ECN bits of IPv4 header */
+#define IPT_ECN_OP_SET_ECE	0x10	/* set ECE bit of TCP header */
+#define IPT_ECN_OP_SET_CWR	0x20	/* set CWR bit of TCP header */
+
+#define IPT_ECN_OP_MASK		0xce
 
 struct ipt_ECN_info {
-	enum ipt_ecn_operation operation;
+	u_int8_t operation;	/* bitset of operations */
+	u_int8_t ip_ect;	/* ECT codepoint of IPv4 header, pre-shifted */
+	union {
+		struct {
+			u_int8_t ece:1, cwr:1; /* TCP ECT bits */
+		} tcp;
+	} proto;
 };
 
-#endif /* _IPT_ECN_H */
+#endif /* _IPT_ECN_TARGET_H */
