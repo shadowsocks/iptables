@@ -184,11 +184,10 @@ dump_entry(STRUCT_ENTRY *e, const TC_HANDLE_T handle)
 	return 0;
 }
 
-static int
+static unsigned char *
 is_same(const STRUCT_ENTRY *a, const STRUCT_ENTRY *b, unsigned char *matchmask)
 {
 	unsigned int i;
-	STRUCT_ENTRY_TARGET *ta, *tb;
 	unsigned char *mptr;
 
 	/* Always compare head structures: ignore mask here. */
@@ -199,43 +198,31 @@ is_same(const STRUCT_ENTRY *a, const STRUCT_ENTRY *b, unsigned char *matchmask)
 	    || a->ip.proto != b->ip.proto
 	    || a->ip.flags != b->ip.flags
 	    || a->ip.invflags != b->ip.invflags)
-		return 0;
+		return NULL;
 
 	for (i = 0; i < IFNAMSIZ; i++) {
 		if (a->ip.iniface_mask[i] != b->ip.iniface_mask[i])
-			return 0;
+			return NULL;
 		if ((a->ip.iniface[i] & a->ip.iniface_mask[i])
 		    != (b->ip.iniface[i] & b->ip.iniface_mask[i]))
-			return 0;
+			return NULL;
 		if (a->ip.outiface_mask[i] != b->ip.outiface_mask[i])
-			return 0;
+			return NULL;
 		if ((a->ip.outiface[i] & a->ip.outiface_mask[i])
 		    != (b->ip.outiface[i] & b->ip.outiface_mask[i]))
-			return 0;
+			return NULL;
 	}
 
 	if (a->nfcache != b->nfcache
 	    || a->target_offset != b->target_offset
 	    || a->next_offset != b->next_offset)
-		return 0;
+		return NULL;
 
 	mptr = matchmask + sizeof(STRUCT_ENTRY);
 	if (IPT_MATCH_ITERATE(a, match_different, a->elems, b->elems, &mptr))
-		return 0;
+		return NULL;
 
-	ta = GET_TARGET((STRUCT_ENTRY *)a);
-	tb = GET_TARGET((STRUCT_ENTRY *)b);
-	if (ta->u.target_size != tb->u.target_size)
-		return 0;
-	if (strcmp(ta->u.user.name, tb->u.user.name) != 0)
-		return 0;
-
-	mptr += sizeof(*ta);
-	if (target_different(ta->data, tb->data,
-			     ta->u.target_size - sizeof(*ta), mptr))
-		return 0;
-
-   	return 1;
+	return mptr;
 }
 
 #if 0

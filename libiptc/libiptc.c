@@ -1238,7 +1238,7 @@ iptcc_map_target(const TC_HANDLE_T handle,
 	memset(t->u.user.name + strlen(t->u.user.name),
 	       0,
 	       FUNCTION_MAXNAMELEN - strlen(t->u.user.name));
-
+	r->type = IPTCC_R_MODULE;
 	set_changed(handle);
 	return 1;
 }
@@ -1413,20 +1413,42 @@ match_different(const STRUCT_ENTRY_MATCH *a,
 }
 
 static inline int
-target_different(const unsigned char *a_targdata,
-		 const unsigned char *b_targdata,
-		 unsigned int tdatasize,
-		 const unsigned char *mask)
+target_same(struct rule_head *a, struct rule_head *b,const unsigned char *mask)
 {
 	unsigned int i;
-	for (i = 0; i < tdatasize; i++)
-		if (((a_targdata[i] ^ b_targdata[i]) & mask[i]) != 0)
-			return 1;
+	STRUCT_ENTRY_TARGET *ta, *tb;
 
-	return 0;
+	if (a->type != b->type)
+		return 0;
+
+	ta = GET_TARGET(a->entry);
+	tb = GET_TARGET(b->entry);
+
+	switch (a->type) {
+	case IPTCC_R_FALLTHROUGH:
+		return 1;
+	case IPTCC_R_JUMP:
+		return a->jump == b->jump;
+	case IPTCC_R_STANDARD:
+		return ((STRUCT_STANDARD_TARGET *)ta)->verdict
+			== ((STRUCT_STANDARD_TARGET *)tb)->verdict;
+	case IPTCC_R_MODULE:
+		if (ta->u.target_size != tb->u.target_size)
+			return 0;
+		if (strcmp(ta->u.user.name, tb->u.user.name) != 0)
+			return 0;
+
+		for (i = 0; i < ta->u.target_size - sizeof(*ta); i++)
+			if (((ta->data[i] ^ ta->data[i]) & mask[i]) != 0)
+				return 0;
+		return 1;
+	default:
+		fprintf(stderr, "ERROR: bad type %i\n", a->type);
+		abort();
+	}
 }
 
-static int
+static unsigned char *
 is_same(const STRUCT_ENTRY *a,
 	const STRUCT_ENTRY *b,
 	unsigned char *matchmask);
@@ -1463,24 +1485,30 @@ TC_DELETE_ENTRY(const IPT_CHAINLABEL chain,
 	}
 
 	list_for_each_entry(i, &c->rules, list) {
-		if (r->type == i->type
-		    && is_same(r->entry, i->entry, matchmask)) {
-			/* If we are about to delete the rule that is the
-			 * current iterator, move rule iterator back.  next
-			 * pointer will then point to real next node */
-			if (i == (*handle)->rule_iterator_cur) {
-				(*handle)->rule_iterator_cur = 
-					list_entry((*handle)->rule_iterator_cur->list.prev,
-						   struct rule_head, list);
-			}
+		unsigned char *mask;
 
-			c->num_rules--;
-			iptcc_delete_rule(i);
+		mask = is_same(r->entry, i->entry, matchmask);
+		if (!mask)
+			continue;
 
-			set_changed(*handle);
-			free(r);
-			return 1;
+		if (!target_same(r, i, mask))
+			continue;
+
+		/* If we are about to delete the rule that is the
+		 * current iterator, move rule iterator back.  next
+		 * pointer will then point to real next node */
+		if (i == (*handle)->rule_iterator_cur) {
+			(*handle)->rule_iterator_cur = 
+				list_entry((*handle)->rule_iterator_cur->list.prev,
+					   struct rule_head, list);
 		}
+
+		c->num_rules--;
+		iptcc_delete_rule(i);
+
+		set_changed(*handle);
+		free(r);
+		return 1;
 	}
 
 	free(r);

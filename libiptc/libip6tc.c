@@ -214,12 +214,11 @@ dump_entry(struct ip6t_entry *e, const ip6tc_handle_t handle)
 	return 0;
 }
 
-static int
+static unsigned char *
 is_same(const STRUCT_ENTRY *a, const STRUCT_ENTRY *b,
 	unsigned char *matchmask)
 {
 	unsigned int i;
-	STRUCT_ENTRY_TARGET *ta, *tb;
 	unsigned char *mptr;
 
 	/* Always compare head structures: ignore mask here. */
@@ -231,43 +230,31 @@ is_same(const STRUCT_ENTRY *a, const STRUCT_ENTRY *b,
 	    || a->ipv6.tos != b->ipv6.tos
 	    || a->ipv6.flags != b->ipv6.flags
 	    || a->ipv6.invflags != b->ipv6.invflags)
-		return 0;
+		return NULL;
 
 	for (i = 0; i < IFNAMSIZ; i++) {
 		if (a->ipv6.iniface_mask[i] != b->ipv6.iniface_mask[i])
-			return 0;
+			return NULL;
 		if ((a->ipv6.iniface[i] & a->ipv6.iniface_mask[i])
 		    != (b->ipv6.iniface[i] & b->ipv6.iniface_mask[i]))
-			return 0;
+			return NULL;
 		if (a->ipv6.outiface_mask[i] != b->ipv6.outiface_mask[i])
-			return 0;
+			return NULL;
 		if ((a->ipv6.outiface[i] & a->ipv6.outiface_mask[i])
 		    != (b->ipv6.outiface[i] & b->ipv6.outiface_mask[i]))
-			return 0;
+			return NULL;
 	}
 
 	if (a->nfcache != b->nfcache
 	    || a->target_offset != b->target_offset
 	    || a->next_offset != b->next_offset)
-		return 0;
+		return NULL;
 
 	mptr = matchmask + sizeof(STRUCT_ENTRY);
 	if (IP6T_MATCH_ITERATE(a, match_different, a->elems, b->elems, &mptr))
-		return 0;
+		return NULL;
 
-	ta = GET_TARGET((STRUCT_ENTRY *)a);
-	tb = GET_TARGET((STRUCT_ENTRY *)b);
-	if (ta->u.target_size != tb->u.target_size)
-		return 0;
-	if (strcmp(ta->u.user.name, tb->u.user.name) != 0)
-		return 0;
-	mptr += sizeof(*ta);
-
-	if (target_different(ta->data, tb->data,
-			     ta->u.target_size - sizeof(*ta), mptr))
-		return 0;
-
-	return 1;
+	return mptr;
 }
 
 /* All zeroes == unconditional rule. */
