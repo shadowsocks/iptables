@@ -2339,11 +2339,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		e = NULL;
 	}
 
-	for (c = 0; c < nsaddrs; c++)
-		free(&saddrs[c]);
-
-	for (c = 0; c < ndaddrs; c++)
-		free(&daddrs[c]);
+	free(saddrs);
+	free(daddrs);
 
 	if (opts != original_opts) {
 		free(opts);
