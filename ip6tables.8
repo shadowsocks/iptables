@@ -27,23 +27,23 @@
 .SH NAME
 ip6tables \- IPv6 packet filter administration
 .SH SYNOPSIS
-.BR "ip6tables -[ADC] " "chain rule-specification [options]"
+.BR "ip6tables [-t table] -[ADC] " "chain rule-specification [options]"
 .br
-.BR "ip6tables -I " "chain [rulenum] rule-specification [options]"
+.BR "ip6tables [-t table] -I " "chain [rulenum] rule-specification [options]"
 .br
-.BR "ip6tables -R " "chain rulenum rule-specification [options]"
+.BR "ip6tables [-t table] -R " "chain rulenum rule-specification [options]"
 .br
-.BR "ip6tables -D " "chain rulenum [options]"
+.BR "ip6tables [-t table] -D " "chain rulenum [options]"
 .br
-.BR "ip6tables -[LFZ] " "[chain] [options]"
+.BR "ip6tables [-t table] -[LFZ] " "[chain] [options]"
 .br
-.BR "ip6tables -N " "chain"
+.BR "ip6tables [-t table] -N " "chain"
 .br
-.BR "ip6tables -X " "[chain]"
+.BR "ip6tables [-t table] -X " "[chain]"
 .br
-.BR "ip6tables -P " "chain target [options]"
+.BR "ip6tables [-t table] -P " "chain target [options]"
 .br
-.BR "ip6tables -E " "old-chain-name new-chain-name"
+.BR "ip6tables [-t table] -E " "old-chain-name new-chain-name"
 .SH DESCRIPTION
 .B Ip6tables
 is used to set up, maintain, and inspect the tables of IPv6 packet
@@ -82,9 +82,9 @@ or a rule in a built-in chain with target
 is matched, the target specified by the chain policy determines the
 fate of the packet.
 .SH TABLES
-There are current three independent tables (which tables are present
+There are currently two independent tables (which tables are present
 at any time depends on the kernel configuration options and which
-modules are present).
+modules are present), as nat table has not been implemented yet.
 .TP
 .BI "-t, --table " "table"
 This option specifies the packet matching table which the command
@@ -95,7 +95,8 @@ that table if it is not already there.
 The tables are as follows:
 .TP
 .B "filter"
-This is the default table.  It contains the built-in chains
+This is the default table (if no -t option is passed).  It contains
+the built-in chains
 .B INPUT
 (for packets coming into the box itself),
 .B FORWARD

@@ -25,23 +25,23 @@
 .SH NAME
 iptables \- administration tool for IPv4 packet filtering and NAT
 .SH SYNOPSIS
-.BR "iptables -[ADC] " "chain rule-specification [options]"
+.BR "iptables [-t table] -[ADC] " "chain rule-specification [options]"
 .br
-.BR "iptables -I " "chain [rulenum] rule-specification [options]"
+.BR "iptables [-t table] -I " "chain [rulenum] rule-specification [options]"
 .br
-.BR "iptables -R " "chain rulenum rule-specification [options]"
+.BR "iptables [-t table] -R " "chain rulenum rule-specification [options]"
 .br
-.BR "iptables -D " "chain rulenum [options]"
+.BR "iptables [-t table] -D " "chain rulenum [options]"
 .br
-.BR "iptables -[LFZ] " "[chain] [options]"
+.BR "iptables [-t table] -[LFZ] " "[chain] [options]"
 .br
-.BR "iptables -N " "chain"
+.BR "iptables [-t table] -N " "chain"
 .br
-.BR "iptables -X " "[chain]"
+.BR "iptables [-t table] -X " "[chain]"
 .br
-.BR "iptables -P " "chain target [options]"
+.BR "iptables [-t table] -P " "chain target [options]"
 .br
-.BR "iptables -E " "old-chain-name new-chain-name"
+.BR "iptables [-t table] -E " "old-chain-name new-chain-name"
 .SH DESCRIPTION
 .B Iptables
 is used to set up, maintain, and inspect the tables of IP packet
@@ -80,7 +80,7 @@ or a rule in a built-in chain with target
 is matched, the target specified by the chain policy determines the
 fate of the packet.
 .SH TABLES
-There are current three independent tables (which tables are present
+There are currently three independent tables (which tables are present
 at any time depends on the kernel configuration options and which
 modules are present).
 .TP
@@ -93,7 +93,8 @@ that table if it is not already there.
 The tables are as follows:
 .TP
 .B "filter"
-This is the default table.  It contains the built-in chains
+This is the default table (if no -t option is passed).  It contains
+the built-in chains
 .B INPUT
 (for packets coming into the box itself),
 .B FORWARD
@@ -595,7 +596,7 @@ or
 .IR syslogd (8)).
 This is a "non-terminating target", i.e. rule traversal continues at
 the next rule.  So if you want to LOG the packets you refuse, use two
-separate rules with the same matching criterias, first using target LOG
+separate rules with the same matching criteria, first using target LOG
 then DROP (or REJECT).
 .TP
 .BI "--log-level " "level"
@@ -683,7 +684,8 @@ table, in the
 .B POSTROUTING
 chain.  It specifies that the source address of the packet should be
 modified (and all future packets in this connection will also be
-mangled), and rules should cease being examined.  It takes one option:
+mangled), and rules should cease being examined.  It takes one type
+of option:
 .TP
 .BR "--to-source  " "\fIipaddr\fP[-\fIipaddr\fP][:\fIport\fP-\fIport\fP]"
 which can specify a single new source IP address, an inclusive range
@@ -696,6 +698,11 @@ If no port range is specified, then source ports below 512 will be
 mapped to other ports below 512: those between 512 and 1023 inclusive
 will be mapped to ports below 1024, and other ports will be mapped to
 1024 or above. Where possible, no port alteration will occur.
+.TP
+You can add several --to-source options.  If you specify more
+than one source address, either via an address range or multiple
+--to-source options, a simple round-robin (one after another in
+cycle) takes place between these adresses.
 .SS DNAT
 This target is only valid in the 
 .B nat
@@ -707,7 +714,7 @@ chains, and user-defined chains which are only called from those
 chains.  It specifies that the destination address of the packet
 should be modified (and all future packets in this connection will
 also be mangled), and rules should cease being examined.  It takes one
-option:
+type of option:
 .TP
 .BR "--to-destination " "\fIipaddr\fP[-\fIipaddr\fP][:\fIport\fP-\fIport\fP]"
 which can specify a single new destination IP address, an inclusive
@@ -718,6 +725,11 @@ or
 .BR "-p udp" ).
 If no port range is specified, then the destination port will never be
 modified.
+.TP
+You can add several --to-destination options.  If you specify more
+than one destination address, either via an address range or multiple
+--to-destination options, a simple round-robin (one after another in
+cycle) load balancing takes place between these adresses.
 .SS MASQUERADE
 This target is only valid in the 
 .B nat
@@ -827,6 +839,7 @@ invalid or abused command line parameters cause an exit code of 2, and
 other errors cause an exit code of 1.
 .SH BUGS
 Bugs?  What's this? ;-)
+Well... the counters are not reliable on sparc64.
 .SH COMPATIBILITY WITH IPCHAINS
 This 
 .B iptables
