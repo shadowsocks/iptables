@@ -916,6 +916,8 @@ merge_options(struct option *oldopts, struct option *newopts,
 void
 register_match(struct iptables_match *me)
 {
+	struct iptables_match **i;
+
 	if (strcmp(me->version, program_version) != 0) {
 		fprintf(stderr, "%s: match `%s' v%s (I'm v%s).\n",
 			program_name, me->name, me->version, program_version);
@@ -934,9 +936,11 @@ register_match(struct iptables_match *me)
 		exit(1);
 	}
 
-	/* Prepend to list. */
-	me->next = iptables_matches;
-	iptables_matches = me;
+	/* Append to list. */
+	for (i = &iptables_matches; *i; i = &(*i)->next);
+	me->next = NULL;
+	*i = me;
+
 	me->m = NULL;
 	me->mflags = 0;
 
