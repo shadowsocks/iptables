@@ -36,9 +36,7 @@
 static void help(void)
 {
 	printf("OS fingerprint match v%s options:\n"
-		"  --genre [!] string          Match a OS genre bypassive fingerprinting.\n"
-		"                              Genres: Linux, FreeBSD, NetBSD, OpenBSD,\n"
-		"                                      Windows\n",
+		"  --genre [!] string          Match a OS genre bypassive fingerprinting.\n",
 		IPTABLES_VERSION);
 }
 
@@ -70,16 +68,22 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
       			struct ipt_entry_match **match)
 {
 	struct ipt_osf_info *info = (struct ipt_osf_info *)(*match)->data;
-
-	if (*flags)
-		exit_error(PARAMETER_PROBLEM, "Can't specify multiple strings");
-
-	check_inverse(optarg, &invert, &optind, 0);
-	parse_string(optarg, info);
-	if (invert)
-		info->invert = 1;
-	info->len=strlen((char *)info->genre);
-	*flags = 1;
+	
+	switch(c) 
+	{
+		case '1':
+			if (*flags)
+				exit_error(PARAMETER_PROBLEM, "Can't specify multiple strings");
+			check_inverse(optarg, &invert, &optind, 0);
+			parse_string(argv[optind-1], info);
+			if (invert)
+				info->invert = 1;
+			info->len=strlen((char *)info->genre);
+			*flags = 1;
+			break;
+		default:
+			return 0;
+	}
 
 	return 1;
 }
