@@ -3,6 +3,13 @@
  * Copyright (C) 2000 Emmanuel Roger  <winfield@freegates.be>
  *
  * ChangeLog
+ *     29.12.2003: Michael Rash <mbr@cipherdyne.org>
+ *             Fixed iptables save/restore for ascii strings
+ *             that contain space chars, and hex strings that
+ *             contain embedded NULL chars.  Updated to print
+ *             strings in hex mode if any non-printable char
+ *             is contained within the string.
+ *
  *     27.01.2001: Gianni Tedesco <gianni@ecsc.co.uk>
  *             Changed --tos to --string in save(). Also
  *             updated to work with slightly modified
@@ -77,8 +84,12 @@ parse_hex_string(const unsigned char *s, struct ipt_string_info *info)
 		} else if (s[i] == '|') {
 			if (hex_f)
 				hex_f = 0;
-			else
+			else {
 				hex_f = 1;
+				/* get past any initial whitespace just after the '|' */
+				while (s[i+1] == ' ')
+					i++;
+			}
 			if (i+1 >= slen)
 				break;
 			else
@@ -178,9 +189,53 @@ final_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
-			   "STRING match: You must specify `--string'");
+			   "STRING match: You must specify `--string' or `--hex-string'");
 }
 
+/* Test to see if the string contains non-printable chars or quotes */
+static unsigned short int
+is_hex_string(const char *str, const unsigned short int len)
+{
+	unsigned int i;
+	for (i=0; i < len; i++)
+		if (! isprint(str[i]))
+			return 1;  /* string contains at least one non-printable char */
+	/* use hex output if the last char is a "\" */
+	if ((unsigned char) str[len-1] == 0x5c)
+		return 1;
+	return 0;
+}
+
+/* Print string with "|" chars included as one would pass to --hex-string */
+static void
+print_hex_string(const char *str, const unsigned short int len)
+{
+	unsigned int i;
+	/* start hex block */
+	printf("\"|");
+	for (i=0; i < len; i++) {
+		/* see if we need to prepend a zero */
+		if ((unsigned char) str[i] <= 0x0F)
+			printf("0%x", (unsigned char) str[i]);
+		else
+			printf("%x", (unsigned char) str[i]);
+	}
+	/* close hex block */
+	printf("|\" ");
+}
+
+static void
+print_string(const char *str, const unsigned short int len)
+{
+	unsigned int i;
+	printf("\"");
+	for (i=0; i < len; i++) {
+		if ((unsigned char) str[i] == 0x22)  /* escape any embedded quotes */
+			printf("%c", 0x5c);
+		printf("%c", (unsigned char) str[i]);
+	}
+	printf("\" ");  /* closing space and quote */
+}
 
 /* Prints out the matchinfo. */
 static void
@@ -191,7 +246,13 @@ print(const struct ipt_ip *ip,
 	const struct ipt_string_info *info =
 	    (const struct ipt_string_info*) match->data;
 
-	printf("STRING match %s%s ", (info->invert) ? "!" : "", info->string);
+	if (is_hex_string(info->string, info->len)) {
+		printf("STRING match %s", (info->invert) ? "!" : "");
+		print_hex_string(info->string, info->len);
+	} else {
+		printf("STRING match %s", (info->invert) ? "!" : "");
+		print_string(info->string, info->len);
+	}
 }
 
 
@@ -202,7 +263,13 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	const struct ipt_string_info *info =
 	    (const struct ipt_string_info*) match->data;
 
-	printf("--string %s%s ", (info->invert) ? "! ": "", info->string);
+	if (is_hex_string(info->string, info->len)) {
+		printf("--hex-string %s", (info->invert) ? "! ": "");
+		print_hex_string(info->string, info->len);
+	} else {
+		printf("--string %s", (info->invert) ? "! ": "");
+		print_string(info->string, info->len);
+	}
 }
 
 
