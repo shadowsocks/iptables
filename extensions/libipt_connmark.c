@@ -107,6 +107,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 		  ((struct ipt_connmark_info *)match->data)->invert, 0);
 }
 
+static
 struct iptables_match mark
 = { NULL,
     "connmark",
