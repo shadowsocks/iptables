@@ -49,7 +49,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 		char *end;
 	case '1':
-		check_inverse(optarg, &invert, &optind, 0);
+		check_inverse(argv[optind], &invert, &optind, 0);
+		optarg = argv[optind-1];
 		realminfo->id = strtoul(optarg, &end, 0);
 		if (*end == '/') {
 			realminfo->mask = strtoul(end+1, &end, 0);
@@ -72,7 +73,7 @@ static void
 print_realm(unsigned long id, unsigned long mask, int invert, int numeric)
 {
 	if (invert)
-		fputc('!', stdout);
+		printf("! ");
 
 	if(mask != 0xffffffff)
 		printf("0x%lx/0x%lx ", id, mask);
