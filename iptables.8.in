@@ -279,7 +279,7 @@ effect on the packet's fate, but the counters on the rule will be
 incremented.
 .TP
 .BR "-i, --in-interface " "[!] \fIname\fP"
-Name of an interface via which a packet is going to be received (only for
+Name of an interface via which a packet was received (only for
 packets entering the 
 .BR INPUT ,
 .B FORWARD
