@@ -2030,6 +2030,9 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 					strcpy(m->m->u.user.name, m->name);
 					m->init(m->m, &fw.nfcache);
 
+					opts = merge_options(opts,
+					    m->extra_opts, &m->option_offset);
+
 					optind--;
 					continue;
 				}
