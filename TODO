@@ -4,30 +4,17 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.63 2002/07/08 06:17:33 laforge Exp $
+CVS ID: $Id: TODO,v 1.64 2002/07/24 07:25:20 laforge Exp $
 
 IMPORTANT issues:
-x solution for nostate / notrack (we don't want to track specific conn's)
-x multiple related connections (solved: newnat)[HW]
-x add support for correct SACK handling [HW]
 - erroneously too-fast dropped conntrack for half-open TCP connections [JK]
 - wrong 'Out of window' error message from tcp-windowtracking [JK]
-x mangle table should use all five netfilter hooks [BC]
 - --mac-source not working in FORWARD (manpage bug?)
-x netfilter hooks should give error if same function registers twice [HW]
-x speed issues (mark_source_chains, Robert Olsson)
-x fix apparent output nat + slip oops bug; see thread at
-  http://lists.samba.org/pipermail/netfilter/2001-December/017747.html
-x TFTP helper: works only on second packet?
-x necessary structures for helper match in newnat [HW]
-x port old conntrack/nat helpers to newnat [HW]
-x update NAT part of netfilter-hacking-HOWTO to newnat [HW]
-x update packet traversal schematics to represent 5hook-mangle
 - update manpages to include recently submitted extensions
-x remove manually-specified source IP for reject-fakesource patch
 - locally bound udp port can still be used for MASQ/SNAT
 - fix for ICMP DNAT info leak
 - unaligned access of nulldevname during string match
+- update documentation to reflect newnat
 
 TO BE INVESTIGATED:
 - packet counters on ultrasparc platform (32bit userspace/64bit kernel issue)
@@ -41,24 +28,16 @@ NICE to have:
 - endianness wrt. unnamed initializers in conntrack helpers after 
   pptp-patch applied
 - make RPC conntrack work again
-x interface names in ipv6 can contain _ and -
 - multicast connection tracking
 - sysctl support for ftp-multi, irc-conntrack/nat, ftp-fxp
 - integrate HOPLIMIT for ipv6 in patch-o-matic [HW]
 - u32 classifier (port from tc -> iptables) [YU]
-x MARK match with boolean OR / AND (to use nfmark bitwise)
 - documentation for libiptc
 - port conntrack to IPv6 (code reuse?) [BC]
-x make patch-o-matic reversible
-x CONFIG_NF_IP_NAT_LOCAL
-x fix and test the netfilter bridging stuff
 - ip_nat_ident module
-x provide daily CVS snapshots via ftp [HW]
 - make iptables / ip6tables use the same codebase (as libiptc) [KA]
-x REJECT optionally generates port unreachable with faked SOURCE
 - libipq reentrancy [JM]
 - compiling without O2 issue
-x add more information like original addresses to the state match
 - libipq runtime version, do before 1.2.5 [JM]
 - add ICMP type-3-code-13 option to REJECT
 - export list of matches/targets via proc-fs
