@@ -1446,7 +1446,7 @@ target_same(struct rule_head *a, struct rule_head *b,const unsigned char *mask)
 			return 0;
 
 		for (i = 0; i < ta->u.target_size - sizeof(*ta); i++)
-			if (((ta->data[i] ^ ta->data[i]) & mask[i]) != 0)
+			if (((ta->data[i] ^ tb->data[i]) & mask[i]) != 0)
 				return 0;
 		return 1;
 	default:
