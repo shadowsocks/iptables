@@ -112,7 +112,7 @@ static void
 print_length(struct ipt_length_info *info)
 {
 	if (info->invert)
-		fputc('!', stdout);
+		printf("! ");
 	
 	if (info->max == info->min)
 		printf("%u ", info->min);
