@@ -33,8 +33,6 @@
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ipt_osf.h>
 
-#define IPTABLES_VERSION	"1.2.6a" /* It looks like FIXME */
-
 static void help(void)
 {
 	printf("OS fingerprint match v%s options:\n"
@@ -42,7 +40,8 @@ static void help(void)
 		"--smart		Use some smart extensions to determine OS (do not use TTL).\n"
 		"--log level		Log all(or only first) determined genres even if "
 					"they do not match desired one. "
-					"Level may be 0(all) or 1(only first entry).\n",
+					"Level may be 0(all) or 1(only first entry).\n"
+		"--netlink		Log through netlink(NETLINK_NFLOG).\n",
 		IPTABLES_VERSION);
 }
 
@@ -51,6 +50,7 @@ static struct option opts[] = {
 	{ .name = "genre",	.has_arg = 1, .flag = 0, .val = '1' },
 	{ .name = "smart",	.has_arg = 0, .flag = 0, .val = '2' },
 	{ .name = "log",	.has_arg = 1, .flag = 0, .val = '3' },
+	{ .name = "netlink",	.has_arg = 0, .flag = 0, .val = '4' },
 	{ .name = 0 }
 };
 
@@ -101,6 +101,12 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 			*flags |= IPT_OSF_LOG;
 			info->loglevel = atoi(argv[optind-1]);
 			info->flags |= IPT_OSF_LOG;
+			break;
+		case '4': /* --netlink */
+			if (*flags & IPT_OSF_NETLINK)
+				exit_error(PARAMETER_PROBLEM, "Can't specify multiple smart parameter");
+			*flags |= IPT_OSF_NETLINK;
+			info->flags |= IPT_OSF_NETLINK;
 			break;
 		default:
 			return 0;
