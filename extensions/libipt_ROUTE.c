@@ -8,6 +8,9 @@
 #include <getopt.h>
 #include <iptables.h>
 #include <net/if.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_ROUTE.h>
 
@@ -17,15 +20,15 @@ help(void)
 {
 	printf(
 "ROUTE target v%s options:\n"
-"  --iface   name                Send this packet directly through iface name.\n"
-"  --ifindex index               Send this packet directly through iface index.\n"
+"  --iface   name    Send the packet directly through this interface.\n"
+"  --to      ip      Route the packet as if its destination address was ip.\n"
 "\n",
 IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
 	{ "iface", 1, 0, '1' },
-	{ "ifindex", 1, 0, '2' },
+	{ "to", 1, 0, '2' },
 	{ 0 }
 };
 
@@ -33,9 +36,15 @@ static struct option opts[] = {
 static void
 init(struct ipt_entry_target *t, unsigned int *nfcache)
 {
+	struct ipt_route_target_info *route_info = 
+		(struct ipt_route_target_info*)t->data;
+
+	route_info->ifname[0] = '\0';
+	route_info->ipto = 0;
 }
 
 #define IPT_ROUTE_OPT_IF    0x01
+#define IPT_ROUTE_OPT_TO    0x02
 
 /* Function which parses command options; returns true if it
    ate an option */
@@ -48,46 +57,36 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		(struct ipt_route_target_info*)(*target)->data;
 
 	switch (c) {
-		char *end;
 	case '1':
 		if (*flags & IPT_ROUTE_OPT_IF)
 			exit_error(PARAMETER_PROBLEM,
-				   "Can't specify --iface or --ifindex twice");
+				   "Can't specify --iface twice");
 
 		if (check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --iface");
 
-		if (strlen(optarg) > sizeof(route_info->if_name) - 1)
+		if (strlen(optarg) > sizeof(route_info->ifname) - 1)
 			exit_error(PARAMETER_PROBLEM,
 				   "Maximum interface name length %u",
-				   sizeof(route_info->if_name) - 1);
+				   sizeof(route_info->ifname) - 1);
 
-		strcpy(route_info->if_name, optarg);
-		route_info->if_index = 0;
+		strcpy(route_info->ifname, optarg);
 		*flags |= IPT_ROUTE_OPT_IF;
 		break;
 
 	case '2':
-		if (*flags & IPT_ROUTE_OPT_IF)
+		if (*flags & IPT_ROUTE_OPT_TO)
 			exit_error(PARAMETER_PROBLEM,
-				   "Can't specify --iface or --ifindex twice");
+				   "Can't specify --to twice");
 
-		if (check_inverse(optarg, &invert, NULL, 0))
+		if (!inet_aton(optarg, (struct in_addr*)&route_info->ipto)) {
 			exit_error(PARAMETER_PROBLEM,
-				   "Unexpected `!' after --ifindex");
-
-		route_info->if_name[0] = 0;
-		route_info->if_index = strtoul(optarg, &end, 0);
-		if (*end != '\0' || end == optarg)
-			exit_error(PARAMETER_PROBLEM, "Bad ROUTE ifindex `%s'",
+				   "Invalid IP address %s",
 				   optarg);
+		}
 
-		if (route_info->if_index == 0)
-			exit_error(PARAMETER_PROBLEM,
-				   "Interface index can't be 0 !");
-
-		*flags |= IPT_ROUTE_OPT_IF;
+		*flags |= IPT_ROUTE_OPT_TO;
 		break;
 
 	default:
@@ -102,7 +101,7 @@ final_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
-		           "ROUTE target: Parameter --iface is required");
+		           "ROUTE target: minimum 1 parameter is required");
 }
 
 /* Prints out the targinfo. */
@@ -116,10 +115,13 @@ print(const struct ipt_ip *ip,
 
 	printf("ROUTE ");
 
-	if (route_info->if_name[0] != 0)
-		printf("iface %s ", route_info->if_name);
-	else 
-		printf("ifindex %u ", route_info->if_index);
+	if (route_info->ifname[0])
+		printf("iface %s ", route_info->ifname);
+
+	if (route_info->ipto) {
+		struct in_addr ip = { route_info->ipto };
+		printf("to %s ", inet_ntoa(ip));
+	}
 }
 
 static
