@@ -8,7 +8,7 @@ NETFILTER_VERSION:=1.2
 OLD_NETFILTER_VERSION:=1.1.2
 
 # Waiting for inclusions in the kernel tree.
-PENDING_PATCHES:=dropped-table.patch
+PENDING_PATCHES:=dropped-table.patch seqoffset.patch irc-conntrack-nat.patch
 # These went in previous kernels.
 PENDING_PATCHES+=ipv6-fixes.patch.ipv6 masquerade+fwmark.patch nat-overlap.patch ppc-sparc-mangle.patch
 
