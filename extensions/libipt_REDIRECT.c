@@ -139,7 +139,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	struct ip_nat_range *r = &mr->range[0];
 
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
-		printf("redir ports: ");
+		printf("--to-ports ");
 		printf("%hu", ntohs(r->min.tcp.port));
 		if (r->max.tcp.port != r->min.tcp.port)
 			printf("-%hu", ntohs(r->max.tcp.port));
