@@ -1,7 +1,7 @@
 #! /usr/bin/make
 
 PF_EXT_SLIB:=tcp udp icmp mac limit standard REJECT LOG unclean state multiport tos TOS mark MARK owner SNAT DNAT MASQUERADE REDIRECT MIRROR
-PF6_EXT_SLIB:=tcp udp icmp standard 
+PF6_EXT_SLIB:=tcp udp icmp standard MARK mark
 
 # Optionals
 PF_EXT_SLIB_OPTS:=$(foreach T,$(wildcard extensions/.*-test),$(shell KERNEL_DIR=$(KERNEL_DIR) $(T)))
