@@ -17,7 +17,7 @@ NETFILTER_VERSION:=1.2.3
 OLD_NETFILTER_VERSION:=1.2.2
 
 # Waiting for inclusions in the kernel tree.
-PENDING_PATCHES:=ipt_MIRROR-ttl.patch ipt_REJECT-checkentry.patch
+PENDING_PATCHES:=ipt_MIRROR-ttl.patch ipt_REJECT-checkentry.patch ipt_LOG.patch
 # These went in previous kernels.
 PENDING_PATCHES+=2.4.1.patch tos-fix.patch tcp-MSS.patch 2.4.4.patch ip6tables-export-symbols.patch sackperm.patch
 
