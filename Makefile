@@ -4,8 +4,8 @@ TOPLEVEL_INCLUDED=YES
 ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
-NETFILTER_VERSION:=1.1.1
-OLD_NETFILTER_VERSION:=1.1.0
+NETFILTER_VERSION:=1.1.2
+OLD_NETFILTER_VERSION:=1.1.1
 
 LIBDIR:=/usr/local/lib
 BINDIR:=/usr/local/bin
@@ -30,7 +30,10 @@ ifndef IPT_LIBDIR
 IPT_LIBDIR:=$(LIBDIR)/iptables
 endif
 
-default: patchcheck all
+default: print-extensions all
+
+print-extensions:
+	@echo Extensions found: $(OPTIONALS)
 
 iptables.o: iptables.c
 	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -c -o $@ $<
@@ -41,13 +44,6 @@ iptables: iptables-standalone.c iptables.o libiptc/libiptc.a
 $(DESTDIR)$(BINDIR)/iptables: iptables
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
 	cp $< $@
-
-# Temporary check for patches: really old patches may fail `isapplied'.
-patchcheck:
-	@for f in `echo patch-*`; do				\
-	if ./isapplied $(KERNEL_DIR) $$f >/dev/null; then :;	\
-	else echo Please apply $$f to this kernel.; exit 1;	\
-	fi; done
 
 iptables-save: iptables-save.c iptables.o libiptc/libiptc.a
 	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ -ldl
@@ -98,6 +94,10 @@ iptables-standalone.d iptables.d: %.d: %.c
 
 distclean: clean
 	@rm -f TAGS `find . -name '*~'` `find . -name '*.rej'` `find . -name '*.d'` .makefirst
+
+.PHONY: patch-o-matic
+patch-o-matic:
+	@cd $@ && KERNEL_DIR=$(KERNEL_DIR) ./runme
 
 # Rusty's distro magic.
 distrib: check nowhitespace distclean delrelease /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2 diff md5sums

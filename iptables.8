@@ -681,6 +681,24 @@ Various error messages are printed to standard error.  The exit code
 is 0 for correct functioning.  Errors which appear to be caused by
 invalid or abused command line parameters cause an exit code of 2, and
 other errors cause an exit code of 1.
+.SS ULOG
+Turn on userspace logging of matching packets. When this
+option is set for a rule, the Linux kernel will multicast this 
+packet through a
+.IR netlink 
+socket. One or more userspace processes may then subscribe to variuos 
+multicast groups and receive the packets.
+.TP
+.BI "--ulog-nlgroup" "<nlgroup>"
+This specifies the netlink group (1-32) to which the packet is sent.
+.TP
+.BI "--ulog-prefix" "<prefix>"
+Prefix log messages with the specified prefix; up to 32 characters
+long, and useful fro distinguishing messages in the logs.
+.TP
+.BI "--ulog-cprange" "<size>"
+Number of bytes to be copied to userspace. A value of 0 does always copy
+the entire packet, regardless of its size.
 .SH BUGS
 Check is not implemented (yet).
 .SH COMPATIBILITY WITH IPCHAINS
@@ -733,6 +751,8 @@ the mark stuff, and ran around doing cool stuff everywhere.
 James Morris wrote the TOS target, and tos match.
 .PP
 Jozsef Kadlecsik wrote the REJECT target.
+.PP
+Harald Welte wrote the ULOG target and libulog.
 .PP
 The Netfilter Core Team is: Marc Boucher, James Morris and Rusty Russell.
 .\" .. and did I mention that we are incredibly cool people?
