@@ -293,7 +293,7 @@ Expand numbers.
 Display the exact value of the packet and byte counters,
 instead of only the rounded number in K's (multiples of 1000)
 M's (multiples of 1000K) or G's (multiples of 1000M).  This option is
-only relevent for the 
+only relevant for the 
 .B -L
 command.
 .TP
@@ -302,7 +302,7 @@ When listing rules, add line numbers to the beginning of each rule,
 corresponding to that rule's position in the chain.
 .SH MATCH EXTENSIONS
 iptables can use extended packet matching modules.  The following are
-included in the base package, and most of these can be preceeded by a
+included in the base package, and most of these can be preceded by a
 .B !
 to invert the sense of the match.
 .SS tcp
@@ -336,7 +336,7 @@ set.  Flags are:
 .BR "SYN ACK FIN RST URG PSH ALL NONE" .
 Hence the command
 .br
- ipchains -p tcp --tcp-flags SYN,ACK,FIN,RST SYN
+ iptables -A FORWARD -p tcp --tcp-flags SYN,ACK,FIN,RST SYN
 .br
 will only match packets with the SYN flag set, and the ACK, FIN and
 RST flags unset.
@@ -616,7 +616,7 @@ target.  Masquerading is equivalent to specifying a mapping to the IP
 address of the interface the packet is going out, but also has the
 effect that connections are 
 .I forgotten
-when the interface goes down.  This is the correct behaviour when the
+when the interface goes down.  This is the correct behavior when the
 next dialup is unlikely to have the same interface address (and hence
 any established connections are lost anyway).  It takes one option:
 .TP
@@ -693,12 +693,13 @@ There are several other changes in iptables.
 .SH SEE ALSO
 The iptables-HOWTO, which details more iptables usage, and the
 netfilter-hacking-HOWTO which details the internals.
-.SH AUTHOR
+.SH AUTHORS
 Rusty Russell wrote iptables, in early consultation with Michael
 Neuling.
 .PP
-Marc Boucher wrote the owner match, the mark stuff, and ran around
-doing cool stuff everywhere.
+Marc Boucher made Rusty abandon ipnatctl by lobbying for a generic packet
+selection framework in iptables, then wrote the mangle table, the owner match,
+the mark stuff, and ran around doing cool stuff everywhere.
 .PP
 James Morris wrote the TOS target, and tos match.
 .PP
