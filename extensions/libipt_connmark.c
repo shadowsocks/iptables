@@ -1,4 +1,24 @@
-/* Shared library add-on to iptables to add CONNMARK matching support. */
+/* Shared library add-on to iptables to add connmark matching support.
+ *
+ * (C) 2002,2004 MARA Systems AB <http://www.marasystems.com>
+ * by Henrik Nordstrom <hno@marasystems.com>
+ *
+ * Version 1.1
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -50,7 +70,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*end == '/') {
 			markinfo->mask = strtoul(end+1, &end, 0);
 		} else
-			markinfo->mask = 0xffffffff;
+			markinfo->mask = ~0;
 		if (*end != '\0' || end == optarg)
 			exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
 		if (invert)
@@ -67,7 +87,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 static void
 print_mark(unsigned long mark, unsigned long mask, int numeric)
 {
-	if(mask != 0xffffffff)
+	if(mask != ~0)
 		printf("0x%lx/0x%lx ", mark, mask);
 	else
 		printf("0x%lx ", mark);
@@ -96,7 +116,7 @@ print(const struct ipt_ip *ip,
 	print_mark(info->mark, info->mask, numeric);
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
+/* Saves the matchinfo in parsable form to stdout. */
 static void
 save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 {
@@ -109,23 +129,21 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	print_mark(info->mark, info->mask, 0);
 }
 
-static
-struct iptables_match mark
-= { NULL,
-    "connmark",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_connmark_info)),
-    IPT_ALIGN(sizeof(struct ipt_connmark_info)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_match connmark_match = {
+    .name          = "connmark",
+    .version       = IPTABLES_VERSION,
+    .size          = IPT_ALIGN(sizeof(struct ipt_connmark_info)),
+    .userspacesize = IPT_ALIGN(sizeof(struct ipt_connmark_info)),
+    .help          = &help,
+    .init          = &init,
+    .parse         = &parse,
+    .final_check   = &final_check,
+    .print         = &print,
+    .save          = &save,
+    .extra_opts    = opts
 };
 
 void _init(void)
 {
-	register_match(&mark);
+	register_match(&connmark_match);
 }
