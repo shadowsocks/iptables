@@ -1,15 +1,15 @@
-A quick list of rules for committing stuff into netfilter cvs:
+A quick list of rules for committing stuff into netfilter svn:
 
-- Always include the Name of the Author/Contributor in the CVS comment
+- Always include the Name of the Author/Contributor in the SVN comment
   like 'fix for foo (Au Thor)'
 
 - make sure that you have set the executable bits on an 'extensions/.*-test'
-  script before adding/committing it to CVS
+  script before adding/committing it to SVN
 
 - If the commit fixes a bugzilla bug, please include '(Closes: #bugnr)' in
   the commit message
 
-- Make sure you don't commit to CVS while a feature freeze is announced
+- Make sure you don't commit to svn while a feature freeze is announced
 
 - For new extensions, there are two possible cases:
 	1) header files are just in patch-o-matic patch, you need an
