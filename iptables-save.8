@@ -37,18 +37,7 @@ include the current values of all packet and byte counters in the output
 restrict output to only one table. If not specified, output includes all
 available tables.
 .SH BUGS
-.B iptables-save
-doesn't order user-defined chains and builtin chains in any specific manner.
-This raises some dependency problems when using the unmodified output of 
-.B iptables-save
-as input for
-.B iptables-restore.
-.PP
-Expect this to be fixed in the next iptables release.
-.PP
-To make it work, reorder the output in a way that in every table, all 
-user-defined chains are created before any other chain uses this chain
-as target.
+None known as of iptables-1.2.1 release
 .SH AUTHOR
 Harald Welte <laforge@gnumonks.org>
 .SH SEE ALSO

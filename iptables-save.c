@@ -145,13 +145,16 @@ static void print_ip(char *prefix, u_int32_t ip, u_int32_t mask, int invert)
 /* We want this to be readable, so only print out neccessary fields.
  * Because that's the kind of world I want to live in.  */
 static void print_rule(const struct ipt_entry *e, 
-		iptc_handle_t *h, int counters)
+		iptc_handle_t *h, const char *chain, int counters)
 {
 	struct ipt_entry_target *t;
 
 	/* print counters */
 	if (counters)
 		printf("[%llu:%llu] ", e->counters.pcnt, e->counters.bcnt);
+
+	/* print chain name */
+	printf("-A %s ", chain);
 
 	/* Print IP part. */
 	print_ip("-s", e->ip.src.s_addr,e->ip.smsk.s_addr,
@@ -246,12 +249,12 @@ static int do_output(const char *tablename)
 		       NETFILTER_VERSION, ctime(&now));
 		printf("*%s\n", tablename);
 
-		/* Dump out chain names */
+		/* Dump out chain names first, 
+		 * thereby preventing dependency conflicts */
 		for (chain = iptc_first_chain(&h);
 		     chain;
 		     chain = iptc_next_chain(&h)) {
-			const struct ipt_entry *e;
-
+			
 			printf(":%s ", chain);
 			if (iptc_builtin(chain, h)) {
 				struct ipt_counters count;
@@ -261,11 +264,18 @@ static int do_output(const char *tablename)
 			} else {
 				printf("- [0:0]\n");
 			}
+		}
+				
+
+		for (chain = iptc_first_chain(&h);
+		     chain;
+		     chain = iptc_next_chain(&h)) {
+			const struct ipt_entry *e;
 
 			/* Dump out rules */
 			e = iptc_first_rule(chain, &h);
 			while(e) {
-				print_rule(e, &h, counters);
+				print_rule(e, &h, chain, counters);
 				e = iptc_next_rule(e, &h);
 			}
 		}
