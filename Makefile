@@ -4,8 +4,8 @@ TOPLEVEL_INCLUDED=YES
 ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
-NETFILTER_VERSION:=1.0.0beta
-OLD_NETFILTER_VERSION:=1.0.0alpha
+NETFILTER_VERSION:=1.0.0
+OLD_NETFILTER_VERSION:=1.0.0beta
 
 LIBDIR:=/usr/local/lib
 BINDIR:=/usr/local/bin
@@ -60,6 +60,8 @@ EXTRA_DEPENDS+=iptables-standalone.d iptables.d
 iptables-standalone.d iptables.d: %.d: %.c
 	@-$(CC) -M -MG $(CFLAGS) $< | sed -e 's@^.*\.o:@$*.d $*.o:@' > $@
 
+distclean: clean
+	@rm -f TAGS `find . -name '*~'` `find . -name '*.rej'` `find . -name '*.d'` .makefirst
 
 # Rusty's distro magic.
 distrib: check nowhitespace distclean delrelease /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2 diff md5sums
@@ -76,7 +78,7 @@ delrelease:
 	rm -f /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2
 
 /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2:
-	cd .. && ln -sf userspace iptables-$(NETFILTER_VERSION) && tar cvf - --exclude CVS --exclude iptables-$(NETFILTER_VERSION)/. | bzip2 -9 > $@ && rm iptables-$(NETFILTER_VERSION)
+	cd .. && ln -sf userspace iptables-$(NETFILTER_VERSION) && tar cvf - --exclude CVS iptables-$(NETFILTER_VERSION)/. | bzip2 -9 > $@ && rm iptables-$(NETFILTER_VERSION)
 
 diff: /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2
 	@mkdir /tmp/diffdir
