@@ -1,7 +1,7 @@
 /* Shared library add-on to iptables to add TTL matching support 
  * (C) 2000 by Harald Welte <laforge@gnumonks.org>
  *
- * $Id: libipt_ttl.c,v 1.5 2002/03/14 11:35:58 laforge Exp $
+ * $Id: libipt_ttl.c,v 1.6 2002/05/29 13:08:16 laforge Exp $
  *
  * This program is released under the terms of GNU GPL */
 
@@ -40,10 +40,6 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 	check_inverse(optarg, &invert, &optind, 0);
 	value = atoi(argv[optind-1]);
 
-	if (*flags) 
-		exit_error(PARAMETER_PROBLEM, 
-				"Can't specify TTL option twice");
-
 	if (!optarg)
 		exit_error(PARAMETER_PROBLEM,
 				"ttl: You must specify a value");
@@ -56,8 +52,6 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 
 			/* is 0 allowed? */
 			info->ttl = value;
-			*flags = 1;
-
 			break;
 		case '3':
 			if (invert) 
@@ -66,8 +60,6 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 
 			info->mode = IPT_TTL_LT;
 			info->ttl = value;
-			*flags = 1;
-
 			break;
 		case '4':
 			if (invert)
@@ -76,13 +68,16 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 
 			info->mode = IPT_TTL_GT;
 			info->ttl = value;
-			*flags = 1;
-
 			break;
 		default:
 			return 0;
 
 	}
+
+	if (*flags) 
+		exit_error(PARAMETER_PROBLEM, 
+				"Can't specify TTL option twice");
+	*flags = 1;
 
 	return 1;
 }
