@@ -434,26 +434,26 @@ creator, for locally-generated packets.  It is only valid in the
 OUTPUT chain, and even this some packets (such as ICMP ping responses)
 may have no owner, and hence never match.
 .TP
-.BI "--uid-owner" "userid"
+.BI "--uid-owner " "userid"
 Matches if the packet was created by a process with the given
 effective user id.
 .TP
-.BI "--gid-owner" "groupid"
+.BI "--gid-owner " "groupid"
 Matches if the packet was created by a process with the given
 effective group id.
 .TP
-.BI "--pid-owner" "processid"
+.BI "--pid-owner " "processid"
 Matches if the packet was created by a process with the given
 process id.
 .TP
-.BI "--sid-owner" "sessionid"
+.BI "--sid-owner " "sessionid"
 Matches if the packet was created by a process in the given session
 group.
 .SS state
 This module, when combined with connection tracking, allows access to
 the connection tracking state for this packet.
 .TP
-.BI "--state" "state"
+.BI "--state " "state"
 Where state is a comma separated list of the connection states to
 match.  Possible states are 
 .B INVALID
@@ -476,7 +476,7 @@ malformed or unusual.  This is regarded as experimental.
 This module matches the 8 bits of Type of Service field in the IP
 header (ie. including the precedence bits). 
 .TP
-.BI "--tos" "tos"
+.BI "--tos " "tos"
 The argument is either a standard name, (use
 .br
  iptables -m tos -h
@@ -513,7 +513,7 @@ packet.  It is only valid in the
 .B mangle
 table.
 .TP
-.BI "--set-mark" "mark"
+.BI "--set-mark " "mark"
 .SS REJECT
 This is used to send back an error packet in response to the matched
 packet: otherwise it is equivalent to 
@@ -526,7 +526,7 @@ and
 chains.  Several options control the nature of the error packet
 returned:
 .TP
-.BI "--reject-with" "type"
+.BI "--reject-with " "type"
 The type given can be 
 .BR icmp-net-unreachable ,
 .BR icmp-host-unreachable ,
@@ -549,7 +549,7 @@ It is only valid in the
 .B mangle
 table.
 .TP
-.BI "--set-tos" "tos"
+.BI "--set-tos " "tos"
 You can use a numeric TOS values, or use
 .br
  iptables -j TOS -h
@@ -573,7 +573,7 @@ chain.  It specifies that the source address of the packet should be
 modified (and all future packets in this connection will also be
 mangled), and rules should cease being examined.  It takes one option:
 .TP
-.BI "--to-source" "<ipaddr>[-<ipaddr>][:port-port]"
+.BI "--to-source  " "<ipaddr>[-<ipaddr>][:port-port]"
 which can specify a single new source IP address, an inclusive range
 of IP addresses, and optionally, a port range (which is only valid if
 the rule also specifies
@@ -596,7 +596,7 @@ should be modified (and all future packets in this connection will
 also be mangled), and rules should cease being examined.  It takes one
 option:
 .TP
-.BI "--to-destination" "<ipaddr>[-<ipaddr>][:port-port]"
+.BI "--to-destination " "<ipaddr>[-<ipaddr>][:port-port]"
 which can specify a single new destination IP address, an inclusive
 range of IP addresses, and optionally, a port range (which is only
 valid if the rule also specifies
@@ -620,7 +620,7 @@ when the interface goes down.  This is the correct behavior when the
 next dialup is unlikely to have the same interface address (and hence
 any established connections are lost anyway).  It takes one option:
 .TP
-.BI "--to-ports" "<port>[-<port>]"
+.BI "--to-ports " "<port>[-<port>]"
 This specifies a range of source ports to use, overriding the default 
 .B SNAT
 source port-selection heuristics (see above).  This is only valid with
@@ -640,7 +640,7 @@ the machine itself (locally-generated packets are mapped to the
 127.0.0.1 address).
 It takes one option:
 .TP
-.BI "--to-ports" "<port>[-<port>]"
+.BI "--to-ports " "<port>[-<port>]"
 This specifies a destination port or range or ports to use: without
 this, the destination port is never altered.  This is only valid with
 if the rule also specifies
