@@ -26,7 +26,7 @@
 
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
-#include <linux/netfilter_ipv4/ipt_CONNMARK.h>
+#include "../include/linux/netfilter_ipv4/ipt_CONNMARK.h"
 
 #if 0
 struct markinfo {
@@ -72,14 +72,25 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	struct ipt_connmark_target_info *markinfo
 		= (struct ipt_connmark_target_info *)(*target)->data;
 
+#ifdef KERNEL_64_USERSPACE_32
+	markinfo->mask = ~0ULL;
+#else
+	markinfo->mask = ~0UL;
+#endif
+
 	switch (c) {
 		char *end;
 	case '1':
 		markinfo->mode = IPT_CONNMARK_SET;
-		markinfo->mask = ~0;
+#ifdef KERNEL_64_USERSPACE_32
+		markinfo->mark = strtoull(optarg, &end, 0);
+		if (*end == '/' && end[1] != '\0')
+		    markinfo->mask = strtoull(end+1, &end, 0);
+#else
 		markinfo->mark = strtoul(optarg, &end, 0);
 		if (*end == '/' && end[1] != '\0')
 		    markinfo->mask = strtoul(end+1, &end, 0);
+#endif
 		if (*end != '\0' || end == optarg)
 			exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
 		if (*flags)
@@ -89,7 +100,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '2':
 		markinfo->mode = IPT_CONNMARK_SAVE;
-		markinfo->mask = ~0;
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
 			           "CONNMARK target: Can't specify --save-mark twice");
@@ -97,7 +107,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '3':
 		markinfo->mode = IPT_CONNMARK_RESTORE;
-		markinfo->mask = ~0;
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
 			           "CONNMARK target: Can't specify --restore-mark twice");
@@ -107,9 +116,13 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (!*flags)
 			exit_error(PARAMETER_PROBLEM,
 			           "CONNMARK target: Can't specify --mask without a operation");
-		markinfo->mark = strtoul(optarg, &end, 0);
+#ifdef KERNEL_64_USERSPACE_32
+		markinfo->mask = strtoull(optarg, &end, 0);
+#else
+		markinfo->mask = strtoul(optarg, &end, 0);
+#endif
 		if (*end != '\0' || end == optarg)
-			exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
+			exit_error(PARAMETER_PROBLEM, "Bad MASK value `%s'", optarg);
 		break;
 	default:
 		return 0;
@@ -126,6 +139,37 @@ final_check(unsigned int flags)
 		           "CONNMARK target: No operation specified");
 }
 
+#ifdef KERNEL_64_USERSPACE_32
+static void
+print_mark(unsigned long long mark)
+{
+	printf("0x%llx", mark);
+}
+
+static void
+print_mask(const char *text, unsigned long long mask)
+{
+	if (mask != ~0ULL)
+		printf("%s%llx", text, mask);
+}
+
+#else
+
+static void
+print_mark(unsigned long mark)
+{
+	printf("0x%lx", mark);
+}
+
+static void
+print_mask(const char *text, unsigned long mask)
+{
+	if (mask != ~0UL)
+		printf("%s%lx", text, mask);
+}
+#endif
+
+
 /* Prints out the target info. */
 static void
 print(const struct ipt_ip *ip,
@@ -136,21 +180,19 @@ print(const struct ipt_ip *ip,
 		(const struct ipt_connmark_target_info *)target->data;
 	switch (markinfo->mode) {
 	case IPT_CONNMARK_SET:
-	    printf("CONNMARK set 0x%lx", markinfo->mark);
-	    if (markinfo->mask != ~0)
-		printf("/0x%lx", markinfo->mask);
+	    printf("CONNMARK set ");
+	    print_mark(markinfo->mark);
+	    print_mask("/", markinfo->mask);
 	    printf(" ");
 	    break;
 	case IPT_CONNMARK_SAVE:
 	    printf("CONNMARK save ");
-	    if (markinfo->mask != ~0)
-		printf("mask 0x%lx", markinfo->mask);
+	    print_mask("mask ", markinfo->mask);
 	    printf(" ");
 	    break;
 	case IPT_CONNMARK_RESTORE:
 	    printf("CONNMARK restore ");
-	    if (markinfo->mask != ~0)
-		printf("mask 0x%lx", markinfo->mask);
+	    print_mask("mask ", markinfo->mask);
 	    break;
 	default:
 	    printf("ERROR: UNKNOWN CONNMARK MODE ");
@@ -167,20 +209,18 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 
 	switch (markinfo->mode) {
 	case IPT_CONNMARK_SET:
-	    printf("--set-mark 0x%lx", markinfo->mark);
-	    if (markinfo->mask != ~0)
-		printf("/0x%lx", markinfo->mask);
+	    printf("--set-mark ");
+	    print_mark(markinfo->mark);
+	    print_mask("/", markinfo->mask);
 	    printf(" ");
 	    break;
 	case IPT_CONNMARK_SAVE:
 	    printf("--save-mark ");
-	    if (markinfo->mask != ~0)
-		printf("--mask 0x%lx", markinfo->mask);
+	    print_mask("--mask ", markinfo->mask);
 	    break;
 	case IPT_CONNMARK_RESTORE:
 	    printf("--restore-mark ");
-	    if (markinfo->mask != ~0)
-		printf("--mask 0x%lx", markinfo->mask);
+	    print_mask("--mask ", markinfo->mask);
 	    break;
 	default:
 	    printf("ERROR: UNKNOWN CONNMARK MODE ");

@@ -17,8 +17,13 @@ enum {
 };
 
 struct ipt_connmark_target_info {
+#ifdef KERNEL_64_USERSPACE_32
+	unsigned long long mark;
+	unsigned long long mask;
+#else
 	unsigned long mark;
 	unsigned long mask;
+#endif
 	u_int8_t mode;
 };
 
