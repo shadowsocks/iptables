@@ -40,12 +40,12 @@ iptables \- IP packet filter administration
 .SH DESCRIPTION
 .B Iptables
 is used to set up, maintain, and inspect the tables of IP packet
-filter rules in the Linux kernel.  There are several different tables
-which may be defined, and each table contains a number of built-in
-chains, and may contain user-defined chains.
+filter rules in the Linux kernel.  Several different tables
+may be defined.  Each table contains a number of built-in
+chains and may also contain user-defined chains.
 
-Each chain is a list of rules which can match a set of packets: each
-rule specifies what to do with a packet which matches.  This is called
+Each chain is a list of rules which can match a set of packets.  Each
+rule specifies what to do with a packet that matches.  This is called
 a `target', which may be a jump to a user-defined chain in the same
 table.
 
@@ -53,7 +53,7 @@ table.
 A firewall rule specifies criteria for a packet, and a target.  If the
 packet does not match, the next rule in the chain is the examined; if
 it does match, then the next rule is specified by the value of the
-target, which can be the name of a user-defined chain, or one of the
+target, which can be the name of a user-defined chain or one of the
 special values 
 .IR ACCEPT ,
 .IR DROP ,
@@ -68,8 +68,8 @@ means to drop the packet on the floor.
 .I QUEUE
 means to pass the packet to userspace (if supported by the kernel).
 .I RETURN
-means stop traversing this chain, and resume at the next rule in the
-previous (calling) chain.  If the end of a built-in chain is reached,
+means stop traversing this chain and resume at the next rule in the
+previous (calling) chain.  If the end of a built-in chain is reached
 or a rule in a built-in chain with target
 .I RETURN
 is matched, the target specified by the chain policy determines the
@@ -87,11 +87,11 @@ that table if it is not already there.
 
 The tables are as follows:
 .BR "filter"
-This is the default table, and contains the built-in chains INPUT (for
+This is the default table.  It contains the built-in chains INPUT (for
 packets coming into the box itself), FORWARD (for packets being routed
 through the box), and OUTPUT (for locally-generated packets).
 .BR "nat"
-This table is consulted when a packet which is creates a new
+This table is consulted when a packet that creates a new
 connection is encountered.  It consists of three built-ins: PREROUTING
 (for altering packets as soon as they come in), OUTPUT (for altering
 locally-generated packets before routing), and POSTROUTING (for
@@ -106,10 +106,10 @@ The options that are recognized by
 .B iptables
 can be divided into several different groups.
 .SS COMMANDS
-These options specify the specific action to perform; only one of them
-can be specified on the command line, unless otherwise specified
+These options specify the specific action to perform.  Only one of them
+can be specified on the command line unless otherwise specified
 below.  For all the long versions of the command and option names, you
-only need to use enough letters to ensure that 
+need to use only enough letters to ensure that
 .B iptables
 can differentiate it from all other options.
 .TP
@@ -139,7 +139,7 @@ List all rules in the selected chain.  If no chain is selected, all
 chains are listed.  It is legal to specify the
 .B -Z
 (zero) option as well, in which case the chain(s) will be atomically
-listed and zeroed.  The exact output is effected by the other
+listed and zeroed.  The exact output is affected by the other
 arguments given.
 .TP
 .B "-F, --flush"
@@ -151,16 +151,16 @@ Zero the packet and byte counters in all chains.  It is legal to
 specify the
 .B "-L, --list"
 (list) option as well, to see the counters immediately before they are
-cleared; see above.
+cleared. (See above.)
 .TP
 .B "-N, --new-chain"
-Create a new user-defined chain of the given name.  There must be no
+Create a new user-defined chain by the given name.  There must be no
 target of that name already.
 .TP
 .B "-X, --delete-chain"
 Delete the specified user-defined chain.  There must be no references
-to the chain (if there are you must delete or replace the referring
-rules before the chain can be deleted).  If no argument is given, it
+to the chain.  If there are, you must delete or replace the referring
+rules before the chain can be deleted.  If no argument is given, it
 will attempt to delete every non-builtin chain in the table.
 .TP
 .B "-P, --policy"
@@ -170,7 +170,7 @@ for the legal targets.  Only non-user-defined chains can have policies,
 and neither built-in nor user-defined chains can be policy targets.
 .TP
 .B "-E, --rename-chain"
-Rename the user specified chain to the user supplied name; this is
+Rename the user specified chain to the user supplied name.  This is
 cosmetic, and has no effect on the structure of the table.
 .TP
 .B -h
@@ -178,7 +178,7 @@ Help.
 Give a (currently very brief) description of the command syntax.
 .SS PARAMETERS
 The following parameters make up a rule specification (as used in the
-add, delete, replace, append and check commands).
+add, delete, insert, replace and append commands).
 .TP
 .BR "-p, --protocol " "[!] \fIprotocol\fP"
 The protocol of the rule or of the packet to check.
@@ -224,10 +224,10 @@ See the description of the
 is an alias for this option.
 .TP
 .BI "-j, --jump " "target"
-This specifies the target of the rule; ie. what to do if the packet
-matches it.  The target can be a user-defined chain (not the one this
-rule is in), one of the special builtin targets which decide the fate
-of the packet immediately, or an extension (see 
+This specifies the target of the rule; i.e., what to do if the packet
+matches it.  The target can be a user-defined chain (other than the
+one this rule is in), one of the special builtin targets which decide
+the fate of the packet immediately, or an extension (see
 .B EXTENSIONS
 below).  If this
 option is omitted in a rule, then matching the rule will have no
@@ -617,9 +617,9 @@ the rule also specifies
 or
 .BR "-p udp" ).
 If no port range is specified, then source ports below 512 will be
-mapped to other ports below 512: those between 1024 will be mapped to
-ports below 1024, and other ports will be mapped to 1024 or above.
-Where possible, no port alteration will occur.
+mapped to other ports below 512: those between 512 and 1023 inclusive
+will be mapped to ports below 1024, and other ports will be mapped to
+1024 or above. Where possible, no port alteration will occur.
 .SS DNAT
 This target is only valid in the 
 .B nat
