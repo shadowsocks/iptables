@@ -1,8 +1,14 @@
-# Standard part of Makefile for topdir.
-TOPLEVEL_INCLUDED=YES
+
 
 # uncomment this to get a fully statically linked version
 # NO_SHARED_LIBS = 1
+
+######################################################################
+# YOU SHOULD NOT NEED TO TOUCH ANYTHING BELOW THIS LINE
+######################################################################
+
+# Standard part of Makefile for topdir.
+TOPLEVEL_INCLUDED=YES
 
 ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
@@ -23,6 +29,9 @@ LIBDIR:=/usr/local/lib
 BINDIR:=/usr/local/sbin
 MANDIR:=/usr/local/man
 INCDIR:=/usr/local/include
+
+# directory for new iptables releases
+RELEASE_DIR:=/tmp
 
 # Need libc6 for this.  FIXME: Should covert to autoconf.
 ifeq ($(shell [ -f /usr/include/netinet/ip6.h ] && echo YES), YES)
@@ -183,7 +192,7 @@ most-of-pom:
 
 # Rusty's distro magic.
 .PHONY: distrib
-distrib: check distclean delrelease /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2 diff md5sums # nowhitespace
+distrib: check distclean delrelease $(RELEASE_DIR)/iptables-$(NETFILTER_VERSION).tar.bz2 diff md5sums # nowhitespace
 
 # Makefile must not define:
 # -g -pg
@@ -199,21 +208,21 @@ nowhitespace:
 
 .PHONY: delrelease
 delrelease:
-	rm -f /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2
+	rm -f $(RELEASE_DIR)/iptables-$(NETFILTER_VERSION).tar.bz2
 
-/home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2:
+$(RELEASE_DIR)/iptables-$(NETFILTER_VERSION).tar.bz2:
 	cd .. && ln -sf userspace iptables-$(NETFILTER_VERSION) && tar cvf - --exclude CVS iptables-$(NETFILTER_VERSION)/. | bzip2 -9 > $@ && rm iptables-$(NETFILTER_VERSION)
 
 .PHONY: diff
-diff: /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2
+diff: $(RELEASE_DIR)/iptables-$(NETFILTER_VERSION).tar.bz2
 	@mkdir /tmp/diffdir
-	@cd /tmp/diffdir && tar -x --bzip2 -f /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2
-	@set -e; cd /tmp/diffdir; tar -x --bzip2 -f /home/public/netfilter/iptables-$(OLD_NETFILTER_VERSION).tar.bz2; echo Creating patch-iptables-$(OLD_NETFILTER_VERSION)-$(NETFILTER_VERSION).bz2; diff -urN iptables-$(OLD_NETFILTER_VERSION) iptables-$(NETFILTER_VERSION) | bzip2 -9 > /home/public/netfilter/patch-iptables-$(OLD_NETFILTER_VERSION)-$(NETFILTER_VERSION).bz2
+	@cd /tmp/diffdir && tar -x --bzip2 -f $(RELEASE_DIR)/iptables-$(NETFILTER_VERSION).tar.bz2
+	@set -e; cd /tmp/diffdir; tar -x --bzip2 -f $(RELEASE_DIR)/iptables-$(OLD_NETFILTER_VERSION).tar.bz2; echo Creating patch-iptables-$(OLD_NETFILTER_VERSION)-$(NETFILTER_VERSION).bz2; diff -urN iptables-$(OLD_NETFILTER_VERSION) iptables-$(NETFILTER_VERSION) | bzip2 -9 > $(RELEASE_DIR)/patch-iptables-$(OLD_NETFILTER_VERSION)-$(NETFILTER_VERSION).bz2
 	@rm -rf /tmp/diffdir
 
 .PHONY: md5sums
 md5sums:
-	cd /home/public/netfilter/ && md5sum patch-iptables-*-$(NETFILTER_VERSION).bz2 iptables-$(NETFILTER_VERSION).tar.bz2
+	cd $(RELEASE_DIR)/ && md5sum patch-iptables-*-$(NETFILTER_VERSION).bz2 iptables-$(NETFILTER_VERSION).tar.bz2
 
 # $(wildcard) fails wierdly with make v.3.78.1.
 include $(shell echo */Makefile)
