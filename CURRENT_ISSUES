@@ -1,28 +1,35 @@
-- REJECT to UDP packets with wrong checksum
-	- fix in pending
-- save/restore problem of owner match
+save/restore problem of owner match
 	- userspace
-- ECN checksum problem
-	- fix in pending
-- 'mangle INPUT MARK problem' 
-	- route me harder?
-- ip6tables HOPLIMIT target
-	- can be put in pom
-- u32
+u32 match
 	- can wait
-- XDMCP conntrack/nat
+XDMCP conntrack/nat
 	- can wait
-- nf_debug stuff
+nf_debug stuff
 	- can wait
-- ipt_ACCOUNT
+ipt_ACCOUNT
 	- can wait
-- ftp conntrack debug message
-	- fix in pending
-- ASSERT debug messages
-	- fix in submitted
-- ICMP de-nat problem at MTU transition
+ICMP de-nat problem at MTU transition
 	- fix needs testing
-- early_drop_backwards.diff 
-	- is in my local pom, needs testing before 'pending'
-- UDP stream timeout (180s) doens't apply for first reply packet
+early_drop_backwards.diff 
+	- fix in pending, needs testing
+UDP stream timeout (180s) doens't apply for first reply packet
 	- fix by Martin Josefsson, needs review/testing
+rpc conntrack helper
+	- comments/updates sent to Ian, waiting for reply
+remove __MOD_INC_USAGE / __MOD_DEC_USAGE patch
+	- need to familiarize with new API and review patch
+SLOG target
+	- no further work expected
+	- needs to be integrated with recent nfnetlink/ctnetlink
+loop detection / nf_hipac (mail from dec 15
+	- need time
+reject --with-admin-prohibited
+	- most compatible version needs to be used
+IPv6 REJECT target fix
+	- important, it's a pity that it's still broken
+bi-directional ftp state tracking
+	- do we want this?
+typo in ftp helper (espv instead of epsv)
+	- cosmetic patch needs to be done and submitted
+final ACK of a SYN - SYN/ACK - ACK tcp handshake establishes ASSURED
+	- patch is on list, needs testing + comments from kadlec

@@ -4,11 +4,11 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.66 2002/09/15 11:29:18 laforge Exp $
+CVS ID: $Id: TODO,v 1.67 2002/10/22 10:15:19 laforge Exp $
 
 IMPORTANT issues:
 - erroneously too-fast dropped conntrack for half-open TCP connections [JK]
-- wrong 'Out of window' error message from tcp-windowtracking [JK]
+X wrong 'Out of window' error message from tcp-windowtracking [JK]
 - --mac-source not working in FORWARD (manpage bug?)
 - update manpages to include recently submitted extensions
 - locally bound udp port can still be used for MASQ/SNAT
@@ -29,12 +29,11 @@ TO BE INVESTIGATED:
 NICE to have:
 - endianness wrt. unnamed initializers in conntrack helpers after 
   pptp-patch applied
-- make RPC conntrack work again
+X make RPC conntrack work again
 - multicast connection tracking
 - sysctl support for ftp-multi, irc-conntrack/nat, ftp-fxp
-- integrate HOPLIMIT for ipv6 in patch-o-matic [HW]
+X integrate HOPLIMIT for ipv6 in patch-o-matic [HW]
 - u32 classifier (port from tc -> iptables) [YU]
-- documentation for libiptc
 - port conntrack to IPv6 (code reuse?) [BC]
 - ip_nat_ident module
 - make iptables / ip6tables use the same codebase (as libiptc) [KA]
