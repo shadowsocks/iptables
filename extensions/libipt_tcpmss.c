@@ -52,13 +52,13 @@ parse_tcp_mssvalues(const char *mssvaluestring,
 
 	buffer = strdup(mssvaluestring);
 	if ((cp = strchr(buffer, ':')) == NULL)
-		mss_min = mss_max = parse_tcp_mssvalue(buffer);
+		*mss_min = *mss_max = parse_tcp_mssvalue(buffer);
 	else {
 		*cp = '\0';
 		cp++;
 
-		mss_min = buffer[0] ? parse_tcp_mssvalue(buffer) : 0;
-		mss_max = cp[0] ? parse_tcp_mssvalue(cp) : 0xFFFF;
+		*mss_min = buffer[0] ? parse_tcp_mssvalue(buffer) : 0;
+		*mss_max = cp[0] ? parse_tcp_mssvalue(cp) : 0xFFFF;
 	}
 	free(buffer);
 }
@@ -124,8 +124,8 @@ print(const struct ipt_ip *ip,
 		(const struct ipt_tcpmss_match_info *)match->data;
 
 	printf("tcpmss match ");
-	print_tcpmss(mss_info->mss_min, mss_info->mss_max,
-		     mss_info->invert, numeric);
+	print_tcpmss(mssinfo->mss_min, mssinfo->mss_max,
+		     mssinfo->invert, numeric);
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
@@ -136,8 +136,8 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 		(const struct ipt_tcpmss_match_info *)match->data;
 
 	printf("--mss ");
-	print_tcpmss(mss_info->mss_min, mss_info->mss_max,
-		     mss_info->invert, 0);
+	print_tcpmss(mssinfo->mss_min, mssinfo->mss_max,
+		     mssinfo->invert, 0);
 }
 
 struct iptables_match tcpmss
