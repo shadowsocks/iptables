@@ -1537,6 +1537,9 @@ static char *get_modprobe(void)
 		case -1: goto fail;
 		case 1024: goto fail; /* Partial read.  Wierd */
 		}
+		if (ret[strlen(ret)-1]=='\n') 
+			ret[strlen(ret)-1]=0;
+		close(procfile);
 		return ret;
 	}
  fail:
