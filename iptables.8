@@ -267,6 +267,14 @@ destination ports of such a packet (or ICMP type), such a packet will
 not match any rules which specify them.  When the "!" argument
 precedes the "-f" flag, the rule will only match head fragments, or
 unfragmented packets.
+.TP
+.B "-c, --set-counters " "PKTS BYTES"
+This enables the administrater to initialize the packet and byte
+counters of a rule (during
+.B INSERT,
+.B APPEND,
+.B REPLACE
+operations)
 .SS "OTHER OPTIONS"
 The following additional options can be specified:
 .TP

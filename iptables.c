@@ -95,9 +95,10 @@ static const char cmdflags[] = { 'I', 'D', 'D', 'R', 'A', 'L', 'F', 'Z',
 #define OPT_VIANAMEOUT	0x00100U
 #define OPT_FRAGMENT    0x00200U
 #define OPT_LINENUMBERS 0x00400U
-#define NUMBER_OF_OPT	11
+#define OPT_COUNTERS	0x00800U
+#define NUMBER_OF_OPT	12
 static const char optflags[NUMBER_OF_OPT]
-= { 'n', 's', 'd', 'p', 'j', 'v', 'x', 'i', 'o', 'f', '3'};
+= { 'n', 's', 'd', 'p', 'j', 'v', 'x', 'i', 'o', 'f', '3', 'c'};
 
 static struct option original_opts[] = {
 	{ "append", 1, 0, 'A' },
@@ -130,6 +131,7 @@ static struct option original_opts[] = {
 	{ "help", 2, 0, 'h' },
 	{ "line-numbers", 0, 0, '0' },
 	{ "modprobe", 1, 0, 'M' },
+	{ "set-counters", 1, 0, 'c' },
 	{ 0 }
 };
 
@@ -387,6 +389,7 @@ exit_printhelp(void)
 "  --exact	-x		expand numbers (display exact values)\n"
 "[!] --fragment	-f		match second or further fragments only\n"
 "  --modprobe=<command>		try to insert modules using this command\n"
+"  --set-counters PKTS BYTES	set the counter during insert/append\n"
 "[!] --version	-V		print package version.\n");
 
 	/* Print out any special helps. A user might like to be able
@@ -1615,6 +1618,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	const char *shostnetworkmask = NULL, *dhostnetworkmask = NULL;
 	const char *policy = NULL, *newname = NULL;
 	unsigned int rulenum = 0, options = 0, command = 0;
+	const char *pcnt = NULL, *bcnt = NULL;
 	int ret = 1;
 	struct iptables_match *m;
 	struct iptables_target *target = NULL;
@@ -1646,7 +1650,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	opterr = 0;
 
 	while ((c = getopt_long(argc, argv,
-	   "-A:C:D:R:I:L::F::Z::N:X::E:P:Vh::o:p:s:d:j:i:fbvnt:m:x",
+	   "-A:C:D:R:I:L::F::Z::N:X::E:P:Vh::o:p:s:d:j:i:fbvnt:m:xc:",
 					   opts, NULL)) != -1) {
 		switch (c) {
 			/*
@@ -1925,6 +1929,32 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		case 'M':
 			modprobe = optarg;
 			break;
+
+		case 'c':
+
+			set_option(&options, OPT_COUNTERS, &fw.ip.invflags,
+				   invert);
+			pcnt = optarg;
+			if (optind < argc && argv[optind][0] != '-'
+			    && argv[optind][0] != '!')
+				bcnt = argv[optind++];
+			else
+				exit_error(PARAMETER_PROBLEM,
+					"-%c requires packet and byte counter",
+					opt2char(OPT_COUNTERS));
+
+			if (sscanf(pcnt, "%llu", &fw.counters.pcnt) != 1)
+				exit_error(PARAMETER_PROBLEM,
+					"-%c packet counter not numeric",
+					opt2char(OPT_COUNTERS));
+
+			if (sscanf(bcnt, "%llu", &fw.counters.bcnt) != 1)
+				exit_error(PARAMETER_PROBLEM,
+					"-%c byte counter not numeric",
+					opt2char(OPT_COUNTERS));
+			
+			break;
+
 
 		case 1: /* non option */
 			if (optarg[0] == '!' && optarg[1] == '\0') {

@@ -3,6 +3,8 @@
  * based on previous code from Rusty Russell <rusty@linuxcare.com.au>
  *
  * This coude is distributed under the terms of GNU GPL
+ *
+ * $Id$
  */
 
 #include <getopt.h>
@@ -221,10 +223,10 @@ int main(int argc, char *argv[])
 
 		} else {
 			char *newargv[1024];
-			int i,a;
+			int i,a, argvsize;
 			char *ptr = buffer;
-			char *ctrs = NULL;
-			struct ipt_counters count;
+			char *pcnt = NULL;
+			char *bcnt = NULL;
 
 			if (buffer[0] == '[') {
 				ptr = strchr(buffer, ']');
@@ -232,24 +234,27 @@ int main(int argc, char *argv[])
 					exit_error(PARAMETER_PROBLEM,
 						   "Bad line %u: need ]\n",
 						   line);
-				ctrs = strtok(ptr, " \t\n");
+				pcnt = strtok(buffer+1, ":");
+				bcnt = strtok(NULL, "]");
 			}
-
-			if (counters && ctrs) {
-
-				parse_counters(ctrs, &count);
-			}
-
-			/* FIXME: Don't ignore counters. */
 
 			newargv[0] = argv[0];
 			newargv[1] = "-t";
 			newargv[2] = (char *) &curtable;
 			newargv[3] = "-A";
 			newargv[4] = (char *) &curchain;
+			argvsize = 5;
+
+			if (counters && pcnt && bcnt) {
+				newargv[5] = "--set-counters";
+				newargv[6] = (char *) pcnt;
+				newargv[7] = (char *) bcnt;
+				argvsize = 8;
+			}
 
 			/* strtok: a function only a coder could love */
-			for (i = 5; i < sizeof(newargv)/sizeof(char *); i++) {
+			for (i = argvsize; i < sizeof(newargv)/sizeof(char *); 
+					i++) {
 				if (!(newargv[i] = strtok(NULL, " \t\n")))
 					break;
 				ptr = NULL;

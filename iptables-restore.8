@@ -50,11 +50,6 @@ Expect this to be fixed in the next iptables release.
 To make it work, reorder the output in a way that in every table, all 
 user-defined chains are created before any other chain uses this chain
 as target.
-.PP
-.B iptables-restore
-does only restore the counter values of the builtin chains, and 
-.B NOT
-the individual counters of each rule. 
 .SH AUTHOR
 Harald Welte <laforge@gnumonks.org>
 .SH SEE ALSO
