@@ -35,7 +35,7 @@ static void help(void)
 "               		or in hex (ex: 0x20)\n"
 "  --set-dscp-class class	Set the DSCP field in packet header to the\n"
 "				value represented by the DiffServ class value.\n"
-"				This class may be EF,BE or any of the CSxx "
+"				This class may be EF,BE or any of the CSxx\n"
 "				or AFxx classes.\n"
 "\n"
 "				These two options are mutually exclusive !\n"
