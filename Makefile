@@ -1,5 +1,3 @@
-
-
 # uncomment this to get a fully statically linked version
 # NO_SHARED_LIBS = 1
 
@@ -89,10 +87,6 @@ default: print-extensions all
 print-extensions:
 	@[ -n "$(OPTIONALS)" ] && echo Extensions found: $(OPTIONALS)
 
-.PHONY: pending-patches
-pending-patches:
-	@cd patch-o-matic && KERNEL_DIR=$(KERNEL_DIR) ./runme pending
-
 iptables.o: iptables.c
 	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -c -o $@ $<
 
@@ -173,15 +167,6 @@ install-devel: all install-devel-man3 install-devel-headers install-devel-libs
 .PHONY: distclean
 distclean: clean
 	@rm -f TAGS `find . -name '*~' -o -name '.*~'` `find . -name '*.rej'` `find . -name '*.d'` .makefirst
-
-.PHONY: patch-o-matic
-patch-o-matic/ patch-o-matic:
-	@echo "Are your sure you didn't want to use make most-of-pom?"
-	@cd $@ && KERNEL_DIR=$(KERNEL_DIR) ./runme extra
-
-.PHONY: most-of-pom
-most-of-pom:
-	@cd patch-o-matic && KERNEL_DIR=$(KERNEL_DIR) ./runme base
 
 # Rusty's distro magic.
 .PHONY: distrib
