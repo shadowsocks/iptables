@@ -292,9 +292,9 @@ exit_tryhelp(int status)
 }
 
 void
-exit_printhelp(void)
+exit_printhelp(struct ip6tables_rule_match *matches)
 {
-	struct ip6tables_match *m = NULL;
+	struct ip6tables_rule_match *matchp = NULL;
 	struct ip6tables_target *t = NULL;
 
 	printf("%s v%s\n\n"
@@ -359,14 +359,16 @@ exit_printhelp(void)
 
 	/* Print out any special helps. A user might like to be able to add a --help 
 	   to the commandline, and see expected results. So we call help for all 
-	   matches & targets */
-	for (t=ip6tables_targets;t;t=t->next) {
-		printf("\n");
-		t->help();
+	   specified matches & targets */
+	for (t = ip6tables_targets; t; t = t->next) {
+		if (t->used) {
+			printf("\n");
+			t->help();
+		}
 	}
-	for (m=ip6tables_matches;m;m=m->next) {
+	for (matchp = matches; matchp; matchp = matchp->next) {
 		printf("\n");
-		m->help();
+		matchp->match->help();
 	}
 	exit(0);
 }
@@ -1839,10 +1841,10 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 				optarg = argv[optind];
 
 			/* iptables -p icmp -h */
-			if (!ip6tables_matches && protocol)
-				find_match(protocol, TRY_LOAD, NULL);
+			if (!matches && protocol)
+				find_match(protocol, TRY_LOAD, &matches);
 
-			exit_printhelp();
+			exit_printhelp(matches);
 
 			/*
 			 * Option selection
