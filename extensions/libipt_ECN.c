@@ -24,13 +24,13 @@ static void init(struct ipt_entry_target *t, unsigned int *nfcache)
 static void help(void) 
 {
 	printf(
-"ECN target options\n"
-"  --ecn-tcp-remove		Remove all ECN bits which may be present\n"
-"  		                in the IPv4 header\n"
-"ECN target EXPERIMENTAL options (use with extreme care!)\n"
+"ECN target v%s options\n"
+"  --ecn-tcp-remove		Remove all ECN bits from TCP header\n"
+"ECN target v%s EXPERIMENTAL options (use with extreme care!)\n"
 "  --ecn-ip-ect			Set the IPv4 ECT codepoint (0 to 3)\n"
 "  --ecn-tcp-cwr		Set the IPv4 CWR bit (0 or 1)\n"
-"  --ecn-tcp-ece		Set the IPv4 CWR bit (0 or 1)\n"
+"  --ecn-tcp-ece		Set the IPv4 CWR bit (0 or 1)\n",
+		NETFILTER_VERSION, NETFILTER_VERSION
 );
 }
 
