@@ -17,9 +17,9 @@ NETFILTER_VERSION:=1.2.3
 OLD_NETFILTER_VERSION:=1.2.2
 
 # Waiting for inclusions in the kernel tree.
-PENDING_PATCHES:= sackperm.patch ipt_MIRROR-ttl.patch ipt_REJECT-checkentry.patch
+PENDING_PATCHES:=ipt_MIRROR-ttl.patch ipt_REJECT-checkentry.patch
 # These went in previous kernels.
-PENDING_PATCHES+=2.4.1.patch tos-fix.patch tcp-MSS.patch 2.4.4.patch ip6tables-export-symbols.patch
+PENDING_PATCHES+=2.4.1.patch tos-fix.patch tcp-MSS.patch 2.4.4.patch ip6tables-export-symbols.patch sackperm.patch
 
 # these are working fine together and don't break themselves
 MOSTOFPOM_PATCHES=NETLINK.patch NETMAP.patch SAME.patch TTL.patch ah-esp.patch ftos.patch iplimit.patch ipv4options.patch irc-conntrack-nat.patch length.patch mport.patch nth.patch pkttype.patch pool.patch psd.patch realm.patch snmp-nat.patch time.patch ttl.patch ulog.patch # string.patch (2.4.9)
