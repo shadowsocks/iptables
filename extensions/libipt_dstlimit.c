@@ -132,9 +132,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch(c) {
 	case '%':
-		if (check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
-				   "Unexpected `!' after --dstlimit");
+		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!parse_rate(optarg, &r->cfg.avg))
 			exit_error(PARAMETER_PROBLEM,
 				   "bad rate `%s'", optarg);
@@ -142,10 +140,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '$':
-		if (check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
-				   "Unexpected `!' after --dstlimit-burst");
-
+		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (string_to_number(optarg, 0, 10000, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				   "bad --dstlimit-burst `%s'", optarg);
@@ -153,10 +148,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_BURST;
 		break;
 	case '&':
-		if (check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
-				"Unexpected `!' after --dstlimit-htable-size");
-
+		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				"bad --dstlimit-htable-size: `%s'", optarg);
@@ -164,9 +156,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_SIZE;
 		break;
 	case '*':
-		if (check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
-				"Unexpected `!' after --dstlimit-htable-max");
+		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				"bad --dstlimit-htable-max: `%s'", optarg);
@@ -174,9 +164,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_MAX;
 		break;
 	case '(':
-		if (check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM, "Unexpected `!' after "
-					"--dstlimit-htable-gcinterval");
+		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				"bad --dstlimit-htable-gcinterval: `%s'", 
@@ -186,9 +174,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_GCINTERVAL;
 		break;
 	case ')':
-		if (check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM, "Unexpected `!' after " 
-					"--dstlimit-htable-expire");
+		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				"bad --dstlimit-htable-expire: `%s'", optarg);
@@ -197,9 +183,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_EXPIRE;
 		break;
 	case '_':
-		if (check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM, "Unexpected `!' after "
-					"--dstlimit-mode");
+		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!strcmp(optarg, "dstip"))
 			r->cfg.mode = IPT_DSTLIMIT_HASH_DIP;
 		else if (!strcmp(optarg, "dstip-destport") ||
@@ -216,9 +200,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_MODE;
 		break;
 	case '"':
-		if (check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM, "Unexpected `!' after "
-					"--dstlimit-name");
+		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (strlen(optarg) == 0)
 			exit_error(PARAMETER_PROBLEM, "Zero-length name?");
 		strncpy(r->name, optarg, sizeof(r->name));
@@ -227,6 +209,10 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	default:
 		return 0;
 	}
+
+	if (invert)
+		exit_error(PARAMETER_PROBLEM,
+			   "dstlimit does not support invert");
 
 	return 1;
 }
