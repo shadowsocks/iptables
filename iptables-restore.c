@@ -174,6 +174,7 @@ int main(int argc, char *argv[])
 			strncpy(curchain, chain, IPT_FUNCTION_MAXNAMELEN);
 
 			/* why the f... does iptc_builtin not work here ? */
+			/* FIXME: abort if chain creation fails --RR */
 //			if (!iptc_builtin(curchain, &handle)) {
 				DEBUGP("Creating new chain '%s'\n", curchain);
 				if (!iptc_create_chain(curchain, &handle))
