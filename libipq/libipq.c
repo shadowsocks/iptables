@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/time.h>
+#include <sys/types.h>
 
 #include <libipq/libipq.h>
 
@@ -50,9 +52,10 @@ enum {
 	IPQ_ERR_NLRECV,
 	IPQ_ERR_SEND,
 	IPQ_ERR_SUPP,
-	IPQ_ERR_RECVBUF
+	IPQ_ERR_RECVBUF,
+	IPQ_ERR_TIMEOUT
 };
-#define IPQ_MAXERR IPQ_ERR_RECVBUF
+#define IPQ_MAXERR IPQ_ERR_TIMEOUT
 
 struct ipq_errmap_t {
 	int errcode;
@@ -72,7 +75,8 @@ struct ipq_errmap_t {
 	{ IPQ_ERR_NLRECV, "Received error from netlink" },
 	{ IPQ_ERR_SEND, "Failed to send netlink message" },
 	{ IPQ_ERR_SUPP, "Operation not supported" },
-	{ IPQ_ERR_RECVBUF, "Receive buffer size invalid" }
+	{ IPQ_ERR_RECVBUF, "Receive buffer size invalid" },
+	{ IPQ_ERR_TIMEOUT, "Timeout"}
 };
 
 static int ipq_errno = IPQ_ERR_NONE;
@@ -81,7 +85,8 @@ static ssize_t ipq_netlink_sendto(const struct ipq_handle *h,
                                   const void *msg, size_t len);
 
 static ssize_t ipq_netlink_recvfrom(const struct ipq_handle *h,
-                                    unsigned char *buf, size_t len);
+                                    unsigned char *buf, size_t len,
+                                    int timeout);
 
 static ssize_t ipq_netlink_sendmsg(const struct ipq_handle *h,
                                    const struct msghdr *msg,
@@ -110,7 +115,8 @@ static ssize_t ipq_netlink_sendmsg(const struct ipq_handle *h,
 }
 
 static ssize_t ipq_netlink_recvfrom(const struct ipq_handle *h,
-                                    unsigned char *buf, size_t len)
+                                    unsigned char *buf, size_t len,
+                                    int timeout)
 {
 	int addrlen, status;
 	struct nlmsghdr *nlh;
@@ -120,6 +126,37 @@ static ssize_t ipq_netlink_recvfrom(const struct ipq_handle *h,
 		return -1;
 	}
 	addrlen = sizeof(h->peer);
+
+	if (timeout != 0) {
+		int ret;
+		struct timeval tv;
+		fd_set read_fds;
+		
+		if (timeout < 0) {
+			/* non-block non-timeout */
+			tv.tv_sec = 0;
+			tv.tv_usec = 0;
+		} else {
+			tv.tv_sec = timeout / 1000000;
+			tv.tv_usec = timeout % 1000000;
+		}
+
+		FD_ZERO(&read_fds);
+		FD_SET(h->fd, &read_fds);
+		ret = select(h->fd+1, &read_fds, NULL, NULL, &tv);
+		if (ret < 0) {
+			if (errno == EINTR) {
+				return 0;
+			} else {
+				ipq_errno = IPQ_ERR_RECV;
+				return -1;
+			}
+		}
+		if (!FD_ISSET(h->fd, &read_fds)) {
+			ipq_errno = IPQ_ERR_TIMEOUT;
+			return 0;
+		}
+	}
 	status = recvfrom(h->fd, buf, len, 0,
 	                      (struct sockaddr *)&h->peer, &addrlen);
 	if (status < 0) {
@@ -226,11 +263,14 @@ int ipq_set_mode(const struct ipq_handle *h,
 	return ipq_netlink_sendto(h, (void *)&req, req.nlh.nlmsg_len);
 }
 
-/* Note: timeout is not yet implemented */
+/*
+ * timeout is in microseconds (1 second is 1000000 (1 million) microseconds)
+ *
+ */
 ssize_t ipq_read(const struct ipq_handle *h,
                  unsigned char *buf, size_t len, int timeout)
 {
-	return ipq_netlink_recvfrom(h, buf, len);
+	return ipq_netlink_recvfrom(h, buf, len, timeout);
 }
 
 int ipq_message_type(const unsigned char *buf)

@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.45 2001/07/31 21:35:18 laforge Exp $
+CVS ID: $Id: TODO,v 1.46 2001/09/02 14:03:02 laforge Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -57,7 +57,7 @@ X integrate PSD target / port it as match [HW]
 X string_to_number() does not work correctly for unsigned ints [JM]
 - REJECT optionally generates port unreachable with faked SOURCE
 - libipq reentrancy [JM]
-- libipq asynchronousness [JM]
+X libipq asynchronousness [Done by Joost Remijn]
 - compiling without O2 issue
 
 FUTURE extensions:
