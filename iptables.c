@@ -1164,9 +1164,6 @@ register_target(struct iptables_target *me)
 			exit(1);
 		}
 
-		fprintf(stderr, "%s v%i vs v%i\n",
-			me->name, me->revision, old->revision);
-
 		/* Now we have two (or more) options, check compatibility. */
 		if (compatible_target_revision(old->name, old->revision)
 		    && old->revision > me->revision)
