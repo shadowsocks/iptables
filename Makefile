@@ -13,7 +13,7 @@ MANDIR:=/usr/local/man
 INCDIR:=/usr/local/include
 
 # Need libc6 for this.  Should covert to autoconf.
-ifneq ($(shell ldd --v | fgrep 2.2),)
+ifneq ($(shell ldd -v | fgrep 2.2),)
 DO_IPV6=1
 endif
 
