@@ -148,7 +148,7 @@ static void print_rate(u_int32_t period)
 
 	for (i = 1; i < sizeof(rates)/sizeof(struct rates); i++) {
 		if (period > rates[i].mult
-		    || rates[i].mult % period != 0)
+            || rates[i].mult/period < rates[i].mult%period)
 			break;
 	}
 
