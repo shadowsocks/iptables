@@ -1,6 +1,6 @@
 /* Shared library add-on to iptables to add ROUTE v6 target support.
  * Author : Cedric de Launois, <delaunois@info.ucl.ac.be>
- * v 1.0 2003/06/24
+ * v 1.1 2004/11/23
  */
 
 #include <stdio.h>
@@ -15,6 +15,11 @@
 #include <linux/netfilter_ipv6/ip6_tables.h>
 #include <linux/netfilter_ipv6/ip6t_ROUTE.h>
 
+/* compile IP6T_ROUTE_TEE support even if kernel headers are unpatched */
+#ifndef IP6T_ROUTE_TEE
+#define IP6T_ROUTE_TEE		0x02
+#endif
+
 /* Function which prints out usage message. */
 static void
 help(void)
@@ -23,9 +28,13 @@ help(void)
 "ROUTE target v%s options:\n"
 "    --oif   \tifname \t\tRoute the packet through `ifname' network interface\n"
 "    --gw    \tip     \t\tRoute the packet via this gateway\n"
-"    --continue\t     \t\tRoute the packet and continue traversing the rules.\n"
+"    --continue\t     \t\tRoute packet and continue traversing the\n"
+"            \t       \t\trules. Not valid with --iif or --tee.\n"
+"    --tee\t  \t\tDuplicate packet, route the duplicate,\n"
+"            \t       \t\tcontinue traversing with original packet.\n"
+"            \t       \t\tNot valid with --iif or --continue.\n"
 "\n",
-"1.0");
+"1.1");
 }
 
 static struct option opts[] = {
@@ -33,6 +42,7 @@ static struct option opts[] = {
 	{ "iif", 1, 0, '2' },
 	{ "gw", 1, 0, '3' },
 	{ "continue", 0, 0, '4' },
+	{ "tee", 0, 0, '5' },
 	{ 0 }
 };
 
@@ -57,6 +67,7 @@ init(struct ip6t_entry_target *t, unsigned int *nfcache)
 #define IP6T_ROUTE_OPT_IIF      0x02
 #define IP6T_ROUTE_OPT_GW       0x04
 #define IP6T_ROUTE_OPT_CONTINUE 0x08
+#define IP6T_ROUTE_OPT_TEE      0x10
 
 /* Function which parses command options; returns true if it
    ate an option */
@@ -114,9 +125,25 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IP6T_ROUTE_OPT_CONTINUE)
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --continue twice");
+		if (*flags & IP6T_ROUTE_OPT_TEE)
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify --continue AND --tee");
 
 		route_info->flags |= IP6T_ROUTE_CONTINUE;
 		*flags |= IP6T_ROUTE_OPT_CONTINUE;
+
+		break;
+
+	case '5':
+		if (*flags & IP6T_ROUTE_OPT_TEE)
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify --tee twice");
+		if (*flags & IP6T_ROUTE_OPT_CONTINUE)
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify --tee AND --continue");
+
+		route_info->flags |= IP6T_ROUTE_TEE;
+		*flags |= IP6T_ROUTE_OPT_TEE;
 
 		break;
 
@@ -162,6 +189,9 @@ print(const struct ip6t_ip6 *ip,
 	if (route_info->flags & IP6T_ROUTE_CONTINUE)
 		printf("continue");
 
+	if (route_info->flags & IP6T_ROUTE_TEE)
+		printf("tee");
+
 }
 
 
@@ -184,6 +214,9 @@ static void save(const struct ip6t_ip6 *ip,
 
 	if (route_info->flags & IP6T_ROUTE_CONTINUE)
 		printf("--continue ");
+
+	if (route_info->flags & IP6T_ROUTE_TEE)
+		printf("--tee ");
 }
 
 

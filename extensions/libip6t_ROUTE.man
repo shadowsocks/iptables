@@ -9,4 +9,7 @@ Route the packet through `ifname' network interface
 Route the packet via this gateway
 .TP
 .BI "--continue "
-Behave like a non-terminating target and continue traversing the rules
+Behave like a non-terminating target and continue traversing the rules. Not valid in combination with `--tee'
+.TP
+.BI "--tee "
+Make a copy of the packet, and route that copy to the given destination. For the original, uncopied packet, behave like a non-terminating target and continue traversing the rules.  Not valid in combination with `--continue'

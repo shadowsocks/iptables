@@ -12,4 +12,7 @@ Change the packet's incoming interface to `ifname'
 Route the packet via this gateway
 .TP
 .BI "--continue "
-Behave like a non-terminating target and continue traversing the rules.  Not valid in combination with `--iif'
+Behave like a non-terminating target and continue traversing the rules.  Not valid in combination with `--iif' or `--tee'
+.TP
+.BI "--tee "
+Make a copy of the packet, and route that copy to the given destination. For the original, uncopied packet, behave like a non-terminating target and continue traversing the rules.  Not valid in combination with `--iif' or `--continue'
