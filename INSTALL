@@ -1,32 +1,40 @@
 FOLLOW THESE STEPS:
 ===================
 
-Make sure /usr/src/linux contains the kernel headers you're building
-against.  If /usr/src/linux is an older kernel, set the KERNEL_DIR
-environment variable to point to the current kernel sources.
-
-If you forget the above step, a bogus dependency files with a ".d"
-extension may be created.  If you see messages like:
-	make: *** No rule to make target `include/linux/netfilter_ipv4/ipt_limit.h',
-	needed by `iptables.d'.  Stop.
-
-then you have these bogus dependency files. Do this:
-
-	% make distclean
-
-To build, just do:
-
+1) If /usr/src/linux contains the kernel headers of a recent 2.4
+   kernel:
 	% make
 
-Finally, you need to to install the shared libraries, and the binary:
+   Otherwise:
+	% make KERNEL_DIR=<<where-your-kernel-is>>
 
+2) Finally, you need to to install the shared libraries, and the binary:
 	# make install
+   Or
+	# make install KERNEL_DIR=<<where-your-kernel-is>>
 
-If you want to specify alternate directories for installation (instead
-of /usr/local/  bin lib man), do this:
+That's it!
+================
+Problems you may encounter:
+
+1) If your kernel is too old, you may be asked to apply one or more of
+   the patches in the directory to your kernel.  This can be safely
+   done as follows:
+
+	cp -al <<where-your-kernel-is>> <<where-your-kernel-is>>.backup
+	cd <<where-your-kernel-is>>
+	patch -p1 <  <<whatever-the-patchfile-is>>
+
+   Then start again.
+
+2) If you get the kernel directory wrong, you may see a message like:
+	Please try `make KERNEL_DIR=path-to-correct-kernel'
+
+3) If you want to specify alternate directories for installation
+(instead of /usr/local/ bin lib man), do this:
 
 	% make BINDIR=/usr/bin LIBDIR=/usr/lib MANDIR=/usr/man
-	% make BINDIR=/usr/bin LIBDIR=/usr/lib MANDIR=/usr/man install
+	# make BINDIR=/usr/bin LIBDIR=/usr/lib MANDIR=/usr/man install
 
 NOTE: make sure you build with at least the correct LIBDIR=
 specification, otherwise iptables(8) won't know where to find the

@@ -4,15 +4,15 @@ TOPLEVEL_INCLUDED=YES
 ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
-NETFILTER_VERSION:=1.1.0
-OLD_NETFILTER_VERSION:=1.0.0
+NETFILTER_VERSION:=1.1.1
+OLD_NETFILTER_VERSION:=1.1.0
 
 LIBDIR:=/usr/local/lib
 BINDIR:=/usr/local/bin
 MANDIR:=/usr/local/man
 
-COPT_FLAGS:=-O2
-CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -Iinclude/ -I$(KERNEL_DIR)/include -DNDEBUG -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" #-g #-pg # -DNDEBUG
+COPT_FLAGS:=-O2 -DNDEBUG
+CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -Iinclude/ -I$(KERNEL_DIR)/include -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" #-g #-pg
 
 DEPFILES = $(SHARED_LIBS:%.so=%.d)
 SH_CFLAGS:=$(CFLAGS) -fPIC
@@ -30,7 +30,7 @@ ifndef IPT_LIBDIR
 IPT_LIBDIR:=$(LIBDIR)/iptables
 endif
 
-default: all
+default: patchcheck all
 
 iptables.o: iptables.c
 	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -c -o $@ $<
@@ -41,6 +41,13 @@ iptables: iptables-standalone.c iptables.o libiptc/libiptc.a
 $(DESTDIR)$(BINDIR)/iptables: iptables
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
 	cp $< $@
+
+# Temporary check for patches: really old patches may fail `isapplied'.
+patchcheck:
+	@for f in `echo patch-*`; do				\
+	if ./isapplied $(KERNEL_DIR) $$f >/dev/null; then :;	\
+	else echo Please apply $$f to this kernel.; exit 1;	\
+	fi; done
 
 iptables-save: iptables-save.c iptables.o libiptc/libiptc.a
 	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ -ldl
