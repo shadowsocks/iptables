@@ -11,7 +11,8 @@
 #include <iptables.h>
 #include <stddef.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
-#include <linux/netfilter_ipv4/ipt_limit.h>
+/* For 64bit kernel / 32bit userspace */
+#include "../include/linux/netfilter_ipv4/ipt_limit.h"
 
 #define IPT_LIMIT_AVG	"3/hour"
 #define IPT_LIMIT_BURST	5

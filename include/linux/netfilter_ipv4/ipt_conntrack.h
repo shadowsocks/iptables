@@ -10,6 +10,7 @@
 
 #define IPT_CONNTRACK_STATE_SNAT (1 << (IP_CT_NUMBER + 1))
 #define IPT_CONNTRACK_STATE_DNAT (1 << (IP_CT_NUMBER + 2))
+#define IPT_CONNTRACK_STATE_UNTRACKED (1 << (IP_CT_NUMBER + 3))
 
 /* flags, invflags: */
 #define IPT_CONNTRACK_STATE	0x01
@@ -28,7 +29,11 @@ struct ipt_conntrack_info
 	struct ip_conntrack_tuple tuple[IP_CT_DIR_MAX];
 	struct in_addr sipmsk[IP_CT_DIR_MAX], dipmsk[IP_CT_DIR_MAX];
 
+#ifdef KERNEL_64_USERSPACE_32
+	unsigned long long expires_min, expires_max;
+#else
 	unsigned long expires_min, expires_max;
+#endif
 
 	/* Flags word */
 	u_int8_t flags;
@@ -36,4 +41,3 @@ struct ipt_conntrack_info
 	u_int8_t invflags;
 };
 #endif /*_IPT_CONNTRACK_H*/
-
