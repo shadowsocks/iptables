@@ -291,7 +291,7 @@ static void print_mode(const struct ipt_hashlimit_info *r, char separator)
 	}
 	if (r->cfg.mode & IPT_HASHLIMIT_HASH_SPT) {
 		if (prevmode)
-			putchar(seprator);
+			putchar(separator);
 		puts("dstport");
 	}
 	putchar(' ');
