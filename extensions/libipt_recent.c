@@ -8,6 +8,17 @@
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ipt_recent.h>
 
+/* need thos two to not fail compilation with old kernel, new userspace */
+#ifndef RECENT_NAME
+#define RECENT_NAME	"ipt_recent"
+#endif /* RECENT_NAME */
+#ifndef RECENT_VER
+#define RECENT_VER	"unknown"
+#endif /* RECENT_VER */
+#ifndef IPT_RECENT_NAME_LEN
+#define	IPT_RECENT_NAME_LEN	200
+#endif /* IPT_RECENT_NAME_LEN */
+
 /* Function which prints out usage message. */
 static void
 help(void)
