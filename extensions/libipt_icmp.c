@@ -7,6 +7,14 @@
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
 
+/* special hack for icmp-type 'any': 
+ * Up to kernel <=2.4.20 the problem was:
+ * '-p icmp ' matches all icmp packets
+ * '-p icmp -m icmp' matches _only_ ICMP type 0 :(
+ * This is now fixed by initializing the field * to icmp type 0xFF
+ * See: https://bugzilla.netfilter.org/cgi-bin/bugzilla/show_bug.cgi?id=37
+ */
+
 struct icmp_names {
 	const char *name;
 	u_int8_t type;
@@ -14,6 +22,7 @@ struct icmp_names {
 };
 
 static const struct icmp_names icmp_codes[] = {
+	{ "any", 0xFF, 0, 0xFF },
 	{ "echo-reply", 0, 0, 0xFF },
 	/* Alias */ { "pong", 0, 0, 0xFF },
 
@@ -168,6 +177,7 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 {
 	struct ipt_icmp *icmpinfo = (struct ipt_icmp *)m->data;
 
+	icmpinfo->type = 0xFF;
 	icmpinfo->code[1] = 0xFF;
 }
 
@@ -261,10 +271,16 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	if (icmp->invflags & IPT_ICMP_INV)
 		printf("! ");
 
-	printf("--icmp-type %u", icmp->type);
-	if (icmp->code[0] != 0 || icmp->code[1] != 0xFF)
-		printf("/%u", icmp->code[0]);
-	printf(" ");
+	/* special hack for 'any' case */
+	if (icmp->type == 0xFF) {
+		print_icmptype(icmp->type, icmp->code[0], icmp->code[1],
+				icmp->invflags & IPT_ICMP_INV, 0);
+	} else {
+		printf("--icmp-type %u", icmp->type);
+		if (icmp->code[0] != 0 || icmp->code[1] != 0xFF)
+			printf("/%u", icmp->code[0]);
+		printf(" ");
+	}
 }
 
 /* Final check; we don't care. */
