@@ -152,7 +152,7 @@ static void print_ip(char *prefix, const struct in6_addr *ip, const struct in6_a
 /* We want this to be readable, so only print out neccessary fields.
  * Because that's the kind of world I want to live in.  */
 static void print_rule(const struct ip6t_entry *e, 
-		ip6tc_handle_t *h, int counters)
+		ip6tc_handle_t *h, const char *chain, int counters)
 {
 	struct ip6t_entry_target *t;
 	const char *target_name;
@@ -160,6 +160,9 @@ static void print_rule(const struct ip6t_entry *e,
 	/* print counters */
 	if (counters)
 		printf("[%llu:%llu] ", e->counters.pcnt, e->counters.bcnt);
+
+	/* print chain name */
+	printf("-A %s ", chain);
 
 	/* Print IP part. */
 	print_ip("-s", &(e->ipv6.src), &(e->ipv6.smsk),
@@ -267,11 +270,11 @@ static int do_output(const char *tablename)
 		       NETFILTER_VERSION, ctime(&now));
 		printf("*%s\n", tablename);
 
-		/* Dump out chain names */
+		/* Dump out chain names first, 
+		 * thereby preventing dependency conflicts */
 		for (chain = ip6tc_first_chain(&h);
 		     chain;
 		     chain = ip6tc_next_chain(&h)) {
-			const struct ip6t_entry *e;
 
 			printf(":%s ", chain);
 			if (ip6tc_builtin(chain, h)) {
@@ -282,11 +285,17 @@ static int do_output(const char *tablename)
 			} else {
 				printf("- [0:0]\n");
 			}
+		}
+
+		for (chain = ip6tc_first_chain(&h);
+		     chain;
+		     chain = ip6tc_next_chain(&h)) {
+		     const struct ip6t_entry *e;
 
 			/* Dump out rules */
 			e = ip6tc_first_rule(chain, &h);
 			while(e) {
-				print_rule(e, &h, counters);
+				print_rule(e, &h, chain, counters);
 				e = ip6tc_next_rule(e, &h);
 			}
 		}

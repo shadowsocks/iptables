@@ -79,6 +79,28 @@ int parse_counters(char *string, struct ip6t_counters *ctr)
 	return (sscanf(string, "[%llu:%llu]", &ctr->pcnt, &ctr->bcnt) == 2);
 }
 
+/* global new argv and argc */
+static char *newargv[255];
+static int newargc;
+
+/* function adding one argument to newargv, updating newargc 
+ *  * returns true if argument added, false otherwise */
+static int add_argv(char *what) {
+        if (what && ((newargc + 1) < sizeof(newargv)/sizeof(char *))) {
+                newargv[newargc] = strdup(what);
+                newargc++;
+                return 1;
+        } else
+                return 0;
+}
+
+static void free_argv(void) {
+        int i;
+
+        for (i = 0; i < newargc; i++)
+                free(newargv[i]);
+}
+
 int main(int argc, char *argv[])
 {
 	ip6tc_handle_t handle;
@@ -86,7 +108,6 @@ int main(int argc, char *argv[])
 	unsigned int line = 0;
 	int c;
 	char curtable[IP6T_TABLE_MAXNAMELEN + 1];
-	char curchain[IP6T_FUNCTION_MAXNAMELEN + 1];
 	FILE *in;
 	const char *modprobe = 0;
 
@@ -131,17 +152,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	else in = stdin;
-/*
-	handle = iptc_init("filter");
-	if (!handle)
-		exit_error(VERSION_PROBLEM,
-			   "can't initialize iptables-restore: %s",
-			   iptc_strerror(errno));
 
-	if (!clean_slate(&handle))
-		exit_error(OTHER_PROBLEM, "Deleting old chains: %s",
-			   iptc_strerror(errno));
-*/
 	/* Grab standard input. */
 	while (fgets(buffer, sizeof(buffer), in)) {
 		int ret;
@@ -195,16 +206,15 @@ int main(int argc, char *argv[])
 					   program_name, line);
 				exit(1);
 			}
-			strncpy(curchain, chain, IP6T_FUNCTION_MAXNAMELEN);
 
-			/* why the f... does iptc_builtin not work here ? */
-			/* FIXME: abort if chain creation fails --RR */
-//			if (!iptc_builtin(curchain, &handle)) {
+			if (!ip6tc_builtin(chain, handle)) {
 				DEBUGP("Creating new chain '%s'\n", curchain);
-				if (!ip6tc_create_chain(curchain, &handle))
-				DEBUGP("unable to create chain '%s':%s\n", curchain,
-					strerror(errno));
-//			}
+				if (!ip6tc_create_chain(chain, &handle))
+                                        exit_error(PARAMETER_PROBLEM,
+                                                   "error creating chain "
+                                                   "'%s':%s\n", chain,
+                                                   strerror(errno));
+			}
 
 			policy = strtok(NULL, " \t\n");
 			DEBUGP("line %u, policy '%s'\n", line, policy);
@@ -244,66 +254,111 @@ int main(int argc, char *argv[])
 			ret = 1;
 
 		} else {
-			char *newargv[1024];
-			int i,a, argvsize;
+			int a;
 			char *ptr = buffer;
 			char *pcnt = NULL;
 			char *bcnt = NULL;
+                        char *parsestart;
+
+                        /* the parser */
+                        char *param_start, *curchar;
+                        int quote_open;
+
+                        /* reset the newargv */
+                        newargc = 0;
 
 			if (buffer[0] == '[') {
+                                /* we have counters in our input */
 				ptr = strchr(buffer, ']');
 				if (!ptr)
 					exit_error(PARAMETER_PROBLEM,
 						   "Bad line %u: need ]\n",
 						   line);
+
 				pcnt = strtok(buffer+1, ":");
+                                if (!pcnt)
+                                        exit_error(PARAMETER_PROBLEM,
+                                                   "Bad line %u: need :\n",
+                                                   line);
+
 				bcnt = strtok(NULL, "]");
-			} 
+                                if (!bcnt)
+                                        exit_error(PARAMETER_PROBLEM,
+                                                   "Bad line %u: need ]\n",
+                                                   line);
 
-			newargv[0] = argv[0];
-			newargv[1] = "-t";
-			newargv[2] = (char *) &curtable;
-			newargv[3] = "-A";
-			newargv[4] = (char *) &curchain;
-			argvsize = 5;
+                                /* start command parsing after counter */
+                                parsestart = ptr + 1;
+                        } else {
+                                /* start command parsing at start of line */
+                                parsestart = buffer;
+                        }
 
+                        add_argv(argv[0]);
+                        add_argv("-t");
+                        add_argv((char *) &curtable);
+
+/* IP6TABLES doesn't support this
 			if (counters && pcnt && bcnt) {
 				newargv[5] = "--set-counters";
 				newargv[6] = (char *) pcnt;
 				newargv[7] = (char *) bcnt;
-				argvsize = 8;
 			}
+*/
 				
-			// strtok initcialize!
-			if ( buffer[0]!='[' )
-			{
-				if (!(newargv[argvsize] = strtok(buffer, " \t\n")))
-					goto ImLaMeR;
-					//break;
-				argvsize++;
-			}
+                        /* After fighting with strtok enough, here's now
+                         * a 'real' parser. According to Rusty I'm now no
+                         * longer a real hacker, but I can live with that */
 
-			/* strtok: a function only a coder could love */
-			for (i = argvsize; i < sizeof(newargv)/sizeof(char *); 
-					i++) {
-				if (!(newargv[i] = strtok(NULL, " \t\n")))
-					break;
-				ptr = NULL;
-			}
-ImLaMeR:		if (i == sizeof(newargv)/sizeof(char *)) {
-				fprintf(stderr,
-					"%s: line %u too many arguments\n",
-					program_name, line);
-				exit(1);
-			}
+                        quote_open = 0;
+                        param_start = parsestart;
 
-			DEBUGP("===>calling do_command6(%u, argv, &%s, handle):\n",
-					i, curtable);
+                        for (curchar = parsestart; *curchar; curchar++) {
+                                if (*curchar == '"') {
+                                        if (quote_open) {
+                                                quote_open = 0;
+                                                *curchar = ' ';
+                                        } else {
+                                                quote_open = 1;
+                                                param_start++;
+                                        }
+                                }
+                                if (*curchar == ' '
+                                    || *curchar == '\t'
+                                    || * curchar == '\n') {
+                                        char param_buffer[1024];
+                                        int param_len = curchar-param_start;
 
-			for (a = 0; a <= i; a++)
+                                        if (quote_open)
+                                                continue;
+
+                                        if (!param_len) {
+                                                /* two spaces? */
+                                                param_start++;
+                                                continue;
+                                        }
+
+                                        /* end of one parameter */
+                                        strncpy(param_buffer, param_start,
+                                                param_len);
+                                        *(param_buffer+param_len) = '\0';
+                                        add_argv(param_buffer);
+                                        param_start += param_len + 1;
+                                } else {
+                                        /* regular character, skip */
+                                }
+                        }
+
+			DEBUGP("calling do_command6(%u, argv, &%s, handle):\n",
+					newargc, curtable);
+
+			for (a = 0; a <= newargc; a++)
 				DEBUGP("argv[%u]: %s\n", a, newargv[a]);
 
-			ret = do_command6(i, newargv, &newargv[2], &handle);
+			ret = do_command6(newargc, newargv, 
+                                          &newargv[2], &handle);
+
+                        free_argv();
 		}
 		if (!ret) {
 			fprintf(stderr, "%s: line %u failed\n",
