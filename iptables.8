@@ -25,7 +25,7 @@
 .SH NAME
 iptables \- administration tool for IPv4 packet filtering and NAT
 .SH SYNOPSIS
-.BR "iptables [-t table] -[ADC] " "chain rule-specification [options]"
+.BR "iptables [-t table] -[AD] " "chain rule-specification [options]"
 .br
 .BR "iptables [-t table] -I " "chain [rulenum] rule-specification [options]"
 .br
@@ -91,8 +91,9 @@ loading, an attempt will be made to load the appropriate module for
 that table if it is not already there.
 
 The tables are as follows:
-.TP
-.B "filter"
+.RS
+.TP .4i
+.BR "filter" :
 This is the default table (if no -t option is passed).  It contains
 the built-in chains
 .B INPUT
@@ -102,7 +103,7 @@ the built-in chains
 .B OUTPUT
 (for locally-generated packets).
 .TP
-.B "nat"
+.BR "nat" :
 This table is consulted when a packet that creates a new
 connection is encountered.  It consists of three built-ins:
 .B PREROUTING
@@ -112,7 +113,7 @@ connection is encountered.  It consists of three built-ins:
 .B POSTROUTING
 (for altering packets as they are about to go out).
 .TP
-.B "mangle"
+.BR "mangle" :
 This table is used for specialized packet alteration.  Until kernel
 2.4.17 it had two built-in chains:
 .B PREROUTING
@@ -126,6 +127,7 @@ Since kernel 2.4.18, three other built-in chains are also supported:
 (for altering packets being routed through the box), and
 .B POSTROUTING
 (for altering packets as they are about to go out).
+.RE
 .SH OPTIONS
 The options that are recognized by
 .B iptables
@@ -166,9 +168,9 @@ fail.  Rules are numbered starting at 1.
 List all rules in the selected chain.  If no chain is selected, all
 chains are listed.  As every other iptables command, it applies to the
 specified table (filter is the default), so NAT rules get listed by
-.br
+.nf
  iptables -t nat -n -L
-.br
+.fi
 Please note that it is often used with the
 .B -n
 option, in order to avoid long reverse DNS lookups.
@@ -177,9 +179,9 @@ It is legal to specify the
 (zero) option as well, in which case the chain(s) will be atomically
 listed and zeroed.  The exact output is affected by the other
 arguments given. The exact rules are suppressed until you use
-.br
+.nf
  iptables -L -v
-.br
+.fi
 .TP
 .BR "-F, --flush " "[\fIchain\fP]"
 Flush the selected chain (all the chains in the table if none is given).
@@ -450,12 +452,13 @@ This module matches packets related to a specific conntrack-helper.
 .TP
 .BI "--helper " "string"
 Matches packets related to the specified conntrack-helper.
-.TP
+.RS
+.PP
 string can be "ftp" for packets related to a ftp-session on default port.
 For other ports append -portnr to the value, ie. "ftp-2121".
-.br
+.PP
 Same rules apply for other conntrack-helpers.
-.br
+.RE
 .SS icmp
 This extension is loaded if `--protocol icmp' is specified.  It
 provides the following option:
@@ -463,9 +466,9 @@ provides the following option:
 .BR "--icmp-type " "[!] \fItypename\fP"
 This allows specification of the ICMP type, which can be a numeric
 ICMP type, or one of the ICMP type names shown by the command
-.br
+.nf
  iptables -p icmp -h
-.br
+.fi
 .SS length
 This module matches the length of a packet against a specific value
 or range of values.
@@ -652,9 +655,9 @@ the second argument is a comma-separated list of flags which must be
 set.  Flags are:
 .BR "SYN ACK FIN RST URG PSH ALL NONE" .
 Hence the command
-.br
+.nf
  iptables -A FORWARD -p tcp --tcp-flags SYN,ACK,FIN,RST SYN
-.br
+.fi
 will only match packets with the SYN flag set, and the ACK, FIN and
 RST flags unset.
 .TP
@@ -732,7 +735,8 @@ or
 .BR "-p udp" ).
 If no port range is specified, then the destination port will never be
 modified.
-.TP
+.RS
+.PP
 You can add several --to-destination options.  If you specify more
 than one destination address, either via an address range or multiple
 --to-destination options, a simple round-robin (one after another in
@@ -862,13 +866,15 @@ returned:
 .TP
 .BI "--reject-with " "type"
 The type given can be
-.BR icmp-net-unreachable ,
-.BR icmp-host-unreachable ,
-.BR icmp-port-unreachable ,
-.BR icmp-proto-unreachable ,
-.BR icmp-net-prohibited ,
-.BR "icmp-host-prohibited or"
-.BR "icmp-admin-prohibited (*)"
+.nf
+.B " icmp-net-unreachable"
+.B " icmp-host-unreachable"
+.B " icmp-port-unreachable"
+.B " icmp-proto-unreachable"
+.B " icmp-net-prohibited"
+.B " icmp-host-prohibited or"
+.B " icmp-admin-prohibited (*)"
+.fi
 which return the appropriate ICMP error message (\fBport-unreachable\fP is
 the default).  The option
 .B tcp-reset
@@ -900,7 +906,8 @@ If no port range is specified, then source ports below 512 will be
 mapped to other ports below 512: those between 512 and 1023 inclusive
 will be mapped to ports below 1024, and other ports will be mapped to
 1024 or above. Where possible, no port alteration will occur.
-.TP
+.RS
+.PP
 You can add several --to-source options.  If you specify more
 than one source address, either via an address range or multiple
 --to-source options, a simple round-robin (one after another in
@@ -917,19 +924,25 @@ which block ICMP Fragmentation Needed packets.  The symptoms of this
 problem are that everything works fine from your Linux
 firewall/router, but machines behind it can never exchange large
 packets:
-.br
- 1) Web browsers connect, then hang with no data received.
-.br
- 2) Small mail works fine, but large emails hang.
-.br
- 3) ssh works fine, but scp hangs after initial handshaking.
-.br
+.PD 0
+.RS 0.1i
+.TP 0.3i
+1)
+Web browsers connect, then hang with no data received.
+.TP
+2)
+Small mail works fine, but large emails hang.
+.TP
+3)
+ssh works fine, but scp hangs after initial handshaking.
+.RE
+.PD
 Workaround: activate this option and add a rule to your firewall
 configuration like:
-.br
+.nf
  iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN \\
-.br
              -j TCPMSS --clamp-mss-to-pmtu
+.fi
 .TP
 .BI "--set-mss " "value"
 Explicitly set MSS option to specified value.
@@ -946,9 +959,9 @@ table.
 .TP
 .BI "--set-tos " "tos"
 You can use a numeric TOS values, or use
-.br
+.nf
  iptables -j TOS -h
-.br
+.fi
 to see the list of valid TOS names.
 .SS ULOG
 This target provides userspace logging of matching packets.  When this
@@ -996,7 +1009,8 @@ and
 .B OUTPUT
 are only traversed for packets coming into the local host and
 originating from the local host respectively.  Hence every packet only
-passes through one of the three chains; previously a forwarded packet
+passes through one of the three chains (except loopback traffic, which
+involves both INPUT and OUTPUT chains); previously a forwarded packet
 would pass through all three.
 .PP
 The other main difference is that
@@ -1013,13 +1027,11 @@ is a pure packet filter when using the default `filter' table, with
 optional extension modules.  This should simplify much of the previous
 confusion over the combination of IP masquerading and packet filtering
 seen previously.  So the following options are handled differently:
-.br
+.nf
  -j MASQ
-.br
  -M -S
-.br
  -M -L
-.br
+.fi
 There are several other changes in iptables.
 .SH SEE ALSO
 .BR iptables-save (8),
@@ -1054,7 +1066,6 @@ The Netfilter Core Team is: Marc Boucher, Martin Josefsson, Jozsef Kadlecsik,
 James Morris, Harald Welte and Rusty Russell.
 .PP
 Man page written by Herve Eychenne <rv@wallfire.org>.
-
 .\" .. and did I mention that we are incredibly cool people?
 .\" .. sexy, too ..
 .\" .. witty, charming, powerful ..

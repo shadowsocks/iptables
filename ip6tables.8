@@ -27,7 +27,7 @@
 .SH NAME
 ip6tables \- IPv6 packet filter administration
 .SH SYNOPSIS
-.BR "ip6tables [-t table] -[ADC] " "chain rule-specification [options]"
+.BR "ip6tables [-t table] -[AD] " "chain rule-specification [options]"
 .br
 .BR "ip6tables [-t table] -I " "chain [rulenum] rule-specification [options]"
 .br
@@ -93,8 +93,9 @@ loading, an attempt will be made to load the appropriate module for
 that table if it is not already there.
 
 The tables are as follows:
-.TP
-.B "filter"
+.RS
+.TP .4i
+.BR "filter" :
 This is the default table (if no -t option is passed).  It contains
 the built-in chains
 .B INPUT
@@ -104,7 +105,7 @@ the built-in chains
 .B OUTPUT
 (for locally-generated packets).
 .TP
-.B "mangle"
+.BR "mangle" :
 This table is used for specialized packet alteration.  Until kernel
 2.4.17 it had two built-in chains:
 .B PREROUTING
@@ -118,6 +119,7 @@ Since kernel 2.4.18, three other built-in chains are also supported:
 (for altering packets being routed through the box), and
 .B POSTROUTING
 (for altering packets as they are about to go out).
+.RE
 .SH OPTIONS
 The options that are recognized by
 .B ip6tables
@@ -157,10 +159,10 @@ fail.  Rules are numbered starting at 1.
 .BR "-L, --list " "[\fIchain\fP]"
 List all rules in the selected chain.  If no chain is selected, all
 chains are listed.  As every other iptables command, it applies to the
-specified table (filter is the default), so NAT rules get listed by
-.br
- iptables -t nat -n -L
-.br
+specified table (filter is the default), so mangle rules get listed by
+.nf
+ ip6tables -t mangle -n -L
+.fi
 Please note that it is often used with the
 .B -n
 option, in order to avoid long reverse DNS lookups.
@@ -169,9 +171,9 @@ It is legal to specify the
 (zero) option as well, in which case the chain(s) will be atomically
 listed and zeroed.  The exact output is affected by the other
 arguments given. The exact rules are suppressed until you use
-.br
+.nf
  ip6tables -L -v
-.br
+.fi
 .TP
 .BR "-F, --flush " "[\fIchain\fP]"
 Flush the selected chain (all the chains in the table if none is given).
@@ -398,14 +400,14 @@ the second argument is a comma-separated list of flags which must be
 set.  Flags are: 
 .BR "SYN ACK FIN RST URG PSH ALL NONE" .
 Hence the command
-.br
+.nf
  ip6tables -A FORWARD -p tcp --tcp-flags SYN,ACK,FIN,RST SYN
-.br
+.fi
 will only match packets with the SYN flag set, and the ACK, FIN and
 RST flags unset.
 .TP
 .B "[!] --syn"
-Only match TCP packets with the SYN bit set and the ACK and FIN bits
+Only match TCP packets with the SYN bit set and the ACK and RST bits
 cleared.  Such packets are used to request TCP connection initiation;
 for example, blocking such packets coming in an interface will prevent
 incoming TCP connections, but outgoing TCP connections will be
@@ -438,9 +440,9 @@ specified. It provides the following option:
 .BR "--icmpv6-type " "[!] \fItypename\fP"
 This allows specification of the ICMP type, which can be a numeric
 IPv6-ICMP type, or one of the IPv6-ICMP type names shown by the command
-.br
+.nf
  ip6tables -p ipv6-icmp -h
-.br
+.fi
 .SS mac
 .TP
 .BR "--mac-source " "[!] \fIaddress\fP"
@@ -607,15 +609,17 @@ chains.  The following option controls the nature of the error packet
 returned:
 .TP
 .BI "--reject-with " "type"
-The type given can be 
-.BR icmp6-no-route ,
-.BR no-route ,
-.BR icmp6-adm-prohibited ,
-.BR adm-prohibited ,
-.BR icmp6-addr-unreachable ,
-.BR addr-unreach ,
-.BR icmp6-port-unreachable ,
-.BR port-unreach ,
+The type given can be
+.nf
+.B " icmp6-no-route"
+.B " no-route"
+.B " icmp6-adm-prohibited"
+.B " adm-prohibited"
+.B " icmp6-addr-unreachable"
+.B " addr-unreach"
+.B " icmp6-port-unreachable"
+.B " port-unreach"
+.fi
 which return the appropriate IPv6-ICMP error message (\fBport-unreach\fP is
 the default). Finally, the option
 .B tcp-reset
@@ -751,7 +755,8 @@ and
 .B OUTPUT
 are only traversed for packets coming into the local host and
 originating from the local host respectively.  Hence every packet only
-passes through one of the three chains; previously a forwarded packet
+passes through one of the three chains (except loopback traffic, which
+involves both INPUT and OUTPUT chains); previously a forwarded packet
 would pass through all three.
 .PP
 The other main difference is that 
@@ -805,12 +810,11 @@ Jozsef Kadlecsik wrote the REJECT target.
 .PP
 Harald Welte wrote the ULOG target, TTL match+target and libipulog.
 .PP
-The Netfilter Core Team is: Marc Boucher, Jozsef Kadlecsik, James Morris,
-Harald Welte and Rusty Russell.
+The Netfilter Core Team is: Marc Boucher, Martin Josefsson, Jozsef Kadlecsik,
+James Morris, Harald Welte and Rusty Russell.
 .PP
 ip6tables man page created by Andras Kis-Szabo, based on
 iptables man page written by Herve Eychenne <rv@wallfire.org>.
-
 .\" .. and did I mention that we are incredibly cool people?
 .\" .. sexy, too ..
 .\" .. witty, charming, powerful ..
