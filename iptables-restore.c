@@ -2,9 +2,9 @@
  * (C) 2000 by Harald Welte <laforge@gnumonks.org>
  * based on previous code from Rusty Russell <rusty@linuxcare.com.au>
  *
- * This coude is distributed under the terms of GNU GPL
+ * This code is distributed under the terms of GNU GPL
  *
- * $Id: iptables-restore.c,v 1.18 2001/10/22 15:16:21 laforge Exp $
+ * $Id: iptables-restore.c,v 1.19 2001/12/06 15:06:34 marc Exp $
  */
 
 #include <getopt.h>
