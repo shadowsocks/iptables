@@ -332,7 +332,7 @@ exit_printhelp(void)
 "  --table	-t table	table to manipulate (default: `filter')\n"
 "  --verbose	-v		verbose mode\n"
 "  --exact	-x		expand numbers (display exact values)\n"
-"[!] --fragment	-f		match second or further fragments only\n"
+/*"[!] --fragment	-f		match second or further fragments only\n"*/
 "[!] --version	-V		print package version.\n");
 
 	/* Print out any special helps. A user might like to be able to add a --help 
@@ -452,69 +452,100 @@ fw_malloc(size_t size)
 	return p;
 }
 
-static struct in6_addr *
-host_to_addr(const char *name, unsigned int *naddr)
-{
-#if 0
-	/* TODO: getipnodebyname() missing */
-	struct hostent *host;
-	struct in6_addr *addr;
-	unsigned int i;
-
-	*naddr = 0;
-	if ((host = getipnodebyname(name, AF_INET6, 0, NULL)) != NULL) {
-		if (host->h_length != sizeof(struct in6_addr))
-			return (struct in6_addr *) NULL;
-
-		while (host->h_addr_list[*naddr] != (char *) NULL)
-			(*naddr)++;
-		addr = fw_calloc(*naddr, sizeof(struct in6_addr));
-		for (i = 0; i < *naddr; i++)
-			in6addrcpy(&(addr[i]),
-				  (struct in6_addr *) host->h_addr_list[i]);
-		freehostent(host);
-		return addr;
-	}
-#endif
-
-	return (struct in6_addr *) NULL;
-}
-
-static char *
-addr_to_host(const struct in6_addr *addr)
-{
-#if 0
-	/* TODO: getipnodebyaddr missing */
-	struct hostent *host;
-
-	if ((host = getipnodebyaddr((char *) addr,
-				  sizeof(struct in6_addr), AF_INET6, NULL)) != NULL)
-		return (char *) host->h_name;
-	/*TODO: freehostent()*/
-#endif
-
-	return (char *) NULL;
-}
-
 static char *
 addr_to_numeric(const struct in6_addr *addrp)
 {
-	// static char buf[20];
-	// ADDR tags + sep. + \0
-	// 0000:0000:0000:0000:0000:0000:0000:000.000.000.000
-	// (but inet_ntop() supports only 
-	// 0000:0000:0000:0000:0000:0000:0000:0000 format now.)
+	/* 0000:0000:0000:0000:0000:000.000.000.000
+	 * 0000:0000:0000:0000:0000:0000:0000:0000 */
 	static char buf[50+1];
-	return (char *)inet_ntop(AF_INET6, addrp, buf, sizeof buf);
+	return (char *)inet_ntop(AF_INET6, addrp, buf, sizeof(buf));
 }
 
 static struct in6_addr *
 numeric_to_addr(const char *num)
 {
 	static struct in6_addr ap;
-	if (inet_pton(AF_INET6, num, &ap) == 1)
+	int err;
+	if ((err=inet_pton(AF_INET6, num, &ap)) == 1)
 		return &ap;
+#ifdef DEBUG
+	fprintf(stderr, "\nnumeric2addr: %d\n", err);
+#endif
 	return (struct in6_addr *)NULL;
+}
+
+
+static struct in6_addr *
+host_to_addr(const char *name, unsigned int *naddr)
+{
+	struct addrinfo hints;
+        struct addrinfo *res;
+        static struct in6_addr *addr;
+	int err;
+
+	memset(&hints, 0, sizeof(hints));
+        hints.ai_flags=AI_CANONNAME;
+        hints.ai_family=AF_INET6;
+        hints.ai_socktype=SOCK_RAW;
+        hints.ai_protocol=41;
+        hints.ai_next=NULL;
+
+	*naddr = 0;
+        if ( (err=getaddrinfo(name, NULL, &hints, &res)) != 0 ){
+#ifdef DEBUG
+                fprintf(stderr,"Name2IP: %s\n",gai_strerror(err)); 
+#endif
+                return (struct in6_addr *) NULL;
+        } else {
+		if (res->ai_family != AF_INET6 ||
+		    res->ai_addrlen != sizeof(struct sockaddr_in6))
+			return (struct in6_addr *) NULL;
+
+#ifdef DEBUG
+                fprintf(stderr, "resolved: len=%d  %s ", res->ai_addrlen, 
+                    addr_to_numeric(&(((struct sockaddr_in6 *)res->ai_addr)->sin6_addr)));
+#endif
+		/* Get the first element of the address-chain */
+		addr = fw_calloc(1, sizeof(struct in6_addr));
+		in6addrcpy(addr, (struct in6_addr *)
+			&((struct sockaddr_in6 *)res->ai_addr)->sin6_addr);
+		freeaddrinfo(res);
+		*naddr = 1;
+		return addr;
+	}
+
+	return (struct in6_addr *) NULL;
+}
+
+/* XXX: the getnameinfo() returns "ai_family not supported".
+ *      it can be a glibc error. */
+static char *
+addr_to_host(const struct in6_addr *addr)
+{
+	struct sockaddr_in6 saddr;
+	int err;
+	static char hostname[NI_MAXHOST];
+
+	memset(&saddr, 0, sizeof(struct sockaddr_in6));
+	in6addrcpy(&(saddr.sin6_addr),(struct in6_addr *)addr);
+
+        if ( (err=getnameinfo((struct sockaddr *)&saddr,
+			       sizeof(struct sockaddr_in6),
+			       hostname, sizeof(hostname)-1,
+			       NULL, 0, 0)) != 0 ){
+#ifdef DEBUG
+                fprintf(stderr,"IP2Name: %s\n",gai_strerror(err)); 
+#endif
+                return (char *) NULL;
+        } else {
+#ifdef DEBUG
+		fprintf (stderr, "\naddr2host: %s\n", hostname);
+#endif
+
+		return hostname;
+	}
+
+	return (char *) NULL;
 }
 
 static char *
@@ -531,7 +562,10 @@ mask_to_numeric(const struct in6_addr *addrp)
 static struct in6_addr *
 network_to_addr(const char *name)
 {
-	abort();
+	/*	abort();*/
+	/* TODO: not implemented yet, but the exception breaks the
+	 *       name resolvation */
+	return (struct in6_addr *)NULL;
 }
 
 static char *
@@ -630,7 +664,7 @@ parse_hostnetworkmask(const char *name, struct in6_addr **addrpp,
 			addrp[j].in6_u.u6_addr32[k] &= maskp->in6_u.u6_addr32[k];
 		j++;
 		for (k = 0; k < j - 1; k++) {
-			if (!memcmp(&addrp[k], &addrp[j - 1], sizeof(struct in6_addr))) {
+			if (IN6_ARE_ADDR_EQUAL(&addrp[k], &addrp[j - 1])) {
 				(*naddrs)--;
 				j--;
 				break;
