@@ -1,6 +1,9 @@
 # uncomment this to get a fully statically linked version
 # NO_SHARED_LIBS = 1
 
+# uncomment this to disable IPv6 support
+# DO_IPV6 = 0
+
 ######################################################################
 # YOU SHOULD NOT NEED TO TOUCH ANYTHING BELOW THIS LINE
 ######################################################################
@@ -25,7 +28,7 @@ RELEASE_DIR:=/tmp
 
 # Need libc6 for this.  FIXME: Should covert to autoconf.
 ifeq ($(shell [ -f /usr/include/netinet/ip6.h ] && echo YES), YES)
-DO_IPV6=1
+DO_IPV6:=1
 endif
 
 COPT_FLAGS:=-O2
@@ -41,7 +44,7 @@ SH_CFLAGS:=$(CFLAGS) -fPIC
 STATIC_LIBS  =
 STATIC6_LIBS =
 LDFLAGS      = -rdynamic
-LDLIBS       = -ldl
+LDLIBS       = -ldl -lnsl
 else
 DEPFILES = $(EXT_OBJS:%.o=%.d)
 STATIC_LIBS  = extensions/libext.a
@@ -57,7 +60,7 @@ EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables $(DESTDIR)$(MANDIR)/man8/iptables.8
 EXTRAS+=iptables-save iptables-restore
 EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables-save $(DESTDIR)$(BINDIR)/iptables-restore $(DESTDIR)$(MANDIR)/man8/iptables-restore.8 $(DESTDIR)$(MANDIR)/man8/iptables-save.8
 
-ifdef DO_IPV6
+ifeq ($(DO_IPV6), 1)
 EXTRAS+=ip6tables ip6tables.o
 EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/ip6tables $(DESTDIR)$(MANDIR)/man8/ip6tables.8
 EXTRAS_EXP+=ip6tables-save ip6tables-restore
