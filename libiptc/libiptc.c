@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.55 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.56 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -1131,7 +1131,7 @@ TC_BUILTIN(const char *chain, const TC_HANDLE_T handle)
 	c = iptcc_find_label(chain, handle);
 	if (!c) {
 		errno = ENOENT;
-		return -1;
+		return 0;
 	}
 
 	return iptcc_is_builtin(c);
