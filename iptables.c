@@ -125,6 +125,14 @@ static struct option original_opts[] = {
 	{ 0 }
 };
 
+#if 0
+static struct ipt_entry_target *
+ipt_get_target(struct ipt_entry *e)
+{
+	return (void *)e + e->target_offset;
+}
+#endif
+
 static struct option *opts = original_opts;
 static unsigned int global_option_offset = 0;
 
@@ -616,8 +624,15 @@ find_match(const char *name, int tryload)
 		char path[sizeof(IPT_LIB_DIR) + sizeof("/libipt_.so")
 			 + strlen(name)];
 		sprintf(path, IPT_LIB_DIR "/libipt_%s.so", name);
-		dlopen(path, RTLD_NOW);
-		return find_match(name, 0);
+		if (dlopen(path, RTLD_NOW)) {
+			/* Found library.  If it didn't register itself,
+			   maybe they specified target as match. */
+			ptr = find_match(name, 0);
+			if (!ptr)
+				exit_error(PARAMETER_PROBLEM,
+					   "Couldn't load match `%s'\n",
+					   name);
+		}
 	}
 
 	return ptr;
@@ -842,8 +857,15 @@ find_target(const char *name, int tryload)
 		char path[sizeof(IPT_LIB_DIR) + sizeof("/libipt_.so")
 			 + strlen(name)];
 		sprintf(path, IPT_LIB_DIR "/libipt_%s.so", name);
-		dlopen(path, RTLD_NOW);
-		return find_target(name, 0);
+		if (dlopen(path, RTLD_NOW)) {
+			/* Found library.  If it didn't register itself,
+			   maybe they specified match as a target. */
+			ptr = find_target(name, 0);
+			if (!ptr)
+				exit_error(PARAMETER_PROBLEM,
+					   "Couldn't load target `%s'\n",
+					   name);
+		}
 	}
 
 	return ptr;
@@ -935,8 +957,10 @@ print_header(unsigned int format, const char *chain, iptc_handle_t *handle)
 		printf(")\n");
 	} else {
 		unsigned int refs;
-		iptc_get_references(&refs, chain, handle);
-		printf(" (%u references)\n", refs);
+		if (!iptc_get_references(&refs, chain, handle))
+			printf(" (ERROR obtaining refs)\n");
+		else
+			printf(" (%u references)\n", refs);
 	}
 
 	if (format & FMT_LINENUMBERS)
@@ -1226,10 +1250,12 @@ make_delete_mask(struct ipt_entry *fw)
 	for (m = iptables_matches; m; m = m->next)
 		size += sizeof(struct ipt_entry_match) + m->size;
 
-	mask = fw_calloc(1, size + iptables_target->size);
+	mask = fw_calloc(1, size
+			 + sizeof(struct ipt_entry_target)
+			 + iptables_targets->size);
 
-	memset(mask, 0xFF, sizeof(ipt_entry));
-	mptr = mask + sizeof(ipt_entry);
+	memset(mask, 0xFF, sizeof(struct ipt_entry));
+	mptr = mask + sizeof(struct ipt_entry);
 
 	for (m = iptables_matches; m; m = m->next) {
 		memset(mptr, 0xFF,
@@ -1239,7 +1265,7 @@ make_delete_mask(struct ipt_entry *fw)
 
 	memset(mptr, 0xFF, sizeof(struct ipt_entry_target));
 	mptr += sizeof(struct ipt_entry_target);
-	memset(mptr, 0xFF, iptables_target->userspacesize);
+	memset(mptr, 0xFF, iptables_targets->userspacesize);
 
 	return mask;
 }
@@ -1302,15 +1328,37 @@ check_packet(const ipt_chainlabel chain,
 
 static int
 for_each_chain(int (*fn)(const ipt_chainlabel, int, iptc_handle_t *),
-	       int verbose, iptc_handle_t *handle)
+	       int verbose, int builtinstoo, iptc_handle_t *handle)
 {
         int ret = 1;
-	const char *chain = NULL;
+	const char *chain;
+	char *chains;
+	unsigned int i, chaincount = 0;
 
-	while ((chain = iptc_next_chain(chain, handle))) {
-	        ret &= fn(chain, verbose, handle);
+	chain = iptc_first_chain(handle);
+	while (chain) {
+		chaincount++;
+		chain = iptc_next_chain(handle);
         }
 
+	chains = fw_malloc(sizeof(ipt_chainlabel) * chaincount);
+	i = 0;
+	chain = iptc_first_chain(handle);
+	while (chain) {
+		strcpy(chains + i*sizeof(ipt_chainlabel), chain);
+		i++;
+		chain = iptc_next_chain(handle);
+        }
+
+	for (i = 0; i < chaincount; i++) {
+		if (!builtinstoo
+		    && iptc_builtin(chains + i*sizeof(ipt_chainlabel),
+				    *handle))
+			continue;
+	        ret &= fn(chains + i*sizeof(ipt_chainlabel), verbose, handle);
+	}
+
+	free(chains);
         return ret;
 }
 
@@ -1319,7 +1367,7 @@ flush_entries(const ipt_chainlabel chain, int verbose,
 	      iptc_handle_t *handle)
 {
 	if (!chain)
-		return for_each_chain(flush_entries, verbose, handle);
+		return for_each_chain(flush_entries, verbose, 1, handle);
 
 	if (verbose)
 		fprintf(stdout, "Flushing chain `%s'\n", chain);
@@ -1331,7 +1379,7 @@ zero_entries(const ipt_chainlabel chain, int verbose,
 	     iptc_handle_t *handle)
 {
 	if (!chain)
-		return for_each_chain(zero_entries, verbose, handle);
+		return for_each_chain(zero_entries, verbose, 1, handle);
 
 	if (verbose)
 		fprintf(stdout, "Zeroing chain `%s'\n", chain);
@@ -1342,33 +1390,8 @@ static int
 delete_chain(const ipt_chainlabel chain, int verbose,
 	     iptc_handle_t *handle)
 {
-	if (!chain) {
-		const char *i, *last = NULL;
-		int ret = 1;
-
-		/* Iterate over built-ins */
-		for (i = iptc_next_chain(NULL, handle);
-		     i && iptc_builtin(i, *handle);
-		     i = iptc_next_chain(i, handle))
-			last = i;
-
-		/* No user-defined chains? */
-		if (!i)
-			return ret;
-
-		/* Be careful iterating: it isn't safe during delete. */
-		/* Re-iterate after each delete successful */
-		while ((i = iptc_next_chain(last, handle)) != NULL) {
-			/* Skip over builtins. */
-			if (!delete_chain(i, verbose, handle)) {
-				/* Delete failed; start next
-				   iteration from here */
-				last = i;
-				ret = 0;
-			}
-		}
-		return ret;
-	}
+	if (!chain)
+		return for_each_chain(delete_chain, verbose, 0, handle);
 
 	if (verbose)
 	        fprintf(stdout, "Deleting chain `%s'\n", chain);
@@ -1380,8 +1403,8 @@ list_entries(const ipt_chainlabel chain, int verbose, int numeric,
 	     int expanded, int linenumbers, iptc_handle_t *handle)
 {
 	int found = 0;
-	unsigned int i, format;
-	const char *this = NULL;
+	unsigned int format;
+	const char *this;
 
 	format = FMT_OPTIONS;
 	if (!verbose)
@@ -1398,20 +1421,29 @@ list_entries(const ipt_chainlabel chain, int verbose, int numeric,
 	if (linenumbers)
 		format |= FMT_LINENUMBERS;
 
+	for (this = iptc_first_chain(handle);
+	     this;
+	     this = iptc_next_chain(handle)) {
+		const struct ipt_entry *i;
+		unsigned int num;
 
-	while ((this = iptc_next_chain(this, handle)) != NULL) {
 		if (chain && strcmp(chain, this) != 0)
 			continue;
 
 		if (found) printf("\n");
 
 		print_header(format, this, handle);
-		for (i = 0; i < iptc_num_rules(this, handle); i++)
-			print_firewall(iptc_get_rule(this, i, handle),
-				       iptc_get_target(this, i, handle),
-				       i,
+		i = iptc_first_rule(this, handle);
+
+		num = 0;
+		while (i) {
+			print_firewall(i,
+				       iptc_get_target(i, handle),
+				       num++,
 				       format,
 				       *handle);
+			i = iptc_next_rule(i, handle);
+		}
 		found = 1;
 	}
 
@@ -1430,7 +1462,7 @@ generate_entry(const struct ipt_entry *fw,
 
 	size = sizeof(struct ipt_entry);
 	for (m = matches; m; m = m->next)
-		size += m->m ? m->m->match_size : 0;
+		size += m->m->match_size;
 
 	e = fw_malloc(size + target->target_size);
 	*e = *fw;
@@ -1439,10 +1471,8 @@ generate_entry(const struct ipt_entry *fw,
 
 	size = 0;
 	for (m = matches; m; m = m->next) {
-		if (m->m) {
-			memcpy(e->elems + size, m->m, m->m->match_size);
-			size += m->m->match_size;
-		}
+		memcpy(e->elems + size, m->m, m->m->match_size);
+		size += m->m->match_size;
 	}
 	memcpy(e->elems + size, target, target->target_size);
 
@@ -1754,6 +1784,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				optarg[0] = '\0';
 				continue;
 			}
+			printf("Bad argument `%s'\n", optarg);
 			exit_tryhelp(2);
 
 		default:
@@ -1776,8 +1807,9 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 
 				/* If you listen carefully, you can
 				   acually hear this code suck. */
-				if (!iptables_matches
+				if (m == NULL
 				    && protocol
+				    && !find_match(protocol, 0)
 				    && (m = find_match(protocol, 1))) {
 					/* Try loading protocol */
 					size_t size = sizeof(struct ipt_entry_match)
