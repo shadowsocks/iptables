@@ -34,9 +34,9 @@ help(void)
 };
 
 static struct option opts[] = {
-	{ "lower-limit", 1 , 0 , '1' } ,
-	{ "upper-limit", 1 , 0 , '2' } ,
-	{ 0 }
+	{ .name = "lower-limit", .has_arg = 1, .flag = 0, .val = '1' },
+	{ .name = "upper-limit", .has_arg = 1, .flag = 0, .val = '2' },
+	{ .name = 0 }
 };
 
 /* Initialize data structures */
@@ -64,8 +64,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct ip6t_entry_match **match)
 {
-
-struct ip6t_fuzzy_info *fuzzyinfo = (struct ip6t_fuzzy_info *)(*match)->data;
+	struct ip6t_fuzzy_info *fuzzyinfo =
+		(struct ip6t_fuzzy_info *)(*match)->data;
 
 	u_int32_t num;
 
@@ -99,7 +99,7 @@ struct ip6t_fuzzy_info *fuzzyinfo = (struct ip6t_fuzzy_info *)(*match)->data;
 	if (string_to_number(optarg,1,MAXFUZZYRATE,&num) == -1 || num < 1)
 		exit_error(PARAMETER_PROBLEM,"BAD --upper-limit");
 
-		fuzzyinfo->maximum_rate = num ;
+		fuzzyinfo->maximum_rate = num;
 
 		*flags |= IP6T_FUZZY_OPT_MAXIMUM;
 
@@ -123,8 +123,8 @@ print(const struct ip6t_ip6 *ipv6,
 	const struct ip6t_fuzzy_info *fuzzyinfo
 		= (const struct ip6t_fuzzy_info *)match->data;
 
-	printf(" fuzzy: lower limit = %u pps - upper limit = %u pps ",fuzzyinfo->minimum_rate,fuzzyinfo->maximum_rate);
-
+	printf(" fuzzy: lower limit = %u pps - upper limit = %u pps ",
+		fuzzyinfo->minimum_rate, fuzzyinfo->maximum_rate);
 }
 
 /* Saves the union ip6t_targinfo in parsable form to stdout. */
@@ -134,24 +134,22 @@ save(const struct ip6t_ip6 *ipv6, const struct ip6t_entry_match *match)
 	const struct ip6t_fuzzy_info *fuzzyinfo
 		= (const struct ip6t_fuzzy_info *)match->data;
 
-	printf("--lower-limit %u ",fuzzyinfo->minimum_rate);
-	printf("--upper-limit %u ",fuzzyinfo->maximum_rate);
-
+	printf("--lower-limit %u --upper-limit %u ",
+		fuzzyinfo->minimum_rate, fuzzyinfo->maximum_rate);
 }
 
-struct ip6tables_match fuzzy_match
-= { NULL,
-    "fuzzy",
-    IPTABLES_VERSION,
-    IP6T_ALIGN(sizeof(struct ip6t_fuzzy_info)),
-    IP6T_ALIGN(sizeof(struct ip6t_fuzzy_info)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+struct ip6tables_match fuzzy_match = {
+	.name          = "fuzzy",
+	.version       = IPTABLES_VERSION,
+	.size          = IP6T_ALIGN(sizeof(struct ip6t_fuzzy_info)),
+	.userspacesize = IP6T_ALIGN(sizeof(struct ip6t_fuzzy_info)),
+	.help          = &help,
+	.init          = &init,
+	.parse         = &parse,
+	.final_check   = &final_check,
+	.print         = &print,
+	.save          = &save,
+	.extra_opts    = opts
 };
 
 void _init(void)

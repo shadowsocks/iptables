@@ -31,17 +31,17 @@ UNAME , IPTABLES_VERSION, LNAME, LNAME, IP6T_OPTS_OPTSNR);
 
 #if HOPBYHOP
 static struct option opts[] = {
-	{ "hbh-len", 1, 0, '1' },
-	{ "hbh-opts", 1, 0, '2' },
-	{ "hbh-not-strict", 1, 0, '3' },
-	{0}
+	{ .name = "hbh-len",        .has_arg = 1, .flag = 0, .val = '1' },
+	{ .name = "hbh-opts",       .has_arg = 1, .flag = 0, .val = '2' },
+	{ .name = "hbh-not-strict", .has_arg = 1, .flag = 0, .val = '3' },
+	{ .name = 0 }
 };
 #else
 static struct option opts[] = {
-	{ "dst-len", 1, 0, '1' },
-	{ "dst-opts", 1, 0, '2' },
-	{ "dst-not-strict", 1, 0, '3' },
-	{0}
+	{ .name = "dst-len",        .has_arg = 1, .flag = 0, .val = '1' },
+	{ .name = "dst-opts",       .has_arg = 1, .flag = 0, .val = '2' },
+	{ .name = "dst-not-strict", .has_arg = 1, .flag = 0, .val = '3' },
+	{ .name = 0 }
 };
 #endif
 
@@ -51,7 +51,7 @@ parse_opts_num(const char *idstr, const char *typestr)
 	unsigned long int id;
 	char* ep;
 
-	id =  strtoul(idstr,&ep,0) ;
+	id = strtoul(idstr, &ep, 0);
 
 	if ( idstr == ep ) {
 		exit_error(PARAMETER_PROBLEM,
@@ -206,15 +206,19 @@ print(const struct ip6t_ip6 *ip,
 	const struct ip6t_opts *optinfo = (struct ip6t_opts *)match->data;
 
 	printf("%s ", LNAME);
-	if (optinfo->flags & IP6T_OPTS_LEN) {
-		printf("length");
-		printf(":%s", optinfo->invflags & IP6T_OPTS_INV_LEN ? "!" : "");
-		printf("%u", optinfo->hdrlen);
-		printf(" ");
-	}
-	if (optinfo->flags & IP6T_OPTS_OPTS) printf("opts ");
+	if (optinfo->flags & IP6T_OPTS_LEN)
+		printf("length:%s%u ",
+			optinfo->invflags & IP6T_OPTS_INV_LEN ? "!" : "",
+			optinfo->hdrlen);
+
+	if (optinfo->flags & IP6T_OPTS_OPTS)
+		printf("opts ");
+
 	print_options(optinfo->optsnr, (u_int16_t *)optinfo->opts);
-	if (optinfo->flags & IP6T_OPTS_NSTRICT) printf("not-strict ");
+
+	if (optinfo->flags & IP6T_OPTS_NSTRICT)
+		printf("not-strict ");
+
 	if (optinfo->invflags & ~IP6T_OPTS_INV_MASK)
 		printf("Unknown invflags: 0x%X ",
 		       optinfo->invflags & ~IP6T_OPTS_INV_MASK);
@@ -231,30 +235,32 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 			optinfo->hdrlen);
 	}
 
-	if (optinfo->flags & IP6T_OPTS_OPTS) printf("--%s-opts ", LNAME);
-	print_options(optinfo->optsnr, (u_int16_t *)optinfo->opts);
-	if (optinfo->flags & IP6T_OPTS_NSTRICT) printf("--%s-not-strict ", LNAME);
+	if (optinfo->flags & IP6T_OPTS_OPTS)
+		printf("--%s-opts ", LNAME);
 
+	print_options(optinfo->optsnr, (u_int16_t *)optinfo->opts);
+
+	if (optinfo->flags & IP6T_OPTS_NSTRICT)
+		printf("--%s-not-strict ", LNAME);
 }
 
 static
-struct ip6tables_match optstruct
-= { NULL,
+struct ip6tables_match optstruct = {
 #if HOPBYHOP
-    "hbh",
+	.name          = "hbh",
 #else
-    "dst",
+	.name          = "dst",
 #endif
-    IPTABLES_VERSION,
-    IP6T_ALIGN(sizeof(struct ip6t_opts)),
-    IP6T_ALIGN(sizeof(struct ip6t_opts)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+	.version       = IPTABLES_VERSION,
+	.size          = IP6T_ALIGN(sizeof(struct ip6t_opts)),
+	.userspacesize = IP6T_ALIGN(sizeof(struct ip6t_opts)),
+	.help          = &help,
+	.init          = &init,
+	.parse         = &parse,
+	.final         = &final_check,
+	.print         = &print,
+	.save          = &save,
+	.extra_opts    = opts
 };
 
 void
