@@ -6,6 +6,8 @@
    ftp://prep.ai.mit.edu/pub/gnu/GPL
 
 2002-08-07 Hime Aguiar e Oliveira Jr. <hime@engineer.com> : Initial version.
+2003-06-09 Hime Aguiar e Oliveira Jr. <hime@engineer.com> : Bug corrections in
+the save function , thanks to information given by Jean-Francois Patenaude .
 
 */
 
@@ -131,8 +133,8 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	const struct ipt_fuzzy_info *fuzzyinfo
 		= (const struct ipt_fuzzy_info *)match->data;
 
-	printf("--upper-limit %u ",fuzzyinfo->minimum_rate);
-	printf("--lower-limit %u ",fuzzyinfo->maximum_rate);
+	printf("--lower-limit %u ",fuzzyinfo->minimum_rate);
+	printf("--upper-limit %u ",fuzzyinfo->maximum_rate);
 
 }
 

@@ -7,6 +7,9 @@
 
 2002-08-07 Hime Aguiar e Oliveira Jr. <hime@engineer.com> : Initial version.
 2003-04-08 Maciej Soltysiak <solt@dns.toxicfilms.tv> : IPv6 Port
+2003-06-09 Hime Aguiar e Oliveira Jr. <hime@engineer.com> : Bug corrections in
+the save function , thanks to information given by Jean-Francois Patenaude.
+
 */
 
 #include <stdio.h>
@@ -131,8 +134,8 @@ save(const struct ip6t_ip6 *ipv6, const struct ip6t_entry_match *match)
 	const struct ip6t_fuzzy_info *fuzzyinfo
 		= (const struct ip6t_fuzzy_info *)match->data;
 
-	printf("--upper-limit %u ",fuzzyinfo->minimum_rate);
-	printf("--lower-limit %u ",fuzzyinfo->maximum_rate);
+	printf("--lower-limit %u ",fuzzyinfo->minimum_rate);
+	printf("--upper-limit %u ",fuzzyinfo->maximum_rate);
 
 }
 
