@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.44 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.45 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -20,8 +20,8 @@
  * 	  up after a ruleset change.  
  */
 
-#include<sys/types.h>
-#include<sys/socket.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 #ifndef IPT_LIB_DIR
 #define IPT_LIB_DIR "/usr/local/lib/iptables"
