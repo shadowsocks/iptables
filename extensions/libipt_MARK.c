@@ -8,11 +8,6 @@
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_MARK.h>
 
-struct markinfo {
-	struct ipt_entry_target t;
-	struct ipt_mark_target_info mark;
-};
-
 /* Function which prints out usage message. */
 static void
 help(void)
