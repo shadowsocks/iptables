@@ -13,6 +13,7 @@
 #include <string.h>
 #include <dlfcn.h>
 #include <time.h>
+#include <netdb.h>
 #include "libiptc/libiptc.h"
 #include "iptables.h"
 
