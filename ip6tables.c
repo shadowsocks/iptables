@@ -1555,6 +1555,11 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			if (optind < argc && argv[optind][0] != '-'
 			    && argv[optind][0] != '!')
 				newname = argv[optind++];
+			else
+				exit_error(PARAMETER_PROBLEM,
+				           "-%c requires old-chain-name and "
+					   "new-chain-name",
+					    cmd2char(CMD_RENAME_CHAIN));	
 			break;
 
 		case 'P':
