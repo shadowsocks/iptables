@@ -6,7 +6,7 @@
  *
  * libipt_ECN.c borrowed heavily from libipt_DSCP.c
  *
- * $Id: libipt_ECN.c,v 1.7 2002/05/29 15:11:36 laforge Exp $
+ * $Id: libipt_ECN.c,v 1.8 2002/08/05 19:36:15 laforge Exp $
  */
 #include <stdio.h>
 #include <string.h>
@@ -29,7 +29,7 @@ static void help(void)
 "ECN target v%s EXPERIMENTAL options (use with extreme care!)\n"
 "  --ecn-ip-ect			Set the IPv4 ECT codepoint (0 to 3)\n"
 "  --ecn-tcp-cwr		Set the IPv4 CWR bit (0 or 1)\n"
-"  --ecn-tcp-ece		Set the IPv4 CWR bit (0 or 1)\n",
+"  --ecn-tcp-ece		Set the IPv4 ECE bit (0 or 1)\n",
 		IPTABLES_VERSION, IPTABLES_VERSION
 );
 }
