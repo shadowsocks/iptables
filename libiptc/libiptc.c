@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <linux/netfilter_ipv4/ipt_limit.h>
 
 #if !defined(__GLIBC__) || (__GLIBC__ < 2)
 typedef unsigned int socklen_t;
@@ -1005,7 +1006,7 @@ match_different(const struct ipt_entry_match *a,
 	const struct ipt_entry_match *b;
 
 	/* Offset of b is the same as a. */
-	b = (void *)b_elems + (a_elems - (char *)a);
+	b = (void *)b_elems + ((char *)a-a_elems);
 
 	if (a->match_size != b->match_size)
 		return 1;
@@ -1013,9 +1014,17 @@ match_different(const struct ipt_entry_match *a,
 	if (strcmp(a->u.name, b->u.name) != 0)
 		return 1;
 
-	/* FIXME: If kernel modifies these (eg. RATE), then we'll
-           never match --RR */
-	if (memcmp(a->data, b->data, a->match_size - sizeof(*a)) != 0)
+	/* FIXME: This is really, really gross --RR */
+        if (strcmp(a->u.name,"limit") == 0) {
+		/* Special case, the kernel writes in this data, so we
+		 *  need to make sure that we only check the parts
+		 *  that are user specified */
+		if (((struct ipt_rateinfo *)a->data)->avg
+		    != ((struct ipt_rateinfo *)b->data)->avg
+		    || ((struct ipt_rateinfo *)a->data)->burst
+		    != ((struct ipt_rateinfo *)b->data)->burst)
+			return 1;
+        } else if (memcmp(a->data, b->data, a->match_size - sizeof(*a)) != 0)
 		return 1;
 
 	return 0;
@@ -1063,11 +1072,13 @@ is_same(const struct ipt_entry *a, const struct ipt_entry *b)
 		return 0;
 	if (strcmp(ta->u.name, tb->u.name) != 0)
 		return 0;
-	/* FIXME: If kernel modifies these, then we never match --RR */
-	if (memcmp(ta->data, tb->data, ta->target_size - sizeof(*ta)) != 0)
-		return 0;
-
-	return 1;
+   
+        /* FIXME: If kernel modifies these, then we never match --RR */
+      
+        if (memcmp(ta->data, tb->data, ta->target_size - sizeof(*ta)) != 0)
+            return 0;                  
+   
+   	return 1;
 }
 
 /* Delete the first rule in `chain' which matches `fw'. */
