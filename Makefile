@@ -10,6 +10,7 @@ OLD_NETFILTER_VERSION:=1.1.1
 LIBDIR:=/usr/local/lib
 BINDIR:=/usr/local/bin
 MANDIR:=/usr/local/man
+INCDIR:=/usr/local/include
 
 COPT_FLAGS:=-O2 -DNDEBUG
 CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -Iinclude/ -I$(KERNEL_DIR)/include -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" #-g #-pg
@@ -91,6 +92,22 @@ EXTRA_DEPENDS+=iptables-standalone.d iptables.d
 
 iptables-standalone.d iptables.d: %.d: %.c
 	@-$(CC) -M -MG $(CFLAGS) $< | sed -e 's@^.*\.o:@$*.d $*.o:@' > $@
+
+
+# Development Targets
+install-devel-man3: $(DEVEL_MAN3)
+	@[ -d $(DESTDIR)$(MANDIR)/man3 ] || mkdir -p $(DESTDIR)$(MANDIR)/man3
+	@cp -v $(DEVEL_MAN3) $(DESTDIR)$(MANDIR)/man3
+
+install-devel-headers: $(DEVEL_HEADERS)
+	@[ -d $(DESTDIR)$(INCDIR) ] || mkdir -p $(DESTDIR)$(INCDIR)
+	@cp -v $(DEVEL_HEADERS) $(DESTDIR)$(INCDIR)
+
+install-devel-libs: $(DEVEL_LIBS)
+	@[ -d $(DESTDIR)$(LIBDIR) ] || mkdir -p $(DESTDIR)$(LIBDIR)
+	@cp -v $(DEVEL_LIBS) $(DESTDIR)$(LIBDIR)
+
+install-devel: all install-devel-man3 install-devel-headers install-devel-libs
 
 distclean: clean
 	@rm -f TAGS `find . -name '*~' -o -name '.*~'` `find . -name '*.rej'` `find . -name '*.d'` .makefirst

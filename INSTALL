@@ -33,3 +33,17 @@ Problems you may encounter:
 NOTE: make sure you build with at least the correct LIBDIR=
 specification, otherwise iptables(8) won't know where to find the
 dynamic objects.
+
+
+DEVELOPERS:
+===========
+
+0) If you wish to install iptables development libraries
+   and related components, type:
+   	% make install-devel
+   	
+Development libraries currently installed by the above are:
+  libipq: Userspace packet queueing API
+  
+
+  
