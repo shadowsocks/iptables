@@ -9,8 +9,6 @@
 #include <linux/netfilter_ipv4/ip_nat_rule.h>
 #include <linux/netfilter_ipv4/ipt_SAME.h>
 
-#define BREAKUP_IP(x) (x) & 0xFF, ((x)>>8) & 0xFF, ((x)>>16) & 0xFF, (x)>>24
-
 /* Function which prints out usage message. */
 static void
 help(void)
@@ -19,6 +17,8 @@ help(void)
 "SAME v%s options:\n"
 " --to <ipaddr>-<ipaddr>\n"
 "				Addresses to map source to.\n"
+"				 May be specified more than\n"
+"				  once for multiple ranges.\n"
 " --nodst\n"
 "				Don't use destination-ip in\n"
 "				           source selection\n",
@@ -37,11 +37,10 @@ init(struct ipt_entry_target *t, unsigned int *nfcache)
 {
 	struct ipt_same_info *mr = (struct ipt_same_info *)t->data;
 
-	/* Actually, it's 0, but it's ignored at the moment. */
-	mr->rangesize = 1;
-
-	/* Set default info to 0 */
+	/* Set default to 0 */
+	mr->rangesize = 0;
 	mr->info = 0;
+	mr->ipnum = 0;
 	
 	/* Can't cache this */
 	*nfcache |= NFC_UNKNOWN;
@@ -56,23 +55,27 @@ parse_to(char *arg, struct ip_nat_range *range)
 
 	range->flags |= IP_NAT_RANGE_MAP_IPS;
 	dash = strchr(arg, '-');
+
 	if (dash)
 		*dash = '\0';
-	else
-		exit_error(PARAMETER_PROBLEM, "Bad IP range `%s'\n", arg);
 
 	ip = dotted_to_addr(arg);
 	if (!ip)
 		exit_error(PARAMETER_PROBLEM, "Bad IP address `%s'\n",
 			   arg);
 	range->min_ip = ip->s_addr;
-	ip = dotted_to_addr(dash+1);
-	if (!ip)
-		exit_error(PARAMETER_PROBLEM, "Bad IP address `%s'\n",
-			   dash+1);
+
+	if (dash) {
+		ip = dotted_to_addr(dash+1);
+		if (!ip)
+			exit_error(PARAMETER_PROBLEM, "Bad IP address `%s'\n",
+				   dash+1);
+	}
 	range->max_ip = ip->s_addr;
-	if (range->min_ip >= range->max_ip)
-		exit_error(PARAMETER_PROBLEM, "Bad IP range `%u.%u.%u.%u-%u.%u.%u.%u'\n", BREAKUP_IP(range->min_ip), BREAKUP_IP(range->max_ip));
+	if (dash)
+		if (range->min_ip > range->max_ip)
+			exit_error(PARAMETER_PROBLEM, "Bad IP range `%s-%s'\n", 
+				   arg, dash+1);
 }
 
 #define IPT_SAME_OPT_TO			0x01
@@ -90,15 +93,17 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (*flags & IPT_SAME_OPT_TO)
+		if (mr->rangesize == IPT_SAME_MAX_RANGE)
 			exit_error(PARAMETER_PROBLEM,
-				   "Can't specify --to twice");
-		
+				   "Too many ranges specified, maximum "
+				   "is %i ranges.\n",
+				   IPT_SAME_MAX_RANGE);
 		if (check_inverse(optarg, &invert))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --to");
 
-		parse_to(optarg, &mr->range[0]);
+		parse_to(optarg, &mr->range[mr->rangesize]);
+		mr->rangesize++;
 		*flags |= IPT_SAME_OPT_TO;
 		break;
 		
@@ -132,16 +137,26 @@ print(const struct ipt_ip *ip,
       const struct ipt_entry_target *target,
       int numeric)
 {
+	int count;
 	struct ipt_same_info *mr
 		= (struct ipt_same_info *)target->data;
-	struct ip_nat_range *r = &mr->range[0];
-	struct in_addr a;
+	
+	printf("same:");
+	
+	for (count = 0; count < mr->rangesize; count++) {
+		struct ip_nat_range *r = &mr->range[count];
+		struct in_addr a;
 
-	a.s_addr = r->min_ip;
+		a.s_addr = r->min_ip;
 
-	printf("same %s", addr_to_dotted(&a));
-	a.s_addr = r->max_ip;
-	printf("-%s ", addr_to_dotted(&a));
+		printf("%s", addr_to_dotted(&a));
+		a.s_addr = r->max_ip;
+		
+		if (r->min_ip == r->max_ip)
+			printf(" ");
+		else
+			printf("-%s ", addr_to_dotted(&a));
+	}
 	
 	if (mr->info & IPT_SAME_NODST)
 		printf("nodst ");
@@ -151,15 +166,23 @@ print(const struct ipt_ip *ip,
 static void
 save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 {
+	int count;
 	struct ipt_same_info *mr
 		= (struct ipt_same_info *)target->data;
-	struct ip_nat_range *r = &mr->range[0];
-	struct in_addr a;
 
-	a.s_addr = r->min_ip;
-	printf("--to %s", addr_to_dotted(&a));
-	a.s_addr = r->max_ip;
-	printf("-%s ", addr_to_dotted(&a));
+	for (count = 0; count < mr->rangesize; count++) {
+		struct ip_nat_range *r = &mr->range[count];
+		struct in_addr a;
+
+		a.s_addr = r->min_ip;
+		printf("--to %s", addr_to_dotted(&a));
+		a.s_addr = r->max_ip;
+
+		if (r->min_ip == r->max_ip)
+			printf(" ");
+		else
+			printf("-%s ", addr_to_dotted(&a));
+	}
 	
 	if (mr->info & IPT_SAME_NODST)
 		printf("--nodst ");
