@@ -15,12 +15,15 @@ help(void)
 	printf(
 "connbytes v%s options:\n"
 " [!] --connbytes from:[to]\n"
-"				Transfered byte range to match\n"
+"     --connbytes-dir [original, reply, both]\n"
+"     --connbytes-mode [packets, bytes, avgpkt]\n"
 "\n", IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
 	{ "connbytes", 1, 0, '1' },
+	{ "connbytes-dir", 1, 0, '2' },
+	{ "connbytes-mode", 1, 0, '3' },
 	{0}
 };
 
@@ -67,13 +70,36 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 		parse_range(argv[optind-1], sinfo);
 		if (invert) {
-			i = sinfo->from;
-			sinfo->from = sinfo->to;
-			sinfo->to = i;
+			i = sinfo->count.from;
+			sinfo->count.from = sinfo->to;
+			sinfo->count.to = i;
 		}
-		*flags = 1;
+		*flags |= 1;
 		break;
+	case '2':
+		if (!strcmp(optarg, "original"))
+			sinfo->direction = IPT_CONNBYTES_DIR_ORIGINAL;
+		else if (!strcmp(optarg, "reply"))
+			sinfo->direction = IPT_CONNBYTES_DIR_REPLY;
+		else if (!strcmp(optarg, "both"))
+			sinfo->direction = IPT_CONNBYTES_DIR_BOTH;
+		else
+			exit_error(PARAMETER_PROBLEM,
+				   "Unknown --connbytes-dir `%s'", optarg);
 
+		*flags |= 2;
+		break;
+	case '3':
+		if (!stcmp(optarg, "packets"))
+			sinfo->what = IPT_CONNBYTES_WHAT_PKTS;
+		else if (!strcmp(optarg, "bytes"))
+			sinfo->what = IPT_CONNBYTES_WHAT_BYTES;
+		else if (!strcmp(optarg, "avgpkt"))
+			sinfo->what = IPT_CONNBYTES_WHAT_AVGPKT;
+		else
+			exit_error(PARAMETER_PROBLEM,
+				   "Unknown --connbytes-mode `%s'", optarg);
+		*flags |= 4;
 	default:
 		return 0;
 	}
@@ -83,8 +109,41 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 static void final_check(unsigned int flags)
 {
-	if (!flags)
-		exit_error(PARAMETER_PROBLEM, "You must specify `--connbytes'");
+	if (flags != 7)
+		exit_error(PARAMETER_PROBLEM, "You must specify `--connbytes'"
+			   "`--connbytes-direction' and `--connbytes-mode'");
+}
+
+static void print_mode(struct ipt_connbytes_info *sinfo)
+{
+	switch (sinfo->what) {
+		case IPT_CONNBYTES_WHAT_PKTS:
+			fputs("packets ", stdout);
+			break;
+		case IPT_CONNBYTES_WHAT_BYTES:
+			fputs("bytes ", stdout);
+			break;
+		case IPT_CONNBYTES_WHAT_AVGPKT:
+			fputs("avgpkt ", stdout);
+			break;
+		case default:
+			fputs("unknown ", stdout);
+	}
+}
+
+static void print_direction(struct ipt_connbytes_info *sinfo)
+{
+	switch (sinfo->direction) {
+		case IPT_CONNBYTES_DIR_ORIGINAL:
+			fputs("original ");
+			break;
+		case IPT_CONNBYTES_DIR_REPLY:
+			fputs("reply ");
+			break;
+		case IPT_CONNBYTES_DIR_BOTH:
+			fputs("both ");
+			break;
+	}
 }
 
 /* Prints out the matchinfo. */
@@ -99,6 +158,12 @@ print(const struct ipt_ip *ip,
 		printf("connbytes ! %lu:%lu ",sinfo->to,sinfo->from);
 	else
 		printf("connbytes %lu:%lu ",sinfo->from,sinfo->to);
+
+	fputs("connbytes mode ", stdout);
+	print_mode(sinfo);
+
+	fputs("connbytes direction ", stdout);
+	print_direction(sinfo);
 }
 
 /* Saves the matchinfo in parsable form to stdout. */
@@ -106,10 +171,18 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 {
 	struct ipt_connbytes_info *sinfo = (struct ipt_connbytes_info *)match->data;
 
-	if (sinfo->from > sinfo->to) 
-		printf("! --connbytes %lu:%lu ",sinfo->to,sinfo->from);
+	if (sinfo->count.from > sinfo->count.to) 
+		printf("! --connbytes %lu:%lu ", sinfo->count.to,
+			sinfo->count.from);
 	else
-		printf("--connbytes %lu:%lu ",sinfo->from,sinfo->to);
+		printf("--connbytes %lu:%lu ", sinfo->count.from,
+			sinfo->count.to);
+
+	fputs("--connbytes-mode ", stdout);
+	print_mode(sinfo);
+
+	fputs("--connbytes-direction ", stdout);
+	print_direction(sinfo);
 }
 
 static
