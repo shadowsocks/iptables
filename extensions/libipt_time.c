@@ -221,13 +221,13 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; must have specified --time-start --time-stop --days. */
+/* Final check; must have specified --timestart --timestop --days. */
 static void
 final_check(unsigned int flags)
 {
 	if (flags != (IPT_TIME_START | IPT_TIME_STOP | IPT_TIME_DAYS))
 		exit_error(PARAMETER_PROBLEM,
-			   "TIME match: You must specify `--time-start --time-stop and --days'");
+			   "TIME match: You must specify `--timestart --timestop and --days'");
 }
 
 
