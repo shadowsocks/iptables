@@ -4,14 +4,14 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.17 2001/01/24 01:15:16 laforge Exp $
+CVS ID: $Id: TODO,v 1.18 2001/01/24 12:33:49 laforge Exp $
 
 IMPORTANT before iptables-1.2.1 release:
-- generic tcp sequence number offset support for nat helpers [HW]
+X generic tcp sequence number offset support for nat helpers [HW]
 - prerelease make target (for applying certain p-o-m stuff)
 - header files in seperate directory, build all extensions, even
   when current kernel not patched
-- restore counters for individual rules (iptables / iptables-restore) [HW]
+X restore counters for individual rules (iptables / iptables-restore) [HW]
 - add libipulog / libiptc to DEVEL target
 
 INDEPENDENT from iptables-1.2.1 release:
@@ -24,8 +24,8 @@ INDEPENDENT from iptables-1.2.1 release:
 - pktlen match (not needed, when u32 available)
 - SMP locking for IRC buggy?
 - MARK match / target with boolean OR / AND (to use nfmark bitwise)
-- full tcp window tracking incompatibility with nat helpers [HW]
-- multiple related connections
+X full tcp window tracking incompatibility with nat helpers [HW]
+X multiple related connections [HW]
 - documentation for libiptc
 - port conntrack to IPv6 (code reuse?)
 - port matches (owner, limit, multiport, owner) to IPv6
@@ -37,6 +37,8 @@ INDEPENDENT from iptables-1.2.1 release:
 - make patch-o-matic more generic (any subdir), and reversible
 - CONFIG_NF_IP_NAT_LOCAL
 - fix and test the netfilter bridging stuff
+- integrate the ipt_NETLINK target from gianni@ecsc.co.uk
+- various NAT performance optimizations possible! (which? ask HW)
 
 ======================================================================
 [RR]	Paul 'Rusty' Russel <rusty@linuxcare.com.au>
