@@ -1,11 +1,44 @@
-  u32 classifier
-  ICQ module
-  -C utility.
-  Static (dumb) NAT.
-  LVS
-  Hard lockup with ip_queue under heavy load.
-  ftp tcp window tracking failure (ftp nat must update window info).
-  CONFIG_NF_IP_NAT_LOCAL
-  mangle should have hooks everywhere
-  Make patch-o-matic more generic (any subdir), and reversible.
-	
+TODO List for netfilter / iptables. 
+Currently maintained by Harald Welte <laforge@gnumonks.org>
+
+Please inform me, if you want to work on any of the TODO items, so I
+can update this list and thus prevent two people doing the same work.
+
+CVS ID: $Id$
+
+IMPORTANT before iptables-1.2.1 release:
+- generic tcp sequence number offset support for nat helpers [HW]
+- prerelease make target (for applying certain p-o-m stuff)
+- header files in seperate directory, build all extensions, even
+  when current kernel not patched
+- restore counters for individual rules (iptables / iptables-restore) [HW]
+- add libipulog / libiptc to DEVEL target
+
+INDEPENDENT from iptables-1.2.1 release:
+- netlink interface for conntrack manipulation from userspace [HW]
+- unified nfnetlink for queue,ulog,conntrack (and more?) (2.5 issue)
+- sysctl support for ftp-multi, irc-conntrack/nat, ftp-fxp
+- integrate HOPLIMIT for ipv6 in patch-o-matic [HW]
+- static 1:1 NAT (only ip address NAT in both directions)
+- u32 classifier (port from tc -> iptables)
+- pktlen match (not needed, when u32 available)
+- SMP locking for IRC buggy?
+- MARK match / target with boolean OR / AND (to use nfmark bitwise)
+- full tcp window tracking incompatibility with nat helpers [HW]
+- multiple related connections
+- documentation for libiptc
+- port conntrack to IPv6 (code reuse?)
+- port matches (owner, limit, multiport, owner) to IPv6
+- HOPLIMIT IPv6 target / match [HW]
+- multicast connection tracking
+- conntrack / nat failover [HW]
+- Hard lockup with ip_queue under heavy load
+- mangle table should use all five netfilter hooks
+- make patch-o-matic more generic (any subdir), and reversible
+- CONFIG_NF_IP_NAT_LOCAL
+
+======================================================================
+[RR]	Paul 'Rusty' Russel <rusty@linuxcare.com.au>
+[MB]	Marc Boucher <marc@mbsi.ca>
+[JM]	James Morris <jmorris@intercode.com.au>
+[HW]	Harald Welte <laforge@gnumonks.org>
