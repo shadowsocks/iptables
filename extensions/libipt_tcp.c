@@ -414,12 +414,13 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	    || (tcpinfo->invflags & IPT_TCP_INV_FLAGS)) {
 		if (tcpinfo->invflags & IPT_TCP_INV_FLAGS)
 			printf("! ");
-
-		print_tcpf(tcpinfo->flg_cmp);
+		printf("--tcp-flags ");
 		if (tcpinfo->flg_mask != 0xFF) {
-			printf("/");
 			print_tcpf(tcpinfo->flg_mask);
 		}
+		printf(" ");
+		print_tcpf(tcpinfo->flg_cmp);
+		printf(" ");
 	}
 }
 
