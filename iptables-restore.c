@@ -1,10 +1,10 @@
 /* Code to restore the iptables state, from file by iptables-save. 
- * (C) 2000 by Harald Welte <laforge@gnumonks.org>
+ * (C) 2000-2002 by Harald Welte <laforge@gnumonks.org>
  * based on previous code from Rusty Russell <rusty@linuxcare.com.au>
  *
- * This code is distributed under the terms of GNU GPL
+ * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: iptables-restore.c,v 1.20 2002/01/17 20:43:10 laforge Exp $
+ * $Id: iptables-restore.c,v 1.21 2002/05/29 13:08:15 laforge Exp $
  */
 
 #include <getopt.h>

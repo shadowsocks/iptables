@@ -3,6 +3,13 @@
  *
  * Based on the ipchains code by Paul Russell and Michael Neuling
  *
+ * (C) 2000-2002 by the netfilter coreteam <coreteam@netfilter.org>:
+ * 		    Paul 'Rusty' Russell <rusty@rustcorp.com.au>
+ * 		    Marc Boucher <marc+nf@mbsi.ca>
+ * 		    James Morris <jmorris@intercode.com.au>
+ * 		    Harald Welte <laforge@gnumonks.org>
+ * 		    Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+ *
  *	iptables -- IP firewall administration for kernels with
  *	firewall table (aimed for the 2.3 kernels)
  *

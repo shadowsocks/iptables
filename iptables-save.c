@@ -1,6 +1,9 @@
 /* Code to save the iptables state, in human readable-form. */
-/* Authors: Paul 'Rusty' Russell <rusty@rustcorp.com.au> and
- * 	    Harald Welte <laforge@gnumonks.org>
+/* (C) 1999 by Paul 'Rusty' Russell <rusty@rustcorp.com.au> and
+ * (C) 2000-2002 by Harald Welte <laforge@gnumonks.org>
+ *
+ * This code is distributed under the terms of GNU GPL v2
+ *
  */
 #include <getopt.h>
 #include <sys/errno.h>

@@ -1,6 +1,13 @@
 /*
  * Author: Paul.Russell@rustcorp.com.au and mneuling@radlogic.com.au
  *
+ * (C) 2000-2002 by the netfilter coreteam <coreteam@netfilter.org>:
+ * 		    Paul 'Rusty' Russell <rusty@rustcorp.com.au>
+ * 		    Marc Boucher <marc+nf@mbsi.ca>
+ * 		    James Morris <jmorris@intercode.com.au>
+ * 		    Harald Welte <laforge@gnumonks.org>
+ * 		    Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+ *
  * Based on the ipchains code by Paul Russell and Michael Neuling
  *
  *	iptables -- IP firewall administration for kernels with
