@@ -35,7 +35,7 @@ void print_groups(unsigned int gmask)
 static void help(void)
 {
 	printf("ULOG v%s options:\n"
-	       " --ulog-nlgroup nlgroup		NETLINK grouo used for logging\n"
+	       " --ulog-nlgroup nlgroup		NETLINK group used for logging\n"
 	       " --ulog-cprange size		Bytes of each packet to be passed\n"
 	       " --ulog-prefix prefix		Prefix log messages with this prefix.\n\n",
 	       NETFILTER_VERSION);
