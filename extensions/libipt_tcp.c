@@ -122,7 +122,7 @@ parse_tcp_flag(const char *flags)
 		}
 		if (i == sizeof(tcp_flag_names)/sizeof(struct tcp_flag_names))
 			exit_error(PARAMETER_PROBLEM,
-				   "Unknown TCP flag `%s'", buffer);
+				   "Unknown TCP flag `%s'", ptr);
 		}
 
 	free(buffer);
