@@ -8,7 +8,7 @@ NETFILTER_VERSION:=1.2
 OLD_NETFILTER_VERSION:=1.1.2
 
 LIBDIR:=/usr/local/lib
-BINDIR:=/usr/local/bin
+BINDIR:=/usr/local/sbin
 MANDIR:=/usr/local/man
 INCDIR:=/usr/local/include
 

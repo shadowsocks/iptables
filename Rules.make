@@ -10,6 +10,10 @@ clean: $(EXTRA_CLEANS)
 	@find . -name '*.[ao]' | xargs rm -f
 
 install: all $(EXTRA_INSTALLS)
+	@if [ -f /usr/local/bin/iptables -a "$(BINDIR)" = "/usr/local/sbin" ];\
+	then echo 'Erasing iptables from old location (now /usr/local/sbin).';\
+	rm -f /usr/local/bin/iptables;\
+	fi
 
 install-experimental: $(EXTRA_INSTALLS_EXP)
 
