@@ -156,7 +156,7 @@ static void print_rule(const struct ipt_entry *e,
 			e->ip.invflags & IPT_INV_SRCIP);	
 
 	print_ip("-d", e->ip.dst.s_addr, e->ip.dmsk.s_addr,
-			e->ip.invflags & IPT_INV_SRCIP);
+			e->ip.invflags & IPT_INV_DSTIP);
 
 	print_iface('i', e->ip.iniface, e->ip.iniface_mask,
 		    e->ip.invflags & IPT_INV_VIA_IN);
