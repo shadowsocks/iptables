@@ -148,6 +148,7 @@ static void print_rule(const struct ipt_entry *e,
 		iptc_handle_t *h, const char *chain, int counters)
 {
 	struct ipt_entry_target *t;
+	char *target_name;
 
 	/* print counters */
 	if (counters)
@@ -181,7 +182,9 @@ static void print_rule(const struct ipt_entry *e,
 	}
 
 	/* Print target name */	
-	printf("-j %s ", iptc_get_target(e, h));
+	target_name = iptc_get_target(e, h);
+	if (target_name && (*target_name != '\0'))
+		printf("-j %s ", target_name);
 
 	/* Print targinfo part */
 	t = ipt_get_target((struct ipt_entry *)e);
