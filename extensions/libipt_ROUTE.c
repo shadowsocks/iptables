@@ -1,5 +1,6 @@
 /* Shared library add-on to iptables to add ROUTE target support.
- * Author : Cédric de Launois, <delaunois@info.ucl.ac.be>
+ * Author : Cedric de Launois, <delaunois@info.ucl.ac.be>
+ * v 1.8 2003/06/24
  */
 
 #include <stdio.h>
@@ -20,17 +21,20 @@ help(void)
 {
 	printf(
 "ROUTE target v%s options:\n"
-"  --oif   \tifname \t\tSend the packet out using `ifname' network interface\n"
-"  --iif   \tifname \t\tChange the packet's incoming interface to `ifname'\n"
-"  --gw    \tip     \t\tRoute the packet via this gateway\n"
+"    --oif   \tifname \t\tRoute the packet through `ifname' network interface\n"
+"    --iif   \tifname \t\tChange the packet's incoming interface to `ifname'\n"
+"    --gw    \tip     \t\tRoute the packet via this gateway\n"
+"    --continue\t     \t\tRoute the packet and continue traversing the\n"
+"            \t       \t\trules. Not valid with --iif.\n"
 "\n",
-IPTABLES_VERSION);
+"1.8");
 }
 
 static struct option opts[] = {
 	{ "oif", 1, 0, '1' },
 	{ "iif", 1, 0, '2' },
 	{ "gw", 1, 0, '3' },
+	{ "continue", 0, 0, '4' },
 	{ 0 }
 };
 
@@ -44,11 +48,14 @@ init(struct ipt_entry_target *t, unsigned int *nfcache)
 	route_info->oif[0] = '\0';
 	route_info->iif[0] = '\0';
 	route_info->gw = 0;
+	route_info->flags = 0;
 }
 
 
-#define IPT_ROUTE_OPT_IF       0x01
-#define IPT_ROUTE_OPT_GW       0x02
+#define IPT_ROUTE_OPT_OIF      0x01
+#define IPT_ROUTE_OPT_IIF      0x02
+#define IPT_ROUTE_OPT_GW       0x04
+#define IPT_ROUTE_OPT_CONTINUE 0x08
 
 /* Function which parses command options; returns true if it
    ate an option */
@@ -62,9 +69,13 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (*flags & IPT_ROUTE_OPT_IF)
+		if (*flags & IPT_ROUTE_OPT_OIF)
 			exit_error(PARAMETER_PROBLEM,
-				   "Can't specify --oif twice or --oif with --iif");
+				   "Can't specify --oif twice");
+
+		if (*flags & IPT_ROUTE_OPT_IIF)
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't use --oif and --iif together");
 
 		if (check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
@@ -76,13 +87,17 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 				   sizeof(route_info->oif) - 1);
 
 		strcpy(route_info->oif, optarg);
-		*flags |= IPT_ROUTE_OPT_IF;
+		*flags |= IPT_ROUTE_OPT_OIF;
 		break;
 
 	case '2':
-		if (*flags & IPT_ROUTE_OPT_IF)
+		if (*flags & IPT_ROUTE_OPT_IIF)
 			exit_error(PARAMETER_PROBLEM,
-				   "Can't specify --iif twice or --iif with --oif");
+				   "Can't specify --iif twice");
+
+		if (*flags & IPT_ROUTE_OPT_OIF)
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't use --iif and --oif together");
 
 		if (check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
@@ -94,13 +109,17 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 				   sizeof(route_info->iif) - 1);
 
 		strcpy(route_info->iif, optarg);
-		*flags |= IPT_ROUTE_OPT_IF;
+		*flags |= IPT_ROUTE_OPT_IIF;
 		break;
 
 	case '3':
 		if (*flags & IPT_ROUTE_OPT_GW)
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --gw twice");
+
+		if (check_inverse(optarg, &invert, NULL, 0))
+			exit_error(PARAMETER_PROBLEM,
+				   "Unexpected `!' after --gw");
 
 		if (!inet_aton(optarg, (struct in_addr*)&route_info->gw)) {
 			exit_error(PARAMETER_PROBLEM,
@@ -109,6 +128,16 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		}
 
 		*flags |= IPT_ROUTE_OPT_GW;
+		break;
+
+	case '4':
+		if (*flags & IPT_ROUTE_OPT_CONTINUE)
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify --continue twice");
+
+		route_info->flags |= IPT_ROUTE_CONTINUE;
+		*flags |= IPT_ROUTE_OPT_CONTINUE;
+
 		break;
 
 	default:
@@ -124,7 +153,11 @@ final_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
-		           "ROUTE target: one parameter is required");
+		           "ROUTE target: oif, iif or gw option required");
+
+	if ((flags & IPT_ROUTE_OPT_CONTINUE) && (flags & IPT_ROUTE_OPT_IIF))
+		exit_error(PARAMETER_PROBLEM,
+			   "ROUTE target: can't continue traversing the rules with iif option");
 }
 
 
@@ -140,15 +173,19 @@ print(const struct ipt_ip *ip,
 	printf("ROUTE ");
 
 	if (route_info->oif[0])
-		printf("oif %s ", route_info->oif);
+		printf("oif:%s ", route_info->oif);
 
 	if (route_info->iif[0])
-		printf("iif %s ", route_info->iif);
+		printf("iif:%s ", route_info->iif);
 
 	if (route_info->gw) {
 		struct in_addr ip = { route_info->gw };
-		printf("gw %s ", inet_ntoa(ip));
+		printf("gw:%s ", inet_ntoa(ip));
 	}
+
+	if (route_info->flags & IPT_ROUTE_CONTINUE)
+		printf("continue");
+
 }
 
 
@@ -168,6 +205,9 @@ static void save(const struct ipt_ip *ip,
 		struct in_addr ip = { route_info->gw };
 		printf("--gw %s ", inet_ntoa(ip));
 	}
+
+	if (route_info->flags & IPT_ROUTE_CONTINUE)
+		printf("--continue ");
 }
 
 
