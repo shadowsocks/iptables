@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.61 2002/03/26 12:54:35 laforge Exp $
+CVS ID: $Id: TODO,v 1.62 2002/05/27 07:52:33 laforge Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -25,6 +25,8 @@ x port old conntrack/nat helpers to newnat [HW]
 - update packet traversal schematics to represent 5hook-mangle
 - update manpages to include recently submitted extensions
 - remove manually-specified source IP for reject-fakesource patch
+- locally bound udp port can still be used for MASQ/SNAT
+- fix for ICMP DNAT info leak
 
 TO BE INVESTIGATED:
 - packet counters on ultrasparc platform (32bit userspace/64bit kernel issue)
@@ -35,6 +37,8 @@ TO BE INVESTIGATED:
 - different behaviour for first packet towards an l2-unresolved ip?
 
 NICE to have:
+- endianness wrt. unnamed initializers in conntrack helpers after 
+  pptp-patch applied
 - make RPC conntrack work again
 x interface names in ipv6 can contain _ and -
 - multicast connection tracking
