@@ -203,7 +203,7 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 			       ahinfo->spis[0]);
 	}
 
-	if (ahinfo->hdrlen != 0 ) {
+	if (ahinfo->hdrlen != 0 || (ahinfo->invflags & IP6T_AH_INV_LEN) ) {
 		printf("--ahlen %s%u ", 
 			(ahinfo->invflags & IP6T_AH_INV_LEN) ? "! " : "", 
 			ahinfo->hdrlen);

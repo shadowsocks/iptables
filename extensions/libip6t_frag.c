@@ -17,7 +17,7 @@ help(void)
 " --fragid [!] id[:id]          match the id (range)\n"
 " --fraglen [!] length          total length of this header\n"
 " --fragres                     check the reserved filed, too\n"
-" --fragfirst                   matches on the frst fragment\n"
+" --fragfirst                   matches on the first fragment\n"
 " [--fragmore|--fraglast]       there are more fragments or this\n"
 "                               is the last one\n",
 NETFILTER_VERSION);
@@ -184,19 +184,6 @@ print_ids(const char *name, u_int32_t min, u_int32_t max,
 	}
 }
 
-static void
-print_len(const char *name, u_int32_t len, int invert)
-{
-	const char *inv = invert ? "!" : "";
-
-	if (len != 0 || invert) {
-		printf("%s", name);
-		printf(":%s", inv);
-		printf("%u", len);
-		printf(" ");
-	}
-}
-
 /* Prints out the union ip6t_matchinfo. */
 static void
 print(const struct ip6t_ip6 *ip,
@@ -207,8 +194,12 @@ print(const struct ip6t_ip6 *ip,
 	printf("frag ");
 	print_ids("id", frag->ids[0], frag->ids[1],
 		    frag->invflags & IP6T_FRAG_INV_IDS);
-	print_len("length", frag->hdrlen, 
-		    frag->invflags & IP6T_FRAG_INV_LEN);
+	if (frag->flags & IP6T_FRAG_LEN) {
+		printf("length");
+		printf(":%s", frag->invflags & IP6T_FRAG_INV_LEN ? "!" : "");
+		printf("%u", frag->hdrlen);
+		printf(" ");
+	}
 	if (frag->flags & IP6T_FRAG_RES) printf("reserved ");
 	if (frag->flags & IP6T_FRAG_FST) printf("first ");
 	if (frag->flags & IP6T_FRAG_MF) printf("more ");
@@ -237,7 +228,7 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 			       fraginfo->ids[0]);
 	}
 
-	if (fraginfo->hdrlen != 0 ) {
+	if (fraginfo->flags & IP6T_FRAG_LEN) {
 		printf("--fraglen %s%u ", 
 			(fraginfo->invflags & IP6T_FRAG_INV_LEN) ? "! " : "", 
 			fraginfo->hdrlen);
