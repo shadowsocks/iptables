@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.28 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.29 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -758,7 +758,7 @@ insert_rules(unsigned int num_rules, unsigned int rules_size,
 	/* Set intermediates to no counter copy */
 	for (i = 0; i < num_rules; i++)
 		newh->counter_map[num_rules_offset+i]
-			= ((struct counter_map){ COUNTER_MAP_NOMAP, 0 });
+			= ((struct counter_map){ COUNTER_MAP_SET, 0 });
 
 	newh->new_number = (*handle)->new_number + num_rules;
 	newh->entries.size = (*handle)->entries.size + rules_size;
