@@ -528,6 +528,7 @@ addr_to_host(const struct in6_addr *addr)
 
 	memset(&saddr, 0, sizeof(struct sockaddr_in6));
 	in6addrcpy(&(saddr.sin6_addr),(struct in6_addr *)addr);
+	saddr.sin6_family = AF_INET6;
 
         if ( (err=getnameinfo((struct sockaddr *)&saddr,
 			       sizeof(struct sockaddr_in6),
