@@ -35,6 +35,9 @@ typedef unsigned int socklen_t;
 #define HOOK_FORWARD		NF_IP_FORWARD
 #define HOOK_LOCAL_OUT		NF_IP_LOCAL_OUT
 #define HOOK_POST_ROUTING	NF_IP_POST_ROUTING
+#ifdef NF_IP_DROPPING
+#define HOOK_DROPPING		NF_IP_DROPPING
+#endif
 
 #define STRUCT_ENTRY_TARGET	struct ipt_entry_target
 #define STRUCT_ENTRY		struct ipt_entry
