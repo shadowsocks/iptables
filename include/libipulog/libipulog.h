@@ -23,7 +23,9 @@ void ipulog_destroy_handle(struct ipulog_handle *h);
 ssize_t ipulog_read(struct ipulog_handle *h,
 		    unsigned char *buf, size_t len, int timeout);
 
-ulog_packet_msg_t *ipulog_get_packet(const unsigned char *buf);
+ulog_packet_msg_t *ipulog_get_packet(struct ipulog_handle *h,
+				     const unsigned char *buf,
+				     size_t len);
 
 void ipulog_perror(const char *s);
 
