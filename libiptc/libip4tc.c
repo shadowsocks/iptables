@@ -99,6 +99,7 @@ typedef unsigned int socklen_t;
 #define LABEL_RETURN		IPTC_LABEL_RETURN
 #define LABEL_ACCEPT		IPTC_LABEL_ACCEPT
 #define LABEL_DROP		IPTC_LABEL_DROP
+#define LABEL_QUEUE		IPTC_LABEL_QUEUE
 
 #define ALIGN			IPT_ALIGN
 #define RETURN			IPT_RETURN
@@ -406,8 +407,9 @@ do_check(TC_HANDLE_T h, unsigned int line)
 		e = get_entry(h, get_chain_end(h, h->info.hook_entry[i]));
 		assert(unconditional(&e->ip));
 		assert(e->target_offset == sizeof(*e));
-		assert(e->next_offset == sizeof(*e) + sizeof(*t));
 		t = (STRUCT_STANDARD_TARGET *)GET_TARGET(e);
+		assert(t->target.u.target_size == IPT_ALIGN(sizeof(*t)));
+		assert(e->next_offset == sizeof(*e) + IPT_ALIGN(sizeof(*t)));
 
 		assert(strcmp(t->target.u.user.name, STANDARD_TARGET)==0);
 		assert(t->verdict == -NF_DROP-1 || t->verdict == -NF_ACCEPT-1);
