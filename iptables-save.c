@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <dlfcn.h>
 #include <time.h>
-#include "packet-match/userspace/libiptc/libiptc.h"
-#include "packet-match/userspace/iptables.h"
+#include "libiptc/libiptc.h"
+#include "iptables.h"
 
 static int binary = 0, counters = 0;
 
