@@ -11,8 +11,8 @@ LIBDIR:=/usr/local/lib
 BINDIR:=/usr/local/bin
 MANDIR:=/usr/local/man
 
-COPT_FLAGS:=-O #-O2
-CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -Iinclude/ -I$(KERNEL_DIR)/include -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" -g #-pg # -DNDEBUG
+COPT_FLAGS:=-O2
+CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -Iinclude/ -I$(KERNEL_DIR)/include -DNDEBUG -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" #-g #-pg # -DNDEBUG
 
 DEPFILES = $(SHARED_LIBS:%.so=%.d)
 SH_CFLAGS:=$(CFLAGS) -fPIC
@@ -53,6 +53,30 @@ iptables-restore: iptables-restore.c iptables.o libiptc/libiptc.a
 	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ -ldl
 
 $(DESTDIR)$(BINDIR)/iptables-restore: iptables-restore
+	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
+	cp $< $@
+
+ip6tables.o: ip6tables.c
+	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -c -o $@ $<
+
+ip6tables: ip6tables-standalone.c ip6tables.o libiptc/libiptc.a
+	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ -ldl
+
+$(DESTDIR)$(BINDIR)/ip6tables: ip6tables
+	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
+	cp $< $@
+
+ip6tables-save: ip6tables-save.c ip6tables.o libiptc/libiptc.a
+	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ -ldl
+
+$(DESTDIR)$(BINDIR)/ip6tables-save: ip6tables-save
+	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
+	cp $< $@
+
+ip6tables-restore: ip6tables-restore.c ip6tables.o libiptc/libiptc.a
+	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ -ldl
+
+$(DESTDIR)$(BINDIR)/ip6tables-restore: ip6tables-restore
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
 	cp $< $@
 

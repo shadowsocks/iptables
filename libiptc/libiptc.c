@@ -478,7 +478,7 @@ get_chain_end(const TC_HANDLE_T handle, unsigned int start)
 
 /* Iterator functions to run through the chains. */
 const char *
-iptc_first_chain(TC_HANDLE_T *handle)
+TC_FIRST_CHAIN(TC_HANDLE_T *handle)
 {
 	if ((*handle)->cache_chain_heads == NULL
 	    && !populate_cache(*handle))
@@ -505,7 +505,7 @@ TC_NEXT_CHAIN(TC_HANDLE_T *handle)
 
 /* Get first rule in the given chain: NULL for empty chain. */
 const STRUCT_ENTRY *
-iptc_first_rule(const char *chain, TC_HANDLE_T *handle)
+TC_FIRST_RULE(const char *chain, TC_HANDLE_T *handle)
 {
 	struct chain_cache *c;
 
@@ -525,7 +525,7 @@ iptc_first_rule(const char *chain, TC_HANDLE_T *handle)
 
 /* Returns NULL when rules run out. */
 const STRUCT_ENTRY *
-iptc_next_rule(const STRUCT_ENTRY *prev, TC_HANDLE_T *handle)
+TC_NEXT_RULE(const STRUCT_ENTRY *prev, TC_HANDLE_T *handle)
 {
 	if ((void *)prev + prev->next_offset
 	    == (void *)(*handle)->cache_rule_end)
@@ -831,7 +831,7 @@ standard_map(STRUCT_ENTRY *e, int verdict)
 	t = (STRUCT_STANDARD_TARGET *)GET_TARGET(e);
 
 	if (t->target.u.target_size
-	    != IPT_ALIGN(sizeof(STRUCT_STANDARD_TARGET))) {
+	    != ALIGN(sizeof(STRUCT_STANDARD_TARGET))) {
 		errno = EINVAL;
 		return 0;
 	}
@@ -1236,18 +1236,18 @@ TC_CREATE_CHAIN(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 	newc.head.target_offset = sizeof(STRUCT_ENTRY);
 	newc.head.next_offset
 		= sizeof(STRUCT_ENTRY)
-		+ IPT_ALIGN(sizeof(struct ipt_error_target));
+		+ ALIGN(sizeof(struct ipt_error_target));
 	strcpy(newc.name.t.u.user.name, ERROR_TARGET);
-	newc.name.t.u.target_size = IPT_ALIGN(sizeof(struct ipt_error_target));
+	newc.name.t.u.target_size = ALIGN(sizeof(struct ipt_error_target));
 	strcpy(newc.name.error, chain);
 
 	newc.ret.target_offset = sizeof(STRUCT_ENTRY);
 	newc.ret.next_offset
 		= sizeof(STRUCT_ENTRY)
-		+ IPT_ALIGN(sizeof(STRUCT_STANDARD_TARGET));
+		+ ALIGN(sizeof(STRUCT_STANDARD_TARGET));
 	strcpy(newc.target.target.u.user.name, STANDARD_TARGET);
 	newc.target.target.u.target_size
-		= IPT_ALIGN(sizeof(STRUCT_STANDARD_TARGET));
+		= ALIGN(sizeof(STRUCT_STANDARD_TARGET));
 	newc.target.verdict = RETURN;
 
 	/* Add just before terminal entry */

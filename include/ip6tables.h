@@ -16,6 +16,9 @@ struct ip6tables_match
 	/* Size of match data. */
 	size_t size;
 
+	/* Size of match data relevent for userspace comparison purposes */
+	size_t userspacesize;
+
 	/* Function which prints out usage message. */
 	void (*help)(void);
 
@@ -60,6 +63,9 @@ struct ip6tables_target
 	/* Size of target data. */
 	size_t size;
 
+	/* Size of target data relevent for userspace comparison purposes */
+	size_t userspacesize;
+
 	/* Function which prints out usage message. */
 	void (*help)(void);
 
@@ -102,6 +108,12 @@ extern int do_command6(int argc, char *argv[], char **table,
 extern struct ip6tables_match *ip6tables_matches;
 extern struct ip6tables_target *ip6tables_targets;
 
-extern struct ip6tables_target *find_target6(const char *name, int tryload);
-extern struct ip6tables_match *find_match6(const char *name, int tryload);
+enum ip6t_tryload {
+	DONT_LOAD,
+	TRY_LOAD,
+	LOAD_MUST_SUCCEED
+};
+
+extern struct ip6tables_target *find_target6(const char *name, enum ip6t_tryload);
+extern struct ip6tables_match *find_match6(const char *name, enum ip6t_tryload);
 #endif /*_IP6TABLES_USER_H*/

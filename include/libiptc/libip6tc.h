@@ -27,16 +27,16 @@ int ip6tc_is_chain(const char *chain, const ip6tc_handle_t handle);
 ip6tc_handle_t ip6tc_init(const char *tablename);
 
 /* Iterator functions to run through the chains.  Returns NULL at end. */
-const char *iptc_first_chain(ip6tc_handle_t *handle);
+const char *ip6tc_first_chain(ip6tc_handle_t *handle);
 const char *ip6tc_next_chain(ip6tc_handle_t *handle);
 
-/* How many rules in this chain? */
-unsigned int ip6tc_num_rules(const char *chain, ip6tc_handle_t *handle);
+/* Get first rule in the given chain: NULL for empty chain. */
+const struct ip6t_entry *ip6tc_first_rule(const char *chain,
+					  ip6tc_handle_t *handle);
 
-/* Get n'th rule in this chain. */
-const struct ip6t_entry *ip6tc_get_rule(const char *chain,
-					unsigned int n,
-					ip6tc_handle_t *handle);
+/* Returns NULL when rules run out. */
+const struct ip6t_entry *ip6tc_next_rule(const struct ip6t_entry *prev,
+					 ip6tc_handle_t *handle);
 
 /* Returns a pointer to the target name of this position. */
 const char *ip6tc_get_target(const struct ip6t_entry *e,

@@ -62,9 +62,10 @@ typedef unsigned int socklen_t;
 
 #define TC_DUMP_ENTRIES		dump_entries
 #define TC_IS_CHAIN		iptc_is_chain
+#define TC_FIRST_CHAIN		iptc_first_chain
 #define TC_NEXT_CHAIN		iptc_next_chain
-#define TC_NUM_RULES		iptc_num_rules
-#define TC_GET_RULE		iptc_get_rule
+#define TC_FIRST_RULE		iptc_first_rule
+#define TC_NEXT_RULE		iptc_next_rule
 #define TC_GET_TARGET		iptc_get_target
 #define TC_BUILTIN		iptc_builtin
 #define TC_GET_POLICY		iptc_get_policy
