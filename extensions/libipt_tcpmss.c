@@ -99,9 +99,9 @@ print_tcpmss(u_int16_t mss_min, u_int16_t mss_max, int invert, int numeric)
 		printf("! ");
 
 	if (mss_min == mss_max)
-		printf("%u", mss_min);
+		printf("%u ", mss_min);
 	else
-		printf("%u:%u", mss_min, mss_max);
+		printf("%u:%u ", mss_min, mss_max);
 }
 
 /* Final check; must have specified --mss. */
