@@ -295,6 +295,21 @@ static struct rule_head *iptcc_get_rule_num(struct chain_head *c,
 	return NULL;
 }
 
+/* Get a specific rule within a chain backwards */
+static struct rule_head *iptcc_get_rule_num_reverse(struct chain_head *c,
+					    unsigned int rulenum)
+{
+	struct rule_head *r;
+	unsigned int num = 0;
+
+	list_for_each_entry_reverse(r, &c->rules, list) {
+		num++;
+		if (num == rulenum)
+			return r;
+	}
+	return NULL;
+}
+
 /* Returns chain head if found, otherwise NULL. */
 static struct chain_head *
 iptcc_find_chain_by_offset(TC_HANDLE_T handle, unsigned int offset)
@@ -1267,13 +1282,11 @@ TC_INSERT_ENTRY(const IPT_CHAINLABEL chain,
 	   prev points to. */
 	if (rulenum == c->num_rules) {
 		prev = &c->rules;
-	} else {
+	} else if (rulenum + 1 <= c->num_rules/2) {
 		r = iptcc_get_rule_num(c, rulenum + 1);
-		if (!r) {
-			/* Shouldn't happen */
-			errno = ENOENT;
-			return 0;
-		}
+		prev = &r->list;
+	} else {
+		r = iptcc_get_rule_num_reverse(c, c->num_rules - rulenum);
 		prev = &r->list;
 	}
 
@@ -1504,17 +1517,16 @@ TC_DELETE_NUM_ENTRY(const IPT_CHAINLABEL chain,
 		return 0;
 	}
 
-	if (c->num_rules == 0) {
+	if (rulenum >= c->num_rules) {
 		errno = E2BIG;
 		return 0;
 	}
 
 	/* Take advantage of the double linked list if possible. */
-	if (rulenum == c->num_rules - 1)
-		r = list_entry(c->rules.prev, struct rule_head, list);
-	else if (!(r = iptcc_get_rule_num(c, rulenum + 1))) {
-		errno = E2BIG;
-		return 0;
+	if (rulenum + 1 <= c->num_rules/2) {
+		r = iptcc_get_rule_num(c, rulenum + 1);
+	} else {
+		r = iptcc_get_rule_num_reverse(c, c->num_rules - rulenum);
 	}
 
 	/* If we are about to delete the rule that is the current
