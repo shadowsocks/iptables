@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.52 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.53 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -1308,7 +1308,7 @@ TC_REPLACE_ENTRY(const IPT_CHAINLABEL chain,
 		return 0;
 	}
 
-	if (!(old = iptcc_get_rule_num(c, rulenum))) {
+	if (!(old = iptcc_get_rule_num(c, rulenum + 1))) {
 		errno = E2BIG;
 		return 0;
 	}
@@ -1495,7 +1495,7 @@ TC_DELETE_NUM_ENTRY(const IPT_CHAINLABEL chain,
 		return 0;
 	}
 
-	if (!(r = iptcc_get_rule_num(c, rulenum))) {
+	if (!(r = iptcc_get_rule_num(c, rulenum + 1))) {
 		errno = E2BIG;
 		return 0;
 	}
