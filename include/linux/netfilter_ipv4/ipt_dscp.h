@@ -5,13 +5,13 @@
  * 
  * See RFC2474 for a description of the DSCP field within the IP Header.
  *
- * Id: ipt_dscp.h,v 1.1 2002/03/14 12:03:13 laforge Exp 
+ * Id: ipt_dscp.h,v 1.3 2002/08/05 19:00:21 laforge Exp
 */
 #ifndef _IPT_DSCP_H
 #define _IPT_DSCP_H
 
 #define IPT_DSCP_MASK	0xfc	/* 11111100 */
-#define IPT_DSCP_SHIFT	2	/* shift DSCP two bits for ECN */
+#define IPT_DSCP_SHIFT	2
 #define IPT_DSCP_MAX	0x3f	/* 00111111 */
 
 /* match info */
