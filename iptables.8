@@ -445,6 +445,17 @@ into it's according numeric value.
 This module matches the SPIs in ESP header of IPSec packets.
 .TP
 .BR "--espspi " "[!] \fIspi\fP[:\fIspi\fP]"
+.SS helper
+This module matches packets related to a specific conntrack-helper.
+.TP
+.BI "--helper " "string"
+Matches packets related to the specified conntrack-helper.
+.TP
+string can be "ftp" for packets related to a ftp-session on default port.
+For other ports append -portnr to the value, ie. "ftp-2121".
+.br
+Same rules apply for other conntrack-helpers.
+.br
 .SS icmp
 This extension is loaded if `--protocol icmp' is specified.  It
 provides the following option:

@@ -14,7 +14,7 @@ help(void)
 {
 	printf(
 "helper match v%s options:\n"
-"[!] --helper value         Match helper value\n"
+"[!] --helper string        Match helper identified by string\n"
 "\n",
 IPTABLES_VERSION);
 }
