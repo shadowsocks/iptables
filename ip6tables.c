@@ -745,14 +745,15 @@ parse_target(const char *targetname)
 int
 string_to_number(const char *s, int min, int max)
 {
-	int number;
+       long number;
 	char *end;
 
 	/* Handle hex, octal, etc. */
-	number = (int)strtol(s, &end, 0);
+       errno = 0;
+       number = strtol(s, &end, 0);
 	if (*end == '\0' && end != s) {
 		/* we parsed a number, let's see if we want this */
-		if (min <= number && number <= max)
+               if (errno != ERANGE && min <= number && number <= max)
 			return number;
 	}
 	return -1;
@@ -818,7 +819,7 @@ find_target(const char *name, enum ip6t_tryload tryload)
 }
 
 static struct option *
-merge_options(struct option *oldopts, struct option *newopts,
+merge_options(struct option *oldopts, const struct option *newopts,
 	      unsigned int *option_offset)
 {
 	unsigned int num_old, num_new, i;
