@@ -35,9 +35,9 @@ help(void)
 "                                /sec /minute /hour /day postfixes]\n"
 "--dstlimit-mode <mode>		mode\n"
 "					dstip\n"
-"					dstip-destport\n"
+"					dstip-dstport\n"
 "					srcip-dstip\n"
-"					srcip-dstip-destport\n"
+"					srcip-dstip-dstport\n"
 "--dstlimit-name <name>		name for /proc/net/ipt_dstlimit/\n"
 "[--dstlimit-burst <num>]	number to match in a burst, default %u\n"
 "[--dstlimit-htable-size <num>]	number of hashtable buckets\n"
@@ -202,11 +202,11 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 					"--dstlimit-mode");
 		if (!strcmp(optarg, "dstip"))
 			r->mode = IPT_DSTLIMIT_HASH_DIP;
-		else if (!strcmp(optarg, "dstip-destport"))
+		else if (!strcmp(optarg, "dstip-dstport"))
 			r->mode = IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT;
 		else if (!strcmp(optarg, "srcip-dstip"))
 			r->mode = IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP;
-		else if (!strcmp(optarg, "srcip-dstip-destport"))
+		else if (!strcmp(optarg, "srcip-dstip-dstport"))
 			r->mode = IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT;
 		else
 			exit_error(PARAMETER_PROBLEM, 
@@ -301,27 +301,27 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	struct ipt_dstlimit_info *r = 
 		(struct ipt_dstlimit_info *)match->data;
 
-	printf("--limit "); print_rate(r->avg);
+	printf("--dstlimit "); print_rate(r->avg);
 	if (r->burst != IPT_DSTLIMIT_BURST)
-		printf("--limit-burst %u ", r->burst);
+		printf("--dstlimit-burst %u ", r->burst);
 	switch (r->mode) {
 		case (IPT_DSTLIMIT_HASH_DIP):
-			printf("--mode dstip ");
+			printf("--dstlimit-mode dstip ");
 			break;
 		case (IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT):
-			printf("--mode dstip-dstport ");
+			printf("--dstlimit-mode dstip-dstport ");
 			break;
 		case (IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP):
-			printf("--mode srcip-dstip ");
+			printf("--dstlimit-mode srcip-dstip ");
 			break;
 		case (IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT):
-			printf("--mode srcip-dstip-dstport ");
+			printf("--dstlimit-mode srcip-dstip-dstport ");
 			break;
 	}
-	printf("--htable-size %u ", r->size);
-	printf("--htable-max %u ", r->max);
-	printf("--htable-gcinterval %u", r->gc_interval);
-	printf("--htable-expire %u ", r->expire);
+	printf("--dstlimit-htable-size %u ", r->size);
+	printf("--dstlimit-htable-max %u ", r->max);
+	printf("--dstlimit-htable-gcinterval %u ", r->gc_interval);
+	printf("--dstlimit-htable-expire %u ", r->expire);
 }
 
 static
