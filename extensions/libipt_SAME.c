@@ -1,3 +1,4 @@
+/* Shared library add-on to iptables to add simple non load-balancing SNAT support. */
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -15,13 +16,13 @@ help(void)
 {
 	printf(
 "SAME v%s options:\n"
-" --to-source <ipaddr>-<ipaddr>\n"
+" --to <ipaddr>-<ipaddr>\n"
 "				Addresses to map source to.\n",
 NETFILTER_VERSION);
 }
 
 static struct option opts[] = {
-	{ "to-source", 1, 0, '1' },
+	{ "to", 1, 0, '1' },
 	{ 0 }
 };
 
@@ -78,7 +79,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 		if (check_inverse(optarg, &invert))
 			exit_error(PARAMETER_PROBLEM,
-				   "Unexpected `!' after --to-source");
+				   "Unexpected `!' after --to");
 
 		parse_to(optarg, &mr->range[0]);
 		*flags = 1;
@@ -89,12 +90,12 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	}
 }
 
-/* Final check; need --to-dest. */
+/* Final check; need --to. */
 static void final_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
-			   "BALANCE needs --to-source");
+			   "SAME needs --to");
 }
 
 /* Prints out the targinfo. */
@@ -125,7 +126,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	struct in_addr a;
 
 	a.s_addr = r->min_ip;
-	printf("--to-source %s", addr_to_dotted(&a));
+	printf("--to %s", addr_to_dotted(&a));
 	a.s_addr = r->max_ip;
 	printf("-%s ", addr_to_dotted(&a));
 }
