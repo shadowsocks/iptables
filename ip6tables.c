@@ -89,7 +89,7 @@
 #define CMD_RENAME_CHAIN	0x1000U
 #define NUMBER_OF_CMD	13
 static const char cmdflags[] = { 'I', 'D', 'D', 'R', 'A', 'L', 'F', 'Z',
-				 'N', 'X', 'P', 'C', 'E' };
+				 'N', 'X', 'P', 'E' };
 
 #define OPTION_OFFSET 256
 
@@ -117,7 +117,6 @@ static struct option original_opts[] = {
 	{ "list", 2, 0,  'L' },
 	{ "flush", 2, 0,  'F' },
 	{ "zero", 2, 0,  'Z' },
-	{ "check", 1, 0,  'C' },
 	{ "new-chain", 1, 0,  'N' },
 	{ "delete-chain", 2, 0,  'X' },
 	{ "rename-chain", 2, 0,  'E' },
@@ -147,7 +146,7 @@ static struct option original_opts[] = {
 struct ip6t_entry_target *
 ip6t_get_target(struct ip6t_entry *e)
 {
-	        return (void *)e + e->target_offset;
+	return (void *)e + e->target_offset;
 }
 #endif
 
@@ -291,7 +290,7 @@ exit_printhelp(void)
 	struct ip6tables_target *t = NULL;
 
 	printf("%s v%s\n\n"
-"Usage: %s -[ADC] chain rule-specification [options]\n"
+"Usage: %s -[AD] chain rule-specification [options]\n"
 "       %s -[RI] chain rulenum rule-specification [options]\n"
 "       %s -D chain rulenum [options]\n"
 "       %s -[LFZ] [chain] [options]\n"
@@ -317,7 +316,6 @@ exit_printhelp(void)
 "  --list    -L [chain]		List the rules in a chain or all chains\n"
 "  --flush   -F [chain]		Delete all rules in  chain or all chains\n"
 "  --zero    -Z [chain]		Zero counters in chain or all chains\n"
-"  --check   -C chain		Test this packet on chain\n"
 "  --new     -N chain		Create a new user-defined chain\n"
 "  --delete-chain\n"
 "            -X [chain]		Delete a user-defined chain\n"
@@ -755,7 +753,6 @@ find_match(const char *name, enum ip6t_tryload tryload)
 
 	if (ptr)
 		ptr->used = 1;
-
 
 	return ptr;
 }
@@ -1424,36 +1421,6 @@ delete_entry(const ip6t_chainlabel chain,
 	return ret;
 }
 
-static int
-check_packet(const ip6t_chainlabel chain,
-	     struct ip6t_entry *fw,
-	     unsigned int nsaddrs,
-	     const struct in6_addr saddrs[],
-	     unsigned int ndaddrs,
-	     const struct in6_addr daddrs[],
-	     int verbose,
-	     ip6tc_handle_t *handle)
-{
-	int ret = 1;
-	unsigned int i, j;
-	const char *msg;
-
-	for (i = 0; i < nsaddrs; i++) {
-		fw->ipv6.src = saddrs[i];
-		for (j = 0; j < ndaddrs; j++) {
-			fw->ipv6.dst = daddrs[j];
-			if (verbose)
-				print_firewall_line(fw, *handle);
-			msg = ip6tc_check_packet(chain, fw, handle);
-			if (!msg) ret = 0;
-			else printf("%s\n", msg);
-		}
-	}
-
-	return ret;
-}
-
-/*static int*/
 int
 for_each_chain(int (*fn)(const ip6t_chainlabel, int, ip6tc_handle_t *),
 	       int verbose, int builtinstoo, ip6tc_handle_t *handle)
@@ -1721,7 +1688,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	opterr = 0;
 
 	while ((c = getopt_long(argc, argv,
-	   "-A:C:D:R:I:L::F::Z::N:X::E:P:Vh::o:p:s:d:j:i:bvnt:m:xc:",
+	   "-A:D:R:I:L::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:bvnt:m:xc:",
 					   opts, NULL)) != -1) {
 		switch (c) {
 			/*
@@ -1742,12 +1709,6 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 				rulenum = parse_rulenumber(argv[optind++]);
 				command = CMD_DELETE_NUM;
 			}
-			break;
-
-		case 'C':
-			add_command(&command, CMD_CHECK, CMD_NONE,
-				    invert);
-			chain = optarg;
 			break;
 
 		case 'R':
@@ -2061,32 +2022,6 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 						     &m->m))
 						break;
 				}
-
-				/* If you listen carefully, you can
-				   actually hear this code suck. */
-				if (m == NULL
-				    && protocol
-				    && !find_proto(protocol, DONT_LOAD,
-						   options&OPT_NUMERIC)
-				    && (m = find_proto(protocol, TRY_LOAD,
-						       options&OPT_NUMERIC))) {
-					/* Try loading protocol */
-					size_t size;
-
-					size = IP6T_ALIGN(sizeof(struct ip6t_entry_match))
-							 + m->size;
-
-					m->m = fw_calloc(1, size);
-					m->m->u.match_size = size;
-					strcpy(m->m->u.user.name, m->name);
-					m->init(m->m, &fw.nfcache);
-
-					opts = merge_options(opts,
-					    m->extra_opts, &m->option_offset);
-
-					optind--;
-					continue;
-				}
 				if (!m)
 					exit_error(PARAMETER_PROBLEM,
 						   "Unknown arg `%s'",
@@ -2117,8 +2052,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 		exit_error(PARAMETER_PROBLEM,
 			   "nothing appropriate following !");
 
-	if (command & (CMD_REPLACE | CMD_INSERT | CMD_DELETE | CMD_APPEND |
-	    CMD_CHECK)) {
+	if (command & (CMD_REPLACE | CMD_INSERT | CMD_DELETE | CMD_APPEND)) {
 		if (!(options & OPT_DESTINATION))
 			dhostnetworkmask = "::0/0";
 		if (!(options & OPT_SOURCE))
@@ -2137,10 +2071,6 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	    (fw.ipv6.invflags & (IP6T_INV_SRCIP | IP6T_INV_DSTIP)))
 		exit_error(PARAMETER_PROBLEM, "! not allowed with multiple"
 			   " source or destination IP addresses");
-
-	if (command == CMD_CHECK && fw.ipv6.invflags != 0)
-		exit_error(PARAMETER_PROBLEM, "! not allowed with -%c",
-			   cmd2char(CMD_CHECK));
 
 	if (command == CMD_REPLACE && (nsaddrs != 1 || ndaddrs != 1))
 		exit_error(PARAMETER_PROBLEM, "Replacement rule does not "
@@ -2168,8 +2098,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			"can't initialize ip6tables table `%s': %s",
 			*table, ip6tc_strerror(errno));
 
-	if (command == CMD_CHECK
-	    || command == CMD_APPEND
+	if (command == CMD_APPEND
 	    || command == CMD_DELETE
 	    || command == CMD_INSERT
 	    || command == CMD_REPLACE) {
@@ -2181,12 +2110,6 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 					   "Can't use -%c with %s\n",
 					   opt2char(OPT_VIANAMEOUT),
 					   chain);
-			/* -i required with -C */
-			if (command == CMD_CHECK && !(options & OPT_VIANAMEIN))
-				exit_error(PARAMETER_PROBLEM,
-					   "Need -%c with %s\n",
-					   opt2char(OPT_VIANAMEIN),
-					   chain);
 		}
 
 		if (strcmp(chain, "POSTROUTING") == 0
@@ -2196,12 +2119,6 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 				exit_error(PARAMETER_PROBLEM,
 					   "Can't use -%c with %s\n",
 					   opt2char(OPT_VIANAMEIN),
-					   chain);
-			/* -o required with -C */
-			if (command == CMD_CHECK && !(options&OPT_VIANAMEOUT))
-				exit_error(PARAMETER_PROBLEM,
-					   "Need -%c with %s\n",
-					   opt2char(OPT_VIANAMEOUT),
 					   chain);
 		}
 
@@ -2247,11 +2164,6 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 				   nsaddrs, saddrs, ndaddrs, daddrs,
 				   options&OPT_VERBOSE,
 				   handle);
-		break;
-	case CMD_CHECK:
-		ret = check_packet(chain, e,
-				   nsaddrs, saddrs, ndaddrs, daddrs,
-				   options&OPT_VERBOSE, handle);
 		break;
 	case CMD_DELETE:
 		ret = delete_entry(chain, e,

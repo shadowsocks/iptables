@@ -5,8 +5,9 @@
  * Authors:
  * 	Harald Welte <laforge@gnumonks.org>
  * 	Rusty Russell <rusty@linuxcare.com.au>
+ * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: ip6tables-restore.c,v 1.8 2002/03/03 09:44:31 laforge Exp $
+ * $Id: ip6tables-restore.c,v 1.9 2002/05/29 13:08:15 laforge Exp $
  */
 
 #include <getopt.h>
@@ -22,12 +23,6 @@
 #else
 #define DEBUGP(x, args...) 
 #endif
-
-/*
-extern int for_each_chain(int (*fn)(const ip6t_chainlabel, int, ip6tc_handle_t *), int verbose, int builtinstoo, ip6tc_handle_t *handle);
-extern int flush_entries(const ip6t_chainlabel chain, int verbose, ip6tc_handle_t *handle);
-extern int delete_chain(const ip6t_chainlabel chain, int verbose, ip6tc_handle_t *handle);
-*/
 
 static int binary = 0, counters = 0, verbose = 0, noflush = 0;
 

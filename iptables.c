@@ -342,7 +342,7 @@ exit_printhelp(void)
 	struct iptables_target *t = NULL;
 
 	printf("%s v%s\n\n"
-"Usage: %s -[ADC] chain rule-specification [options]\n"
+"Usage: %s -[AD] chain rule-specification [options]\n"
 "       %s -[RI] chain rulenum rule-specification [options]\n"
 "       %s -D chain rulenum [options]\n"
 "       %s -[LFZ] [chain] [options]\n"

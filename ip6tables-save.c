@@ -3,6 +3,7 @@
  * Original code: iptables-save
  * Authors: Paul 'Rusty' Russel <rusty@linuxcare.com.au> and
  * 	    Harald Welte <laforge@gnumonks.org>
+ * This code is distributed under the terms of GNU GPL v2
  */
 #include <getopt.h>
 #include <sys/errno.h>
@@ -27,10 +28,6 @@ static struct option options[] = {
 	{ 0 }
 };
 
-/*
-extern struct ip6tables_match *find_match(const char *name, enum ip6t_tryload tryload);
-extern struct ip6tables_target *find_target(const char *name, enum ip6t_tryload tryload);
-*/
 
 /* This assumes that mask is contiguous, and byte-bounded. */
 static void
