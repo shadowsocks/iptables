@@ -4,24 +4,23 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.67 2002/10/22 10:15:19 laforge Exp $
+CVS ID: $Id: TODO,v 1.68 2003/01/10 14:50:24 laforge Exp $
 
 IMPORTANT issues:
 - erroneously too-fast dropped conntrack for half-open TCP connections [JK]
 X wrong 'Out of window' error message from tcp-windowtracking [JK]
-- --mac-source not working in FORWARD (manpage bug?)
-- update manpages to include recently submitted extensions
-- locally bound udp port can still be used for MASQ/SNAT
+- --mac-source not working in FORWARD (manpage bug?) [BZ]
+- update manpages to include recently submitted extensions [BZ]
+- locally bound udp port can still be used for MASQ/SNAT [BZ]
 - fix for ICMP DNAT info leak
-- unaligned access of nulldevname during string match
+- unaligned access of nulldevname during string match [BZ]
 - update documentation to reflect newnat
-- ip6_tables not working on ultrasparc 
-  (20020912155314.GA20741@paradigm.rfc822.org)
+- ip6_tables not working on ultrasparc [BZ]
+  (20020912155314.GA20741@paradigm.rfc822.org) 
 
 TO BE INVESTIGATED:
-- packet counters on ultrasparc platform (32bit userspace/64bit kernel issue)
+- packet counters on sparc64 platform [BZ]
 - token ring crashes ??
-- iptables-save/restore problems with log-level
 - ip_conntrack rmmod loop (sometimes, Yan's patch?)
 - conntrack helper not called for first packet (udp!)
 - different behaviour for first packet towards an l2-unresolved ip?
@@ -31,18 +30,18 @@ NICE to have:
   pptp-patch applied
 X make RPC conntrack work again
 - multicast connection tracking
-- sysctl support for ftp-multi, irc-conntrack/nat, ftp-fxp
+- sysctl support for ftp-multi, irc-conntrack/nat, ftp-fxp [BZ]
 X integrate HOPLIMIT for ipv6 in patch-o-matic [HW]
 - u32 classifier (port from tc -> iptables) [YU]
 - port conntrack to IPv6 (code reuse?) [BC]
-- ip_nat_ident module
+- ip_nat_ident module [BZ]
 - make iptables / ip6tables use the same codebase (as libiptc) [KA]
 - libipq reentrancy [JM]
-- compiling without O2 issue
+- compiling without O2 issue [BZ]
 - libipq runtime version, do before 1.2.5 [JM]
-- add ICMP type-3-code-13 option to REJECT
-- export list of matches/targets via proc-fs
-- ip6tables mangle needs 'route_me_harder' equivalent
+- add ICMP type-3-code-13 option to REJECT [BZ]
+- export list of matches/targets via proc-fs [BZ]
+- ip6tables mangle needs 'route_me_harder' equivalent [BZ]
 
 FUTURE extensions:
 - dealing with fragmented expectation-causes (i.e. DCC chat split
@@ -75,3 +74,4 @@ Userspace queuing for 2.5:
 [MB]	Marc Boucher <marc@mbsi.ca>
 [RR]	Paul 'Rusty' Russel <rusty@rustcorp.com.au>
 [YU]	Yon Uriarte <ukl2@rz.uni-karlsruhe.de>
+[BZ]	Included in Bugzilla System
