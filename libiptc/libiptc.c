@@ -1453,10 +1453,11 @@ iptc_set_policy(const ipt_chainlabel chain,
 	struct ipt_standard_target *t;
 
 	CHECK(*handle);
+	iptc_fn = iptc_set_policy;
 	/* Figure out which chain. */
 	hook = iptc_builtin(chain, *handle);
 	if (hook == 0) {
-		errno = EINVAL;
+		errno = ENOENT;
 		return 0;
 	} else
 		hook--;
@@ -1656,10 +1657,14 @@ iptc_strerror(int err)
 	    { iptc_insert_entry, EINVAL, "Target problem" },
 	    /* EINVAL for CHECK probably means bad interface. */
 	    { iptc_check_packet, EINVAL,
-	      "bad arguments (does that interface exist?)" },
+	      "Bad arguments (does that interface exist?)" },
 	    /* ENOENT for DELETE probably means no matching rule */
 	    { iptc_delete_entry, ENOENT,
-	      "bad rule (does a matching rule exist in that chain?)" },
+	      "Bad rule (does a matching rule exist in that chain?)" },
+	    { iptc_set_policy, ENOENT,
+	      "Bad built-in chain name" },
+	    { iptc_set_policy, EINVAL,
+	      "Bad policy name" },
 	    { NULL, ENOENT, "No extended target/match by that name" }
 	  };
 
