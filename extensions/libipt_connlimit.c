@@ -43,6 +43,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       struct ipt_entry_match **match)
 {
 	struct ipt_connlimit_info *info = (struct ipt_connlimit_info*)(*match)->data;
+	int i;
 
 	if (0 == (*flags & 2)) {
 		/* set default mask unless we've already seen a mask option */
@@ -58,7 +59,15 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '2':
-		info->mask = htonl(0xFFFFFFFF << (32 - atoi(argv[optind-1])));
+		i = atoi(argv[optind-1]);
+		if ((i < 0) || (i > 32))
+			exit_error(PARAMETER_PROBLEM,
+				"--connlimit-mask must be between 0 and 32");
+
+		if (i == 0)
+			info->mask = 0;
+		else
+			info->mask = htonl(0xFFFFFFFF << (32 - i));
 		*flags |= 2;
 		break;
 
