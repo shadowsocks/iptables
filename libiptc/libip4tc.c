@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #ifdef DEBUG_CONNTRACK
 #define inline

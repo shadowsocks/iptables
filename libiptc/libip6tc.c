@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <arpa/inet.h>
 
 #ifdef DEBUG_CONNTRACK
