@@ -6,6 +6,11 @@
    ftp://prep.ai.mit.edu/pub/gnu/GPL
 
    2001-07-17 Fabrice MARIE <fabrice@celestix.com> : initial development.
+   2001-09-20 Richard Wagner (rwagner@cloudnet.com)
+        * added support for multiple counters
+        * added support for matching on individual packets
+          in the counter cycle
+
 */
 
 #include <stdio.h>
@@ -25,17 +30,24 @@ help(void)
 {
 	printf(
 "nth v%s options:\n"
-"  --every     Nth            Match every Nth packet.\n\n",
-" [--start]    counter        Initialize the counter at the number 'counter'\n"
-"                             instead of 0. Must be of the form :\n"
-"                             0 <= counter <= (nth-1)"
-"                             Example if nth=2 : 0 <= counter <= 1\n\n"
-NETFILTER_VERSION);
+"   --every     Nth              Match every Nth packet\n"
+"  [--counter]  num              Use counter 0-%u (default:0)\n"
+"  [--start]    num              Initialize the counter at the number 'num'\n"
+"                                instead of 0. Must be between 0 and Nth-1\n"
+"  [--packet]   num              Match on 'num' packet. Must be between 0\n"
+"                                and Nth-1.\n\n"
+"                                If --packet is used for a counter than\n"
+"                                there must be Nth number of --packet\n"
+"                                rules, covering all values between 0 and\n"
+"                                Nth-1 inclusively.\n",
+NETFILTER_VERSION, IPT_NTH_NUM_COUNTERS-1);
 }
 
 static struct option opts[] = {
 	{ "every", 1, 0, '1' },
 	{ "start", 1, 0, '2' },
+        { "counter", 1, 0, '3' },
+        { "packet", 1, 0, '4' },
 	{ 0 }
 };
 
@@ -49,6 +61,8 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 #define IPT_NTH_OPT_EVERY	0x01
 #define IPT_NTH_OPT_NOT_EVERY	0x02
 #define IPT_NTH_OPT_START	0x04
+#define IPT_NTH_OPT_COUNTER     0x08
+#define IPT_NTH_OPT_PACKET      0x10
 
 /* Function which parses command options; returns true if it
    ate an option */
@@ -86,6 +100,11 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		/* assign the values */
 		nthinfo->every = num-1;
 		nthinfo->startat = 0;
+                nthinfo->packet = 0xFF;
+                if(!(*flags & IPT_NTH_OPT_EVERY))
+                {
+                        nthinfo->counter = 0;
+                }
 		if (invert)
 		{
 			*flags |= IPT_NTH_OPT_NOT_EVERY;
@@ -115,6 +134,42 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= IPT_NTH_OPT_START;
 		nthinfo->startat = num;
 		break;
+        case '3':
+                /* check for common mistakes... */
+                if (invert)
+                        exit_error(PARAMETER_PROBLEM,
+                                   "Can't specify with ! --counter");
+                if (*flags & IPT_NTH_OPT_COUNTER)
+                        exit_error(PARAMETER_PROBLEM,
+                                   "Can't specify --counter twice");
+                if (string_to_number(optarg, 0, IPT_NTH_NUM_COUNTERS-1, &num) == -1)
+                        exit_error(PARAMETER_PROBLEM,
+                                   "bad --counter `%s', must between 0 and %u", optarg, IPT_NTH_NUM_COUNTERS-1);
+                /* assign the values */
+                *flags |= IPT_NTH_OPT_COUNTER;
+                nthinfo->counter = num;
+                break;
+        case '4':
+                /* check for common mistakes... */
+                if (!((*flags & IPT_NTH_OPT_EVERY) ||
+                      (*flags & IPT_NTH_OPT_NOT_EVERY)))
+                        exit_error(PARAMETER_PROBLEM,
+                                   "Can't specify --packet before --every");
+                if ((*flags & IPT_NTH_OPT_NOT_EVERY))
+                        exit_error(PARAMETER_PROBLEM,
+                                   "Can't specify --packet with ! --every");
+                if (invert)
+                        exit_error(PARAMETER_PROBLEM,
+                                   "Can't specify with ! --packet");
+                if (*flags & IPT_NTH_OPT_PACKET)
+                        exit_error(PARAMETER_PROBLEM,
+                                   "Can't specify --packet twice");
+                if (string_to_number(optarg, 0, nthinfo->every, &num) == -1)
+                        exit_error(PARAMETER_PROBLEM,
+                                   "bad --packet `%s', must between 0 and %u", optarg, nthinfo->every);
+                *flags |= IPT_NTH_OPT_PACKET;
+                nthinfo->packet = num;
+                break;
 	default:
 		return 0;
 	}
@@ -138,8 +193,12 @@ print(const struct ipt_ip *ip,
 	if (nthinfo->not == 1)
 		printf(" !");
 	printf("every %uth ", (nthinfo->every +1));
+	if (nthinfo->counter != 0) 
+		printf("counter #%u ", (nthinfo->counter));
+        if (nthinfo->packet != 0xFF)
+                printf("packet #%u ", nthinfo->packet);
 	if (nthinfo->startat != 0)
-		printf(" start at %u ", nthinfo->startat);
+		printf("start at %u ", nthinfo->startat);
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
@@ -152,8 +211,11 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	if (nthinfo->not == 1)
 		printf("! ");
 	printf("--every %u ", (nthinfo->every +1));
+	printf("--counter %u ", (nthinfo->counter));
 	if (nthinfo->startat != 0)
-		printf(" --start %u", nthinfo->startat );
+		printf("--start %u ", nthinfo->startat );
+        if (nthinfo->packet != 0xFF)
+                printf("--packet %u ", nthinfo->packet );
 }
 
 struct iptables_match nth
