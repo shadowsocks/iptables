@@ -6,6 +6,8 @@
  *
  * libipt_dscp.c borrowed heavily from libipt_tos.c
  *
+ * --class support added by Iain Barnes
+ * 
  * For a list of DSCP codepoints see 
  * http://www.iana.org/assignments/dscp-registry
  *
@@ -19,6 +21,9 @@
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_dscp.h>
 
+/* This is evil, but it's my code - HW*/
+#include "libipt_dscp_helper.c"
+
 static void init(struct ipt_entry_match *m, unsigned int *nfcache) 
 {
 	*nfcache |= NFC_IP_TOS;
@@ -30,12 +35,18 @@ static void help(void)
 "DSCP match v%s options\n"
 "[!] --dscp value		Match DSCP codepoint with numerical value\n"
 "  		                This value can be in decimal (ex: 32)\n"
-"               		or in hex (ex: 0x20)\n", IPTABLES_VERSION
+"               		or in hex (ex: 0x20)\n"
+"[!] --class name		Match the DiffServ class. This value may\n"
+"				be any of the BE,EF, AFxx or CSx classes\n"
+"\n"
+"				These two options are mutually exclusive !\n"
+				, IPTABLES_VERSION
 );
 }
 
 static struct option opts[] = {
 	{ "dscp", 1, 0, 'F' },
+	{ "class", 1, 0, 'G' },
 	{ 0 }
 };
 
@@ -56,6 +67,17 @@ parse_dscp(const unsigned char *s, struct ipt_dscp_info *dinfo)
     	return;
 }
 
+
+static void
+parse_class(const char *s, struct ipt_dscp_info *dinfo)
+{
+	unsigned int dscp = class_to_dscp(s);
+
+	/* Assign the value */
+	dinfo->dscp = (u_int8_t)dscp;
+}
+
+
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
@@ -72,6 +94,17 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			           "DSCP match: Only use --dscp ONCE!");
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_dscp(argv[optind-1], dinfo);
+		if (invert)
+			dinfo->invert = 1;
+		*flags = 1;
+		break;
+
+	case 'G':
+		if (*flags)
+			exit_error(PARAMETER_PROBLEM,
+					"DSCP match: Only use --class ONCE!");
+		check_inverse(optarg, &invert, &optind, 0);
+		parse_class(argv[optind - 1], dinfo);
 		if (invert)
 			dinfo->invert = 1;
 		*flags = 1;
