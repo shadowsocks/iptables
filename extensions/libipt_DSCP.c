@@ -17,11 +17,6 @@
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_DSCP.h>
 
-struct finfo {
- 	struct ipt_entry_target t;
-	u_int8_t dscp;
-};
-
 static void init(struct ipt_entry_target *t, unsigned int *nfcache) 
 {
 }
@@ -42,7 +37,7 @@ static struct option opts[] = {
 };
 
 static void
-parse_dscp(const unsigned char *s, struct ipt_DSCP_info *finfo)
+parse_dscp(const unsigned char *s, struct ipt_DSCP_info *dinfo)
 {
 	unsigned int dscp;
        
@@ -50,11 +45,11 @@ parse_dscp(const unsigned char *s, struct ipt_DSCP_info *finfo)
 		exit_error(PARAMETER_PROBLEM,
 			   "Invalid dscp `%s'\n", s);
 
-	if (dscp & ~IPT_DSCP_MASK) {
+	if (dscp > IPT_DSCP_MAX)
 		exit_error(PARAMETER_PROBLEM,
 			   "DSCP `%d` out of range\n", dscp);
 
-    	finfo->dscp = (u_int8_t )ftos;
+    	dinfo->dscp = (u_int8_t )dscp;
     	return;
 }
 
@@ -63,7 +58,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
       struct ipt_entry_target **target)
 {
-	struct ipt_DSCP_info *finfo
+	struct ipt_DSCP_info *dinfo
 		= (struct ipt_DSCP_info *)(*target)->data;
 
 	switch (c) {
@@ -71,7 +66,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
 			           "DSCP target: Only use --set-dscp ONCE!");
-		parse_dscp(optarg, finfo);
+		parse_dscp(optarg, dinfo);
 		*flags = 1;
 		break;
 
@@ -91,7 +86,7 @@ final_check(unsigned int flags)
 }
 
 static void
-print_dscp(u_int8_t ftos, int numeric)
+print_dscp(u_int8_t dscp, int numeric)
 {
  	printf("0x%02x ", dscp);
 }
@@ -102,20 +97,20 @@ print(const struct ipt_ip *ip,
       const struct ipt_entry_target *target,
       int numeric)
 {
-	const struct ipt_DSCP_info *finfo =
+	const struct ipt_DSCP_info *dinfo =
 		(const struct ipt_DSCP_info *)target->data;
 	printf("DSCP set ");
-	print_dscp(finfo->ftos, numeric);
+	print_dscp(dinfo->dscp, numeric);
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
 static void
 save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 {
-	const struct ipt_DSCP_info *finfo =
+	const struct ipt_DSCP_info *dinfo =
 		(const struct ipt_DSCP_info *)target->data;
 
-	printf("--set-dscp 0x%02x ", finfo->ftos);
+	printf("--set-dscp 0x%02x ", dinfo->dscp);
 }
 
 static
