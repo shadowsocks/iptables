@@ -112,6 +112,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
+		check_inverse(argv[optind-1], &invert, &optind, 0);
 		proto = check_proto(entry);
 		multiinfo->count = parse_multi_ports(argv[optind-1],
 						     multiinfo->ports, proto);
@@ -120,6 +121,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '2':
+		check_inverse(argv[optind-1], &invert, &optind, 0);
 		proto = check_proto(entry);
 		multiinfo->count = parse_multi_ports(argv[optind-1],
 						     multiinfo->ports, proto);
@@ -128,6 +130,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '3':
+		check_inverse(argv[optind-1], &invert, &optind, 0);
 		proto = check_proto(entry);
 		multiinfo->count = parse_multi_ports(argv[optind-1],
 						     multiinfo->ports, proto);
@@ -138,6 +141,10 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	default:
 		return 0;
 	}
+
+	if (invert)
+		exit_error(PARAMETER_PROBLEM,
+			   "multiport does not support invert");
 
 	if (*flags)
 		exit_error(PARAMETER_PROBLEM,
