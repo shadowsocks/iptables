@@ -1033,10 +1033,56 @@ merge_options(struct option *oldopts, const struct option *newopts,
 	return merge;
 }
 
+static int compatible_revision(const char *name, u_int8_t revision, int opt)
+{
+	struct ipt_get_revision rev;
+	socklen_t s = sizeof(rev);
+	int max_rev, sockfd;
+
+	sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
+	if (sockfd < 0) {
+		fprintf(stderr, "Could not open socket to kernel: %s\n",
+			strerror(errno));
+		exit(1);
+	}
+
+	strcpy(rev.name, name);
+	rev.revision = revision;
+
+	max_rev = getsockopt(sockfd, IPPROTO_IP, opt, &rev, &s);
+	if (max_rev < 0) {
+		/* Definitely don't support this? */
+		if (errno == EPROTONOSUPPORT) {
+			close(sockfd);
+			return 0;
+		} else if (errno == ENOPROTOOPT) {
+			close(sockfd);
+			/* Assume only revision 0 support (old kernel) */
+			return (revision == 0);
+		} else {
+			fprintf(stderr, "getsockopt failed strangely: %s\n",
+				strerror(errno));
+			exit(1);
+		}
+	}
+	close(sockfd);
+	return 1;
+}
+
+static int compatible_match_revision(const char *name, u_int8_t revision)
+{
+	return compatible_revision(name, revision, IPT_SO_GET_REVISION_MATCH);
+}
+
+static int compatible_target_revision(const char *name, u_int8_t revision)
+{
+	return compatible_revision(name, revision, IPT_SO_GET_REVISION_TARGET);
+}
+
 void
 register_match(struct iptables_match *me)
 {
-	struct iptables_match **i;
+	struct iptables_match **i, *old;
 
 	if (strcmp(me->version, program_version) != 0) {
 		fprintf(stderr, "%s: match `%s' v%s (I'm v%s).\n",
@@ -1044,10 +1090,34 @@ register_match(struct iptables_match *me)
 		exit(1);
 	}
 
-	if (find_match(me->name, DONT_LOAD, NULL)) {
-		fprintf(stderr, "%s: match `%s' already registered.\n",
+	/* Revision field stole a char: check for 30 char names. */
+	if (!memchr(me->name, 0, IPT_FUNCTION_MAXNAMELEN-1)) {
+		fprintf(stderr, "%s: target `%s' has invalid name\n",
 			program_name, me->name);
 		exit(1);
+	}
+
+	old = find_match(me->name, DONT_LOAD, NULL);
+	if (old) {
+		if (old->revision == me->revision) {
+			fprintf(stderr,
+				"%s: match `%s' already registered.\n",
+				program_name, me->name);
+			exit(1);
+		}
+
+		/* Now we have two (or more) options, check compatibility. */
+		if (compatible_match_revision(old->name, old->revision)
+		    && old->revision > me->revision)
+			return;
+
+		/* Replace if compatible. */
+		if (!compatible_match_revision(me->name, me->revision))
+			return;
+
+		/* Delete old one. */
+		for (i = &iptables_matches; *i!=old; i = &(*i)->next);
+		*i = old->next;
 	}
 
 	if (me->size != IPT_ALIGN(me->size)) {
@@ -1068,16 +1138,47 @@ register_match(struct iptables_match *me)
 void
 register_target(struct iptables_target *me)
 {
+	struct iptables_target *old;
+
 	if (strcmp(me->version, program_version) != 0) {
 		fprintf(stderr, "%s: target `%s' v%s (I'm v%s).\n",
 			program_name, me->name, me->version, program_version);
 		exit(1);
 	}
 
-	if (find_target(me->name, DONT_LOAD)) {
-		fprintf(stderr, "%s: target `%s' already registered.\n",
+	/* Revision field stole a char: check for 30 char names. */
+	if (!memchr(me->name, 0, IPT_FUNCTION_MAXNAMELEN)) {
+		fprintf(stderr, "%s: target `%s' has invalid name\n",
 			program_name, me->name);
 		exit(1);
+	}
+
+	old = find_target(me->name, DONT_LOAD);
+	if (old) {
+		struct iptables_target **i;
+
+		if (old->revision == me->revision) {
+			fprintf(stderr,
+				"%s: target `%s' already registered.\n",
+				program_name, me->name);
+			exit(1);
+		}
+
+		fprintf(stderr, "%s v%i vs v%i\n",
+			me->name, me->revision, old->revision);
+
+		/* Now we have two (or more) options, check compatibility. */
+		if (compatible_target_revision(old->name, old->revision)
+		    && old->revision > me->revision)
+			return;
+
+		/* Replace if compatible. */
+		if (!compatible_target_revision(me->name, me->revision))
+			return;
+
+		/* Delete old one. */
+		for (i = &iptables_targets; *i!=old; i = &(*i)->next);
+		*i = old->next;
 	}
 
 	if (me->size != IPT_ALIGN(me->size)) {
@@ -1684,6 +1785,14 @@ void clear_rule_matches(struct iptables_rule_match **matches)
 	*matches = NULL;
 }
 
+static void set_revision(char *name, u_int8_t revision)
+{
+	/* Old kernel sources don't have ".revision" field,
+	   but we stole a byte from name. */
+	name[IPT_FUNCTION_MAXNAMELEN - 2] = '\0';
+	name[IPT_FUNCTION_MAXNAMELEN - 1] = revision;
+}
+
 int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 {
 	struct ipt_entry fw, *e = NULL;
@@ -1916,6 +2025,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				target->t = fw_calloc(1, size);
 				target->t->u.target_size = size;
 				strcpy(target->t->u.user.name, jumpto);
+				set_revision(target->t->u.user.name,
+					     target->revision);
 				target->init(target->t, &fw.nfcache);
 				opts = merge_options(opts, target->extra_opts, &target->option_offset);
 			}
@@ -1969,6 +2080,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			m->m = fw_calloc(1, size);
 			m->m->u.match_size = size;
 			strcpy(m->m->u.user.name, m->name);
+			set_revision(m->m->u.user.name, m->revision);
 			m->init(m->m, &fw.nfcache);
 			opts = merge_options(opts, m->extra_opts, &m->option_offset);
 		}
@@ -2110,6 +2222,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 					m->m = fw_calloc(1, size);
 					m->m->u.match_size = size;
 					strcpy(m->m->u.user.name, m->name);
+					set_revision(m->m->u.user.name,
+						     m->revision);
 					m->init(m->m, &fw.nfcache);
 
 					opts = merge_options(opts,
@@ -2237,6 +2351,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			target->t = fw_calloc(1, size);
 			target->t->u.target_size = size;
 			strcpy(target->t->u.user.name, jumpto);
+			set_revision(target->t->u.user.name, target->revision);
 			target->init(target->t, &fw.nfcache);
 		}
 

@@ -1234,10 +1234,10 @@ iptcc_map_target(const TC_HANDLE_T handle,
 	}
 
 	/* Must be a module?  If not, kernel will reject... */
-	/* memset to all 0 for your memcmp convenience. */
+	/* memset to all 0 for your memcmp convenience: don't clear version */
 	memset(t->u.user.name + strlen(t->u.user.name),
 	       0,
-	       FUNCTION_MAXNAMELEN - strlen(t->u.user.name));
+	       FUNCTION_MAXNAMELEN - 1 - strlen(t->u.user.name));
 	r->type = IPTCC_R_MODULE;
 	set_changed(handle);
 	return 1;
