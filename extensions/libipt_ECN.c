@@ -6,7 +6,7 @@
  *
  * libipt_ECN.c borrowed heavily from libipt_DSCP.c
  *
- * $Id$
+ * $Id: libipt_ECN.c,v 1.1 2002/02/17 21:32:32 laforge Exp $
  */
 #include <stdio.h>
 #include <string.h>
@@ -40,7 +40,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
       struct ipt_entry_target **target)
 {
-	struct ipt_ECN_info *finfo
+	struct ipt_ECN_info *einfo
 		= (struct ipt_ECN_info *)(*target)->data;
 
 	switch (c) {
