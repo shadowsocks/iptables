@@ -386,7 +386,7 @@ exit_printhelp(void)
 "  --line-numbers		print line numbers when listing\n"
 "  --exact	-x		expand numbers (display exact values)\n"
 "[!] --fragment	-f		match second or further fragments only\n"
-"  --modprobe=<command>		try to insert modules using this commandx\n"
+"  --modprobe=<command>		try to insert modules using this command\n"
 "[!] --version	-V		print package version.\n");
 
 	/* Print out any special helps. A user might like to be able
@@ -657,7 +657,7 @@ find_match(const char *name, enum ipt_tryload tryload)
 					   name);
 		} else if (tryload == LOAD_MUST_SUCCEED)
 			exit_error(PARAMETER_PROBLEM,
-				   "Couldn't load match `%s':%s\n", 
+				   "Couldn't load match `%s':%s\n",
 				   name, dlerror());
 	}
 
@@ -674,7 +674,7 @@ find_proto(const char *pname, enum ipt_tryload tryload, int nolookup)
 	int proto;
 
 	proto = string_to_number(pname, 0, 255);
-	if (proto != -1) 
+	if (proto != -1)
 		return find_match(proto_to_name(proto, nolookup), tryload);
 
 	return find_match(pname, tryload);
@@ -910,7 +910,7 @@ find_target(const char *name, enum ipt_tryload tryload)
 					   name);
 		} else if (tryload == LOAD_MUST_SUCCEED)
 			exit_error(PARAMETER_PROBLEM,
-				   "Couldn't load target `%s':%s\n", 
+				   "Couldn't load target `%s':%s\n",
 				   name, dlerror());
 	}
 
@@ -1331,7 +1331,7 @@ make_delete_mask(struct ipt_entry *fw)
 		mptr += IPT_ALIGN(sizeof(struct ipt_entry_match)) + m->size;
 	}
 
-	memset(mptr, 0xFF, 
+	memset(mptr, 0xFF,
 	       IPT_ALIGN(sizeof(struct ipt_entry_target))
 	       + iptables_targets->userspacesize);
 
@@ -2120,7 +2120,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		if (!target) {
 			/* it is no chain, and we can't load a plugin.
 			 * We cannot know if the plugin is corrupt, non
-			 * existant OR if the user just misspelled a 
+			 * existant OR if the user just misspelled a
 			 * chain. */
 			find_target(jumpto, LOAD_MUST_SUCCEED);
 		} else {
