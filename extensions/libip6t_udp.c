@@ -205,7 +205,7 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 	const struct ip6t_udp *udpinfo = (struct ip6t_udp *)match->data;
 
 	if (udpinfo->spts[0] != 0
-	    && udpinfo->spts[1] != 0xFFFF) {
+	    || udpinfo->spts[1] != 0xFFFF) {
 		if (udpinfo->invflags & IP6T_UDP_INV_SRCPT)
 			printf("! ");
 		if (udpinfo->spts[0]
@@ -219,7 +219,7 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 	}
 
 	if (udpinfo->dpts[0] != 0
-	    && udpinfo->dpts[1] != 0xFFFF) {
+	    || udpinfo->dpts[1] != 0xFFFF) {
 		if (udpinfo->invflags & IP6T_UDP_INV_DSTPT)
 			printf("! ");
 		if (udpinfo->dpts[0]
