@@ -2005,15 +2005,11 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		}
 
 		if (!target) {
-			struct ipt_entry_target unknown_target;
-
-			/* Don't know it.  Must be extension with no
-                           options? */
-			unknown_target.u.target_size = sizeof(unknown_target);
-			strcpy(unknown_target.u.user.name, jumpto);
-
-			e = generate_entry(&fw, iptables_matches,
-					   &unknown_target);
+			/* it is no chain, and we can't load a plugin.
+			 * We cannot know if the plugin is corrupt, non
+			 * existant OR if the user just misspelled a 
+			 * chain. */
+			find_target(jumpto, LOAD_MUST_SUCCEED);
 		} else {
 			e = generate_entry(&fw, iptables_matches, target->t);
 		}
