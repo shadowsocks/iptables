@@ -77,6 +77,10 @@ parse_tcp_ports(const char *portstring, u_int16_t *ports)
 
 		ports[0] = buffer[0] ? parse_tcp_port(buffer) : 0;
 		ports[1] = cp[0] ? parse_tcp_port(cp) : 0xFFFF;
+		
+		if (ports[0] > ports[1])
+			exit_error(PARAMETER_PROBLEM, 
+				   "invalid portrange (min > max)");
 	}
 	free(buffer);
 }
