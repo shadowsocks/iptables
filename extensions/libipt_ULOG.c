@@ -162,7 +162,6 @@ static void save(const struct ipt_ip *ip,
 	if (loginfo->nl_group != ULOG_DEFAULT_NLGROUP) {
 		printf("--ulog-nlgroup ");
 		print_groups(loginfo->nl_group);
-		printf("\n");
 	}
 	if (loginfo->copy_range)
 		printf("--ulog-cprange %d ", loginfo->copy_range);
