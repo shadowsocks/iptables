@@ -125,7 +125,7 @@ static struct option original_opts[] = {
 	{ 0 }
 };
 
-#if 0
+#ifndef __OPTIMIZE__
 static struct ipt_entry_target *
 ipt_get_target(struct ipt_entry *e)
 {

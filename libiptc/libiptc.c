@@ -15,7 +15,7 @@
 #define IPT_LIB_DIR "/usr/local/lib/iptables"
 #endif
 
-#if 0
+#ifndef __OPTIMIZE__
 static STRUCT_ENTRY_TARGET *
 GET_TARGET(STRUCT_ENTRY *e)
 {
