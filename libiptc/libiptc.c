@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.54 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.55 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -1962,7 +1962,7 @@ TC_COMMIT(TC_HANDLE_T *handle)
 		errno = ENOMEM;
 		return 0;
 	}
-	memset(repl, 0, sizeof(*repl));
+	memset(repl, 0, sizeof(*repl) + new_size);
 
 	counterlen = sizeof(STRUCT_COUNTERS_INFO)
 			+ sizeof(STRUCT_COUNTERS) * new_number;
