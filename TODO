@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.58 2002/02/25 09:27:31 laforge Exp $
+CVS ID: $Id: TODO,v 1.59 2002/03/19 07:56:59 laforge Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -19,7 +19,11 @@ x speed issues (mark_source_chains, Robert Olsson)
 x fix apparent output nat + slip oops bug; see thread at
   http://lists.samba.org/pipermail/netfilter/2001-December/017747.html
 x TFTP helper: works only on second packet?
-- necessary structures for helper match in newnat
+x necessary structures for helper match in newnat [HW]
+- port old conntrack/nat helpers to newnat [HW]
+- update NAT part of netfilter-hacking-HOWTO to newnat [HW]
+- update packet traversal schematics to represent 5hook-mangle
+- update manpages to include recently submitted extensions
 
 TO BE INVESTIGATED:
 - token ring crashes ??
@@ -41,7 +45,7 @@ x interface names in ipv6 can contain _ and -
 x make patch-o-matic reversible
 x CONFIG_NF_IP_NAT_LOCAL
 x fix and test the netfilter bridging stuff
-- ip_nat_ident module [FM]
+- ip_nat_ident module
 x provide daily CVS snapshots via ftp [HW]
 - make iptables / ip6tables use the same codebase (as libiptc) [KA]
 x REJECT optionally generates port unreachable with faked SOURCE
@@ -75,7 +79,6 @@ Userspace queuing for 2.5:
 
 ======================================================================
 [BC]	Brad Chapman <kakadu_croc@yahoo.com>
-[FM]	Fabrice Marie <fabrice@celestix.com>
 [HW]	Harald Welte <laforge@gnumonks.org>
 [JK]	Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
 [JM]	James Morris <jmorris@intercode.com.au>
