@@ -13,7 +13,8 @@ FOLLOW THESE STEPS:
 2) Finally, you need to to install the shared libraries, and the binary:
 	# make install KERNEL_DIR=<<where-your-kernel-is>>
 
-If you are a developer, you can install the header files, like:
+If you are a developer, you can install the headers, development libraries
+and associated development man pages, with:
 	# make install-devel
 
 That's it!
