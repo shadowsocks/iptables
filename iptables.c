@@ -160,7 +160,7 @@ static char commands_v_options[NUMBER_OF_CMD][NUMBER_OF_OPT] =
 /*NEW_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x','x'},
 /*DEL_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x','x'},
 /*SET_POLICY*/{'x','x','x','x','x',' ','x','x','x','x','x'},
-/*CHECK*/     {'x','+','+','+','x',' ','x','+','+',' ','x'},
+/*CHECK*/     {'x','+','+','+','x',' ','x',' ',' ',' ','x'},
 /*RENAME*/    {'x','x','x','x','x',' ','x','x','x','x','x'}
 };
 
@@ -1922,23 +1922,35 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	    || command == CMD_DELETE
 	    || command == CMD_INSERT
 	    || command == CMD_REPLACE) {
-		/* -o not valid with incoming packets. */
-		if (options & OPT_VIANAMEOUT)
-			if (strcmp(chain, "PREROUTING") == 0
-		    	    || strcmp(chain, "INPUT") == 0) {
+		if (strcmp(chain, "PREROUTING") == 0
+		    || strcmp(chain, "INPUT") == 0) {
+			/* -o not valid with incoming packets. */
+			if (options & OPT_VIANAMEOUT)
 				exit_error(PARAMETER_PROBLEM,
 					   "Can't use -%c with %s\n",
 					   opt2char(OPT_VIANAMEOUT),
 					   chain);
+			/* -i required with -C */
+			if (command == CMD_CHECK && !(options & OPT_VIANAMEIN))
+				exit_error(PARAMETER_PROBLEM,
+					   "Need -%c with %s\n",
+					   opt2char(OPT_VIANAMEIN),
+					   chain);
 		}
 
-		/* -i not valid with outgoing packets */
-		if (options & OPT_VIANAMEIN)
-			if (strcmp(chain, "POSTROUTING") == 0
-			    || strcmp(chain, "OUTPUT") == 0) {
+		if (strcmp(chain, "POSTROUTING") == 0
+		    || strcmp(chain, "OUTPUT") == 0) {
+			/* -i not valid with outgoing packets */
+			if (options & OPT_VIANAMEIN)
 				exit_error(PARAMETER_PROBLEM,
 					   "Can't use -%c with %s\n",
 					   opt2char(OPT_VIANAMEIN),
+					   chain);
+			/* -o required with -C */
+			if (command == CMD_CHECK && !(options&OPT_VIANAMEOUT))
+				exit_error(PARAMETER_PROBLEM,
+					   "Need -%c with %s\n",
+					   opt2char(OPT_VIANAMEOUT),
 					   chain);
 		}
 
