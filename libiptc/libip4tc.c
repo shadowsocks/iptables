@@ -129,8 +129,8 @@ dump_entry(STRUCT_ENTRY *e, const TC_HANDLE_T handle)
 	size_t i;
 	STRUCT_ENTRY_TARGET *t;
 
-	printf("Entry %u (%lu):\n", entry2index(handle, e),
-	       entry2offset(handle, e));
+	printf("Entry %u (%lu):\n", iptcb_entry2index(handle, e),
+	       iptcb_entry2offset(handle, e));
 	printf("SRC IP: %u.%u.%u.%u/%u.%u.%u.%u\n",
 	       IP_PARTS(e->ip.src.s_addr),IP_PARTS(e->ip.smsk.s_addr));
 	printf("DST IP: %u.%u.%u.%u/%u.%u.%u.%u\n",
@@ -238,6 +238,7 @@ is_same(const STRUCT_ENTRY *a, const STRUCT_ENTRY *b, unsigned char *matchmask)
    	return 1;
 }
 
+#if 0
 /***************************** DEBUGGING ********************************/
 static inline int
 unconditional(const struct ipt_ip *ip)
@@ -292,20 +293,20 @@ check_entry(const STRUCT_ENTRY *e, unsigned int *i, unsigned int *off,
 		assert(t->verdict == -NF_DROP-1
 		       || t->verdict == -NF_ACCEPT-1
 		       || t->verdict == RETURN
-		       || t->verdict < (int)h->entries.size);
+		       || t->verdict < (int)h->entries->size);
 
 		if (t->verdict >= 0) {
 			STRUCT_ENTRY *te = get_entry(h, t->verdict);
 			int idx;
 
-			idx = entry2index(h, te);
+			idx = iptcb_entry2index(h, te);
 			assert(strcmp(GET_TARGET(te)->u.user.name,
 				      IPT_ERROR_TARGET)
 			       != 0);
 			assert(te != e);
 
 			/* Prior node must be error node, or this node. */
-			assert(t->verdict == entry2offset(h, e)+e->next_offset
+			assert(t->verdict == iptcb_entry2offset(h, e)+e->next_offset
 			       || strcmp(GET_TARGET(index2entry(h, idx-1))
 					 ->u.user.name, IPT_ERROR_TARGET)
 			       == 0);
@@ -518,3 +519,5 @@ do_check(TC_HANDLE_T h, unsigned int line)
 		      ERROR_TARGET) == 0);
 }
 #endif /*IPTC_DEBUG*/
+
+#endif

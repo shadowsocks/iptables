@@ -136,8 +136,8 @@ dump_entry(struct ip6t_entry *e, const ip6tc_handle_t handle)
 	int len;
 	struct ip6t_entry_target *t;
 	
-	printf("Entry %u (%lu):\n", entry2index(handle, e),
-	       entry2offset(handle, e));
+	printf("Entry %u (%lu):\n", iptcb_entry2index(handle, e),
+	       iptcb_entry2offset(handle, e));
 	puts("SRC IP: ");
 	inet_ntop(AF_INET6, &e->ipv6.src, buf, sizeof buf);
 	puts(buf);
@@ -428,8 +428,8 @@ do_check(TC_HANDLE_T h, unsigned int line)
 		assert(t->verdict == -NF_DROP-1 || t->verdict == -NF_ACCEPT-1);
 
 		/* Hooks and underflows must be valid entries */
-		entry2index(h, get_entry(h, h->info.hook_entry[i]));
-		entry2index(h, get_entry(h, h->info.underflow[i]));
+		iptcb_entry2index(h, get_entry(h, h->info.hook_entry[i]));
+		iptcb_entry2index(h, get_entry(h, h->info.underflow[i]));
 	}
 
 	assert(h->info.size
