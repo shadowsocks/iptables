@@ -44,7 +44,7 @@ struct iptables_match
 		     const struct ipt_entry_match *match);
 
 	/* Pointer to list of extra command-line options */
-	struct option *extra_opts;
+	const struct option *extra_opts;
 
 	/* Ignore these men behind the curtain: */
 	unsigned int option_offset;
