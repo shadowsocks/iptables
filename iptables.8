@@ -309,13 +309,11 @@ to invert the sense of the match.
 These extensions are loaded if `--protocol tcp' is specified, and no
 other match is specified. It provides the following options:
 .TP
-.BR "--source-port " "[!] [\fIport[:port]\fP] or [\fIport[-port]]\fP]"
+.BR "--source-port " "[!] [\fIport[:port]\fP]"
 Source port or port range specification. This can either be a service
 name or a port number. An inclusive range can also be specified,
 using the format
-.IR port : port 
-or
-.IR port - port .
+.IR port : port .
 If the first port is omitted, "0" is assumed; if the last is omitted,
 "65535" is assumed.
 If the second port greater then the first they will be swapped.
@@ -323,7 +321,7 @@ The flag
 .B --sport
 is an alias for this option.
 .TP
-.BR "--destination-port " "[!] [\fIport[:port]\fP] or [\fIport[-port]]\fP"
+.BR "--destination-port " "[!] [\fIport[:port]\fP]"
 Destination port or port range specification. The flag
 .B --dport
 is an alias for this option.
@@ -357,13 +355,13 @@ Match if TCP option set.
 These extensions are loaded if `--protocol udp' is specified, and no
 other match is specified. It provides the following options:
 .TP
-.BR "--source-port " "[!] [\fIport[:port]\fP] or [\fIport[-port]]\fP"
+.BR "--source-port " "[!] [\fIport[:port]\fP]"
 Source port or port range specification.
 See the description of the
 .B --source-port
 option of the TCP extension for details.
 .TP
-.BR "--destination-port " "[!] [\fIport[:port]\fP] or [\fIport[-port]]\fP"
+.BR "--destination-port " "[!] [\fIport[:port]\fP]"
 Destination port or port range specification.
 See the description of the
 .B --destination-port
