@@ -533,16 +533,10 @@ The type given can be
 .BR icmp-port-unreachable or
 .BR icmp-proto-unreachable
 which return the appropriate ICMP error message (net-unreachable is
-the default).  The following special types are also allowed:
-.B tcp-reset 
-is only valid if the rule also specifies 
-.BR "-p tcp" ,
-and generates a TCP reset packet in response.  This is generally not a
-good idea (modern stacks should deal with ICMPs on TCP connection
-initiation attempts).
+the default).  The option 
 .B echo-reply
-can only be used for rules which specify an ICMP ping packet, and
-generates a ping reply.
+is also allowed; it can only be used for rules which specify an ICMP
+ping packet, and generates a ping reply.
 .SS TOS
 This is used to set the 8-bit Type of Service field in the IP header.
 It is only valid in the
