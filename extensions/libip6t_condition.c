@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
-#include <iptables.h>
+#include <ip6tables.h>
 
-#include<linux/netfilter_ipv4/ip_tables.h>
-#include<linux/netfilter_ipv4/ipt_condition.h>
+#include<linux/netfilter_ipv6/ip6_tables.h>
+#include<linux/netfilter_ipv6/ip6t_condition.h>
 
 
 static void
@@ -25,7 +25,7 @@ static struct option opts[] = {
 
 
 static void
-init(struct ipt_entry_match *m, unsigned int *nfcache)
+init(struct ip6t_entry_match *m, unsigned int *nfcache)
 {
 	*nfcache |= NFC_UNKNOWN;
 }
@@ -33,11 +33,11 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ipt_entry *entry, unsigned int *nfcache,
-      struct ipt_entry_match **match)
+      const struct ip6t_entry *entry, unsigned int *nfcache,
+      struct ip6t_entry_match **match)
 {
-	struct condition_info *info =
-	    (struct condition_info *) (*match)->data;
+	struct condition6_info *info =
+	    (struct condition6_info *) (*match)->data;
 
 	check_inverse(optarg, &invert, &optind, 0);
 
@@ -46,7 +46,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			   "Can't specify multiple conditions");
 
 	if (c == 'X') {
-		if (strlen(argv[optind - 1]) < CONDITION_NAME_LEN)
+		if (strlen(argv[optind - 1]) < CONDITION6_NAME_LEN)
 			strcpy(info->name, argv[optind - 1]);
 		else
 			exit_error(PARAMETER_PROBLEM,
@@ -71,32 +71,32 @@ final_check(unsigned int flags)
 
 
 static void
-print(const struct ipt_ip *ip,
-		  const struct ipt_entry_match *match, int numeric)
+print(const struct ip6t_ip6 *ip,
+		  const struct ip6t_entry_match *match, int numeric)
 {
-	const struct condition_info *info =
-	    (const struct condition_info *) match->data;
+	const struct condition6_info *info =
+	    (const struct condition6_info *) match->data;
 
 	printf("condition %s%s ", (info->invert) ? "!" : "", info->name);
 }
 
 
 static void
-save(const struct ipt_ip *ip,
-		 const struct ipt_entry_match *match)
+save(const struct ip6t_ip6 *ip,
+		 const struct ip6t_entry_match *match)
 {
-	const struct condition_info *info =
-	    (const struct condition_info *) match->data;
+	const struct condition6_info *info =
+	    (const struct condition6_info *) match->data;
 
 	printf("--condition %s%s ", (info->invert) ? "! " : "", info->name);
 }
 
 
-static struct iptables_match condition = {
+static struct ip6tables_match condition = {
 	.name = "condition",
 	.version = IPTABLES_VERSION,
-	.size = IPT_ALIGN(sizeof(struct condition_info)),
-	.userspacesize = IPT_ALIGN(sizeof(struct condition_info)),
+	.size = IP6T_ALIGN(sizeof(struct condition6_info)),
+	.userspacesize = IP6T_ALIGN(sizeof(struct condition6_info)),
 	.help = &help,
 	.init = &init,
 	.parse = &parse,
@@ -110,5 +110,5 @@ static struct iptables_match condition = {
 void
 _init(void)
 {
-	register_match(&condition);
+	register_match6(&condition);
 }
