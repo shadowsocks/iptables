@@ -83,7 +83,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (string_to_number(optarg, 0, 3, &result))
 			exit_error(PARAMETER_PROBLEM,
 				   "ECN match: Value out of range");
-		einfo->ip_ect = result;
+		einfo->ip_ect = (result << IPT_ECN_SHIFT);
 		break;
 	default:
 		return 0;
