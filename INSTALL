@@ -31,7 +31,7 @@ can use
 ================================================================
 PROBLEMS YOU MAY ENCOUNTER:
 
-1) This package requires a 2.4.0 kernel, or above.
+1) This package requires a 2.4.4 kernel, or above.
 
 2) If you get the kernel directory wrong, you may see a message like:
 	Please try `make KERNEL_DIR=path-to-correct-kernel'
