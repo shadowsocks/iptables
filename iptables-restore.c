@@ -4,7 +4,7 @@
  *
  * This coude is distributed under the terms of GNU GPL
  *
- * $Id: iptables-restore.c,v 1.17 2001/10/21 14:11:54 laforge Exp $
+ * $Id: iptables-restore.c,v 1.18 2001/10/22 15:16:21 laforge Exp $
  */
 
 #include <getopt.h>
@@ -27,7 +27,7 @@ static int binary = 0, counters = 0, verbose = 0, noflush = 0;
 static struct option options[] = {
 	{ "binary", 0, 0, 'b' },
 	{ "counters", 0, 0, 'c' },
-/*	{ "verbose", 1, 0, 'v' }, */
+	{ "verbose", 1, 0, 'v' },
 	{ "help", 0, 0, 'h' },
 	{ "noflush", 0, 0, 'n'},
 	{ "modprobe", 1, 0, 'M'},
@@ -121,6 +121,9 @@ int main(int argc, char *argv[])
 				break;
 			case 'c':
 				counters = 1;
+				break;
+			case 'v':
+				verbose = 1;
 				break;
 			case 'h':
 				print_usage("iptables-restore",
