@@ -1159,9 +1159,6 @@ print_firewall(const struct ipt_entry *fw,
 	u_int8_t flags;
 	char buf[BUFSIZ];
 
-	/* User creates a chain called "REJECT": this overrides the
-	   `REJECT' target module.  Keep feeding them rope until the
-	   revolution... Bwahahahahah */
 	if (!iptc_is_chain(targname, handle))
 		target = find_target(targname, TRY_LOAD);
 	else
@@ -1760,6 +1757,10 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				exit_error(PARAMETER_PROBLEM,
 					   "chain name not allowed to start "
 					   "with `-'\n");
+			if (find_target(optarg, TRY_LOAD))
+				exit_error(PARAMETER_PROBLEM,
+					   "chain name may not clash "
+					   "with target name\n");
 			add_command(&command, CMD_NEW_CHAIN, CMD_NONE,
 				    invert);
 			chain = optarg;

@@ -1161,9 +1161,6 @@ print_firewall(const struct ip6t_entry *fw,
 	u_int8_t flags;
 	char buf[BUFSIZ];
 
-	/* User creates a chain called "REJECT": this overrides the
-	   `REJECT' target module.  Keep feeding them rope until the
-	   revolution... Bwahahahahah */
 	if (!ip6tc_is_chain(targname, handle))
 		target = find_target(targname, TRY_LOAD);
 	else
@@ -1797,6 +1794,14 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			break;
 
 		case 'N':
+			if (optarg && *optarg == '-')
+				exit_error(PARAMETER_PROBLEM,
+					   "chain name not allowed to start "
+					   "with `-'\n");
+			if (find_target(optarg, TRY_LOAD))
+				exit_error(PARAMETER_PROBLEM,
+					   "chain name may not clash "
+					   "with target name\n");
 			add_command(&command, CMD_NEW_CHAIN, CMD_NONE,
 				    invert);
 			chain = optarg;
