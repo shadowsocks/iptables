@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.36 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.37 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -234,8 +234,10 @@ TC_INIT(const char *tablename)
 
 	iptc_fn = TC_INIT;
 
-	if (sockfd != -1)
+	if (sockfd != -1) {
 		close(sockfd);
+		sockfd = -1;
+	}
 
 	if (strlen(tablename) >= TABLE_MAXNAMELEN) {
 		errno = EINVAL;
@@ -255,6 +257,7 @@ TC_INIT(const char *tablename)
 	if ((h = alloc_handle(info.name, info.size, info.num_entries))
 	    == NULL) {
 		close(sockfd);
+		sockfd = -1;
 		return NULL;
 	}
 
@@ -289,6 +292,7 @@ TC_INIT(const char *tablename)
 	if (getsockopt(sockfd, TC_IPPROTO, SO_GET_ENTRIES, &h->entries,
 		       &tmp) < 0) {
 		close(sockfd);
+		sockfd = -1;
 		free(h);
 		return NULL;
 	}
@@ -301,6 +305,7 @@ void
 TC_FREE(TC_HANDLE_T *h)
 {
 	close(sockfd);
+	sockfd = -1;
 	if ((*h)->cache_chain_heads)
 		free((*h)->cache_chain_heads);
 	free(*h);
