@@ -343,13 +343,13 @@ do_check(TC_HANDLE_T h, unsigned int line)
 
 		n = get_chain_end(h, 0);
 
-		if (h->info.valid_hooks & NF_IP6_LOCAL_IN) {
+		if (h->info.valid_hooks & (1 << NF_IP6_LOCAL_IN)) {
 			n += get_entry(h, n)->next_offset;
 			assert(h->info.hook_entry[NF_IP6_LOCAL_IN] == n);
 			n = get_chain_end(h, n);
 		}
 
-		if (h->info.valid_hooks & NF_IP6_FORWARD) {
+		if (h->info.valid_hooks & (1 << NF_IP6_FORWARD)) {
 			n += get_entry(h, n)->next_offset;
 			assert(h->info.hook_entry[NF_IP6_FORWARD] == n);
 			n = get_chain_end(h, n);
@@ -359,14 +359,16 @@ do_check(TC_HANDLE_T h, unsigned int line)
 		assert(h->info.hook_entry[NF_IP6_LOCAL_OUT] == n);
 		user_offset = h->info.hook_entry[NF_IP6_LOCAL_OUT];
 
-		if (h->info.valid_hooks & NF_IP6_POST_ROUTING) {
+		if (h->info.valid_hooks & (1 << NF_IP6_POST_ROUTING)) {
 			n = get_chain_end(h, n);
 			n += get_entry(h, n)->next_offset;
 			assert(h->info.hook_entry[NF_IP6_POST_ROUTING] == n);
 			user_offset = h->info.hook_entry[NF_IP6_POST_ROUTING];
 		}
-	} else
+	} else {
+                fprintf(stderr, "Unknown table `%s'\n", h->info.name);
 		abort();
+	}
 
 	/* User chain == end of last builtin + policy entry */
 	user_offset = get_chain_end(h, user_offset);
@@ -387,6 +389,8 @@ do_check(TC_HANDLE_T h, unsigned int line)
 		assert(unconditional(&e->ipv6));
 		assert(e->target_offset == sizeof(*e));
 		t = (STRUCT_STANDARD_TARGET *)GET_TARGET(e);
+		printf("target_size=%u, align=%u\n",
+			t->target.u.target_size, ALIGN(sizeof(*t)));
 		assert(t->target.u.target_size == ALIGN(sizeof(*t)));
 		assert(e->next_offset == sizeof(*e) + ALIGN(sizeof(*t)));
 
@@ -413,7 +417,7 @@ do_check(TC_HANDLE_T h, unsigned int line)
 
 #if 0
 	/* Check all the entries. */
-	ENTRY_ITERATE(h->entries.entries, h->entries.size,
+	ENTRY_ITERATE(h->entries.entrytable, h->entries.size,
 		      check_entry, &i, &n, user_offset, &was_return, h);
 
 	assert(i == h->new_number);

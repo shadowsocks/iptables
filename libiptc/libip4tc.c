@@ -386,9 +386,9 @@ do_check(TC_HANDLE_T h, unsigned int line)
 		 * two mangle hooks, linux >= 2.4.18-pre6 has five mangle hooks
 		 * */
 		assert((h->info.valid_hooks &
-			~(1 << NF_IP_LOCAL_IN)
+			~(1 << NF_IP_LOCAL_IN
 			  | 1 << NF_IP_FORWARD
-			  | 1 << NF_IP_POST_ROUTING)
+			  | 1 << NF_IP_POST_ROUTING))
 		       == (1 << NF_IP_PRE_ROUTING
 			   | 1 << NF_IP_LOCAL_OUT));
 
@@ -397,13 +397,13 @@ do_check(TC_HANDLE_T h, unsigned int line)
 
 		n = get_chain_end(h, 0);
 
-		if (h->info.valid_hooks & NF_IP_LOCAL_IN) {
+		if (h->info.valid_hooks & (1 << NF_IP_LOCAL_IN)) {
 			n += get_entry(h, n)->next_offset;
 			assert(h->info.hook_entry[NF_IP_LOCAL_IN] == n);
 			n = get_chain_end(h, n);
 		}
 
-		if (h->info.valid_hooks & NF_IP_FORWARD) {
+		if (h->info.valid_hooks & (1 << NF_IP_FORWARD)) {
 			n += get_entry(h, n)->next_offset;
 			assert(h->info.hook_entry[NF_IP_FORWARD] == n);
 			n = get_chain_end(h, n);
@@ -413,7 +413,7 @@ do_check(TC_HANDLE_T h, unsigned int line)
 		assert(h->info.hook_entry[NF_IP_LOCAL_OUT] == n);
 		user_offset = h->info.hook_entry[NF_IP_LOCAL_OUT];
 
-		if (h->info.valid_hooks & NF_IP_POST_ROUTING) {
+		if (h->info.valid_hooks & (1 << NF_IP_POST_ROUTING)) {
 			n = get_chain_end(h, n);
 			n += get_entry(h, n)->next_offset;
 			assert(h->info.hook_entry[NF_IP_POST_ROUTING] == n);
@@ -452,8 +452,8 @@ do_check(TC_HANDLE_T h, unsigned int line)
 		assert(unconditional(&e->ip));
 		assert(e->target_offset == sizeof(*e));
 		t = (STRUCT_STANDARD_TARGET *)GET_TARGET(e);
-		assert(t->target.u.target_size == IPT_ALIGN(sizeof(*t)));
-		assert(e->next_offset == sizeof(*e) + IPT_ALIGN(sizeof(*t)));
+		assert(t->target.u.target_size == ALIGN(sizeof(*t)));
+		assert(e->next_offset == sizeof(*e) + ALIGN(sizeof(*t)));
 
 		assert(strcmp(t->target.u.user.name, STANDARD_TARGET)==0);
 		assert(t->verdict == -NF_DROP-1 || t->verdict == -NF_ACCEPT-1);
@@ -485,6 +485,6 @@ do_check(TC_HANDLE_T h, unsigned int line)
 	/* Final entry must be error node */
 	assert(strcmp(GET_TARGET(index2entry(h, h->new_number-1))
 		      ->u.user.name,
-		      IPT_ERROR_TARGET) == 0);
+		      ERROR_TARGET) == 0);
 }
 #endif /*IPTC_DEBUG*/
