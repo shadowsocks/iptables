@@ -7,13 +7,17 @@ TOPLEVEL_INCLUDED=YES
 ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
-NETFILTER_VERSION:=1.2.2
-OLD_NETFILTER_VERSION:=1.2.1a
+NETFILTER_VERSION:=1.2.3
+OLD_NETFILTER_VERSION:=1.2.2
 
 # Waiting for inclusions in the kernel tree.
-PENDING_PATCHES:=
+PENDING_PATCHES:= sackperm.patch ipt_MIRROR-ttl.patch ipt_REJECT-checkentry.patch
 # These went in previous kernels.
-PENDING_PATCHES+=2.4.1.patch tos-fix.patch tcp-MSS.patch 2.4.4.patch ip6tables-export-symbols.patch sackperm.patch
+PENDING_PATCHES+=2.4.1.patch tos-fix.patch tcp-MSS.patch 2.4.4.patch ip6tables-export-symbols.patch
+
+# these are working fine together and don't break themselves
+MOSTOFPOM_PATCHES=NETLINK.patch NETMAP.patch SAME.patch TTL.patch ah-esp.patch ftos.patch iplimit.patch ipv4options.patch irc-conntrack-nat.patch length.patch mport.patch nth.patch pkttype.patch pool.patch psd.patch realm.patch snmp-nat.patch time.patch ttl.patch ulog.patch # string.patch (2.4.9)
+MOSTOFPOM_PATCHES+=REJECT.patch.ipv6 LOG.patch.ipv6 ipv6-agr.patch.ipv6 ipv6-fixes.patch.ipv6 ipv6-ports.patch.ipv6 length.patch.ipv6
 
 LIBDIR:=/usr/local/lib
 BINDIR:=/usr/local/sbin
@@ -172,6 +176,10 @@ distclean: clean
 .PHONY: patch-o-matic
 patch-o-matic/ patch-o-matic:
 	@cd $@ && KERNEL_DIR=$(KERNEL_DIR) ./runme
+
+.PHONY: most-of-pom
+most-of-pom:
+	@cd patch-o-matic && KERNEL_DIR=$(KERNEL_DIR) ./runme $(MOSTOFPOM_PATCHES)
 
 # Rusty's distro magic.
 .PHONY: distrib
