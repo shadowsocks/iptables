@@ -7,7 +7,7 @@
  * 	Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: ip6tables-restore.c,v 1.12 2003/05/02 15:30:11 laforge Exp $
+ * $Id: ip6tables-restore.c,v 1.13 2004/01/05 09:41:51 laforge Exp $
  */
 
 #include <getopt.h>
@@ -182,6 +182,7 @@ int main(int argc, char *argv[])
 				exit(1);
 			}
 			strncpy(curtable, table, IP6T_TABLE_MAXNAMELEN);
+			curtable[IP6T_TABLE_MAXNAMELEN] = '\0';
 
 			if (handle)
 				ip6tc_free(&handle);

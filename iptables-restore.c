@@ -4,7 +4,7 @@
  *
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: iptables-restore.c,v 1.26 2003/05/02 15:30:11 laforge Exp $
+ * $Id: iptables-restore.c,v 1.27 2004/01/05 09:41:50 laforge Exp $
  */
 
 #include <getopt.h>
@@ -179,6 +179,7 @@ int main(int argc, char *argv[])
 				exit(1);
 			}
 			strncpy(curtable, table, IPT_TABLE_MAXNAMELEN);
+			curtable[IPT_TABLE_MAXNAMELEN] = '\0';
 
 			if (handle)
 				iptc_free(&handle);

@@ -46,6 +46,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 		check_inverse(optarg, &invert, &invert, 0);
 		strncpy(info->name, optarg, 29);
+		info->name[29] = '\0';
 		if (invert)
 			info->invert = 1;
 		*flags = 1;

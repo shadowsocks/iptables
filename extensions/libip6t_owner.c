@@ -129,6 +129,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM, "OWNER CMD `%s' too long, max %d characters", optarg, sizeof(ownerinfo->comm));
 		
 		strncpy(ownerinfo->comm, optarg, sizeof(ownerinfo->comm));
+		ownerinfo->comm[sizeof(ownerinfo->comm)-1] = '\0';
 
 		if (invert)
 			ownerinfo->invert |= IP6T_OWNER_COMM;

@@ -47,6 +47,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {	
 		case '1':
 			strncpy(info->key, optarg, 30);
+			info->key[29] = '\0';
 			*flags |= IPT_KEY_SET;
 			break;
 		case '2':

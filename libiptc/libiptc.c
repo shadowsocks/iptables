@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.41 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.43 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -526,6 +526,7 @@ add_chain_cache(TC_HANDLE_T h, const char *name, unsigned int start_off,
 	h->cache_num_chains++;
 
 	strncpy(newcc->name, name, TABLE_MAXNAMELEN-1);
+	newcc->name[TABLE_MAXNAMELEN-1] = '\0';
 	newcc->start_off = start_off;
 	newcc->end_off = end_off;
 

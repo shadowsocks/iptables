@@ -75,6 +75,9 @@ init(struct ipt_entry_match *match, unsigned int *nfcache)
 	*nfcache |= NFC_UNKNOWN;
 
 	strncpy(info->name,"DEFAULT",IPT_RECENT_NAME_LEN);
+	/* eventhough IPT_RECENT_NAME_LEN is currently defined as 200,
+	 * better be safe, than sorry */
+	info->name[IPT_RECENT_NAME_LEN-1] = '\0';
 	info->side = IPT_RECENT_SOURCE;
 }
 
@@ -142,6 +145,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 		case 208:
 			strncpy(info->name,optarg,IPT_RECENT_NAME_LEN);
+			info->name[IPT_RECENT_NAME_LEN-1] = '\0';
 			break;
 
 		case 209:
