@@ -8,7 +8,7 @@ X MTU change in route_me_harder + test.
   LVS
   Hard lockup with ip_queue under heavy load.
 X OSPF failure on local box with NAT (Lai Zit Seng)
-  IPv6 ping crash with NAT.
+x IPv6 ping crash with NAT (should be fixed with patch-test8-ipv6-fixes)
   Redirecting loopback to external machines (LOCAL_IN hook for NAT).
 X Jules Bean: `Problems with large transfers'
   ftp tcp window tracking failure (ftp nat must update window info).
