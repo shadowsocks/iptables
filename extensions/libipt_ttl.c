@@ -1,7 +1,7 @@
 /* Shared library add-on to iptables to add TTL matching support 
  * (C) 2000 by Harald Welte <laforge@gnumonks.org>
  *
- * Version: 1.3
+ * libipt_ttl.c,v 1.4 2000/11/13 11:16:08 laforge Exp
  *
  * This program is released under the terms of GNU GPL */
 
@@ -18,12 +18,16 @@ static void help(void)
 {
 	printf(
 "TTL match v%s options:\n"
-"  --ttl value		Match time to live value\n", NETFILTER_VERSION);
+"  --ttl-eq value	Match time to live value\n"
+"  --ttl-lt value	Match TTL < value\n"
+"  --ttl-gt value	Match TTL > value\n"
+, NETFILTER_VERSION);
 }
 
 static void init(struct ipt_entry_match *m, unsigned int *nfcache)
 {
 	/* caching not yet implemented */
+	*nfcache |= NFC_UNKNOWN;
 }
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
@@ -33,16 +37,48 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 	struct ipt_ttl_info *info = (struct ipt_ttl_info *) (*match)->data;
 	u_int8_t value;
 
+	if (check_inverse(optarg, &invert))
+		optind++;
+	value = atoi(argv[optind-1]);
+
+	if (*flags) 
+		exit_error(PARAMETER_PROBLEM, 
+				"Can't specify TTL option twice");
+
+	if (!optarg)
+		exit_error(PARAMETER_PROBLEM,
+				"ttl: You must specify a value");
 	switch (c) {
-		case '1':
-			if (check_inverse(optarg, &invert))
-				optind++;
-			value = atoi(argv[optind-1]);
+		case '2':
+			if (invert)
+				info->mode = IPT_TTL_NE;
+			else
+				info->mode = IPT_TTL_EQ;
 
 			/* is 0 allowed? */
 			info->ttl = value;
+			*flags = 1;
+
+			break;
+		case '3':
+			if (invert) 
+				exit_error(PARAMETER_PROBLEM,
+						"ttl: unexpected `!'");
+
+			info->mode = IPT_TTL_LT;
+			info->ttl = value;
+			*flags = 1;
+
+			break;
+		case '4':
 			if (invert)
-				info->invert = 1;
+				exit_error(PARAMETER_PROBLEM,
+						"ttl: unexpected `!'");
+
+			info->mode = IPT_TTL_GT;
+			info->ttl = value;
+			*flags = 1;
+
 			break;
 		default:
 			return 0;
@@ -56,7 +92,8 @@ static void final_check(unsigned int flags)
 {
 	if (!flags) 
 		exit_error(PARAMETER_PROBLEM,
-			"TTL match: You must specify `--ttl'");
+			"TTL match: You must specify one of "
+			"`--ttl-eq', `--ttl-lt', `--ttl-gt");
 }
 
 static void print(const struct ipt_ip *ip, 
@@ -67,8 +104,20 @@ static void print(const struct ipt_ip *ip,
 		(struct ipt_ttl_info *) match->data;
 
 	printf("TTL match ");
-	if (info->invert)
-		printf("!");
+	switch (info->mode) {
+		case IPT_TTL_EQ:
+			printf("TTL == ");
+			break;
+		case IPT_TTL_NE:
+			printf("TTL != ");
+			break;
+		case IPT_TTL_LT:
+			printf("TTL < ");
+			break;
+		case IPT_TTL_GT:
+			printf("TTL > ");
+			break;
+	}
 	printf("%u ", info->ttl);
 }
 
@@ -78,14 +127,31 @@ static void save(const struct ipt_ip *ip,
 	const struct ipt_ttl_info *info =
 		(struct ipt_ttl_info *) match->data;
 
-	printf("--ttl ");
-	if (info->invert)
-		printf("!");
+	switch (info->mode) {
+		case IPT_TTL_EQ:
+			printf("--ttl-eq ");
+			break;
+		case IPT_TTL_NE:
+			printf("! --ttl-eq ");
+			break;
+		case IPT_TTL_LT:
+			printf("--ttl-lt ");
+			break;
+		case IPT_TTL_GT:
+			printf("--ttl-gt ");
+			break;
+		default:
+			/* error */
+			break;
+	}
 	printf("%u ", info->ttl);
 }
 
 static struct option opts[] = {
-	{ "ttl", 0, '1' },
+	{ "ttl", 1, 0, '2' },
+	{ "ttl-eq", 1, 0, '2'},
+	{ "ttl-lt", 1, 0, '3'},
+	{ "ttl-gt", 1, 0, '4'},
 	{ 0 }
 };
 
