@@ -399,7 +399,7 @@ do_check(TC_HANDLE_T h, unsigned int line)
 		user_offset = 0;
 #endif
 	} else {
-		fprintf(stderr, "Unknown table `s'\n", h->info.name);
+		fprintf(stderr, "Unknown table `%s'\n", h->info.name);
 		abort();
 	}
 
