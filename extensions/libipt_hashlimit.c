@@ -116,21 +116,26 @@ static int parse_mode(struct ipt_hashlimit_info *r, char *optarg)
 	if (!arg)
 		return -1;
 
+	r->cfg.mode = 0;
+
 	for (tok = strtok(arg, ",|");
 	     tok;
 	     tok = strtok(NULL, ",|")) {
 		if (!strcmp(tok, "dstip"))
 			r->cfg.mode |= IPT_HASHLIMIT_HASH_DIP;
-		else if (!strcmp(optarg, "srcip"))
+		else if (!strcmp(tok, "srcip"))
 			r->cfg.mode |= IPT_HASHLIMIT_HASH_SIP;
-		else if (!strcmp(optarg, "srcport"))
+		else if (!strcmp(tok, "srcport"))
 			r->cfg.mode |= IPT_HASHLIMIT_HASH_SPT;
-		else if (!strcmp(optarg, "dstport"))
+		else if (!strcmp(tok, "dstport"))
 			r->cfg.mode |= IPT_HASHLIMIT_HASH_DPT;
-		else
+		else {
+			free(arg);
 			return -1;
+		}
 	}
-	return 1;
+	free(arg);
+	return 0;
 }
 
 #define PARAM_LIMIT		0x00000001
@@ -274,25 +279,25 @@ static void print_mode(const struct ipt_hashlimit_info *r, char separator)
 	if (r->cfg.mode & IPT_HASHLIMIT_HASH_SIP) {
 		if (prevmode)
 			putchar(separator);
-		puts("srcip");
+		fputs("srcip", stdout);
 		prevmode = 1;
 	}
 	if (r->cfg.mode & IPT_HASHLIMIT_HASH_SPT) {
 		if (prevmode)
 			putchar(separator);
-		puts("srcport");
+		fputs("srcport", stdout);
 		prevmode = 1;
 	}
 	if (r->cfg.mode & IPT_HASHLIMIT_HASH_DIP) {
 		if (prevmode)
 			putchar(separator);
-		puts("dstip");
+		fputs("dstip", stdout);
 		prevmode = 1;
 	}
 	if (r->cfg.mode & IPT_HASHLIMIT_HASH_SPT) {
 		if (prevmode)
 			putchar(separator);
-		puts("dstport");
+		fputs("dstport", stdout);
 	}
 	putchar(' ');
 }
@@ -305,9 +310,9 @@ print(const struct ipt_ip *ip,
 {
 	struct ipt_hashlimit_info *r = 
 		(struct ipt_hashlimit_info *)match->data;
-	puts("limit: avg "); print_rate(r->cfg.avg);
+	fputs("limit: avg ", stdout); print_rate(r->cfg.avg);
 	printf("burst %u ", r->cfg.burst);
-	puts("mode ");
+	fputs("mode ", stdout);
 	print_mode(r, '-');
 	if (r->cfg.size)
 		printf("htable-size %u ", r->cfg.size);
@@ -325,11 +330,11 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	struct ipt_hashlimit_info *r = 
 		(struct ipt_hashlimit_info *)match->data;
 
-	puts("--hashlimit "); print_rate(r->cfg.avg);
+	fputs("--hashlimit ", stdout); print_rate(r->cfg.avg);
 	if (r->cfg.burst != IPT_HASHLIMIT_BURST)
 		printf("--hashlimit-burst %u ", r->cfg.burst);
 
-	puts("--mode ");
+	fputs("--mode ", stdout);
 	print_mode(r, ',');
 
 	if (r->cfg.size)
