@@ -730,7 +730,7 @@ insert_rules(unsigned int num_rules, unsigned int rules_size,
 	}
 
 	newh = alloc_handle((*handle)->info.name,
-			    (*handle)->info.size + rules_size,
+			    (*handle)->entries.size + rules_size,
 			    (*handle)->info.num_entries + num_rules);
 	if (!newh)
 		return 0;
