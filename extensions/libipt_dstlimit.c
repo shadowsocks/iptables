@@ -291,10 +291,14 @@ print(const struct ipt_ip *ip,
 			printf("mode srcip-dstip-dstport ");
 			break;
 	}
-	printf("htable-size %u ", r->cfg.size);
-	printf("htable-max %u ", r->cfg.max);
-	printf("htable-gcinterval %u ", r->cfg.gc_interval);
-	printf("htable-expire %u ", r->cfg.expire);
+	if (r->cfg.size)
+		printf("htable-size %u ", r->cfg.size);
+	if (r->cfg.max)
+		printf("htable-max %u ", r->cfg.max);
+	if (r->cfg.gc_interval != IPT_DSTLIMIT_GCINTEVAL)
+		printf("htable-gcinterval %u ", r->cfg.gc_interval);
+	if (r->cfg.expire != IPT_DSTLIMIT_EXPIRE)
+		printf("htable-expire %u ", r->cfg.expire);
 }
 
 /* FIXME: Make minimalist: only print rate if not default --RR */
@@ -303,9 +307,9 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	struct ipt_dstlimit_info *r = 
 		(struct ipt_dstlimit_info *)match->data;
 
-	printf("--limit "); print_rate(r->cfg.avg);
+	printf("--dstlimit "); print_rate(r->cfg.avg);
 	if (r->cfg.burst != IPT_DSTLIMIT_BURST)
-		printf("--limit-burst %u ", r->cfg.burst);
+		printf("--dstlimit-burst %u ", r->cfg.burst);
 	switch (r->cfg.mode) {
 		case (IPT_DSTLIMIT_HASH_DIP):
 			printf("--mode dstip ");
@@ -320,10 +324,14 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 			printf("--mode srcip-dstip-dstport ");
 			break;
 	}
-	printf("--dstlimit-htable-size %u ", r->cfg.size);
-	printf("--dstlimit-htable-max %u ", r->cfg.max);
-	printf("--dstlimit-htable-gcinterval %u", r->cfg.gc_interval);
-	printf("--dstlimit-htable-expire %u ", r->cfg.expire);
+	if (r->cfg.size)
+		printf("--dstlimit-htable-size %u ", r->cfg.size);
+	if (r->cfg.max)
+		printf("--dstlimit-htable-max %u ", r->cfg.max);
+	if (r->cfg.gc_interval != IPT_DSTLIMIT_GCINTERVAL)
+		printf("--dstlimit-htable-gcinterval %u", r->cfg.gc_interval);
+	if (r->cfg.expire != IPT_DSTLIMIT_EXPIRE)
+		printf("--dstlimit-htable-expire %u ", r->cfg.expire);
 }
 
 static
