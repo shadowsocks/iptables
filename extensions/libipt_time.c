@@ -21,6 +21,7 @@ help(void)
 " [ --timestart value ] [ --timestop value] [ --days listofdays ] [ --datestart value ] [ --datestop value ]\n"
 "          timestart value : HH:MM (default 00:00)\n"
 "          timestop  value : HH:MM (default 23:59)\n"
+"                            Note: daylight savings time changes are not tracked\n"
 "          listofdays value: a list of days to apply\n"
 "                            from Mon,Tue,Wed,Thu,Fri,Sat,Sun\n"
 "                            Coma speparated, no space, case sensitive.\n"
