@@ -45,6 +45,7 @@
 #endif
 
 static int sockfd = -1;
+static int sockfd_use = 0;
 static void *iptc_fn = NULL;
 
 static const char *hooknames[]
@@ -788,33 +789,38 @@ TC_INIT(const char *tablename)
 
 	iptc_fn = TC_INIT;
 
-	if (sockfd != -1) {
-		close(sockfd);
-		sockfd = -1;
-	}
-
 	if (strlen(tablename) >= TABLE_MAXNAMELEN) {
 		errno = EINVAL;
 		return NULL;
 	}
 	
-	sockfd = socket(TC_AF, SOCK_RAW, IPPROTO_RAW);
-	if (sockfd < 0)
-		return NULL;
+	if (sockfd_use == 0) {
+		sockfd = socket(TC_AF, SOCK_RAW, IPPROTO_RAW);
+		if (sockfd < 0)
+			return NULL;
+	}
+	sockfd_use++;
 
 	s = sizeof(info);
 
 	strcpy(info.name, tablename);
-	if (getsockopt(sockfd, TC_IPPROTO, SO_GET_INFO, &info, &s) < 0)
+	if (getsockopt(sockfd, TC_IPPROTO, SO_GET_INFO, &info, &s) < 0) {
+		if (--sockfd_use == 0) {
+			close(sockfd);
+			sockfd = -1;
+		}
 		return NULL;
+	}
 
 	DEBUGP("valid_hooks=0x%08x, num_entries=%u, size=%u\n",
 		info.valid_hooks, info.num_entries, info.size);
 
 	if ((h = alloc_handle(info.name, info.size, info.num_entries))
 	    == NULL) {
-		close(sockfd);
-		sockfd = -1;
+		if (--sockfd_use == 0) {
+			close(sockfd);
+			sockfd = -1;
+		}
 		return NULL;
 	}
 
@@ -846,6 +852,10 @@ TC_INIT(const char *tablename)
 	CHECK(h);
 	return h;
 error:
+	if (--sockfd_use == 0) {
+		close(sockfd);
+		sockfd = -1;
+	}
 	TC_FREE(&h);
 	return NULL;
 }
@@ -855,8 +865,11 @@ TC_FREE(TC_HANDLE_T *h)
 {
 	struct chain_head *c, *tmp;
 
-	close(sockfd);
-	sockfd = -1;
+	iptc_fn = TC_FREE;
+	if (--sockfd_use == 0) {
+		close(sockfd);
+		sockfd = -1;
+	}
 
 	list_for_each_entry_safe(c, tmp, &(*h)->chains, list) {
 		struct rule_head *r, *rtmp;
@@ -886,6 +899,7 @@ static int dump_entry(STRUCT_ENTRY *e, const TC_HANDLE_T handle);
 void
 TC_DUMP_ENTRIES(const TC_HANDLE_T handle)
 {
+	iptc_fn = TC_DUMP_ENTRIES;
 	CHECK(handle);
 #if 0
 	printf("libiptc v%s. %u bytes.\n",
@@ -912,6 +926,7 @@ TC_DUMP_ENTRIES(const TC_HANDLE_T handle)
 /* Does this chain exist? */
 int TC_IS_CHAIN(const char *chain, const TC_HANDLE_T handle)
 {
+	iptc_fn = TC_IS_CHAIN;
 	return iptcc_find_label(chain, handle) != NULL;
 }
 
@@ -1003,6 +1018,7 @@ TC_NEXT_RULE(const STRUCT_ENTRY *prev, TC_HANDLE_T *handle)
 {
 	struct rule_head *r;
 
+	iptc_fn = TC_NEXT_RULE;
 	DEBUGP("rule_iterator_cur=%p...", (*handle)->rule_iterator_cur);
 
 	if (!(*handle)->rule_iterator_cur) {
@@ -1576,6 +1592,7 @@ TC_CHECK_PACKET(const IPT_CHAINLABEL chain,
 		STRUCT_ENTRY *entry,
 		TC_HANDLE_T *handle)
 {
+	iptc_fn = TC_CHECK_PACKET;
 	errno = ENOSYS;
 	return NULL;
 }
@@ -1611,6 +1628,7 @@ TC_ZERO_ENTRIES(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 	struct chain_head *c;
 	struct rule_head *r;
 
+	iptc_fn = TC_ZERO_ENTRIES;
 	if (!(c = iptcc_find_label(chain, *handle))) {
 		errno = ENOENT;
 		return 0;
@@ -1763,6 +1781,7 @@ TC_GET_REFERENCES(unsigned int *ref, const IPT_CHAINLABEL chain,
 {
 	struct chain_head *c;
 
+	iptc_fn = TC_GET_REFERENCES;
 	if (!(c = iptcc_find_label(chain, *handle))) {
 		errno = ENOENT;
 		return 0;
@@ -1991,6 +2010,7 @@ TC_COMMIT(TC_HANDLE_T *handle)
 	int new_number;
 	unsigned int new_size;
 
+	iptc_fn = TC_COMMIT;
 	CHECK(*handle);
 
 	/* Don't commit if nothing changed. */
@@ -2016,6 +2036,7 @@ TC_COMMIT(TC_HANDLE_T *handle)
 
 	counterlen = sizeof(STRUCT_COUNTERS_INFO)
 			+ sizeof(STRUCT_COUNTERS) * new_number;
+	memset(repl, 0, sizeof(*repl) + (*handle)->entries->size);
 
 	/* These are the old counters we will get from kernel */
 	repl->counters = malloc(sizeof(STRUCT_COUNTERS)
@@ -2025,6 +2046,8 @@ TC_COMMIT(TC_HANDLE_T *handle)
 		errno = ENOMEM;
 		return 0;
 	}
+	memset(repl->counters, 0, sizeof(STRUCT_COUNTERS)
+			* (*handle)->info.num_entries);
 	/* These are the counters we're going to put back, later. */
 	newcounters = malloc(counterlen);
 	if (!newcounters) {
