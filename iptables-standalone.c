@@ -35,21 +35,14 @@ main(int argc, char *argv[])
 {
 	int ret;
 	char *table = "filter";
-	iptc_handle_t *handle;
-
-	handle = (iptc_handle_t *) malloc(sizeof(iptc_handle_t));
-	if (!handle) {
-		fprintf(stderr, "out of memory\n");
-		exit(1);
-	}
-	memset(handle, 0, sizeof(iptc_handle_t));
+	iptc_handle_t handle = NULL;
 
 	program_name = "iptables";
 	program_version = NETFILTER_VERSION;
 
-	ret = do_command(argc, argv, &table, handle);
+	ret = do_command(argc, argv, &table, &handle);
 	if (ret)
-		ret = iptc_commit(handle);
+		ret = iptc_commit(&handle);
 
 	if (!ret)
 		fprintf(stderr, "iptables: %s\n",
