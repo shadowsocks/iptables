@@ -604,7 +604,7 @@ parse_mask(char *mask)
 	return &maskaddr;
 }
 
-static void
+void
 parse_hostnetworkmask(const char *name, struct in_addr **addrpp,
 		      struct in_addr *maskp, unsigned int *naddrs)
 {
@@ -695,7 +695,7 @@ find_proto(const char *pname, enum ipt_tryload tryload, int nolookup)
 	return find_match(pname, tryload);
 }
 
-static u_int16_t
+u_int16_t
 parse_protocol(const char *s)
 {
 	unsigned int proto;
@@ -818,7 +818,8 @@ addr_to_dotted(const struct in_addr *addrp)
 	sprintf(buf, "%d.%d.%d.%d", bytep[0], bytep[1], bytep[2], bytep[3]);
 	return buf;
 }
-static char *
+
+char *
 addr_to_anyname(const struct in_addr *addr)
 {
 	char *name;
@@ -830,7 +831,7 @@ addr_to_anyname(const struct in_addr *addr)
 	return addr_to_dotted(addr);
 }
 
-static char *
+char *
 mask_to_dotted(const struct in_addr *mask)
 {
 	int i;
