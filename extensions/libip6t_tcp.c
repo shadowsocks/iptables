@@ -220,7 +220,9 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "--tcp-flags requires two args.");
 
-		parse_tcp_flags(tcpinfo, optarg, argv[optind++], invert);
+		parse_tcp_flags(tcpinfo, argv[optind-1], argv[optind], 
+				invert);
+		optind++;
 		*flags |= TCP_FLAGS;
 		*nfcache |= NFC_IP6_TCPFLAGS;
 		break;
@@ -330,9 +332,9 @@ print_flags(u_int8_t mask, u_int8_t cmp, int invert, int numeric)
 		if (numeric)
 			printf("0x%02X/0x%02X ", mask, cmp);
 		else {
-			print_tcpf(cmp);
-			printf("/");
 			print_tcpf(mask);
+			printf("/");
+			print_tcpf(cmp);
 			printf(" ");
 		}
 	}
@@ -383,7 +385,7 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 	}
 
 	if (tcpinfo->dpts[0] != 0
-	    && tcpinfo->dpts[1] != 0xFFFF) {
+	    || tcpinfo->dpts[1] != 0xFFFF) {
 		if (tcpinfo->invflags & IP6T_TCP_INV_DSTPT)
 			printf("! ");
 		if (tcpinfo->dpts[0]
@@ -408,11 +410,13 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 		if (tcpinfo->invflags & IP6T_TCP_INV_FLAGS)
 			printf("! ");
 
-		print_tcpf(tcpinfo->flg_cmp);
+		printf("--tcp-flags ");
 		if (tcpinfo->flg_mask != 0xFF) {
-			printf("/");
 			print_tcpf(tcpinfo->flg_mask);
 		}
+		printf(" ");
+		print_tcpf(tcpinfo->flg_cmp);
+		printf(" ");
 	}
 }
 
