@@ -530,13 +530,20 @@ returned:
 The type given can be 
 .BR icmp-net-unreachable ,
 .BR icmp-host-unreachable ,
-.BR icmp-port-unreachable or
-.BR icmp-proto-unreachable
+.BR icmp-port-unreachable ,
+.BR icmp-proto-unreachable ,
+.BR icmp-net-prohibited or
+.BR icmp-host-prohibited ,
 which return the appropriate ICMP error message (port-unreachable is
 the default).  The option 
 .B echo-reply
 is also allowed; it can only be used for rules which specify an ICMP
-ping packet, and generates a ping reply.
+ping packet, and generates a ping reply.  Finally, the option
+.B tcp-reset
+can be used on rules in (or called from) the 
+.B INPUT
+chain which only match the TCP protocol: this causes a TCP RST packet
+to be sent back.
 .SS TOS
 This is used to set the 8-bit Type of Service field in the IP header.
 It is only valid in the
