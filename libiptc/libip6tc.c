@@ -111,7 +111,7 @@ typedef unsigned int socklen_t;
 #include "libiptc.c"
 
 #define BIT6(a, l) \
- (((a->in6_u.u6_addr32[(l) / 32]) >> ((l) & 31)) & 1)
+ ((ntohl(a->in6_u.u6_addr32[(l) / 32]) >> (31 - ((l) & 31))) & 1)
 
 int
 ipv6_prefix_length(const struct in6_addr *a)
