@@ -17,10 +17,6 @@
 #include "libiptc/libip6tc.h"
 #include "ip6tables.h"
 
-#ifndef IP6T_LIB_DIR
-#define IP6T_LIB_DIR "/usr/local/lib/iptables"
-#endif
-
 static int binary = 0, counters = 0;
 
 static struct option options[] = {
@@ -31,8 +27,10 @@ static struct option options[] = {
 	{ 0 }
 };
 
+/*
 extern struct ip6tables_match *find_match(const char *name, enum ip6t_tryload tryload);
 extern struct ip6tables_target *find_target(const char *name, enum ip6t_tryload tryload);
+*/
 
 /* This assumes that mask is contiguous, and byte-bounded. */
 static void
@@ -51,7 +49,9 @@ print_iface(char letter, const char *iface, const unsigned char *mask,
 			if (iface[i] != '\0')
 				printf("%c", iface[i]);
 		} else {
-			if (iface[i] == '\0')
+			/* we can access iface[i-1] here, because 
+			 * a few lines above we make sure that mask[0] != 0 */
+			if (iface[i-1] != '\0')
 				printf("+");
 			break;
 		}
@@ -131,22 +131,15 @@ static void print_ip(char *prefix, const struct in6_addr *ip, const struct in6_a
 	if (!mask && !ip)
 		return;
 
-	printf("%s %s%s/",
+	printf("%s %s%s",
 		prefix,
 		invert ? "! " : "",
 		inet_ntop(AF_INET6, ip, buf, sizeof buf));
 
 	if (l == -1)
-		printf("%s ", inet_ntop(AF_INET6, mask, buf, sizeof buf));
+		printf("/%s ", inet_ntop(AF_INET6, mask, buf, sizeof buf));
 	else
-		printf("%d ", l);
-	
-#if 0
-	if (mask != 0xffffffff) 
-		printf("/%u.%u.%u.%u ", IP_PARTS(mask));
-	else
-		printf(" ");
-#endif
+		printf("/%d ", l);
 }
 
 /* We want this to be readable, so only print out neccessary fields.
@@ -180,15 +173,13 @@ static void print_rule(const struct ip6t_entry *e,
 	print_proto(e->ipv6.proto, e->ipv6.invflags & IP6T_INV_PROTO);
 
 #if 0
-	// not definied in ipv6
-	// FIXME: linux/netfilter_ipv6/ip6_tables: IP6T_INV_FRAG why definied?
+	/* not definied in ipv6
+	 * FIXME: linux/netfilter_ipv6/ip6_tables: IP6T_INV_FRAG why definied? */
 	if (e->ipv6.flags & IPT_F_FRAG)
 		printf("%s-f ",
 		       e->ipv6.invflags & IP6T_INV_FRAG ? "! " : "");
 #endif
 
-	// TODO: i've got some problem with the code - under understanding ;)
-	// How can I set this?
 	if (e->ipv6.flags & IP6T_F_TOS)
 		printf("%s-? %d ",
 		       e->ipv6.invflags & IP6T_INV_TOS ? "! " : "", 
@@ -201,8 +192,8 @@ static void print_rule(const struct ip6t_entry *e,
 
 	/* Print target name */	
 	target_name = ip6tc_get_target(e, h);
-	if (target_name && *target_name != '\0')
-		printf("-j %s ", ip6tc_get_target(e, h));
+	if (target_name && (*target_name != '\0'))
+		printf("-j %s ", target_name);
 
 	/* Print targinfo part */
 	t = ip6t_get_target((struct ip6t_entry *)e);
@@ -210,14 +201,22 @@ static void print_rule(const struct ip6t_entry *e,
 		struct ip6tables_target *target
 			= find_target(t->u.user.name, TRY_LOAD);
 
-		if (target)
+		if (!target) {
+			fprintf(stderr, "Can't find library for target `%s'\n",
+				t->u.user.name);
+			exit(1);
+		}
+
+		if (target->save)
 			target->save(&e->ipv6, t);
 		else {
-			/* If some bits are non-zero, it implies we *need*
-			   to understand it */
-			if (t->u.target_size) {
-				fprintf(stderr,
-					"Can't find library for target `%s'\n",
+			/* If the target size is greater than ip6t_entry_target
+			 * there is something to be saved, we just don't know
+			 * how to print it */
+			if (t->u.target_size != 
+			    sizeof(struct ip6t_entry_target)) {
+				fprintf(stderr, "Target `%s' is missing "
+						"save function\n",
 					t->u.user.name);
 				exit(1);
 			}
@@ -287,10 +286,11 @@ static int do_output(const char *tablename)
 			}
 		}
 
+
 		for (chain = ip6tc_first_chain(&h);
 		     chain;
 		     chain = ip6tc_next_chain(&h)) {
-		     const struct ip6t_entry *e;
+			const struct ip6t_entry *e;
 
 			/* Dump out rules */
 			e = ip6tc_first_rule(chain, &h);
@@ -327,7 +327,7 @@ int main(int argc, char *argv[])
 	init_extensions();
 #endif
 
-	while ((c = getopt_long(argc, argv, "bc", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "bcdt:", options, NULL)) != -1) {
 		switch (c) {
 		case 'b':
 			binary = 1;
@@ -341,7 +341,6 @@ int main(int argc, char *argv[])
 			/* Select specific table. */
 			tablename = optarg;
 			break;
-
 		case 'd':
 			do_output(tablename);
 			exit(0);
