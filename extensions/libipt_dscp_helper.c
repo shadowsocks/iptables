@@ -47,7 +47,7 @@ static struct ds_class
 
 
 
-unsigned int 
+static unsigned int 
 class_to_dscp(const char *name)
 {
 	int i;
@@ -64,7 +64,7 @@ class_to_dscp(const char *name)
 
 
 
-const char *
+static const char *
 dscp_to_name(unsigned int dscp)
 {
 	int i;
