@@ -1607,7 +1607,7 @@ TC_STRERROR(int err)
 	      "Bad built-in chain name" },
 	    { TC_SET_POLICY, EINVAL,
 	      "Bad policy name" },
-	    { NULL, ENOENT, "No extended target/match by that name" }
+	    { NULL, ENOENT, "No chain/target/match by that name" }
 	  };
 
 	for (i = 0; i < sizeof(table)/sizeof(struct table_struct); i++) {
