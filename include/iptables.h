@@ -50,6 +50,7 @@ struct iptables_match
 	unsigned int option_offset;
 	struct ipt_entry_match *m;
 	unsigned int mflags;
+	unsigned int used;
 };
 
 struct iptables_target
@@ -96,6 +97,7 @@ struct iptables_target
 	unsigned int option_offset;
 	struct ipt_entry_target *t;
 	unsigned int tflags;
+	unsigned int used;
 };
 
 /* Your shared library should call one of these. */
@@ -119,4 +121,11 @@ enum ipt_tryload {
 
 extern struct iptables_target *find_target(const char *name, enum ipt_tryload);
 extern struct iptables_match *find_match(const char *name, enum ipt_tryload);
+
+extern int delete_chain(const ipt_chainlabel chain, int verbose,
+			iptc_handle_t *handle);
+extern int flush_entries(const ipt_chainlabel chain, int verbose, 
+			iptc_handle_t *handle);
+extern int for_each_chain(int (*fn)(const ipt_chainlabel, int, iptc_handle_t *),
+		int verbose, int builtinstoo, iptc_handle_t *handle);
 #endif /*_IPTABLES_USER_H*/
