@@ -4,7 +4,7 @@
  *
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: iptables-restore.c,v 1.30 2004/01/31 19:33:47 gandalf Exp $
+ * $Id: iptables-restore.c,v 1.31 2004/01/31 19:41:49 gandalf Exp $
  */
 
 #include <getopt.h>
@@ -385,6 +385,11 @@ int main(int argc, char *argv[])
 					program_name, line);
 			exit(1);
 		}
+	}
+	if (in_table) {
+		fprintf(stderr, "%s: COMMIT expected at line %u\n",
+				program_name, line + 1);
+		exit(1);
 	}
 
 	return 0;
