@@ -6,7 +6,7 @@
  *
  * libipt_ECN.c borrowed heavily from libipt_DSCP.c
  *
- * $Id: libipt_ECN.c,v 1.9 2002/08/06 06:50:04 laforge Exp $
+ * $Id: libipt_ECN.c,v 1.10 2002/08/06 18:46:18 laforge Exp $
  */
 #include <stdio.h>
 #include <string.h>
@@ -26,7 +26,7 @@ static void help(void)
 	printf(
 "ECN target v%s options\n"
 "  --ecn-tcp-remove		Remove all ECN bits from TCP header\n",
-		IPTABLES_VERSION, IPTABLES_VERSION);
+		IPTABLES_VERSION);
 }
 
 #if 0
