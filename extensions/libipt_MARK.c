@@ -48,8 +48,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 		char *end;
 	case '1':
-		markinfo->mark = strtoul(optarg, &end, 0);
-		if (*end != '\0' || end == optarg)
+		if (string_to_number(optarg, 0, 0xfffff, &markinfo->mark))
 			exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
