@@ -1023,9 +1023,9 @@ match_different(const STRUCT_ENTRY_MATCH *a,
 	if (strcmp(a->u.user.name, b->u.user.name) != 0)
 		return 1;
 
-	*maskptr += sizeof(*a);
+	*maskptr += ALIGN(sizeof(*a));
 
-	for (i = 0; i < a->u.match_size - sizeof(*a); i++)
+	for (i = 0; i < a->u.match_size - ALIGN(sizeof(*a)); i++)
 		if (((a->data[i] ^ b->data[i]) & (*maskptr)[i]) != 0)
 			return 1;
 	*maskptr += i;
