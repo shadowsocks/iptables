@@ -47,7 +47,7 @@ parse_ports(const char *arg, struct ip_nat_multi_range *mr)
 	mr->range[0].flags |= IP_NAT_RANGE_PROTO_SPECIFIED;
 
 	port = atoi(arg);
-	if (port == 0 || port > 65535)
+	if (port <= 0 || port > 65535)
 		exit_error(PARAMETER_PROBLEM, "Port `%s' not valid\n", arg);
 
 	dash = strchr(arg, '-');
