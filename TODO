@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.36 2001/05/23 23:07:33 laforge Exp $
+CVS ID: $Id: TODO,v 1.37 2001/05/25 12:24:20 jamesm Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -50,6 +50,7 @@ X integrate PSD target / port it as match [HW]
 - 10.1.2.3.4 is accepted as a valid IP address by iptables -s / -d ?
 - make iptables / ip6tables use the same codebase (as libiptc) [KA]
 - string_to_number() does not work correctly for unsigned ints [JM]
+- REJECT optionally generates port unreachable with faked SOURCE
 - libipq reentrancy [JM]
 - libipq asynchronousness [JM]
 
