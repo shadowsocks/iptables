@@ -3,6 +3,7 @@
  * Maciej Soltysiak <solt@dns.toxicfilms.tv>
  * Based on HW's ttl match
  * This program is released under the terms of GNU GPL
+ * Cleanups by Stephane Ouellette <ouellettes@videotron.ca>
  */
 
 #include <stdio.h>
@@ -18,7 +19,7 @@ static void help(void)
 {
 	printf(
 "HL match v%s options:\n"
-"  --hl-eq value	Match hop limit value\n"
+"  --hl-eq [!] value	Match hop limit value\n"
 "  --hl-lt value	Match HL < value\n"
 "  --hl-gt value	Match HL > value\n"
 , IPTABLES_VERSION);
@@ -81,7 +82,6 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 			break;
 		default:
 			return 0;
-
 	}
 
 	return 1;
@@ -92,82 +92,61 @@ static void final_check(unsigned int flags)
 	if (!flags) 
 		exit_error(PARAMETER_PROBLEM,
 			"HL match: You must specify one of "
-			"`--hl-eq', `--hl-lt', `--hl-gt");
+			"`--hl-eq', `--hl-lt', `--hl-gt'");
 }
 
 static void print(const struct ip6t_ip6 *ip, 
 		const struct ip6t_entry_match *match,
 		int numeric)
 {
+	static const char *op[] = {
+		[IP6T_HL_EQ] = "==",
+		[IP6T_HL_NE] = "!=",
+		[IP6T_HL_LT] = "<",
+		[IP6T_HL_GT] = ">" };
+
 	const struct ip6t_hl_info *info = 
 		(struct ip6t_hl_info *) match->data;
 
-	printf("HL match ");
-	switch (info->mode) {
-		case IP6T_HL_EQ:
-			printf("HL == ");
-			break;
-		case IP6T_HL_NE:
-			printf("HL != ");
-			break;
-		case IP6T_HL_LT:
-			printf("HL < ");
-			break;
-		case IP6T_HL_GT:
-			printf("HL > ");
-			break;
-	}
-	printf("%u ", info->hop_limit);
+	printf("HL match HL %s %u ", op[info->mode], info->hop_limit);
 }
 
 static void save(const struct ip6t_ip6 *ip, 
 		const struct ip6t_entry_match *match)
 {
+	static const char *op[] = {
+		[IP6T_HL_EQ] = "eq",
+		[IP6T_HL_NE] = "eq !",
+		[IP6T_HL_LT] = "lt",
+		[IP6T_HL_GT] = "gt" };
+
 	const struct ip6t_hl_info *info =
 		(struct ip6t_hl_info *) match->data;
 
-	switch (info->mode) {
-		case IP6T_HL_EQ:
-			printf("--hl-eq ");
-			break;
-		case IP6T_HL_NE:
-			printf("! --hl-eq ");
-			break;
-		case IP6T_HL_LT:
-			printf("--hl-lt ");
-			break;
-		case IP6T_HL_GT:
-			printf("--hl-gt ");
-			break;
-		default:
-			/* error */
-			break;
-	}
-	printf("%u ", info->hop_limit);
+	printf("--hl-%s %u ", op[info->mode], info->hop_limit);
 }
 
 static struct option opts[] = {
-	{ "hl", 1, 0, '2' },
-	{ "hl-eq", 1, 0, '2'},
-	{ "hl-lt", 1, 0, '3'},
-	{ "hl-gt", 1, 0, '4'},
+	{ .name = "hl",    .has_arg = 1, .flag = 0, .val = '2' },
+	{ .name = "hl-eq", .has_arg = 1, .flag = 0, .val = '2' },
+	{ .name = "hl-lt", .has_arg = 1, .flag = 0, .val = '3' },
+	{ .name = "hl-gt", .has_arg = 1, .flag = 0, .val = '4' },
 	{ 0 }
 };
 
 static
 struct ip6tables_match hl = {
-	NULL,
-	"hl",
-	IPTABLES_VERSION,
-	IP6T_ALIGN(sizeof(struct ip6t_hl_info)),
-	IP6T_ALIGN(sizeof(struct ip6t_hl_info)),
-	&help,
-	&init,
-	&parse,
-	&final_check,
-	&print,
-	&save,
-	opts
+	.name          = "hl",
+	.version       = IPTABLES_VERSION,
+	.size          = IP6T_ALIGN(sizeof(struct ip6t_hl_info)),
+	.userspacesize = IP6T_ALIGN(sizeof(struct ip6t_hl_info)),
+	.help          = &help,
+	.init          = &init,
+	.parse         = &parse,
+	.final_check   = &final_check,
+	.print         = &print,
+	.save          = &save,
+	.extra_opts    = opts
 };
 
 
