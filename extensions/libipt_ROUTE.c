@@ -20,15 +20,17 @@ help(void)
 {
 	printf(
 "ROUTE target v%s options:\n"
-"  --iface   name    Send the packet directly through this interface.\n"
-"  --to      ip      Route the packet as if its destination address was ip.\n"
+"  --oif   \tifname \t\tSend the packet out using `ifname' network interface\n"
+"  --iif   \tifname \t\tChange the packet's incoming interface to `ifname'\n"
+"  --gw    \tip     \t\tRoute the packet via this gateway\n"
 "\n",
 IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
-	{ "iface", 1, 0, '1' },
-	{ "to", 1, 0, '2' },
+	{ "oif", 1, 0, '1' },
+	{ "iif", 1, 0, '2' },
+	{ "gw", 1, 0, '3' },
 	{ 0 }
 };
 
@@ -39,12 +41,14 @@ init(struct ipt_entry_target *t, unsigned int *nfcache)
 	struct ipt_route_target_info *route_info = 
 		(struct ipt_route_target_info*)t->data;
 
-	route_info->ifname[0] = '\0';
-	route_info->ipto = 0;
+	route_info->oif[0] = '\0';
+	route_info->iif[0] = '\0';
+	route_info->gw = 0;
 }
 
-#define IPT_ROUTE_OPT_IF    0x01
-#define IPT_ROUTE_OPT_TO    0x02
+
+#define IPT_ROUTE_OPT_IF       0x01
+#define IPT_ROUTE_OPT_GW       0x02
 
 /* Function which parses command options; returns true if it
    ate an option */
@@ -60,33 +64,51 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 		if (*flags & IPT_ROUTE_OPT_IF)
 			exit_error(PARAMETER_PROBLEM,
-				   "Can't specify --iface twice");
+				   "Can't specify --oif twice or --oif with --iif");
 
 		if (check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
-				   "Unexpected `!' after --iface");
+				   "Unexpected `!' after --oif");
 
-		if (strlen(optarg) > sizeof(route_info->ifname) - 1)
+		if (strlen(optarg) > sizeof(route_info->oif) - 1)
 			exit_error(PARAMETER_PROBLEM,
 				   "Maximum interface name length %u",
-				   sizeof(route_info->ifname) - 1);
+				   sizeof(route_info->oif) - 1);
 
-		strcpy(route_info->ifname, optarg);
+		strcpy(route_info->oif, optarg);
 		*flags |= IPT_ROUTE_OPT_IF;
 		break;
 
 	case '2':
-		if (*flags & IPT_ROUTE_OPT_TO)
+		if (*flags & IPT_ROUTE_OPT_IF)
 			exit_error(PARAMETER_PROBLEM,
-				   "Can't specify --to twice");
+				   "Can't specify --iif twice or --iif with --oif");
 
-		if (!inet_aton(optarg, (struct in_addr*)&route_info->ipto)) {
+		if (check_inverse(optarg, &invert, NULL, 0))
+			exit_error(PARAMETER_PROBLEM,
+				   "Unexpected `!' after --iif");
+
+		if (strlen(optarg) > sizeof(route_info->iif) - 1)
+			exit_error(PARAMETER_PROBLEM,
+				   "Maximum interface name length %u",
+				   sizeof(route_info->iif) - 1);
+
+		strcpy(route_info->iif, optarg);
+		*flags |= IPT_ROUTE_OPT_IF;
+		break;
+
+	case '3':
+		if (*flags & IPT_ROUTE_OPT_GW)
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify --gw twice");
+
+		if (!inet_aton(optarg, (struct in_addr*)&route_info->gw)) {
 			exit_error(PARAMETER_PROBLEM,
 				   "Invalid IP address %s",
 				   optarg);
 		}
 
-		*flags |= IPT_ROUTE_OPT_TO;
+		*flags |= IPT_ROUTE_OPT_GW;
 		break;
 
 	default:
@@ -96,13 +118,15 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
+
 static void
 final_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
-		           "ROUTE target: minimum 1 parameter is required");
+		           "ROUTE target: one parameter is required");
 }
+
 
 /* Prints out the targinfo. */
 static void
@@ -115,14 +139,37 @@ print(const struct ipt_ip *ip,
 
 	printf("ROUTE ");
 
-	if (route_info->ifname[0])
-		printf("iface %s ", route_info->ifname);
+	if (route_info->oif[0])
+		printf("oif %s ", route_info->oif);
 
-	if (route_info->ipto) {
-		struct in_addr ip = { route_info->ipto };
-		printf("to %s ", inet_ntoa(ip));
+	if (route_info->iif[0])
+		printf("iif %s ", route_info->iif);
+
+	if (route_info->gw) {
+		struct in_addr ip = { route_info->gw };
+		printf("gw %s ", inet_ntoa(ip));
 	}
 }
+
+
+static void save(const struct ipt_ip *ip, 
+		 const struct ipt_entry_target *target)
+{
+	const struct ipt_route_target_info *route_info
+		= (const struct ipt_route_target_info *)target->data;
+
+	if (route_info->oif[0])
+		printf("--oif %s ", route_info->oif);
+
+	if (route_info->iif[0])
+		printf("--iif %s ", route_info->iif);
+
+	if (route_info->gw) {
+		struct in_addr ip = { route_info->gw };
+		printf("--gw %s ", inet_ntoa(ip));
+	}
+}
+
 
 static
 struct iptables_target route
@@ -136,7 +183,7 @@ struct iptables_target route
     &parse,
     &final_check,
     &print,
-    NULL, /* save */
+    &save,
     opts
 };
 
