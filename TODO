@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id$
+CVS ID: $Id: TODO,v 1.17 2001/01/24 01:15:16 laforge Exp $
 
 IMPORTANT before iptables-1.2.1 release:
 - generic tcp sequence number offset support for nat helpers [HW]
@@ -36,6 +36,7 @@ INDEPENDENT from iptables-1.2.1 release:
 - mangle table should use all five netfilter hooks
 - make patch-o-matic more generic (any subdir), and reversible
 - CONFIG_NF_IP_NAT_LOCAL
+- fix and test the netfilter bridging stuff
 
 ======================================================================
 [RR]	Paul 'Rusty' Russel <rusty@linuxcare.com.au>
