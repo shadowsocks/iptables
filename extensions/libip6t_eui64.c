@@ -1,4 +1,4 @@
-/* Shared library add-on to ip6tables to add MAC address checking support. */
+/* Shared library add-on to ip6tables to add EUI64 address checking support. */
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -16,9 +16,9 @@ static void
 help(void)
 {
 	printf(
-"AGR v%s options:\n"
+"eui64 v%s options:\n"
 " This module hasn't got any option\n"
-" This module checks for aggregated IPv6 addresses\n"
+" This module checks for EUI64 IPv6 addresses\n"
 "\n", NETFILTER_VERSION);
 }
 
@@ -56,19 +56,19 @@ print(const struct ip6t_ip6 *ip,
       const struct ip6t_entry_match *match,
       int numeric)
 {
-	printf("AGR ");
+	printf("eui64 ");
 }
 
 /* Saves the union ip6t_matchinfo in parsable form to stdout. */
 static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match)
 {
-	/* printf("--agr "); */
+
 }
 
 static
-struct ip6tables_match agr
+struct ip6tables_match eui64
 = { NULL,
-    "agr",
+    "eui64",
     NETFILTER_VERSION,
     IP6T_ALIGN(sizeof(int)),
     IP6T_ALIGN(sizeof(int)),
@@ -83,5 +83,5 @@ struct ip6tables_match agr
 
 void _init(void)
 {
-	register_match6(&agr);
+	register_match6(&eui64);
 }
