@@ -95,18 +95,28 @@ that table if it is not already there.
 The tables are as follows:
 .TP
 .B "filter"
-This is the default table.  It contains the built-in chains INPUT (for
-packets coming into the box itself), FORWARD (for packets being routed
-through the box), and OUTPUT (for locally-generated packets).
+This is the default table.  It contains the built-in chains
+.B INPUT
+(for packets coming into the box itself),
+.B FORWARD
+(for packets being routed through the box), and
+.B OUTPUT
+(for locally-generated packets).
 .TP
 .B "mangle"
 This table is used for specialized packet alteration.  Until kernel
-2.4.17 it had two built-in chains: PREROUTING (for altering incoming
-packets before routing) and OUTPUT (for altering locally-generated
-packets before routing).  Since kernel 2.4.18, three other built-in
-chains are also supported : INPUT (for packets coming into the box itself),
-FORWARD (for altering packets being routed through the box), and
-POSTROUTING (for altering packets as they are about to go out).
+2.4.17 it had two built-in chains:
+.B PREROUTING
+(for altering incoming packets before routing) and
+.B OUTPUT
+(for altering locally-generated packets before routing).
+Since kernel 2.4.18, three other built-in chains are also supported:
+.B INPUT
+(for packets coming into the box itself),
+.B FORWARD
+(for altering packets being routed through the box), and
+.B POSTROUTING
+(for altering packets as they are about to go out).
 .SH OPTIONS
 The options that are recognized by
 .B ip6tables
@@ -718,60 +728,13 @@ hosts (which won't accept your mail otherwise).
 .\" .B "-p tcp"
 .\" or
 .\" .BR "-p udp" .
-.\" .SH EXTRA EXTENSIONS
-.\" The following extensions are not included by default in the standard
-.\" distribution.
-.\" .SS ttl
-.\" This module matches the time to live field in the IP header.
-.\" .TP
-.\" .BI "--ttl " "ttl"
-.\" Matches the given TTL value.
-.\" .SS TTL
-.\" This target is used to modify the time to live field in the IP header.
-.\" It is only valid in the 
-.\" .B mangle
-.\" table.
-.\" .TP
-.\" .BI "--ttl-set " "ttl"
-.\" Set the TTL to the given value.
-.\" .TP
-.\" .BI "--ttl-dec " "ttl"
-.\" Decrement the TTL by the given value.
-.\" .TP
-.\" .BI "--ttl-inc " "ttl"
-.\" Increment the TTL by the given value.
-.\" .SS ULOG
-.\" This target provides userspace logging of matching packets.  When this
-.\" target is set for a rule, the Linux kernel will multicast this packet
-.\" through a
-.\" .IR netlink 
-.\" socket. One or more userspace processes may then subscribe to various 
-.\" multicast groups and receive the packets.
-.\" .TP
-.\" .BI "--ulog-nlgroup " "nlgroup"
-.\" This specifies the netlink group (1-32) to which the packet is sent.
-.\" Default value is 1.
-.\" .TP
-.\" .BI "--ulog-prefix " "prefix"
-.\" Prefix log messages with the specified prefix; up to 32 characters
-.\" long, and useful fro distinguishing messages in the logs.
-.\" .TP
-.\" .BI "--ulog-cprange " "size"
-.\" Number of bytes to be copied to userspace. A value of 0 always copies
-.\" the entire packet, regardless of its size. Default is 0.
-.\" .TP
-.\" .BI "--ulog-qthreshold " "size"
-.\" Number of packet to queue inside kernel. Setting this value to, e.g. 10
-.\" accumulates ten packets inside the kernel and transmits them as one
-.\" netlink multipart message to userspace.  Default is 1 (for backwards
-.\" compatibility).
 .SH DIAGNOSTICS
 Various error messages are printed to standard error.  The exit code
 is 0 for correct functioning.  Errors which appear to be caused by
 invalid or abused command line parameters cause an exit code of 2, and
 other errors cause an exit code of 1.
 .SH BUGS
-Check is not implemented (yet).
+Bugs?  What's this? ;-)
 .SH COMPATIBILITY WITH IPCHAINS
 This 
 .B ip6tables
@@ -808,9 +771,17 @@ chain.
 .\" .br
 There are several other changes in ip6tables.
 .SH SEE ALSO
-The packet-filtering-HOWTO, which details more iptables usage for
-packet filtering, the NAT-HOWTO, which details NAT,
-and the netfilter-hacking-HOWTO which details the internals.
+.BR ip6tables-save (8),
+.BR ip6tables-restore(8),
+.BR iptables (8),
+.BR iptables-save (8),
+.BR iptables-restore (8).
+.P
+The packet-filtering-HOWTO details iptables usage for
+packet filtering, the NAT-HOWTO details NAT,
+the netfilter-extensions-HOWTO details the extensions that are
+not in the standard distribution,
+and the netfilter-hacking-HOWTO details the netfilter internals.
 .br
 See
 .BR "http://www.netfilter.org/" .
