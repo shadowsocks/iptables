@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.34 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.35 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -504,8 +504,10 @@ TC_NEXT_CHAIN(TC_HANDLE_T *handle)
 	(*handle)->cache_chain_iteration++;
 
 	if ((*handle)->cache_chain_iteration - (*handle)->cache_chain_heads
-	    == (*handle)->cache_num_chains)
+	    == (*handle)->cache_num_chains) {
+		free((*handle)->cache_chain_heads);
 		return NULL;
+	}
 
 	return (*handle)->cache_chain_iteration->name;
 }
