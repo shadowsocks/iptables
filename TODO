@@ -4,17 +4,17 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.70 2003/04/13 10:24:59 laforge Exp $
+CVS ID: $Id: TODO,v 1.71 2003/11/06 23:20:00 laforge Exp $
 
 IMPORTANT issues:
 - erroneously too-fast dropped conntrack for half-open TCP connections [JK]
 - --mac-source not working in FORWARD (manpage bug?) [BZ]
 - locally bound udp port can still be used for MASQ/SNAT [BZ]
-X fix for ICMP DNAT info leak
 - unaligned access of nulldevname during string match [BZ]
+- unaligned access in interface match (ip_tables core)
 - update documentation to reflect newnat
-- ip6_tables not working on ultrasparc [BZ]
-  (20020912155314.GA20741@paradigm.rfc822.org) 
+- release iptables-1.3.0-test (with new libiptc for speedup)
+- ipv6 ldp (igmp) and ndisc bypasses LOCAL_OUT hook
 
 TO BE INVESTIGATED:
 - packet counters on sparc64 platform [BZ]
@@ -22,29 +22,24 @@ TO BE INVESTIGATED:
 - different behaviour for first packet towards an l2-unresolved ip?
 
 NICE to have:
-- endianness wrt. unnamed initializers in conntrack helpers after 
-  pptp-patch applied
-X make RPC conntrack work again
-- multicast connection tracking
 - sysctl support for ftp-multi, irc-conntrack/nat, ftp-fxp [BZ]
-X integrate HOPLIMIT for ipv6 in patch-o-matic [HW]
-X u32 classifier (port from tc -> iptables) [YU]
-- port conntrack to IPv6 (code reuse?) [BC]
+- port conntrack to IPv6 (code reuse?) 
 - ip_nat_ident module [BZ]
 - make iptables / ip6tables use the same codebase (as libiptc) [KA]
 - libipq reentrancy [JM]
 - compiling without O2 issue [BZ]
 - libipq runtime version, do before 1.2.5 [JM]
-- add ICMP type-3-code-13 option to REJECT [BZ]
-X export list of matches/targets via proc-fs [BZ]
-X ip6tables mangle needs 'route_me_harder' equivalent [BZ]
+- l3 independent ip_queue / ULOG (2.6)
+- add support for IRC tracking in opposite direction
+- Find mirrors for www.TLD.netfilter.org domains
+- example section on homepage
+- searchable mailinglist archives
+- faq-o-matic system
 
 FUTURE extensions:
 - dealing with fragmented expectation-causes (i.e. DCC chat split
   over two packets, etc.)
 - conntrack / nat failover [HW]
-- brainstorming about 2.5 conntrack code
-- netlink interface for conntrack manipulation from userspace [HW]
 - unified nfnetlink for queue,ulog,conntrack (and more?) (2.5 issue)
 
 Userspace queuing for 2.5:
@@ -67,7 +62,5 @@ Userspace queuing for 2.5:
 [JK]	Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
 [JM]	James Morris <jmorris@intercode.com.au>
 [KA]	Kiz-Szabo Andras <kisza@sch.bme.hu>
-[MB]	Marc Boucher <marc@mbsi.ca>
 [RR]	Paul 'Rusty' Russel <rusty@rustcorp.com.au>
-[YU]	Yon Uriarte <ukl2@rz.uni-karlsruhe.de>
 [BZ]	Included in Bugzilla System
