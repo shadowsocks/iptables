@@ -235,7 +235,7 @@ delrelease:
 	rm -f $(RELEASE_DIR)/iptables-$(IPTABLES_VERSION).tar.bz2
 
 $(RELEASE_DIR)/iptables-$(IPTABLES_VERSION).tar.bz2:
-	cd .. && ln -sf iptables iptables-$(IPTABLES_VERSION) && tar cvf - --exclude CVS iptables-$(IPTABLES_VERSION)/. | bzip2 -9 > $@ && rm iptables-$(IPTABLES_VERSION)
+	cd .. && ln -sf iptables iptables-$(IPTABLES_VERSION) && tar cvf - --exclude .svn iptables-$(IPTABLES_VERSION)/. | bzip2 -9 > $@ && rm iptables-$(IPTABLES_VERSION)
 
 .PHONY: diff
 diff: $(RELEASE_DIR)/iptables-$(IPTABLES_VERSION).tar.bz2
