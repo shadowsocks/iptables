@@ -307,6 +307,11 @@ command.
 .B "--line-numbers"
 When listing rules, add line numbers to the beginning of each rule,
 corresponding to that rule's position in the chain.
+.TP
+.B "--modprobe=<command>"
+When adding or inserting rules into a chain, use
+.B command
+to load any necessary modules (targets, match extensions, etc).
 .SH MATCH EXTENSIONS
 iptables can use extended packet matching modules.  These are loaded
 in two ways: implicitly, when
