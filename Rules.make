@@ -32,7 +32,8 @@ $(SHARED_LIBS): %.so : %_sh.o
 # This is useful for when dependencies completely screwed
 %.h::
 	@echo Something wrong... deleting dependencies.
-	-rm -f $(DEPFILES) $(EXTRA_DEPENDS) .makefirst
+	@-rm -f $(DEPFILES) $(EXTRA_DEPENDS) .makefirst
+	@[ -d $(KERNEL_DIR)/include/linux/netfilter_ipv4 ] || echo -e '\n\n    Please try `make KERNEL_DIR=path-to-correct-kernel'\'.'\n\n'
 	@exit 1
 
 -include $(DEPFILES) $(EXTRA_DEPENDS)
