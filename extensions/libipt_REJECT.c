@@ -26,8 +26,10 @@ static const struct reject_names reject_table[] = {
 		IPT_ICMP_PORT_UNREACHABLE, "ICMP port unreachable (default)"},
 	{"icmp-proto-unreachable", "proto-unreach",
 		IPT_ICMP_PROT_UNREACHABLE, "ICMP protocol unreachable"},
+#if 0
 	{"echo-reply", "echoreply",
 	 IPT_ICMP_ECHOREPLY, "for ICMP echo only: faked ICMP echo reply"},
+#endif
 	{"icmp-net-prohibited", "net-prohib",
 	 IPT_ICMP_NET_PROHIBITED, "ICMP network prohibited"},
 	{"icmp-host-prohibited", "host-prohib",
@@ -105,6 +107,11 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 				return 1;
 			}
 		}
+		/* This due to be dropped late in 2.4 pre-release cycle --RR */
+		if (strncasecmp("echo-reply", optarg, strlen(optarg)) == 0
+		    || strncasecmp("echoreply", optarg, strlen(optarg)) == 0)
+			fprintf(stderr, "--reject-with echo-reply no longer"
+				" supported\n");
 		exit_error(PARAMETER_PROBLEM, "unknown reject type `%s'",optarg);
 	default:
 		/* Fall through */
