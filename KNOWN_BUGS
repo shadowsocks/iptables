@@ -8,3 +8,5 @@ Known bugs with the 2.4.0 kernel:
 
 3) Connection tracking doesn't wait very long for reply FIN, meaning
    that half-closed pipes can time out early (seen frequently with squid).
+
+4) iptables-restore and -save still have problems. Sorry.
