@@ -4,19 +4,19 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.54 2001/12/18 23:44:23 jamesm Exp $
+CVS ID: $Id: TODO,v 1.55 2002/01/10 08:34:28 laforge Exp $
 
 IMPORTANT issues:
 - token ring crashes ??
 - solution for nostate / notrack (we don't want to track specific conn's)
 - iptables-save/restore problems with log-level
-- multiple related connections (solved: newnat)[HW]
+x multiple related connections (solved: newnat)[HW]
 - ip_conntrack rmmod loop (sometimes, Yan's patch?)
 - conntrack helper not called for first packet (udp!)
-- add support for correct SACK handling [HW]
-- erroneously too-fast dropped conntrack for half-open TCP connections [HW]
-- mangle table should use all five netfilter hooks [BC]
-- wrong 'Out of window' error message from tcp-windowtracking [HW]
+x add support for correct SACK handling [HW]
+- erroneously too-fast dropped conntrack for half-open TCP connections [JK]
+- wrong 'Out of window' error message from tcp-windowtracking [JK]
+x mangle table should use all five netfilter hooks [BC]
 - --mac-source not working in FORWARD (manpage bug?)
 - netfilter hooks should give error if same function registers twice [HW]
 - speed issues (mark_source_chains, Robert Olsson)
@@ -28,14 +28,14 @@ IMPORTANT issues:
 
 NICE to have:
 - make RPC conntrack work again
-- interface names in ipv6 can contain _ and -
+x interface names in ipv6 can contain _ and -
 - multicast connection tracking
 - sysctl support for ftp-multi, irc-conntrack/nat, ftp-fxp
 - integrate HOPLIMIT for ipv6 in patch-o-matic [HW]
 - u32 classifier (port from tc -> iptables) [YU]
 - MARK match / target with boolean OR / AND (to use nfmark bitwise)
 - documentation for libiptc
-- port conntrack to IPv6 (code reuse?) [BB]
+- port conntrack to IPv6 (code reuse?) [BC]
 - make patch-o-matic reversible
 - CONFIG_NF_IP_NAT_LOCAL
 - fix and test the netfilter bridging stuff
@@ -48,6 +48,7 @@ NICE to have:
 - compiling without O2 issue
 - add more information like original addresses to the state match
 - libipq runtime version, do before 1.2.5 [JM]
+- add ICMP type-3-code-13 option to REJECT
 
 FUTURE extensions:
 - dealing with fragmented expectation-causes (i.e. DCC chat split
@@ -72,13 +73,12 @@ Userspace queuing for 2.5:
 - Possibly pass conntrack/NAT info to userspace with packet.
 
 ======================================================================
-[RR]	Paul 'Rusty' Russel <rusty@rustcorp.com.au>
-[MB]	Marc Boucher <marc@mbsi.ca>
-[JM]	James Morris <jmorris@intercode.com.au>
-[HW]	Harald Welte <laforge@gnumonks.org>
-[YU]	Yon Uriarte <ukl2@rz.uni-karlsruhe.de>
-[RJ]	Jan Rekorajski <baggins@mimuw.edu.pl>
-[BB]	Bastian Blank <bastianb@gmx.de>
-[FM]	Fabrice Marie <fabrice@celestix.com>
-[KA]	Kiz-Szabo Andras <kisza@sch.bme.hu>
 [BC]	Brad Chapman <kakadu_croc@yahoo.com>
+[FM]	Fabrice Marie <fabrice@celestix.com>
+[HW]	Harald Welte <laforge@gnumonks.org>
+[JK]	Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+[JM]	James Morris <jmorris@intercode.com.au>
+[KA]	Kiz-Szabo Andras <kisza@sch.bme.hu>
+[MB]	Marc Boucher <marc@mbsi.ca>
+[RR]	Paul 'Rusty' Russel <rusty@rustcorp.com.au>
+[YU]	Yon Uriarte <ukl2@rz.uni-karlsruhe.de>
