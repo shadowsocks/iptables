@@ -1445,6 +1445,11 @@ subtract_counters(STRUCT_COUNTERS *answer,
 {
 	answer->pcnt = a->pcnt - b->pcnt;
 	answer->bcnt = a->bcnt - b->bcnt;
+
+	fprintf(stderr, "pcnt: %llu - %llu = %llu\n",
+		a->pcnt, b->pcnt answer->pcnt);
+	fprintf(stderr, "bcnt: %llu - %llu = %llu\n",
+		a->bcnt, b->bcnt answer->bcnt);
 }
 
 int
