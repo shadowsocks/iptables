@@ -19,3 +19,5 @@ process id.
 .BI "--sid-owner " "sessionid"
 Matches if the packet was created by a process in the given session
 group.
+.TP
+.B NOTE: pid, sid and command matching are broken on SMP

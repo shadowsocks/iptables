@@ -24,3 +24,5 @@ group.
 Matches if the packet was created by a process with the given command name.
 (this option is present only if iptables was compiled under a kernel
 supporting this feature)
+.TP
+.B NOTE: pid, sid and command matching are broken on SMP
