@@ -384,7 +384,10 @@ do_check(TC_HANDLE_T h, unsigned int line)
 	} else if (strcmp(h->info.name, "mangle") == 0) {
 		assert(h->info.valid_hooks
 		       == (1 << NF_IP_PRE_ROUTING
-			   | 1 << NF_IP_LOCAL_OUT));
+			   | 1 << NF_IP_POST_ROUTING
+			   | 1 << NF_IP_LOCAL_IN
+			   | 1 << NF_IP_LOCAL_OUT
+			   | 1 << NF_IP_FORWARD));
 
 		/* Hooks should be first two */
 		assert(h->info.hook_entry[NF_IP_PRE_ROUTING] == 0);
