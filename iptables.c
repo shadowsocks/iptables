@@ -1719,7 +1719,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			set_option(&options, OPT_JUMP, &fw.ip.invflags,
 				   invert);
 			jumpto = parse_target(optarg);
-			target = find_target(jumpto, LOAD_MUST_SUCCEED);
+			/* TRY_LOAD (may be chain name) */
+			target = find_target(jumpto, TRY_LOAD);
 
 			if (target) {
 				size_t size;
