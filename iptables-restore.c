@@ -14,9 +14,9 @@
 #include "libiptc/libiptc.h"
 
 #ifdef DEBUG
-#define DEBUGP(x, args ...) fprintf(stderr, x, ## args)
+#define DEBUGP(x, args...) fprintf(stderr, x, ## args)
 #else
-#define DEBUGP(x, args ...) 
+#define DEBUGP(x, args...) 
 #endif
 
 /* Keeping track of external matches and targets.  */
