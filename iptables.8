@@ -166,7 +166,7 @@ will attempt to delete every non-builtin chain in the table.
 .B "-P, --policy"
 Set the policy for the chain to the given target.  See the section
 .B TARGETS
-for the legal targets.  Only non-userdefined chains can have policies,
+for the legal targets.  Only non-user-defined chains can have policies,
 and neither built-in nor user-defined chains can be policy targets.
 .TP
 .B "-E, --rename-chain"
@@ -676,17 +676,34 @@ if the rule also specifies
 .B "-p tcp"
 or
 .BR "-p udp" ).
-.SH DIAGNOSTICS
-Various error messages are printed to standard error.  The exit code
-is 0 for correct functioning.  Errors which appear to be caused by
-invalid or abused command line parameters cause an exit code of 2, and
-other errors cause an exit code of 1.
+.SH EXTRA EXTENSIONS
+The following extensions are not included by default in the standard
+distribution.
+.SS ttl
+This module matches the time to live field in the IP header.
+.TP
+.BI "--ttl " "ttl"
+Matches the given TTL value.
+.SS TTL
+This target is used to modify the time to live field in the IP header.
+It is only valid in the 
+.B mangle
+table.
+.TP
+.BI "--ttl-set " "ttl"
+Set the TTL to the given value.
+.TP
+.BI "--ttl-dec " "ttl"
+Decrement the TTL by the given value.
+.TP
+.BI "--ttl-inc " "ttl"
+Increment the TTL by the given value.
 .SS ULOG
-Turn on userspace logging of matching packets. When this
-option is set for a rule, the Linux kernel will multicast this 
-packet through a
+This target provides userspace logging of matching packets.  When this
+target is set for a rule, the Linux kernel will multicast this packet
+through a
 .IR netlink 
-socket. One or more userspace processes may then subscribe to variuos 
+socket. One or more userspace processes may then subscribe to various 
 multicast groups and receive the packets.
 .TP
 .BI "--ulog-nlgroup" "<nlgroup>"
@@ -697,8 +714,13 @@ Prefix log messages with the specified prefix; up to 32 characters
 long, and useful fro distinguishing messages in the logs.
 .TP
 .BI "--ulog-cprange" "<size>"
-Number of bytes to be copied to userspace. A value of 0 does always copy
+Number of bytes to be copied to userspace. A value of 0 always copies
 the entire packet, regardless of its size.
+.SH DIAGNOSTICS
+Various error messages are printed to standard error.  The exit code
+is 0 for correct functioning.  Errors which appear to be caused by
+invalid or abused command line parameters cause an exit code of 2, and
+other errors cause an exit code of 1.
 .SH BUGS
 Check is not implemented (yet).
 .SH COMPATIBILITY WITH IPCHAINS
@@ -752,8 +774,9 @@ James Morris wrote the TOS target, and tos match.
 .PP
 Jozsef Kadlecsik wrote the REJECT target.
 .PP
-Harald Welte wrote the ULOG target and libulog.
+Harald Welte wrote the ULOG target, TTL match+target and libipulog.
 .PP
 The Netfilter Core Team is: Marc Boucher, James Morris and Rusty Russell.
 .\" .. and did I mention that we are incredibly cool people?
 .\" .. sexy, too ..
+.\" .. witty, charming, powerful ..
