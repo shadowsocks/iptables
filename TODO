@@ -23,9 +23,11 @@ x Russell King's ipchains module crash report.
   Static (dumb) NAT.
 x Fix ICMP errors for NAT.
   ipchains module doesn't load with CONFIG_MODVERSIONS.
-  Investigate ping corruption with ipchains and iptables MASQ in -test2.
-  touch userspace/libiptc/libiptc.c doesn't cause re-make.
+x Investigate ping corruption with ipchains and iptables MASQ in -test2.
+x touch userspace/libiptc/libiptc.c doesn't cause re-make.
   skb_cow in NAT.
   MTU change in route_me_harder + test.
   LVS
   Hard lockup with ip_queue under heavy load.
+  OSPF failure on local box with NAT (Lai Zit Seng)
+  IPv6 ping crash with NAT.
