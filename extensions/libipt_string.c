@@ -202,7 +202,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	const struct ipt_string_info *info =
 	    (const struct ipt_string_info*) match->data;
 
-	printf("--string %s%s ", (info->invert) ? "! ", "", info->string);
+	printf("--string %s%s ", (info->invert) ? "! ": "", info->string);
 }
 
 
