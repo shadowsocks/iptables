@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.39 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.48 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -903,45 +903,6 @@ int TC_IS_CHAIN(const char *chain, const TC_HANDLE_T handle)
 	return iptcc_find_label(chain, handle) != NULL;
 }
 
-#if 0
-/* Returns the position of the final (ie. unconditional) element. */
-static unsigned int
-get_chain_end(const TC_HANDLE_T handle, unsigned int start)
-{
-	unsigned int last_off, off;
-	STRUCT_ENTRY *e;
-
-	last_off = start;
-	e = get_entry(handle, start);
-
-	/* Terminate when we meet a error label or a hook entry. */
-	for (off = start + e->next_offset;
-	     off < handle->entries.size;
-	     last_off = off, off += e->next_offset) {
-		STRUCT_ENTRY_TARGET *t;
-		unsigned int i;
-
-		e = get_entry(handle, off);
-
-		/* We hit an entry point. */
-		for (i = 0; i < NUMHOOKS; i++) {
-			if ((handle->info.valid_hooks & (1 << i))
-			    && off == handle->info.hook_entry[i])
-				return last_off;
-		}
-
-		/* We hit a user chain label */
-		t = GET_TARGET(e);
-		if (strcmp(t->u.user.name, ERROR_TARGET) == 0)
-			return last_off;
-	}
-	/* SHOULD NEVER HAPPEN */
-	fprintf(stderr, "ERROR: Off end (%u) of chain from %u!\n",
-		handle->entries.size, off);
-	abort();
-}
-#endif
-
 static void iptcc_chain_iterator_advance(TC_HANDLE_T handle)
 {
 	struct chain_head *c = handle->chain_iterator_cur;
@@ -1437,7 +1398,6 @@ target_different(const unsigned char *a_targdata,
 
 	return 0;
 }
-#if 0
 
 static int
 is_same(const STRUCT_ENTRY *a,
@@ -1451,8 +1411,8 @@ TC_DELETE_ENTRY(const IPT_CHAINLABEL chain,
 		unsigned char *matchmask,
 		TC_HANDLE_T *handle)
 {
-	unsigned int offset;
 	struct chain_head *c;
+	struct rule_head *r;
 	STRUCT_ENTRY *e, *fw;
 
 	iptc_fn = TC_DELETE_ENTRY;
@@ -1467,30 +1427,33 @@ TC_DELETE_ENTRY(const IPT_CHAINLABEL chain,
 		return 0;
 	}
 
-	for (offset = c->start_off; offset < c->end_off;
-	     offset += e->next_offset) {
-		STRUCT_ENTRY_TARGET discard;
+	list_for_each_entry(r, &c->rules, list) {
 
 		memcpy(fw, origfw, origfw->next_offset);
 
+#if 0
 		/* FIXME: handle this in is_same --RR */
 		if (!map_target(*handle, fw, offset, &discard)) {
 			free(fw);
 			return 0;
 		}
-		e = get_entry(*handle, offset);
-
-#if 0
-		printf("Deleting:\n");
-		dump_entry(newe);
 #endif
+
+		e = r->entry;
+
 		if (is_same(e, fw, matchmask)) {
-			int ret;
-			ret = delete_rules(1, e->next_offset,
-					   offset, entry2index(*handle, e),
-					   handle);
-			free(fw);
-			return ret;
+			/* If we are about to delete the rule that is the
+			 * current iterator, move rule iterator back.  next
+			 * pointer will then point to real next node */
+			if (r == (*handle)->rule_iterator_cur) {
+				(*handle)->rule_iterator_cur = 
+					list_entry((*handle)->rule_iterator_cur->list.prev,
+						   struct rule_head, list);
+			}
+
+			c->num_rules--;
+			iptcc_delete_rule(r);
+			return 1;
 		}
 	}
 
@@ -1498,18 +1461,7 @@ TC_DELETE_ENTRY(const IPT_CHAINLABEL chain,
 	errno = ENOENT;
 	return 0;
 }
-#endif
 
-/* Delete the first rule in `chain' which matches `fw'. */
-int
-TC_DELETE_ENTRY(const IPT_CHAINLABEL chain,
-		const STRUCT_ENTRY *origfw,
-		unsigned char *matchmask,
-		TC_HANDLE_T *handle)
-{
-	errno = ENOSYS;
-	return 0;
-}
 
 /* Delete the rule in position `rulenum' in `chain'. */
 int
