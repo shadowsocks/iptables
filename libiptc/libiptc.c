@@ -182,7 +182,7 @@ get_errorlabel(TC_HANDLE_T h, unsigned int offset)
 	STRUCT_ENTRY *e;
 
 	e = get_entry(h, offset);
-	if (strcmp(GET_TARGET(e)->u.user.name, IPT_ERROR_TARGET) != 0) {
+	if (strcmp(GET_TARGET(e)->u.user.name, ERROR_TARGET) != 0) {
 		fprintf(stderr, "ERROR: offset %u not an error node!\n",
 			offset);
 		abort();
@@ -304,17 +304,17 @@ TC_DUMP_ENTRIES(const TC_HANDLE_T handle)
 	       handle->new_number, handle->entries.size);
 	printf("Table `%s'\n", handle->info.name);
 	printf("Hooks: pre/in/fwd/out/post = %u/%u/%u/%u/%u\n",
-	       handle->info.hook_entry[NF_IP_PRE_ROUTING],
-	       handle->info.hook_entry[NF_IP_LOCAL_IN],
-	       handle->info.hook_entry[NF_IP_FORWARD],
-	       handle->info.hook_entry[NF_IP_LOCAL_OUT],
-	       handle->info.hook_entry[NF_IP_POST_ROUTING]);
+	       handle->info.hook_entry[HOOK_PRE_ROUTING],
+	       handle->info.hook_entry[HOOK_LOCAL_IN],
+	       handle->info.hook_entry[HOOK_FORWARD],
+	       handle->info.hook_entry[HOOK_LOCAL_OUT],
+	       handle->info.hook_entry[HOOK_POST_ROUTING]);
 	printf("Underflows: pre/in/fwd/out/post = %u/%u/%u/%u/%u\n",
-	       handle->info.underflow[NF_IP_PRE_ROUTING],
-	       handle->info.underflow[NF_IP_LOCAL_IN],
-	       handle->info.underflow[NF_IP_FORWARD],
-	       handle->info.underflow[NF_IP_LOCAL_OUT],
-	       handle->info.underflow[NF_IP_POST_ROUTING]);
+	       handle->info.underflow[HOOK_PRE_ROUTING],
+	       handle->info.underflow[HOOK_LOCAL_IN],
+	       handle->info.underflow[HOOK_FORWARD],
+	       handle->info.underflow[HOOK_LOCAL_OUT],
+	       handle->info.underflow[HOOK_POST_ROUTING]);
 
 	ENTRY_ITERATE(handle->entries.entries, handle->entries.size,
 		      dump_entry, handle);
@@ -348,7 +348,7 @@ add_chain(STRUCT_ENTRY *e, TC_HANDLE_T h, STRUCT_ENTRY **prev)
 
 	/* We know this is the start of a new chain if it's an ERROR
 	   target, or a hook entry point */
-	if (strcmp(GET_TARGET(e)->u.user.name, IPT_ERROR_TARGET) == 0) {
+	if (strcmp(GET_TARGET(e)->u.user.name, ERROR_TARGET) == 0) {
 		/* prev was last entry in previous chain */
 		h->cache_chain_heads[h->cache_num_chains-1].end
 			= *prev;
@@ -467,7 +467,7 @@ get_chain_end(const TC_HANDLE_T handle, unsigned int start)
 
 		/* We hit a user chain label */
 		t = GET_TARGET(e);
-		if (strcmp(t->u.user.name, IPT_ERROR_TARGET) == 0)
+		if (strcmp(t->u.user.name, ERROR_TARGET) == 0)
 			return last_off;
 	}
 	/* SHOULD NEVER HAPPEN */
@@ -596,7 +596,7 @@ target_name(TC_HANDLE_T handle, const STRUCT_ENTRY *ce)
 		else if (spos == -NF_DROP-1)
 			return LABEL_DROP;
 		else if (spos == -NF_QUEUE-1)
-			return IPTC_LABEL_QUEUE;
+			return LABEL_QUEUE;
 
 		fprintf(stderr, "ERROR: off %lu/%u not a valid target (%i)\n",
 			entry2offset(handle, e), handle->entries.size,
@@ -830,7 +830,8 @@ standard_map(STRUCT_ENTRY *e, int verdict)
 
 	t = (STRUCT_STANDARD_TARGET *)GET_TARGET(e);
 
-	if (t->target.u.target_size != sizeof(STRUCT_STANDARD_TARGET)) {
+	if (t->target.u.target_size
+	    != IPT_ALIGN(sizeof(STRUCT_STANDARD_TARGET))) {
 		errno = EINVAL;
 		return 0;
 	}
@@ -862,7 +863,7 @@ map_target(const TC_HANDLE_T handle,
 		return standard_map(e, -NF_ACCEPT - 1);
 	else if (strcmp(t->u.user.name, LABEL_DROP) == 0)
 		return standard_map(e, -NF_DROP - 1);
-	else if (strcmp(t->u.user.name, IPTC_LABEL_QUEUE) == 0)
+	else if (strcmp(t->u.user.name, LABEL_QUEUE) == 0)
 		return standard_map(e, -NF_QUEUE - 1);
 	else if (strcmp(t->u.user.name, LABEL_RETURN) == 0)
 		return standard_map(e, RETURN);
@@ -1220,7 +1221,7 @@ TC_CREATE_CHAIN(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 	if (find_label(chain, *handle)
 	    || strcmp(chain, LABEL_DROP) == 0
 	    || strcmp(chain, LABEL_ACCEPT) == 0
-	    || strcmp(chain, IPTC_LABEL_QUEUE) == 0
+	    || strcmp(chain, LABEL_QUEUE) == 0
 	    || strcmp(chain, LABEL_RETURN) == 0) {
 		errno = EEXIST;
 		return 0;
@@ -1234,16 +1235,19 @@ TC_CREATE_CHAIN(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 	memset(&newc, 0, sizeof(newc));
 	newc.head.target_offset = sizeof(STRUCT_ENTRY);
 	newc.head.next_offset
-		= sizeof(STRUCT_ENTRY) + sizeof(struct ipt_error_target);
-	strcpy(newc.name.t.u.user.name, IPT_ERROR_TARGET);
-	newc.name.t.u.target_size = sizeof(struct ipt_error_target);
+		= sizeof(STRUCT_ENTRY)
+		+ IPT_ALIGN(sizeof(struct ipt_error_target));
+	strcpy(newc.name.t.u.user.name, ERROR_TARGET);
+	newc.name.t.u.target_size = IPT_ALIGN(sizeof(struct ipt_error_target));
 	strcpy(newc.name.error, chain);
 
 	newc.ret.target_offset = sizeof(STRUCT_ENTRY);
 	newc.ret.next_offset
-		= sizeof(STRUCT_ENTRY)+sizeof(STRUCT_STANDARD_TARGET);
+		= sizeof(STRUCT_ENTRY)
+		+ IPT_ALIGN(sizeof(STRUCT_STANDARD_TARGET));
 	strcpy(newc.target.target.u.user.name, STANDARD_TARGET);
-	newc.target.target.u.target_size = sizeof(STRUCT_STANDARD_TARGET);
+	newc.target.target.u.target_size
+		= IPT_ALIGN(sizeof(STRUCT_STANDARD_TARGET));
 	newc.target.verdict = RETURN;
 
 	/* Add just before terminal entry */
