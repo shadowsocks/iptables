@@ -336,7 +336,7 @@ exit_error(enum exittype status, char *msg, ...)
 void
 exit_tryhelp(int status)
 {
-	if (line =! -1)
+	if (line != -1)
 		fprintf(stderr, "Error occured at line: %d\n", line);
 	fprintf(stderr, "Try `%s -h' or '%s --help' for more information.\n",
 			program_name, program_name );
