@@ -612,7 +612,7 @@ parse_mask(char *mask)
 {
 	static struct in6_addr maskaddr;
 	struct in6_addr *addrp;
-	int bits;
+	unsigned int bits;
 
 	if (mask == NULL) {
 		/* no mask at all defaults to 128 bits */
@@ -621,7 +621,7 @@ parse_mask(char *mask)
 	}
 	if ((addrp = numeric_to_addr(mask)) != NULL)
 		return addrp;
-	if ((bits = string_to_number(mask, 0, 128)) == -1)
+	if (string_to_number(mask, 0, 128, &bits) == -1)
 		exit_error(PARAMETER_PROBLEM,
 			   "invalid mask `%s' specified", mask);
 	if (bits != 0) {
@@ -713,10 +713,9 @@ find_match(const char *name, enum ip6t_tryload tryload)
 static struct ip6tables_match *
 find_proto(const char *pname, enum ip6t_tryload tryload, int nolookup)
 {
-	int proto;
+	unsigned int proto;
 
-	proto = string_to_number(pname, 0, 255);
-	if (proto != -1) 
+	if (string_to_number(pname, 0, 255, &proto) != -1) 
 		return find_match(proto_to_name(proto, nolookup), tryload);
 
 	return find_match(pname, tryload);
@@ -725,9 +724,9 @@ find_proto(const char *pname, enum ip6t_tryload tryload, int nolookup)
 static u_int16_t
 parse_protocol(const char *s)
 {
-	int proto = string_to_number(s, 0, 255);
+	unsigned int proto;
 
-	if (proto == -1) {
+	if (string_to_number(s, 0, 255, &proto) == -1) {
 		struct protoent *pent;
 
 		if ((pent = getprotobyname(s)))
@@ -793,9 +792,9 @@ parse_interface(const char *arg, char *vianame, unsigned char *mask)
 static int
 parse_rulenumber(const char *rule)
 {
-	int rulenum = string_to_number(rule, 1, INT_MAX);
+	unsigned int rulenum; 
 
-	if (rulenum == -1)
+	if (string_to_number(rule, 1, INT_MAX, &rulenum))
 		exit_error(PARAMETER_PROBLEM,
 			   "Invalid rule number `%s'", rule);
 
@@ -824,18 +823,21 @@ parse_target(const char *targetname)
 }
 
 int
-string_to_number(const char *s, int min, int max)
+string_to_number(const char *s, unsigned int min, unsigned int max,
+		 unsigned int *ret)
 {
-       long number;
+	long number;
 	char *end;
 
 	/* Handle hex, octal, etc. */
-       errno = 0;
-       number = strtol(s, &end, 0);
+	errno = 0;
+	number = strtol(s, &end, 0);
 	if (*end == '\0' && end != s) {
 		/* we parsed a number, let's see if we want this */
-               if (errno != ERANGE && min <= number && number <= max)
-			return number;
+               if (errno != ERANGE && min <= number && number <= max) {
+			*ret = number;
+			return 0;
+	       }
 	}
 	return -1;
 }

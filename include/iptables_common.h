@@ -10,7 +10,10 @@ enum exittype {
 extern void exit_printhelp() __attribute__((noreturn));
 extern void exit_tryhelp(int) __attribute__((noreturn));
 int check_inverse(const char option[], int *invert);
-extern int string_to_number(const char *, int, int);
+extern int string_to_number(const char *, 
+			    unsigned int, 
+			    unsigned int,
+			    unsigned int *);
 extern int iptables_insmod(const char *modname, const char *modprobe);
 void exit_error(enum exittype, char *, ...)__attribute__((noreturn,
 							  format(printf,2,3)));

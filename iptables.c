@@ -250,7 +250,8 @@ dotted_to_addr(const char *dotted)
 	static struct in_addr addr;
 	unsigned char *addrp;
 	char *p, *q;
-	int onebyte, i;
+	unsigned int onebyte;
+	int i;
 	char buf[20];
 
 	/* copy dotted string, because we need to modify it */
@@ -263,7 +264,7 @@ dotted_to_addr(const char *dotted)
 			return (struct in_addr *) NULL;
 
 		*q = '\0';
-		if ((onebyte = string_to_number(p, 0, 255)) == -1)
+		if (string_to_number(p, 0, 255, &onebyte) == -1)
 			return (struct in_addr *) NULL;
 
 		addrp[i] = (unsigned char) onebyte;
@@ -271,7 +272,7 @@ dotted_to_addr(const char *dotted)
 	}
 
 	/* we've checked 3 bytes, now we check the last one */
-	if ((onebyte = string_to_number(p, 0, 255)) == -1)
+	if (string_to_number(p, 0, 255, &onebyte) == -1)
 		return (struct in_addr *) NULL;
 
 	addrp[3] = (unsigned char) onebyte;
@@ -581,7 +582,7 @@ parse_mask(char *mask)
 {
 	static struct in_addr maskaddr;
 	struct in_addr *addrp;
-	int bits;
+	unsigned int bits;
 
 	if (mask == NULL) {
 		/* no mask at all defaults to 32 bits */
@@ -591,7 +592,7 @@ parse_mask(char *mask)
 	if ((addrp = dotted_to_addr(mask)) != NULL)
 		/* dotted_to_addr already returns a network byte order addr */
 		return addrp;
-	if ((bits = string_to_number(mask, 0, 32)) == -1)
+	if (string_to_number(mask, 0, 32, &bits) == -1)
 		exit_error(PARAMETER_PROBLEM,
 			   "invalid mask `%s' specified", mask);
 	if (bits != 0) {
@@ -677,10 +678,9 @@ find_match(const char *name, enum ipt_tryload tryload)
 static struct iptables_match *
 find_proto(const char *pname, enum ipt_tryload tryload, int nolookup)
 {
-	int proto;
+	unsigned int proto;
 
-	proto = string_to_number(pname, 0, 255);
-	if (proto != -1)
+	if (string_to_number(pname, 0, 255, &proto) != -1)
 		return find_match(proto_to_name(proto, nolookup), tryload);
 
 	return find_match(pname, tryload);
@@ -689,9 +689,9 @@ find_proto(const char *pname, enum ipt_tryload tryload, int nolookup)
 static u_int16_t
 parse_protocol(const char *s)
 {
-	int proto = string_to_number(s, 0, 255);
+	unsigned int proto;
 
-	if (proto == -1) {
+	if (string_to_number(s, 0, 255, &proto) == -1) {
 		struct protoent *pent;
 
 		if ((pent = getprotobyname(s)))
@@ -756,9 +756,9 @@ parse_interface(const char *arg, char *vianame, unsigned char *mask)
 static int
 parse_rulenumber(const char *rule)
 {
-	int rulenum = string_to_number(rule, 1, INT_MAX);
+	unsigned int rulenum;
 
-	if (rulenum == -1)
+	if (string_to_number(rule, 1, INT_MAX, &rulenum) == -1)
 		exit_error(PARAMETER_PROBLEM,
 			   "Invalid rule number `%s'", rule);
 
@@ -846,7 +846,8 @@ mask_to_dotted(const struct in_addr *mask)
 }
 
 int
-string_to_number(const char *s, int min, int max)
+string_to_number(const char *s, unsigned int min, unsigned int max,
+		 unsigned int *ret)
 {
 	long number;
 	char *end;
@@ -856,8 +857,10 @@ string_to_number(const char *s, int min, int max)
 	number = strtol(s, &end, 0);
 	if (*end == '\0' && end != s) {
 		/* we parsed a number, let's see if we want this */
-		if (errno != ERANGE && min <= number && number <= max)
-			return number;
+		if (errno != ERANGE && min <= number && number <= max) {
+			*ret = number;
+			return 0;
+		}
 	}
 	return -1;
 }
