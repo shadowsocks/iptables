@@ -13,13 +13,14 @@ static void
 help(void)
 {
 	printf(
-"IPV4OPTIONS v%s options:\n"
-"      --ssrr   (match strict source routing flag)\n"
-"      --lsrr   (match loose  source routing flag)\n"
-"      --no-srr (match packets with no source routing)\n\n"
-"  [!] --rr     (match record route flag)\n\n"
-"  [!] --ts     (match timestamp flag)\n\n"
-"  [!] --ra     (match router-alert option)\n\n",
+"ipv4options v%s options:\n"
+"      --ssrr    (match strict source routing flag)\n"
+"      --lsrr    (match loose  source routing flag)\n"
+"      --no-srr  (match packets with no source routing)\n\n"
+"  [!] --rr      (match record route flag)\n\n"
+"  [!] --ts      (match timestamp flag)\n\n"
+"  [!] --ra      (match router-alert option)\n\n"
+"  [!] --any-opt (match any option or no option at all if used with '!')\n",
 NETFILTER_VERSION);
 }
 
@@ -30,6 +31,7 @@ static struct option opts[] = {
 	{ "rr", 0, 0, '4'},
 	{ "ts", 0, 0, '5'},
 	{ "ra", 0, 0, '6'},
+	{ "any-opt", 0, 0, '7'},
 	{0}
 };
 
@@ -180,6 +182,42 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		}
 		break;
 
+		/* any option */
+	case '7' :
+		if ((!invert) && (*flags & IPT_IPV4OPTION_MATCH_ANY_OPT))
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify --any-opt twice");
+		if (invert && (*flags & IPT_IPV4OPTION_MATCH_ANY_OPT))
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify ! --any-opt with --any-opt");
+		if (invert && (*flags & IPT_IPV4OPTION_DONT_MATCH_ROUTER_ALERT))
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify ! --any-opt twice");
+		if ((!invert) &&
+		    ((*flags & IPT_IPV4OPTION_DONT_MATCH_SRR)       ||
+		     (*flags & IPT_IPV4OPTION_DONT_MATCH_RR)        ||
+		     (*flags & IPT_IPV4OPTION_DONT_MATCH_TIMESTAMP) ||
+		     (*flags & IPT_IPV4OPTION_DONT_MATCH_ROUTER_ALERT)))
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify --any-opt with any other negative ipv4options match");
+		if (invert &&
+		    ((*flags & IPT_IPV4OPTION_MATCH_LSRR)      ||
+		     (*flags & IPT_IPV4OPTION_MATCH_SSRR)      ||
+		     (*flags & IPT_IPV4OPTION_MATCH_RR)        ||
+		     (*flags & IPT_IPV4OPTION_MATCH_TIMESTAMP) ||
+		     (*flags & IPT_IPV4OPTION_MATCH_ROUTER_ALERT)))
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify ! --any-opt with any other positive ipv4options match");
+		if (invert) {
+			info->options |= IPT_IPV4OPTION_DONT_MATCH_ANY_OPT;
+			*flags |= IPT_IPV4OPTION_DONT_MATCH_ANY_OPT;	
+		}
+		else {
+			info->options |= IPT_IPV4OPTION_MATCH_ANY_OPT;
+			*flags |= IPT_IPV4OPTION_MATCH_ANY_OPT;
+		}
+		break;
+
 	default:
 		return 0;
 	}
@@ -221,6 +259,10 @@ print(const struct ipt_ip *ip,
 		printf(" RA");
 	else if (info->options & IPT_IPV4OPTION_DONT_MATCH_ROUTER_ALERT)
 		printf(" !RA");
+	if (info->options & IPT_IPV4OPTION_MATCH_ANY_OPT)
+		printf(" ANYOPT ");
+	else if (info->options & IPT_IPV4OPTION_DONT_MATCH_ANY_OPT)
+		printf(" NOOPT");
 
 	printf(" ");
 }
@@ -249,6 +291,10 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 		printf(" --ra");
 	else if (info->options & IPT_IPV4OPTION_DONT_MATCH_ROUTER_ALERT)
 		printf(" ! --ra");
+	if (info->options & IPT_IPV4OPTION_MATCH_ANY_OPT)
+		printf(" --any-opt");
+	if (info->options & IPT_IPV4OPTION_DONT_MATCH_ANY_OPT)
+		printf(" ! --any-opt");
 
 	printf(" ");
 }
