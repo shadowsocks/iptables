@@ -1,18 +1,14 @@
-X TCP Window Tracking
   PPC heisenbug failure
   u32 classifier
-  IPv6: `Hook 4 already set' message.
-  Merge random module.
+X IPv6: `Hook 4 already set' message.
   ICQ module
   -C utility.
   Static (dumb) NAT.
-  MTU change in route_me_harder + test.
+X MTU change in route_me_harder + test.
   LVS
   Hard lockup with ip_queue under heavy load.
-  OSPF failure on local box with NAT (Lai Zit Seng)
+X OSPF failure on local box with NAT (Lai Zit Seng)
   IPv6 ping crash with NAT.
   Redirecting loopback to external machines (LOCAL_IN hook for NAT).
-  Jules Bean: `Problems with large transfers'
-X Harald's multi-port ftp patch into patch-o-matic.
-X tcpmss match
+X Jules Bean: `Problems with large transfers'
   ftp tcp window tracking failure (ftp nat must update window info).
