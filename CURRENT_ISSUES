@@ -8,12 +8,8 @@ nf_debug stuff
 	- can wait
 ipt_ACCOUNT
 	- can wait
-early_drop_backwards.diff 
-	- fix in pending, needs testing
 UDP stream timeout (180s) doens't apply for first reply packet
 	- fix by Martin Josefsson, needs review/testing
-remove __MOD_INC_USAGE / __MOD_DEC_USAGE patch
-	- need to familiarize with new API and review patch
 SLOG target
 	- no further work expected
 	- needs to be integrated with recent nfnetlink/ctnetlink
@@ -27,13 +23,10 @@ bi-directional ftp state tracking
 	- do we want this?
 final ACK of a SYN - SYN/ACK - ACK tcp handshake establishes ASSURED
 	- patch is on list, needs testing + comments from kadlec
-iptrables-restore doesn't check for table definition
-	- patch from <Pine.LNX.4.44.0301271551570.909-300000@octane>
-	- bugzilla
 expectations allegedly don't work on sparc64
 	- see <771F217D7A4AF84494632457889470A412D77A@bcmsg011.corp.ads>
 	- is this in bugzilla yet?
-new byteelimit match
+new bytelimit match
 	- unify it with 'limit' for 2.5.x
 new hash (abcdx/...) for conntrack
 	- put patch in p-o-m, do testing, submit to kernel
