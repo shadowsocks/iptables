@@ -14,6 +14,7 @@ typedef char ip6t_chainlabel[32];
 
 #define IP6TC_LABEL_ACCEPT "ACCEPT"
 #define IP6TC_LABEL_DROP "DROP"
+#define IP6TC_LABEL_QUEUE   "QUEUE"
 #define IP6TC_LABEL_RETURN "RETURN"
 
 /* Transparent handle type. */
@@ -25,9 +26,9 @@ int ip6tc_is_chain(const char *chain, const ip6tc_handle_t handle);
 /* Take a snapshot of the rules. Returns NULL on error. */
 ip6tc_handle_t ip6tc_init(const char *tablename);
 
-/* Iterator functions to run through the chains; prev = NULL means
- first chain. Returns NULL at end. */
-const char *ip6tc_next_chain(const char *prev, ip6tc_handle_t *handle);
+/* Iterator functions to run through the chains.  Returns NULL at end. */
+const char *iptc_first_chain(ip6tc_handle_t *handle);
+const char *ip6tc_next_chain(ip6tc_handle_t *handle);
 
 /* How many rules in this chain? */
 unsigned int ip6tc_num_rules(const char *chain, ip6tc_handle_t *handle);
@@ -38,8 +39,7 @@ const struct ip6t_entry *ip6tc_get_rule(const char *chain,
 					ip6tc_handle_t *handle);
 
 /* Returns a pointer to the target name of this position. */
-const char *ip6tc_get_target(const char *chain,
-			     unsigned int n,
+const char *ip6tc_get_target(const struct ip6t_entry *e,
 			     ip6tc_handle_t *handle);
 
 /* Is this a built-in chain? */
@@ -75,6 +75,7 @@ int ip6tc_append_entry(const ip6t_chainlabel chain,
 /* Delete the first rule in `chain' which matches `fw'. */
 int ip6tc_delete_entry(const ip6t_chainlabel chain,
 		       const struct ip6t_entry *origfw,
+		       unsigned char *matchmask,
 		       ip6tc_handle_t *handle);
 
 /* Delete the rule in position `rulenum' in `chain'. */

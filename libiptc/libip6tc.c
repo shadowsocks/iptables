@@ -97,6 +97,7 @@ typedef unsigned int socklen_t;
 #define LABEL_RETURN		IP6TC_LABEL_RETURN
 #define LABEL_ACCEPT		IP6TC_LABEL_ACCEPT
 #define LABEL_DROP		IP6TC_LABEL_DROP
+#define LABEL_QUEUE		IP6TC_LABEL_QUEUE
 
 #define ALIGN			IP6T_ALIGN
 #define RETURN			IP6T_RETURN
@@ -189,8 +190,8 @@ dump_entry(struct ip6t_entry *e, const ip6tc_handle_t handle)
 	IP6T_MATCH_ITERATE(e, print_match);
 
 	t = ip6t_get_target(e);
-	printf("Target name: `%s' [%u]\n", t->u.name, t->target_size);
-	if (strcmp(t->u.name, IP6T_STANDARD_TARGET) == 0) {
+	printf("Target name: `%s' [%u]\n", t->u.user.name, t->u.target_size);
+	if (strcmp(t->u.user.name, IP6T_STANDARD_TARGET) == 0) {
 		int pos = *(int *)t->data;
 		if (pos < 0)
 			printf("verdict=%s\n",
@@ -200,19 +201,19 @@ dump_entry(struct ip6t_entry *e, const ip6tc_handle_t handle)
 			       : "UNKNOWN");
 		else
 			printf("verdict=%u\n", pos);
-	} else if (strcmp(t->u.name, IP6T_ERROR_TARGET) == 0)
+	} else if (strcmp(t->u.user.name, IP6T_ERROR_TARGET) == 0)
 		printf("error=`%s'\n", t->data);
 
 	printf("\n");
 	return 0;
 }
 
-static inline int
-is_same(const struct STRUCT_ENTRY *a, const struct STRUCT_ENTRY *b,
+static int
+is_same(const STRUCT_ENTRY *a, const STRUCT_ENTRY *b,
 	unsigned char *matchmask)
 {
 	unsigned int i;
-	struct STRUCT_ENTRY_TARGET *ta, *tb;
+	STRUCT_ENTRY_TARGET *ta, *tb;
 	unsigned char *mptr;
 
 	/* Always compare head structures: ignore mask here. */
@@ -244,15 +245,15 @@ is_same(const struct STRUCT_ENTRY *a, const struct STRUCT_ENTRY *b,
 	    || a->next_offset != b->next_offset)
 		return 0;
 
-	mptr = matchmask + sizeof(struct STRUCT_ENTRY);
-	if (IP6T_MATCH_ITERATE(a, match_different, a->elems, b->elems))
+	mptr = matchmask + sizeof(STRUCT_ENTRY);
+	if (IP6T_MATCH_ITERATE(a, match_different, a->elems, b->elems, &mptr))
 		return 0;
 
-	ta = GET_TARGET((struct STRUCT_ENTRY *)a);
-	tb = GET_TARGET((struct STRUCT_ENTRY *)b);
-	if (ta->target_size != tb->target_size)
+	ta = GET_TARGET((STRUCT_ENTRY *)a);
+	tb = GET_TARGET((STRUCT_ENTRY *)b);
+	if (ta->u.target_size != tb->u.target_size)
 		return 0;
-	if (strcmp(ta->u.name, tb->u.name) != 0)
+	if (strcmp(ta->u.user.name, tb->u.user.name) != 0)
 		return 0;
 	mptr += sizeof(*ta);
 
