@@ -1757,7 +1757,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 					 + m->size);
 			m->m = fw_calloc(1, size);
 			m->m->u.match_size = size;
-			strcpy(m->m->u.user.name, optarg);
+			strcpy(m->m->u.user.name, m->name);
 			m->init(m->m, &fw.nfcache);
 		}
 		break;
@@ -1839,7 +1839,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 
 					m->m = fw_calloc(1, size);
 					m->m->u.match_size = size;
-					strcpy(m->m->u.user.name, protocol);
+					strcpy(m->m->u.user.name, m->name);
 					m->init(m->m, &fw.nfcache);
 
 					optind--;
