@@ -1660,6 +1660,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	const char *jumpto = "";
 	char *protocol = NULL;
 	const char *modprobe = NULL;
+	int proto_used = 0;
 	char icmp6p[] = "icmpv6";
 
 	memset(&fw, 0, sizeof(fw));
@@ -2022,6 +2023,60 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 						     &m->m))
 						break;
 				}
+
+				/* If you listen carefully, you can
+				   actually hear this code suck. */
+
+				/* some explanations (after four different bugs
+				 * in 3 different releases): If we encountere a
+				 * parameter, that has not been parsed yet,
+				 * it's not an option of an explicitly loaded
+				 * match or a target.  However, we support
+				 * implicit loading of the protocol match
+				 * extension.  '-p tcp' means 'l4 proto 6' and
+				 * at the same time 'load tcp protocol match on
+				 * demand if we specify --dport'.
+				 *
+				 * To make this work, we need to make sure:
+				 * - the parameter has not been parsed by
+				 *   a match (m above)
+				 * - a protocol has been specified
+				 * - the protocol extension has not been
+				 *   loaded yet, or is loaded and unused
+				 *   [think of iptables-restore!]
+				 * - the protocol extension can be successively
+				 *   loaded
+				 */
+				if (m == NULL
+				    && protocol
+				    && (!find_proto(protocol, DONT_LOAD,
+						   options&OPT_NUMERIC) 
+					|| (find_proto(protocol, DONT_LOAD,
+							options&OPT_NUMERIC)
+					    && (proto_used == 0))
+				       )
+				    && (m = find_proto(protocol, TRY_LOAD,
+						       options&OPT_NUMERIC))) {
+					/* Try loading protocol */
+					size_t size;
+					
+					proto_used = 1;
+
+					size = IP6T_ALIGN(sizeof(struct ip6t_entry_match))
+							 + m->size;
+
+					m->m = fw_calloc(1, size);
+					m->m->u.match_size = size;
+					strcpy(m->m->u.user.name, m->name);
+					m->init(m->m, &fw.nfcache);
+
+					opts = merge_options(opts,
+					    m->extra_opts, &m->option_offset);
+
+					optind--;
+					continue;
+				}
+
 				if (!m)
 					exit_error(PARAMETER_PROBLEM,
 						   "Unknown arg `%s'",
