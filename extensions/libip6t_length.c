@@ -35,6 +35,7 @@ init(struct ip6t_entry_match *m, unsigned int *nfcache)
 
 static u_int16_t
 parse_length(const char *s)
+{
 
 	int len;
 	
