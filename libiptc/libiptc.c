@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version 0.1. */
+/* Library which manipulates firewall rules.  Version $Revision$ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -731,7 +731,7 @@ insert_rules(unsigned int num_rules, unsigned int rules_size,
 
 	newh = alloc_handle((*handle)->info.name,
 			    (*handle)->entries.size + rules_size,
-			    (*handle)->info.num_entries + num_rules);
+			    (*handle)->new_number + num_rules);
 	if (!newh)
 		return 0;
 	newh->info = newinfo;
@@ -1355,11 +1355,12 @@ int TC_RENAME_CHAIN(const IPT_CHAINLABEL oldname,
 
 	iptc_fn = TC_RENAME_CHAIN;
 
-	/* find_label doesn't cover built-in targets: DROP, ACCEPT
-           RETURN. */
+	/* find_label doesn't cover built-in targets: DROP, ACCEPT,
+           QUEUE, RETURN. */
 	if (find_label(newname, *handle)
 	    || strcmp(newname, LABEL_DROP) == 0
 	    || strcmp(newname, LABEL_ACCEPT) == 0
+	    || strcmp(newname, LABEL_QUEUE) == 0
 	    || strcmp(newname, LABEL_RETURN) == 0) {
 		errno = EEXIST;
 		return 0;
