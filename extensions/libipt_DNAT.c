@@ -65,7 +65,7 @@ static struct ipt_entry_target *
 parse_to(char *arg, int portok, struct ipt_natinfo *info)
 {
 	struct ip_nat_range range;
-	char *colon, *dash;
+	char *colon, *dash, *error;
 	struct in_addr *ip;
 
 	memset(&range, 0, sizeof(range));
@@ -84,6 +84,11 @@ parse_to(char *arg, int portok, struct ipt_natinfo *info)
 		if (port == 0 || port > 65535)
 			exit_error(PARAMETER_PROBLEM,
 				   "Port `%s' not valid\n", colon+1);
+
+		error = strchr(colon+1, ':');
+		if (error)
+			exit_error(PARAMETER_PROBLEM,
+				   "Invalid port:port syntax - use dash\n");
 
 		dash = strchr(colon, '-');
 		if (!dash) {
