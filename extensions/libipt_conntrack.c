@@ -30,7 +30,7 @@ help(void)
 "				Reply source specification\n"
 "     --ctrepldst  [!] address[/mask]\n"
 "				Reply destination specification\n"
-" [!] --ctstatus [NONE|EXPECTED|SEEN_REPLY|ASSURED][,...]\n"
+" [!] --ctstatus [NONE|EXPECTED|SEEN_REPLY|ASSURED|CONFIRMED][,...]\n"
 "				Status(es) to match\n"
 " [!] --ctexpire time[:time]	Match remaining lifetime in seconds against\n"
 "				value or range of values (inclusive)\n"
@@ -105,6 +105,10 @@ parse_status(const char *status, size_t strlen, struct ipt_conntrack_info *sinfo
 		sinfo->statusmask |= IPS_SEEN_REPLY;
 	else if (strncasecmp(status, "ASSURED", strlen) == 0)
 		sinfo->statusmask |= IPS_ASSURED;
+#ifdef IPS_CONFIRMED
+	else if (strncasecmp(status, "CONFIRMED", strlen) == 0)
+		sinfo->stausmask |= IPS_CONFIRMED;
+#endif
 	else
 		return 0;
 	return 1;
@@ -373,6 +377,12 @@ print_status(unsigned int statusmask)
 		printf("%sASSURED", sep);
 		sep = ",";
 	}
+#ifdef IPS_CONFIRMED
+	if (statusmask & IPS_CONFIRMED) {
+		printf("%sCONFIRMED", sep);
+		sep =",";
+	}
+#endif
 	if (statusmask == 0) {
 		printf("%sNONE", sep);
 		sep = ",";
