@@ -33,3 +33,5 @@ typo in ftp helper (espv instead of epsv)
 	- cosmetic patch needs to be done and submitted
 final ACK of a SYN - SYN/ACK - ACK tcp handshake establishes ASSURED
 	- patch is on list, needs testing + comments from kadlec
+boolean MARK operations
+	- patch by Anders Fugmann, needs 64bit testing
