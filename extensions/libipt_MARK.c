@@ -6,7 +6,8 @@
 
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
-#include <linux/netfilter_ipv4/ipt_MARK.h>
+/* For 64bit kernel / 32bit userspace */
+#include "../include/linux/netfilter_ipv4/ipt_MARK.h"
 
 /* Function which prints out usage message. */
 static void
@@ -42,8 +43,13 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (string_to_number(optarg, 0, 0xffffffff, 
-				     (unsigned int *)&markinfo->mark))
+#ifdef KERNEL_64_USERSPACE_32
+		if (string_to_number_ll(optarg, 0, 0, 
+				     &markinfo->mark))
+#else
+		if (string_to_number_l(optarg, 0, 0, 
+				     &markinfo->mark))
+#endif
 			exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
@@ -66,11 +72,19 @@ final_check(unsigned int flags)
 		           "MARK target: Parameter --set-mark is required");
 }
 
+#ifdef KERNEL_64_USERSPACE_32
 static void
-print_mark(unsigned long mark, int numeric)
+print_mark(unsigned long long mark)
+{
+	printf("0x%llx ", mark);
+}
+#else
+static void
+print_mark(unsigned long mark)
 {
 	printf("0x%lx ", mark);
 }
+#endif
 
 /* Prints out the targinfo. */
 static void
@@ -81,7 +95,7 @@ print(const struct ipt_ip *ip,
 	const struct ipt_mark_target_info *markinfo =
 		(const struct ipt_mark_target_info *)target->data;
 	printf("MARK set ");
-	print_mark(markinfo->mark, numeric);
+	print_mark(markinfo->mark);
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
@@ -91,7 +105,8 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	const struct ipt_mark_target_info *markinfo =
 		(const struct ipt_mark_target_info *)target->data;
 
-	printf("--set-mark 0x%lx ", markinfo->mark);
+	printf("--set-mark ");
+	print_mark(markinfo->mark);
 }
 
 static

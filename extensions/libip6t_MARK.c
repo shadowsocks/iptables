@@ -6,7 +6,8 @@
 
 #include <ip6tables.h>
 #include <linux/netfilter_ipv6/ip6_tables.h>
-#include <linux/netfilter_ipv6/ip6t_MARK.h>
+/* For 64bit kernel / 32bit userspace */
+#include "../include/linux/netfilter_ipv6/ip6t_MARK.h"
 
 /* Function which prints out usage message. */
 static void
@@ -41,10 +42,14 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		= (struct ip6t_mark_target_info *)(*target)->data;
 
 	switch (c) {
-		char *end;
 	case '1':
-		markinfo->mark = strtoul(optarg, &end, 0);
-		if (*end != '\0' || end == optarg)
+#ifdef KERNEL_64_USERSPACE_32
+		if (string_to_number_ll(optarg, 0, 0, 
+				     &markinfo->mark))
+#else
+		if (string_to_number_l(optarg, 0, 0, 
+				     &markinfo->mark))
+#endif
 			exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
@@ -67,6 +72,20 @@ final_check(unsigned int flags)
 		           "MARK target: Parameter --set-mark is required");
 }
 
+#ifdef KERNEL_64_USERSPACE_32
+static void
+print_mark(unsigned long long mark)
+{
+	printf("0x%llx ", mark);
+}
+#else
+static void
+print_mark(unsigned long mark)
+{
+	printf("0x%lx ", mark);
+}
+#endif
+
 /* Prints out the targinfo. */
 static void
 print(const struct ip6t_ip6 *ip,
@@ -76,7 +95,8 @@ print(const struct ip6t_ip6 *ip,
 	const struct ip6t_mark_target_info *markinfo =
 		(const struct ip6t_mark_target_info *)target->data;
 
-	printf("MARK set 0x%lx ", markinfo->mark);
+	printf("MARK set ");
+	print_mark(markinfo->mark);
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
@@ -86,7 +106,8 @@ save(const struct ip6t_ip6 *ip, const struct ip6t_entry_target *target)
 	const struct ip6t_mark_target_info *markinfo =
 		(const struct ip6t_mark_target_info *)target->data;
 
-	printf("--set-mark 0x%lx ", markinfo->mark);
+	printf("--set-mark ");
+	print_mark(markinfo->mark);
 }
 
 static

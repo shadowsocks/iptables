@@ -6,7 +6,8 @@
 #include <getopt.h>
 
 #include <iptables.h>
-#include <linux/netfilter_ipv4/ipt_mark.h>
+/* For 64bit kernel / 32bit userspace */
+#include "../include/linux/netfilter_ipv4/ipt_mark.h"
 
 /* Function which prints out usage message. */
 static void
@@ -46,11 +47,19 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		char *end;
 	case '1':
 		check_inverse(optarg, &invert, &optind, 0);
+#ifdef KERNEL_64_USERSPACE_32
+		markinfo->mark = strtoull(optarg, &end, 0);
+		if (*end == '/') {
+			markinfo->mask = strtoull(end+1, &end, 0);
+		} else
+			markinfo->mask = 0xffffffffffffffffULL;
+#else
 		markinfo->mark = strtoul(optarg, &end, 0);
 		if (*end == '/') {
 			markinfo->mask = strtoul(end+1, &end, 0);
 		} else
 			markinfo->mask = 0xffffffff;
+#endif
 		if (*end != '\0' || end == optarg)
 			exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
 		if (invert)
@@ -64,6 +73,16 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
+#ifdef KERNEL_64_USERSPACE_32
+static void
+print_mark(unsigned long long mark, unsigned long long mask, int numeric)
+{
+	if(mask != 0xffffffffffffffffULL)
+		printf("0x%llx/0x%llx ", mark, mask);
+	else
+		printf("0x%llx ", mark);
+}
+#else
 static void
 print_mark(unsigned long mark, unsigned long mask, int numeric)
 {
@@ -72,6 +91,7 @@ print_mark(unsigned long mark, unsigned long mask, int numeric)
 	else
 		printf("0x%lx ", mark);
 }
+#endif
 
 /* Final check; must have specified --mark. */
 static void
