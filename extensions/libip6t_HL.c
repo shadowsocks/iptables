@@ -147,17 +147,17 @@ static struct option opts[] = {
 
 static
 struct ip6tables_target HL = { NULL, 
-	"HL",
-	IPTABLES_VERSION,
-	IP6T_ALIGN(sizeof(struct ip6t_HL_info)),
-	IP6T_ALIGN(sizeof(struct ip6t_HL_info)),
-	&help,
-	&init,
-	&parse,
-	&final_check,
-	&print,
-	&save,
-	opts 
+	.name 		= "HL",
+	.version	= IPTABLES_VERSION,
+	.size		= IP6T_ALIGN(sizeof(struct ip6t_HL_info)),
+	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_HL_info)),
+	.help		= &help, 
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts 
 };
 
 void _init(void)
