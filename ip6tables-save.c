@@ -100,7 +100,7 @@ static int print_match(const struct ip6t_entry_match *e,
 			const struct ip6t_ip6 *ip)
 {
 	struct ip6tables_match *match
-		= find_match(e->u.user.name, TRY_LOAD);
+		= find_match(e->u.user.name, TRY_LOAD, NULL);
 
 	if (match) {
 		printf("-m %s ", e->u.user.name);
