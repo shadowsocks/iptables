@@ -1040,7 +1040,11 @@ print_num(u_int64_t number, unsigned int format)
 				number = (number + 500) / 1000;
 				if (number > 9999) {
 					number = (number + 500) / 1000;
-					printf(FMT("%4lluG ","%lluG "),number);
+					if (number > 9999) {
+						number = (number + 500) / 1000;
+						printf(FMT("%4lluT ","%lluT "), number);
+					}
+					else printf(FMT("%4lluG ","%lluG "), number);
 				}
 				else printf(FMT("%4lluM ","%lluM "), number);
 			} else
