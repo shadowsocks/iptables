@@ -7,7 +7,7 @@
  * 	Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: ip6tables-restore.c,v 1.17 2004/01/31 19:41:49 gandalf Exp $
+ * $Id: ip6tables-restore.c,v 1.18 2004/02/02 19:58:36 gandalf Exp $
  */
 
 #include <getopt.h>
@@ -31,6 +31,7 @@ static struct option options[] = {
 	{ "binary", 0, 0, 'b' },
 	{ "counters", 0, 0, 'c' },
 	{ "verbose", 0, 0, 'v' },
+	{ "test", 0, 0, 't' },
 	{ "help", 0, 0, 'h' },
 	{ "noflush", 0, 0, 'n'},
 	{ "modprobe", 1, 0, 'M'},
@@ -41,10 +42,11 @@ static void print_usage(const char *name, const char *version) __attribute__((no
 
 static void print_usage(const char *name, const char *version)
 {
-	fprintf(stderr, "Usage: %s [-b] [-c] [-v] [-h]\n"
+	fprintf(stderr, "Usage: %s [-b] [-c] [-v] [-v] [-h]\n"
 			"	   [ --binary ]\n"
 			"	   [ --counters ]\n"
 			"	   [ --verbose ]\n"
+			"	   [ --test ]\n"
 			"	   [ --help ]\n"
 			"	   [ --noflush ]\n"
 		        "          [ --modprobe=<command>]\n", name);
@@ -108,7 +110,7 @@ int main(int argc, char *argv[])
 	char curtable[IP6T_TABLE_MAXNAMELEN + 1];
 	FILE *in;
 	const char *modprobe = 0;
-	int in_table = 0;
+	int in_table = 0, testing = 0;
 
 	program_name = "ip6tables-restore";
 	program_version = IPTABLES_VERSION;
@@ -118,7 +120,7 @@ int main(int argc, char *argv[])
 	init_extensions();
 #endif
 
-	while ((c = getopt_long(argc, argv, "bcvhnM:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "bcvthnM:", options, NULL)) != -1) {
 		switch (c) {
 			case 'b':
 				binary = 1;
@@ -128,6 +130,9 @@ int main(int argc, char *argv[])
 				break;
 			case 'v':
 				verbose = 1;
+				break;
+			case 't':
+				testing = 1;
 				break;
 			case 'h':
 				print_usage("ip6tables-restore",
@@ -168,8 +173,13 @@ int main(int argc, char *argv[])
 				fputs(buffer, stdout);
 			continue;
 		} else if ((strcmp(buffer, "COMMIT\n") == 0) && (in_table)) {
-			DEBUGP("Calling commit\n");
-			ret = ip6tc_commit(&handle);
+			if (!testing) {
+				DEBUGP("Calling commit\n");
+				ret = ip6tc_commit(&handle);
+			} else {
+				DEBUGP("Not calling commit, testing\n");
+				ret = 1;
+			}
 			in_table = 0;
 		} else if ((buffer[0] == '*') && (!in_table)) {
 			/* New table */
