@@ -1,18 +1,11 @@
-  PPC heisenbug failure
   u32 classifier
-X IPv6: `Hook 4 already set' message.
   ICQ module
   -C utility.
   Static (dumb) NAT.
-X MTU change in route_me_harder + test.
   LVS
   Hard lockup with ip_queue under heavy load.
-X OSPF failure on local box with NAT (Lai Zit Seng)
-x IPv6 ping crash with NAT (should be fixed with patch-test8-ipv6-fixes)
-  Redirecting loopback to external machines (LOCAL_IN hook for NAT).
-X Jules Bean: `Problems with large transfers'
   ftp tcp window tracking failure (ftp nat must update window info).
   CONFIG_NF_IP_NAT_LOCAL
   mangle should have hooks everywhere
-
+  Make patch-o-matic more generic (any subdir), and reversible.
 	
