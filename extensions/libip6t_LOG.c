@@ -76,7 +76,7 @@ parse_level(const char *level)
 		     i++) {
 			if (strncasecmp(level, ip6t_log_names[i].name,
 					strlen(level)) == 0) {
-				if (lev != -1)
+				if (set++)
 					exit_error(PARAMETER_PROBLEM,
 						   "log-level `%s' ambiguous",
 						   level);
@@ -84,7 +84,7 @@ parse_level(const char *level)
 			}
 		}
 
-		if (lev == -1)
+		if (!set)
 			exit_error(PARAMETER_PROBLEM,
 				   "log-level `%s' unknown", level);
 	}
@@ -226,7 +226,7 @@ save(const struct ip6t_ip6 *ip, const struct ip6t_entry_target *target)
 		= (const struct ip6t_log_info *)target->data;
 
 	if (strcmp(loginfo->prefix, "") != 0)
-		printf("--log-prefix %s ", loginfo->prefix);
+		printf("--log-prefix \"%s\" ", loginfo->prefix);
 
 	if (loginfo->level != LOG_DEFAULT_LEVEL)
 		printf("--log-level %u ", loginfo->level);
