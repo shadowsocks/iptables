@@ -227,7 +227,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 		= (const struct ipt_log_info *)target->data;
 
 	if (strcmp(loginfo->prefix, "") != 0)
-		printf("--log-prefix %s ", loginfo->prefix);
+		printf("--log-prefix \"%s\" ", loginfo->prefix);
 
 	if (loginfo->level != LOG_DEFAULT_LEVEL)
 		printf("--log-level %u ", loginfo->level);
