@@ -31,13 +31,13 @@ help_v1(void)
 {
 	printf(
 "multiport v%s options:\n"
-" --source-ports port[,port:port,port...]\n"
+" --source-ports [!] port[,port:port,port...]\n"
 " --sports ...\n"
 "				match source port(s)\n"
-" --destination-ports port[,port:port,port...]\n"
+" --destination-ports [!] port[,port:port,port...]\n"
 " --dports ...\n"
 "				match destination port(s)\n"
-" --ports port[,port:port,port]\n"
+" --ports [!] port[,port:port,port]\n"
 "				match both source and destination port(s)\n",
 IPTABLES_VERSION);
 }
@@ -255,8 +255,7 @@ parse_v1(int c, char **argv, int invert, unsigned int *flags,
 	}
 
 	if (invert)
-		exit_error(PARAMETER_PROBLEM,
-			   "multiport does not support invert");
+		multiinfo->invert = 1;
 
 	if (*flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -362,6 +361,9 @@ print_v1(const struct ipt_ip *ip,
 		break;
 	}
 
+	if (multiinfo->invert)
+		printf("! ");
+
 	for (i=0; i < multiinfo->count; i++) {
 		printf("%s", i ? "," : "");
 		print_port(multiinfo->ports[i], ip->proto, numeric);
@@ -421,6 +423,9 @@ static void save_v1(const struct ipt_ip *ip,
 		printf("--ports ");
 		break;
 	}
+
+	if (multiinfo->invert)
+		printf("! ");
 
 	for (i=0; i < multiinfo->count; i++) {
 		printf("%s", i ? "," : "");
