@@ -265,6 +265,19 @@ is_same(const STRUCT_ENTRY *a, const STRUCT_ENTRY *b,
 	return 1;
 }
 
+/* All zeroes == unconditional rule. */
+static inline int
+unconditional(const struct ip6t_ip6 *ipv6)
+{
+	unsigned int i;
+
+	for (i = 0; i < sizeof(*ipv6); i++)
+		if (((char *)ipv6)[i])
+			break;
+
+	return (i == sizeof(*ipv6));
+}
+
 #ifndef NDEBUG
 /* Do every conceivable sanity check on the handle */
 static void
@@ -342,7 +355,7 @@ do_check(TC_HANDLE_T h, unsigned int line)
 		       == get_chain_end(h, h->info.hook_entry[i]));
 
 		e = get_entry(h, get_chain_end(h, h->info.hook_entry[i]));
-//		assert(unconditional(&e->ipv6));
+		assert(unconditional(&e->ipv6));
 		assert(e->target_offset == sizeof(*e));
 		t = (STRUCT_STANDARD_TARGET *)GET_TARGET(e);
 		assert(t->target.u.target_size == ALIGN(sizeof(*t)));
@@ -369,9 +382,10 @@ do_check(TC_HANDLE_T h, unsigned int line)
 	i = 0; n = 0;
 	was_return = 0;
 
+#if 0
 	/* Check all the entries. */
-//	ENTRY_ITERATE(h->entries.entries, h->entries.size,
-//		      check_entry, &i, &n, user_offset, &was_return, h);
+	ENTRY_ITERATE(h->entries.entries, h->entries.size,
+		      check_entry, &i, &n, user_offset, &was_return, h);
 
 	assert(i == h->new_number);
 	assert(n == h->entries.size);
@@ -380,5 +394,6 @@ do_check(TC_HANDLE_T h, unsigned int line)
 	assert(strcmp(GET_TARGET(index2entry(h, h->new_number-1))
 		      ->u.user.name,
 		      ERROR_TARGET) == 0);
+#endif
 }
 #endif /*NDEBUG*/

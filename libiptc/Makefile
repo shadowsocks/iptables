@@ -9,8 +9,8 @@ local:
 else
 EXTRA_DEPENDS+=libiptc/libiptc.d
 
-#libiptc/libiptc.a: libiptc/libiptc.a(libiptc/libip4tc.o libiptc/libip6tc.o)
-libiptc/libiptc.a: libiptc/libiptc.a(libiptc/libip4tc.o)
+libiptc/libiptc.a: libiptc/libiptc.a(libiptc/libip4tc.o libiptc/libip6tc.o)
+#libiptc/libiptc.a: libiptc/libiptc.a(libiptc/libip4tc.o)
 
 libiptc/libiptc.d: %.d: %.c
 	@-$(CC) -M -MG $(CFLAGS) $< | sed -e 's@^.*\.o:@$*.d $*.a($*.o):@' > $@

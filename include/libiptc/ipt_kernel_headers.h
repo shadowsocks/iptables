@@ -3,6 +3,8 @@
 #ifndef _FWCHAINS_KERNEL_HEADERS_H
 #define _FWCHAINS_KERNEL_HEADERS_H
 
+#include <limits.h>
+
 #if defined(__GLIBC__) && __GLIBC__ == 2
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
@@ -10,7 +12,6 @@
 #include <netinet/udp.h>
 #include <net/if.h>
 #include <sys/types.h>
-#include <limits.h>
 #else /* libc5 */
 #include <sys/socket.h>
 #include <linux/ip.h>
