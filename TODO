@@ -1,33 +1,15 @@
   TCP Window Tracking
-  PPC testsuite failure
+  PPC heisenbug failure
   u32 classifier
-x CPU consumption on stream.c flood
-x Fix for PowerPC alignment for ERROR node
-	(t->target.target_size != e->next_offset - e->target_offset)
   IPv6: `Hook 4 already set' message.
-x Merge netfilter IPv6 stuff
-  Merge IRC conntrack module
-  Merge RPC conntrack module
-  Merge pool module.
   Merge random module.
-  Merge SNMP NAT module
-x ipchains compat module removal with existing rules: crash.
-x ipchains -A without ipchains module loaded oops.
-x ARM crash in pre-5 when pinging through ipt_MASQUERADE.
-x Dependency problem with libiptc.c (change it, no remake).
   ICQ module
-  Random crashes after adding REJECT rule, testing it, cleaning up,
-     rmmoding and running /etc/init.d/gateway stop.
-x Russell King's ipchains module crash report.
   -C utility.
   Static (dumb) NAT.
-x Fix ICMP errors for NAT.
-  ipchains module doesn't load with CONFIG_MODVERSIONS.
-x Investigate ping corruption with ipchains and iptables MASQ in -test2.
-x touch userspace/libiptc/libiptc.c doesn't cause re-make.
-  skb_cow in NAT.
   MTU change in route_me_harder + test.
   LVS
   Hard lockup with ip_queue under heavy load.
   OSPF failure on local box with NAT (Lai Zit Seng)
   IPv6 ping crash with NAT.
+  Redirecting loopback to external machines (LOCAL_IN hook for NAT).
+  Jules Bean: `Problems with large transfers'
