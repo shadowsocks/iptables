@@ -4,7 +4,7 @@
  *
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: iptables-restore.c,v 1.21 2002/05/29 13:08:15 laforge Exp $
+ * $Id: iptables-restore.c,v 1.22 2002/08/07 09:07:41 laforge Exp $
  */
 
 #include <getopt.h>
@@ -106,6 +106,7 @@ int main(int argc, char *argv[])
 	char curtable[IPT_TABLE_MAXNAMELEN + 1];
 	FILE *in;
 	const char *modprobe = 0;
+	int in_table = 0;
 
 	program_name = "iptables-restore";
 	program_version = IPTABLES_VERSION;
@@ -161,10 +162,11 @@ int main(int argc, char *argv[])
 		else if (buffer[0] == '#') {
 			if (verbose) fputs(buffer, stdout);
 			continue;
-		} else if (strcmp(buffer, "COMMIT\n") == 0) {
+		} else if ((strcmp(buffer, "COMMIT\n") == 0) && (in_table)) {
 			DEBUGP("Calling commit\n");
 			ret = iptc_commit(&handle);
-		} else if (buffer[0] == '*') {
+			in_table = 0;
+		} else if ((buffer[0] == '*') && (!in_table)){
 			/* New table */
 			char *table;
 
@@ -192,8 +194,9 @@ int main(int argc, char *argv[])
 			}
 
 			ret = 1;
+			in_table = 1;
 
-		} else if (buffer[0] == ':') {
+		} else if ((buffer[0] == ':') && (in_table)) {
 			/* New chain. */
 			char *policy, *chain;
 
@@ -252,7 +255,7 @@ int main(int argc, char *argv[])
 
 			ret = 1;
 
-		} else {
+		} else if (in_table) {
 			int a;
 			char *ptr = buffer;
 			char *pcnt = NULL;
