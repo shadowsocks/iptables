@@ -1,10 +1,10 @@
 #! /usr/bin/make
 
-PF_EXT_SLIB:=tcp udp icmp mac limit standard REJECT LOG unclean state multiport tos TOS mark MARK owner SNAT DNAT MASQUERADE REDIRECT MIRROR SAME
-PF6_EXT_SLIB:=tcp udp icmpv6 standard MARK mark
+PF_EXT_SLIB:=ah esp icmp limit mac mark multiport owner standard state tcp tcpmss tos ttl udp unclean DNAT DSCP ECN LOG MARK MASQUERADE MIRROR REDIRECT REJECT SAME SNAT TCPMSS TOS ULOG
+PF6_EXT_SLIB:=icmpv6 mark tcp udp standard MARK
 
 # The following may not be present, but compile them anyway.
-PF_EXT_SLIB+=FTOS TCPMSS TTL ULOG ah esp iplimit tcpmss ttl
+PF_EXT_SLIB+=TTL iplimit
 
 # Optionals
 PF_EXT_SLIB_OPTS:=$(foreach T,$(wildcard extensions/.*-test),$(shell KERNEL_DIR=$(KERNEL_DIR) $(T)))
