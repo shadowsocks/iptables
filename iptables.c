@@ -1987,7 +1987,6 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			    && (fw.ip.invflags & IPT_INV_PROTO))
 				exit_error(PARAMETER_PROBLEM,
 					   "rule would never match protocol");
-			fw.nfcache |= NFC_IP_PROTO;
 			break;
 
 		case 's':
@@ -1995,7 +1994,6 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			set_option(&options, OPT_SOURCE, &fw.ip.invflags,
 				   invert);
 			shostnetworkmask = argv[optind-1];
-			fw.nfcache |= NFC_IP_SRC;
 			break;
 
 		case 'd':
@@ -2003,7 +2001,6 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			set_option(&options, OPT_DESTINATION, &fw.ip.invflags,
 				   invert);
 			dhostnetworkmask = argv[optind-1];
-			fw.nfcache |= NFC_IP_DST;
 			break;
 
 		case 'j':
@@ -2024,7 +2021,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				strcpy(target->t->u.user.name, jumpto);
 				set_revision(target->t->u.user.name,
 					     target->revision);
-				target->init(target->t, &fw.nfcache);
+				if (target->init != NULL)
+					target->init(target->t, &fw.nfcache);
 				opts = merge_options(opts, target->extra_opts, &target->option_offset);
 			}
 			break;
@@ -2037,7 +2035,6 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			parse_interface(argv[optind-1],
 					fw.ip.iniface,
 					fw.ip.iniface_mask);
-			fw.nfcache |= NFC_IP_IF_IN;
 			break;
 
 		case 'o':
@@ -2047,14 +2044,12 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			parse_interface(argv[optind-1],
 					fw.ip.outiface,
 					fw.ip.outiface_mask);
-			fw.nfcache |= NFC_IP_IF_OUT;
 			break;
 
 		case 'f':
 			set_option(&options, OPT_FRAGMENT, &fw.ip.invflags,
 				   invert);
 			fw.ip.flags |= IPT_F_FRAG;
-			fw.nfcache |= NFC_IP_FRAG;
 			break;
 
 		case 'v':
@@ -2078,7 +2073,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			m->m->u.match_size = size;
 			strcpy(m->m->u.user.name, m->name);
 			set_revision(m->m->u.user.name, m->revision);
-			m->init(m->m, &fw.nfcache);
+			if (m->init != NULL)
+				m->init(m->m, &fw.nfcache);
 			opts = merge_options(opts, m->extra_opts, &m->option_offset);
 		}
 		break;
@@ -2221,7 +2217,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 					strcpy(m->m->u.user.name, m->name);
 					set_revision(m->m->u.user.name,
 						     m->revision);
-					m->init(m->m, &fw.nfcache);
+					if (m->init != NULL)
+						m->init(m->m, &fw.nfcache);
 
 					opts = merge_options(opts,
 					    m->extra_opts, &m->option_offset);
@@ -2349,7 +2346,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			target->t->u.target_size = size;
 			strcpy(target->t->u.user.name, jumpto);
 			set_revision(target->t->u.user.name, target->revision);
-			target->init(target->t, &fw.nfcache);
+			if (target->init != NULL)
+				target->init(target->t, &fw.nfcache);
 		}
 
 		if (!target) {

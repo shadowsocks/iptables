@@ -50,13 +50,6 @@ static struct option opts[] = {
 	{ 0 }
 };
 
-/* Initialize the target. */
-static void
-init(struct ipt_entry_match *m, unsigned int *nfcache)
-{
-	*nfcache |= NFC_UNKNOWN;
-}
-
 #define IPT_NTH_OPT_EVERY	0x01
 #define IPT_NTH_OPT_NOT_EVERY	0x02
 #define IPT_NTH_OPT_START	0x04
@@ -224,7 +217,6 @@ static struct iptables_match nth = {
 	.size		= IPT_ALIGN(sizeof(struct ipt_nth_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_nth_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

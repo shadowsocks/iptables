@@ -24,14 +24,6 @@ static struct option opts[] = {
 	{ .name = 0 }
 };
 
-
-static void
-init(struct ip6t_entry_match *m, unsigned int *nfcache)
-{
-	*nfcache |= NFC_UNKNOWN;
-}
-
-
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ip6t_entry *entry, unsigned int *nfcache,
@@ -99,7 +91,6 @@ static struct ip6tables_match condition = {
 	.size = IP6T_ALIGN(sizeof(struct condition6_info)),
 	.userspacesize = IP6T_ALIGN(sizeof(struct condition6_info)),
 	.help = &help,
-	.init = &init,
 	.parse = &parse,
 	.final_check = &final_check,
 	.print = &print,

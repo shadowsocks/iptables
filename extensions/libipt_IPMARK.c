@@ -53,7 +53,6 @@ init(struct ipt_entry_target *t, unsigned int *nfcache)
 	ipmarkinfo->andmask=0xffffffff;
 	ipmarkinfo->ormask=0;
 
-	*nfcache |= NFC_UNKNOWN;
 }
 
 /* Function which parses command options; returns true if it

@@ -25,12 +25,6 @@ static void help(void)
 , IPTABLES_VERSION);
 }
 
-static void init(struct ip6t_entry_match *m, unsigned int *nfcache)
-{
-	/* caching not yet implemented */
-	*nfcache |= NFC_UNKNOWN;
-}
-
 static int parse(int c, char **argv, int invert, unsigned int *flags,
 		const struct ip6t_entry *entry, unsigned int *nfcache,
 		struct ip6t_entry_match **match)
@@ -141,7 +135,6 @@ struct ip6tables_match hl = {
 	.size          = IP6T_ALIGN(sizeof(struct ip6t_hl_info)),
 	.userspacesize = IP6T_ALIGN(sizeof(struct ip6t_hl_info)),
 	.help          = &help,
-	.init          = &init,
 	.parse         = &parse,
 	.final_check   = &final_check,
 	.print         = &print,

@@ -43,8 +43,6 @@ init(struct ipt_entry_target *t, unsigned int *nfcache)
 	mr->info = 0;
 	mr->ipnum = 0;
 	
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 /* Parses range of IPs */

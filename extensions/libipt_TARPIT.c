@@ -15,13 +15,6 @@ static struct option opts[] = {
 	{ 0 }
 };
 
-static void
-init(struct ipt_entry_target *t, unsigned int *nfcache)
-{
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
-}
-
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
@@ -52,7 +45,6 @@ static struct iptables_target tarpit = {
 	.size		= IPT_ALIGN(0),
 	.userspacesize	= IPT_ALIGN(0),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

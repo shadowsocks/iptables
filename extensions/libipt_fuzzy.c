@@ -43,7 +43,6 @@ static void
 init(struct ipt_entry_match *m, unsigned int *nfcache)
 {
 	struct ipt_fuzzy_info *presentinfo = (struct ipt_fuzzy_info *)(m)->data;
-	*nfcache |= NFC_UNKNOWN;
 
 	/*
 	 * Default rates ( I'll improve this very soon with something based 

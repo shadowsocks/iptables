@@ -57,8 +57,6 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 {
 	struct ipt_time_info *info = (struct ipt_time_info *)m->data;
 	globaldays = 0;
-	/* caching not yet implemented */
-        *nfcache |= NFC_UNKNOWN;
         /* By default, we match on everyday */
 	info->days_match = 127;
 	/* By default, we match on every hour:min of the day */

@@ -37,13 +37,6 @@ static struct option opts[] = {
 	{ 0 }
 };
 
-/* Initialize the match. */
-static void
-init(struct ipt_entry_match *m, unsigned int *nfcache)
-{
-	*nfcache |= NFC_UNKNOWN;
-}
-
 /* shared printing code */
 static void print_u32(struct ipt_u32 *data)
 {
@@ -257,7 +250,6 @@ struct iptables_match u32 = {
 	.size		= IPT_ALIGN(sizeof(struct ipt_u32)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_u32)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

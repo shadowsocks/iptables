@@ -32,7 +32,6 @@ static void init(struct ipt_entry_target *t, unsigned int *nfcache)
 	
 	nld->flags=0;
 	
-	*nfcache |= NFC_UNKNOWN;
 }
 
 /* Parse command options */

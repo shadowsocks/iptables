@@ -180,8 +180,6 @@ static void init(struct ipt_entry_match *match, unsigned int *nfcache)
 	struct ipt_rpc_info *rpcinfo = ((struct ipt_rpc_info *)match->data);
 
 
-	/* caching not yet implemented */
-        *nfcache |= NFC_UNKNOWN;
 
 	/* initialise those funky user vars */
 	rpcinfo->i_procs = -1;

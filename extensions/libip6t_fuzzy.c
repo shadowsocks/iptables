@@ -44,8 +44,6 @@ static void
 init(struct ip6t_entry_match *m, unsigned int *nfcache)
 {
 	struct ip6t_fuzzy_info *presentinfo = (struct ip6t_fuzzy_info *)(m)->data;
-	*nfcache |= NFC_UNKNOWN;
-
 	/*
 	 * Default rates ( I'll improve this very soon with something based
 	 * on real statistics of the running machine ) .

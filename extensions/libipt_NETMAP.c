@@ -63,8 +63,6 @@ init(struct ipt_entry_target *t, unsigned int *nfcache)
 	/* Actually, it's 0, but it's ignored at the moment. */
 	mr->rangesize = 1;
 
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 /* Parses network address */

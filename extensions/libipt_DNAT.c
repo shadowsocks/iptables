@@ -33,14 +33,6 @@ static struct option opts[] = {
 	{ 0 }
 };
 
-/* Initialize the target. */
-static void
-init(struct ipt_entry_target *t, unsigned int *nfcache)
-{
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
-}
-
 static struct ipt_natinfo *
 append_range(struct ipt_natinfo *info, const struct ip_nat_range *range)
 {
@@ -236,7 +228,6 @@ static struct iptables_target dnat = {
 	.size		= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

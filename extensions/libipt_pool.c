@@ -43,8 +43,6 @@ init(struct ipt_entry_match *match, unsigned int *nfcache)
 	info->src = IP_POOL_NONE;
 	info->dst = IP_POOL_NONE;
 	info->flags = 0;
-	/* Can't cache this - XXX */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 /* Function which parses command options; returns true if it ate an option */

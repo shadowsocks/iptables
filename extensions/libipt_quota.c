@@ -24,14 +24,6 @@ help(void)
                " --quota quota			quota (bytes)\n" "\n");
 }
 
-/* initialise match */
-static void
-init(struct ipt_entry_match *m, unsigned int *nfcache)
-{
-        /* no can cache */
-        *nfcache |= NFC_UNKNOWN;
-}
-
 /* print matchinfo */
 static void
 print(const struct ipt_ip *ip, const struct ipt_entry_match *match, int numeric)
@@ -100,7 +92,6 @@ struct iptables_match quota = {
 	.size		= IPT_ALIGN(sizeof (struct ipt_quota_info)),
 	.userspacesize	= IPT_ALIGN(sizeof (struct ipt_quota_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

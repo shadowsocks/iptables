@@ -180,17 +180,6 @@ dump_entry(struct ip6t_entry *e, const ip6tc_handle_t handle)
 	printf("Cache: %08X ", e->nfcache);
 	if (e->nfcache & NFC_ALTERED) printf("ALTERED ");
 	if (e->nfcache & NFC_UNKNOWN) printf("UNKNOWN ");
-	if (e->nfcache & NFC_IP6_SRC) printf("IP6_SRC ");
-	if (e->nfcache & NFC_IP6_DST) printf("IP6_DST ");
-	if (e->nfcache & NFC_IP6_IF_IN) printf("IP6_IF_IN ");
-	if (e->nfcache & NFC_IP6_IF_OUT) printf("IP6_IF_OUT ");
-	if (e->nfcache & NFC_IP6_TOS) printf("IP6_TOS ");
-	if (e->nfcache & NFC_IP6_PROTO) printf("IP6_PROTO ");
-	if (e->nfcache & NFC_IP6_OPTIONS) printf("IP6_OPTIONS ");
-	if (e->nfcache & NFC_IP6_TCPFLAGS) printf("IP6_TCPFLAGS ");
-	if (e->nfcache & NFC_IP6_SRC_PT) printf("IP6_SRC_PT ");
-	if (e->nfcache & NFC_IP6_DST_PT) printf("IP6_DST_PT ");
-	if (e->nfcache & NFC_IP6_PROTO_UNKNOWN) printf("IP6_PROTO_UNKNOWN ");
 	printf("\n");
 	
 	IP6T_MATCH_ITERATE(e, print_match);

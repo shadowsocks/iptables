@@ -47,13 +47,6 @@ static struct option opts[] = {
 	{0}
 };
 
-/* Initialize the match. */
-static void
-init(struct ipt_entry_match *m, unsigned int *nfcache)
-{
-	*nfcache |= NFC_IP_TOS;
-}
-
 static void
 parse_tos(const unsigned char *s, struct ipt_tos_info *info)
 {
@@ -166,7 +159,6 @@ static struct iptables_match tos = {
 	.size		= IPT_ALIGN(sizeof(struct ipt_tos_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_tos_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

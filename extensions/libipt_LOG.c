@@ -50,8 +50,6 @@ init(struct ipt_entry_target *t, unsigned int *nfcache)
 
 	loginfo->level = LOG_DEFAULT_LEVEL;
 
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 struct ipt_log_names {

@@ -29,13 +29,6 @@ static struct option opts[] = {
 	{0}
 };
 
-/* Initialize the match. */
-static void
-init(struct ipt_entry_match *m, unsigned int *nfcache)
-{
-	*nfcache |= NFC_UNKNOWN;
-}
-
 static void
 parse_comment(const unsigned char *s, struct ipt_comment_info *info)
 {	
@@ -113,7 +106,6 @@ static struct iptables_match comment = {
     .size 		= IPT_ALIGN(sizeof(struct ipt_comment_info)),
     .userspacesize	= IPT_ALIGN(sizeof(struct ipt_comment_info)),
     .help		= &help,
-    .init 		= &init,
     .parse 		= &parse,
     .final_check 	= &final_check,
     .print 		= &print,

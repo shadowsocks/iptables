@@ -140,7 +140,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		proto = check_proto(entry);
 		parse_multi_ports(argv[optind-1], minfo, proto);
 		minfo->flags = IPT_MPORT_SOURCE;
-		*nfcache |= NFC_IP_SRC_PT;
 		break;
 
 	case '2':
@@ -148,7 +147,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		proto = check_proto(entry);
 		parse_multi_ports(argv[optind-1], minfo, proto);
 		minfo->flags = IPT_MPORT_DESTINATION;
-		*nfcache |= NFC_IP_DST_PT;
 		break;
 
 	case '3':
@@ -156,7 +154,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		proto = check_proto(entry);
 		parse_multi_ports(argv[optind-1], minfo, proto);
 		minfo->flags = IPT_MPORT_EITHER;
-		*nfcache |= NFC_IP_SRC_PT | NFC_IP_DST_PT;
 		break;
 
 	default:

@@ -187,7 +187,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			tcpinfo->invflags |= IP6T_TCP_INV_SRCPT;
 		*flags |= TCP_SRC_PORTS;
-		*nfcache |= NFC_IP6_SRC_PT;
 		break;
 
 	case '2':
@@ -199,7 +198,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			tcpinfo->invflags |= IP6T_TCP_INV_DSTPT;
 		*flags |= TCP_DST_PORTS;
-		*nfcache |= NFC_IP6_DST_PT;
 		break;
 
 	case '3':
@@ -209,7 +207,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 				   " allowed");
 		parse_tcp_flags(tcpinfo, "SYN,RST,ACK", "SYN", invert);
 		*flags |= TCP_FLAGS;
-		*nfcache |= NFC_IP6_TCPFLAGS;
 		break;
 
 	case '4':
@@ -228,7 +225,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 				invert);
 		optind++;
 		*flags |= TCP_FLAGS;
-		*nfcache |= NFC_IP6_TCPFLAGS;
 		break;
 
 	case '5':
@@ -240,7 +236,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			tcpinfo->invflags |= IP6T_TCP_INV_OPTION;
 		*flags |= TCP_OPTION;
-		*nfcache |= NFC_IP6_PROTO_UNKNOWN;
 		break;
 
 	default:

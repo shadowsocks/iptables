@@ -25,14 +25,6 @@ static struct option opts[] = {
 	{0}
 };
 
-/* Initialize the match. */
-static void
-init(struct ip6t_entry_match *m, unsigned int *nfcache)
-{
-	/* Can't cache this. */
-	*nfcache |= NFC_UNKNOWN;
-}
-
 /* Function which parses command options; returns true if it
    ate an option */
 static int
@@ -137,7 +129,6 @@ static struct ip6tables_match mark = {
 	.size		= IP6T_ALIGN(sizeof(struct ip6t_mark_info)),
 	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_mark_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

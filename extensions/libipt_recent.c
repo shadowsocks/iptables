@@ -72,7 +72,6 @@ init(struct ipt_entry_match *match, unsigned int *nfcache)
 {
 	struct ipt_recent_info *info = (struct ipt_recent_info *)(match)->data;
 
-	*nfcache |= NFC_UNKNOWN;
 
 	strncpy(info->name,"DEFAULT",IPT_RECENT_NAME_LEN);
 	/* eventhough IPT_RECENT_NAME_LEN is currently defined as 200,

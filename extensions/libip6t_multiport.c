@@ -117,7 +117,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		multiinfo->count = parse_multi_ports(argv[optind-1],
 						     multiinfo->ports, proto);
 		multiinfo->flags = IP6T_MULTIPORT_SOURCE;
-		*nfcache |= NFC_IP6_SRC_PT;
 		break;
 
 	case '2':
@@ -126,7 +125,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		multiinfo->count = parse_multi_ports(argv[optind-1],
 						     multiinfo->ports, proto);
 		multiinfo->flags = IP6T_MULTIPORT_DESTINATION;
-		*nfcache |= NFC_IP6_DST_PT;
 		break;
 
 	case '3':
@@ -135,7 +133,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		multiinfo->count = parse_multi_ports(argv[optind-1],
 						     multiinfo->ports, proto);
 		multiinfo->flags = IP6T_MULTIPORT_EITHER;
-		*nfcache |= NFC_IP6_SRC_PT | NFC_IP6_DST_PT;
 		break;
 
 	default:

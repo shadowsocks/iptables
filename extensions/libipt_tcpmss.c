@@ -24,13 +24,6 @@ static struct option opts[] = {
 	{0}
 };
 
-/* Initialize the match. */
-static void
-init(struct ipt_entry_match *m, unsigned int *nfcache)
-{
-	*nfcache |= NFC_IP_PROTO_UNKNOWN;
-}
-
 static u_int16_t
 parse_tcp_mssvalue(const char *mssvalue)
 {
@@ -146,7 +139,6 @@ static struct iptables_match tcpmss = {
 	.size		= IPT_ALIGN(sizeof(struct ipt_tcpmss_match_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_tcpmss_match_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

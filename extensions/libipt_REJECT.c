@@ -94,8 +94,6 @@ init(struct ipt_entry_target *t, unsigned int *nfcache)
 	/* default */
 	reject->with = IPT_ICMP_PORT_UNREACHABLE;
 
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 /* Function which parses command options; returns true if it

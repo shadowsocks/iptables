@@ -81,8 +81,6 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 	parse_rate(IPT_LIMIT_AVG, &r->avg);
 	r->burst = IPT_LIMIT_BURST;
 
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 /* FIXME: handle overflow:

@@ -51,8 +51,6 @@ static void init(struct ipt_entry_target *target, unsigned int *nfcache)
 	info->add_set.index =
 	info->del_set.index = IP_SET_INVALID_ID;
 
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 static void

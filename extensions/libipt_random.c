@@ -51,7 +51,6 @@ static void
 init(struct ipt_entry_match *m, unsigned int *nfcache)
 {
 	struct ipt_rand_info *randinfo = (struct ipt_rand_info *)(m)->data;
-	*nfcache |= NFC_UNKNOWN;
 
 	/* We assign the average to be 50 which is our default value */
 	/* 50 * 2.55 = 128 */

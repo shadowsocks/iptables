@@ -81,8 +81,6 @@ init(struct ip6t_entry_match *m, unsigned int *nfcache)
 	parse_rate(IP6T_LIMIT_AVG, &r->avg);
 	r->burst = IP6T_LIMIT_BURST;
 
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 /* FIXME: handle overflow:

@@ -28,14 +28,6 @@ static struct option opts[] = {
 	{0}
 };
 
-/* Initialize the match. */
-static void
-init(struct ip6t_entry_match *m, unsigned int *nfcache)
-{
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
-}
-
 static void
 parse_mac(const char *mac, struct ip6t_mac_info *info)
 {
@@ -134,7 +126,6 @@ static struct ip6tables_match mac = {
 	.size		= IP6T_ALIGN(sizeof(struct ip6t_mac_info)),
 	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_mac_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

@@ -149,17 +149,6 @@ dump_entry(STRUCT_ENTRY *e, const TC_HANDLE_T handle)
 	printf("Cache: %08X ", e->nfcache);
 	if (e->nfcache & NFC_ALTERED) printf("ALTERED ");
 	if (e->nfcache & NFC_UNKNOWN) printf("UNKNOWN ");
-	if (e->nfcache & NFC_IP_SRC) printf("IP_SRC ");
-	if (e->nfcache & NFC_IP_DST) printf("IP_DST ");
-	if (e->nfcache & NFC_IP_IF_IN) printf("IP_IF_IN ");
-	if (e->nfcache & NFC_IP_IF_OUT) printf("IP_IF_OUT ");
-	if (e->nfcache & NFC_IP_TOS) printf("IP_TOS ");
-	if (e->nfcache & NFC_IP_PROTO) printf("IP_PROTO ");
-	if (e->nfcache & NFC_IP_OPTIONS) printf("IP_OPTIONS ");
-	if (e->nfcache & NFC_IP_TCPFLAGS) printf("IP_TCPFLAGS ");
-	if (e->nfcache & NFC_IP_SRC_PT) printf("IP_SRC_PT ");
-	if (e->nfcache & NFC_IP_DST_PT) printf("IP_DST_PT ");
-	if (e->nfcache & NFC_IP_PROTO_UNKNOWN) printf("IP_PROTO_UNKNOWN ");
 	printf("\n");
 
 	IPT_MATCH_ITERATE(e, print_match);

@@ -56,8 +56,6 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 	psdinfo->delay_threshold = SCAN_DELAY_THRESHOLD;
 	psdinfo->lo_ports_weight = PORT_WEIGHT_PRIV;
 	psdinfo->hi_ports_weight = PORT_WEIGHT_HIGH;
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 

@@ -48,12 +48,6 @@ static void help(void)
 	help_types();
 }
 
-static void init(struct ipt_entry_match *m, unsigned int *nfcache)
-{
-	/* caching not yet implemented */
-	*nfcache |= NFC_UNKNOWN;
-}
-
 static int
 parse_type(const char *name, size_t strlen, u_int16_t *mask)
 {
@@ -199,7 +193,6 @@ struct iptables_match addrtype = {
 	.size 		= IPT_ALIGN(sizeof(struct ipt_addrtype_info)),
 	.userspacesize 	= IPT_ALIGN(sizeof(struct ipt_addrtype_info)),
 	.help 		= &help,
-	.init 		= &init,
 	.parse 		= &parse,
 	.final_check 	= &final_check,
 	.print 		= &print,

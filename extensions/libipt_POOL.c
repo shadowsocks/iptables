@@ -51,8 +51,6 @@ init(struct ipt_entry_target *target, unsigned int *nfcache)
 	ipi->src = ipi->dst = IP_POOL_NONE;
 	ipi->flags = 0;
 
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 /* Function which parses command options; returns true if it

@@ -179,7 +179,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		multiinfo->count = parse_multi_ports(argv[optind-1],
 						     multiinfo->ports, proto);
 		multiinfo->flags = IPT_MULTIPORT_SOURCE;
-		*nfcache |= NFC_IP_SRC_PT;
 		break;
 
 	case '2':
@@ -188,7 +187,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		multiinfo->count = parse_multi_ports(argv[optind-1],
 						     multiinfo->ports, proto);
 		multiinfo->flags = IPT_MULTIPORT_DESTINATION;
-		*nfcache |= NFC_IP_DST_PT;
 		break;
 
 	case '3':
@@ -197,7 +195,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		multiinfo->count = parse_multi_ports(argv[optind-1],
 						     multiinfo->ports, proto);
 		multiinfo->flags = IPT_MULTIPORT_EITHER;
-		*nfcache |= NFC_IP_SRC_PT | NFC_IP_DST_PT;
 		break;
 
 	default:
@@ -231,7 +228,6 @@ parse_v1(int c, char **argv, int invert, unsigned int *flags,
 		proto = check_proto(entry);
 		parse_multi_ports_v1(argv[optind-1], multiinfo, proto);
 		multiinfo->flags = IPT_MULTIPORT_SOURCE;
-		*nfcache |= NFC_IP_SRC_PT;
 		break;
 
 	case '2':
@@ -239,7 +235,6 @@ parse_v1(int c, char **argv, int invert, unsigned int *flags,
 		proto = check_proto(entry);
 		parse_multi_ports_v1(argv[optind-1], multiinfo, proto);
 		multiinfo->flags = IPT_MULTIPORT_DESTINATION;
-		*nfcache |= NFC_IP_DST_PT;
 		break;
 
 	case '3':
@@ -247,7 +242,6 @@ parse_v1(int c, char **argv, int invert, unsigned int *flags,
 		proto = check_proto(entry);
 		parse_multi_ports_v1(argv[optind-1], multiinfo, proto);
 		multiinfo->flags = IPT_MULTIPORT_EITHER;
-		*nfcache |= NFC_IP_SRC_PT | NFC_IP_DST_PT;
 		break;
 
 	default:

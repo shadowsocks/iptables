@@ -105,8 +105,6 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 	r->cfg.gc_interval = IPT_DSTLIMIT_GCINTERVAL;
 	r->cfg.expire = IPT_DSTLIMIT_EXPIRE;
 
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 #define PARAM_LIMIT		0x00000001

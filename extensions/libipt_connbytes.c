@@ -27,14 +27,6 @@ static struct option opts[] = {
 	{0}
 };
 
-/* Initialize the match. */
-static void
-init(struct ipt_entry_match *m, unsigned int *nfcache)
-{
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
-}
-
 static void
 parse_range(const char *arg, struct ipt_connbytes_info *si)
 {
@@ -199,7 +191,6 @@ static struct iptables_match state = {
 	.size 		= IPT_ALIGN(sizeof(struct ipt_connbytes_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_connbytes_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

@@ -42,8 +42,6 @@ init(struct ip6t_entry_target *t, unsigned int *nfcache)
 
 	loginfo->level = LOG_DEFAULT_LEVEL;
 
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 struct ip6t_log_names {

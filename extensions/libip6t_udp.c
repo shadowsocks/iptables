@@ -109,7 +109,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			udpinfo->invflags |= IP6T_UDP_INV_SRCPT;
 		*flags |= UDP_SRC_PORTS;
-		*nfcache |= NFC_IP6_SRC_PT;
 		break;
 
 	case '2':
@@ -121,7 +120,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			udpinfo->invflags |= IP6T_UDP_INV_DSTPT;
 		*flags |= UDP_DST_PORTS;
-		*nfcache |= NFC_IP6_DST_PT;
 		break;
 
 	default:

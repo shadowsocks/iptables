@@ -24,12 +24,6 @@ static void help(void)
 , IPTABLES_VERSION);
 }
 
-static void init(struct ipt_entry_match *m, unsigned int *nfcache)
-{
-	/* caching not yet implemented */
-	*nfcache |= NFC_UNKNOWN;
-}
-
 static int parse(int c, char **argv, int invert, unsigned int *flags,
 		const struct ipt_entry *entry, unsigned int *nfcache,
 		struct ipt_entry_match **match)
@@ -156,7 +150,6 @@ static struct iptables_match ttl = {
 	.size		= IPT_ALIGN(sizeof(struct ipt_ttl_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_ttl_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

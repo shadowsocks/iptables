@@ -162,8 +162,6 @@ init(struct ip6t_entry_match *m, unsigned int *nfcache)
 	info->matchflags = 0x00;
 	info->invflags = 0x00;
 	info->modeflag = 0x00;
-	/* No caching (yet) */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 static unsigned int

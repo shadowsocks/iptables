@@ -70,18 +70,6 @@ static const struct option opts[] =
  * our own private data structure (which is at t->data).
  * Probably we could fiddle with t->tflags too but there is
  * no great advantage in doing so.
- * 
- * TODO: Find documentation for the above flags which
- *       can be ored into nfcache...
- *
- * NFC_IP6_DST_PT
- * NFC_IP6_PROTO_UNKNOWN
- * NFC_IP6_SRC_PT
- * NFC_IP6_TCPFLAGS
- * NFC_IP_DST_PT
- * NFC_IP_SRC_PT
- * NFC_IP_TOS
- * NFC_UNKNOWN             -- This one seems safest
  */
 static void init( struct ipt_entry_target *t, unsigned int *nfcache )
 {
@@ -89,7 +77,6 @@ static void init( struct ipt_entry_target *t, unsigned int *nfcache )
 	memset( el, 0, sizeof( struct ipt_tcplag ));
 	el->level = 4; /* Default to warning level */
 	strcpy( el->prefix, "TCPLAG:" ); /* Give a reasonable default prefix */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 /*

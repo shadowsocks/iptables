@@ -54,13 +54,6 @@ static struct option opts[] = {
 	{ .name = 0 }
 };
 
-
-static void init(struct ipt_entry_match *m, unsigned int *nfcache)
-{
-	*nfcache |= NFC_UNKNOWN;
-}
-
-
 static void parse_string(const unsigned char *s, struct ipt_osf_info *info)
 {
 	if (strlen(s) < MAXGENRELEN) 
@@ -142,7 +135,6 @@ static struct iptables_match osf_match = {
     .size          = IPT_ALIGN(sizeof(struct ipt_osf_info)),
     .userspacesize = IPT_ALIGN(sizeof(struct ipt_osf_info)),
     .help          = &help,
-    .init          = &init,
     .parse         = &parse,
     .final_check   = &final_check,
     .print         = &print,

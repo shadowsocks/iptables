@@ -47,8 +47,6 @@ static void init(struct ipt_entry_match *match, unsigned int *nfcache)
 
 	memset(info, 0, sizeof(struct ipt_set_info_match));
 
-	/* Can't cache this - XXX */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 /* Function which parses command options; returns true if it ate an option */

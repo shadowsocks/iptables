@@ -60,8 +60,6 @@ static void init(struct ipt_entry_target *t, unsigned int *nfcache)
 	loginfo->nl_group = ULOG_DEFAULT_NLGROUP;
 	loginfo->qthreshold = ULOG_DEFAULT_QTHRESHOLD;
 
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 #define IPT_LOG_OPT_NLGROUP 0x01

@@ -25,13 +25,6 @@ static struct option opts[] = {
 	{0}
 };
 
-/* Initialize the match. */
-static void
-init(struct ipt_entry_match *m, unsigned int *nfcache)
-{
-	*nfcache |= NFC_UNKNOWN;
-}
-
 static u_int16_t
 parse_length(const char *s)
 {
@@ -145,7 +138,6 @@ static struct iptables_match length = {
 	.size		= IPT_ALIGN(sizeof(struct ipt_length_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_length_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

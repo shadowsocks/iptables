@@ -13,11 +13,6 @@
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
 
-static void init(struct ipt_entry_target *t, unsigned int *nfcache) 
-{
-        *nfcache |= NFC_UNKNOWN;
-}
-
 static void help(void) 
 {
 	printf("IPV4OPTSSTRIP v%s target takes no option !! Make sure you use it in the mangle table.\n",
@@ -66,7 +61,6 @@ static struct iptables_target IPV4OPTSSTRIP = {
 	.size		= IPT_ALIGN(0),
 	.userspacesize	= IPT_ALIGN(0),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

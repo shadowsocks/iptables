@@ -79,8 +79,6 @@ init(struct ip6t_entry_target *t, unsigned int *nfcache)
 	/* default */
 	reject->with = IP6T_ICMP6_PORT_UNREACH;
 
-	/* Can't cache this */
-	*nfcache |= NFC_UNKNOWN;
 }
 
 /* Function which parses command options; returns true if it

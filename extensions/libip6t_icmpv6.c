@@ -90,7 +90,7 @@ static struct option opts[] = {
 	{0}
 };
 
-static unsigned int
+static void
 parse_icmpv6(const char *icmpv6type, u_int8_t *type, u_int8_t code[])
 {
 	unsigned int limit = sizeof(icmpv6_codes)/sizeof(struct icmpv6_names);
@@ -141,10 +141,6 @@ parse_icmpv6(const char *icmpv6type, u_int8_t *type, u_int8_t code[])
 			code[1] = 0xFF;
 		}
 	}
-
-	if (code[0] == 0 && code[1] == 0xFF)
-		return NFC_IP6_SRC_PT;
-	else return NFC_IP6_SRC_PT | NFC_IP6_DST_PT;
 }
 
 /* Initialize the match. */
@@ -169,9 +165,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		check_inverse(optarg, &invert, &optind, 0);
-		*nfcache |= parse_icmpv6(argv[optind-1],
-				       &icmpv6info->type,
-				       icmpv6info->code);
+		parse_icmpv6(argv[optind-1], &icmpv6info->type, 
+			     icmpv6info->code);
 		if (invert)
 			icmpv6info->invflags |= IP6T_ICMP_INV;
 		break;

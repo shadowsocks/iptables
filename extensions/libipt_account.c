@@ -168,7 +168,6 @@ static void init(struct ipt_entry_match *match,
 	
 	struct t_ipt_account_info *info = (struct t_ipt_account_info *)(match)->data;
 
-	*nfcache |= NFC_UNKNOWN;
 
 	/* set default table name to DEFAULT */
 	strncpy(info->name, "DEFAULT", IPT_ACCOUNT_NAME_LEN);

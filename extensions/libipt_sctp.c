@@ -293,7 +293,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			einfo->invflags |= IPT_SCTP_SRC_PORTS;
 		*flags |= IPT_SCTP_SRC_PORTS;
-		*nfcache |= NFC_IP_SRC_PT;
 		break;
 
 	case '2':
@@ -306,7 +305,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			einfo->invflags |= IPT_SCTP_DEST_PORTS;
 		*flags |= IPT_SCTP_DEST_PORTS;
-		*nfcache |= NFC_IP_DST_PT;
 		break;
 
 	case '3':

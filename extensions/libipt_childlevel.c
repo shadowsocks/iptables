@@ -39,12 +39,6 @@ static struct option opts[] = {
 	{ .name = 0 }
 };
 
-/* Initialize the match. */
-static void init(struct ipt_entry_match *m, unsigned int *nfcache)
-{
-	*nfcache |= NFC_UNKNOWN;
-}
-
 /* Function which parses command options; returns true if it ate an option */
 static int parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry, unsigned int *nfcache,
@@ -108,7 +102,6 @@ static struct iptables_match childlevel = {
 	.size		= IPT_ALIGN(sizeof(struct ipt_childlevel_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_childlevel_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

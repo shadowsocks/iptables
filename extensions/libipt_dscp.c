@@ -24,11 +24,6 @@
 /* This is evil, but it's my code - HW*/
 #include "libipt_dscp_helper.c"
 
-static void init(struct ipt_entry_match *m, unsigned int *nfcache) 
-{
-	*nfcache |= NFC_IP_TOS;
-}
-
 static void help(void) 
 {
 	printf(
@@ -164,7 +159,6 @@ static struct iptables_match dscp = {
 	.size 		= IPT_ALIGN(sizeof(struct ipt_dscp_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_dscp_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

@@ -114,7 +114,7 @@ static struct option opts[] = {
 	{0}
 };
 
-static unsigned int
+static void 
 parse_icmp(const char *icmptype, u_int8_t *type, u_int8_t code[])
 {
 	unsigned int limit = sizeof(icmp_codes)/sizeof(struct icmp_names);
@@ -165,10 +165,6 @@ parse_icmp(const char *icmptype, u_int8_t *type, u_int8_t code[])
 			code[1] = 0xFF;
 		}
 	}
-
-	if (code[0] == 0 && code[1] == 0xFF)
-		return NFC_IP_SRC_PT;
-	else return NFC_IP_SRC_PT | NFC_IP_DST_PT;
 }
 
 /* Initialize the match. */
@@ -194,9 +190,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		check_inverse(optarg, &invert, &optind, 0);
-		*nfcache |= parse_icmp(argv[optind-1],
-				       &icmpinfo->type,
-				       icmpinfo->code);
+		parse_icmp(argv[optind-1], &icmpinfo->type, 
+			   icmpinfo->code);
 		if (invert)
 			icmpinfo->invflags |= IPT_ICMP_INV;
 		break;

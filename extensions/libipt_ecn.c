@@ -16,11 +16,6 @@
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_ecn.h>
 
-static void init(struct ipt_entry_match *m, unsigned int *nfcache) 
-{
-	*nfcache |= NFC_IP_TOS;
-}
-
 static void help(void) 
 {
 	printf(
@@ -163,7 +158,6 @@ struct iptables_match ecn
     .size          = IPT_ALIGN(sizeof(struct ipt_ecn_info)),
     .userspacesize = IPT_ALIGN(sizeof(struct ipt_ecn_info)),
     .help          = &help,
-    .init          = &init,
     .parse         = &parse,
     .final_check   = &final_check,
     .print         = &print,
