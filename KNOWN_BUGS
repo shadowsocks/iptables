@@ -1,8 +1,8 @@
 Known bugs:
 
-1) NAT in the OUTPUT chain does not work in general.  The fix is
-   intrusive, and means we will have a CONFIG_NF_IP_NAT_LOCAL option
-   when it comes back.
+1) NAT in the OUTPUT chain does not work in stock kernels.  However,
+   there is a patch in patch-o-matic, called the 'local-nat.patch'. 
+   This patch adds a CONFIG_NF_IP_NAT_LOCAL kernel config option.
 
 2) tcpdump traffic is corrupted by OUTPUT NAT.
 
