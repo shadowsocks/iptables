@@ -1,3 +1,13 @@
+/* Copyright (C) 2000-2002 Joakim Axelsson <gozem@linux.nu>
+ *                         Patrick Schaaf <bof@bof.de>
+ *                         Martin Josefsson <gandalf@wlug.westbo.se>
+ * Copyright (C) 2003-2004 Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.  
+ */
+
 /* Shared library add-on to iptables to add IP set mangling target. */
 #include <stdio.h>
 #include <netdb.h>
@@ -11,14 +21,14 @@
 #include <linux/netfilter_ipv4/ip_nat_rule.h>
 #include <linux/netfilter_ipv4/ip_set.h>
 #include <linux/netfilter_ipv4/ipt_set.h>
-#include "../ipset/libipt_set.h"
+#include "libipt_set.h"
 
 /* Function which prints out usage message. */
 static void help(void)
 {
 	printf("SET v%s options:\n"
-	       " --add-set name[:flags] flags\n"
-	       " --del-set name[:flags] flags\n"
+	       " --add-set name flags\n"
+	       " --del-set name flags\n"
 	       "		add/del src/dst IP/port from/to named sets,\n"
 	       "		where flags are the comma separated list of\n"
 	       "		'src' and 'dst'.\n"
@@ -38,11 +48,40 @@ static void init(struct ipt_entry_target *target, unsigned int *nfcache)
 	    (struct ipt_set_info_target *) target->data;
 
 	memset(info, 0, sizeof(struct ipt_set_info_target));
-	info->add_set.id = -1;
-	info->del_set.id = -1;
+	info->add_set.index =
+	info->del_set.index = IP_SET_INVALID_ID;
 
 	/* Can't cache this */
 	*nfcache |= NFC_UNKNOWN;
+}
+
+static void
+parse_target(char **argv, int invert, unsigned int *flags,
+             struct ipt_set_info *info, const char *what)
+{
+	if (info->flags[0])
+		exit_error(PARAMETER_PROBLEM,
+			   "--%s can be specified only once", what);
+
+	if (check_inverse(optarg, &invert, NULL, 0))
+		exit_error(PARAMETER_PROBLEM,
+			   "Unexpected `!' after --%s", what);
+
+	if (!argv[optind]
+	    || argv[optind][0] == '-' || argv[optind][0] == '!')
+		exit_error(PARAMETER_PROBLEM,
+			   "--%s requires two args.", what);
+
+	if (strlen(argv[optind-1]) > IP_SET_MAXNAMELEN - 1)
+		exit_error(PARAMETER_PROBLEM,
+			   "setname `%s' too long, max %d characters.",
+			   argv[optind-1], IP_SET_MAXNAMELEN - 1);
+
+	get_set_byname(argv[optind - 1], info);
+	parse_bindings(argv[optind], info);
+	optind++;
+	
+	*flags = 1;
 }
 
 /* Function which parses command options; returns true if it
@@ -53,44 +92,15 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 {
 	struct ipt_set_info_target *myinfo =
 	    (struct ipt_set_info_target *) (*target)->data;
-	struct ipt_set_info *info;
 
 	switch (c) {
-	case '1':		/* --add-set <set>[:<flags>] <flags> */
-		info = &myinfo->add_set;
-
-		if (check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
-				   "Unexpected `!' after --add-set");
-
-		if (!argv[optind]
-		    || argv[optind][0] == '-' || argv[optind][0] == '!')
-			exit_error(PARAMETER_PROBLEM,
-				   "--add-set requires two args.");
-
-		parse_pool(argv[optind - 1], info);
-		parse_ipflags(argv[optind++], info);
-		
-		*flags = 1;
+	case '1':		/* --add-set <set> <flags> */
+		parse_target(argv, invert, flags,
+			     &myinfo->add_set, "add-set");
 		break;
 	case '2':		/* --del-set <set>[:<flags>] <flags> */
-		info = &myinfo->del_set;
-
-		if (check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
-				   "Unexpected `!' after --del-set");
-
-		if (!argv[optind]
-		    || argv[optind][0] == '-' || argv[optind][0] == '!')
-			exit_error(PARAMETER_PROBLEM,
-				   "--del-set requires two args.");
-
-		parse_pool(argv[optind - 1], info);
-		if (parse_ipflags(argv[optind++], info))
-			exit_error(PARAMETER_PROBLEM,
-				   "Can't use overwrite flag with --del-set.");
-		
-		*flags = 1;
+		parse_target(argv, invert, flags,
+			     &myinfo->del_set, "del-set");
 		break;
 
 	default:
@@ -112,21 +122,17 @@ print_target(const char *prefix, const struct ipt_set_info *info)
 {
 	int i;
 	char setname[IP_SET_MAXNAMELEN];
-
-	if (info->id >= 0) {
-		get_set_byid(setname, info->id);
-		printf("%s %s", prefix, setname);
-		for (i = 0; i < info->set_level; i++)
-			printf("%s%s",
-			       i == 0 ? ":" : ",",
-			       info->flags[i] & IPSET_SRC ? "src" : "dst");
-		for (i = info->set_level; i < info->ip_level; i++)
-			printf("%s%s%s",
-			       i == info->set_level ? " " : ",",
-			       info->flags[i] & IPSET_ADD_OVERWRITE ? "+" : "",
-			       info->flags[i] & IPSET_SRC ? "src" : "dst");
-		printf(" ");
+	
+	get_set_byid(setname, info->index);
+	printf("%s %s", prefix, setname);
+	for (i = 0; i < IP_SET_MAX_BINDINGS; i++) {
+		if (!info->flags[i])
+			break;		
+		printf("%s%s",
+		       i == 0 ? " " : ",",
+		       info->flags[i] & IPSET_SRC ? "src" : "dst");
 	}
+	printf(" ");
 }
 
 /* Prints out the targinfo. */
