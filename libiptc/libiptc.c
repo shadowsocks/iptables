@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.49 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.50 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -498,6 +498,9 @@ new_rule:
 				 * until second pass, since we migh not
 				 * yet have parsed the target */
 			}
+		} else {
+			DEBUGP_C("module, target=%s\n", GET_TARGET(e)->u.user.name);
+			r->type = IPTCC_R_MODULE;
 		}
 
 		list_add_tail(&r->list, &h->chain_iterator_cur->rules);
