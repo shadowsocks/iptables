@@ -5,13 +5,14 @@
 #define _IP_QUEUE_H
 
 #include <net/if.h>
+#include <sys/types.h>
 
 /* Messages sent from kernel */
 typedef struct ipq_packet_msg {
 	u_int64_t packet_id;	/* ID of queued packet */
 	u_int64_t mark;		/* Netfilter mark value */
-	s_int64_t timestamp_sec;	/* Packet arrival time (seconds) */
-	s_int64_t timestamp_usec;	/* Packet arrvial time (+useconds) */
+	int64_t timestamp_sec;	/* Packet arrival time (seconds) */
+	int64_t timestamp_usec;	/* Packet arrvial time (+useconds) */
 	unsigned int hook;		/* Netfilter hook we rode in on */
 	char indev_name[IFNAMSIZ];	/* Name of incoming interface */
 	char outdev_name[IFNAMSIZ];	/* Name of outgoing interface */
