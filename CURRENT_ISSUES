@@ -15,8 +15,6 @@ SLOG target
 	- needs to be integrated with recent nfnetlink/ctnetlink
 loop detection / nf_hipac (mail from dec 15
 	- need time
-reject --with-admin-prohibited
-	- most compatible version needs to be used
 IPv6 REJECT target fix
 	- important, it's a pity that it's still broken
 bi-directional ftp state tracking
@@ -28,9 +26,5 @@ expectations allegedly don't work on sparc64
 	- is this in bugzilla yet?
 new bytelimit match
 	- unify it with 'limit' for 2.5.x
-new hash (abcdx/...) for conntrack
-	- put patch in p-o-m, do testing, submit to kernel
-PPTP reverse key lookup <3E40CA1F.1080205@snapgear.com>
-	- ?
 boolean MARK operations
 	- patch by Anders Fugmann, needs 64bit testing

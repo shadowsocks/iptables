@@ -235,6 +235,7 @@ static const struct pprot chain_protos[] = {
 	{ "icmp", IPPROTO_ICMP },
 	{ "esp", IPPROTO_ESP },
 	{ "ah", IPPROTO_AH },
+	{ "sctp", IPPROTO_SCTP },
 	{ "all", 0 },
 };
 

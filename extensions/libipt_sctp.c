@@ -17,25 +17,41 @@
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_sctp.h>
 
+#if 0
+#define DEBUGP(format, first...) printf(format, ##first)
+#define static
+#else
+#define DEBUGP(format, fist...) 
+#endif
+
+/*static void
+print_chunks(u_int32_t chunk_match_type, const u_int32_t *chunkmap, int numeric);*/
+
 /* Initialize the match. */
 static void
-init(struct ipt_entry_match *m, unsigned int *nfcache)
+init(struct ipt_entry_match *m, 
+     unsigned int *nfcache)
 {
 	struct ipt_sctp_info *einfo = (struct ipt_sctp_info *)m->data;
 
+	einfo->flags = einfo->invflags = 0;
+
+	/*einfo->spts[0] = einfo->dpts[0] = 0;
 	einfo->spts[1] = einfo->dpts[1] = 0xFFFF;
+	SCTP_CHUNKMAP_RESET(einfo->chunkmap);*/
 }
 
-static void help(void) 
+static void help(void)
 {
 	printf(
 "SCTP match v%s options\n"
-" --sctp-chunks [!] mask comp	match when SCTP chunks & mask == comp\n"
-" --source-port [!] port[:port]\n"
+" --source-port [!] port[:port]                          match source port(s)\n"
 " --sport ...\n"
-"                               match source port(s)"
-" --destination-port [!] port[:port]\n"
-" --dport ...\n\n",
+" --destination-port [!] port[:port]                     match destination port(s)\n"
+" --dport ...\n" 
+" --chunk-types [!] (all|any|none) (chunktype[:flags])+	match if all, any or none of\n"
+"						        chunktypes are present\n"
+"chunktypes - DATA INIT INIT_ACK SACK HEARTBEAT HEARTBEAT_ACK ABORT SHUTDOWN SHUTDOWN_ACK ERROR COOKIE_ECHO COOKIE_ACK ECN_ECNE ECN_CWR SHUTDOWN_COMPLETE ASCONF ASCONF_ACK ALL NONE\n",
 	IPTABLES_VERSION);
 }
 
@@ -44,7 +60,7 @@ static struct option opts[] = {
 	{ .name = "sport", .has_arg = 1, .flag = 0, .val = '1' },
 	{ .name = "destination-port", .has_arg = 1, .flag = 0, .val = '2' },
 	{ .name = "dport", .has_arg = 1, .flag = 0, .val = '2' },
-	{ .name = "sctp-chunks", .has_arg = 1, .flag = 0, .val = '3' },
+	{ .name = "chunk-types", .has_arg = 1, .flag = 0, .val = '3' },
 	{ .name = 0 }
 };
 
@@ -64,24 +80,27 @@ parse_sctp_port(const char *port)
 {
 	unsigned int portnum;
 
+	DEBUGP("%s\n", port);
 	if (string_to_number(port, 0, 65535, &portnum) != -1 ||
 	    (portnum = service_to_port(port)) != -1)
 		return (u_int16_t)portnum;
 
 	exit_error(PARAMETER_PROBLEM,
-		   "invalid TCP port/service `%s' specified", port);
+		   "invalid SCTP port/service `%s' specified", port);
 }
 
-
 static void
-parse_sctp_ports(const char *portstring, u_int16_t *ports)
+parse_sctp_ports(const char *portstring, 
+		 u_int16_t *ports)
 {
 	char *buffer;
 	char *cp;
 
 	buffer = strdup(portstring);
-	if ((cp = strchr(buffer, ':')) == NULL)
+	DEBUGP("%s\n", portstring);
+	if ((cp = strchr(buffer, ':')) == NULL) {
 		ports[0] = ports[1] = parse_sctp_port(buffer);
+	}
 	else {
 		*cp = '\0';
 		cp++;
@@ -98,51 +117,62 @@ parse_sctp_ports(const char *portstring, u_int16_t *ports)
 
 struct sctp_chunk_names {
 	const char *name;
-	unsigned int flag;
+	unsigned int chunk_type;
 };
 
-/* FIXME: */
-#define ALL_CHUNKS	0xabcdef
+/*'ALL' and 'NONE' will be treated specially. */
 static struct sctp_chunk_names sctp_chunk_names[]
-= { { .name = "DATA", 		.flag = (1 << 0) },
-    { .name = "INIT", 		.flag = (1 << 1) },
-    { .name = "INIT_ACK", 	.flag = (1 << 2) },
-    { .name = "SACK",		.flag = (1 << 3) },
-    { .name = "HEARTBEAT",	.flag = (1 << 4) },
-    { .name = "HEARTBEAT_ACK",	.flag = (1 << 5) },
-    { .name = "ABORT",		.flag = (1 << 6) },
-    { .name = "SHUTDOWN",	.flag = (1 << 7) },
-    { .name = "SHUTDOWN_ACK",	.flag = (1 << 8) },
-    { .name = "ERROR",		.flag = (1 << 9) },
-    { .name = "COOKIE_ECHO",	.flag = (1 << 10) },
-    { .name = "COOKIE_ACK",	.flag = (1 << 11) },
-    { .name = "ECN_ECNE",	.flag = (1 << 12) },
-    { .name = "ECN_CWR",	.flag = (1 << 13) },
-    { .name = "SHUTDOWN_COMPLETE", .flag = (1 << 14) },
-    { .name = "ASCONF",		.flag = (1 << 31) },
-    { .name = "ASCONF_ACK",	.flag = (1 << 30) },
-    { .name = "ALL", 		.flag = ALL_CHUNKS },
-    { .name = "NONE",		.flag = 0 },
+= { { .name = "DATA", 		.chunk_type = 0 },
+    { .name = "INIT", 		.chunk_type = 1 },
+    { .name = "INIT_ACK", 	.chunk_type = 2 },
+    { .name = "SACK",		.chunk_type = 3 },
+    { .name = "HEARTBEAT",	.chunk_type = 4 },
+    { .name = "HEARTBEAT_ACK",	.chunk_type = 5 },
+    { .name = "ABORT",		.chunk_type = 6 },
+    { .name = "SHUTDOWN",	.chunk_type = 7 },
+    { .name = "SHUTDOWN_ACK",	.chunk_type = 8 },
+    { .name = "ERROR",		.chunk_type = 9 },
+    { .name = "COOKIE_ECHO",	.chunk_type = 10 },
+    { .name = "COOKIE_ACK",	.chunk_type = 11 },
+    { .name = "ECN_ECNE",	.chunk_type = 12 },
+    { .name = "ECN_CWR",	.chunk_type = 13 },
+    { .name = "SHUTDOWN_COMPLETE", .chunk_type = 14 },
+    { .name = "ASCONF",		.chunk_type = 31 },
+    { .name = "ASCONF_ACK",	.chunk_type = 30 },
 };
 
-
-static unsigned int
-parse_sctp_chunk(const char *flags)
+static void
+parse_sctp_chunk(struct ipt_sctp_info *einfo, 
+		 const char *chunks)
 {
-	unsigned int ret = 0;
 	char *ptr;
 	char *buffer;
+	unsigned int i;
+	int found = 0;
 
-	buffer = strdup(flags);
+	buffer = strdup(chunks);
+	DEBUGP("Buffer: %s\n", buffer);
+
+	SCTP_CHUNKMAP_RESET(einfo->chunkmap);
+
+	if (!strcasecmp(buffer, "ALL")) {
+		SCTP_CHUNKMAP_SET_ALL(einfo->chunkmap);
+		goto out;
+	}
+	
+	if (!strcasecmp(buffer, "NONE")) {
+		SCTP_CHUNKMAP_RESET(einfo->chunkmap);
+		goto out;
+	}
 
 	for (ptr = strtok(buffer, ","); ptr; ptr = strtok(NULL, ",")) {
-		unsigned int i;
-		int found = 0;
-		for (i = 0;
-		     i < sizeof(sctp_chunk_names)/sizeof(struct sctp_chunk_names);
-		     i++) {
+		found = 0;
+		DEBUGP("Next Chunk type %s\n", ptr);
+		for (i = 0; i < ELEMCOUNT(sctp_chunk_names); i++) {
 			if (strcasecmp(sctp_chunk_names[i].name, ptr) == 0) {
-				ret |= sctp_chunk_names[i].flag;
+				DEBUGP("Chunk num %d\n", sctp_chunk_names[i].chunk_type);
+				SCTP_CHUNKMAP_SET(einfo->chunkmap, 
+					sctp_chunk_names[i].chunk_type);
 				found = 1;
 				break;
 			}
@@ -151,27 +181,30 @@ parse_sctp_chunk(const char *flags)
 			exit_error(PARAMETER_PROBLEM,
 				   "Unknown sctp chunk `%s'", ptr);
 	}
-
+out:
 	free(buffer);
-	return ret;
 }
 
 static void
 parse_sctp_chunks(struct ipt_sctp_info *einfo,
-		const char *mask,
-		const char *cmp,
-		int invert)
+		  const char *match_type,
+		  const char *chunks)
 {
-	einfo->chunks = parse_sctp_chunk(mask);
-	einfo->chunk_mask = parse_sctp_chunk(cmp);
+	DEBUGP("Match type: %s Chunks: %s\n", match_type, chunks);
+	if (!strcasecmp(match_type, "ANY")) {
+		einfo->chunk_match_type = SCTP_CHUNK_MATCH_ANY;
+	} else 	if (!strcasecmp(match_type, "ALL")) {
+		einfo->chunk_match_type = SCTP_CHUNK_MATCH_ALL;
+	} else 	if (!strcasecmp(match_type, "ONLY")) {
+		einfo->chunk_match_type = SCTP_CHUNK_MATCH_ONLY;
+	} else {
+		exit_error (PARAMETER_PROBLEM, 
+			"Match type has to be one of \"ALL\", \"ANY\" or \"ONLY\"");
+	}
 
-	if (invert)
-		einfo->invflags |= IPT_SCTP_INV_CHUNKS;
+	SCTP_CHUNKMAP_RESET(einfo->chunkmap);
+	parse_sctp_chunk(einfo, chunks);
 }
-
-#define SCTP_SRC_PORTS	0x01
-#define SCTP_DST_PORTS	0x02
-#define SCTP_CHUNKS	0x03
 
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
@@ -184,48 +217,53 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (*flags & SCTP_SRC_PORTS)
+		if (*flags & IPT_SCTP_SRC_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 			           "Only one `--source-port' allowed");
+		einfo->flags |= IPT_SCTP_SRC_PORTS;
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_sctp_ports(argv[optind-1], einfo->spts);
 		if (invert)
-			einfo->invflags |= IPT_SCTP_INV_SRCPT;
-		*flags |= SCTP_SRC_PORTS;
+			einfo->invflags |= IPT_SCTP_SRC_PORTS;
+		*flags |= IPT_SCTP_SRC_PORTS;
 		*nfcache |= NFC_IP_SRC_PT;
 		break;
 
 	case '2':
-		if (*flags & SCTP_DST_PORTS)
+		if (*flags & IPT_SCTP_DEST_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--destination-port' allowed");
+		einfo->flags |= IPT_SCTP_DEST_PORTS;
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_sctp_ports(argv[optind-1], einfo->dpts);
 		if (invert)
-			einfo->invflags |= IPT_SCTP_INV_DSTPT;
-		*flags |= SCTP_DST_PORTS;
+			einfo->invflags |= IPT_SCTP_DEST_PORTS;
+		*flags |= IPT_SCTP_DEST_PORTS;
 		*nfcache |= NFC_IP_DST_PT;
 		break;
 
 	case '3':
-		if (*flags & SCTP_CHUNKS)
+		if (*flags & IPT_SCTP_CHUNK_TYPES)
 			exit_error(PARAMETER_PROBLEM,
-				   "Only one `--sctp-chunks' allowed");
+				   "Only one `--chunk-types' allowed");
 		check_inverse(optarg, &invert, &optind, 0);
 
 		if (!argv[optind] 
 		    || argv[optind][0] == '-' || argv[optind][0] == '!')
 			exit_error(PARAMETER_PROBLEM,
-				   "--sctp-chunks requires two args");
+				   "--chunk-types requires two args");
 
-		parse_sctp_chunks(einfo, argv[optind-1], argv[optind], invert);
+		einfo->flags |= IPT_SCTP_CHUNK_TYPES;
+		parse_sctp_chunks(einfo, argv[optind-1], argv[optind]);
+		if (invert)
+			einfo->invflags |= IPT_SCTP_CHUNK_TYPES;
 		optind++;
-		*flags |= SCTP_CHUNKS;
+		*flags |= IPT_SCTP_CHUNK_TYPES;
 		break;
+
 	default:
 		return 0;
 	}
-
 	return 1;
 }
 
@@ -278,41 +316,53 @@ print_ports(const char *name, u_int16_t min, u_int16_t max,
 }
 
 static void
-print_chunk(u_int32_t chunks)
+print_chunk(u_int32_t chunknum, int numeric)
 {
-	unsigned int have_flag = 0;
-
-	while (chunks) {
-		unsigned int i;
-
-		for (i = 0; (chunks & sctp_chunk_names[i].flag) == 0; i++);
-
-		if (have_flag)
-			printf(",");
-		printf("%s", sctp_chunk_names[i].name);
-		have_flag = 1;
-
-		chunks &= ~sctp_chunk_names[i].flag;
+	if (numeric) {
+		printf("0x%04X", chunknum);
 	}
-
-	if (!have_flag)
-		printf("NONE");
+	else {
+		printf("%s", sctp_chunk_names[chunknum].name);
+	}
 }
 
 static void
-print_chunks(u_int32_t mask, u_int32_t cmp, int invert, int numeric)
+print_chunks(u_int32_t chunk_match_type, 
+	     const u_int32_t *chunkmap, 
+	     int numeric)
 {
-	if (mask || invert) {
-		printf("flags:%s", invert ? "!" : "");
-		if (numeric)
-			printf("0x%04X/0x%04X ", mask, cmp);
-		else {
-			print_chunk(mask);
-			printf("/");
-			print_chunk(cmp);
-			printf(" ");
+	int i;
+	int flag;
+
+	switch (chunk_match_type) {
+		case SCTP_CHUNK_MATCH_ANY:	printf("any "); break;
+		case SCTP_CHUNK_MATCH_ALL:	printf("all "); break;
+		case SCTP_CHUNK_MATCH_ONLY:	printf("only "); break;
+		default:	printf("Never reach herer\n"); break;
+	}
+
+	if (SCTP_CHUNKMAP_IS_CLEAR(chunkmap)) {
+		printf("NONE ");
+		goto out;
+	}
+	
+	if (SCTP_CHUNKMAP_IS_ALL_SET(chunkmap)) {
+		printf("ALL ");
+		goto out;
+	}
+	
+	flag = 0;
+	for (i = 0; i < 256; i++) {
+		if (SCTP_CHUNKMAP_IS_SET(chunkmap, i)) {
+			flag && printf(",");
+			flag = 1;
+			print_chunk(i, numeric);
 		}
 	}
+
+	flag && printf(" ");
+out:
+	return;
 }
 
 /* Prints out the matchinfo. */
@@ -326,28 +376,38 @@ print(const struct ipt_ip *ip,
 
 	printf("sctp ");
 
-	print_ports("spt", einfo->spts[0], einfo->spts[1],
-		    einfo->invflags & IPT_SCTP_INV_SRCPT,
-		    numeric);
-	print_ports("dpt", einfo->dpts[0], einfo->dpts[1],
-		    einfo->invflags & IPT_SCTP_INV_DSTPT,
-		    numeric);
+	if (einfo->flags & IPT_SCTP_SRC_PORTS) {
+		print_ports("spt", einfo->spts[0], einfo->spts[1],
+			einfo->invflags & IPT_SCTP_SRC_PORTS,
+			numeric);
+	}
 
-	print_chunks(einfo->chunks, einfo->chunk_mask,
-		     einfo->invflags & ~IPT_SCTP_INV_MASK,
-		     numeric);
+	if (einfo->flags & IPT_SCTP_DEST_PORTS) {
+		print_ports("dpt", einfo->dpts[0], einfo->dpts[1],
+			einfo->invflags & IPT_SCTP_DEST_PORTS,
+			numeric);
+	}
+
+	if (einfo->flags & IPT_SCTP_CHUNK_TYPES) {
+		/* FIXME: print_chunks() is used in save() where the printing of '!'
+		s taken care of, so we need to do that here as well */
+		if (einfo->invflags & IPT_SCTP_CHUNK_TYPES) {
+			printf("! ");
+		}
+		print_chunks(einfo->chunk_match_type, einfo->chunkmap, numeric);
+	}
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void
-save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
+save(const struct ipt_ip *ip, 
+     const struct ipt_entry_match *match)
 {
 	const struct ipt_sctp_info *einfo =
 		(const struct ipt_sctp_info *)match->data;
 
-	if (einfo->spts[0] != 0
-	    || einfo->spts[1] != 0xFFFF) {
-		if (einfo->invflags & IPT_SCTP_INV_SRCPT)
+	if (einfo->flags & IPT_SCTP_SRC_PORTS) {
+		if (einfo->invflags & IPT_SCTP_SRC_PORTS)
 			printf("! ");
 		if (einfo->spts[0] != einfo->spts[1])
 			printf("--sport %u:%u ", 
@@ -356,9 +416,8 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 			printf("--sport %u ", einfo->spts[0]);
 	}
 
-	if (einfo->dpts[0] != 0
-	    || einfo->dpts[1] != 0xFFFF) {
-		if (einfo->invflags & IPT_SCTP_INV_DSTPT)
+	if (einfo->flags & IPT_SCTP_DEST_PORTS) {
+		if (einfo->invflags & IPT_SCTP_DEST_PORTS)
 			printf("! ");
 		if (einfo->dpts[0] != einfo->dpts[1])
 			printf("--dport %u:%u ",
@@ -367,17 +426,12 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 			printf("--dport %u ", einfo->dpts[0]);
 	}
 
-	if (einfo->chunks
-	    || (einfo->invflags & IPT_SCTP_INV_CHUNKS)) {
-		if (einfo->invflags & IPT_SCTP_INV_CHUNKS)
+	if (einfo->flags & IPT_SCTP_CHUNK_TYPES) {
+		if (einfo->invflags & IPT_SCTP_CHUNK_TYPES)
 			printf("! ");
-		printf("--sctp-chunks ");
-		if (einfo->chunks != ALL_CHUNKS) {
-			print_chunk(einfo->chunks);
-		}
-		printf(" ");
-		print_chunk(einfo->chunk_mask);
-		printf(" ");
+		printf("--chunk-types ");
+
+		print_chunks(einfo->chunk_match_type, einfo->chunkmap, 0);
 	}
 }
 
@@ -400,3 +454,4 @@ void _init(void)
 {
 	register_match(&sctp);
 }
+
