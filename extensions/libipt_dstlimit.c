@@ -101,9 +101,9 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 {
 	struct ipt_dstlimit_info *r = (struct ipt_dstlimit_info *)m->data;
 
-	r->burst = IPT_DSTLIMIT_BURST;
-	r->gc_interval = IPT_DSTLIMIT_GCINTERVAL;
-	r->expire = IPT_DSTLIMIT_EXPIRE;
+	r->cfg.burst = IPT_DSTLIMIT_BURST;
+	r->cfg.gc_interval = IPT_DSTLIMIT_GCINTERVAL;
+	r->cfg.expire = IPT_DSTLIMIT_EXPIRE;
 
 	/* Can't cache this */
 	*nfcache |= NFC_UNKNOWN;
@@ -135,7 +135,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --dstlimit");
-		if (!parse_rate(optarg, &r->avg))
+		if (!parse_rate(optarg, &r->cfg.avg))
 			exit_error(PARAMETER_PROBLEM,
 				   "bad rate `%s'", optarg);
 		*flags |= PARAM_LIMIT;
@@ -149,7 +149,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (string_to_number(optarg, 0, 10000, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				   "bad --dstlimit-burst `%s'", optarg);
-		r->burst = num;
+		r->cfg.burst = num;
 		*flags |= PARAM_BURST;
 		break;
 	case '&':
@@ -160,7 +160,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				"bad --dstlimit-htable-size: `%s'", optarg);
-		r->size = num;
+		r->cfg.size = num;
 		*flags |= PARAM_SIZE;
 		break;
 	case '*':
@@ -170,7 +170,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				"bad --dstlimit-htable-max: `%s'", optarg);
-		r->max = num;
+		r->cfg.max = num;
 		*flags |= PARAM_MAX;
 		break;
 	case '(':
@@ -182,7 +182,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 				"bad --dstlimit-htable-gcinterval: `%s'", 
 				optarg);
 		/* FIXME: not HZ dependent!! */
-		r->gc_interval = num;
+		r->cfg.gc_interval = num;
 		*flags |= PARAM_GCINTERVAL;
 		break;
 	case ')':
@@ -193,7 +193,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				"bad --dstlimit-htable-expire: `%s'", optarg);
 		/* FIXME: not HZ dependent */
-		r->expire = num;
+		r->cfg.expire = num;
 		*flags |= PARAM_EXPIRE;
 		break;
 	case '_':
@@ -201,13 +201,15 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM, "Unexpected `!' after "
 					"--dstlimit-mode");
 		if (!strcmp(optarg, "dstip"))
-			r->mode = IPT_DSTLIMIT_HASH_DIP;
-		else if (!strcmp(optarg, "dstip-dstport"))
-			r->mode = IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT;
+			r->cfg.mode = IPT_DSTLIMIT_HASH_DIP;
+		else if (!strcmp(optarg, "dstip-destport") ||
+			 !strcmp(optarg, "dstip-dstport"))
+			r->cfg.mode = IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT;
 		else if (!strcmp(optarg, "srcip-dstip"))
-			r->mode = IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP;
-		else if (!strcmp(optarg, "srcip-dstip-dstport"))
-			r->mode = IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT;
+			r->cfg.mode = IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP;
+		else if (!strcmp(optarg, "srcip-dstip-destport") ||
+			 !strcmp(optarg, "srcip-dstip-dstport"))
+			r->cfg.mode = IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT;
 		else
 			exit_error(PARAMETER_PROBLEM, 
 				"bad --dstlimit-mode: `%s'\n", optarg);
@@ -273,9 +275,9 @@ print(const struct ipt_ip *ip,
 {
 	struct ipt_dstlimit_info *r = 
 		(struct ipt_dstlimit_info *)match->data;
-	printf("limit: avg "); print_rate(r->avg);
-	printf("burst %u ", r->burst);
-	switch (r->mode) {
+	printf("limit: avg "); print_rate(r->cfg.avg);
+	printf("burst %u ", r->cfg.burst);
+	switch (r->cfg.mode) {
 		case (IPT_DSTLIMIT_HASH_DIP):
 			printf("mode dstip ");
 			break;
@@ -289,10 +291,10 @@ print(const struct ipt_ip *ip,
 			printf("mode srcip-dstip-dstport ");
 			break;
 	}
-	printf("htable-size %u ", r->size);
-	printf("htable-max %u ", r->max);
-	printf("htable-gcinterval %u ", r->gc_interval);
-	printf("htable-expire %u ", r->expire);
+	printf("htable-size %u ", r->cfg.size);
+	printf("htable-max %u ", r->cfg.max);
+	printf("htable-gcinterval %u ", r->cfg.gc_interval);
+	printf("htable-expire %u ", r->cfg.expire);
 }
 
 /* FIXME: Make minimalist: only print rate if not default --RR */
@@ -301,28 +303,27 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	struct ipt_dstlimit_info *r = 
 		(struct ipt_dstlimit_info *)match->data;
 
-	printf("--dstlimit "); print_rate(r->avg);
-	if (r->burst != IPT_DSTLIMIT_BURST)
-		printf("--dstlimit-burst %u ", r->burst);
-	switch (r->mode) {
+	printf("--limit "); print_rate(r->cfg.avg);
+	if (r->cfg.burst != IPT_DSTLIMIT_BURST)
+		printf("--limit-burst %u ", r->cfg.burst);
+	switch (r->cfg.mode) {
 		case (IPT_DSTLIMIT_HASH_DIP):
-			printf("--dstlimit-mode dstip ");
+			printf("--mode dstip ");
 			break;
 		case (IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT):
-			printf("--dstlimit-mode dstip-dstport ");
+			printf("--mode dstip-dstport ");
 			break;
 		case (IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP):
-			printf("--dstlimit-mode srcip-dstip ");
+			printf("--mode srcip-dstip ");
 			break;
 		case (IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT):
-			printf("--dstlimit-mode srcip-dstip-dstport ");
+			printf("--mode srcip-dstip-dstport ");
 			break;
 	}
-	printf("--dstlimit-htable-size %u ", r->size);
-	printf("--dstlimit-htable-max %u ", r->max);
-	printf("--dstlimit-htable-gcinterval %u ", r->gc_interval);
-	printf("--dstlimit-htable-expire %u ", r->expire);
-	printf("--dstlimit-name %s ", r->name);
+	printf("--dstlimit-htable-size %u ", r->cfg.size);
+	printf("--dstlimit-htable-max %u ", r->cfg.max);
+	printf("--dstlimit-htable-gcinterval %u", r->cfg.gc_interval);
+	printf("--dstlimit-htable-expire %u ", r->cfg.expire);
 }
 
 static
