@@ -105,12 +105,9 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static void
-print_tos(u_int8_t tos, int invert, int numeric)
+print_tos(u_int8_t tos, int numeric)
 {
 	unsigned int i;
-
-	if (invert)
-		fputc('!', stdout);
 
 	if (!numeric) {
 		for (i = 0; i<sizeof(TOS_values)/sizeof(struct TOS_value); i++)
@@ -137,18 +134,24 @@ print(const struct ipt_ip *ip,
       const struct ipt_entry_match *match,
       int numeric)
 {
+	const struct ipt_tos_info *info = (const struct ipt_tos_info *)match->data;
+    
 	printf("TOS match ");
-	print_tos(((struct ipt_tos_info *)match->data)->tos,
-		  ((struct ipt_tos_info *)match->data)->invert, numeric);
+	if (info->invert)
+		printf("!");
+	print_tos(info->tos, numeric);
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void
 save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 {
+	const struct ipt_tos_info *info = (const struct ipt_tos_info *)match->data;
+    
+	if (info->invert)
+		printf("! ");
 	printf("--tos ");
-	print_tos(((struct ipt_tos_info *)match->data)->tos,
-		  ((struct ipt_tos_info *)match->data)->invert, 0);
+	print_tos(info->tos, 0);
 }
 
 static
