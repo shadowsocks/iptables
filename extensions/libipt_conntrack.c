@@ -434,7 +434,7 @@ matchinfo_print(const struct ipt_ip *ip, const struct ipt_entry_match *match, in
 	}
 
 	if(sinfo->flags & IPT_CONNTRACK_REPLSRC) {
-		printf("%sctorigsrc ", optpfx);
+		printf("%sctreplsrc ", optpfx);
 
 		print_addr(
 		    (struct in_addr *)&sinfo->tuple[IP_CT_DIR_REPLY].src.ip,
@@ -444,7 +444,7 @@ matchinfo_print(const struct ipt_ip *ip, const struct ipt_entry_match *match, in
 	}
 
 	if(sinfo->flags & IPT_CONNTRACK_REPLDST) {
-		printf("%sctorigdst ", optpfx);
+		printf("%sctrepldst ", optpfx);
 
 		print_addr(
 		    (struct in_addr *)&sinfo->tuple[IP_CT_DIR_REPLY].dst.ip,
