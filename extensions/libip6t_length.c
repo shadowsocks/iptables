@@ -9,11 +9,6 @@
 #include <ip6tables.h>
 #include <linux/netfilter_ipv6/ip6t_length.h>
 
-struct ip6t_length_info {
-    u_int16_t	min, max;
-    u_int8_t	invert;
-};
-
 /* Function which prints out usage message. */
 static void
 help(void)
