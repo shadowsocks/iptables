@@ -91,6 +91,11 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
+		/* Ensure that `--tos' haven't been used yet. */
+		if (*flags == 1)
+			exit_error(PARAMETER_PROBLEM,
+					"tos match: only use --tos once!");
+
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_tos(argv[optind-1], tosinfo);
 		if (invert)
