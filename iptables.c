@@ -109,7 +109,7 @@ static struct option original_opts[] = {
 	{ "destination", 1, 0,  'd' },
 	{ "src", 1, 0,  's' }, /* synonym */
 	{ "dst", 1, 0,  'd' }, /* synonym */
-	{ "proto", 1, 0,  'p' },
+	{ "protocol", 1, 0,  'p' },
 	{ "in-interface", 1, 0, 'i' },
 	{ "jump", 1, 0, 'j' },
 	{ "table", 1, 0, 't' },
@@ -174,8 +174,7 @@ static int inverse_for_options[NUMBER_OF_OPT] =
 const char *program_version;
 const char *program_name;
 
-/* Keeping track of external matches and targets: linked lists, but
-   unless we're listing (-L), they have only 0 or 1 entry.  */
+/* Keeping track of external matches and targets: linked lists.  */
 struct iptables_match *iptables_matches = NULL;
 struct iptables_target *iptables_targets = NULL;
 
@@ -301,6 +300,9 @@ exit_tryhelp(int status)
 void
 exit_printhelp(void)
 {
+	struct iptables_match *m = NULL;
+	struct iptables_target *t = NULL;
+
 	printf("%s v%s\n\n"
 "Usage: %s -[ADC] chain rule-specification [options]\n"
 "       %s -[RI] chain rulenum rule-specification [options]\n"
@@ -357,16 +359,17 @@ exit_printhelp(void)
 "[!] --fragment	-f		match second or further fragments only\n"
 "[!] --version	-V		print package version.\n");
 
-	/* Print out any special helps. */
-	if (iptables_targets) {
+	/* Print out any special helps. A user might like to be able to add a --help 
+	   to the commandline, and see expected results. So we call help for all 
+	   matches & targets */
+	for (t=iptables_targets;t;t=t->next) {
 		printf("\n");
-		iptables_targets->help();
+		t->help();
 	}
-	if (iptables_matches) {
+	for (m=iptables_matches;m;m=m->next) {
 		printf("\n");
-		iptables_matches->help();
+		m->help();
 	}
-
 	exit(0);
 }
 
@@ -1211,6 +1214,36 @@ insert_entry(const ipt_chainlabel chain,
 	return ret;
 }
 
+static unsigned char *
+make_delete_mask(struct ipt_entry *fw)
+{
+	/* Establish mask for comparison */
+	unsigned int size;
+	struct iptables_match *m;
+	unsigned char *mask, *mptr;
+
+	size = sizeof(struct ipt_entry);
+	for (m = iptables_matches; m; m = m->next)
+		size += sizeof(struct ipt_entry_match) + m->size;
+
+	mask = fw_calloc(1, size + iptables_target->size);
+
+	memset(mask, 0xFF, sizeof(ipt_entry));
+	mptr = mask + sizeof(ipt_entry);
+
+	for (m = iptables_matches; m; m = m->next) {
+		memset(mptr, 0xFF,
+		       sizeof(struct ipt_entry_match) + m->userspacesize);
+		mptr += sizeof(struct ipt_entry_match) + m->size;
+	}
+
+	memset(mptr, 0xFF, sizeof(struct ipt_entry_target));
+	mptr += sizeof(struct ipt_entry_target);
+	memset(mptr, 0xFF, iptables_target->userspacesize);
+
+	return mask;
+}
+
 static int
 delete_entry(const ipt_chainlabel chain,
 	     struct ipt_entry *fw,
@@ -1223,14 +1256,16 @@ delete_entry(const ipt_chainlabel chain,
 {
 	unsigned int i, j;
 	int ret = 1;
+	unsigned char *mask;
 
+	mask = make_delete_mask(fw);
 	for (i = 0; i < nsaddrs; i++) {
 		fw->ip.src.s_addr = saddrs[i].s_addr;
 		for (j = 0; j < ndaddrs; j++) {
 			fw->ip.dst.s_addr = daddrs[j].s_addr;
 			if (verbose)
 				print_firewall_line(fw, *handle);
-			ret &= iptc_delete_entry(chain, fw, handle);
+			ret &= iptc_delete_entry(chain, fw, mask, handle);
 		}
 	}
 	return ret;
@@ -1557,6 +1592,10 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			if (!optarg)
 				optarg = argv[optind];
 
+			/* iptables -p icmp -h */
+			if (!iptables_matches && protocol)
+			    find_match(protocol, 1);
+
 			exit_printhelp();
 
 			/*
@@ -1610,7 +1649,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				size_t size = sizeof(struct ipt_entry_target)
 					+ IPT_ALIGN(target->size);
 
-				target->t = fw_calloc(size, 1);
+				target->t = fw_calloc(1, size);
 				target->t->target_size = size;
 				strcpy(target->t->u.name, jumpto);
 				target->init(target->t, &fw.nfcache);
@@ -1666,7 +1705,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			else {
 				size_t size = sizeof(struct ipt_entry_match)
 					+ IPT_ALIGN(m->size);
-				m->m = fw_calloc(size, 1);
+				m->m = fw_calloc(1, size);
 				m->m->match_size = size;
 				strcpy(m->m->u.name, optarg);
 				m->init(m->m, &fw.nfcache);
@@ -1742,7 +1781,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 					size_t size = sizeof(struct ipt_entry_match)
 						+ IPT_ALIGN(m->size);
 
-					m->m = fw_calloc(size, 1);
+					m->m = fw_calloc(1, size);
 					m->m->match_size = size;
 					strcpy(m->m->u.name, protocol);
 					m->init(m->m, &fw.nfcache);
@@ -1861,7 +1900,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 
 			size = sizeof(struct ipt_entry_target)
 				+ IPT_ALIGN(target->size);
-			target->t = fw_calloc(size, 1);
+			target->t = fw_calloc(1, size);
 			target->t->target_size = size;
 			strcpy(target->t->u.name, jumpto);
 			target->init(target->t, &fw.nfcache);
