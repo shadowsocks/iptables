@@ -357,7 +357,9 @@ exit_printhelp(void)
 "  --in-interface -i [!] input name[+]\n"
 "				network interface name ([+] for wildcard)\n"
 "  --jump	-j target\n"
-"				target for rule\n"
+"				target for rule (may load target extension)\n"
+"  --match	-m match\n"
+"				extended match (may load extension)\n"
 "  --numeric	-n		numeric output of addresses and ports\n"
 "  --out-interface -o [!] output name[+]\n"
 "				network interface name ([+] for wildcard)\n"
@@ -367,9 +369,9 @@ exit_printhelp(void)
 "[!] --fragment	-f		match second or further fragments only\n"
 "[!] --version	-V		print package version.\n");
 
-	/* Print out any special helps. A user might like to be able to add a --help 
-	   to the commandline, and see expected results. So we call help for all 
-	   matches & targets */
+	/* Print out any special helps. A user might like to be able
+	   to add a --help to the commandline, and see expected
+	   results. So we call help for all matches & targets */
 	for (t=iptables_targets;t;t=t->next) {
 		printf("\n");
 		t->help();
