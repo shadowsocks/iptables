@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.44 2001/07/23 02:18:48 laforge Exp $
+CVS ID: $Id: TODO,v 1.45 2001/07/31 21:35:18 laforge Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -13,6 +13,7 @@ IMPORTANT issues:
 - ip_conntrack rmmod loop (sometimes, Yan's patch?)
 - conntrack helper not called for first packet (udp!)
 - add support for correct SACK handling [HW]
+- erroneously too-fast dropped conntrack for half-open TCP connections [HW]
 X why is nat_helper's expect() function called for all helpers? [HW]
 X full tcp window tracking incompatibility with nat helpers [HW]
 - mangle table should use all five netfilter hooks [BC]
@@ -20,8 +21,7 @@ X merge EPRT / EPSV ftp stuff [RR] (reimplemented in ftp-fixes, included 2.4.4)
 X runme error with IPv6 stuff! [HW]
 - wrong 'Out of window' error message from tcp-windowtracking [HW]
 X SMP conntrack race [RR] (ftp-fixes, included in 2.4.4)
-- static compiling/linking of iptables (for router-on-a-disk) [HW]
-  (what about the patch from David McCullough? -- JM)
+X static compiling/linking of iptables (for router-on-a-disk) [HW]
 X IPv6 testing (MARK, LOG, REJECT) [HW]
 x iptables-save doesn't work with eth+ style multiple IF stuff [HW]
 X reject-with on REJECT target doesn't work [HW]
@@ -78,4 +78,4 @@ FUTURE extensions:
 [BB]	Bastian Blank <bastianb@gmx.de>
 [FM]	Fabrice Marie <fabrice@celestix.com>
 [KA]	Kiz-Szabo Andras <kisza@sch.bme.hu>
-[BC]	Brad Chapman <kakadu@earthlink.net>
+[BC]	Brad Chapman <kakadu_croc@yahoo.com>
