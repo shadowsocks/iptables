@@ -4,10 +4,10 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.62 2002/05/27 07:52:33 laforge Exp $
+CVS ID: $Id: TODO,v 1.63 2002/07/08 06:17:33 laforge Exp $
 
 IMPORTANT issues:
-- solution for nostate / notrack (we don't want to track specific conn's)
+x solution for nostate / notrack (we don't want to track specific conn's)
 x multiple related connections (solved: newnat)[HW]
 x add support for correct SACK handling [HW]
 - erroneously too-fast dropped conntrack for half-open TCP connections [JK]
@@ -21,12 +21,13 @@ x fix apparent output nat + slip oops bug; see thread at
 x TFTP helper: works only on second packet?
 x necessary structures for helper match in newnat [HW]
 x port old conntrack/nat helpers to newnat [HW]
-- update NAT part of netfilter-hacking-HOWTO to newnat [HW]
-- update packet traversal schematics to represent 5hook-mangle
+x update NAT part of netfilter-hacking-HOWTO to newnat [HW]
+x update packet traversal schematics to represent 5hook-mangle
 - update manpages to include recently submitted extensions
-- remove manually-specified source IP for reject-fakesource patch
+x remove manually-specified source IP for reject-fakesource patch
 - locally bound udp port can still be used for MASQ/SNAT
 - fix for ICMP DNAT info leak
+- unaligned access of nulldevname during string match
 
 TO BE INVESTIGATED:
 - packet counters on ultrasparc platform (32bit userspace/64bit kernel issue)
