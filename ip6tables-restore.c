@@ -7,7 +7,7 @@
  * 	Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: ip6tables-restore.c,v 1.22 2004/05/26 16:04:48 gandalf Exp $
+ * $Id$
  */
 
 #include <getopt.h>
@@ -115,6 +115,10 @@ int main(int argc, char *argv[])
 	program_name = "ip6tables-restore";
 	program_version = IPTABLES_VERSION;
 	line = 0;
+
+	lib_dir = getenv("IP6TABLES_LIB_DIR");
+	if (!lib_dir)
+		lib_dir = IP6T_LIB_DIR;
 
 #ifdef NO_SHARED_LIBS
 	init_extensions();

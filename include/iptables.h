@@ -4,6 +4,10 @@
 #include "iptables_common.h"
 #include "libiptc/libiptc.h"
 
+#ifndef IPT_LIB_DIR
+#define IPT_LIB_DIR "/usr/local/lib/iptables"
+#endif
+
 #ifndef IPPROTO_SCTP
 #define IPPROTO_SCTP 132
 #endif

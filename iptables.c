@@ -47,10 +47,6 @@
 #define FALSE 0
 #endif
 
-#ifndef IPT_LIB_DIR
-#define IPT_LIB_DIR "/usr/local/lib/iptables"
-#endif
-
 #ifndef PROC_SYS_MODPROBE
 #define PROC_SYS_MODPROBE "/proc/sys/kernel/modprobe"
 #endif
@@ -195,6 +191,7 @@ static int inverse_for_options[NUMBER_OF_OPT] =
 
 const char *program_version;
 const char *program_name;
+char *lib_dir;
 
 /* Keeping track of external matches and targets: linked lists.  */
 struct iptables_match *iptables_matches = NULL;
@@ -209,8 +206,6 @@ struct pprot {
 	char *name;
 	u_int8_t num;
 };
-
-static char *lib_dir;
 
 /* Primitive headers... */
 /* defined in netinet/in.h */
@@ -1714,10 +1709,6 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	int proto_used = 0;
 
 	memset(&fw, 0, sizeof(fw));
-
-	lib_dir = getenv("IPTABLES_LIB_DIR");
-	if (!lib_dir)
-		lib_dir = IPT_LIB_DIR;
 
 	/* re-set optind to 0 in case do_command gets called
 	 * a second time */

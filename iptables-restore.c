@@ -4,7 +4,7 @@
  *
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: iptables-restore.c,v 1.35 2004/06/25 11:18:57 kadlec Exp $
+ * $Id$
  */
 
 #include <getopt.h>
@@ -118,6 +118,10 @@ main(int argc, char *argv[])
 	program_name = "iptables-restore";
 	program_version = IPTABLES_VERSION;
 	line = 0;
+
+	lib_dir = getenv("IPTABLES_LIB_DIR");
+	if (!lib_dir)
+		lib_dir = IPT_LIB_DIR;
 
 #ifdef NO_SHARED_LIBS
 	init_extensions();

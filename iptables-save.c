@@ -335,6 +335,10 @@ main(int argc, char *argv[])
 	program_name = "iptables-save";
 	program_version = IPTABLES_VERSION;
 
+	lib_dir = getenv("IPTABLES_LIB_DIR");
+	if (!lib_dir)
+		lib_dir = IPT_LIB_DIR;
+
 #ifdef NO_SHARED_LIBS
 	init_extensions();
 #endif

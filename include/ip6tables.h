@@ -4,6 +4,10 @@
 #include "iptables_common.h"
 #include "libiptc/libip6tc.h"
 
+#ifndef IP6T_LIB_DIR
+#define IP6T_LIB_DIR "/usr/local/lib/iptables"
+#endif
+
 struct ip6tables_rule_match
 {
 	struct ip6tables_rule_match *next;

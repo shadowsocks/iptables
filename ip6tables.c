@@ -50,10 +50,6 @@
 #define FALSE 0
 #endif
 
-#ifndef IP6T_LIB_DIR
-#define IP6T_LIB_DIR "/usr/local/lib/iptables"
-#endif
-
 #ifndef PROC_SYS_MODPROBE
 #define PROC_SYS_MODPROBE "/proc/sys/kernel/modprobe"
 #endif
@@ -195,8 +191,7 @@ static int inverse_for_options[NUMBER_OF_OPT] =
 
 const char *program_version;
 const char *program_name;
-
-static char *lib_dir;
+char *lib_dir;
 
 /* Keeping track of external matches and targets: linked lists.  */
 struct ip6tables_match *ip6tables_matches = NULL;
@@ -1717,10 +1712,6 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	char icmp6p[] = "icmpv6";
 
 	memset(&fw, 0, sizeof(fw));
-
-	lib_dir = getenv("IP6TABLES_LIB_DIR");
-	if (!lib_dir)
-		lib_dir = IP6T_LIB_DIR;
 
 	/* re-set optind to 0 in case do_command gets called
 	 * a second time */
