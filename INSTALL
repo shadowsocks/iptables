@@ -2,16 +2,16 @@ FOLLOW THESE STEPS:
 
 0) There may be some outstanding bugfixes or tweaks which are not yet
    in the official kernel.  To look through these, do:
-	% make pending-patches KERNEL_DIR=<<where-your-kernel-is>>
+	% make pending-patches KERNEL_DIR=<<where-you-built-your-kernel>>
 
    Please note that you have to recompile your kernel and your kernel modules
    after this step of kernel patching.
 
 1) Next, make the package.
-	% make KERNEL_DIR=<<where-your-kernel-is>>
+	% make KERNEL_DIR=<<where-you-built-your-kernel>>
 
 2) Finally, you need to to install the shared libraries, and the binary:
-	# make install KERNEL_DIR=<<where-your-kernel-is>>
+	# make install KERNEL_DIR=<<where-you-built-your-kernel>>
 
 If you are a developer, you can install the headers, development libraries
 and associated development man pages, with:
@@ -34,7 +34,7 @@ This is why we provide two ways of applying them:
 If you want to try some extensions, and be sure that they don't break each
 other, you can do the following:
 
-	% make most-of-pom KERNEL_DIR=<<where-your-kernel-is>>
+	% make most-of-pom KERNEL_DIR=<<where-you-built-your-kernel>>
 
 It will modify you kernel source (so back it up first!).  You will have
 to recompile / rebuild your kernel and modules.
@@ -43,7 +43,7 @@ Alternatively, if you really know what your are doing, you can use the
 following command in order to offer you the full list of choices.  Be aware
 that we don't prevent you from shooting yourself in the foot.
 
-	% make patch-o-matic KERNEL_DIR=<<where-your-kernel-is>>
+	% make patch-o-matic KERNEL_DIR=<<where-you-built-your-kernel>>
 
 ================================================================
 PROBLEMS YOU MAY ENCOUNTER:
