@@ -3,6 +3,9 @@
 PF_EXT_SLIB:=tcp udp icmp mac limit standard REJECT LOG unclean state multiport tos TOS mark MARK owner SNAT DNAT MASQUERADE REDIRECT MIRROR
 PF6_EXT_SLIB:=tcp udp icmp standard MARK mark
 
+# The following may not be present, but compile them anyway.
+PF_EXT_SLIB+=FTOS TCPMSS TTL ULOG ah esp iplimit tcpmss ttl
+
 # Optionals
 PF_EXT_SLIB_OPTS:=$(foreach T,$(wildcard extensions/.*-test),$(shell KERNEL_DIR=$(KERNEL_DIR) $(T)))
 PF6_EXT_SLIB_OPTS:=$(foreach T,$(wildcard extensions/.*-test6),$(shell KERNEL_DIR=$(KERNEL_DIR) $(T)))

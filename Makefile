@@ -23,7 +23,7 @@ DO_IPV6=1
 endif
 
 COPT_FLAGS:=-O2 -DNDEBUG
-CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -Iinclude/ -I$(KERNEL_DIR)/include -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" #-g #-pg
+CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -I$(KERNEL_DIR)/include -Iinclude/ -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" #-g #-pg
 
 DEPFILES = $(SHARED_LIBS:%.so=%.d)
 SH_CFLAGS:=$(CFLAGS) -fPIC
