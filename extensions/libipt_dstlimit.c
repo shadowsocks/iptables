@@ -22,7 +22,7 @@
 
 /* miliseconds */
 #define IPT_DSTLIMIT_GCINTERVAL	1000
-#define IPT_DSTLIMIT_EXPIRE	10
+#define IPT_DSTLIMIT_EXPIRE	10000
 
 /* Function which prints out usage message. */
 static void
@@ -33,7 +33,11 @@ help(void)
 "--dstlimit <avg>		max average match rate\n"
 "                                [Packets per second unless followed by \n"
 "                                /sec /minute /hour /day postfixes]\n"
-"--dstlimit-mode <mode>		mode (destip|destip-destport)\n"
+"--dstlimit-mode <mode>		mode\n"
+"					dstip\n"
+"					dstip-destport\n"
+"					srcip-dstip\n"
+"					srcip-dstip-destport\n"
 "--dstlimit-name <name>		name for /proc/net/ipt_dstlimit/\n"
 "[--dstlimit-burst <num>]	number to match in a burst, default %u\n"
 "[--dstlimit-htable-size <num>]	number of hashtable buckets\n"
@@ -196,10 +200,14 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM, "Unexpected `!' after "
 					"--dstlimit-mode");
-		if (!strcmp(optarg, "destip"))
-			r->mode = IPT_DSTLIMIT_MODE_DIP;
-		else if (!strcmp(optarg, "destip-destport"))
-			r->mode = IPT_DSTLIMIT_MODE_DIP_DPT;
+		if (!strcmp(optarg, "dstip"))
+			r->mode = IPT_DSTLIMIT_HASH_DIP;
+		else if (!strcmp(optarg, "dstip-destport"))
+			r->mode = IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT;
+		else if (!strcmp(optarg, "srcip-dstip"))
+			r->mode = IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP;
+		else if (!strcmp(optarg, "srcip-dstip-destport"))
+			r->mode = IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT;
 		else
 			exit_error(PARAMETER_PROBLEM, 
 				"bad --dstlimit-mode: `%s'\n", optarg);
@@ -226,7 +234,7 @@ static void final_check(unsigned int flags)
 {
 	if (!(flags & PARAM_LIMIT))
 		exit_error(PARAMETER_PROBLEM,
-				"You have to specify --dstlimit-rate");
+				"You have to specify --dstlimit");
 	if (!(flags & PARAM_MODE))
 		exit_error(PARAMETER_PROBLEM,
 				"You have to specify --dstlimit-mode");
@@ -268,11 +276,17 @@ print(const struct ipt_ip *ip,
 	printf("limit: avg "); print_rate(r->avg);
 	printf("burst %u ", r->burst);
 	switch (r->mode) {
-		case IPT_DSTLIMIT_MODE_DIP:
+		case (IPT_DSTLIMIT_HASH_DIP):
 			printf("mode dstip ");
 			break;
-		case IPT_DSTLIMIT_MODE_DIP_DPT:
+		case (IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT):
 			printf("mode dstip-dstport ");
+			break;
+		case (IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP):
+			printf("mode srcip-dstip ");
+			break;
+		case (IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT):
+			printf("mode srcip-dstip-dstport ");
 			break;
 	}
 	printf("htable-size %u ", r->size);
@@ -291,11 +305,17 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	if (r->burst != IPT_DSTLIMIT_BURST)
 		printf("--limit-burst %u ", r->burst);
 	switch (r->mode) {
-		case IPT_DSTLIMIT_MODE_DIP:
+		case (IPT_DSTLIMIT_HASH_DIP):
 			printf("--mode dstip ");
 			break;
-		case IPT_DSTLIMIT_MODE_DIP_DPT:
+		case (IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT):
 			printf("--mode dstip-dstport ");
+			break;
+		case (IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP):
+			printf("--mode srcip-dstip ");
+			break;
+		case (IPT_DSTLIMIT_HASH_SIP|IPT_DSTLIMIT_HASH_DIP|IPT_DSTLIMIT_HASH_DPT):
+			printf("--mode srcip-dstip-dstport ");
 			break;
 	}
 	printf("--htable-size %u ", r->size);
