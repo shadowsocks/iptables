@@ -1,7 +1,7 @@
 /* Shared library add-on to iptables to add TTL matching support 
  * (C) 2000 by Harald Welte <laforge@gnumonks.org>
  *
- * $Id: libipt_ttl.c,v 1.6 2002/05/29 13:08:16 laforge Exp $
+ * $Id$
  *
  * This program is released under the terms of GNU GPL */
 
@@ -35,14 +35,14 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		struct ipt_entry_match **match)
 {
 	struct ipt_ttl_info *info = (struct ipt_ttl_info *) (*match)->data;
-	u_int8_t value;
+	int value;
 
 	check_inverse(optarg, &invert, &optind, 0);
-	value = atoi(argv[optind-1]);
 
-	if (!optarg)
+	if (string_to_number(optarg, 0, 255, &value) == -1)
 		exit_error(PARAMETER_PROBLEM,
-				"ttl: You must specify a value");
+		           "ttl: Expected value between 0 and 255");
+
 	switch (c) {
 		case '2':
 			if (invert)
