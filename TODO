@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.39 2001/07/05 06:26:37 laforge Exp $
+CVS ID: $Id: TODO,v 1.40 2001/07/07 23:39:16 laforge Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -29,8 +29,10 @@ X reject-with on REJECT target doesn't work [HW]
 - colon inside prefix doesn't work
 - pending minor ip_queue updates [JM]
 - --mac-source not working in FORWARD (manpage bug?)
+- netfilter hooks should give error if same function registers twice
 
 NICE to have:
+- make RPC conntrack work again
 - interface names in ipv6 can contain _ and -
 - multicast connection tracking
 - sysctl support for ftp-multi, irc-conntrack/nat, ftp-fxp
@@ -56,6 +58,7 @@ X integrate PSD target / port it as match [HW]
 - REJECT optionally generates port unreachable with faked SOURCE
 - libipq reentrancy [JM]
 - libipq asynchronousness [JM]
+- compiling without O2 issue
 
 FUTURE extensions:
 - dealing with fragmented expectation-causes (i.e. DCC chat split
