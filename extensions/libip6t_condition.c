@@ -1,3 +1,4 @@
+/* Shared library add-on to ip6tables for condition match */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,12 +40,12 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	struct condition6_info *info =
 	    (struct condition6_info *) (*match)->data;
 
-	check_inverse(optarg, &invert, &optind, 0);
-
 	if (c == 'X') {
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify multiple conditions");
+
+		check_inverse(optarg, &invert, &optind, 0);
 
 		if (strlen(argv[optind - 1]) < CONDITION6_NAME_LEN)
 			strcpy(info->name, argv[optind - 1]);
@@ -88,7 +89,7 @@ save(const struct ip6t_ip6 *ip,
 	const struct condition6_info *info =
 	    (const struct condition6_info *) match->data;
 
-	printf("--condition %s%s ", (info->invert) ? "! " : "", info->name);
+	printf("--condition %s\"%s\" ", (info->invert) ? "! " : "", info->name);
 }
 
 
