@@ -108,7 +108,10 @@ static int print_match(const struct ipt_entry_match *e,
 
 	if (match) {
 		printf("-m %s ", e->u.user.name);
-		match->save(ip, e);
+
+		/* some matches don't provide a save function */
+		if (match->save)
+			match->save(ip, e);
 	} else {
 		if (e->u.match_size) {
 			fprintf(stderr,
