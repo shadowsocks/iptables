@@ -18,7 +18,7 @@ MANDIR:=/usr/local/man
 INCDIR:=/usr/local/include
 
 # Need libc6 for this.  FIXME: Should covert to autoconf.
-ifneq ($(shell ldd --version 2>/dev/null | fgrep 2.2),)
+ifeq ($(shell [ -f /usr/include/netinet/ip6.h ] && echo YES), YES)
 DO_IPV6=1
 endif
 
