@@ -7,7 +7,7 @@
  * 	Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: ip6tables-restore.c,v 1.19 2004/02/02 19:59:17 gandalf Exp $
+ * $Id: ip6tables-restore.c,v 1.20 2004/02/02 20:12:33 gandalf Exp $
  */
 
 #include <getopt.h>
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
 	
 	/* Grab standard input. */
 	while (fgets(buffer, sizeof(buffer), in)) {
-		int ret;
+		int ret = 0;
 
 		line++;
 		if (buffer[0] == '\n')
