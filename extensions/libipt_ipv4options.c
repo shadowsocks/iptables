@@ -18,7 +18,8 @@ help(void)
 "      --lsrr   (match loose  source routing flag)\n"
 "      --no-srr (match packets with no source routing)\n\n"
 "  [!] --rr     (match record route flag)\n\n"
-"  [!] --ts     (match timestamp flag)\n\n",
+"  [!] --ts     (match timestamp flag)\n\n"
+"  [!] --ra     (match router-alert option)\n\n",
 NETFILTER_VERSION);
 }
 
@@ -28,6 +29,7 @@ static struct option opts[] = {
 	{ "no-srr", 0, 0, '3'},
 	{ "rr", 0, 0, '4'},
 	{ "ts", 0, 0, '5'},
+	{ "ra", 0, 0, '6'},
 	{0}
 };
 
@@ -154,6 +156,30 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		}
 		break;
 
+		/* router-alert  */
+	case '6':
+		if ((!invert) && (*flags & IPT_IPV4OPTION_MATCH_ROUTER_ALERT))
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify --ra twice");	
+		if (invert && (*flags & IPT_IPV4OPTION_DONT_MATCH_ROUTER_ALERT))
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify ! --rr twice");
+		if ((!invert) && (*flags & IPT_IPV4OPTION_DONT_MATCH_ROUTER_ALERT))
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify --ra with ! --ra");
+		if (invert && (*flags & IPT_IPV4OPTION_MATCH_ROUTER_ALERT))
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify ! --ra with --ra");
+		if (invert) {
+			info->options |= IPT_IPV4OPTION_DONT_MATCH_ROUTER_ALERT;
+			*flags |= IPT_IPV4OPTION_DONT_MATCH_ROUTER_ALERT;
+		}
+		else {
+			info->options |= IPT_IPV4OPTION_MATCH_ROUTER_ALERT;
+			*flags |= IPT_IPV4OPTION_MATCH_ROUTER_ALERT;
+		}
+		break;
+
 	default:
 		return 0;
 	}
@@ -191,6 +217,11 @@ print(const struct ipt_ip *ip,
 		printf(" TS");
 	else if (info->options & IPT_IPV4OPTION_DONT_MATCH_TIMESTAMP)
 		printf(" !TS");
+	if (info->options & IPT_IPV4OPTION_MATCH_ROUTER_ALERT)
+		printf(" RA");
+	else if (info->options & IPT_IPV4OPTION_DONT_MATCH_ROUTER_ALERT)
+		printf(" !RA");
+
 	printf(" ");
 }
 
@@ -214,6 +245,11 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 		printf(" --ts");
 	else if (info->options & IPT_IPV4OPTION_DONT_MATCH_TIMESTAMP)
 		printf(" ! --ts");
+	if (info->options & IPT_IPV4OPTION_MATCH_ROUTER_ALERT)
+		printf(" --ra");
+	else if (info->options & IPT_IPV4OPTION_DONT_MATCH_ROUTER_ALERT)
+		printf(" ! --ra");
+
 	printf(" ");
 }
 
