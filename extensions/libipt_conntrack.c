@@ -504,7 +504,7 @@ print(const struct ipt_ip *ip,
 /* Saves the matchinfo in parsable form to stdout. */
 static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 {
-	matchinfo_print(ip, match, 0, "--");
+	matchinfo_print(ip, match, 1, "--");
 }
 
 static
