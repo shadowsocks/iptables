@@ -67,6 +67,7 @@ static u_int8_t
 parse_level(const char *level)
 {
 	unsigned int lev = -1;
+	unsigned int set = 0;
 
 	if (string_to_number(level, 0, 7, &lev) == -1) {
 		unsigned int i = 0;
@@ -76,7 +77,7 @@ parse_level(const char *level)
 		     i++) {
 			if (strncasecmp(level, ipt_log_names[i].name,
 					strlen(level)) == 0) {
-				if (lev != -1)
+				if (set++)
 					exit_error(PARAMETER_PROBLEM,
 						   "log-level `%s' ambiguous",
 						   level);
@@ -84,7 +85,7 @@ parse_level(const char *level)
 			}
 		}
 
-		if (lev == -1)
+		if (!set)
 			exit_error(PARAMETER_PROBLEM,
 				   "log-level `%s' unknown", level);
 	}
