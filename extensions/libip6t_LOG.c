@@ -134,6 +134,10 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 				   "Maximum prefix length %u for --log-prefix",
 				   (unsigned int)sizeof(loginfo->prefix) - 1);
 
+		if (strlen(optarg) != strlen(strtok(optarg, "\n")))
+			exit_error(PARAMETER_PROBLEM,
+				   "Newlines not allowed in --log-prefix");
+
 		strcpy(loginfo->prefix, optarg);
 		*flags |= IP6T_LOG_OPT_PREFIX;
 		break;
