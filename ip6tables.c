@@ -30,6 +30,11 @@
 #include <limits.h>
 #include <ip6tables.h>
 #include <arpa/inet.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 #ifndef TRUE
 #define TRUE 1
@@ -40,6 +45,10 @@
 
 #ifndef IP6T_LIB_DIR
 #define IP6T_LIB_DIR "/usr/local/lib/iptables"
+#endif
+
+#ifndef PROC_SYS_MODPROBE
+#define PROC_SYS_MODPROBE "/proc/sys/kernel/modprobe"
 #endif
 
 #define FMT_NUMERIC	0x0001
@@ -124,6 +133,14 @@ static struct option original_opts[] = {
 	{ 0 }
 };
 
+#ifndef __OPTIMIZE__
+struct ip6t_entry_target *
+ip6t_get_target(struct ipt_entry *e)
+{
+	        return (void *)e + e->target_offset;
+}
+#endif
+
 static struct option *opts = original_opts;
 static unsigned int global_option_offset = 0;
 
@@ -185,6 +202,17 @@ struct pprot {
 	char *name;
 	u_int8_t num;
 };
+
+/* Primitive headers... */
+/* defined in netinet/in.h */
+#if 0
+#ifndef IPPROTO_ESP
+#define IPPROTO_ESP 50
+#endif
+#ifndef IPPROTO_AH
+#define IPPROTO_AH 51
+#endif
+#endif
 
 static const struct pprot chain_protos[] = {
 	{ "tcp", IPPROTO_TCP },
@@ -406,7 +434,7 @@ fw_calloc(size_t count, size_t size)
 	void *p;
 
 	if ((p = calloc(count, size)) == NULL) {
-		perror("iptables: calloc failed");
+		perror("ip6tables: calloc failed");
 		exit(1);
 	}
 	return p;
@@ -418,7 +446,7 @@ fw_malloc(size_t size)
 	void *p;
 
 	if ((p = malloc(size)) == NULL) {
-		perror("iptables: malloc failed");
+		perror("ip6tables: malloc failed");
 		exit(1);
 	}
 	return p;
@@ -427,14 +455,15 @@ fw_malloc(size_t size)
 static struct in6_addr *
 host_to_addr(const char *name, unsigned int *naddr)
 {
+#if 0
+	/* TODO: getipnodebyname() missing */
 	struct hostent *host;
 	struct in6_addr *addr;
 	unsigned int i;
 
 	*naddr = 0;
-	if ((host = gethostbyname2(name, AF_INET6)) != NULL) {
-		if (host->h_addrtype != AF_INET6 ||
-		    host->h_length != sizeof(struct in6_addr))
+	if ((host = getipnodebyname(name, AF_INET6, 0, NULL)) != NULL) {
+		if (host->h_length != sizeof(struct in6_addr))
 			return (struct in6_addr *) NULL;
 
 		while (host->h_addr_list[*naddr] != (char *) NULL)
@@ -443,8 +472,10 @@ host_to_addr(const char *name, unsigned int *naddr)
 		for (i = 0; i < *naddr; i++)
 			in6addrcpy(&(addr[i]),
 				  (struct in6_addr *) host->h_addr_list[i]);
+		freehostent(host);
 		return addr;
 	}
+#endif
 
 	return (struct in6_addr *) NULL;
 }
@@ -452,12 +483,15 @@ host_to_addr(const char *name, unsigned int *naddr)
 static char *
 addr_to_host(const struct in6_addr *addr)
 {
+#if 0
+	/* TODO: getipnodebyaddr missing */
 	struct hostent *host;
 
-	/* TODO: gets errno 96 (EPFNOSUPPORT) on Debian/Sid. Got only AF_INET! */
-	if ((host = gethostbyaddr((char *) addr,
-				  sizeof(struct in_addr), AF_INET6)) != NULL)
+	if ((host = getipnodebyaddr((char *) addr,
+				  sizeof(struct in6_addr), AF_INET6, NULL)) != NULL)
 		return (char *) host->h_name;
+	/*TODO: freehostent()*/
+#endif
 
 	return (char *) NULL;
 }
@@ -632,6 +666,10 @@ find_match(const char *name, enum ip6t_tryload tryload)
 			exit_error(PARAMETER_PROBLEM,
 				   "Couldn't load match `%s'\n", name);
 	}
+
+        if (ptr)
+                ptr->used = 1;
+
 
 	return ptr;
 }
@@ -820,8 +858,12 @@ find_target(const char *name, enum ip6t_tryload tryload)
 					   name);
 		} else if (tryload == LOAD_MUST_SUCCEED)
 			exit_error(PARAMETER_PROBLEM,
-				   "Couldn't load target `%s'\n", name);
+				   "Couldn't load target `%s'%s\n", 
+				   name, dlerror());
 	}
+
+        if (ptr)
+                ptr->used = 1;
 
 	return ptr;
 }
@@ -865,13 +907,19 @@ register_match6(struct ip6tables_match *me)
 		exit(1);
 	}
 
+        if (me->size != IP6T_ALIGN(me->size)) {
+                fprintf(stderr, "%s: match `%s' has invalid size %u.\n",
+                        program_name, me->name, me->size);
+                exit(1);
+        }
+
 	/* Prepend to list. */
 	me->next = ip6tables_matches;
 	ip6tables_matches = me;
 	me->m = NULL;
 	me->mflags = 0;
 
-	opts = merge_options(opts, me->extra_opts, &me->option_offset);
+	/* opts = merge_options(opts, me->extra_opts, &me->option_offset);*/
 }
 
 void
@@ -889,13 +937,40 @@ register_target6(struct ip6tables_target *me)
 		exit(1);
 	}
 
+        if (me->size != IP6T_ALIGN(me->size)) {
+                fprintf(stderr, "%s: target `%s' has invalid size %u.\n",
+                        program_name, me->name, me->size);
+                exit(1);
+        }
+
 	/* Prepend to list. */
 	me->next = ip6tables_targets;
 	ip6tables_targets = me;
 	me->t = NULL;
 	me->tflags = 0;
 
-	opts = merge_options(opts, me->extra_opts, &me->option_offset);
+	/*opts = merge_options(opts, me->extra_opts, &me->option_offset);*/
+}
+
+static void
+print_num(u_int64_t number, unsigned int format)
+{
+        if (format & FMT_KILOMEGAGIGA) {
+                if (number > 99999) {
+                        number = (number + 500) / 1000;
+                        if (number > 9999) {
+                                number = (number + 500) / 1000;
+                                if (number > 9999) {
+                                        number = (number + 500) / 1000;
+                                        printf(FMT("%4lluG ","%lluG "),number);
+                                }
+                                else printf(FMT("%4lluM ","%lluM "), number);
+                        } else
+                                printf(FMT("%4lluK ","%lluK "), number);
+                } else
+                        printf(FMT("%5llu ","%llu "), number);
+        } else
+                printf(FMT("%8llu ","%llu "), number);
 }
 
 static void
@@ -906,9 +981,15 @@ print_header(unsigned int format, const char *chain, ip6tc_handle_t *handle)
 	printf("Chain %s", chain);
 	if (pol) {
 		printf(" (policy %s", pol);
-		if (!(format & FMT_NOCOUNTS))
-			printf(" %llu packets, %llu bytes",
-			       counters.pcnt, counters.bcnt);
+		if (!(format & FMT_NOCOUNTS)) {
+			/*printf(" %llu packets, %llu bytes",
+			       counters.pcnt, counters.bcnt);*/
+                        fputc(' ', stdout);
+                        print_num(counters.pcnt, (format|FMT_NOTABLE));
+                        fputs("packets, ", stdout);
+                        print_num(counters.bcnt, (format|FMT_NOTABLE));
+                        fputs("bytes", stdout);
+		}
 		printf(")\n");
 	} else {
 		unsigned int refs;
@@ -943,27 +1024,6 @@ print_header(unsigned int format, const char *chain, ip6tc_handle_t *handle)
 	printf("\n");
 }
 
-static void
-print_num(u_int64_t number, unsigned int format)
-{
-	if (format & FMT_KILOMEGAGIGA) {
-		if (number > 99999) {
-			number = (number + 500) / 1000;
-			if (number > 9999) {
-				number = (number + 500) / 1000;
-				if (number > 9999) {
-					number = (number + 500) / 1000;
-					printf(FMT("%4lluG ","%lluG "),number);
-				}
-				else printf(FMT("%4lluM ","%lluM "), number);
-			} else
-				printf(FMT("%4lluK ","%lluK "), number);
-		} else
-			printf(FMT("%5llu ","%llu "), number);
-	} else
-		printf(FMT("%8llu ","%llu "), number);
-}
-
 static int
 print_match(const struct ip6t_entry_match *m,
 	    const struct ip6t_ip6 *ip,
@@ -974,6 +1034,8 @@ print_match(const struct ip6t_entry_match *m,
 	if (match) {
 		if (match->print)
 			match->print(ip, m, numeric);
+                else
+                        printf("%s ", match->name);
 	} else {
 		if (m->u.user.name[0])
 			printf("UNKNOWN match `%s' ", m->u.user.name);
@@ -1205,8 +1267,12 @@ make_delete_mask(struct ip6t_entry *fw)
 	unsigned char *mask, *mptr;
 
 	size = sizeof(struct ip6t_entry);
-	for (m = ip6tables_matches; m; m = m->next)
-		size += sizeof(struct ip6t_entry_match) + m->size;
+	for (m = ip6tables_matches; m; m = m->next) {
+                if (!m->used)
+                        continue;
+
+		size += IP6T_ALIGN(sizeof(struct ip6t_entry_match)) + m->size;
+	}
 
 	mask = fw_calloc(1, size
 			 + sizeof(struct ip6t_entry_target)
@@ -1216,14 +1282,20 @@ make_delete_mask(struct ip6t_entry *fw)
 	mptr = mask + sizeof(struct ip6t_entry);
 
 	for (m = ip6tables_matches; m; m = m->next) {
+                if (!m->used)
+                        continue;
+
 		memset(mptr, 0xFF,
-		       sizeof(struct ip6t_entry_match) + m->userspacesize);
-		mptr += sizeof(struct ip6t_entry_match) + m->size;
+		       IP6T_ALIGN(sizeof(struct ip6t_entry_match)) + 
+		       m->userspacesize);
+		mptr += IP6T_ALIGN(sizeof(struct ip6t_entry_match)) + m->size;
 	}
 
-	memset(mptr, 0xFF, sizeof(struct ip6t_entry_target));
-	mptr += sizeof(struct ip6t_entry_target);
-	memset(mptr, 0xFF, ip6tables_targets->userspacesize);
+	memset(mptr, 0xFF, 
+	       IP6T_ALIGN(sizeof(struct ip6t_entry_target))
+	       + ip6tables_targets->userspacesize);
+	/*mptr += sizeof(struct ip6t_entry_target);
+	memset(mptr, 0xFF, ip6tables_targets->userspacesize);*/
 
 	return mask;
 }
@@ -1285,7 +1357,7 @@ check_packet(const ip6t_chainlabel chain,
 	return ret;
 }
 
-//static int
+/*static int*/
 int
 for_each_chain(int (*fn)(const ip6t_chainlabel, int, ip6tc_handle_t *),
 	       int verbose, int builtinstoo, ip6tc_handle_t *handle)
@@ -1322,7 +1394,7 @@ for_each_chain(int (*fn)(const ip6t_chainlabel, int, ip6tc_handle_t *),
         return ret;
 }
 
-//static int
+/*static int*/
 int
 flush_entries(const ip6t_chainlabel chain, int verbose,
 	      ip6tc_handle_t *handle)
@@ -1347,7 +1419,7 @@ zero_entries(const ip6t_chainlabel chain, int verbose,
 	return ip6tc_zero_entries(chain, handle);
 }
 
-//static int
+/*static int*/
 int
 delete_chain(const ip6t_chainlabel chain, int verbose,
 	     ip6tc_handle_t *handle)
@@ -1413,6 +1485,65 @@ list_entries(const ip6t_chainlabel chain, int verbose, int numeric,
 	return found;
 }
 
+static char *get_modprobe(void)
+{
+        int procfile;
+        char *ret;
+
+        procfile = open(PROC_SYS_MODPROBE, O_RDONLY);
+        if (procfile < 0)
+                return NULL;
+
+        ret = malloc(1024);
+        if (ret) {
+                switch (read(procfile, ret, 1024)) {
+                case -1: goto fail;
+                case 1024: goto fail; /* Partial read.  Wierd */
+                }
+                if (ret[strlen(ret)-1]=='\n')
+                        ret[strlen(ret)-1]=0;
+                close(procfile);
+                return ret;
+        }
+ fail:
+        free(ret);
+        close(procfile);
+        return NULL;
+}
+
+static int ip6tables_insmod(const char *modname, const char *modprobe)
+{
+        char *buf = NULL;
+        char *argv[3];
+
+        /* If they don't explicitly set it, read out of kernel */
+        if (!modprobe) {
+                buf = get_modprobe();
+                if (!buf)
+                        return -1;
+                modprobe = buf;
+        }
+
+        switch (fork()) {
+        case 0:
+                argv[0] = (char *)modprobe;
+                argv[1] = (char *)modname;
+                argv[2] = NULL;
+                execv(argv[0], argv);
+
+                /* not usually reached */
+                exit(0);
+        case -1:
+                return -1;
+
+        default: /* parent */
+                wait(NULL);
+        }
+
+        free(buf);
+        return 0;
+}
+
 static struct ip6t_entry *
 generate_entry(const struct ip6t_entry *fw,
 	       struct ip6tables_match *matches,
@@ -1423,8 +1554,12 @@ generate_entry(const struct ip6t_entry *fw,
 	struct ip6t_entry *e;
 
 	size = sizeof(struct ip6t_entry);
-	for (m = matches; m; m = m->next)
+	for (m = matches; m; m = m->next) {
+                if (!m->used)
+                        continue;
+
 		size += m->m->u.match_size;
+	}
 
 	e = fw_malloc(size + target->u.target_size);
 	*e = *fw;
@@ -1433,6 +1568,9 @@ generate_entry(const struct ip6t_entry *fw,
 
 	size = 0;
 	for (m = matches; m; m = m->next) {
+                if (!m->used)
+                        continue;
+
 		memcpy(e->elems + size, m->m, m->m->u.match_size);
 		size += m->m->u.match_size;
 	}
@@ -1459,6 +1597,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	struct ip6tables_target *t;
 	const char *jumpto = "";
 	char *protocol = NULL;
+        const char *modprobe = NULL;
 
 	memset(&fw, 0, sizeof(fw));
 
@@ -1473,10 +1612,12 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
          * (we clear the global list of all matches for security)*/
         for (m = ip6tables_matches; m; m = m->next) {
                 m->mflags = 0;
+                m->used = 0;
         }
 
         for (t = ip6tables_targets; t; t = t->next) {
                 t->tflags = 0;
+                t->used = 0;
         }
 
 	/* Suppress error messages: we may add new options if we
@@ -1777,6 +1918,9 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 					       &target->tflags,
 					       &fw, &target->t))) {
 				for (m = ip6tables_matches; m; m = m->next) {
+                                        if (!m->used)
+                                                continue;
+
 					if (m->parse(c - m->option_offset,
 						     argv, invert,
 						     &m->mflags,
@@ -1820,10 +1964,14 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 		invert = FALSE;
 	}
 
-	for (m = ip6tables_matches; m; m = m->next) 
-		m->final_check(m->mflags);
+	for (m = ip6tables_matches; m; m = m->next) {
+                if (!m->used)
+                        continue;
 
-	if (target)
+		m->final_check(m->mflags);
+	}
+
+	if (target) 
 		target->final_check(target->tflags);
 
 	/* Fix me: must put inverse options checking here --MN */
@@ -1876,6 +2024,12 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
         /* only allocate handle if we weren't called with a handle */
         if (!*handle)
                 *handle = ip6tc_init(*table);
+
+        if (!*handle) {
+                /* try to insmod the module if iptc_init failed */
+                ip6tables_insmod("ip6_tables", modprobe);
+                *handle = ip6tc_init(*table);
+        }
 
         if (!*handle)
                 exit_error(VERSION_PROBLEM,
@@ -1945,6 +2099,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 		}
 
 		if (!target) {
+#if 0
 			struct ip6t_entry_target unknown_target;
 
 			/* Don't know it.  Must be extension with no
@@ -1954,6 +2109,12 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 
 			e = generate_entry(&fw, ip6tables_matches,
 					   &unknown_target);
+#endif
+                        /* it is no chain, and we can't load a plugin.
+                         * We cannot know if the plugin is corrupt, non
+                         * existant OR if the user just misspelled a
+                         * chain. */
+                        find_target(jumpto, LOAD_MUST_SUCCEED);
 		} else {
 			e = generate_entry(&fw, ip6tables_matches, target->t);
 		}

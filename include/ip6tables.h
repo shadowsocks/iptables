@@ -50,6 +50,7 @@ struct ip6tables_match
 	unsigned int option_offset;
 	struct ip6t_entry_match *m;
 	unsigned int mflags;
+	unsigned int used;
 };
 
 struct ip6tables_target
@@ -96,6 +97,7 @@ struct ip6tables_target
 	unsigned int option_offset;
 	struct ip6t_entry_target *t;
 	unsigned int tflags;
+	unsigned int used;
 };
 
 /* Your shared library should call one of these. */
@@ -114,8 +116,8 @@ enum ip6t_tryload {
 	LOAD_MUST_SUCCEED
 };
 
-extern struct ip6tables_target *find_target6(const char *name, enum ip6t_tryload);
-extern struct ip6tables_match *find_match6(const char *name, enum ip6t_tryload);
+extern struct ip6tables_target *find_target(const char *name, enum ip6t_tryload);
+extern struct ip6tables_match *find_match(const char *name, enum ip6t_tryload);
 
 extern int for_each_chain(int (*fn)(const ip6t_chainlabel, int, ip6tc_handle_t *), int verbose, int builtinstoo, ip6tc_handle_t *handle);
 extern int flush_entries(const ip6t_chainlabel chain, int verbose, ip6tc_handle_t *handle);
