@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.49 2001/10/25 13:37:46 laforge Exp $
+CVS ID: $Id: TODO,v 1.50 2001/11/13 09:26:03 laforge Exp $
 
 IMPORTANT issues:
 - token ring crashes ??
@@ -41,6 +41,7 @@ NICE to have:
 - REJECT optionally generates port unreachable with faked SOURCE
 - libipq reentrancy [JM]
 - compiling without O2 issue
+- libipq runtime version, do before 1.2.5 [JM]
 
 FUTURE extensions:
 - dealing with fragmented expectation-causes (i.e. DCC chat split
