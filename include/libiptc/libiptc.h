@@ -5,6 +5,10 @@
 #include <libiptc/ipt_kernel_headers.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef IPT_MIN_ALIGN
 /* ipt_entry has pointers and u_int64_t's in it, so if you align to
    it, you'll also align to any crazy matches and targets someone
@@ -150,4 +154,10 @@ int iptc_get_raw_socket();
 
 /* Translates errno numbers into more human-readable form than strerror. */
 const char *iptc_strerror(int err);
+
+#ifdef __cplusplus
+}
+#endif
+
+
 #endif /* _LIBIPTC_H */
