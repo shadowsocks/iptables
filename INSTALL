@@ -1,14 +1,13 @@
 FOLLOW THESE STEPS:
 
-1) If /usr/src/linux contains the kernel headers of a recent 2.4
-   kernel:
-	% make
-   Otherwise:
+0) There may be some outstanding bugfixes or tweaks which are not yet
+   in the official kernel.  To look through these, do:
+	% make pending-patches KERNEL_DIR=<<where-your-kernel-is>>
+
+1) Next, make the package.
 	% make KERNEL_DIR=<<where-your-kernel-is>>
 
 2) Finally, you need to to install the shared libraries, and the binary:
-	# make install
-   Or
 	# make install KERNEL_DIR=<<where-your-kernel-is>>
 
 If you are a developer, you can install the libipq headers, like:

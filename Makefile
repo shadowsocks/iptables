@@ -7,6 +7,11 @@ endif
 NETFILTER_VERSION:=1.2
 OLD_NETFILTER_VERSION:=1.1.2
 
+# Waiting for inclusions in the kernel tree.
+PENDING_PATCHES:=dropped-table.patch
+# These went in previous kernels.
+PENDING_PATCHES+=ipv6-fixes.patch.ipv6 masquerade+fwmark.patch nat-overlap.patch ppc-sparc-mangle.patch
+
 LIBDIR:=/usr/local/lib
 BINDIR:=/usr/local/sbin
 MANDIR:=/usr/local/man
@@ -49,6 +54,9 @@ default: print-extensions all
 
 print-extensions:
 	@[ -n "$(OPTIONALS)" ] && echo Extensions found: $(OPTIONALS)
+
+pending-patches:
+	@cd patch-o-matic && KERNEL_DIR=$(KERNEL_DIR) ./runme $(PENDING_PATCHES)
 
 iptables.o: iptables.c
 	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -c -o $@ $<
