@@ -44,14 +44,6 @@
 #define IPT_LIB_DIR "/usr/local/lib/iptables"
 #endif
 
-#ifndef __OPTIMIZE__
-STRUCT_ENTRY_TARGET *
-GET_TARGET(STRUCT_ENTRY *e)
-{
-	return (void *)e + e->target_offset;
-}
-#endif
-
 static int sockfd = -1;
 static void *iptc_fn = NULL;
 
@@ -896,9 +888,8 @@ TC_DUMP_ENTRIES(const TC_HANDLE_T handle)
 {
 	CHECK(handle);
 #if 0
-	printf("libiptc v%s.  %u entries, %u bytes.\n",
-	       IPTABLES_VERSION,
-	       handle->new_number, handle->entries->size);
+	printf("libiptc v%s. %u bytes.\n",
+	       IPTABLES_VERSION, handle->entries->size);
 	printf("Table `%s'\n", handle->info.name);
 	printf("Hooks: pre/in/fwd/out/post = %u/%u/%u/%u/%u\n",
 	       handle->info.hook_entry[HOOK_PRE_ROUTING],
@@ -1111,7 +1102,7 @@ const char *TC_GET_TARGET(const STRUCT_ENTRY *ce,
 			  TC_HANDLE_T *handle)
 {
 	STRUCT_ENTRY *e = (STRUCT_ENTRY *)ce;
-	struct rule_head *r = container_of(e, struct rule_head, entry);
+	struct rule_head *r = container_of(e, struct rule_head, entry[0]);
 
 	iptc_fn = TC_GET_TARGET;
 
@@ -1448,8 +1439,7 @@ TC_DELETE_ENTRY(const IPT_CHAINLABEL chain,
 		TC_HANDLE_T *handle)
 {
 	struct chain_head *c;
-	struct rule_head *r;
-	STRUCT_ENTRY *e, *fw;
+	struct rule_head *r, *i;
 
 	iptc_fn = TC_DELETE_ENTRY;
 	if (!(c = iptcc_find_label(chain, *handle))) {
@@ -1457,45 +1447,43 @@ TC_DELETE_ENTRY(const IPT_CHAINLABEL chain,
 		return 0;
 	}
 
-	fw = malloc(origfw->next_offset);
-	if (fw == NULL) {
+	/* Create a rule_head from origfw. */
+	r = iptcc_alloc_rule(c, origfw->next_offset);
+	if (!r) {
 		errno = ENOMEM;
 		return 0;
 	}
 
-	list_for_each_entry(r, &c->rules, list) {
+	memcpy(r->entry, origfw, origfw->next_offset);
+	r->counter_map.maptype = COUNTER_MAP_NOMAP;
+	if (!iptcc_map_target(*handle, r)) {
+		DEBUGP("unable to map target of rule for chain `%s'\n", chain);
+		free(r);
+		return 0;
+	}
 
-		memcpy(fw, origfw, origfw->next_offset);
-
-#if 0
-		/* FIXME: handle this in is_same --RR */
-		if (!map_target(*handle, fw, offset, &discard)) {
-			free(fw);
-			return 0;
-		}
-#endif
-
-		e = r->entry;
-
-		if (is_same(e, fw, matchmask)) {
+	list_for_each_entry(i, &c->rules, list) {
+		if (r->type == i->type
+		    && is_same(r->entry, i->entry, matchmask)) {
 			/* If we are about to delete the rule that is the
 			 * current iterator, move rule iterator back.  next
 			 * pointer will then point to real next node */
-			if (r == (*handle)->rule_iterator_cur) {
+			if (i == (*handle)->rule_iterator_cur) {
 				(*handle)->rule_iterator_cur = 
 					list_entry((*handle)->rule_iterator_cur->list.prev,
 						   struct rule_head, list);
 			}
 
 			c->num_rules--;
-			iptcc_delete_rule(r);
+			iptcc_delete_rule(i);
 
 			set_changed(*handle);
+			free(r);
 			return 1;
 		}
 	}
 
-	free(fw);
+	free(r);
 	errno = ENOENT;
 	return 0;
 }
@@ -1970,10 +1958,6 @@ TC_COMMIT(TC_HANDLE_T *handle)
 
 	CHECK(*handle);
 
-#if 0
-	TC_DUMP_ENTRIES(*handle);
-#endif
-
 	/* Don't commit if nothing changed. */
 	if (!(*handle)->changed)
 		goto finished;
@@ -1990,6 +1974,10 @@ TC_COMMIT(TC_HANDLE_T *handle)
 		return 0;
 	}
 	memset(repl, 0, sizeof(*repl) + new_size);
+
+#if 0
+	TC_DUMP_ENTRIES(*handle);
+#endif
 
 	counterlen = sizeof(STRUCT_COUNTERS_INFO)
 			+ sizeof(STRUCT_COUNTERS) * new_number;
