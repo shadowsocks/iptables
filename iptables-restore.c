@@ -4,7 +4,7 @@
  *
  * This coude is distributed under the terms of GNU GPL
  *
- * $Id$
+ * $Id: iptables-restore.c,v 1.8 2001/01/23 22:54:34 laforge Exp $
  */
 
 #include <getopt.h>
@@ -252,6 +252,15 @@ int main(int argc, char *argv[])
 				argvsize = 8;
 			}
 
+			// strtok initcialize!
+			if ( buffer[0]!='[' )
+			{
+				if (!(newargv[argvsize] = strtok(buffer, " \t\n")))
+					goto ImLaMeR;
+					//break;
+				argvsize++;
+			}
+
 			/* strtok: a function only a coder could love */
 			for (i = argvsize; i < sizeof(newargv)/sizeof(char *); 
 					i++) {
@@ -259,7 +268,7 @@ int main(int argc, char *argv[])
 					break;
 				ptr = NULL;
 			}
-			if (i == sizeof(newargv)/sizeof(char *)) {
+ImLaMeR:		if (i == sizeof(newargv)/sizeof(char *)) {
 				fprintf(stderr,
 					"%s: line %u too many arguments\n",
 					program_name, line);

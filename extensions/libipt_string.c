@@ -1,6 +1,12 @@
 /* Shared library add-on to iptables to add string matching support. 
  * 
  * Copyright (C) 2000 Emmanuel Roger  <winfield@freegates.be>
+ *
+ * ChangeLog
+ *     27.01.2001: Gianni Tedesco <gianni@ecsc.co.uk>
+ *             Changed --tos to --string in save(). Also
+ *             updated to work with slightly modified
+ *             ipt_string_info.
  */
 #include <stdio.h>
 #include <netdb.h>
@@ -38,7 +44,7 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 static void
 parse_string(const unsigned char *s, struct ipt_string_info *info)
 {	
-	if (strlen(s) <= 255) strcpy(info->string, s);
+        if (strlen(s) <= BM_MAX_LEN) strcpy(info->string, s);
 	else exit_error(PARAMETER_PROBLEM, "STRING too long `%s'", s);
 }
 
@@ -59,6 +65,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		parse_string(argv[optind-1], stringinfo);
 		if (invert)
 			stringinfo->invert = 1;
+                stringinfo->len=strlen((char *)&stringinfo->string);
 		*flags = 1;
 		break;
 
@@ -101,7 +108,7 @@ print(const struct ipt_ip *ip,
 static void
 save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 {
-	printf("--tos ");
+	printf("--string ");
 	print_string(((struct ipt_string_info *)match->data)->string,
 		  ((struct ipt_string_info *)match->data)->invert, 0);
 }

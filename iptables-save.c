@@ -63,11 +63,13 @@ struct pprot {
 	u_int8_t num;
 };
 
-/* FIXME: why don't we use /etc/services ? */
+/* FIXME: why don't we use /etc/protocols ? */
 static const struct pprot chain_protos[] = {
 	{ "tcp", IPPROTO_TCP },
 	{ "udp", IPPROTO_UDP },
 	{ "icmp", IPPROTO_ICMP },
+	{ "esp", IPPROTO_ESP },
+	{ "ah", IPPROTO_AH },
 };
 
 static void print_proto(u_int16_t proto, int invert)

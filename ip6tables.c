@@ -190,6 +190,8 @@ static const struct pprot chain_protos[] = {
 	{ "tcp", IPPROTO_TCP },
 	{ "udp", IPPROTO_UDP },
 	{ "icmpv6", IPPROTO_ICMPV6 },
+	{ "esp", IPPROTO_ESP },
+	{ "ah", IPPROTO_AH },
 	{ "all", 0 },
 };
 
@@ -452,6 +454,7 @@ addr_to_host(const struct in6_addr *addr)
 {
 	struct hostent *host;
 
+	/* TODO: gets errno 96 (EPFNOSUPPORT) on Debian/Sid. Got only AF_INET! */
 	if ((host = gethostbyaddr((char *) addr,
 				  sizeof(struct in_addr), AF_INET6)) != NULL)
 		return (char *) host->h_name;
@@ -462,7 +465,12 @@ addr_to_host(const struct in6_addr *addr)
 static char *
 addr_to_numeric(const struct in6_addr *addrp)
 {
-	static char buf[20];
+	// static char buf[20];
+	// ADDR tags + sep. + \0
+	// 0000:0000:0000:0000:0000:0000:0000:000.000.000.000
+	// (but inet_ntop() supports only 
+	// 0000:0000:0000:0000:0000:0000:0000:0000 format now.)
+	static char buf[50+1];
 	return (char *)inet_ntop(AF_INET6, addrp, buf, sizeof buf);
 }
 
@@ -1277,7 +1285,8 @@ check_packet(const ip6t_chainlabel chain,
 	return ret;
 }
 
-static int
+//static int
+int
 for_each_chain(int (*fn)(const ip6t_chainlabel, int, ip6tc_handle_t *),
 	       int verbose, int builtinstoo, ip6tc_handle_t *handle)
 {
@@ -1313,7 +1322,8 @@ for_each_chain(int (*fn)(const ip6t_chainlabel, int, ip6tc_handle_t *),
         return ret;
 }
 
-static int
+//static int
+int
 flush_entries(const ip6t_chainlabel chain, int verbose,
 	      ip6tc_handle_t *handle)
 {
@@ -1337,7 +1347,8 @@ zero_entries(const ip6t_chainlabel chain, int verbose,
 	return ip6tc_zero_entries(chain, handle);
 }
 
-static int
+//static int
+int
 delete_chain(const ip6t_chainlabel chain, int verbose,
 	     ip6tc_handle_t *handle)
 {
@@ -1805,9 +1816,9 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	if (command & (CMD_REPLACE | CMD_INSERT | CMD_DELETE | CMD_APPEND |
 	    CMD_CHECK)) {
 		if (!(options & OPT_DESTINATION))
-			dhostnetworkmask = "0.0.0.0/0";
+			dhostnetworkmask = "::0/0";
 		if (!(options & OPT_SOURCE))
-			shostnetworkmask = "0.0.0.0/0";
+			shostnetworkmask = "::0/0";
 	}
 
 	if (shostnetworkmask)

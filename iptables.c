@@ -207,11 +207,14 @@ struct pprot {
 };
 
 /* Primitive headers... */
+/* defined in netinet/in.h */
+#if 0
 #ifndef IPPROTO_ESP
 #define IPPROTO_ESP 50
 #endif
 #ifndef IPPROTO_AH
 #define IPPROTO_AH 51
+#endif
 #endif
 
 static const struct pprot chain_protos[] = {
