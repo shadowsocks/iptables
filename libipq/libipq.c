@@ -247,7 +247,7 @@ ipq_packet_msg_t *ipq_get_packet(const unsigned char *buf)
 }
 
 int ipq_set_verdict(const struct ipq_handle *h,
-                    unsigned long id,
+                    ipq_id_t id,
                     unsigned int verdict,
                     size_t data_len,
                     unsigned char *buf)
