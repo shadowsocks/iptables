@@ -2195,7 +2195,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		ret = iptc_rename_chain(chain, newname,	handle);
 		break;
 	case CMD_SET_POLICY:
-		ret = iptc_set_policy(chain, policy, handle);
+		ret = iptc_set_policy(chain, policy, NULL, handle);
 		break;
 	default:
 		/* We should never reach this... */

@@ -145,7 +145,7 @@ static void print_rule(const struct ipt_entry *e,
 
 	/* print counters */
 	if (counters)
-		printf("[%llu,%llu] ", e->counters.pcnt, e->counters.bcnt);
+		printf("[%llu:%llu] ", e->counters.pcnt, e->counters.bcnt);
 
 	/* Print IP part. */
 	print_ip("-s", e->ip.src.s_addr,e->ip.smsk.s_addr,
@@ -251,9 +251,9 @@ static int do_output(const char *tablename)
 				struct ipt_counters count;
 				printf("%s ",
 				       iptc_get_policy(chain, &count, &h));
-				printf("%llu:%llu\n", count.pcnt, count.bcnt);
+				printf("[%llu:%llu]\n", count.pcnt, count.bcnt);
 			} else {
-				printf("- 0 0\n");
+				printf("- [0:0]\n");
 			}
 
 			/* Dump out rules */

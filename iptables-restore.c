@@ -58,6 +58,10 @@ iptc_handle_t create_handle(const char *tablename)
 	return handle;
 }
 
+int parse_counters(char *string, struct ipt_counters *ctr)
+{
+	return (sscanf(string, "[%llu:%llu]", &ctr->pcnt, &ctr->bcnt) == 2);
+}
 
 int main(int argc, char *argv[])
 {
@@ -159,8 +163,6 @@ int main(int argc, char *argv[])
 			/* New chain. */
 			char *policy, *chain;
 
-			/* FIXME: Don't ignore counters. */
-
 			chain = strtok(buffer+1, " \t\n");
 			DEBUGP("line %u, chain '%s'\n", line, chain);
 			if (!chain) {
@@ -189,11 +191,24 @@ int main(int argc, char *argv[])
 			}
 
 			if (strcmp(policy, "-") != 0) {
+				struct ipt_counters count;
+
+				if (counters) {
+					char *ctrs;
+					ctrs = strtok(NULL, " \t\n");
+
+					parse_counters(ctrs, &count);
+
+				} else {
+					memset(&count, 0, 
+					       sizeof(struct ipt_counters));
+				}
 
 				DEBUGP("Setting policy of chain %s to %s\n",
 					chain, policy);
 
-				if (!iptc_set_policy(chain, policy, &handle))
+				if (!iptc_set_policy(chain, policy, &count,
+						     &handle))
 					exit_error(OTHER_PROBLEM,
 						"Can't set policy `%s'"
 						" on `%s' line %u: %s\n",
@@ -207,15 +222,24 @@ int main(int argc, char *argv[])
 			char *newargv[1024];
 			int i,a;
 			char *ptr = buffer;
+			char *ctrs = NULL;
+			struct ipt_counters count;
 
-			/* FIXME: Don't ignore counters. */
 			if (buffer[0] == '[') {
 				ptr = strchr(buffer, ']');
 				if (!ptr)
 					exit_error(PARAMETER_PROBLEM,
 						   "Bad line %u: need ]\n",
 						   line);
+				ctrs = strtok(ptr, " \t\n");
 			}
+
+			if (counters && ctrs) {
+
+				parse_counters(ctrs, &count);
+			}
+
+			/* FIXME: Don't ignore counters. */
 
 			newargv[0] = argv[0];
 			newargv[1] = "-t";
@@ -225,7 +249,7 @@ int main(int argc, char *argv[])
 
 			/* strtok: a function only a coder could love */
 			for (i = 5; i < sizeof(newargv)/sizeof(char *); i++) {
-				if (!(newargv[i] = strtok(ptr, " \t\n")))
+				if (!(newargv[i] = strtok(NULL, " \t\n")))
 					break;
 				ptr = NULL;
 			}

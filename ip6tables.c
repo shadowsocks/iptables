@@ -1976,7 +1976,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 		ret = ip6tc_rename_chain(chain, newname,	handle);
 		break;
 	case CMD_SET_POLICY:
-		ret = ip6tc_set_policy(chain, policy, handle);
+		ret = ip6tc_set_policy(chain, policy, NULL, handle);
 		break;
 	default:
 		/* We should never reach this... */
