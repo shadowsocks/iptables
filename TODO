@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.50 2001/11/13 09:26:03 laforge Exp $
+CVS ID: $Id: TODO,v 1.51 2001/11/24 22:59:16 jamesm Exp $
 
 IMPORTANT issues:
 - token ring crashes ??
@@ -50,6 +50,20 @@ FUTURE extensions:
 - brainstorming about 2.5 conntrack code
 - netlink interface for conntrack manipulation from userspace [HW]
 - unified nfnetlink for queue,ulog,conntrack (and more?) (2.5 issue)
+
+Userspace queuing for 2.5:
+- Integration with nfnetlink.
+- Multiple queues per protocol.
+- Netlink broadcast support.
+- Allow multiple reader/writers in userspace.
+- How to handle multiple protocols (e.g. use separate queue handlers
+  or a multiplexer like ipqmpd).
+- Peformance improvements: multipart messages, mmaped socket (possibly).
+- Simplify queuing logic, which is quite ugly at the moment. (BC suggested
+  removing logic from kernel).
+- Allow userspace to set nfmark.
+- Allow userspace to set queue length etc.
+- Possibly pass conntrack/NAT info to userspace with packet.
 
 ======================================================================
 [RR]	Paul 'Rusty' Russel <rusty@rustcorp.com.au>
