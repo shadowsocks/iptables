@@ -26,21 +26,20 @@ int iptc_is_chain(const char *chain, const iptc_handle_t handle);
 /* Take a snapshot of the rules.  Returns NULL on error. */
 iptc_handle_t iptc_init(const char *tablename);
 
-/* Iterator functions to run through the chains; prev = NULL means
-   first chain.  Returns NULL at end. */
-const char *iptc_next_chain(const char *prev, iptc_handle_t *handle);
+/* Iterator functions to run through the chains.  Returns NULL at end. */
+const char *iptc_first_chain(iptc_handle_t *handle);
+const char *iptc_next_chain(iptc_handle_t *handle);
 
-/* How many rules in this chain? */
-unsigned int iptc_num_rules(const char *chain, iptc_handle_t *handle);
+/* Get first rule in the given chain: NULL for empty chain. */
+const struct ipt_entry *iptc_first_rule(const char *chain,
+					iptc_handle_t *handle);
 
-/* Get n'th rule in this chain. */
-const struct ipt_entry *iptc_get_rule(const char *chain,
-				      unsigned int n,
-				      iptc_handle_t *handle);
+/* Returns NULL when rules run out. */
+const struct ipt_entry *iptc_next_rule(const struct ipt_entry *prev,
+				       iptc_handle_t *handle);
 
-/* Returns a pointer to the target name of this position. */
-const char *iptc_get_target(const char *chain,
-			    unsigned int n,
+/* Returns a pointer to the target name of this entry. */
+const char *iptc_get_target(const struct ipt_entry *e,
 			    iptc_handle_t *handle);
 
 /* Is this a built-in chain? */

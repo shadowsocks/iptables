@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <iptables.h>
-#include <linux/stddef.h>
+#include <stddef.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_limit.h>
 

@@ -121,8 +121,8 @@ print(const struct ipt_ip *ip,
 		= (struct ip_nat_multi_range *)target->data;
 	struct ip_nat_range *r = &mr->range[0];
 
-	printf("REDIRECT ");
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
+		printf("redir ports ");
 		printf("%hu", ntohs(r->min.tcp.port));
 		if (r->max.tcp.port != r->min.tcp.port)
 			printf("-%hu", ntohs(r->max.tcp.port));

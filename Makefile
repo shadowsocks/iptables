@@ -4,15 +4,15 @@ TOPLEVEL_INCLUDED=YES
 ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
-NETFILTER_VERSION:=1.0.0
-OLD_NETFILTER_VERSION:=1.0.0beta
+NETFILTER_VERSION:=1.0.1
+OLD_NETFILTER_VERSION:=1.0.0
 
 LIBDIR:=/usr/local/lib
 BINDIR:=/usr/local/bin
 MANDIR:=/usr/local/man
 
-COPT_FLAGS:=-O2
-CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -Iinclude/ -I$(KERNEL_DIR)/include -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" #-g -pg
+COPT_FLAGS:=-O #-O2
+CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -Iinclude/ -I$(KERNEL_DIR)/include -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" -g #-pg # -DNDEBUG
 
 DEPFILES := $(SHARED_LIBS:%.so=%.d)
 SH_CFLAGS:=$(CFLAGS) -fPIC
@@ -68,8 +68,10 @@ distrib: check nowhitespace distclean delrelease /home/public/netfilter/iptables
 
 # Makefile must not define:
 # -g -pg
+# And must define -NDEBUG
 check:
-	@if echo $(CFLAGS) | egrep 'DEBUG|-g|-pg' >/dev/null; then echo Remove debugging flags; exit 1; else exit 0; fi
+	@if echo $(CFLAGS) | egrep -e '-g|-pg' >/dev/null; then echo Remove debugging flags; exit 1; else exit 0; fi
+	@if echo $(CFLAGS) | egrep -e NDEBUG >/dev/null; then exit 0; else echo Define -DNDEBUG; exit 1; fi
 
 nowhitespace:
 	@if grep -n ' 	$$' `find . -name 'Makefile' -o -name '*.[ch]'`; then exit 1; else exit 0; fi
