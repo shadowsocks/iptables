@@ -37,10 +37,10 @@ parse_range(const char *arg, struct ipt_connbytes_info *si)
 {
 	char *colon,*p;
 
-	si->from = strtol(arg,&colon,10);
+	si->from = strtoul(arg,&colon,10);
 	if (*colon != ':') 
 		exit_error(PARAMETER_PROBLEM, "Bad range `%s'", arg);
-	si->to = strtol(colon+1,&p,10);
+	si->to = strtoul(colon+1,&p,10);
 	if (p == colon+1) {
 		/* second number omited */
 		si->to = 0xffffffff;
@@ -58,7 +58,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       struct ipt_entry_match **match)
 {
 	struct ipt_connbytes_info *sinfo = (struct ipt_connbytes_info *)(*match)->data;
-	int i;
+	unsigned long i;
 
 	switch (c) {
 	case '1':
