@@ -29,8 +29,8 @@ ifeq ($(shell [ -f /usr/include/netinet/ip6.h ] && echo YES), YES)
 DO_IPV6=1
 endif
 
-COPT_FLAGS:=-O2 -DNDEBUG
-CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -I$(KERNEL_DIR)/include -Iinclude/ -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" #-g #-pg
+COPT_FLAGS:=-O2
+CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -I$(KERNEL_DIR)/include -Iinclude/ -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" #-g #-pg # -DIPTC_DEBUG
 
 ifdef NO_SHARED_LIBS
 CFLAGS += -DNO_SHARED_LIBS=1
@@ -187,12 +187,10 @@ most-of-pom:
 distrib: check distclean delrelease $(RELEASE_DIR)/iptables-$(NETFILTER_VERSION).tar.bz2 diff md5sums # nowhitespace
 
 # Makefile must not define:
-# -g -pg
-# And must define -NDEBUG
+# -g -pg -DIPTC_DEBUG
 .PHONY: check
 check:
-	@if echo $(CFLAGS) | egrep -e '-g|-pg' >/dev/null; then echo Remove debugging flags; exit 1; else exit 0; fi
-	@if echo $(CFLAGS) | egrep -e NDEBUG >/dev/null; then exit 0; else echo Define -DNDEBUG; exit 1; fi
+	@if echo $(CFLAGS) | egrep -e '-g|-pg|IPTC_DEBUG' >/dev/null; then echo Remove debugging flags; exit 1; else exit 0; fi
 
 .PHONY: nowhitespace
 nowhitespace:

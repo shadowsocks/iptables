@@ -336,7 +336,7 @@ check_entry(const STRUCT_ENTRY *e, unsigned int *i, unsigned int *off,
 	return 0;
 }
 
-#ifndef NDEBUG
+#ifdef IPTC_DEBUG
 /* Do every conceivable sanity check on the handle */
 static void
 do_check(TC_HANDLE_T h, unsigned int line)
@@ -382,21 +382,35 @@ do_check(TC_HANDLE_T h, unsigned int line)
 
 		user_offset = h->info.hook_entry[NF_IP_LOCAL_OUT];
 	} else if (strcmp(h->info.name, "mangle") == 0) {
+		/* This code assumes mangle5hooks enabled iptable_mangle,
+		 * either by patch-o-matic patch or linux >= 2.4.18-pre6 */
 		assert(h->info.valid_hooks
 		       == (1 << NF_IP_PRE_ROUTING
-			   | 1 << NF_IP_POST_ROUTING
 			   | 1 << NF_IP_LOCAL_IN
+			   | 1 << NF_IP_FORWARD
 			   | 1 << NF_IP_LOCAL_OUT
-			   | 1 << NF_IP_FORWARD));
+			   | 1 << NF_IP_POST_ROUTING));
 
-		/* Hooks should be first two */
+		/* Hooks should be first five */
 		assert(h->info.hook_entry[NF_IP_PRE_ROUTING] == 0);
 
 		n = get_chain_end(h, 0);
 		n += get_entry(h, n)->next_offset;
+		assert(h->info.hook_entry[NF_IP_LOCAL_IN] == n);
+
+		n = get_chain_end(h, n);
+		n += get_entry(h, n)->next_offset;
+		assert(h->info.hook_entry[NF_IP_FORWARD] == n);
+
+		n = get_chain_end(h, n);
+		n += get_entry(h, n)->next_offset;
 		assert(h->info.hook_entry[NF_IP_LOCAL_OUT] == n);
 
-		user_offset = h->info.hook_entry[NF_IP_LOCAL_OUT];
+		n = get_chain_end(h, n);
+		n += get_entry(h, n)->next_offset;
+		assert(h->info.hook_entry[NF_IP_POST_ROUTING] == n);
+
+		user_offset = h->info.hook_entry[NF_IP_POST_ROUTING];
 #ifdef NF_IP_DROPPING
 	} else if (strcmp(h->info.name, "drop") == 0) {
 		assert(h->info.valid_hooks == (1 << NF_IP_DROPPING));
@@ -464,4 +478,4 @@ do_check(TC_HANDLE_T h, unsigned int line)
 		      ->u.user.name,
 		      IPT_ERROR_TARGET) == 0);
 }
-#endif /*NDEBUG*/
+#endif /*IPTC_DEBUG*/

@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.32 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.33 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -104,7 +104,7 @@ set_changed(TC_HANDLE_T h)
 	h->changed = 1;
 }
 
-#ifndef NDEBUG
+#ifdef IPTC_DEBUG
 static void do_check(TC_HANDLE_T h, unsigned int line);
 #define CHECK(h) do { if (!getenv("IPTC_NO_CHECK")) do_check((h), __LINE__); } while(0)
 #else
