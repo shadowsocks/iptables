@@ -4,13 +4,11 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.69 2003/01/14 21:21:11 laforge Exp $
+CVS ID: $Id: TODO,v 1.70 2003/04/13 10:24:59 laforge Exp $
 
 IMPORTANT issues:
 - erroneously too-fast dropped conntrack for half-open TCP connections [JK]
-X wrong 'Out of window' error message from tcp-windowtracking [JK]
 - --mac-source not working in FORWARD (manpage bug?) [BZ]
-X update manpages to include recently submitted extensions [BZ]
 - locally bound udp port can still be used for MASQ/SNAT [BZ]
 X fix for ICMP DNAT info leak
 - unaligned access of nulldevname during string match [BZ]
@@ -20,7 +18,6 @@ X fix for ICMP DNAT info leak
 
 TO BE INVESTIGATED:
 - packet counters on sparc64 platform [BZ]
-- ip_conntrack rmmod loop (sometimes, Yan's patch?)
 - conntrack helper not called for first packet (udp!)
 - different behaviour for first packet towards an l2-unresolved ip?
 
