@@ -224,8 +224,9 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "--tcp-flags requires two args.");
 
-		parse_tcp_flags(tcpinfo, argv[optind-1], argv[optind++],
+		parse_tcp_flags(tcpinfo, argv[optind-1], argv[optind],
 				invert);
+		optind++;
 		*flags |= TCP_FLAGS;
 		*nfcache |= NFC_IP_TCPFLAGS;
 		break;
