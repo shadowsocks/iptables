@@ -335,7 +335,7 @@ print_flags(u_int8_t mask, u_int8_t cmp, int invert, int numeric)
 	if (mask || invert) {
 		printf("flags:%s", invert ? "!" : "");
 		if (numeric)
-			printf("0x02%X/0x02%X ", mask, cmp);
+			printf("0x%02X/0x%02X ", mask, cmp);
 		else {
 			print_tcpf(mask);
 			printf("/");
