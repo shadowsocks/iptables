@@ -1,4 +1,11 @@
-/* Shared library add-on to iptables to add ULOG support. */
+/* Shared library add-on to iptables to add ULOG support.
+ * 
+ * (C) 2000 by Harald Welte <laforge@sunbeam.franken.de>
+ *
+ * This software is released under the terms of GNU GPL
+ * 
+ * libipt_ULOG.c,v 1.3 2000/07/31 11:51:50 laforge Exp
+ */
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -17,8 +24,7 @@ void print_groups(unsigned int gmask)
 	int b;
 	unsigned int test;
 
-	for (b = 31; b >= 0; b--)
-	{
+	for (b = 31; b >= 0; b--) {
 		test = (1 << b);
 		if (gmask & test)
 			printf("%d ", b + 1);
@@ -28,23 +34,24 @@ void print_groups(unsigned int gmask)
 /* Function which prints out usage message. */
 static void help(void)
 {
-	printf(
-"ULOG v%s options:\n"
-" --ulog-nlgroup nlgroup		NETLINK grouo used for logging\n"
-" --ulog-prefix prefix		Prefix log messages with this prefix.\n\n",
-NETFILTER_VERSION);
+	printf("ULOG v%s options:\n"
+	       " --ulog-nlgroup nlgroup		NETLINK grouo used for logging\n"
+	       " --ulog-cprange size		Bytes of each packet to be passed\n"
+	       " --ulog-prefix prefix		Prefix log messages with this prefix.\n\n",
+	       NETFILTER_VERSION);
 }
 
 static struct option opts[] = {
-	{ "ulog-nlgroup", 1, 0, '!' },
-	{ "ulog-prefix", 1, 0, '#' },
-	{ 0 }
+	{"ulog-nlgroup", 1, 0, '!'},
+	{"ulog-prefix", 1, 0, '#'},
+	{"ulog-cprange", 1, 0, 'A'},
+	{0}
 };
 
 /* Initialize the target. */
 static void init(struct ipt_entry_target *t, unsigned int *nfcache)
 {
-	struct ipt_ulog_info *loginfo = (struct ipt_ulog_info *)t->data;
+	struct ipt_ulog_info *loginfo = (struct ipt_ulog_info *) t->data;
 
 	loginfo->nl_group = ULOG_DEFAULT_NLGROUP;
 
@@ -54,14 +61,16 @@ static void init(struct ipt_entry_target *t, unsigned int *nfcache)
 
 #define IPT_LOG_OPT_NLGROUP 0x01
 #define IPT_LOG_OPT_PREFIX 0x02
+#define IPT_LOG_OPT_CPRANGE 0x04
 
 /* Function which parses command options; returns true if it
    ate an option */
 static int parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ipt_entry *entry,
-      struct ipt_entry_target **target)
+		 const struct ipt_entry *entry,
+		 struct ipt_entry_target **target)
 {
-	struct ipt_ulog_info *loginfo = (struct ipt_ulog_info *)(*target)->data;
+	struct ipt_ulog_info *loginfo =
+	    (struct ipt_ulog_info *) (*target)->data;
 	int group_d;
 
 	switch (c) {
@@ -76,9 +85,9 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		group_d = atoi(optarg);
 		if (group_d > 32 || group_d < 1)
 			exit_error(PARAMETER_PROBLEM,
-				"--ulog-nlgroup has to be between 1 and 32");
+				   "--ulog-nlgroup has to be between 1 and 32");
 
-		loginfo->nl_group = (1 << (group_d -1));
+		loginfo->nl_group = (1 << (group_d - 1));
 
 		*flags |= IPT_LOG_OPT_NLGROUP;
 		break;
@@ -100,6 +109,16 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		strcpy(loginfo->prefix, optarg);
 		*flags |= IPT_LOG_OPT_PREFIX;
 		break;
+	case 'A':
+		if (*flags & IPT_LOG_OPT_CPRANGE)
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify --ulog-cprange twice");
+		if (atoi(optarg) < 0)
+			exit_error(PARAMETER_PROBLEM,
+				   "Negative copy range?");
+		loginfo->copy_range = atoi(optarg);
+		*flags |= IPT_LOG_OPT_CPRANGE;
+		break;
 	}
 	return 1;
 }
@@ -110,51 +129,51 @@ static void final_check(unsigned int flags)
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
-static void save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
+static void save(const struct ipt_ip *ip,
+		 const struct ipt_entry_target *target)
 {
-        const struct ipt_ulog_info *loginfo
-                = (const struct ipt_ulog_info *)target->data;
+	const struct ipt_ulog_info *loginfo
+	    = (const struct ipt_ulog_info *) target->data;
 
-        if (strcmp(loginfo->prefix, "") != 0)
-                printf("--ulog-prefix %s ", loginfo->prefix);
+	if (strcmp(loginfo->prefix, "") != 0)
+		printf("--ulog-prefix %s ", loginfo->prefix);
 
-        if (loginfo->nl_group != ULOG_DEFAULT_NLGROUP)
-	{
-                printf("--ulog-nlgroup ");
+	if (loginfo->nl_group != ULOG_DEFAULT_NLGROUP) {
+		printf("--ulog-nlgroup ");
 		print_groups(loginfo->nl_group);
 		printf("\n");
 	}
+	if (loginfo->copy_range)
+		printf("--ulog-cprange %d", loginfo->copy_range);
 }
 
 /* Prints out the targinfo. */
 static void
 print(const struct ipt_ip *ip,
-      const struct ipt_entry_target *target,
-      int numeric)
+      const struct ipt_entry_target *target, int numeric)
 {
 	const struct ipt_ulog_info *loginfo
-		= (const struct ipt_ulog_info *)target->data;
+	    = (const struct ipt_ulog_info *) target->data;
 
 	printf("ULOG ");
-	printf("nlgroup ");
+	printf("copy_range %d nlgroup ", loginfo->copy_range);
 	print_groups(loginfo->nl_group);
 	if (strcmp(loginfo->prefix, "") != 0)
 		printf("prefix `%s' ", loginfo->prefix);
 }
 
-struct iptables_target ulog
-= { NULL,
-    "ULOG",
-    NETFILTER_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_ulog_info)),
-    IPT_ALIGN(sizeof(struct ipt_ulog_info)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+struct iptables_target ulog = { NULL,
+	"ULOG",
+	NETFILTER_VERSION,
+	IPT_ALIGN(sizeof(struct ipt_ulog_info)),
+	IPT_ALIGN(sizeof(struct ipt_ulog_info)),
+	&help,
+	&init,
+	&parse,
+	&final_check,
+	&print,
+	&save,
+	opts
 };
 
 void _init(void)
