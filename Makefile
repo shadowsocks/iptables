@@ -23,8 +23,12 @@ CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -Iinclude/ -I$(KERNEL_DIR)/include -DNETFIL
 DEPFILES = $(SHARED_LIBS:%.so=%.d)
 SH_CFLAGS:=$(CFLAGS) -fPIC
 
-EXTRAS+=iptables iptables.o iptables-save iptables-restore
-EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables $(DESTDIR)$(MANDIR)/man8/iptables.8 $(DESTDIR)$(MANDIR)/man8/iptables-restore.8 $(DESTDIR)$(MANDIR)/man8/iptables-save.8  $(DESTDIR)$(BINDIR)/iptables-save $(DESTDIR)$(BINDIR)/iptables-restore
+EXTRAS+=iptables iptables.o 
+EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables $(DESTDIR)$(MANDIR)/man8/iptables.8
+
+# Still experimental.
+EXTRAS_EXP+=iptables-save iptables-restore
+EXTRA_INSTALLS_EXP:=$(DESTDIR)$(BINDIR)/iptables-save $(DESTDIR)$(BINDIR)/iptables-restore $(DESTDIR)$(MANDIR)/man8/iptables-restore.8 $(DESTDIR)$(MANDIR)/man8/iptables-save.8
 
 ifdef DO_IPV6
 EXTRAS+=ip6tables ip6tables.o
@@ -94,7 +98,7 @@ $(DESTDIR)$(BINDIR)/ip6tables-restore: ip6tables-restore
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
 	cp $< $@
 
-$(DESTDIR)$(MANDIR)/man8/iptables.8: iptables.8
+$(DESTDIR)$(MANDIR)/man8/%.8: %.8
 	@[ -d $(DESTDIR)$(MANDIR)/man8 ] || mkdir -p $(DESTDIR)$(MANDIR)/man8
 	cp $< $@
 
@@ -137,7 +141,7 @@ check:
 	@if echo $(CFLAGS) | egrep -e NDEBUG >/dev/null; then exit 0; else echo Define -DNDEBUG; exit 1; fi
 
 nowhitespace:
-	@if grep -n ' 	$$' `find . -name 'Makefile' -o -name '*.[ch]'`; then exit 1; else exit 0; fi
+	@if grep -n '[ 	]$$' `find . -name 'Makefile' -o -name '*.[ch]'`; then exit 1; else exit 0; fi 
 
 delrelease:
 	rm -f /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2
@@ -147,8 +151,8 @@ delrelease:
 
 diff: /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2
 	@mkdir /tmp/diffdir
-	@cd /tmp/diffdir && tar xfI /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2
-	@set -e; cd /tmp/diffdir; tar xfI /home/public/netfilter/iptables-$(OLD_NETFILTER_VERSION).tar.bz2; echo Creating patch-iptables-$(OLD_NETFILTER_VERSION)-$(NETFILTER_VERSION).bz2; diff -urN iptables-$(OLD_NETFILTER_VERSION) iptables-$(NETFILTER_VERSION) | bzip2 -9 > /home/public/netfilter/patch-iptables-$(OLD_NETFILTER_VERSION)-$(NETFILTER_VERSION).bz2
+	@cd /tmp/diffdir && tar -x --bzip2 -f /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2
+	@set -e; cd /tmp/diffdir; tar -x --bzip2 -f /home/public/netfilter/iptables-$(OLD_NETFILTER_VERSION).tar.bz2; echo Creating patch-iptables-$(OLD_NETFILTER_VERSION)-$(NETFILTER_VERSION).bz2; diff -urN iptables-$(OLD_NETFILTER_VERSION) iptables-$(NETFILTER_VERSION) | bzip2 -9 > /home/public/netfilter/patch-iptables-$(OLD_NETFILTER_VERSION)-$(NETFILTER_VERSION).bz2
 	@rm -rf /tmp/diffdir
 
 md5sums:

@@ -2,12 +2,16 @@
 
 all: $(SHARED_LIBS) $(EXTRAS)
 
+experimental: $(EXTRAS_EXP)
+
 # Have to handle extensions which no longer exist.
 clean: $(EXTRA_CLEANS)
 	rm -f $(SHARED_LIBS) $(EXTRAS) $(SHARED_LIBS:%.so=%_sh.o)
 	@find . -name '*.[ao]' | xargs rm -f
 
 install: all $(EXTRA_INSTALLS)
+
+install-experimental: $(EXTRA_INSTALLS_EXP)
 
 TAGS:
 	@rm -f $@
