@@ -123,10 +123,10 @@ entry2index(const TC_HANDLE_T h, const STRUCT_ENTRY *seek)
 {
 	unsigned int pos = 0;
 
-	if (ENTRY_ITERATE(h->entries.entries, h->entries.size,
+	if (ENTRY_ITERATE(h->entries.entrytable, h->entries.size,
 			  get_number, seek, &pos) == 0) {
 		fprintf(stderr, "ERROR: offset %i not an entry!\n",
-			(unsigned char *)seek - h->entries.entries);
+			(char *)seek - (char *)h->entries.entrytable);
 		abort();
 	}
 	return pos;
@@ -152,7 +152,7 @@ index2entry(TC_HANDLE_T h, unsigned int index)
 	unsigned int pos = 0;
 	STRUCT_ENTRY *ret = NULL;
 
-	ENTRY_ITERATE(h->entries.entries, h->entries.size,
+	ENTRY_ITERATE(h->entries.entrytable, h->entries.size,
 		      get_entry_n, index, &pos, &ret);
 
 	return ret;
@@ -161,13 +161,13 @@ index2entry(TC_HANDLE_T h, unsigned int index)
 static inline STRUCT_ENTRY *
 get_entry(TC_HANDLE_T h, unsigned int offset)
 {
-	return (STRUCT_ENTRY *)(h->entries.entries + offset);
+	return (STRUCT_ENTRY *)((char *)h->entries.entrytable + offset);
 }
 
 static inline unsigned long
 entry2offset(const TC_HANDLE_T h, const STRUCT_ENTRY *e)
 {
-	return (unsigned char *)e - h->entries.entries;
+	return (char *)e - (char *)h->entries.entrytable;
 }
 
 static unsigned long
@@ -316,7 +316,7 @@ TC_DUMP_ENTRIES(const TC_HANDLE_T handle)
 	       handle->info.underflow[HOOK_LOCAL_OUT],
 	       handle->info.underflow[HOOK_POST_ROUTING]);
 
-	ENTRY_ITERATE(handle->entries.entries, handle->entries.size,
+	ENTRY_ITERATE(handle->entries.entrytable, handle->entries.size,
 		      dump_entry, handle);
 }
 
@@ -404,7 +404,7 @@ static int populate_cache(TC_HANDLE_T h)
 	}
 
 	prev = NULL;
-	ENTRY_ITERATE(h->entries.entries, h->entries.size,
+	ENTRY_ITERATE(h->entries.entrytable, h->entries.size,
 		      add_chain, h, &prev);
 
 	qsort(h->cache_chain_heads + h->cache_num_builtins,
@@ -661,11 +661,11 @@ TC_GET_POLICY(const char *chain,
 
 static int
 correct_verdict(STRUCT_ENTRY *e,
-		unsigned char *base,
+		char *base,
 		unsigned int offset, int delta_offset)
 {
 	STRUCT_STANDARD_TARGET *t = (void *)GET_TARGET(e);
-	unsigned int curr = (unsigned char *)e - base;
+	unsigned int curr = (char *)e - base;
 
 	/* Trap: insert of fall-through rule.  Don't change fall-through
 	   verdict to jump-over-next-rule. */
@@ -683,9 +683,9 @@ correct_verdict(STRUCT_ENTRY *e,
 static int
 set_verdict(unsigned int offset, int delta_offset, TC_HANDLE_T *handle)
 {
-	ENTRY_ITERATE((*handle)->entries.entries,
+	ENTRY_ITERATE((*handle)->entries.entrytable,
 		      (*handle)->entries.size,
-		      correct_verdict, (*handle)->entries.entries,
+		      correct_verdict, (char *)(*handle)->entries.entrytable,
 		      offset, delta_offset);
 
 	set_changed(*handle);
@@ -734,12 +734,12 @@ insert_rules(unsigned int num_rules, unsigned int rules_size,
 	newh->info = newinfo;
 
 	/* Copy pre... */
-	memcpy(newh->entries.entries, (*handle)->entries.entries, offset);
+	memcpy(newh->entries.entrytable, (*handle)->entries.entrytable,offset);
 	/* ... Insert new ... */
-	memcpy(newh->entries.entries + offset, insert, rules_size);
+	memcpy((char *)newh->entries.entrytable + offset, insert, rules_size);
 	/* ... copy post */
-	memcpy(newh->entries.entries + offset + rules_size,
-	       (*handle)->entries.entries + offset,
+	memcpy((char *)newh->entries.entrytable + offset + rules_size,
+	       (char *)(*handle)->entries.entrytable + offset,
 	       (*handle)->entries.size - offset);
 
 	/* Move counter map. */
@@ -806,8 +806,8 @@ delete_rules(unsigned int num_rules, unsigned int rules_size,
 	}
 
 	/* Move the rules down. */
-	memmove((*handle)->entries.entries + offset,
-		(*handle)->entries.entries + offset + rules_size,
+	memmove((char *)(*handle)->entries.entrytable + offset,
+		(char *)(*handle)->entries.entrytable + offset + rules_size,
 		(*handle)->entries.size - (offset + rules_size));
 
 	/* Move the counter map down. */
@@ -1286,7 +1286,7 @@ TC_GET_REFERENCES(unsigned int *ref, const IPT_CHAINLABEL chain,
 	}
 
 	*ref = 0;
-	ENTRY_ITERATE((*handle)->entries.entries,
+	ENTRY_ITERATE((*handle)->entries.entrytable,
 		      (*handle)->entries.size,
 		      count_ref, entry2offset(*handle, c->start), ref);
 	return 1;
@@ -1496,7 +1496,7 @@ TC_COMMIT(TC_HANDLE_T *handle)
 	       sizeof(repl->underflow));
 	repl->num_counters = (*handle)->info.num_entries;
 	repl->valid_hooks = (*handle)->info.valid_hooks;
-	memcpy(repl->entries, (*handle)->entries.entries,
+	memcpy(repl->entries, (*handle)->entries.entrytable,
 	       (*handle)->entries.size);
 
 	if (setsockopt(sockfd, TC_IPPROTO, SO_SET_REPLACE, repl,

@@ -433,7 +433,7 @@ do_check(TC_HANDLE_T h, unsigned int line)
 	i = 0; n = 0;
 	was_return = 0;
 	/* Check all the entries. */
-	ENTRY_ITERATE(h->entries.entries, h->entries.size,
+	ENTRY_ITERATE(h->entries.entrytable, h->entries.size,
 		      check_entry, &i, &n, user_offset, &was_return, h);
 
 	assert(i == h->new_number);
