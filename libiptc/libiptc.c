@@ -908,7 +908,7 @@ TC_INSERT_ENTRY(const IPT_CHAINLABEL chain,
 	unsigned int chainindex, offset;
 	STRUCT_ENTRY_TARGET old;
 	struct chain_cache *c;
-	STRUCT_ENTRY *e;
+	STRUCT_ENTRY *tmp;
 	int ret;
 
 	iptc_fn = TC_INSERT_ENTRY;
@@ -919,8 +919,8 @@ TC_INSERT_ENTRY(const IPT_CHAINLABEL chain,
 
 	chainindex = entry2index(*handle, c->start);
 
-	e = index2entry(*handle, chainindex + rulenum);
-	if (!e || e > c->end) {
+	tmp = index2entry(*handle, chainindex + rulenum);
+	if (!tmp || tmp > c->end) {
 		errno = E2BIG;
 		return 0;
 	}
@@ -947,7 +947,7 @@ TC_REPLACE_ENTRY(const IPT_CHAINLABEL chain,
 	unsigned int chainindex, offset;
 	STRUCT_ENTRY_TARGET old;
 	struct chain_cache *c;
-	STRUCT_ENTRY *e;
+	STRUCT_ENTRY *tmp;
 	int ret;
 
 	iptc_fn = TC_REPLACE_ENTRY;
@@ -959,8 +959,8 @@ TC_REPLACE_ENTRY(const IPT_CHAINLABEL chain,
 
 	chainindex = entry2index(*handle, c->start);
 
-	e = index2entry(*handle, chainindex + rulenum);
-	if (!e || e >= c->end) {
+	tmp = index2entry(*handle, chainindex + rulenum);
+	if (!tmp || tmp >= c->end) {
 		errno = E2BIG;
 		return 0;
 	}
