@@ -63,7 +63,7 @@ parse_tos(const unsigned char *s, struct ipt_tos_target_info *info)
 {
 	unsigned int i, tos;
 
-	if (string_to_number(s, 0, 255,tos) != -1) {
+	if (string_to_number(s, 0, 255, &tos) != -1) {
 		if (tos == IPTOS_LOWDELAY
 		    || tos == IPTOS_THROUGHPUT
 		    || tos == IPTOS_RELIABILITY

@@ -45,7 +45,9 @@ parse_ftos(const unsigned char *s, struct ipt_FTOS_info *finfo)
 {
 	unsigned int ftos;
        
-	string_to_number(s, 0, 255, &ftos);
+	if (string_to_number(s, 0, 255, &ftos) == -1)
+		exit_error(PARAMETER_PROBLEM,
+			   "Invalid ftos `%s'\n", s);
     	finfo->ftos = (u_int8_t )ftos;
     	return;
 }

@@ -95,9 +95,10 @@ parse_time_string(unsigned int *hour, unsigned int *minute, const char *time)
 		if (minutes[0] == '0')
 			minutes[0] = ' ';
 
-		/* FIXME: error checking */
-		string_to_number(hours, 0, 23, hour);
-		string_to_number(minutes, 0, 59, minute);
+		if((string_to_number(hours, 0, 23, hour) == -1) ||
+			(string_to_number(minutes, 0, 59, minute) == -1)) {
+			*hour = *minute = (-1);
+		}
 	}
 	if ((*hour != (-1)) && (*minute != (-1))) {
 		free(hours);

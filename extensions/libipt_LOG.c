@@ -66,7 +66,7 @@ static struct ipt_log_names ipt_log_names[]
 static u_int8_t
 parse_level(const char *level)
 {
-	unsigned int lev;
+	unsigned int lev = -1;
 
 	if (string_to_number(level, 0, 7, &lev) == -1) {
 		unsigned int i = 0;
