@@ -65,11 +65,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static void
-print_mark(unsigned long mark, unsigned long mask, int invert, int numeric)
+print_mark(unsigned long mark, unsigned long mask, int numeric)
 {
-	if (invert)
-		fputc('!', stdout);
-
 	if(mask != 0xffffffff)
 		printf("0x%lx/0x%lx ", mark, mask);
 	else
@@ -91,20 +88,25 @@ print(const struct ipt_ip *ip,
       const struct ipt_entry_match *match,
       int numeric)
 {
+	struct ipt_connmark_info *info = (struct ipt_connmark_info *)match->data;
+
 	printf("CONNMARK match ");
-	print_mark(((struct ipt_connmark_info *)match->data)->mark,
-		  ((struct ipt_connmark_info *)match->data)->mask,
-		  ((struct ipt_connmark_info *)match->data)->invert, numeric);
+	if (info->invert)
+		printf("!");
+	print_mark(info->mark, info->mask, numeric);
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void
 save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 {
+	struct ipt_connmark_info *info = (struct ipt_connmark_info *)match->data;
+
+	if (info->invert)
+		printf("! ");
+
 	printf("--mark ");
-	print_mark(((struct ipt_connmark_info *)match->data)->mark,
-		  ((struct ipt_connmark_info *)match->data)->mask,
-		  ((struct ipt_connmark_info *)match->data)->invert, 0);
+	print_mark(info->mark, info->mask, 0);
 }
 
 static
