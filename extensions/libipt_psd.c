@@ -84,11 +84,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	struct ipt_psd_info *psdinfo = (struct ipt_psd_info *)(*match)->data;
 	unsigned int num;
 	
-	if (!optarg)
-		exit_error(PARAMETER_PROBLEM, "missing optarg");
-
-	/* string_to_number needs a leading space */
-
 	switch (c) {
 	/* PSD-weight-threshold */
 	case '1':
