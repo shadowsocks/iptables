@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <stddef.h>
 
 #if defined(__GLIBC__) && __GLIBC__ == 2
 #include <net/ethernet.h>
@@ -16,7 +17,7 @@
 
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
-#include <linux/netfilter_ipv4/ipt_CLUSTERIP.h>
+#include "../include/linux/netfilter_ipv4/ipt_CLUSTERIP.h"
 
 static void
 help(void)
@@ -242,7 +243,7 @@ static struct iptables_target clusterip = {
 	.name		= "CLUSTERIP",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_clusterip_tgt_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_clusterip_tgt_info)),
+	.userspacesize	= offsetof(struct ipt_clusterip_tgt_info, config),
  	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
