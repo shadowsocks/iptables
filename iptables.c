@@ -1090,8 +1090,8 @@ register_match(struct iptables_match *me)
 		exit(1);
 	}
 
-	/* Revision field stole a char: check for 30 char names. */
-	if (!memchr(me->name, 0, IPT_FUNCTION_MAXNAMELEN-1)) {
+	/* Revision field stole a char from name. */
+	if (strlen(me->name) >= IPT_FUNCTION_MAXNAMELEN-1) {
 		fprintf(stderr, "%s: target `%s' has invalid name\n",
 			program_name, me->name);
 		exit(1);
@@ -1146,8 +1146,8 @@ register_target(struct iptables_target *me)
 		exit(1);
 	}
 
-	/* Revision field stole a char: check for 30 char names. */
-	if (!memchr(me->name, 0, IPT_FUNCTION_MAXNAMELEN)) {
+	/* Revision field stole a char from name. */
+	if (strlen(me->name) >= IPT_FUNCTION_MAXNAMELEN-1) {
 		fprintf(stderr, "%s: target `%s' has invalid name\n",
 			program_name, me->name);
 		exit(1);
