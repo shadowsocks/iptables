@@ -7,7 +7,7 @@
  * 	Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: ip6tables-restore.c,v 1.18 2004/02/02 19:58:36 gandalf Exp $
+ * $Id: ip6tables-restore.c,v 1.19 2004/02/02 19:59:17 gandalf Exp $
  */
 
 #include <getopt.h>
@@ -42,7 +42,7 @@ static void print_usage(const char *name, const char *version) __attribute__((no
 
 static void print_usage(const char *name, const char *version)
 {
-	fprintf(stderr, "Usage: %s [-b] [-c] [-v] [-v] [-h]\n"
+	fprintf(stderr, "Usage: %s [-b] [-c] [-v] [-t] [-h]\n"
 			"	   [ --binary ]\n"
 			"	   [ --counters ]\n"
 			"	   [ --verbose ]\n"
