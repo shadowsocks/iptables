@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.32 2001/05/03 21:10:24 laforge Exp $
+CVS ID: $Id: TODO,v 1.33 2001/05/05 00:01:55 laforge Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -20,6 +20,8 @@ X merge EPRT / EPSV ftp stuff [RR] (reimplemented in ftp-fixes, included 2.4.4)
 X runme error with IPv6 stuff! [HW]
 - wrong 'Out of window' error message from tcp-windowtracking [HW]
 X SMP conntrack race [RR] (ftp-fixes, included in 2.4.4)
+- static compiling/linking of iptables (for router-on-a-disk) [HW]
+- IPv6 testing (MARK, LOG, REJECT) [HW]
 
 NICE to have:
 - multicast connection tracking
