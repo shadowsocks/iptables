@@ -5,7 +5,7 @@ ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
 NETFILTER_VERSION:=1.2.1
-OLD_NETFILTER_VERSION:=1.1.2
+OLD_NETFILTER_VERSION:=1.2
 
 # Waiting for inclusions in the kernel tree.
 PENDING_PATCHES:=tos-fix.patch dropped-table.patch seqoffset.patch irc-conntrack-nat.patch

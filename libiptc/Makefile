@@ -2,6 +2,8 @@
 
 EXTRAS+=libiptc/libiptc.a
 
+DEVEL_LIBS+=libiptc/libiptc.a
+
 ifndef TOPLEVEL_INCLUDED
 local:
 	cd .. && $(MAKE) $(KERN_TARGETS) $(SHARED_LIBS) $(EXTRAS)
