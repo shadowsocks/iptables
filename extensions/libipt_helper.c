@@ -44,6 +44,9 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
+		if (*flags)
+			exit_error(PARAMETER_PROBLEM,
+					"helper match: Only use --helper ONCE!");
 		check_inverse(optarg, &invert, &invert, 0);
 		strncpy(info->name, optarg, 29);
 		info->name[29] = '\0';
