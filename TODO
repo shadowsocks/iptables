@@ -4,9 +4,10 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.47 2001/09/21 11:59:23 jamesm Exp $
+CVS ID: $Id: TODO,v 1.48 2001/10/16 08:07:39 laforge Exp $
 
 IMPORTANT issues:
+- token ring crashes ??
 - solution for nostate / notrack (we don't want to track specific conn's)
 - iptables-save/restore problems with log-level
 - multiple related connections [HW]
