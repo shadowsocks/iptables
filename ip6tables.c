@@ -740,6 +740,10 @@ find_match(const char *name, enum ip6t_tryload tryload)
 		else
 			ptr = NULL;
 	}
+	if(!ptr && (tryload == LOAD_MUST_SUCCEED)) {
+		exit_error(PARAMETER_PROBLEM,
+			   "Couldn't find match `%s'\n", name);
+	}
 #endif
 
 	if (ptr)
@@ -951,6 +955,10 @@ find_target(const char *name, enum ip6t_tryload tryload)
 			ptr->loaded = 1;
 		else
 			ptr = NULL;
+	}
+	if(!ptr && (tryload == LOAD_MUST_SUCCEED)) {
+		exit_error(PARAMETER_PROBLEM,
+			   "Couldn't find target `%s'\n", name);
 	}
 #endif
 
