@@ -3,6 +3,13 @@
 /*
  * Author: Paul.Russell@rustcorp.com.au and mneuling@radlogic.com.au
  *
+ * (C) 2000-2002 by the netfilter coreteam <coreteam@netfilter.org>:
+ * 		    Paul 'Rusty' Russell <rusty@rustcorp.com.au>
+ * 		    Marc Boucher <marc+nf@mbsi.ca>
+ * 		    James Morris <jmorris@intercode.com.au>
+ * 		    Harald Welte <laforge@gnumonks.org>
+ * 		    Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+ *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
  *	the Free Software Foundation; either version 2 of the License, or
@@ -1832,6 +1839,20 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				exit_error(PARAMETER_PROBLEM,
 					   "rule would never match protocol");
 			fw.nfcache |= NFC_IP_PROTO;
+
+			/* try to load match with protocol name */
+			if ((m = find_proto(protocol, TRY_LOAD,
+					    options&OPT_NUMERIC))) {
+				size_t size;
+				size = IPT_ALIGN(sizeof(struct ipt_entry_match))
+						 + m->size;
+				m->m = fw_calloc(1, size);
+				m->m->u.match_size = size;
+				strcpy(m->m->u.user.name, m->name);
+				m->init(m->m, &fw.nfcache);
+				opts = merge_options(opts, m->extra_opts, &m->option_offset);
+			}
+
 			break;
 
 		case 's':
@@ -2016,30 +2037,6 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 						     &fw.nfcache,
 						     &m->m))
 						break;
-				}
-
-				/* If you listen carefully, you can
-				   actually hear this code suck. */
-				if (m == NULL
-				    && protocol
-				    && (m = find_proto(protocol, TRY_LOAD,
-						       options&OPT_NUMERIC))) {
-					/* Try loading protocol */
-					size_t size;
-
-					size = IPT_ALIGN(sizeof(struct ipt_entry_match))
-							 + m->size;
-
-					m->m = fw_calloc(1, size);
-					m->m->u.match_size = size;
-					strcpy(m->m->u.user.name, m->name);
-					m->init(m->m, &fw.nfcache);
-
-					opts = merge_options(opts,
-					    m->extra_opts, &m->option_offset);
-
-					optind--;
-					continue;
 				}
 				if (!m)
 					exit_error(PARAMETER_PROBLEM,
