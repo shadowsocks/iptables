@@ -270,7 +270,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 
 	for (i=0; i < IPT_MULTI_PORTS; i++) {
                 if (pflags & (1<<i)
-                    && !(~minfo->ports[i]))
+                    && minfo->ports[i] == 65535)
                         break;
                 if (i == IPT_MULTI_PORTS-1
                     && minfo->ports[i-1] == minfo->ports[i])
@@ -279,7 +279,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 		print_port(minfo->ports[i], ip->proto, 0);
                 if (pflags & (1<<i)) {
                         printf(":");
-                        print_port(minfo->ports[i++], ip->proto, 0);
+                        print_port(minfo->ports[++i], ip->proto, 0);
                 }
 	}
 	printf(" ");
