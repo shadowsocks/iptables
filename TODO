@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.26 2001/03/26 18:06:04 laforge Exp $
+CVS ID: $Id: TODO,v 1.27 2001/04/12 22:24:29 laforge Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -47,7 +47,7 @@ FUTURE extensions:
 - unified nfnetlink for queue,ulog,conntrack (and more?) (2.5 issue)
 
 ======================================================================
-[RR]	Paul 'Rusty' Russel <rusty@linuxcare.com.au>
+[RR]	Paul 'Rusty' Russel <rusty@rustcorp.com.au>
 [MB]	Marc Boucher <marc@mbsi.ca>
 [JM]	James Morris <jmorris@intercode.com.au>
 [HW]	Harald Welte <laforge@gnumonks.org>
