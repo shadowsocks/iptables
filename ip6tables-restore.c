@@ -7,7 +7,7 @@
  * 	Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: ip6tables-restore.c,v 1.9 2002/05/29 13:08:15 laforge Exp $
+ * $Id: ip6tables-restore.c,v 1.10 2002/08/14 11:40:41 laforge Exp $
  */
 
 #include <getopt.h>
@@ -104,14 +104,15 @@ int main(int argc, char *argv[])
 {
 	ip6tc_handle_t handle;
 	char buffer[10240];
-	unsigned int line = 0;
 	int c;
 	char curtable[IP6T_TABLE_MAXNAMELEN + 1];
 	FILE *in;
 	const char *modprobe = 0;
+	int in_table = 0;
 
 	program_name = "ip6tables-restore";
 	program_version = IPTABLES_VERSION;
+	line = 0;
 
 #ifdef NO_SHARED_LIBS
 	init_extensions();
@@ -164,10 +165,11 @@ int main(int argc, char *argv[])
 		else if (buffer[0] == '#') {
 			if (verbose) fputs(buffer, stdout);
 			continue;
-		} else if (strcmp(buffer, "COMMIT\n") == 0) {
+		} else if ((strcmp(buffer, "COMMIT\n") == 0) && (in_table)) {
 			DEBUGP("Calling commit\n");
 			ret = ip6tc_commit(&handle);
-		} else if (buffer[0] == '*') {
+			in_table = 0;
+		} else if ((buffer[0] == '*') && (!in_table)) {
 			/* New table */
 			char *table;
 
@@ -195,8 +197,9 @@ int main(int argc, char *argv[])
 			}
 
 			ret = 1;
+			in_table = 1;
 
-		} else if (buffer[0] == ':') {
+		} else if ((buffer[0] == ':') && (in_table)) {
 			/* New chain. */
 			char *policy, *chain;
 
@@ -255,7 +258,7 @@ int main(int argc, char *argv[])
 
 			ret = 1;
 
-		} else {
+		} else if (in_table) {
 			int a;
 			char *ptr = buffer;
 			char *pcnt = NULL;

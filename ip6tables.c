@@ -142,6 +142,12 @@ static struct option original_opts[] = {
 	{ 0 }
 };
 
+/* we need this for ip6tables-restore. ip6tables-restore.c sets line to the
+ * current line of the input file, in order to give a more precise error
+ * message. ip6tables itself doesn't need this, so it is initialized to the
+ * magic number of -1 */
+int line = -1;
+
 #ifndef __OPTIMIZE__
 struct ip6t_entry_target *
 ip6t_get_target(struct ip6t_entry *e)
@@ -278,6 +284,8 @@ exit_error(enum exittype status, char *msg, ...)
 void
 exit_tryhelp(int status)
 {
+	if (line != -1)
+		fprintf(stderr, "Error occurred at line: %d\n", line);
 	fprintf(stderr, "Try `%s -h' or '%s --help' for more information.\n",
 			program_name, program_name );
 	exit(status);

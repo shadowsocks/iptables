@@ -106,6 +106,8 @@ struct ip6tables_target
 #endif
 };
 
+extern int line;
+
 /* Your shared library should call one of these. */
 extern void register_match6(struct ip6tables_match *me);
 extern void register_target6(struct ip6tables_target *me);
