@@ -4,15 +4,15 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.18 2001/01/24 12:33:49 laforge Exp $
+CVS ID: $Id: TODO,v 1.19 2001/02/02 10:53:46 laforge Exp $
 
 IMPORTANT before iptables-1.2.1 release:
 X generic tcp sequence number offset support for nat helpers [HW]
-- prerelease make target (for applying certain p-o-m stuff)
+X prerelease make target (for applying certain p-o-m stuff) [RR]
 - header files in seperate directory, build all extensions, even
-  when current kernel not patched
+  when current kernel not patched [RR]
 X restore counters for individual rules (iptables / iptables-restore) [HW]
-- add libipulog / libiptc to DEVEL target
+- add libipulog / libiptc to DEVEL target [RR]
 
 INDEPENDENT from iptables-1.2.1 release:
 - netlink interface for conntrack manipulation from userspace [HW]
@@ -38,6 +38,7 @@ X multiple related connections [HW]
 - CONFIG_NF_IP_NAT_LOCAL
 - fix and test the netfilter bridging stuff
 - integrate the ipt_NETLINK target from gianni@ecsc.co.uk
+- integrate PSD target / port it as match [HW]
 - various NAT performance optimizations possible! (which? ask HW)
 
 ======================================================================
