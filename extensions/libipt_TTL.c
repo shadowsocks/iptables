@@ -1,7 +1,7 @@
 /* Shared library add-on to iptables for the TTL target
  * (C) 2000 by Harald Welte <laforge@gnumonks.org>
  *
- * $Id: libipt_TTL.c,v 1.5 2002/03/14 11:35:58 laforge Exp $
+ * $Id: libipt_TTL.c,v 1.6 2002/05/29 13:08:16 laforge Exp $
  *
  * This program is distributed under the terms of GNU GPL
  */
@@ -24,9 +24,9 @@ static void help(void)
 {
 	printf(
 "TTL target v%s options\n"
-"  --ttl-set value		Set TTL to <value>\n"
-"  --ttl-dec value		Decrement TTL by <value>\n"
-"  --ttl-inc value		Increment TTL by <value>\n"
+"  --ttl-set value		Set TTL to <value 0-255>\n"
+"  --ttl-dec value		Decrement TTL by <value 1-255>\n"
+"  --ttl-inc value		Increment TTL by <value 1-255>\n"
 , IPTABLES_VERSION);
 }
 
@@ -35,7 +35,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		struct ipt_entry_target **target)
 {
 	struct ipt_TTL_info *info = (struct ipt_TTL_info *) (*target)->data;
-	u_int8_t value;
+	unsigned int value;
 
 	if (*flags & IPT_TTL_USED) {
 		exit_error(PARAMETER_PROBLEM, 
@@ -50,7 +50,9 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		exit_error(PARAMETER_PROBLEM,
 				"TTL: unexpected `!'");
 	
-	value = atoi(optarg);
+	if (string_to_number(optarg, 0, 255, &value) == -1)
+		exit_error(PARAMETER_PROBLEM,
+		           "TTL: Expected value between 0 and 255");
 
 	switch (c) {
 
