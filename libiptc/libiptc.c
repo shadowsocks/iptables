@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.50 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.51 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -382,6 +382,7 @@ static int __iptcc_p_del_policy(TC_HANDLE_T h, unsigned int num)
 
 		/* delete rule from cache */
 		iptcc_delete_rule(pr);
+		h->chain_iterator_cur->num_rules--;
 
 		return 1;
 	}
@@ -504,6 +505,7 @@ new_rule:
 		}
 
 		list_add_tail(&r->list, &h->chain_iterator_cur->rules);
+		h->chain_iterator_cur->num_rules++;
 	}
 out_inc:
 	(*num)++;
