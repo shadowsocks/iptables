@@ -6,11 +6,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
-
 #include <iptables.h>
+#include <net/if.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_ROUTE.h>
-#include <net/if.h>
 
 /* Function which prints out usage message. */
 static void
@@ -21,7 +20,7 @@ help(void)
 "  --iface   name                Send this packet directly through iface name.\n"
 "  --ifindex index               Send this packet directly through iface index.\n"
 "\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -48,8 +47,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	struct ipt_route_target_info *route_info = 
 		(struct ipt_route_target_info*)(*target)->data;
 
-	unsigned int if_index;
-
 	switch (c) {
 		char *end;
 	case '1':
@@ -57,15 +54,17 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --iface or --ifindex twice");
 
-		if (check_inverse(optarg, &invert))
+		if (check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --iface");
 
-		if ((if_index = if_nametoindex(optarg))==0)
+		if (strlen(optarg) > sizeof(route_info->if_name) - 1)
 			exit_error(PARAMETER_PROBLEM,
-				   "Unknown interface name %s", optarg);
+				   "Maximum interface name length %u",
+				   sizeof(route_info->if_name) - 1);
 
-		route_info->if_index = if_index;
+		strcpy(route_info->if_name, optarg);
+		route_info->if_index = 0;
 		*flags |= IPT_ROUTE_OPT_IF;
 		break;
 
@@ -74,14 +73,19 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --iface or --ifindex twice");
 
-		if (check_inverse(optarg, &invert))
+		if (check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --ifindex");
 
+		route_info->if_name[0] = 0;
 		route_info->if_index = strtoul(optarg, &end, 0);
-
 		if (*end != '\0' || end == optarg)
-			exit_error(PARAMETER_PROBLEM, "Bad ROUTE ifindex `%s'", optarg);
+			exit_error(PARAMETER_PROBLEM, "Bad ROUTE ifindex `%s'",
+				   optarg);
+
+		if (route_info->if_index == 0)
+			exit_error(PARAMETER_PROBLEM,
+				   "Interface index can't be 0 !");
 
 		*flags |= IPT_ROUTE_OPT_IF;
 		break;
@@ -112,19 +116,17 @@ print(const struct ipt_ip *ip,
 
 	printf("ROUTE ");
 
-	if (route_info->if_index != 0) {
-		char buf[IF_NAMESIZE];
-		printf("iface %s(%d) ",
-		       if_indextoname(route_info->if_index, buf),
-		       route_info->if_index);
-	}
+	if (route_info->if_name[0] != 0)
+		printf("iface %s ", route_info->if_name);
+	else 
+		printf("ifindex %u ", route_info->if_index);
 }
 
 static
 struct iptables_target route
 = { NULL,
     "ROUTE",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_route_target_info)),
     IPT_ALIGN(sizeof(struct ipt_route_target_info)),
     &help,
