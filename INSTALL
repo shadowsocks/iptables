@@ -1,5 +1,7 @@
 FOLLOW THESE STEPS:
 ===================
+0) If you want to try some fun extensions, try:
+	% make patch-o-matic KERNEL_DIR=<<where-your-kernel-is>>
 
 1) If /usr/src/linux contains the kernel headers of a recent 2.4
    kernel:
@@ -17,15 +19,7 @@ That's it!
 ================
 Problems you may encounter:
 
-1) If your kernel is too old, you may be asked to apply one or more of
-   the patches in the directory to your kernel.  This can be safely
-   done as follows:
-
-	cp -al <<where-your-kernel-is>> <<where-your-kernel-is>>.backup
-	cd <<where-your-kernel-is>>
-	patch -p1 <  <<whatever-the-patchfile-is>>
-
-   Then start again.
+1) This package requires a 2.4.0 test9 kernel, or above.
 
 2) If you get the kernel directory wrong, you may see a message like:
 	Please try `make KERNEL_DIR=path-to-correct-kernel'
