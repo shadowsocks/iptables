@@ -689,10 +689,15 @@ find_proto(const char *pname, enum ipt_tryload tryload, int nolookup)
 {
 	unsigned int proto;
 
-	if (string_to_number(pname, 0, 255, &proto) != -1)
-		return find_match(proto_to_name(proto, nolookup), tryload);
+	if (string_to_number(pname, 0, 255, &proto) != -1) {
+		char *protoname = proto_to_name(proto, nolookup);
 
-	return find_match(pname, tryload);
+		if (protoname)
+			return find_match(protoname, tryload);
+	} else
+		return find_match(pname, tryload);
+
+	return NULL;
 }
 
 u_int16_t
