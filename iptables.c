@@ -126,7 +126,7 @@ static struct option original_opts[] = {
 };
 
 #ifndef __OPTIMIZE__
-static struct ipt_entry_target *
+struct ipt_entry_target *
 ipt_get_target(struct ipt_entry *e)
 {
 	return (void *)e + e->target_offset;
@@ -643,6 +643,9 @@ find_match(const char *name, enum ipt_tryload tryload)
 				   name, dlerror());
 	}
 
+	if (ptr)
+		ptr->used = 1;
+
 	return ptr;
 }
 
@@ -892,6 +895,9 @@ find_target(const char *name, enum ipt_tryload tryload)
 				   "Couldn't load target `%s':%s\n", 
 				   name, dlerror());
 	}
+
+	if (ptr)
+		ptr->used = 1;
 
 	return ptr;
 }
@@ -1290,7 +1296,7 @@ make_delete_mask(struct ipt_entry *fw)
 	unsigned char *mask, *mptr;
 
 	size = sizeof(struct ipt_entry);
-	for (m = iptables_matches; m; m = m->next)
+	for (m = iptables_matches; m && m->used; m = m->next)
 		size += IPT_ALIGN(sizeof(struct ipt_entry_match)) + m->size;
 
 	mask = fw_calloc(1, size
@@ -1300,7 +1306,7 @@ make_delete_mask(struct ipt_entry *fw)
 	memset(mask, 0xFF, sizeof(struct ipt_entry));
 	mptr = mask + sizeof(struct ipt_entry);
 
-	for (m = iptables_matches; m; m = m->next) {
+	for (m = iptables_matches; m && m->used; m = m->next) {
 		memset(mptr, 0xFF,
 		       IPT_ALIGN(sizeof(struct ipt_entry_match))
 		       + m->userspacesize);
@@ -1370,7 +1376,7 @@ check_packet(const ipt_chainlabel chain,
 	return ret;
 }
 
-static int
+int
 for_each_chain(int (*fn)(const ipt_chainlabel, int, iptc_handle_t *),
 	       int verbose, int builtinstoo, iptc_handle_t *handle)
 {
@@ -1406,7 +1412,7 @@ for_each_chain(int (*fn)(const ipt_chainlabel, int, iptc_handle_t *),
         return ret;
 }
 
-static int
+int
 flush_entries(const ipt_chainlabel chain, int verbose,
 	      iptc_handle_t *handle)
 {
@@ -1430,7 +1436,7 @@ zero_entries(const ipt_chainlabel chain, int verbose,
 	return iptc_zero_entries(chain, handle);
 }
 
-static int
+int
 delete_chain(const ipt_chainlabel chain, int verbose,
 	     iptc_handle_t *handle)
 {
@@ -1505,7 +1511,7 @@ generate_entry(const struct ipt_entry *fw,
 	struct ipt_entry *e;
 
 	size = sizeof(struct ipt_entry);
-	for (m = matches; m; m = m->next)
+	for (m = matches; m && m->used; m = m->next)
 		size += m->m->u.match_size;
 
 	e = fw_malloc(size + target->u.target_size);
@@ -1514,7 +1520,7 @@ generate_entry(const struct ipt_entry *fw,
 	e->next_offset = size + target->u.target_size;
 
 	size = 0;
-	for (m = matches; m; m = m->next) {
+	for (m = matches; m && m->used; m = m->next) {
 		memcpy(e->elems + size, m->m, m->m->u.match_size);
 		size += m->m->u.match_size;
 	}
@@ -1538,10 +1544,27 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	int ret = 1;
 	struct iptables_match *m;
 	struct iptables_target *target = NULL;
+	struct iptables_target *t;
 	const char *jumpto = "";
 	char *protocol = NULL;
 
 	memset(&fw, 0, sizeof(fw));
+
+	/* re-set optind to 0 in case do_command gets called
+	 * a second time */
+	optind = 0;
+
+	/* clear mflags in case do_command gets called a second time
+	 * (we clear the global list of all matches for security)*/
+	for (m = iptables_matches; m; m = m->next) {
+		m->mflags = 0;
+		m->used = 0;
+	}
+
+	for (t = iptables_targets; t; t = t->next) {
+		t->tflags = 0;
+		t->used = 0;
+	}
 
 	/* Suppress error messages: we may add new options if we
            demand-load a protocol. */
@@ -1845,7 +1868,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 					       argv, invert,
 					       &target->tflags,
 					       &fw, &target->t))) {
-				for (m = iptables_matches; m; m = m->next) {
+				for (m = iptables_matches; m && m->used; m = m->next) {
 					if (m->parse(c - m->option_offset,
 						     argv, invert,
 						     &m->mflags,
@@ -1886,7 +1909,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		invert = FALSE;
 	}
 
-	for (m = iptables_matches; m; m = m->next)
+	for (m = iptables_matches; m && m->used; m = m->next)
 		m->final_check(m->mflags);
 	if (target)
 		target->final_check(target->tflags);
@@ -1938,7 +1961,10 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			   "chain name `%s' too long (must be under %i chars)",
 			   chain, IPT_FUNCTION_MAXNAMELEN);
 
-	*handle = iptc_init(*table);
+	/* only allocate handle if we weren't called with a handle */
+	if (!*handle)
+		*handle = iptc_init(*table);
+
 	if (!*handle)
 		exit_error(VERSION_PROBLEM,
 			   "can't initialize iptables table `%s': %s",

@@ -1,10 +1,23 @@
-/* Code to restore the iptables state, from file by iptables-save. */
+/* Code to restore the iptables state, from file by iptables-save. 
+ * (C) 2000 by Harald Welte <laforge@gnumonks.org>
+ * based on previous code from Rusty Russell <rusty@linuxcare.com.au>
+ *
+ * This coude is distributed under the terms of GNU GPL
+ */
+
 #include <getopt.h>
 #include <sys/errno.h>
 #include <string.h>
 #include <stdio.h>
-#include "packet-filter/userspace/iptables.h"
-#include "packet-filter/userspace/libiptc/libiptc.h"
+#include <stdlib.h>
+#include "iptables.h"
+#include "libiptc/libiptc.h"
+
+#ifdef DEBUG
+#define DEBUGP(x, args ...) fprintf(stderr, x, ## args)
+#else
+#define DEBUGP(x, args ...) 
+#endif
 
 /* Keeping track of external matches and targets.  */
 static struct option options[] = {
@@ -23,20 +36,19 @@ static void print_usage(const char *name, const char *version)
 	exit(1);
 }
 
-static int clean_slate(iptc_handle_t *handle)
+iptc_handle_t create_handle(const char *tablename)
 {
-	/* Skip over builtins. */
-	const char *i, *last = IPTC_LABEL_OUTPUT;
+	iptc_handle_t handle;
 
-	/* Be careful iterating: it isn't safe during delete. */
-	/* Re-iterate after each delete successful */
-	while ((i = iptc_next_chain(last, handle)) != NULL) {
-		if (!iptc_flush_entries(i, handle)
-		    || !iptc_delete_chain(i, handle))
-			return 0;
+	handle = iptc_init(tablename);
+	if (!handle) {
+		exit_error(PARAMETER_PROBLEM, "%s: unable to initialize"
+			"table '%s'\n", program_name, tablename);
+		exit(1);
 	}
-	return 1;
+	return handle;
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -44,8 +56,8 @@ int main(int argc, char *argv[])
 	char buffer[10240];
 	int counters = 0, binary = 0, verbose = 0;
 	unsigned int line = 0;
-	int c;
-	const char *chain;
+	char curtable[IPT_TABLE_MAXNAMELEN + 1];
+	char curchain[IPT_FUNCTION_MAXNAMELEN + 1];
 	FILE *in;
 
 	program_name = "iptables-restore";
@@ -65,8 +77,8 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	else in = stdin;
-
-	handle = iptc_init();
+/*
+	handle = iptc_init("filter");
 	if (!handle)
 		exit_error(VERSION_PROBLEM,
 			   "can't initialize iptables-restore: %s",
@@ -75,7 +87,7 @@ int main(int argc, char *argv[])
 	if (!clean_slate(&handle))
 		exit_error(OTHER_PROBLEM, "Deleting old chains: %s",
 			   iptc_strerror(errno));
-
+*/
 	/* Grab standard input. */
 	while (fgets(buffer, sizeof(buffer), in)) {
 		int ret;
@@ -85,37 +97,84 @@ int main(int argc, char *argv[])
 		else if (buffer[0] == '#') {
 			if (verbose) fputs(buffer, stdout);
 			continue;
-		} else if (strcmp(buffer, "COMMIT\n") == 0)
+		} else if (strcmp(buffer, "COMMIT\n") == 0) {
+			DEBUGP("Calling commit\n");
 			ret = iptc_commit(&handle);
-		else if (buffer[0] == ':') {
+		} else if (buffer[0] == '*') {
+			/* New table */
+			char *table;
+
+			table = strtok(buffer+1, " \t\n");
+			DEBUGP("line %u, table '%s'\n", line, table);
+			if (!table) {
+				exit_error(PARAMETER_PROBLEM, 
+					"%s: line %u table name invalid\n",
+					program_name, line);
+				exit(1);
+			}
+			strncpy(curtable, table, IPT_TABLE_MAXNAMELEN);
+
+			handle = create_handle(table);
+
+			DEBUGP("Cleaning all chains of table '%s'\n", table);
+			for_each_chain(flush_entries, verbose, 1, &handle) ;
+
+			DEBUGP("Deleting all user-defined chains of table '%s'\n", table);
+			for_each_chain(delete_chain, verbose, 0, &handle) ;
+
+			ret = 1;
+
+		} else if (buffer[0] == ':') {
 			/* New chain. */
-			char *chain, *policy;
+			char *policy, *chain;
 
 			/* FIXME: Don't ignore counters. */
+
 			chain = strtok(buffer+1, " \t\n");
+			DEBUGP("line %u, chain '%s'\n", line, chain);
 			if (!chain) {
 				exit_error(PARAMETER_PROBLEM,
 					   "%s: line %u chain name invalid\n",
 					   program_name, line);
 				exit(1);
 			}
+			strncpy(curchain, chain, IPT_FUNCTION_MAXNAMELEN);
+
+			/* why the f... does iptc_builtin not work here ? */
+//			if (!iptc_builtin(curchain, &handle)) {
+				DEBUGP("Creating new chain '%s'\n", curchain);
+				if (!iptc_create_chain(curchain, &handle))
+				DEBUGP("unable to create chain '%s':%s\n", curchain,
+					strerror(errno));
+//			}
+
 			policy = strtok(NULL, " \t\n");
+			DEBUGP("line %u, policy '%s'\n", line, policy);
 			if (!policy) {
 				exit_error(PARAMETER_PROBLEM,
 					   "%s: line %u policy invalid\n",
 					   program_name, line);
 				exit(1);
 			}
-			if (strcmp(policy, "-") != 0
-			    && !iptc_set_policy(chain, policy, &handle))
-				exit_error(OTHER_PROBLEM,
-					   "Can't set policy `%s'"
-					   " on `%s' line %u: %s\n",
-					   chain, policy, line,
-					   iptc_strerror(errno));
+
+			if (strcmp(policy, "-") != 0) {
+
+				DEBUGP("Setting policy of chain %s to %s\n",
+					chain, policy);
+
+				if (!iptc_set_policy(chain, policy, &handle))
+					exit_error(OTHER_PROBLEM,
+						"Can't set policy `%s'"
+						" on `%s' line %u: %s\n",
+						chain, policy, line,
+						iptc_strerror(errno));
+			}
+
+			ret = 1;
+
 		} else {
 			char *newargv[1024];
-			int i;
+			int i,a;
 			char *ptr = buffer;
 
 			/* FIXME: Don't ignore counters. */
@@ -127,9 +186,14 @@ int main(int argc, char *argv[])
 						   line);
 			}
 
-			/* strtok: a function only a coder could love */
 			newargv[0] = argv[0];
-			for (i = 1; i < sizeof(newargv)/sizeof(char *); i++) {
+			newargv[1] = "-t";
+			newargv[2] = (char *) &curtable;
+			newargv[3] = "-A";
+			newargv[4] = (char *) &curchain;
+
+			/* strtok: a function only a coder could love */
+			for (i = 5; i < sizeof(newargv)/sizeof(char *); i++) {
 				if (!(newargv[i] = strtok(ptr, " \t\n")))
 					break;
 				ptr = NULL;
@@ -141,7 +205,13 @@ int main(int argc, char *argv[])
 				exit(1);
 			}
 
-			ret = do_command(i, newargv, &handle);
+			DEBUGP("===>calling do_command(%u, argv, &%s, handle):\n",
+					i, curtable);
+
+			for (a = 0; a <= i; a++)
+				DEBUGP("argv[%u]: %s\n", a, newargv[a]);
+
+			ret = do_command(i, newargv, &newargv[2], &handle);
 		}
 		if (!ret) {
 			fprintf(stderr, "%s: line %u failed\n",

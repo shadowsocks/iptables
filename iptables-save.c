@@ -1,7 +1,13 @@
 /* Code to save the iptables state, in human readable-form. */
+/* Authors: Paul 'Rusty' Russel <rusty@linuxcare.com.au> and
+ * 	    Harald Welte <laforge@gnumonks.org>
+ */
 #include <getopt.h>
 #include <sys/errno.h>
 #include <stdio.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
 #include <dlfcn.h>
 #include <time.h>
 #include "libiptc/libiptc.h"
@@ -47,6 +53,8 @@ print_iface(char letter, const char *iface, const unsigned char *mask,
 			break;
 		}
 	}
+
+	printf(" ");
 }
 
 /* These are hardcoded backups in iptables.c, so they are safe */
@@ -55,6 +63,7 @@ struct pprot {
 	u_int8_t num;
 };
 
+/* FIXME: why don't we use /etc/services ? */
 static const struct pprot chain_protos[] = {
 	{ "tcp", IPPROTO_TCP },
 	{ "udp", IPPROTO_UDP },
@@ -78,6 +87,7 @@ static void print_proto(u_int16_t proto, int invert)
 	}
 }
 
+#if 0
 static int non_zero(const void *ptr, size_t size)
 {
 	unsigned int i;
@@ -88,74 +98,97 @@ static int non_zero(const void *ptr, size_t size)
 
 	return 1;
 }
+#endif
+
+static int print_match(const struct ipt_entry_match *e)
+{
+	struct iptables_match *match
+		= find_match(e->u.user.name, TRY_LOAD);
+
+	if (match) {
+		printf("-m %s ", e->u.user.name);
+		match->save(NULL, e);
+	} else {
+		if (e->u.match_size) {
+			fprintf(stderr,
+				"Can't find library for match `%s'\n",
+				e->u.user.name);
+			exit(1);
+		}
+	}
+	return 0;
+}
+
+/* print a given ip including mask if neccessary */
+static void print_ip(char *prefix, u_int32_t ip, u_int32_t mask, int invert)
+{
+	if (!mask && !ip)
+		return;
+
+	printf("%s %s%u.%u.%u.%u",
+		prefix,
+		invert ? "! " : "",
+		IP_PARTS(ip));
+
+	if (mask != 0xffffffff) 
+		printf("/%u.%u.%u.%u ", IP_PARTS(mask));
+	else
+		printf(" ");
+}
 
 /* We want this to be readable, so only print out neccessary fields.
  * Because that's the kind of world I want to live in.  */
-static void print_rule(const struct ipt_entry *e, int counters)
+static void print_rule(const struct ipt_entry *e, 
+		iptc_handle_t *h, int counters)
 {
+	struct ipt_entry_target *t;
+
+	/* print counters */
 	if (counters)
 		printf("[%llu,%llu] ", e->counters.pcnt, e->counters.bcnt);
 
 	/* Print IP part. */
-	if (e->ip.smsk.s_addr)
-		printf("-s %s%u.%u.%u.%u/%u.%u.%u.%u ",
-		       e->ip.invflags & IPT_INV_SRCIP ? "! " : "",
-		       IP_PARTS(e->ip.src.s_addr),
-		       IP_PARTS(e->ip.smsk.s_addr));
-	if (e->ip.dmsk.s_addr)
-		printf("-d %s%u.%u.%u.%u/%u.%u.%u.%u ",
-		       e->ip.invflags & IPT_INV_SRCIP ? "! " : "",
-		       IP_PARTS(e->ip.dst.s_addr),
-		       IP_PARTS(e->ip.dmsk.s_addr));
+	print_ip("-s", e->ip.src.s_addr,e->ip.smsk.s_addr,
+			e->ip.invflags & IPT_INV_SRCIP);	
+
+	print_ip("-d", e->ip.dst.s_addr, e->ip.dmsk.s_addr,
+			e->ip.invflags & IPT_INV_SRCIP);
 
 	print_iface('i', e->ip.iniface, e->ip.iniface_mask,
 		    e->ip.invflags & IPT_INV_VIA_IN);
+
 	print_iface('o', e->ip.outiface, e->ip.outiface_mask,
 		    e->ip.invflags & IPT_INV_VIA_OUT);
+
 	print_proto(e->ip.proto, e->ip.invflags & IPT_INV_PROTO);
 
 	if (e->ip.flags & IPT_F_FRAG)
 		printf("%s-f ",
 		       e->ip.invflags & IPT_INV_FRAG ? "! " : "");
 
-	if (e->ip.flags & IPT_F_TOS)
-		printf("-t %s0x%02X ",
-		       e->ip.invflags & IPT_INV_TOS ? "! " : "",
-		       e->ip.tos);
-
 	/* Print matchinfo part */
-	if (e->match_name[0]) {
-		struct iptables_match *match
-			= find_match(e->match_name, TRY_LOAD);
-
-		if (match)
-			match->save(e);
-		else {
-			/* If some bits are non-zero, it implies we *need*
-			   to understand it */
-			if (non_zero(&e->matchinfo, sizeof(e->matchinfo))) {
-				fprintf(stderr,
-					"Can't find library for match `%s'\n",
-					e->match_name);
-				exit(1);
-			}
-		}
+	if (e->target_offset) {
+		IPT_MATCH_ITERATE(e, print_match);
 	}
 
+	/* Print target name */	
+	printf("-j %s ", iptc_get_target(e, h));
+
 	/* Print targinfo part */
-	if (e->target_name[0]) {
+	t = ipt_get_target(e);
+	if (t->u.user.name[0]) {
 		struct iptables_target *target
-			= find_target(e->target_name, TRY_LOAD);
+			= find_target(t->u.user.name, TRY_LOAD);
 
 		if (target)
-			target->save(e);
+			target->save(NULL, t);
 		else {
 			/* If some bits are non-zero, it implies we *need*
 			   to understand it */
-			if (non_zero(&e->targinfo, sizeof(e->targinfo))) {
+			if (t->u.target_size) {
 				fprintf(stderr,
 					"Can't find library for target `%s'\n",
-					e->target_name);
+					t->u.user.name);
 				exit(1);
 			}
 		}
@@ -164,15 +197,13 @@ static void print_rule(const struct ipt_entry *e, int counters)
 }
 
 /* Debugging prototype. */
-extern void dump_entries(iptc_handle_t handle);
-
 static int for_each_table(int (*func)(const char *tablename))
 {
         int ret = 1;
-	FILE *procfile;
+	FILE *procfile = NULL;
 	char tablename[IPT_TABLE_MAXNAMELEN+1];
 
-	procfile = fopen("/proc/net/ip_tables_names", O_RDONLY);
+	procfile = fopen("/proc/net/ip_tables_names", "r");
 	if (!procfile)
 		return 0;
 
@@ -189,21 +220,6 @@ static int for_each_table(int (*func)(const char *tablename))
 }
 	
 
-static int dump_table(const char *tablename)
-{
-	iptc_handle_t h;
-
-	if (!tablename)
-		return for_each_table(&dump_table);
-
-	/* Debugging dump. */
-	h = iptc_init(tablename);
-	if (!h)
-		exit_error(OTHER_PROBLEM, "iptc_init: %s\n",
-			   iptc_strerror(errno));
-	dump_entries(h);
-}
-	
 static int do_output(const char *tablename)
 {
 	iptc_handle_t h;
@@ -222,39 +238,29 @@ static int do_output(const char *tablename)
 
 		printf("# Generated by iptables-save v%s on %s",
 		       NETFILTER_VERSION, ctime(&now));
+		printf("*%s\n", tablename);
 
 		/* Dump out chain names */
 		for (chain = iptc_first_chain(&h);
 		     chain;
 		     chain = iptc_next_chain(&h)) {
+			const struct ipt_entry *e;
+
 			printf(":%s ", chain);
-			if (iptc_builtin(chain, &h)) {
+			if (iptc_builtin(chain, h)) {
 				struct ipt_counters count;
 				printf("%s ",
 				       iptc_get_policy(chain, &count, &h));
-				printf("%llu %llu\n", count.pcnt, count.bcnt);
+				printf("%llu:%llu\n", count.pcnt, count.bcnt);
 			} else {
 				printf("- 0 0\n");
 			}
-		}
 
-		/* Dump out rules */
-		for (chain = iptc_first_chain(&h);
-		     chain;
-		     chain = iptc_next_chain(&h)) {
-			unsigned int i;
-
-			for (i = 0; i < iptc_num_rules(chain, &h); i++) {
-				const struct ipt_entry *e
-					= iptc_get_rule(chain, i, &h);
-
-				if (!e)
-					exit_error(OTHER_PROBLEM,
-						   "Can't read rule %u"
-						   " of chain %s: %s\n",
-						   i, chain,
-						   iptc_strerror(errno));
-				print_rule(e, counters);
+			/* Dump out rules */
+			e = iptc_first_rule(chain, &h);
+			while(e) {
+				print_rule(e, &h, counters);
+				e = iptc_next_rule(e, &h);
 			}
 		}
 
@@ -296,7 +302,7 @@ int main(int argc, char *argv[])
 			tablename = optarg;
 			break;
 		case 'd':
-			dump_table(tablename);
+			do_output(tablename);
 			exit(0);
 		}
 	}
