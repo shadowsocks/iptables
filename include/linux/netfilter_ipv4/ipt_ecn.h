@@ -1,11 +1,10 @@
 /* iptables module for matching the ECN header in IPv4 and TCP header
  *
  * (C) 2002 Harald Welte <laforge@gnumonks.org>
+ *
  * This software is distributed under GNU GPL v2, 1991
  * 
- * See 
- *
- * $Id: ipt_ecn.h,v 1.1 2002/05/29 15:12:30 laforge Exp $
+ * Id: ipt_ecn.h,v 1.4 2002/08/05 19:39:00 laforge Exp
 */
 #ifndef _IPT_ECN_H
 #define _IPT_ECN_H
