@@ -115,7 +115,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --limit-burst");
 
-		if (string_to_number(optarg, 0, 10000, &num) <= 0)
+		if (string_to_number(optarg, 0, 10000, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				   "bad --limit-burst `%s'", optarg);
 		r->burst = num;
