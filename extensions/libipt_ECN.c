@@ -6,7 +6,7 @@
  *
  * libipt_ECN.c borrowed heavily from libipt_DSCP.c
  *
- * $Id: libipt_ECN.c,v 1.10 2002/08/06 18:46:18 laforge Exp $
+ * $Id: libipt_ECN.c,v 1.11 2002/08/07 10:04:42 laforge Exp $
  */
 #include <stdio.h>
 #include <string.h>
@@ -109,7 +109,7 @@ final_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
-		           "ECN target: Parameter --ecn-remove is required");
+		           "ECN target: Parameter --ecn-tcp-remove is required");
 }
 
 /* Prints out the targinfo. */
