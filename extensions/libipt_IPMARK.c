@@ -33,7 +33,7 @@ help(void)
 "  --and-mask value       logical AND ip address with this value becomes MARK\n"
 "  --or-mask value        logical OR ip address with this value becomes MARK\n"
 "\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -152,7 +152,7 @@ static
 struct iptables_target ipmark
 = { NULL,
     "IPMARK",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_ipmark_target_info)),
     IPT_ALIGN(sizeof(struct ipt_ipmark_target_info)),
     &help,
