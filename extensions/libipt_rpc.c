@@ -47,7 +47,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include "/usr/include/rpc/rpc.h"
+#include <rpc/rpc.h>
 
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ipt_rpc.h>
