@@ -100,14 +100,15 @@ static int non_zero(const void *ptr, size_t size)
 }
 #endif
 
-static int print_match(const struct ipt_entry_match *e)
+static int print_match(const struct ipt_entry_match *e,
+			const struct ipt_ip *ip)
 {
 	struct iptables_match *match
 		= find_match(e->u.user.name, TRY_LOAD);
 
 	if (match) {
 		printf("-m %s ", e->u.user.name);
-		match->save(NULL, e);
+		match->save(ip, e);
 	} else {
 		if (e->u.match_size) {
 			fprintf(stderr,
@@ -168,7 +169,7 @@ static void print_rule(const struct ipt_entry *e,
 
 	/* Print matchinfo part */
 	if (e->target_offset) {
-		IPT_MATCH_ITERATE(e, print_match);
+		IPT_MATCH_ITERATE(e, print_match, &e->ip);
 	}
 
 	/* Print target name */	
@@ -181,7 +182,7 @@ static void print_rule(const struct ipt_entry *e,
 			= find_target(t->u.user.name, TRY_LOAD);
 
 		if (target)
-			target->save(NULL, t);
+			target->save(&e->ip, t);
 		else {
 			/* If some bits are non-zero, it implies we *need*
 			   to understand it */
