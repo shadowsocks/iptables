@@ -337,9 +337,9 @@ print_flags(u_int8_t mask, u_int8_t cmp, int invert, int numeric)
 		if (numeric)
 			printf("0x02%X/0x02%X ", mask, cmp);
 		else {
-			print_tcpf(cmp);
-			printf("/");
 			print_tcpf(mask);
+			printf("/");
+			print_tcpf(cmp);
 			printf(" ");
 		}
 	}
