@@ -54,7 +54,7 @@ parse_ports(const char *arg, struct ip_nat_multi_range *mr)
 	if (!dash) {
 		mr->range[0].min.tcp.port
 			= mr->range[0].max.tcp.port
-			= port;
+			= htons(port);
 	} else {
 		int maxport;
 
@@ -66,8 +66,8 @@ parse_ports(const char *arg, struct ip_nat_multi_range *mr)
 			/* People are stupid.  Present reader excepted. */
 			exit_error(PARAMETER_PROBLEM,
 				   "Port range `%s' funky\n", arg);
-		mr->range[0].min.tcp.port = port;
-		mr->range[0].max.tcp.port = maxport;
+		mr->range[0].min.tcp.port = htons(port);
+		mr->range[0].max.tcp.port = htons(maxport);
 	}
 }
 
@@ -121,11 +121,11 @@ print(const struct ipt_ip *ip,
 		= (struct ip_nat_multi_range *)target->data;
 	struct ip_nat_range *r = &mr->range[0];
 
-	printf("MASQUERADE ");
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
-		printf("%hu", r->min.tcp.port);
+		printf("masq ports: ");
+		printf("%hu", ntohs(r->min.tcp.port));
 		if (r->max.tcp.port != r->min.tcp.port)
-			printf("-%hu", r->max.tcp.port);
+			printf("-%hu", ntohs(r->max.tcp.port));
 		printf(" ");
 	}
 }
@@ -139,9 +139,9 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	struct ip_nat_range *r = &mr->range[0];
 
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
-		printf("%hu", r->min.tcp.port);
+		printf("%hu", ntohs(r->min.tcp.port));
 		if (r->max.tcp.port != r->min.tcp.port)
-			printf("-%hu", r->max.tcp.port);
+			printf("-%hu", ntohs(r->max.tcp.port));
 		printf(" ");
 	}
 }
@@ -150,6 +150,7 @@ struct iptables_target masq
 = { NULL,
     "MASQUERADE",
     NETFILTER_VERSION,
+    sizeof(struct ip_nat_multi_range),
     sizeof(struct ip_nat_multi_range),
     &help,
     &init,
