@@ -452,10 +452,11 @@ divide_time(int fulltime, int *hours, int *minutes)
 static void
 print_date(time_t date, char *command)
 {
+	struct tm *t;
+
 	/* If it's default value, don't print..*/
 	if (((date == 0) || (date == LONG_MAX)) && (command != NULL))
 		return;
-	struct tm *t;
 	t = localtime(&date);
 	if (command != NULL)
 		printf("%s %d:%d:%d:%d:%d:%d ", command, (t->tm_year + 1900), (t->tm_mon + 1),
