@@ -328,35 +328,43 @@ do_check(TC_HANDLE_T h, unsigned int line)
 
 		user_offset = h->info.hook_entry[NF_IP6_LOCAL_OUT];
 	} else if (strcmp(h->info.name, "mangle") == 0) {
-		 /* This code assumes mangle5hooks enabled iptable_mangle,
-		  * either by patch-o-matic patch or linux >= 2.4.18-pre6 */
-		assert(h->info.valid_hooks
+		/* This code is getting ugly because linux < 2.4.18-pre6 had
+		 * two mangle hooks, linux >= 2.4.18-pre6 has five mangle hooks
+		 * */
+		assert((h->info.valid_hooks &
+			~(1 << NF_IP6_LOCAL_IN
+			  | 1 << NF_IP6_FORWARD
+			  | 1 << NF_IP6_POST_ROUTING))
 		       == (1 << NF_IP6_PRE_ROUTING
-			   | 1 << NF_IP6_LOCAL_IN
-			   | 1 << NF_IP6_FORWARD
-			   | 1 << NF_IP6_LOCAL_OUT
-			   | 1 << NF_IP6_POST_ROUTING));
+			   | 1 << NF_IP6_LOCAL_OUT));
 
 		/* Hooks should be first five */
 		assert(h->info.hook_entry[NF_IP6_PRE_ROUTING] == 0);
 
 		n = get_chain_end(h, 0);
-		n += get_entry(h, n)->next_offset;
-		assert(h->info.hook_entry[NF_IP6_LOCAL_IN] == n);
 
-		n = get_chain_end(h, n);
-		n += get_entry(h, n)->next_offset;
-		assert(h->info.hook_entry[NF_IP6_FORWARD] == n);
+		if (h->info.valid_hooks & NF_IP6_LOCAL_IN) {
+			n += get_entry(h, n)->next_offset;
+			assert(h->info.hook_entry[NF_IP6_LOCAL_IN] == n);
+			n = get_chain_end(h, n);
+		}
 
-		n = get_chain_end(h, n);
+		if (h->info.valid_hooks & NF_IP6_FORWARD) {
+			n += get_entry(h, n)->next_offset;
+			assert(h->info.hook_entry[NF_IP6_FORWARD] == n);
+			n = get_chain_end(h, n);
+		}
+
 		n += get_entry(h, n)->next_offset;
 		assert(h->info.hook_entry[NF_IP6_LOCAL_OUT] == n);
+		user_offset = h->info.hook_entry[NF_IP6_LOCAL_OUT];
 
-		n = get_chain_end(h, n);
-		n += get_entry(h, n)->next_offset;
-		assert(h->info.hook_entry[NF_IP6_POST_ROUTING] == n);
-
-		user_offset = h->info.hook_entry[NF_IP6_POST_ROUTING];
+		if (h->info.valid_hooks & NF_IP6_POST_ROUTING) {
+			n = get_chain_end(h, n);
+			n += get_entry(h, n)->next_offset;
+			assert(h->info.hook_entry[NF_IP6_POST_ROUTING] == n);
+			user_offset = h->info.hook_entry[NF_IP6_POST_ROUTING];
+		}
 	} else
 		abort();
 
