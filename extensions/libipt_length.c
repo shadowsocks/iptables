@@ -35,11 +35,9 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 static u_int16_t
 parse_length(const char *s)
 {
-	int len;
+	unsigned int len;
 	
-	len = string_to_number(s, 0, 0xFFFF);
-	
-	if (len == -1)
+	if (string_to_number(s, 0, 0xFFFF, &len) == -1)
 		exit_error(PARAMETER_PROBLEM, "length invalid: `%s'\n", s);
 	else
 		return (u_int16_t )len;

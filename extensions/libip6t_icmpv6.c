@@ -118,7 +118,7 @@ parse_icmpv6(const char *icmpv6type, u_int8_t *type, u_int8_t code[])
 	} else {
 		char *slash;
 		char buffer[strlen(icmpv6type) + 1];
-		int number;
+		unsigned int number;
 
 		strcpy(buffer, icmpv6type);
 		slash = strchr(buffer, '/');
@@ -126,14 +126,12 @@ parse_icmpv6(const char *icmpv6type, u_int8_t *type, u_int8_t code[])
 		if (slash)
 			*slash = '\0';
 
-		number = string_to_number(buffer, 0, 255);
-		if (number == -1)
+		if (string_to_number(buffer, 0, 255, &number) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				   "Invalid ICMPv6 type `%s'\n", buffer);
 		*type = number;
 		if (slash) {
-			number = string_to_number(slash+1, 0, 255);
-			if (number == -1)
+			if (string_to_number(slash+1, 0, 255, &number) == -1)
 				exit_error(PARAMETER_PROBLEM,
 					   "Invalid ICMPv6 code `%s'\n",
 					   slash+1);

@@ -59,7 +59,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       struct ipt_entry_match **match)
 {
 	struct ipt_nth_info *nthinfo = (struct ipt_nth_info *)(*match)->data;
-	int num;
+	unsigned int num;
 
 	switch (c) {
 	case '1':
@@ -79,8 +79,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 		/* Remember, this function will interpret a leading 0 to be 
 		   Octal, a leading 0x to be hexdecimal... */
-                num = string_to_number(optarg, 2, 100);
-                if (num < 2)
+                if (string_to_number(optarg, 2, 100, &num) == -1 || num < 2)
                         exit_error(PARAMETER_PROBLEM,
                                    "bad --every `%s', must be between 2 and 100", optarg);
 
@@ -110,8 +109,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_NTH_OPT_START)
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --start twice");
-		num = string_to_number(optarg, 0, nthinfo->every);
-                if (num < 0)
+		if (string_to_number(optarg, 0, nthinfo->every, &num) == -1)
                         exit_error(PARAMETER_PROBLEM,
                                    "bad --start `%s', must between 0 and %u", optarg, nthinfo->every);
 		*flags |= IPT_NTH_OPT_START;

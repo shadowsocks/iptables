@@ -50,13 +50,13 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		= (struct ipt_tcpmss_info *)(*target)->data;
 
 	switch (c) {
-		int mssval;
+		unsigned int mssval;
 
 	case '1':
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
 			           "TCPMSS target: Only one option may be specified");
-		if ((mssval = string_to_number(optarg, 0, 65535 - 40)) == -1)
+		if (string_to_number(optarg, 0, 65535 - 40, &mssval) == -1)
 			exit_error(PARAMETER_PROBLEM, "Bad TCPMSS value `%s'", optarg);
 		
 		mssinfo->mss = mssval;

@@ -34,9 +34,9 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 static u_int16_t
 parse_tcp_mssvalue(const char *mssvalue)
 {
-	int mssvaluenum;
+	unsigned int mssvaluenum;
 
-	if ((mssvaluenum = string_to_number(mssvalue, 0, 65535)) != -1)
+	if (string_to_number(mssvalue, 0, 65535, &mssvaluenum) != -1)
 		return (u_int16_t)mssvaluenum;
 
 	exit_error(PARAMETER_PROBLEM,

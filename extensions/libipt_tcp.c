@@ -52,9 +52,9 @@ service_to_port(const char *name)
 static u_int16_t
 parse_tcp_port(const char *port)
 {
-	int portnum;
+	unsigned int portnum;
 
-	if ((portnum = string_to_number(port, 0, 65535)) != -1 ||
+	if (string_to_number(port, 0, 65535, &portnum) != -1 ||
 	    (portnum = service_to_port(port)) != -1)
 		return (u_int16_t)portnum;
 
@@ -141,10 +141,9 @@ parse_tcp_flags(struct ipt_tcp *tcpinfo,
 static void
 parse_tcp_option(const char *option, u_int8_t *result)
 {
-	int ret;
+	unsigned int ret;
 
-	ret = string_to_number(option, 1, 255);
-	if (ret == -1)
+	if (string_to_number(option, 1, 255, &ret) == -1)
 		exit_error(PARAMETER_PROBLEM, "Bad TCP option `%s'", option);
 
 	*result = (u_int8_t)ret;

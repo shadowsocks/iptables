@@ -44,9 +44,9 @@ service_to_port(const char *name)
 static u_int16_t
 parse_udp_port(const char *port)
 {
-	int portnum;
+	unsigned int portnum;
 
-	if ((portnum = string_to_number(port, 0, 65535)) != -1 ||
+	if (string_to_number(port, 0, 65535, &portnum) != -1 ||
 	    (portnum = service_to_port(port)) != -1)
 		return (u_int16_t)portnum;
 

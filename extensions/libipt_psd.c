@@ -81,7 +81,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       struct ipt_entry_match **match)
 {
 	struct ipt_psd_info *psdinfo = (struct ipt_psd_info *)(*match)->data;
-	int num;
+	unsigned int num;
 
 	switch (c) {
 	/* PSD-weight-threshold */
@@ -90,8 +90,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --psd-weight-threshold "
 				   "twice");
-                num = string_to_number(optarg, 0, 10000);
-                if (num <= 0)
+                if (string_to_number(optarg, 0, 10000, &num) == -1)
                         exit_error(PARAMETER_PROBLEM,
                                    "bad --psd-weight-threshold `%s'", optarg);
 		psdinfo->weight_threshold = num;
@@ -103,8 +102,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_PSD_OPT_DTRESH)
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --psd-delay-threshold twice");
-                num = string_to_number(optarg, 0, 10000);
-                if (num <= 0)
+                if (string_to_number(optarg, 0, 10000, &num) == -1)
                         exit_error(PARAMETER_PROBLEM,
                                    "bad --psd-delay-threshold `%s'", optarg);
 		psdinfo->delay_threshold = num;
@@ -116,8 +114,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_PSD_OPT_LPWEIGHT)
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --psd-lo-ports-weight twice");
-                num = string_to_number(optarg, 0, 10000);
-                if (num <= 0)
+                if (string_to_number(optarg, 0, 10000, &num) == -1)
                         exit_error(PARAMETER_PROBLEM,
                                    "bad --psd-lo-ports-weight `%s'", optarg);
 		psdinfo->lo_ports_weight = num;
@@ -129,8 +126,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_PSD_OPT_HPWEIGHT)
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --psd-hi-ports-weight twice");
-                num = string_to_number(optarg, 0, 10000);
-                if (num <= 0)
+                if (string_to_number(optarg, 0, 10000, &num) == -1)
                         exit_error(PARAMETER_PROBLEM,
                                    "bad --psd-hi-ports-weight `%s'", optarg);
 		psdinfo->hi_ports_weight = num;

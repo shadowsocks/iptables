@@ -76,7 +76,7 @@ split_time(char **part1, char **part2, const char *str_2_parse)
 }
 
 static void
-parse_time_string(int *hour, int *minute, const char *time)
+parse_time_string(unsigned int *hour, unsigned int *minute, const char *time)
 {
 	char *hours;
 	char *minutes;
@@ -94,8 +94,10 @@ parse_time_string(int *hour, int *minute, const char *time)
 			hours[0] = ' ';
 		if (minutes[0] == '0')
 			minutes[0] = ' ';
-		*hour   = string_to_number(hours, 0, 23);
-		*minute = string_to_number(minutes, 0, 59);
+
+		/* FIXME: error checking */
+		string_to_number(hours, 0, 23, hour);
+		string_to_number(minutes, 0, 59, minute);
 	}
 	if ((*hour != (-1)) && (*minute != (-1))) {
 		free(hours);

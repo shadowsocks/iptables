@@ -74,7 +74,7 @@ parse_to(char *arg, struct ip_nat_range *range)
 	char *slash;
 	struct in_addr *ip;
 	u_int32_t netmask;
-	int bits;
+	unsigned int bits;
 
 	range->flags |= IP_NAT_RANGE_MAP_IPS;
 	slash = strchr(arg, '/');
@@ -95,7 +95,7 @@ parse_to(char *arg, struct ip_nat_range *range)
 			netmask = ip->s_addr;
 		}
 		else {
-			if ((bits = string_to_number(slash+1, 0, 32)) == -1)
+			if (string_to_number(slash+1, 0, 32, &bits) == -1)
 				exit_error(PARAMETER_PROBLEM, "Bad netmask `%s'\n",
 					   slash+1);
 			netmask = bits2netmask(bits);

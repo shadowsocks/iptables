@@ -43,7 +43,9 @@ static struct option opts[] = {
 static void
 parse_ftos(const unsigned char *s, struct ipt_FTOS_info *finfo)
 {
-	int ftos = string_to_number(s, 0, 255);
+	unsigned int ftos;
+       
+	string_to_number(s, 0, 255, &ftos);
     	finfo->ftos = (u_int8_t )ftos;
     	return;
 }
