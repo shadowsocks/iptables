@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.38 2001/05/26 20:31:59 laforge Exp $
+CVS ID: $Id: TODO,v 1.39 2001/07/05 06:26:37 laforge Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -16,7 +16,7 @@ IMPORTANT issues:
 X full tcp window tracking incompatibility with nat helpers [HW]
 ? Hard lockup with ip_queue under heavy load (was possibly some unrelated 2.3
   problem) [JM]
-- mangle table should use all five netfilter hooks [HW]
+- mangle table should use all five netfilter hooks [BC]
 X merge EPRT / EPSV ftp stuff [RR] (reimplemented in ftp-fixes, included 2.4.4)
 X runme error with IPv6 stuff! [HW]
 - wrong 'Out of window' error message from tcp-windowtracking [HW]
@@ -75,3 +75,4 @@ FUTURE extensions:
 [BB]	Bastian Blank <bastianb@gmx.de>
 [FM]	Fabrice Marie <fabrice@celestix.com>
 [KA]	Kiz-Szabo Andras <kisza@sch.bme.hu>
+[BC]	Brad Chapman <kakadu@earthlink.net>
