@@ -33,8 +33,8 @@ static void help(void)
 "  --set-dscp value		Set DSCP field in packet header to value\n"
 "  		                This value can be in decimal (ex: 32)\n"
 "               		or in hex (ex: 0x20)\n"
-"  --set-class class		Set the DSCP field in packet header to the value\n"
-"				represented by the DiffServ class value.\n"
+"  --set-dscp-class class	Set the DSCP field in packet header to the\n"
+"				value represented by the DiffServ class value.\n"
 "				This class may be EF,BE or any of the CSxx "
 "				or AFxx classes.\n"
 "\n"
@@ -44,7 +44,7 @@ static void help(void)
 
 static struct option opts[] = {
 	{ "set-dscp", 1, 0, 'F' },
-	{ "set-class", 1, 0, 'G' },
+	{ "set-dscp-class", 1, 0, 'G' },
 	{ 0 }
 };
 
@@ -95,7 +95,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	case 'G':
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
-				   "DSCP target: Only use --set-class ONCE!");
+				   "DSCP target: Only use --set-dscp-class ONCE!");
 		parse_class(optarg, dinfo);
 		*flags = 1;
 		break;

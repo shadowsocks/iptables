@@ -36,7 +36,7 @@ static void help(void)
 "[!] --dscp value		Match DSCP codepoint with numerical value\n"
 "  		                This value can be in decimal (ex: 32)\n"
 "               		or in hex (ex: 0x20)\n"
-"[!] --class name		Match the DiffServ class. This value may\n"
+"[!] --dscp-class name		Match the DiffServ class. This value may\n"
 "				be any of the BE,EF, AFxx or CSx classes\n"
 "\n"
 "				These two options are mutually exclusive !\n"
@@ -46,7 +46,7 @@ static void help(void)
 
 static struct option opts[] = {
 	{ "dscp", 1, 0, 'F' },
-	{ "class", 1, 0, 'G' },
+	{ "dscp-class", 1, 0, 'G' },
 	{ 0 }
 };
 
@@ -102,7 +102,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	case 'G':
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
-					"DSCP match: Only use --class ONCE!");
+					"DSCP match: Only use --dscp-class ONCE!");
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_class(argv[optind - 1], dinfo);
 		if (invert)
