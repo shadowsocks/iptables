@@ -4,7 +4,7 @@
  *
  * This coude is distributed under the terms of GNU GPL
  *
- * $Id: iptables-restore.c,v 1.11 2001/05/03 20:50:03 laforge Exp $
+ * $Id: iptables-restore.c,v 1.12 2001/05/26 04:41:56 laforge Exp $
  */
 
 #include <getopt.h>
@@ -30,6 +30,7 @@ static struct option options[] = {
 /*	{ "verbose", 1, 0, 'v' }, */
 	{ "help", 0, 0, 'h' },
 	{ "noflush", 0, 0, 'n'},
+	{ "modprobe", 1, 0, 'M'},
 	{ 0 }
 };
 
@@ -42,16 +43,24 @@ static void print_usage(const char *name, const char *version)
 			"	   [ --counters ]\n"
 			"	   [ --verbose ]\n"
 			"	   [ --help ]\n"
-			"	   [ --noflush ]\n", name);
+			"	   [ --noflush ]\n"
+		        "          [ --modprobe=<command>]\n", name);
 		
 	exit(1);
 }
 
-iptc_handle_t create_handle(const char *tablename)
+iptc_handle_t create_handle(const char *tablename, const char* modprobe )
 {
 	iptc_handle_t handle;
 
 	handle = iptc_init(tablename);
+
+	if (!handle) {
+		/* try to insmod the module if iptc_init failed */
+		iptables_insmod("ip_tables", modprobe);
+		handle = iptc_init(tablename);
+	}
+
 	if (!handle) {
 		exit_error(PARAMETER_PROBLEM, "%s: unable to initialize"
 			"table '%s'\n", program_name, tablename);
@@ -95,11 +104,12 @@ int main(int argc, char *argv[])
 	int c;
 	char curtable[IPT_TABLE_MAXNAMELEN + 1];
 	FILE *in;
+	const char *modprobe = 0;
 
 	program_name = "iptables-restore";
 	program_version = NETFILTER_VERSION;
 
-	while ((c = getopt_long(argc, argv, "bcvhn", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "bcvhnM:", options, NULL)) != -1) {
 		switch (c) {
 			case 'b':
 				binary = 1;
@@ -113,6 +123,9 @@ int main(int argc, char *argv[])
 				break;
 			case 'n':
 				noflush = 1;
+				break;
+			case 'M':
+				modprobe = optarg;
 				break;
 		}
 	}
@@ -157,7 +170,7 @@ int main(int argc, char *argv[])
 			}
 			strncpy(curtable, table, IPT_TABLE_MAXNAMELEN);
 
-			handle = create_handle(table);
+			handle = create_handle(table, modprobe);
 			if (noflush == 0) {
 				DEBUGP("Cleaning all chains of table '%s'\n",
 					table);

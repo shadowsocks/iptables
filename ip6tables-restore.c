@@ -35,6 +35,7 @@ static struct option options[] = {
 /*	{ "verbose", 1, 0, 'v' }, */
 	{ "help", 0, 0, 'h' },
 	{ "noflush", 0, 0, 'n'},
+	{ "modprobe", 1, 0, 'M'},
 	{ 0 }
 };
 
@@ -47,16 +48,24 @@ static void print_usage(const char *name, const char *version)
 			"	   [ --counters ]\n"
 			"	   [ --verbose ]\n"
 			"	   [ --help ]\n"
-			"	   [ --noflush ]\n", name);
+			"	   [ --noflush ]\n"
+		        "          [ --modprobe=<command>]\n", name);
 		
 	exit(1);
 }
 
-ip6tc_handle_t create_handle(const char *tablename)
+ip6tc_handle_t create_handle(const char *tablename, const char* modprobe)
 {
 	ip6tc_handle_t handle;
 
 	handle = ip6tc_init(tablename);
+
+	if (!handle) {
+                /* try to insmod the module if iptc_init failed */
+                ip6tables_insmod("ip6_tables", modprobe);
+                handle = ip6tc_init(tablename);
+	}
+
 	if (!handle) {
 		exit_error(PARAMETER_PROBLEM, "%s: unable to initialize"
 			"table '%s'\n", program_name, tablename);
@@ -79,11 +88,12 @@ int main(int argc, char *argv[])
 	char curtable[IP6T_TABLE_MAXNAMELEN + 1];
 	char curchain[IP6T_FUNCTION_MAXNAMELEN + 1];
 	FILE *in;
+	const char *modprobe = 0;
 
 	program_name = "ip6tables-restore";
 	program_version = NETFILTER_VERSION;
 
-	while ((c = getopt_long(argc, argv, "bcvhn", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "bcvhnM:", options, NULL)) != -1) {
 		switch (c) {
 			case 'b':
 				binary = 1;
@@ -97,6 +107,9 @@ int main(int argc, char *argv[])
 				break;
 			case 'n':
 				noflush = 1;
+				break;
+			case 'M':
+				modprobe = optarg;
 				break;
 		}
 	}
@@ -151,7 +164,7 @@ int main(int argc, char *argv[])
 			}
 			strncpy(curtable, table, IP6T_TABLE_MAXNAMELEN);
 
-			handle = create_handle(table);
+			handle = create_handle(table, modprobe);
 			if (noflush == 0) {
 				DEBUGP("Cleaning all chains of table '%s'\n",
 					table);

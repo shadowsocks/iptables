@@ -1545,7 +1545,7 @@ static char *get_modprobe(void)
         return NULL;
 }
 
-static int ip6tables_insmod(const char *modname, const char *modprobe)
+int ip6tables_insmod(const char *modname, const char *modprobe)
 {
         char *buf = NULL;
         char *argv[3];
