@@ -5,11 +5,11 @@
  * 
  * See 
  *
- * $Id: ipt_ecn.h,v 1.2 2002/05/29 15:09:00 laforge Exp $
+ * $Id: ipt_ecn.h,v 1.1 2002/05/29 15:12:30 laforge Exp $
 */
 #ifndef _IPT_ECN_H
 #define _IPT_ECN_H
-#include <linux/netfilter_ipv4/ipt_dcsp.h>
+#include <linux/netfilter_ipv4/ipt_dscp.h>
 
 #define IPT_ECN_IP_MASK	(~IPT_DSCP_MASK)
 
