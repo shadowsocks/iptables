@@ -27,7 +27,13 @@ static const struct reject_names reject_table[] = {
 	{"icmp-proto-unreachable", "proto-unreach",
 		IPT_ICMP_PROT_UNREACHABLE, "ICMP protocol unreachable"},
 	{"echo-reply", "echoreply",
-		IPT_ICMP_ECHOREPLY, "for ICMP echo only: faked ICMP echo reply"}
+	 IPT_ICMP_ECHOREPLY, "for ICMP echo only: faked ICMP echo reply"},
+	{"icmp-net-prohibited", "net-prohib",
+	 IPT_ICMP_NET_PROHIBITED, "ICMP network prohibited"},
+	{"icmp-host-prohibited", "host-prohib",
+	 IPT_ICMP_HOST_PROHIBITED, "ICMP host prohibited"},
+	{"icmp-packet-filtered", "packet-filtered",
+	 IPT_ICMP_PACKET_FILTERED, "ICMP packet filtered"}
 };
 
 static void
