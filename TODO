@@ -4,15 +4,11 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.56 2002/02/19 09:14:27 laforge Exp $
+CVS ID: $Id: TODO,v 1.57 2002/02/19 20:36:19 laforge Exp $
 
 IMPORTANT issues:
-- token ring crashes ??
 - solution for nostate / notrack (we don't want to track specific conn's)
-- iptables-save/restore problems with log-level
 x multiple related connections (solved: newnat)[HW]
-- ip_conntrack rmmod loop (sometimes, Yan's patch?)
-- conntrack helper not called for first packet (udp!)
 x add support for correct SACK handling [HW]
 - erroneously too-fast dropped conntrack for half-open TCP connections [JK]
 - wrong 'Out of window' error message from tcp-windowtracking [JK]
@@ -20,11 +16,17 @@ x mangle table should use all five netfilter hooks [BC]
 - --mac-source not working in FORWARD (manpage bug?)
 x netfilter hooks should give error if same function registers twice [HW]
 x speed issues (mark_source_chains, Robert Olsson)
-- different behaviour for first packet towards an l2-unresolved ip?
 x fix apparent output nat + slip oops bug; see thread at
   http://lists.samba.org/pipermail/netfilter/2001-December/017747.html
 x TFTP helper: works only on second packet?
 - necessary structures for helper match in newnat
+
+TO BE INVESTIGATED:
+- token ring crashes ??
+- iptables-save/restore problems with log-level
+- ip_conntrack rmmod loop (sometimes, Yan's patch?)
+- conntrack helper not called for first packet (udp!)
+- different behaviour for first packet towards an l2-unresolved ip?
 
 NICE to have:
 - make RPC conntrack work again
@@ -39,7 +41,6 @@ x interface names in ipv6 can contain _ and -
 x make patch-o-matic reversible
 x CONFIG_NF_IP_NAT_LOCAL
 x fix and test the netfilter bridging stuff
-- various NAT performance optimizations possible! (which? ask HW)
 - ip_nat_ident module [FM]
 x provide daily CVS snapshots via ftp [HW]
 - make iptables / ip6tables use the same codebase (as libiptc) [KA]
