@@ -1,7 +1,7 @@
 /* Shared library add-on to iptables for the TTL target
  * (C) 2000 by Harald Welte <laforge@gnumonks.org>
  *
- * $Id: libipt_TTL.c,v 1.4 2002/02/25 11:25:41 laforge Exp $
+ * $Id: libipt_TTL.c,v 1.5 2002/03/14 11:35:58 laforge Exp $
  *
  * This program is distributed under the terms of GNU GPL
  */
@@ -27,7 +27,7 @@ static void help(void)
 "  --ttl-set value		Set TTL to <value>\n"
 "  --ttl-dec value		Decrement TTL by <value>\n"
 "  --ttl-inc value		Increment TTL by <value>\n"
-, NETFILTER_VERSION);
+, IPTABLES_VERSION);
 }
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
@@ -146,7 +146,7 @@ static struct option opts[] = {
 static
 struct iptables_target TTL = { NULL, 
 	"TTL",
-	NETFILTER_VERSION,
+	IPTABLES_VERSION,
 	IPT_ALIGN(sizeof(struct ipt_TTL_info)),
 	IPT_ALIGN(sizeof(struct ipt_TTL_info)),
 	&help,

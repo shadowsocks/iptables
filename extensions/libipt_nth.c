@@ -40,7 +40,7 @@ help(void)
 "                                there must be Nth number of --packet\n"
 "                                rules, covering all values between 0 and\n"
 "                                Nth-1 inclusively.\n",
-NETFILTER_VERSION, IPT_NTH_NUM_COUNTERS-1);
+IPTABLES_VERSION, IPT_NTH_NUM_COUNTERS-1);
 }
 
 static struct option opts[] = {
@@ -221,7 +221,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 struct iptables_match nth
 = { NULL,
     "nth",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_nth_info)),
     IPT_ALIGN(sizeof(struct ipt_nth_info)),
     &help,

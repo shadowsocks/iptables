@@ -25,7 +25,7 @@ help(void)
 "  --save-mark                   Save the packet nfmark on the connection\n"
 "  --restore-mark                Restore saved nfmark value\n"
 "\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -149,7 +149,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 struct iptables_target mark
 = { NULL,
     "CONNMARK",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_connmark_target_info)),
     IPT_ALIGN(sizeof(struct ipt_connmark_target_info)),
     &help,

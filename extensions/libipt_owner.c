@@ -23,7 +23,7 @@ help(void)
 "[!] --sid-owner sessionid  Match local sid\n"
 "[!] --cmd-owner name       Match local command name\n"
 "\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 #else
 	printf(
 "OWNER match v%s options:\n"
@@ -32,7 +32,7 @@ NETFILTER_VERSION);
 "[!] --pid-owner processid  Match local pid\n"
 "[!] --sid-owner sessionid  Match local sid\n"
 "\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 #endif /* IPT_OWNER_COMM */
 }
 
@@ -239,7 +239,7 @@ static
 struct iptables_match owner
 = { NULL,
     "owner",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_owner_info)),
     IPT_ALIGN(sizeof(struct ipt_owner_info)),
     &help,

@@ -154,7 +154,7 @@ static void save(const struct ip6t_ip6 *ip,
 struct ip6tables_target reject
 = { NULL,
     "REJECT",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(struct ip6t_reject_info)),
     IP6T_ALIGN(sizeof(struct ip6t_reject_info)),
     &help,

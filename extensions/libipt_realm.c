@@ -20,7 +20,7 @@ help(void)
 "REALM v%s options:\n"
 " --realm [!] value[/mask]\n"
 "				Match realm\n"
-"\n", NETFILTER_VERSION);
+"\n", IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -115,7 +115,7 @@ final_check(unsigned int flags)
 struct iptables_match realm
 = { NULL,
     "realm",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_realm_info)),
     IPT_ALIGN(sizeof(struct ipt_realm_info)),
     &help,

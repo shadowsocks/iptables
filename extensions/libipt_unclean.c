@@ -10,7 +10,7 @@ help(void)
 {
 	printf(
 "unclean v%s takes no options\n"
-"\n", NETFILTER_VERSION);
+"\n", IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -45,7 +45,7 @@ static
 struct iptables_match unclean
 = { NULL,
     "unclean",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(0),
     IPT_ALIGN(0),
     &help,

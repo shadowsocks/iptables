@@ -6,7 +6,7 @@
  * 	Harald Welte <laforge@gnumonks.org>
  * 	Rusty Russell <rusty@linuxcare.com.au>
  *
- * $Id: ip6tables-restore.c,v 1.20 2002/01/17 20:43:10 laforge Exp $
+ * $Id: ip6tables-restore.c,v 1.8 2002/03/03 09:44:31 laforge Exp $
  */
 
 #include <getopt.h>
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 	const char *modprobe = 0;
 
 	program_name = "ip6tables-restore";
-	program_version = NETFILTER_VERSION;
+	program_version = IPTABLES_VERSION;
 
 #ifdef NO_SHARED_LIBS
 	init_extensions();
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 				break;
 			case 'h':
 				print_usage("ip6tables-restore",
-					    NETFILTER_VERSION);
+					    IPTABLES_VERSION);
 				break;
 			case 'n':
 				noflush = 1;

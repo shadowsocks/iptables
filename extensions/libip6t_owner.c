@@ -21,7 +21,7 @@ help(void)
 "[!] --pid-owner processid  Match local pid\n"
 "[!] --sid-owner sessionid  Match local sid\n"
 "\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -199,7 +199,7 @@ static
 struct ip6tables_match owner
 = { NULL,
     "owner",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(struct ip6t_owner_info)),
     IP6T_ALIGN(sizeof(struct ip6t_owner_info)),
     &help,

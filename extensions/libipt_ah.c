@@ -16,7 +16,7 @@ help(void)
 "AH v%s options:\n"
 " --ahspi [!] spi[:spi]\n"
 "				match spi (range)\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -172,7 +172,7 @@ static
 struct iptables_match ah
 = { NULL,
     "ah",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_ah)),
     IPT_ALIGN(sizeof(struct ipt_ah)),
     &help,

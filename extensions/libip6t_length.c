@@ -17,7 +17,7 @@ help(void)
 "length v%s options:\n"
 "[!] --length length[:length]    Match packet length against value or range\n"
 "                                of values (inclusive)\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 
 }
   
@@ -143,7 +143,7 @@ save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match)
 struct ip6tables_match length
 = { NULL,
     "length",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(struct ip6t_length_info)),
     IP6T_ALIGN(sizeof(struct ip6t_length_info)),
     &help,

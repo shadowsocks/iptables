@@ -21,7 +21,7 @@ help(void)
 "  [!] --ts      (match timestamp flag)\n\n"
 "  [!] --ra      (match router-alert option)\n\n"
 "  [!] --any-opt (match any option or no option at all if used with '!')\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -303,7 +303,7 @@ static
 struct iptables_match ipv4options_struct
 = { NULL,
     "ipv4options",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_ipv4options_info)),
     IPT_ALIGN(sizeof(struct ipt_ipv4options_info)),
     &help,

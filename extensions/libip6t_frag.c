@@ -20,7 +20,7 @@ help(void)
 " --fragfirst                   matches on the first fragment\n"
 " [--fragmore|--fraglast]       there are more fragments or this\n"
 "                               is the last one\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -245,7 +245,7 @@ static
 struct ip6tables_match frag
 = { NULL,
     "frag",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(struct ip6t_frag)),
     IP6T_ALIGN(sizeof(struct ip6t_frag)),
     &help,

@@ -16,7 +16,7 @@ help(void)
 "REDIRECT v%s options:\n"
 " --to-ports <port>[-<port>]\n"
 "				Port (range) to map to.\n\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -151,7 +151,7 @@ static
 struct iptables_target redir
 = { NULL,
     "REDIRECT",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
     IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
     &help,

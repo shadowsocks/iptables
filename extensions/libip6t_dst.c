@@ -26,7 +26,7 @@ help(void)
 " --%s-len [!] length           total length of this header\n"
 " --%s-opts TYPE[:LEN][,TYPE[:LEN]...] \n"
 "                               Options and its length (list, max: %d)\n", 
-UNAME , NETFILTER_VERSION, LNAME, LNAME, IP6T_OPTS_OPTSNR);
+UNAME , IPTABLES_VERSION, LNAME, LNAME, IP6T_OPTS_OPTSNR);
 }
 
 #if HOPBYHOP
@@ -266,7 +266,7 @@ struct ip6tables_match optstruct
 #else
     "dst",
 #endif
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(struct ip6t_opts)),
     IP6T_ALIGN(sizeof(struct ip6t_opts)),
     &help,

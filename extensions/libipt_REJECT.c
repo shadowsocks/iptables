@@ -160,7 +160,7 @@ static
 struct iptables_target reject
 = { NULL,
     "REJECT",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_reject_info)),
     IPT_ALIGN(sizeof(struct ipt_reject_info)),
     &help,

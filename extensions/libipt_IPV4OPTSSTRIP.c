@@ -21,7 +21,7 @@ static void init(struct ipt_entry_target *t, unsigned int *nfcache)
 static void help(void) 
 {
 	printf("IPV4OPTSSTRIP v%s target takes no option !! Make sure you use it in the mangle table.\n",
-	       NETFILTER_VERSION);
+	       IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -63,7 +63,7 @@ static
 struct iptables_target IPV4OPTSSTRIP
 = { NULL,
     "IPV4OPTSSTRIP",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(0),
     IPT_ALIGN(0),
     &help,

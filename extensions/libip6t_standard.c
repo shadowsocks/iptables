@@ -13,7 +13,7 @@ help(void)
 {
 	printf(
 "Standard v%s options:\n"
-"(If target is DROP, ACCEPT, RETURN or nothing)\n", NETFILTER_VERSION);
+"(If target is DROP, ACCEPT, RETURN or nothing)\n", IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -51,7 +51,7 @@ static
 struct ip6tables_target standard
 = { NULL,
     "standard",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(int)),
     IP6T_ALIGN(sizeof(int)),
     &help,

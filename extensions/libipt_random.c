@@ -38,7 +38,7 @@ help(void)
 "  [--average]     percent      The probability in percentage of the match\n"
 "                               If ommited, a probability of 50%% percent is set.\n"
 "                               Percentage must be within : 1 <= percent <= 99.\n\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -133,7 +133,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 struct iptables_match rand_match
 = { NULL,
     "random",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_rand_info)),
     IPT_ALIGN(sizeof(struct ipt_rand_info)),
     &help,

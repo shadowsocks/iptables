@@ -19,7 +19,7 @@ help(void)
 "eui64 v%s options:\n"
 " This module hasn't got any option\n"
 " This module checks for EUI64 IPv6 addresses\n"
-"\n", NETFILTER_VERSION);
+"\n", IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -69,7 +69,7 @@ static
 struct ip6tables_match eui64
 = { NULL,
     "eui64",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(int)),
     IP6T_ALIGN(sizeof(int)),
     &help,

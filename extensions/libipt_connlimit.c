@@ -17,7 +17,7 @@ help(void)
 "iplimit v%s options:\n"
 "[!] --iplimit-above n		match if the number of existing tcp connections is (not) above n\n"
 " --iplimit-mask n		group hosts using mask\n"
-"\n", NETFILTER_VERSION);
+"\n", IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -114,7 +114,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 
 static struct iptables_match iplimit = {
 	name:		"iplimit",
-	version:	NETFILTER_VERSION,
+	version:	IPTABLES_VERSION,
 	size:		IPT_ALIGN(sizeof(struct ipt_iplimit_info)),
 	userspacesize:	offsetof(struct ipt_iplimit_info,data),
 	help:		help,

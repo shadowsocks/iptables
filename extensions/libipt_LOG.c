@@ -22,7 +22,7 @@ help(void)
 " --log-tcp-sequence		Log TCP sequence numbers.\n\n"
 " --log-tcp-options		Log TCP options.\n\n"
 " --log-ip-options		Log IP options.\n\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -244,7 +244,7 @@ static
 struct iptables_target log
 = { NULL,
     "LOG",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_log_info)),
     IPT_ALIGN(sizeof(struct ipt_log_info)),
     &help,

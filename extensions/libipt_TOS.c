@@ -37,7 +37,7 @@ help(void)
 "TOS target v%s options:\n"
 "  --set-tos value                   Set Type of Service field to one of the\n"
 "                                following numeric or descriptive values:\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 
 	for (i = 0; i < sizeof(TOS_values)/sizeof(struct TOS_value);i++)
 		printf("                                     %s %u (0x%02x)\n",
@@ -157,7 +157,7 @@ static
 struct iptables_target tos
 = { NULL,
     "TOS",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_tos_target_info)),
     IPT_ALIGN(sizeof(struct ipt_tos_target_info)),
     &help,

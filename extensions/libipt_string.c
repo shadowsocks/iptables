@@ -24,7 +24,7 @@ help(void)
 	printf(
 "STRING match v%s options:\n"
 "--string [!] string             Match a string in a packet\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 
 	fputc('\n', stdout);
 }
@@ -116,7 +116,7 @@ static
 struct iptables_match string
 = { NULL,
     "string",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_string_info)),
     IPT_ALIGN(sizeof(struct ipt_string_info)),
     &help,

@@ -1,7 +1,7 @@
 /* Shared library add-on to iptables to add TTL matching support 
  * (C) 2000 by Harald Welte <laforge@gnumonks.org>
  *
- * $Id: libipt_ttl.c,v 1.4 2002/02/25 11:25:41 laforge Exp $
+ * $Id: libipt_ttl.c,v 1.5 2002/03/14 11:35:58 laforge Exp $
  *
  * This program is released under the terms of GNU GPL */
 
@@ -21,7 +21,7 @@ static void help(void)
 "  --ttl-eq value	Match time to live value\n"
 "  --ttl-lt value	Match TTL < value\n"
 "  --ttl-gt value	Match TTL > value\n"
-, NETFILTER_VERSION);
+, IPTABLES_VERSION);
 }
 
 static void init(struct ipt_entry_match *m, unsigned int *nfcache)
@@ -158,7 +158,7 @@ static
 struct iptables_match ttl = {
 	NULL,
 	"ttl",
-	NETFILTER_VERSION,
+	IPTABLES_VERSION,
 	IPT_ALIGN(sizeof(struct ipt_ttl_info)),
 	IPT_ALIGN(sizeof(struct ipt_ttl_info)),
 	&help,

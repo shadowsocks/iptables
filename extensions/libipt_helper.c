@@ -16,7 +16,7 @@ help(void)
 "helper match v%s options:\n"
 "[!] --helper value         Match helper value\n"
 "\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -90,7 +90,7 @@ static
 struct iptables_match helper
 = { NULL,
     "helper",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_helper_info)),
     IPT_ALIGN(sizeof(struct ipt_helper_info)),
     &help,

@@ -20,7 +20,7 @@ help(void)
 "MAC v%s options:\n"
 " --mac-source [!] XX:XX:XX:XX:XX:XX\n"
 "				Match source MAC address\n"
-"\n", NETFILTER_VERSION);
+"\n", IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -127,7 +127,7 @@ static
 struct ip6tables_match mac
 = { NULL,
     "mac",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(struct ip6t_mac_info)),
     IP6T_ALIGN(sizeof(struct ip6t_mac_info)),
     &help,

@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.33 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.34 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -307,7 +307,7 @@ TC_DUMP_ENTRIES(const TC_HANDLE_T handle)
 	CHECK(handle);
 
 	printf("libiptc v%s.  %u entries, %u bytes.\n",
-	       NETFILTER_VERSION,
+	       IPTABLES_VERSION,
 	       handle->new_number, handle->entries.size);
 	printf("Table `%s'\n", handle->info.name);
 	printf("Hooks: pre/in/fwd/out/post = %u/%u/%u/%u/%u\n",

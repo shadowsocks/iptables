@@ -16,7 +16,7 @@ help(void)
 "state v%s options:\n"
 " [!] --state [INVALID|ESTABLISHED|NEW|RELATED][,...]\n"
 "				State(s) to match\n"
-"\n", NETFILTER_VERSION);
+"\n", IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -145,7 +145,7 @@ static
 struct iptables_match state
 = { NULL,
     "state",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_state_info)),
     IPT_ALIGN(sizeof(struct ipt_state_info)),
     &help,

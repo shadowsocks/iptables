@@ -34,7 +34,7 @@ help(void)
 "				Status(es) to match\n"
 " [!] --ctexpire time[:time]	Match remaining lifetime in seconds against\n"
 "				value or range of values (inclusive)\n"
-"\n", NETFILTER_VERSION);
+"\n", IPTABLES_VERSION);
 }
 
 
@@ -491,7 +491,7 @@ static
 struct iptables_match conntrack
 = { NULL,
     "conntrack",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_conntrack_info)),
     IPT_ALIGN(sizeof(struct ipt_conntrack_info)),
     &help,

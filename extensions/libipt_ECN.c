@@ -6,7 +6,7 @@
  *
  * libipt_ECN.c borrowed heavily from libipt_DSCP.c
  *
- * $Id: libipt_ECN.c,v 1.3 2002/04/10 13:12:53 laforge Exp $
+ * $Id: libipt_ECN.c,v 1.5 2002/05/29 12:43:34 laforge Exp $
  */
 #include <stdio.h>
 #include <string.h>
@@ -30,7 +30,7 @@ static void help(void)
 "  --ecn-ip-ect			Set the IPv4 ECT codepoint (0 to 3)\n"
 "  --ecn-tcp-cwr		Set the IPv4 CWR bit (0 or 1)\n"
 "  --ecn-tcp-ece		Set the IPv4 CWR bit (0 or 1)\n",
-		NETFILTER_VERSION, NETFILTER_VERSION
+		IPTABLES_VERSION, IPTABLES_VERSION
 );
 }
 
@@ -157,7 +157,7 @@ static
 struct iptables_target ecn
 = { NULL,
     "ECN",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_ECN_info)),
     IPT_ALIGN(sizeof(struct ipt_ECN_info)),
     &help,

@@ -21,7 +21,7 @@ help(void)
 "          timestart value : HH:MM\n"
 "          timestop  value : HH:MM\n"
 "          listofdays value: a list of days to apply -> ie. Mon,Tue,Wed,Thu,Fri. Case sensitive\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -295,7 +295,7 @@ static
 struct iptables_match timestruct
 = { NULL,
     "time",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_time_info)),
     IPT_ALIGN(sizeof(struct ipt_time_info)),
     &help,

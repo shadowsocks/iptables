@@ -13,7 +13,7 @@ help(void)
 {
 	printf(
 "MIRROR target v%s takes no options\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -45,7 +45,7 @@ static
 struct iptables_target mirror
 = { NULL,
     "MIRROR",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(0),
     IPT_ALIGN(0),
     &help,

@@ -24,7 +24,7 @@ help(void)
 "TCPMSS target v%s mutually-exclusive options:\n"
 "  --set-mss value               explicitly set MSS option to specified value\n"
 "  --clamp-mss-to-pmtu           automatically clamp MSS value to (path_MTU - 40)\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -117,7 +117,7 @@ static
 struct iptables_target mss
 = { NULL,
     "TCPMSS",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_tcpmss_info)),
     IPT_ALIGN(sizeof(struct ipt_tcpmss_info)),
     &help,

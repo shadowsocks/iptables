@@ -16,7 +16,7 @@ help(void)
 "CONNMARK match v%s options:\n"
 "[!] --mark value[/mask]         Match nfmark value with optional mask\n"
 "\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -110,7 +110,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 struct iptables_match mark
 = { NULL,
     "connmark",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_connmark_info)),
     IPT_ALIGN(sizeof(struct ipt_connmark_info)),
     &help,

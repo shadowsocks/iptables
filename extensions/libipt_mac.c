@@ -20,7 +20,7 @@ help(void)
 "MAC v%s options:\n"
 " --mac-source [!] XX:XX:XX:XX:XX:XX\n"
 "				Match source MAC address\n"
-"\n", NETFILTER_VERSION);
+"\n", IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -127,7 +127,7 @@ static
 struct iptables_match mac
 = { NULL,
     "mac",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_mac_info)),
     IPT_ALIGN(sizeof(struct ipt_mac_info)),
     &help,

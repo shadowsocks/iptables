@@ -9,7 +9,7 @@ help(void)
 {
 	printf(
 "record_rpc v%s takes no options\n"
-"\n", NETFILTER_VERSION);
+"\n", IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -56,7 +56,7 @@ static
 struct iptables_match record_rpc
 = { NULL,
     "record_rpc",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(0),
     IPT_ALIGN(0),
     &help,

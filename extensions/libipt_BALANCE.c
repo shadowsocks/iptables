@@ -18,7 +18,7 @@ help(void)
 "BALANCE v%s options:\n"
 " --to-destination <ipaddr>-<ipaddr>\n"
 "				Addresses to map destination to.\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -135,7 +135,7 @@ static
 struct iptables_target balance
 = { NULL,
     "BALANCE",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
     IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
     &help,

@@ -145,7 +145,7 @@ help(void)
 "                                ipv6-frag,ah,esp,ipv6-nonxt,protocol\n"
 "                       numbers: 0,60,43,44,51,50,59\n"
 "--soft                    The header CONTAINS the specified extensions\n",
-	NETFILTER_VERSION);
+	IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -301,7 +301,7 @@ static
 struct ip6tables_match ipv6header
 = { NULL,
     "ipv6header",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(struct ip6t_ipv6header_info)),
     IP6T_ALIGN(sizeof(struct ip6t_ipv6header_info)),
     &help,

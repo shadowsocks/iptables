@@ -16,7 +16,7 @@ help(void)
 "length v%s options:\n"
 "[!] --length length[:length]    Match packet length against value or range\n"
 "                                of values (inclusive)\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 
 }
   
@@ -142,7 +142,7 @@ static
 struct iptables_match length
 = { NULL,
     "length",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_length_info)),
     IPT_ALIGN(sizeof(struct ipt_length_info)),
     &help,

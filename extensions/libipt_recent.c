@@ -30,7 +30,7 @@ help(void)
 "                                Useful if you have problems with people spoofing their source address in order\n"
 "                                to DoS you via this module.\n"
 "    --name name                 Name of the recent list to be used.  DEFAULT used if none given.\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 
 }
   
@@ -185,7 +185,7 @@ static
 struct iptables_match recent
 = { NULL,
     "recent",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_recent_info)),
     IPT_ALIGN(sizeof(struct ipt_recent_info)),
     &help,

@@ -37,7 +37,7 @@ main(int argc, char *argv[])
 	ip6tc_handle_t handle = NULL;
 
 	program_name = "ip6tables";
-	program_version = NETFILTER_VERSION;
+	program_version = IPTABLES_VERSION;
 
 #ifdef NO_SHARED_LIBS
 	init_extensions();

@@ -17,7 +17,7 @@ help(void)
 " --ahspi [!] spi[:spi]         match spi (range)\n"
 " --ahlen [!] length            total length of this header\n"
 " --ahres                       check the reserved filed, too\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -219,7 +219,7 @@ static
 struct ip6tables_match ah
 = { NULL,
     "ah",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(struct ip6t_ah)),
     IP6T_ALIGN(sizeof(struct ip6t_ah)),
     &help,

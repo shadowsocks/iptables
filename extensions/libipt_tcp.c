@@ -24,7 +24,7 @@ help(void)
 " --dport ...\n"
 "				match destination port(s)\n"
 " --tcp-option [!] number       match if TCP option set\n\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -423,7 +423,7 @@ static
 struct iptables_match tcp
 = { NULL,
     "tcp",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_tcp)),
     IPT_ALIGN(sizeof(struct ipt_tcp)),
     &help,

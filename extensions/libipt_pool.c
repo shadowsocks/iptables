@@ -24,7 +24,7 @@ help(void)
 " [!] --srcpool NAME|INDEX\n"
 " [!] --dstpool NAME|INDEX\n"
 "			Pool index (or name from %s) to match\n"
-"\n", NETFILTER_VERSION, IPPOOL_CONF);
+"\n", IPTABLES_VERSION, IPPOOL_CONF);
 }
 
 static struct option opts[] = {
@@ -126,7 +126,7 @@ static
 struct iptables_match pool
 = { NULL,
     "pool",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_pool_info)),
     IPT_ALIGN(sizeof(struct ipt_pool_info)),
     &help,

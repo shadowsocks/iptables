@@ -26,7 +26,7 @@ help(void)
 "                                [Packets per second unless followed by \n"
 "                                /sec /minute /hour /day postfixes]\n"
 "--limit-burst number		number to match in a burst, default %u\n"
-"\n", NETFILTER_VERSION, IP6T_LIMIT_BURST);
+"\n", IPTABLES_VERSION, IP6T_LIMIT_BURST);
 }
 
 static struct option opts[] = {
@@ -181,7 +181,7 @@ static
 struct ip6tables_match limit
 = { NULL,
     "limit",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(struct ip6t_rateinfo)),
     offsetof(struct ip6t_rateinfo, prev),
     &help,

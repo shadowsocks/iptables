@@ -95,7 +95,7 @@ final_check(unsigned int flags)
 
 struct iptables_match quota = { NULL,
         "quota",
-        NETFILTER_VERSION,
+        IPTABLES_VERSION,
         IPT_ALIGN(sizeof (struct ipt_quota_info)),
         IPT_ALIGN(sizeof (struct ipt_quota_info)),
         &help,

@@ -30,7 +30,7 @@ static void help(void)
 "DSCP match v%s options\n"
 "[!] --dscp value		Match DSCP codepoint with numerical value\n"
 "  		                This value can be in decimal (ex: 32)\n"
-"               		or in hex (ex: 0x20)\n", NETFILTER_VERSION
+"               		or in hex (ex: 0x20)\n", IPTABLES_VERSION
 );
 }
 
@@ -128,7 +128,7 @@ static
 struct iptables_match dscp
 = { NULL,
     "dscp",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_dscp_info)),
     IPT_ALIGN(sizeof(struct ipt_dscp_info)),
     &help,

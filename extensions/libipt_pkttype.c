@@ -156,7 +156,7 @@ static
 struct iptables_match pkttype = {
     NULL,
     "pkttype",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_pkttype_info)),
     IPT_ALIGN(sizeof(struct ipt_pkttype_info)),
     &help,

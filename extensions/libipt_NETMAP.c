@@ -25,7 +25,7 @@ help(void)
 	printf(MODULENAME" v%s options:\n"
 	       "  --%s address[/mask]\n"
 	       "				Network address to map to.\n\n",
-	       NETFILTER_VERSION, opts[0].name);
+	       IPTABLES_VERSION, opts[0].name);
 }
 
 static u_int32_t
@@ -183,7 +183,7 @@ static
 struct iptables_target target_module
 = { NULL,
     MODULENAME,
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
     IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
     &help,

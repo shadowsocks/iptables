@@ -21,7 +21,7 @@ help(void)
 "				match destination port(s)\n"
 " --ports port[,port,port]\n"
 "				match both source and destination port(s)\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -246,7 +246,7 @@ static
 struct ip6tables_match multiport
 = { NULL,
     "multiport",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(struct ip6t_multiport)),
     IP6T_ALIGN(sizeof(struct ip6t_multiport)),
     &help,

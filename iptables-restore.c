@@ -4,7 +4,7 @@
  *
  * This code is distributed under the terms of GNU GPL
  *
- * $Id: iptables-restore.c,v 1.19 2001/12/06 15:06:34 marc Exp $
+ * $Id: iptables-restore.c,v 1.20 2002/01/17 20:43:10 laforge Exp $
  */
 
 #include <getopt.h>
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 	const char *modprobe = 0;
 
 	program_name = "iptables-restore";
-	program_version = NETFILTER_VERSION;
+	program_version = IPTABLES_VERSION;
 
 #ifdef NO_SHARED_LIBS
 	init_extensions();
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 				break;
 			case 'h':
 				print_usage("iptables-restore",
-					    NETFILTER_VERSION);
+					    IPTABLES_VERSION);
 				break;
 			case 'n':
 				noflush = 1;

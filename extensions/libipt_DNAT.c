@@ -25,7 +25,7 @@ help(void)
 " --to-destination <ipaddr>[-<ipaddr>][:port-port]\n"
 "				Address to map destination to.\n"
 "				(You can use this more than once)\n\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -228,7 +228,7 @@ static
 struct iptables_target dnat
 = { NULL,
     "DNAT",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
     IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
     &help,

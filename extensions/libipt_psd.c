@@ -34,7 +34,7 @@ help(void)
 " --psd-delay-threshold  delay       Portscan detection delay threshold\n\n"
 " --psd-lo-ports-weight  lo          Privileged ports weight\n\n"
 " --psd-hi-ports-weight  hi          High ports weight\n\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -183,7 +183,7 @@ static
 struct iptables_match psd
 = { NULL,
     "psd",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_psd_info)),
     IPT_ALIGN(sizeof(struct ipt_psd_info)),
     &help,

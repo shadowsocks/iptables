@@ -21,7 +21,7 @@ help(void)
 "				match destination port(s)\n"
 " --ports port[,port:port,port]\n"
 "				match both source and destination port(s)\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -288,7 +288,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 struct iptables_match mport
 = { NULL,
     "mport",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_mport)),
     IPT_ALIGN(sizeof(struct ipt_mport)),
     &help,

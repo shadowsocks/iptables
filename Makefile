@@ -13,8 +13,8 @@ TOPLEVEL_INCLUDED=YES
 ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
-NETFILTER_VERSION:=1.2.7
-OLD_NETFILTER_VERSION:=1.2.6a
+IPTABLES_VERSION:=1.2.7
+OLD_IPTABLES_VERSION:=1.2.6a
 
 PREFIX:=/usr/local
 LIBDIR:=$(PREFIX)/lib
@@ -31,7 +31,7 @@ DO_IPV6=1
 endif
 
 COPT_FLAGS:=-O2
-CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -I$(KERNEL_DIR)/include -Iinclude/ -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" #-g #-pg # -DIPTC_DEBUG
+CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -I$(KERNEL_DIR)/include -Iinclude/ -DIPTABLES_VERSION=\"$(IPTABLES_VERSION)\" #-g -DDEBUG #-pg # -DIPTC_DEBUG
 
 ifdef NO_SHARED_LIBS
 CFLAGS += -DNO_SHARED_LIBS=1
@@ -185,7 +185,7 @@ most-of-pom:
 
 # Rusty's distro magic.
 .PHONY: distrib
-distrib: check distclean delrelease $(RELEASE_DIR)/iptables-$(NETFILTER_VERSION).tar.bz2 diff md5sums # nowhitespace
+distrib: check distclean delrelease $(RELEASE_DIR)/iptables-$(IPTABLES_VERSION).tar.bz2 diff md5sums # nowhitespace
 
 # Makefile must not define:
 # -g -pg -DIPTC_DEBUG
@@ -199,21 +199,21 @@ nowhitespace:
 
 .PHONY: delrelease
 delrelease:
-	rm -f $(RELEASE_DIR)/iptables-$(NETFILTER_VERSION).tar.bz2
+	rm -f $(RELEASE_DIR)/iptables-$(IPTABLES_VERSION).tar.bz2
 
-$(RELEASE_DIR)/iptables-$(NETFILTER_VERSION).tar.bz2:
-	cd .. && ln -sf userspace iptables-$(NETFILTER_VERSION) && tar cvf - --exclude CVS iptables-$(NETFILTER_VERSION)/. | bzip2 -9 > $@ && rm iptables-$(NETFILTER_VERSION)
+$(RELEASE_DIR)/iptables-$(IPTABLES_VERSION).tar.bz2:
+	cd .. && ln -sf userspace iptables-$(IPTABLES_VERSION) && tar cvf - --exclude CVS iptables-$(IPTABLES_VERSION)/. | bzip2 -9 > $@ && rm iptables-$(IPTABLES_VERSION)
 
 .PHONY: diff
-diff: $(RELEASE_DIR)/iptables-$(NETFILTER_VERSION).tar.bz2
+diff: $(RELEASE_DIR)/iptables-$(IPTABLES_VERSION).tar.bz2
 	@mkdir /tmp/diffdir
-	@cd /tmp/diffdir && tar -x --bzip2 -f $(RELEASE_DIR)/iptables-$(NETFILTER_VERSION).tar.bz2
-	@set -e; cd /tmp/diffdir; tar -x --bzip2 -f $(RELEASE_DIR)/iptables-$(OLD_NETFILTER_VERSION).tar.bz2; echo Creating patch-iptables-$(OLD_NETFILTER_VERSION)-$(NETFILTER_VERSION).bz2; diff -urN iptables-$(OLD_NETFILTER_VERSION) iptables-$(NETFILTER_VERSION) | bzip2 -9 > $(RELEASE_DIR)/patch-iptables-$(OLD_NETFILTER_VERSION)-$(NETFILTER_VERSION).bz2
+	@cd /tmp/diffdir && tar -x --bzip2 -f $(RELEASE_DIR)/iptables-$(IPTABLES_VERSION).tar.bz2
+	@set -e; cd /tmp/diffdir; tar -x --bzip2 -f $(RELEASE_DIR)/iptables-$(OLD_IPTABLES_VERSION).tar.bz2; echo Creating patch-iptables-$(OLD_IPTABLES_VERSION)-$(IPTABLES_VERSION).bz2; diff -urN iptables-$(OLD_IPTABLES_VERSION) iptables-$(IPTABLES_VERSION) | bzip2 -9 > $(RELEASE_DIR)/patch-iptables-$(OLD_IPTABLES_VERSION)-$(IPTABLES_VERSION).bz2
 	@rm -rf /tmp/diffdir
 
 .PHONY: md5sums
 md5sums:
-	cd $(RELEASE_DIR)/ && md5sum patch-iptables-*-$(NETFILTER_VERSION).bz2 iptables-$(NETFILTER_VERSION).tar.bz2
+	cd $(RELEASE_DIR)/ && md5sum patch-iptables-*-$(IPTABLES_VERSION).bz2 iptables-$(IPTABLES_VERSION).tar.bz2
 
 # $(wildcard) fails wierdly with make v.3.78.1.
 include $(shell echo */Makefile)

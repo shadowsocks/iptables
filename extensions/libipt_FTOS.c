@@ -116,7 +116,7 @@ static
 struct iptables_target ftos
 = { NULL,
     "FTOS",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_FTOS_info)),
     IPT_ALIGN(sizeof(struct ipt_FTOS_info)),
     &help,

@@ -16,7 +16,7 @@ help(void)
 "MARK match v%s options:\n"
 "[!] --mark value[/mask]         Match nfmark value with optional mask\n"
 "\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -111,7 +111,7 @@ static
 struct iptables_match mark
 = { NULL,
     "mark",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_mark_info)),
     IPT_ALIGN(sizeof(struct ipt_mark_info)),
     &help,

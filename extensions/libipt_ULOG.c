@@ -43,7 +43,7 @@ static void help(void)
 	       " --ulog-cprange size		Bytes of each packet to be passed\n"
 	       " --ulog-qthreshold		Threshold of in-kernel queue\n"
 	       " --ulog-prefix prefix		Prefix log messages with this prefix.\n\n",
-	       NETFILTER_VERSION);
+	       IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -190,7 +190,7 @@ print(const struct ipt_ip *ip,
 static
 struct iptables_target ulog = { NULL,
 	"ULOG",
-	NETFILTER_VERSION,
+	IPTABLES_VERSION,
 	IPT_ALIGN(sizeof(struct ipt_ulog_info)),
 	IPT_ALIGN(sizeof(struct ipt_ulog_info)),
 	&help,

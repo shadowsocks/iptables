@@ -26,7 +26,7 @@ help(void)
 " --rt-0-res                    check the reserved filed, too (type 0)\n"
 " --rt-0-addrs ADDR[,ADDR...]   Type=0 addresses (list, max: %d)\n"
 " --rt-0-not-strict             List of Type=0 addresses not a strict list\n",
-NETFILTER_VERSION, IP6T_RT_HOPS);
+IPTABLES_VERSION, IP6T_RT_HOPS);
 }
 
 static struct option opts[] = {
@@ -345,7 +345,7 @@ static
 struct ip6tables_match rt
 = { NULL,
     "rt",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(struct ip6t_rt)),
     IP6T_ALIGN(sizeof(struct ip6t_rt)),
     &help,

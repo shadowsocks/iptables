@@ -21,7 +21,7 @@ help(void)
 "MARK target v%s options:\n"
 "  --set-mark value                   Set nfmark value\n"
 "\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -104,7 +104,7 @@ static
 struct iptables_target mark
 = { NULL,
     "MARK",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_mark_target_info)),
     IPT_ALIGN(sizeof(struct ipt_mark_target_info)),
     &help,

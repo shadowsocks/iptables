@@ -184,7 +184,7 @@ static
 struct iptables_target dscp
 = { NULL,
     "DSCP",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_DSCP_info)),
     IPT_ALIGN(sizeof(struct ipt_DSCP_info)),
     &help,

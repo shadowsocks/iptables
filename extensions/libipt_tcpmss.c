@@ -16,7 +16,7 @@ help(void)
 "tcpmss match v%s options:\n"
 "[!] --mss value[:value]	Match TCP MSS range.\n"
 "				(only valid for TCP SYN or SYN/ACK packets)\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -143,7 +143,7 @@ static
 struct iptables_match tcpmss
 = { NULL,
     "tcpmss",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_tcpmss_match_info)),
     IPT_ALIGN(sizeof(struct ipt_tcpmss_match_info)),
     &help,

@@ -19,7 +19,7 @@ help(void)
 " --destination-port [!] port[:port]\n"
 " --dport ...\n"
 "				match destination port(s)\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -233,7 +233,7 @@ static
 struct ip6tables_match udp
 = { NULL,
     "udp",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(struct ip6t_udp)),
     IP6T_ALIGN(sizeof(struct ip6t_udp)),
     &help,

@@ -81,7 +81,7 @@ help(void)
 "ICMPv6 v%s options:\n"
 " --icmpv6-type [!] typename	match icmpv6 type\n"
 "				(or numeric type or type/code)\n"
-"\n", NETFILTER_VERSION);
+"\n", IPTABLES_VERSION);
 	print_icmpv6types();
 }
 
@@ -260,7 +260,7 @@ static void final_check(unsigned int flags)
 static struct ip6tables_match icmpv6
 = { NULL,
     "icmp6",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IP6T_ALIGN(sizeof(struct ip6t_icmp)),
     IP6T_ALIGN(sizeof(struct ip6t_icmp)),
     &help,

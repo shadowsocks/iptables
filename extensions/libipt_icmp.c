@@ -96,7 +96,7 @@ help(void)
 "ICMP v%s options:\n"
 " --icmp-type [!] typename	match icmp type\n"
 "				(or numeric type or type/code)\n"
-"\n", NETFILTER_VERSION);
+"\n", IPTABLES_VERSION);
 	print_icmptypes();
 }
 
@@ -276,7 +276,7 @@ static
 struct iptables_match icmp
 = { NULL,
     "icmp",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_icmp)),
     IPT_ALIGN(sizeof(struct ipt_icmp)),
     &help,

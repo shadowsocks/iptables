@@ -22,7 +22,7 @@ help(void)
 " --nodst\n"
 "				Don't use destination-ip in\n"
 "				           source selection\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -192,7 +192,7 @@ static
 struct iptables_target same
 = { NULL,
     "SAME",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_same_info)),
     IPT_ALIGN(sizeof(struct ipt_same_info)),
     &help,

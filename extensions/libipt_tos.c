@@ -32,7 +32,7 @@ help(void)
 "TOS match v%s options:\n"
 "[!] --tos value                 Match Type of Service field from one of the\n"
 "                                following numeric or descriptive values:\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 
 	for (i = 0; i < sizeof(TOS_values)/sizeof(struct TOS_value);i++)
 		printf("                                     %s %u (0x%02x)\n",
@@ -155,7 +155,7 @@ static
 struct iptables_match tos
 = { NULL,
     "tos",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_tos_info)),
     IPT_ALIGN(sizeof(struct ipt_tos_info)),
     &help,

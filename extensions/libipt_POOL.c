@@ -28,7 +28,7 @@ help(void)
 " --add-dstip <pool>\n"
 " --del-dstip <pool>\n"
 "				add/del src/dst IP from pool.\n\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -134,7 +134,7 @@ static
 struct iptables_target ipt_pool_target
 = { NULL,
     "POOL",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_pool_info)),
     IPT_ALIGN(sizeof(struct ipt_pool_info)),
     &help,

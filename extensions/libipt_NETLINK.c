@@ -16,7 +16,7 @@ static void help(void)
 		" --nldrop		Drop the packet too\n"
 		" --nlmark <number>	Mark the packet\n"
 		" --nlsize <bytes>	Limit packet size\n",
-	       NETFILTER_VERSION);
+	       IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -139,7 +139,7 @@ print(const struct ipt_ip *ip,
 static
 struct iptables_target netlink = { NULL,
 	"NETLINK",
-	NETFILTER_VERSION,
+	IPTABLES_VERSION,
 	IPT_ALIGN(sizeof(struct ipt_nldata)),
 	IPT_ALIGN(sizeof(struct ipt_nldata)),
 	&help,

@@ -16,7 +16,7 @@ help(void)
 "ESP v%s options:\n"
 " --espspi [!] spi[:spi]\n"
 "				match spi (range)\n",
-NETFILTER_VERSION);
+IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
@@ -172,7 +172,7 @@ static
 struct iptables_match esp
 = { NULL,
     "esp",
-    NETFILTER_VERSION,
+    IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_esp)),
     IPT_ALIGN(sizeof(struct ipt_esp)),
     &help,
