@@ -4,7 +4,7 @@ TOPLEVEL_INCLUDED=YES
 ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
-NETFILTER_VERSION:=1.2
+NETFILTER_VERSION:=1.2.1
 OLD_NETFILTER_VERSION:=1.1.2
 
 # Waiting for inclusions in the kernel tree.
