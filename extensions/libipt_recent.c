@@ -24,6 +24,12 @@ help(void)
 "    --hitcount hits             For check and update commands above.\n"
 "                                Specifies that the match will only occur if source address seen hits times.\n"
 "                                May be used in conjunction with the seconds option.\n",
+"    --rttl                      For check and update commands above.\n"
+"                                Specifies that the match will only occur if the source address and the TTL\n"
+"                                match between this packet and the one which was set.\n"
+"                                Useful if you have problems with people spoofing their source address in order\n"
+"                                to DoS you via this module.\n"
+"    --name name                 Name of the recent list to be used.  DEFAULT used if none given.\n",
 NETFILTER_VERSION);
 
 }
@@ -35,6 +41,8 @@ static struct option opts[] = {
 	{ "seconds", 1, 0, 204 }, 
 	{ "hitcount", 1, 0, 205 },
 	{ "remove",0, 0, 206 },
+	{ "rttl",0, 0, 207},
+	{ "name", 1, 0, 208},
 	{0}
 };
 
@@ -54,6 +62,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       struct ipt_entry_match **match)
 {
 	struct ipt_recent_info *info = (struct ipt_recent_info *)(*match)->data;
+
+	info->name[0] = '\0';
 
 	switch (c) {
 		case 201:
@@ -104,9 +114,20 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			info->hit_count = atoi(optarg);
 			break;
 
+		case 207:
+			info->check_set |= IPT_RECENT_TTL;
+			break;
+
+		case 208:
+			strncpy(info->name,optarg,200);
+			break;
+
 		default:
 			return 0;
 	}
+
+	if(!info->name[0]) strncpy(info->name,"DEFAULT",200);
+
 	return 1;
 }
 
@@ -135,8 +156,10 @@ print(const struct ipt_ip *ip,
 	if(info->check_set & IPT_RECENT_CHECK) printf("CHECK ");
 	if(info->check_set & IPT_RECENT_UPDATE) printf("UPDATE ");
 	if(info->check_set & IPT_RECENT_REMOVE) printf("REMOVE ");
-	if(info->seconds) printf("seconds: %d",info->seconds);
-	if(info->hit_count) printf("hit_count: %d",info->hit_count);
+	if(info->seconds) printf("seconds: %d ",info->seconds);
+	if(info->hit_count) printf("hit_count: %d ",info->hit_count);
+	if(info->check_set & IPT_RECENT_TTL) printf("TTL-Match ");
+	if(info->name) printf("name: %s",info->name);
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
@@ -152,8 +175,10 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	if(info->check_set & IPT_RECENT_CHECK) printf("CHECK ");
 	if(info->check_set & IPT_RECENT_UPDATE) printf("UPDATE ");
 	if(info->check_set & IPT_RECENT_REMOVE) printf("REMOVE ");
-	if(info->seconds) printf("seconds: ");
-	if(info->hit_count) printf("hit_count: ");
+	if(info->seconds) printf("seconds: %d ",info->seconds);
+	if(info->hit_count) printf("hit_count: %d ",info->hit_count);
+	if(info->check_set & IPT_RECENT_TTL) printf("TTL-Match ");
+	if(info->name) printf("name: %s",info->name);
 }
 
 static
