@@ -85,7 +85,7 @@ u_int32_t parse_number(char **s, int pos)
 	char *end;
 	errno = 0;
 
-	number = strtol(*s, &end, 0);
+	number = strtoul(*s, &end, 0);
 	if (end == *s)
 		exit_error(PARAMETER_PROBLEM, 
 			   "u32: at char %d expected number", pos);
