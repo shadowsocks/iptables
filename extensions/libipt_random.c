@@ -35,7 +35,7 @@ help(void)
 {
 	printf(
 "random v%s options:\n"
-"  [--average]     percent      The probability in percentage of the match\n"
+"  [--average      percent ]    The probability in percentage of the match\n"
 "                               If ommited, a probability of 50%% percent is set.\n"
 "                               Percentage must be within : 1 <= percent <= 99.\n\n",
 IPTABLES_VERSION);

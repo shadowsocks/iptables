@@ -30,10 +30,10 @@ help(void)
 	printf(
 "nth v%s options:\n"
 "   --every     Nth              Match every Nth packet\n"
-"  [--counter]  num              Use counter 0-%u (default:0)\n"
-"  [--start]    num              Initialize the counter at the number 'num'\n"
+"  [--counter   num ]            Use counter 0-%u (default:0)\n"
+"  [--start     num ]            Initialize the counter at the number 'num'\n"
 "                                instead of 0. Must be between 0 and Nth-1\n"
-"  [--packet]   num              Match on 'num' packet. Must be between 0\n"
+"  [--packet    num ]            Match on 'num' packet. Must be between 0\n"
 "                                and Nth-1.\n\n"
 "                                If --packet is used for a counter than\n"
 "                                there must be Nth number of --packet\n"
