@@ -11,30 +11,13 @@
 /* (C)1999 Paul ``Rusty'' Russell - Placed under the GNU GPL (See
    COPYING for details). */
 
-#include <assert.h>
-#include <string.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <limits.h>
-
-#if !defined(__GLIBC__) || (__GLIBC__ < 2)
-typedef unsigned int socklen_t;
-#endif
-
-#include <libiptc/libiptc.h>
-#include <linux/netfilter_ipv4/ipt_limit.h>
-
-#define IP_VERSION	4
-#define IP_OFFSET	0x1FFF
-
 #ifndef IPT_LIB_DIR
 #define IPT_LIB_DIR "/usr/local/lib/iptables"
 #endif
 
 #if 0
-static struct ipt_entry_target *
-ipt_get_target(struct ipt_entry *e)
+static STRUCT_ENTRY_TARGET *
+GET_TARGET(STRUCT_ENTRY *e)
 {
 	return (void *)e + e->target_offset;
 }
@@ -44,11 +27,11 @@ static int sockfd = -1;
 static void *iptc_fn = NULL;
 
 static const char *hooknames[]
-= { [NF_IP_PRE_ROUTING]  "PREROUTING",
-    [NF_IP_LOCAL_IN]     "INPUT",
-    [NF_IP_FORWARD]      "FORWARD",
-    [NF_IP_LOCAL_OUT]    "OUTPUT",
-    [NF_IP_POST_ROUTING] "POSTROUTING"
+= { [HOOK_PRE_ROUTING]  "PREROUTING",
+    [HOOK_LOCAL_IN]     "INPUT",
+    [HOOK_FORWARD]      "FORWARD",
+    [HOOK_LOCAL_OUT]    "OUTPUT",
+    [HOOK_POST_ROUTING] "POSTROUTING"
 };
 
 struct counter_map
@@ -64,25 +47,25 @@ struct counter_map
 /* Convenience structures */
 struct ipt_error_target
 {
-	struct ipt_entry_target t;
-	char error[IPT_TABLE_MAXNAMELEN];
+	STRUCT_ENTRY_TARGET t;
+	char error[TABLE_MAXNAMELEN];
 };
 
 struct chain_cache
 {
-	char name[IPT_TABLE_MAXNAMELEN];
+	char name[TABLE_MAXNAMELEN];
 	/* This is the first rule in chain. */
-	struct ipt_entry *start;
+	STRUCT_ENTRY *start;
 	/* Last rule in chain */
-	struct ipt_entry *end;
+	STRUCT_ENTRY *end;
 };
 
-struct iptc_handle
+STRUCT_TC_HANDLE
 {
 	/* Have changes been made? */
 	int changed;
 	/* Size in here reflects original state. */
-	struct ipt_getinfo info;
+	STRUCT_GETINFO info;
 
 	struct counter_map *counter_map;
 	/* Array of hook names */
@@ -97,15 +80,15 @@ struct iptc_handle
 	struct chain_cache *cache_chain_iteration;
 
 	/* Rule iterator: terminal rule */
-	struct ipt_entry *cache_rule_end;
+	STRUCT_ENTRY *cache_rule_end;
 
 	/* Number in here reflects current state. */
 	unsigned int new_number;
-	struct ipt_get_entries entries;
+	STRUCT_GET_ENTRIES entries;
 };
 
 static void
-set_changed(iptc_handle_t h)
+set_changed(TC_HANDLE_T h)
 {
 	if (h->cache_chain_heads) {
 		free(h->cache_chain_heads);
@@ -118,15 +101,15 @@ set_changed(iptc_handle_t h)
 }
 
 #ifndef NDEBUG
-static void do_check(iptc_handle_t h, unsigned int line);
+static void do_check(TC_HANDLE_T h, unsigned int line);
 #define CHECK(h) do { if (!getenv("IPTC_NO_CHECK")) do_check((h), __LINE__); } while(0)
 #else
 #define CHECK(h)
 #endif
 
 static inline int
-get_number(const struct ipt_entry *i,
-	   const struct ipt_entry *seek,
+get_number(const STRUCT_ENTRY *i,
+	   const STRUCT_ENTRY *seek,
 	   unsigned int *pos)
 {
 	if (i == seek)
@@ -136,12 +119,12 @@ get_number(const struct ipt_entry *i,
 }
 
 static unsigned int
-entry2index(const iptc_handle_t h, const struct ipt_entry *seek)
+entry2index(const TC_HANDLE_T h, const STRUCT_ENTRY *seek)
 {
 	unsigned int pos = 0;
 
-	if (IPT_ENTRY_ITERATE(h->entries.entries, h->entries.size,
-			      get_number, seek, &pos) == 0) {
+	if (ENTRY_ITERATE(h->entries.entries, h->entries.size,
+			  get_number, seek, &pos) == 0) {
 		fprintf(stderr, "ERROR: offset %i not an entry!\n",
 			(unsigned char *)seek - h->entries.entries);
 		abort();
@@ -150,10 +133,10 @@ entry2index(const iptc_handle_t h, const struct ipt_entry *seek)
 }
 
 static inline int
-get_entry_n(struct ipt_entry *i,
+get_entry_n(STRUCT_ENTRY *i,
 	    unsigned int number,
 	    unsigned int *pos,
-	    struct ipt_entry **pe)
+	    STRUCT_ENTRY **pe)
 {
 	if (*pos == number) {
 		*pe = i;
@@ -163,59 +146,59 @@ get_entry_n(struct ipt_entry *i,
 	return 0;
 }
 
-static struct ipt_entry *
-index2entry(iptc_handle_t h, unsigned int index)
+static STRUCT_ENTRY *
+index2entry(TC_HANDLE_T h, unsigned int index)
 {
 	unsigned int pos = 0;
-	struct ipt_entry *ret = NULL;
+	STRUCT_ENTRY *ret = NULL;
 
-	IPT_ENTRY_ITERATE(h->entries.entries, h->entries.size,
-			  get_entry_n, index, &pos, &ret);
+	ENTRY_ITERATE(h->entries.entries, h->entries.size,
+		      get_entry_n, index, &pos, &ret);
 
 	return ret;
 }
 
-static inline struct ipt_entry *
-get_entry(iptc_handle_t h, unsigned int offset)
+static inline STRUCT_ENTRY *
+get_entry(TC_HANDLE_T h, unsigned int offset)
 {
-	return (struct ipt_entry *)(h->entries.entries + offset);
+	return (STRUCT_ENTRY *)(h->entries.entries + offset);
 }
 
 static inline unsigned long
-entry2offset(const iptc_handle_t h, const struct ipt_entry *e)
+entry2offset(const TC_HANDLE_T h, const STRUCT_ENTRY *e)
 {
 	return (unsigned char *)e - h->entries.entries;
 }
 
 static unsigned long
-index2offset(iptc_handle_t h, unsigned int index)
+index2offset(TC_HANDLE_T h, unsigned int index)
 {
 	return entry2offset(h, index2entry(h, index));
 }
 
 static const char *
-get_errorlabel(iptc_handle_t h, unsigned int offset)
+get_errorlabel(TC_HANDLE_T h, unsigned int offset)
 {
-	struct ipt_entry *e;
+	STRUCT_ENTRY *e;
 
 	e = get_entry(h, offset);
-	if (strcmp(ipt_get_target(e)->u.user.name, IPT_ERROR_TARGET) != 0) {
+	if (strcmp(GET_TARGET(e)->u.user.name, IPT_ERROR_TARGET) != 0) {
 		fprintf(stderr, "ERROR: offset %u not an error node!\n",
 			offset);
 		abort();
 	}
 
-	return (const char *)ipt_get_target(e)->data;
+	return (const char *)GET_TARGET(e)->data;
 }
 
 /* Allocate handle of given size */
-static iptc_handle_t
+static TC_HANDLE_T
 alloc_handle(const char *tablename, unsigned int size, unsigned int num_rules)
 {
 	size_t len;
-	iptc_handle_t h;
+	TC_HANDLE_T h;
 
-	len = sizeof(struct iptc_handle)
+	len = sizeof(STRUCT_TC_HANDLE)
 		+ size
 		+ num_rules * sizeof(struct counter_map);
 
@@ -228,7 +211,7 @@ alloc_handle(const char *tablename, unsigned int size, unsigned int num_rules)
 	h->cache_num_chains = 0;
 	h->cache_chain_heads = NULL;
 	h->counter_map = (void *)h
-		+ sizeof(struct iptc_handle)
+		+ sizeof(STRUCT_TC_HANDLE)
 		+ size;
 	strcpy(h->info.name, tablename);
 	strcpy(h->entries.name, tablename);
@@ -236,28 +219,28 @@ alloc_handle(const char *tablename, unsigned int size, unsigned int num_rules)
 	return h;
 }
 
-iptc_handle_t
-iptc_init(const char *tablename)
+TC_HANDLE_T
+TC_INIT(const char *tablename)
 {
-	iptc_handle_t h;
-	struct ipt_getinfo info;
+	TC_HANDLE_T h;
+	STRUCT_GETINFO info;
 	unsigned int i;
 	int tmp;
 	socklen_t s;
 
-	iptc_fn = iptc_init;
+	iptc_fn = TC_INIT;
 
-	sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
+	sockfd = socket(TC_AF, SOCK_RAW, IPPROTO_RAW);
 	if (sockfd < 0)
 		return NULL;
 
 	s = sizeof(info);
-	if (strlen(tablename) >= IPT_TABLE_MAXNAMELEN) {
+	if (strlen(tablename) >= TABLE_MAXNAMELEN) {
 		errno = EINVAL;
 		return NULL;
 	}
 	strcpy(info.name, tablename);
-	if (getsockopt(sockfd, IPPROTO_IP, IPT_SO_GET_INFO, &info, &s) < 0)
+	if (getsockopt(sockfd, TC_IPPROTO, SO_GET_INFO, &info, &s) < 0)
 		return NULL;
 
 	if ((h = alloc_handle(info.name, info.size, info.num_entries))
@@ -290,9 +273,9 @@ iptc_init(const char *tablename)
 
 	h->entries.size = h->info.size;
 
-	tmp = sizeof(struct ipt_get_entries) + h->info.size;
+	tmp = sizeof(STRUCT_GET_ENTRIES) + h->info.size;
 
-	if (getsockopt(sockfd, IPPROTO_IP, IPT_SO_GET_ENTRIES, &h->entries,
+	if (getsockopt(sockfd, TC_IPPROTO, SO_GET_ENTRIES, &h->entries,
 		       &tmp) < 0) {
 		free(h);
 		return NULL;
@@ -302,84 +285,17 @@ iptc_init(const char *tablename)
 	return h;
 }
 
-#define IP_PARTS_NATIVE(n)			\
-(unsigned int)((n)>>24)&0xFF,			\
-(unsigned int)((n)>>16)&0xFF,			\
-(unsigned int)((n)>>8)&0xFF,			\
-(unsigned int)((n)&0xFF)
-
-#define IP_PARTS(n) IP_PARTS_NATIVE(ntohl(n))
-
 static inline int
-print_match(const struct ipt_entry_match *m)
+print_match(const STRUCT_ENTRY_MATCH *m)
 {
 	printf("Match name: `%s'\n", m->u.user.name);
 	return 0;
 }
 
-int
-dump_entry(struct ipt_entry *e, const iptc_handle_t handle)
-{
-	size_t i;
-	struct ipt_entry_target *t;
-
-	printf("Entry %u (%lu):\n", entry2index(handle, e),
-	       entry2offset(handle, e));
-	printf("SRC IP: %u.%u.%u.%u/%u.%u.%u.%u\n",
-	       IP_PARTS(e->ip.src.s_addr),IP_PARTS(e->ip.smsk.s_addr));
-	printf("DST IP: %u.%u.%u.%u/%u.%u.%u.%u\n",
-	       IP_PARTS(e->ip.dst.s_addr),IP_PARTS(e->ip.dmsk.s_addr));
-	printf("Interface: `%s'/", e->ip.iniface);
-	for (i = 0; i < IFNAMSIZ; i++)
-		printf("%c", e->ip.iniface_mask[i] ? 'X' : '.');
-	printf("to `%s'/", e->ip.outiface);
-	for (i = 0; i < IFNAMSIZ; i++)
-		printf("%c", e->ip.outiface_mask[i] ? 'X' : '.');
-	printf("\nProtocol: %u\n", e->ip.proto);
-	printf("Flags: %02X\n", e->ip.flags);
-	printf("Invflags: %02X\n", e->ip.invflags);
-	printf("Counters: %llu packets, %llu bytes\n",
-	       e->counters.pcnt, e->counters.bcnt);
-	printf("Cache: %08X ", e->nfcache);
-	if (e->nfcache & NFC_ALTERED) printf("ALTERED ");
-	if (e->nfcache & NFC_UNKNOWN) printf("UNKNOWN ");
-	if (e->nfcache & NFC_IP_SRC) printf("IP_SRC ");
-	if (e->nfcache & NFC_IP_DST) printf("IP_DST ");
-	if (e->nfcache & NFC_IP_IF_IN) printf("IP_IF_IN ");
-	if (e->nfcache & NFC_IP_IF_OUT) printf("IP_IF_OUT ");
-	if (e->nfcache & NFC_IP_TOS) printf("IP_TOS ");
-	if (e->nfcache & NFC_IP_PROTO) printf("IP_PROTO ");
-	if (e->nfcache & NFC_IP_OPTIONS) printf("IP_OPTIONS ");
-	if (e->nfcache & NFC_IP_TCPFLAGS) printf("IP_TCPFLAGS ");
-	if (e->nfcache & NFC_IP_SRC_PT) printf("IP_SRC_PT ");
-	if (e->nfcache & NFC_IP_DST_PT) printf("IP_DST_PT ");
-	if (e->nfcache & NFC_IP_PROTO_UNKNOWN) printf("IP_PROTO_UNKNOWN ");
-	printf("\n");
-
-	IPT_MATCH_ITERATE(e, print_match);
-
-	t = ipt_get_target(e);
-	printf("Target name: `%s' [%u]\n", t->u.user.name, t->u.target_size);
-	if (strcmp(t->u.user.name, IPT_STANDARD_TARGET) == 0) {
-		int pos = *(int *)t->data;
-		if (pos < 0)
-			printf("verdict=%s\n",
-			       pos == -NF_ACCEPT-1 ? "NF_ACCEPT"
-			       : pos == -NF_DROP-1 ? "NF_DROP"
-			       : pos == -NF_QUEUE-1 ? "NF_QUEUE"
-			       : pos == IPT_RETURN ? "RETURN"
-			       : "UNKNOWN");
-		else
-			printf("verdict=%u\n", pos);
-	} else if (strcmp(t->u.user.name, IPT_ERROR_TARGET) == 0)
-		printf("error=`%s'\n", t->data);
-
-	printf("\n");
-	return 0;
-}
-
+static int dump_entry(STRUCT_ENTRY *e, const TC_HANDLE_T handle);
+ 
 void
-dump_entries(const iptc_handle_t handle)
+TC_DUMP_ENTRIES(const TC_HANDLE_T handle)
 {
 	CHECK(handle);
 
@@ -400,17 +316,17 @@ dump_entries(const iptc_handle_t handle)
 	       handle->info.underflow[NF_IP_LOCAL_OUT],
 	       handle->info.underflow[NF_IP_POST_ROUTING]);
 
-	IPT_ENTRY_ITERATE(handle->entries.entries, handle->entries.size,
-			  dump_entry, handle);
+	ENTRY_ITERATE(handle->entries.entries, handle->entries.size,
+		      dump_entry, handle);
 }
 
 /* Returns 0 if not hook entry, else hooknumber + 1 */
 static inline unsigned int
-is_hook_entry(struct ipt_entry *e, iptc_handle_t h)
+is_hook_entry(STRUCT_ENTRY *e, TC_HANDLE_T h)
 {
 	unsigned int i;
 
-	for (i = 0; i < NF_IP_NUMHOOKS; i++) {
+	for (i = 0; i < NUMHOOKS; i++) {
 		if ((h->info.valid_hooks & (1 << i))
 		    && get_entry(h, h->info.hook_entry[i]) == e)
 			return i+1;
@@ -419,7 +335,7 @@ is_hook_entry(struct ipt_entry *e, iptc_handle_t h)
 }
 
 static inline int
-add_chain(struct ipt_entry *e, iptc_handle_t h, struct ipt_entry **prev)
+add_chain(STRUCT_ENTRY *e, TC_HANDLE_T h, STRUCT_ENTRY **prev)
 {
 	unsigned int builtin;
 
@@ -432,13 +348,13 @@ add_chain(struct ipt_entry *e, iptc_handle_t h, struct ipt_entry **prev)
 
 	/* We know this is the start of a new chain if it's an ERROR
 	   target, or a hook entry point */
-	if (strcmp(ipt_get_target(e)->u.user.name, IPT_ERROR_TARGET) == 0) {
+	if (strcmp(GET_TARGET(e)->u.user.name, IPT_ERROR_TARGET) == 0) {
 		/* prev was last entry in previous chain */
 		h->cache_chain_heads[h->cache_num_chains-1].end
 			= *prev;
 
 		strcpy(h->cache_chain_heads[h->cache_num_chains].name,
-		       (const char *)ipt_get_target(e)->data);
+		       (const char *)GET_TARGET(e)->data);
 		h->cache_chain_heads[h->cache_num_chains].start
 			= (void *)e + e->next_offset;
 		h->cache_num_chains++;
@@ -465,10 +381,10 @@ static int alphasort(const void *a, const void *b)
 		      ((struct chain_cache *)b)->name);
 }
 
-static int populate_cache(iptc_handle_t h)
+static int populate_cache(TC_HANDLE_T h)
 {
 	unsigned int i;
-	struct ipt_entry *prev;
+	STRUCT_ENTRY *prev;
 
 	/* # chains < # rules / 2 + num builtins - 1 */
 	h->cache_chain_heads = malloc((h->new_number / 2 + 4)
@@ -482,14 +398,14 @@ static int populate_cache(iptc_handle_t h)
 	h->cache_num_builtins = 0;
 
 	/* Count builtins */
-	for (i = 0; i < NF_IP_NUMHOOKS; i++) {
+	for (i = 0; i < NUMHOOKS; i++) {
 		if (h->info.valid_hooks & (1 << i))
 			h->cache_num_builtins++;
 	}
 
 	prev = NULL;
-	IPT_ENTRY_ITERATE(h->entries.entries, h->entries.size,
-			  add_chain, h, &prev);
+	ENTRY_ITERATE(h->entries.entries, h->entries.size,
+		      add_chain, h, &prev);
 
 	qsort(h->cache_chain_heads + h->cache_num_builtins,
 	      h->cache_num_chains - h->cache_num_builtins,
@@ -500,7 +416,7 @@ static int populate_cache(iptc_handle_t h)
 
 /* Returns cache ptr if found, otherwise NULL. */
 static struct chain_cache *
-find_label(const char *name, iptc_handle_t handle)
+find_label(const char *name, TC_HANDLE_T handle)
 {
 	unsigned int i;
 
@@ -518,17 +434,17 @@ find_label(const char *name, iptc_handle_t handle)
 }
 
 /* Does this chain exist? */
-int iptc_is_chain(const char *chain, const iptc_handle_t handle)
+int TC_IS_CHAIN(const char *chain, const TC_HANDLE_T handle)
 {
 	return find_label(chain, handle) != NULL;
 }
 
 /* Returns the position of the final (ie. unconditional) element. */
 static unsigned int
-get_chain_end(const iptc_handle_t handle, unsigned int start)
+get_chain_end(const TC_HANDLE_T handle, unsigned int start)
 {
 	unsigned int last_off, off;
-	struct ipt_entry *e;
+	STRUCT_ENTRY *e;
 
 	last_off = start;
 	e = get_entry(handle, start);
@@ -537,20 +453,20 @@ get_chain_end(const iptc_handle_t handle, unsigned int start)
 	for (off = start + e->next_offset;
 	     off < handle->entries.size;
 	     last_off = off, off += e->next_offset) {
-		struct ipt_entry_target *t;
+		STRUCT_ENTRY_TARGET *t;
 		unsigned int i;
 
 		e = get_entry(handle, off);
 
 		/* We hit an entry point. */
-		for (i = 0; i < NF_IP_NUMHOOKS; i++) {
+		for (i = 0; i < NUMHOOKS; i++) {
 			if ((handle->info.valid_hooks & (1 << i))
 			    && off == handle->info.hook_entry[i])
 				return last_off;
 		}
 
 		/* We hit a user chain label */
-		t = ipt_get_target(e);
+		t = GET_TARGET(e);
 		if (strcmp(t->u.user.name, IPT_ERROR_TARGET) == 0)
 			return last_off;
 	}
@@ -562,7 +478,7 @@ get_chain_end(const iptc_handle_t handle, unsigned int start)
 
 /* Iterator functions to run through the chains. */
 const char *
-iptc_first_chain(iptc_handle_t *handle)
+iptc_first_chain(TC_HANDLE_T *handle)
 {
 	if ((*handle)->cache_chain_heads == NULL
 	    && !populate_cache(*handle))
@@ -576,7 +492,7 @@ iptc_first_chain(iptc_handle_t *handle)
 
 /* Iterator functions to run through the chains.  Returns NULL at end. */
 const char *
-iptc_next_chain(iptc_handle_t *handle)
+TC_NEXT_CHAIN(TC_HANDLE_T *handle)
 {
 	(*handle)->cache_chain_iteration++;
 
@@ -588,8 +504,8 @@ iptc_next_chain(iptc_handle_t *handle)
 }
 
 /* Get first rule in the given chain: NULL for empty chain. */
-const struct ipt_entry *
-iptc_first_rule(const char *chain, iptc_handle_t *handle)
+const STRUCT_ENTRY *
+iptc_first_rule(const char *chain, TC_HANDLE_T *handle)
 {
 	struct chain_cache *c;
 
@@ -608,8 +524,8 @@ iptc_first_rule(const char *chain, iptc_handle_t *handle)
 }
 
 /* Returns NULL when rules run out. */
-const struct ipt_entry *
-iptc_next_rule(const struct ipt_entry *prev, iptc_handle_t *handle)
+const STRUCT_ENTRY *
+iptc_next_rule(const STRUCT_ENTRY *prev, TC_HANDLE_T *handle)
 {
 	if ((void *)prev + prev->next_offset
 	    == (void *)(*handle)->cache_rule_end)
@@ -621,10 +537,10 @@ iptc_next_rule(const struct ipt_entry *prev, iptc_handle_t *handle)
 #if 0
 /* How many rules in this chain? */
 unsigned int
-iptc_num_rules(const char *chain, iptc_handle_t *handle)
+TC_NUM_RULES(const char *chain, TC_HANDLE_T *handle)
 {
 	unsigned int off = 0;
-	struct ipt_entry *start, *end;
+	STRUCT_ENTRY *start, *end;
 
 	CHECK(*handle);
 	if (!find_label(&off, chain, *handle)) {
@@ -639,9 +555,9 @@ iptc_num_rules(const char *chain, iptc_handle_t *handle)
 }
 
 /* Get n'th rule in this chain. */
-const struct ipt_entry *iptc_get_rule(const char *chain,
-				      unsigned int n,
-				      iptc_handle_t *handle)
+const STRUCT_ENTRY *TC_GET_RULE(const char *chain,
+				unsigned int n,
+				TC_HANDLE_T *handle)
 {
 	unsigned int pos = 0, chainindex;
 
@@ -658,27 +574,27 @@ const struct ipt_entry *iptc_get_rule(const char *chain,
 #endif
 
 static const char *
-target_name(iptc_handle_t handle, const struct ipt_entry *ce)
+target_name(TC_HANDLE_T handle, const STRUCT_ENTRY *ce)
 {
 	int spos;
 	unsigned int labelidx;
-	struct ipt_entry *jumpto;
+	STRUCT_ENTRY *jumpto;
 
 	/* To avoid const warnings */
-	struct ipt_entry *e = (struct ipt_entry *)ce;
+	STRUCT_ENTRY *e = (STRUCT_ENTRY *)ce;
 
-	if (strcmp(ipt_get_target(e)->u.user.name, IPT_STANDARD_TARGET) != 0)
-		return ipt_get_target(e)->u.user.name;
+	if (strcmp(GET_TARGET(e)->u.user.name, STANDARD_TARGET) != 0)
+		return GET_TARGET(e)->u.user.name;
 
 	/* Standard target: evaluate */
-	spos = *(int *)ipt_get_target(e)->data;
+	spos = *(int *)GET_TARGET(e)->data;
 	if (spos < 0) {
-		if (spos == IPT_RETURN)
-			return IPTC_LABEL_RETURN;
+		if (spos == RETURN)
+			return LABEL_RETURN;
 		else if (spos == -NF_ACCEPT-1)
-			return IPTC_LABEL_ACCEPT;
+			return LABEL_ACCEPT;
 		else if (spos == -NF_DROP-1)
-			return IPTC_LABEL_DROP;
+			return LABEL_DROP;
 		else if (spos == -NF_QUEUE-1)
 			return IPTC_LABEL_QUEUE;
 
@@ -700,19 +616,19 @@ target_name(iptc_handle_t handle, const struct ipt_entry *ce)
 }
 
 /* Returns a pointer to the target name of this position. */
-const char *iptc_get_target(const struct ipt_entry *e,
-			    iptc_handle_t *handle)
+const char *TC_GET_TARGET(const STRUCT_ENTRY *e,
+			  TC_HANDLE_T *handle)
 {
 	return target_name(*handle, e);
 }
 
 /* Is this a built-in chain?  Actually returns hook + 1. */
 int
-iptc_builtin(const char *chain, const iptc_handle_t handle)
+TC_BUILTIN(const char *chain, const TC_HANDLE_T handle)
 {
 	unsigned int i;
 
-	for (i = 0; i < NF_IP_NUMHOOKS; i++) {
+	for (i = 0; i < NUMHOOKS; i++) {
 		if ((handle->info.valid_hooks & (1 << i))
 		    && handle->hooknames[i]
 		    && strcmp(handle->hooknames[i], chain) == 0)
@@ -723,15 +639,15 @@ iptc_builtin(const char *chain, const iptc_handle_t handle)
 
 /* Get the policy of a given built-in chain */
 const char *
-iptc_get_policy(const char *chain,
-		struct ipt_counters *counters,
-		iptc_handle_t *handle)
+TC_GET_POLICY(const char *chain,
+	      STRUCT_COUNTERS *counters,
+	      TC_HANDLE_T *handle)
 {
 	unsigned int start;
-	struct ipt_entry *e;
+	STRUCT_ENTRY *e;
 	int hook;
 
-	hook = iptc_builtin(chain, *handle);
+	hook = TC_BUILTIN(chain, *handle);
 	if (hook != 0)
 		start = (*handle)->info.hook_entry[hook-1];
 	else
@@ -744,16 +660,16 @@ iptc_get_policy(const char *chain,
 }
 
 static int
-correct_verdict(struct ipt_entry *e,
+correct_verdict(STRUCT_ENTRY *e,
 		unsigned char *base,
 		unsigned int offset, int delta_offset)
 {
-	struct ipt_standard_target *t = (void *)ipt_get_target(e);
+	STRUCT_STANDARD_TARGET *t = (void *)GET_TARGET(e);
 	unsigned int curr = (unsigned char *)e - base;
 
 	/* Trap: insert of fall-through rule.  Don't change fall-through
 	   verdict to jump-over-next-rule. */
-	if (strcmp(t->target.u.user.name, IPT_STANDARD_TARGET) == 0
+	if (strcmp(t->target.u.user.name, STANDARD_TARGET) == 0
 	    && t->verdict > (int)offset
 	    && !(curr == offset &&
 		 t->verdict == curr + e->next_offset)) {
@@ -765,12 +681,12 @@ correct_verdict(struct ipt_entry *e,
 
 /* Adjusts standard verdict jump positions after an insertion/deletion. */
 static int
-set_verdict(unsigned int offset, int delta_offset, iptc_handle_t *handle)
+set_verdict(unsigned int offset, int delta_offset, TC_HANDLE_T *handle)
 {
-	IPT_ENTRY_ITERATE((*handle)->entries.entries,
-			  (*handle)->entries.size,
-			  correct_verdict, (*handle)->entries.entries,
-			  offset, delta_offset);
+	ENTRY_ITERATE((*handle)->entries.entries,
+		      (*handle)->entries.size,
+		      correct_verdict, (*handle)->entries.entries,
+		      offset, delta_offset);
 
 	set_changed(*handle);
 	return 1;
@@ -780,13 +696,13 @@ set_verdict(unsigned int offset, int delta_offset, iptc_handle_t *handle)
  * insertion position is an entry point, keep the entry point. */
 static int
 insert_rules(unsigned int num_rules, unsigned int rules_size,
-	     const struct ipt_entry *insert,
+	     const STRUCT_ENTRY *insert,
 	     unsigned int offset, unsigned int num_rules_offset,
 	     int prepend,
-	     iptc_handle_t *handle)
+	     TC_HANDLE_T *handle)
 {
-	iptc_handle_t newh;
-	struct ipt_getinfo newinfo;
+	TC_HANDLE_T newh;
+	STRUCT_GETINFO newinfo;
 	unsigned int i;
 
 	if (offset >= (*handle)->entries.size) {
@@ -797,7 +713,7 @@ insert_rules(unsigned int num_rules, unsigned int rules_size,
 	newinfo = (*handle)->info;
 
 	/* Fix up entry points. */
-	for (i = 0; i < NF_IP_NUMHOOKS; i++) {
+	for (i = 0; i < NUMHOOKS; i++) {
 		/* Entry points to START of chain, so keep same if
                    inserting on at that point. */
 		if ((*handle)->info.hook_entry[i] > offset)
@@ -855,7 +771,7 @@ insert_rules(unsigned int num_rules, unsigned int rules_size,
 static int
 delete_rules(unsigned int num_rules, unsigned int rules_size,
 	     unsigned int offset, unsigned int num_rules_offset,
-	     iptc_handle_t *handle)
+	     TC_HANDLE_T *handle)
 {
 	unsigned int i;
 
@@ -865,7 +781,7 @@ delete_rules(unsigned int num_rules, unsigned int rules_size,
 	}
 
 	/* Fix up entry points. */
-	for (i = 0; i < NF_IP_NUMHOOKS; i++) {
+	for (i = 0; i < NUMHOOKS; i++) {
 		/* In practice, we never delete up to a hook entry,
 		   since the built-in chains are always first,
 		   so these two are never equal */
@@ -908,31 +824,31 @@ delete_rules(unsigned int num_rules, unsigned int rules_size,
 }
 
 static int
-standard_map(struct ipt_entry *e, int verdict)
+standard_map(STRUCT_ENTRY *e, int verdict)
 {
-	struct ipt_standard_target *t;
+	STRUCT_STANDARD_TARGET *t;
 
-	t = (struct ipt_standard_target *)ipt_get_target(e);
+	t = (STRUCT_STANDARD_TARGET *)GET_TARGET(e);
 
-	if (t->target.u.target_size != sizeof(struct ipt_standard_target)) {
+	if (t->target.u.target_size != sizeof(STRUCT_STANDARD_TARGET)) {
 		errno = EINVAL;
 		return 0;
 	}
 	/* memset for memcmp convenience on delete/replace */
-	memset(t->target.u.user.name, 0, IPT_FUNCTION_MAXNAMELEN);
-	strcpy(t->target.u.user.name, IPT_STANDARD_TARGET);
+	memset(t->target.u.user.name, 0, FUNCTION_MAXNAMELEN);
+	strcpy(t->target.u.user.name, STANDARD_TARGET);
 	t->verdict = verdict;
 
 	return 1;
 }
 
 static int
-map_target(const iptc_handle_t handle,
-	   struct ipt_entry *e,
+map_target(const TC_HANDLE_T handle,
+	   STRUCT_ENTRY *e,
 	   unsigned int offset,
-	   struct ipt_entry_target *old)
+	   STRUCT_ENTRY_TARGET *old)
 {
-	struct ipt_entry_target *t = ipt_get_target(e);
+	STRUCT_ENTRY_TARGET *t = GET_TARGET(e);
 
 	/* Save old target (except data, which we don't change, except for
 	   standard case, where we don't care). */
@@ -942,15 +858,15 @@ map_target(const iptc_handle_t handle,
 	if (strcmp(t->u.user.name, "") == 0)
 		return standard_map(e, offset + e->next_offset);
 	/* Maybe it's a standard target name... */
-	else if (strcmp(t->u.user.name, IPTC_LABEL_ACCEPT) == 0)
+	else if (strcmp(t->u.user.name, LABEL_ACCEPT) == 0)
 		return standard_map(e, -NF_ACCEPT - 1);
-	else if (strcmp(t->u.user.name, IPTC_LABEL_DROP) == 0)
+	else if (strcmp(t->u.user.name, LABEL_DROP) == 0)
 		return standard_map(e, -NF_DROP - 1);
 	else if (strcmp(t->u.user.name, IPTC_LABEL_QUEUE) == 0)
 		return standard_map(e, -NF_QUEUE - 1);
-	else if (strcmp(t->u.user.name, IPTC_LABEL_RETURN) == 0)
-		return standard_map(e, IPT_RETURN);
-	else if (iptc_builtin(t->u.user.name, handle)) {
+	else if (strcmp(t->u.user.name, LABEL_RETURN) == 0)
+		return standard_map(e, RETURN);
+	else if (TC_BUILTIN(t->u.user.name, handle)) {
 		/* Can't jump to builtins. */
 		errno = EINVAL;
 		return 0;
@@ -967,14 +883,14 @@ map_target(const iptc_handle_t handle,
 	/* memset to all 0 for your memcmp convenience. */
 	memset(t->u.user.name + strlen(t->u.user.name),
 	       0,
-	       IPT_FUNCTION_MAXNAMELEN - strlen(t->u.user.name));
+	       FUNCTION_MAXNAMELEN - strlen(t->u.user.name));
 	return 1;
 }
 
 static void
-unmap_target(struct ipt_entry *e, struct ipt_entry_target *old)
+unmap_target(STRUCT_ENTRY *e, STRUCT_ENTRY_TARGET *old)
 {
-	struct ipt_entry_target *t = ipt_get_target(e);
+	STRUCT_ENTRY_TARGET *t = GET_TARGET(e);
 
 	/* Save old target (except data, which we don't change, except for
 	   standard case, where we don't care). */
@@ -983,17 +899,17 @@ unmap_target(struct ipt_entry *e, struct ipt_entry_target *old)
 
 /* Insert the entry `fw' in chain `chain' into position `rulenum'. */
 int
-iptc_insert_entry(const ipt_chainlabel chain,
-		  const struct ipt_entry *e,
-		  unsigned int rulenum,
-		  iptc_handle_t *handle)
+TC_INSERT_ENTRY(const IPT_CHAINLABEL chain,
+		const STRUCT_ENTRY *e,
+		unsigned int rulenum,
+		TC_HANDLE_T *handle)
 {
 	unsigned int chainindex, offset;
-	struct ipt_entry_target old;
+	STRUCT_ENTRY_TARGET old;
 	struct chain_cache *c;
 	int ret;
 
-	iptc_fn = iptc_insert_entry;
+	iptc_fn = TC_INSERT_ENTRY;
 	if (!(c = find_label(chain, *handle))) {
 		errno = ENOENT;
 		return 0;
@@ -1009,28 +925,28 @@ iptc_insert_entry(const ipt_chainlabel chain,
 
 	/* Mapping target actually alters entry, but that's
            transparent to the caller. */
-	if (!map_target(*handle, (struct ipt_entry *)e, offset, &old))
+	if (!map_target(*handle, (STRUCT_ENTRY *)e, offset, &old))
 		return 0;
 
 	ret = insert_rules(1, e->next_offset, e, offset,
 			   chainindex + rulenum, rulenum == 0, handle);
-	unmap_target((struct ipt_entry *)e, &old);
+	unmap_target((STRUCT_ENTRY *)e, &old);
 	return ret;
 }
 
 /* Atomically replace rule `rulenum' in `chain' with `fw'. */
 int
-iptc_replace_entry(const ipt_chainlabel chain,
-		   const struct ipt_entry *e,
-		   unsigned int rulenum,
-		   iptc_handle_t *handle)
+TC_REPLACE_ENTRY(const IPT_CHAINLABEL chain,
+		 const STRUCT_ENTRY *e,
+		 unsigned int rulenum,
+		 TC_HANDLE_T *handle)
 {
 	unsigned int chainindex, offset;
-	struct ipt_entry_target old;
+	STRUCT_ENTRY_TARGET old;
 	struct chain_cache *c;
 	int ret;
 
-	iptc_fn = iptc_replace_entry;
+	iptc_fn = TC_REPLACE_ENTRY;
 
 	if (!(c = find_label(chain, *handle))) {
 		errno = ENOENT;
@@ -1050,33 +966,33 @@ iptc_replace_entry(const ipt_chainlabel chain,
 			  offset, chainindex + rulenum, handle))
 		return 0;
 
-	if (!map_target(*handle, (struct ipt_entry *)e, offset, &old))
+	if (!map_target(*handle, (STRUCT_ENTRY *)e, offset, &old))
 		return 0;
 
 	ret = insert_rules(1, e->next_offset, e, offset,
 			   chainindex + rulenum, 1, handle);
-	unmap_target((struct ipt_entry *)e, &old);
+	unmap_target((STRUCT_ENTRY *)e, &old);
 	return ret;
 }
 
 /* Append entry `fw' to chain `chain'.  Equivalent to insert with
    rulenum = length of chain. */
 int
-iptc_append_entry(const ipt_chainlabel chain,
-		  const struct ipt_entry *e,
-		  iptc_handle_t *handle)
+TC_APPEND_ENTRY(const IPT_CHAINLABEL chain,
+		const STRUCT_ENTRY *e,
+		TC_HANDLE_T *handle)
 {
 	struct chain_cache *c;
-	struct ipt_entry_target old;
+	STRUCT_ENTRY_TARGET old;
 	int ret;
 
-	iptc_fn = iptc_append_entry;
+	iptc_fn = TC_APPEND_ENTRY;
 	if (!(c = find_label(chain, *handle))) {
 		errno = ENOENT;
 		return 0;
 	}
 
-	if (!map_target(*handle, (struct ipt_entry *)e,
+	if (!map_target(*handle, (STRUCT_ENTRY *)e,
 			entry2offset(*handle, c->end), &old))
 		return 0;
 
@@ -1084,17 +1000,17 @@ iptc_append_entry(const ipt_chainlabel chain,
 			   entry2offset(*handle, c->end),
 			   entry2index(*handle, c->end),
 			   0, handle);
-	unmap_target((struct ipt_entry *)e, &old);
+	unmap_target((STRUCT_ENTRY *)e, &old);
 	return ret;
 }
 
 static inline int
-match_different(const struct ipt_entry_match *a,
+match_different(const STRUCT_ENTRY_MATCH *a,
 		const unsigned char *a_elems,
 		const unsigned char *b_elems,
 		unsigned char **maskptr)
 {
-	const struct ipt_entry_match *b;
+	const STRUCT_ENTRY_MATCH *b;
 	unsigned int i;
 
 	/* Offset of b is the same as a. */
@@ -1129,73 +1045,23 @@ target_different(const unsigned char *a_targdata,
 	return 0;
 }
 
-static inline int
-is_same(const struct ipt_entry *a, const struct ipt_entry *b,
-	unsigned char *matchmask)
-{
-	unsigned int i;
-	struct ipt_entry_target *ta, *tb;
-	unsigned char *mptr;
-
-	/* Always compare head structures: ignore mask here. */
-	if (a->ip.src.s_addr != b->ip.src.s_addr
-	    || a->ip.dst.s_addr != b->ip.dst.s_addr
-	    || a->ip.smsk.s_addr != b->ip.smsk.s_addr
-	    || a->ip.smsk.s_addr != b->ip.smsk.s_addr
-	    || a->ip.proto != b->ip.proto
-	    || a->ip.flags != b->ip.flags
-	    || a->ip.invflags != b->ip.invflags)
-		return 0;
-
-	for (i = 0; i < IFNAMSIZ; i++) {
-		if (a->ip.iniface_mask[i] != b->ip.iniface_mask[i])
-			return 0;
-		if ((a->ip.iniface[i] & a->ip.iniface_mask[i])
-		    != (b->ip.iniface[i] & b->ip.iniface_mask[i]))
-			return 0;
-		if (a->ip.outiface_mask[i] != b->ip.outiface_mask[i])
-			return 0;
-		if ((a->ip.outiface[i] & a->ip.outiface_mask[i])
-		    != (b->ip.outiface[i] & b->ip.outiface_mask[i]))
-			return 0;
-	}
-
-	if (a->nfcache != b->nfcache
-	    || a->target_offset != b->target_offset
-	    || a->next_offset != b->next_offset)
-		return 0;
-
-	mptr = matchmask + sizeof(struct ipt_entry);
-	if (IPT_MATCH_ITERATE(a, match_different, a->elems, b->elems, &mptr))
-		return 0;
-
-	ta = ipt_get_target((struct ipt_entry *)a);
-	tb = ipt_get_target((struct ipt_entry *)b);
-	if (ta->u.target_size != tb->u.target_size)
-		return 0;
-	if (strcmp(ta->u.user.name, tb->u.user.name) != 0)
-		return 0;
-
-	mptr += sizeof(*ta);
-	if (target_different(ta->data, tb->data,
-			     ta->u.target_size - sizeof(*ta), mptr))
-		return 0;
-
-   	return 1;
-}
+static int
+is_same(const STRUCT_ENTRY *a,
+	const STRUCT_ENTRY *b,
+	unsigned char *matchmask);
 
 /* Delete the first rule in `chain' which matches `fw'. */
 int
-iptc_delete_entry(const ipt_chainlabel chain,
-		  const struct ipt_entry *origfw,
-		  unsigned char *matchmask,
-		  iptc_handle_t *handle)
+TC_DELETE_ENTRY(const IPT_CHAINLABEL chain,
+		const STRUCT_ENTRY *origfw,
+		unsigned char *matchmask,
+		TC_HANDLE_T *handle)
 {
 	unsigned int offset;
 	struct chain_cache *c;
-	struct ipt_entry *e, *fw;
+	STRUCT_ENTRY *e, *fw;
 
-	iptc_fn = iptc_delete_entry;
+	iptc_fn = TC_DELETE_ENTRY;
 	if (!(c = find_label(chain, *handle))) {
 		errno = ENOENT;
 		return 0;
@@ -1210,7 +1076,7 @@ iptc_delete_entry(const ipt_chainlabel chain,
 	for (offset = entry2offset(*handle, c->start);
 	     offset < entry2offset(*handle, c->end);
 	     offset += e->next_offset) {
-		struct ipt_entry_target discard;
+		STRUCT_ENTRY_TARGET discard;
 
 		memcpy(fw, origfw, origfw->next_offset);
 
@@ -1242,16 +1108,16 @@ iptc_delete_entry(const ipt_chainlabel chain,
 
 /* Delete the rule in position `rulenum' in `chain'. */
 int
-iptc_delete_num_entry(const ipt_chainlabel chain,
-		      unsigned int rulenum,
-		      iptc_handle_t *handle)
+TC_DELETE_NUM_ENTRY(const IPT_CHAINLABEL chain,
+		    unsigned int rulenum,
+		    TC_HANDLE_T *handle)
 {
 	unsigned int index;
 	int ret;
-	struct ipt_entry *e;
+	STRUCT_ENTRY *e;
 	struct chain_cache *c;
 
-	iptc_fn = iptc_delete_num_entry;
+	iptc_fn = TC_DELETE_NUM_ENTRY;
 	if (!(c = find_label(chain, *handle))) {
 		errno = ENOENT;
 		return 0;
@@ -1278,9 +1144,9 @@ iptc_delete_num_entry(const ipt_chainlabel chain,
 /* Check the packet `fw' on chain `chain'.  Returns the verdict, or
    NULL and sets errno. */
 const char *
-iptc_check_packet(const ipt_chainlabel chain,
-			      struct ipt_entry *entry,
-			      iptc_handle_t *handle)
+TC_CHECK_PACKET(const IPT_CHAINLABEL chain,
+		STRUCT_ENTRY *entry,
+		TC_HANDLE_T *handle)
 {
 	errno = ENOSYS;
 	return NULL;
@@ -1288,13 +1154,13 @@ iptc_check_packet(const ipt_chainlabel chain,
 
 /* Flushes the entries in the given chain (ie. empties chain). */
 int
-iptc_flush_entries(const ipt_chainlabel chain, iptc_handle_t *handle)
+TC_FLUSH_ENTRIES(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 {
 	unsigned int startindex, endindex;
 	struct chain_cache *c;
 	int ret;
 
-	iptc_fn = iptc_flush_entries;
+	iptc_fn = TC_FLUSH_ENTRIES;
 	if (!(c = find_label(chain, *handle))) {
 		errno = ENOENT;
 		return 0;
@@ -1311,7 +1177,7 @@ iptc_flush_entries(const ipt_chainlabel chain, iptc_handle_t *handle)
 
 /* Zeroes the counters in a chain. */
 int
-iptc_zero_entries(const ipt_chainlabel chain, iptc_handle_t *handle)
+TC_ZERO_ENTRIES(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 {
 	unsigned int i, end;
 	struct chain_cache *c;
@@ -1337,48 +1203,48 @@ iptc_zero_entries(const ipt_chainlabel chain, iptc_handle_t *handle)
 /* To create a chain, create two rules: error node and unconditional
  * return. */
 int
-iptc_create_chain(const ipt_chainlabel chain, iptc_handle_t *handle)
+TC_CREATE_CHAIN(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 {
 	int ret;
 	struct {
-		struct ipt_entry head;
+		STRUCT_ENTRY head;
 		struct ipt_error_target name;
-		struct ipt_entry ret;
-		struct ipt_standard_target target;
+		STRUCT_ENTRY ret;
+		STRUCT_STANDARD_TARGET target;
 	} newc;
 
-	iptc_fn = iptc_create_chain;
+	iptc_fn = TC_CREATE_CHAIN;
 
 	/* find_label doesn't cover built-in targets: DROP, ACCEPT,
            QUEUE, RETURN. */
 	if (find_label(chain, *handle)
-	    || strcmp(chain, IPTC_LABEL_DROP) == 0
-	    || strcmp(chain, IPTC_LABEL_ACCEPT) == 0
+	    || strcmp(chain, LABEL_DROP) == 0
+	    || strcmp(chain, LABEL_ACCEPT) == 0
 	    || strcmp(chain, IPTC_LABEL_QUEUE) == 0
-	    || strcmp(chain, IPTC_LABEL_RETURN) == 0) {
+	    || strcmp(chain, LABEL_RETURN) == 0) {
 		errno = EEXIST;
 		return 0;
 	}
 
-	if (strlen(chain)+1 > sizeof(ipt_chainlabel)) {
+	if (strlen(chain)+1 > sizeof(IPT_CHAINLABEL)) {
 		errno = EINVAL;
 		return 0;
 	}
 
 	memset(&newc, 0, sizeof(newc));
-	newc.head.target_offset = sizeof(struct ipt_entry);
+	newc.head.target_offset = sizeof(STRUCT_ENTRY);
 	newc.head.next_offset
-		= sizeof(struct ipt_entry) + sizeof(struct ipt_error_target);
+		= sizeof(STRUCT_ENTRY) + sizeof(struct ipt_error_target);
 	strcpy(newc.name.t.u.user.name, IPT_ERROR_TARGET);
 	newc.name.t.u.target_size = sizeof(struct ipt_error_target);
 	strcpy(newc.name.error, chain);
 
-	newc.ret.target_offset = sizeof(struct ipt_entry);
+	newc.ret.target_offset = sizeof(STRUCT_ENTRY);
 	newc.ret.next_offset
-		= sizeof(struct ipt_entry)+sizeof(struct ipt_standard_target);
-	strcpy(newc.target.target.u.user.name, IPT_STANDARD_TARGET);
-	newc.target.target.u.target_size = sizeof(struct ipt_standard_target);
-	newc.target.verdict = IPT_RETURN;
+		= sizeof(STRUCT_ENTRY)+sizeof(STRUCT_STANDARD_TARGET);
+	strcpy(newc.target.target.u.user.name, STANDARD_TARGET);
+	newc.target.target.u.target_size = sizeof(STRUCT_STANDARD_TARGET);
+	newc.target.verdict = RETURN;
 
 	/* Add just before terminal entry */
 	ret = insert_rules(2, sizeof(newc), &newc.head,
@@ -1389,12 +1255,12 @@ iptc_create_chain(const ipt_chainlabel chain, iptc_handle_t *handle)
 }
 
 static int
-count_ref(struct ipt_entry *e, unsigned int offset, unsigned int *ref)
+count_ref(STRUCT_ENTRY *e, unsigned int offset, unsigned int *ref)
 {
-	struct ipt_standard_target *t;
+	STRUCT_STANDARD_TARGET *t;
 
-	if (strcmp(ipt_get_target(e)->u.user.name, IPT_STANDARD_TARGET) == 0) {
-		t = (struct ipt_standard_target *)ipt_get_target(e);
+	if (strcmp(GET_TARGET(e)->u.user.name, STANDARD_TARGET) == 0) {
+		t = (STRUCT_STANDARD_TARGET *)GET_TARGET(e);
 
 		if (t->verdict == offset)
 			(*ref)++;
@@ -1405,8 +1271,8 @@ count_ref(struct ipt_entry *e, unsigned int offset, unsigned int *ref)
 
 /* Get the number of references to this chain. */
 int
-iptc_get_references(unsigned int *ref, const ipt_chainlabel chain,
-		    iptc_handle_t *handle)
+TC_GET_REFERENCES(unsigned int *ref, const IPT_CHAINLABEL chain,
+		  TC_HANDLE_T *handle)
 {
 	struct chain_cache *c;
 
@@ -1416,27 +1282,27 @@ iptc_get_references(unsigned int *ref, const ipt_chainlabel chain,
 	}
 
 	*ref = 0;
-	IPT_ENTRY_ITERATE((*handle)->entries.entries,
-			  (*handle)->entries.size,
-			  count_ref, entry2offset(*handle, c->start), ref);
+	ENTRY_ITERATE((*handle)->entries.entries,
+		      (*handle)->entries.size,
+		      count_ref, entry2offset(*handle, c->start), ref);
 	return 1;
 }
 
 /* Deletes a chain. */
 int
-iptc_delete_chain(const ipt_chainlabel chain, iptc_handle_t *handle)
+TC_DELETE_CHAIN(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 {
 	unsigned int labelidx, labeloff;
 	unsigned int references;
 	struct chain_cache *c;
 	int ret;
 
-	if (!iptc_get_references(&references, chain, handle))
+	if (!TC_GET_REFERENCES(&references, chain, handle))
 		return 0;
 
-	iptc_fn = iptc_delete_chain;
+	iptc_fn = TC_DELETE_CHAIN;
 
-	if (iptc_builtin(chain, *handle)) {
+	if (TC_BUILTIN(chain, *handle)) {
 		errno = EINVAL;
 		return 0;
 	}
@@ -1468,33 +1334,33 @@ iptc_delete_chain(const ipt_chainlabel chain, iptc_handle_t *handle)
 }
 
 /* Renames a chain. */
-int iptc_rename_chain(const ipt_chainlabel oldname,
-		      const ipt_chainlabel newname,
-		      iptc_handle_t *handle)
+int TC_RENAME_CHAIN(const IPT_CHAINLABEL oldname,
+		    const IPT_CHAINLABEL newname,
+		    TC_HANDLE_T *handle)
 {
 	unsigned int labeloff, labelidx;
 	struct chain_cache *c;
 	struct ipt_error_target *t;
 
-	iptc_fn = iptc_rename_chain;
+	iptc_fn = TC_RENAME_CHAIN;
 
 	/* find_label doesn't cover built-in targets: DROP, ACCEPT
            RETURN. */
 	if (find_label(newname, *handle)
-	    || strcmp(newname, IPTC_LABEL_DROP) == 0
-	    || strcmp(newname, IPTC_LABEL_ACCEPT) == 0
-	    || strcmp(newname, IPTC_LABEL_RETURN) == 0) {
+	    || strcmp(newname, LABEL_DROP) == 0
+	    || strcmp(newname, LABEL_ACCEPT) == 0
+	    || strcmp(newname, LABEL_RETURN) == 0) {
 		errno = EEXIST;
 		return 0;
 	}
 
 	if (!(c = find_label(oldname, *handle))
-	    || iptc_builtin(oldname, *handle)) {
+	    || TC_BUILTIN(oldname, *handle)) {
 		errno = ENOENT;
 		return 0;
 	}
 
-	if (strlen(newname)+1 > sizeof(ipt_chainlabel)) {
+	if (strlen(newname)+1 > sizeof(IPT_CHAINLABEL)) {
 		errno = EINVAL;
 		return 0;
 	}
@@ -1504,7 +1370,7 @@ int iptc_rename_chain(const ipt_chainlabel oldname,
 	labeloff = index2offset(*handle, labelidx);
 
 	t = (struct ipt_error_target *)
-		ipt_get_target(get_entry(*handle, labeloff));
+		GET_TARGET(get_entry(*handle, labeloff));
 
 	memset(t->error, 0, sizeof(t->error));
 	strcpy(t->error, newname);
@@ -1515,18 +1381,18 @@ int iptc_rename_chain(const ipt_chainlabel oldname,
 
 /* Sets the policy on a built-in chain. */
 int
-iptc_set_policy(const ipt_chainlabel chain,
-		const ipt_chainlabel policy,
-		iptc_handle_t *handle)
+TC_SET_POLICY(const IPT_CHAINLABEL chain,
+	      const IPT_CHAINLABEL policy,
+	      TC_HANDLE_T *handle)
 {
 	unsigned int hook;
 	unsigned int policyoff;
-	struct ipt_entry *e;
-	struct ipt_standard_target *t;
+	STRUCT_ENTRY *e;
+	STRUCT_STANDARD_TARGET *t;
 
-	iptc_fn = iptc_set_policy;
+	iptc_fn = TC_SET_POLICY;
 	/* Figure out which chain. */
-	hook = iptc_builtin(chain, *handle);
+	hook = TC_BUILTIN(chain, *handle);
 	if (hook == 0) {
 		errno = ENOENT;
 		return 0;
@@ -1541,11 +1407,11 @@ iptc_set_policy(const ipt_chainlabel chain,
 	}
 
 	e = get_entry(*handle, policyoff);
-	t = (struct ipt_standard_target *)ipt_get_target(e);
+	t = (STRUCT_STANDARD_TARGET *)GET_TARGET(e);
 
-	if (strcmp(policy, IPTC_LABEL_ACCEPT) == 0)
+	if (strcmp(policy, LABEL_ACCEPT) == 0)
 		t->verdict = -NF_ACCEPT - 1;
-	else if (strcmp(policy, IPTC_LABEL_DROP) == 0)
+	else if (strcmp(policy, LABEL_DROP) == 0)
 		t->verdict = -NF_DROP - 1;
 	else {
 		errno = EINVAL;
@@ -1559,34 +1425,34 @@ iptc_set_policy(const ipt_chainlabel chain,
 }
 
 /* Without this, on gcc 2.7.2.3, we get:
-   libiptc.c: In function `iptc_commit':
+   libiptc.c: In function `TC_COMMIT':
    libiptc.c:833: fixed or forbidden register was spilled.
    This may be due to a compiler bug or to impossible asm
    statements or clauses.
 */
 static void
-subtract_counters(struct ipt_counters *answer,
-		  const struct ipt_counters *a,
-		  const struct ipt_counters *b)
+subtract_counters(STRUCT_COUNTERS *answer,
+		  const STRUCT_COUNTERS *a,
+		  const STRUCT_COUNTERS *b)
 {
 	answer->pcnt = a->pcnt - b->pcnt;
 	answer->bcnt = a->bcnt - b->bcnt;
 }
 
 int
-iptc_commit(iptc_handle_t *handle)
+TC_COMMIT(TC_HANDLE_T *handle)
 {
 	/* Replace, then map back the counters. */
-	struct ipt_replace *repl;
-	struct ipt_counters_info *newcounters;
+	STRUCT_REPLACE *repl;
+	STRUCT_COUNTERS_INFO *newcounters;
 	unsigned int i;
 	size_t counterlen
-		= sizeof(struct ipt_counters_info)
-		+ sizeof(struct ipt_counters) * (*handle)->new_number;
+		= sizeof(STRUCT_COUNTERS_INFO)
+		+ sizeof(STRUCT_COUNTERS) * (*handle)->new_number;
 
 	CHECK(*handle);
 #if 0
-	dump_entries(*handle);
+	TC_TC_DUMP_ENTRIES(*handle);
 #endif
 
 	/* Don't commit if nothing changed. */
@@ -1600,7 +1466,7 @@ iptc_commit(iptc_handle_t *handle)
 	}
 
 	/* These are the old counters we will get from kernel */
-	repl->counters = malloc(sizeof(struct ipt_counters)
+	repl->counters = malloc(sizeof(STRUCT_COUNTERS)
 				* (*handle)->info.num_entries);
 	if (!repl->counters) {
 		free(repl);
@@ -1629,7 +1495,7 @@ iptc_commit(iptc_handle_t *handle)
 	memcpy(repl->entries, (*handle)->entries.entries,
 	       (*handle)->entries.size);
 
-	if (setsockopt(sockfd, IPPROTO_IP, IPT_SO_SET_REPLACE, repl,
+	if (setsockopt(sockfd, TC_IPPROTO, SO_SET_REPLACE, repl,
 		       sizeof(*repl) + (*handle)->entries.size) < 0) {
 		free(repl->counters);
 		free(repl);
@@ -1645,7 +1511,7 @@ iptc_commit(iptc_handle_t *handle)
 		switch ((*handle)->counter_map[i].maptype) {
 		case COUNTER_MAP_NOMAP:
 			newcounters->counters[i]
-				= ((struct ipt_counters){ 0, 0 });
+				= ((STRUCT_COUNTERS){ 0, 0 });
 			break;
 
 		case COUNTER_MAP_NORMAL_MAP:
@@ -1674,8 +1540,8 @@ iptc_commit(iptc_handle_t *handle)
 		}
 	}
 
-	if (setsockopt(sockfd, IPPROTO_IP, IPT_SO_SET_ADD_COUNTERS,
-	       newcounters, counterlen) < 0) {
+	if (setsockopt(sockfd, TC_IPPROTO, SO_SET_ADD_COUNTERS,
+		       newcounters, counterlen) < 0) {
 		free(repl->counters);
 		free(repl);
 		free(newcounters);
@@ -1696,14 +1562,14 @@ iptc_commit(iptc_handle_t *handle)
 
 /* Get raw socket. */
 int
-iptc_get_raw_socket()
+TC_GET_RAW_SOCKET()
 {
 	return sockfd;
 }
 
 /* Translates errno numbers into more human-readable form than strerror. */
 const char *
-iptc_strerror(int err)
+TC_STRERROR(int err)
 {
 	unsigned int i;
 	struct table_struct {
@@ -1715,27 +1581,27 @@ iptc_strerror(int err)
 	    { NULL, ENOPROTOOPT, "iptables who? (do you need to insmod?)" },
 	    { NULL, ENOSYS, "Will be implemented real soon.  I promise." },
 	    { NULL, ENOMEM, "Memory allocation problem" },
-	    { iptc_init, EPERM, "Permission denied (you must be root)" },
-	    { iptc_init, EINVAL, "Module is wrong version" },
-	    { iptc_delete_chain, ENOTEMPTY, "Chain is not empty" },
-	    { iptc_delete_chain, EINVAL, "Can't delete built-in chain" },
-	    { iptc_delete_chain, EMLINK,
+	    { TC_INIT, EPERM, "Permission denied (you must be root)" },
+	    { TC_INIT, EINVAL, "Module is wrong version" },
+	    { TC_DELETE_CHAIN, ENOTEMPTY, "Chain is not empty" },
+	    { TC_DELETE_CHAIN, EINVAL, "Can't delete built-in chain" },
+	    { TC_DELETE_CHAIN, EMLINK,
 	      "Can't delete chain with references left" },
-	    { iptc_create_chain, EEXIST, "Chain already exists" },
-	    { iptc_insert_entry, E2BIG, "Index of insertion too big" },
-	    { iptc_replace_entry, E2BIG, "Index of replacement too big" },
-	    { iptc_delete_num_entry, E2BIG, "Index of deletion too big" },
-	    { iptc_insert_entry, ELOOP, "Loop found in table" },
-	    { iptc_insert_entry, EINVAL, "Target problem" },
+	    { TC_CREATE_CHAIN, EEXIST, "Chain already exists" },
+	    { TC_INSERT_ENTRY, E2BIG, "Index of insertion too big" },
+	    { TC_REPLACE_ENTRY, E2BIG, "Index of replacement too big" },
+	    { TC_DELETE_NUM_ENTRY, E2BIG, "Index of deletion too big" },
+	    { TC_INSERT_ENTRY, ELOOP, "Loop found in table" },
+	    { TC_INSERT_ENTRY, EINVAL, "Target problem" },
 	    /* EINVAL for CHECK probably means bad interface. */
-	    { iptc_check_packet, EINVAL,
+	    { TC_CHECK_PACKET, EINVAL,
 	      "Bad arguments (does that interface exist?)" },
 	    /* ENOENT for DELETE probably means no matching rule */
-	    { iptc_delete_entry, ENOENT,
+	    { TC_DELETE_ENTRY, ENOENT,
 	      "Bad rule (does a matching rule exist in that chain?)" },
-	    { iptc_set_policy, ENOENT,
+	    { TC_SET_POLICY, ENOENT,
 	      "Bad built-in chain name" },
-	    { iptc_set_policy, EINVAL,
+	    { TC_SET_POLICY, EINVAL,
 	      "Bad policy name" },
 	    { NULL, ENOENT, "No extended target/match by that name" }
 	  };
@@ -1748,218 +1614,3 @@ iptc_strerror(int err)
 
 	return strerror(err);
 }
-
-/***************************** DEBUGGING ********************************/
-static inline int
-unconditional(const struct ipt_ip *ip)
-{
-	unsigned int i;
-
-	for (i = 0; i < sizeof(*ip)/sizeof(u_int32_t); i++)
-		if (((u_int32_t *)ip)[i])
-			return 0;
-
-	return 1;
-}
-
-static inline int
-check_match(const struct ipt_entry_match *m, unsigned int *off)
-{
-	assert(m->u.match_size >= sizeof(struct ipt_entry_match));
-	assert(IPT_ALIGN(m->u.match_size) == m->u.match_size);
-
-	(*off) += m->u.match_size;
-	return 0;
-}
-
-static inline int
-check_entry(const struct ipt_entry *e, unsigned int *i, unsigned int *off,
-	    unsigned int user_offset, int *was_return,
-	    iptc_handle_t h)
-{
-	unsigned int toff;
-	struct ipt_standard_target *t;
-
-	assert(e->target_offset >= sizeof(struct ipt_entry));
-	assert(e->next_offset >= e->target_offset
-	       + sizeof(struct ipt_entry_target));
-	toff = sizeof(struct ipt_entry);
-	IPT_MATCH_ITERATE(e, check_match, &toff);
-
-	assert(toff == e->target_offset);
-
-	t = (struct ipt_standard_target *)
-		ipt_get_target((struct ipt_entry *)e);
-	/* next_offset will have to be multiple of entry alignment. */
-	assert(e->next_offset == IPT_ALIGN(e->next_offset));
-	assert(e->target_offset == IPT_ALIGN(e->target_offset));
-	assert(t->target.u.target_size == IPT_ALIGN(t->target.u.target_size));
-	assert(!iptc_is_chain(t->target.u.user.name, h));
-
-	if (strcmp(t->target.u.user.name, IPT_STANDARD_TARGET) == 0) {
-		assert(t->target.u.target_size
-		       == IPT_ALIGN(sizeof(struct ipt_standard_target)));
-
-		assert(t->verdict == -NF_DROP-1
-		       || t->verdict == -NF_ACCEPT-1
-		       || t->verdict == IPT_RETURN
-		       || t->verdict < (int)h->entries.size);
-
-		if (t->verdict >= 0) {
-			struct ipt_entry *te = get_entry(h, t->verdict);
-			int idx;
-
-			idx = entry2index(h, te);
-			assert(strcmp(ipt_get_target(te)->u.user.name,
-				      IPT_ERROR_TARGET)
-			       != 0);
-			assert(te != e);
-
-			/* Prior node must be error node, or this node. */
-			assert(t->verdict == entry2offset(h, e)+e->next_offset
-			       || strcmp(ipt_get_target(index2entry(h, idx-1))
-					 ->u.user.name, IPT_ERROR_TARGET)
-			       == 0);
-		}
-
-		if (t->verdict == IPT_RETURN
-		    && unconditional(&e->ip)
-		    && e->target_offset == sizeof(*e))
-			*was_return = 1;
-		else
-			*was_return = 0;
-	} else if (strcmp(t->target.u.user.name, IPT_ERROR_TARGET) == 0) {
-		assert(t->target.u.target_size
-		       == IPT_ALIGN(sizeof(struct ipt_error_target)));
-
-		/* If this is in user area, previous must have been return */
-		if (*off > user_offset)
-			assert(*was_return);
-
-		*was_return = 0;
-	}
-	else *was_return = 0;
-
-	if (*off == user_offset)
-		assert(strcmp(t->target.u.user.name, IPT_ERROR_TARGET) == 0);
-
-	(*off) += e->next_offset;
-	(*i)++;
-	return 0;
-}
-
-#ifndef NDEBUG
-/* Do every conceivable sanity check on the handle */
-static void
-do_check(iptc_handle_t h, unsigned int line)
-{
-	unsigned int i, n;
-	unsigned int user_offset; /* Offset of first user chain */
-	int was_return;
-
-	assert(h->changed == 0 || h->changed == 1);
-	if (strcmp(h->info.name, "filter") == 0) {
-		assert(h->info.valid_hooks
-		       == (1 << NF_IP_LOCAL_IN
-			   | 1 << NF_IP_FORWARD
-			   | 1 << NF_IP_LOCAL_OUT));
-
-		/* Hooks should be first three */
-		assert(h->info.hook_entry[NF_IP_LOCAL_IN] == 0);
-
-		n = get_chain_end(h, 0);
-		n += get_entry(h, n)->next_offset;
-		assert(h->info.hook_entry[NF_IP_FORWARD] == n);
-
-		n = get_chain_end(h, n);
-		n += get_entry(h, n)->next_offset;
-		assert(h->info.hook_entry[NF_IP_LOCAL_OUT] == n);
-
-		user_offset = h->info.hook_entry[NF_IP_LOCAL_OUT];
-	} else if (strcmp(h->info.name, "nat") == 0) {
-		assert(h->info.valid_hooks
-		       == (1 << NF_IP_PRE_ROUTING
-			   | 1 << NF_IP_POST_ROUTING
-			   | 1 << NF_IP_LOCAL_OUT));
-
-		assert(h->info.hook_entry[NF_IP_PRE_ROUTING] == 0);
-
-		n = get_chain_end(h, 0);
-		n += get_entry(h, n)->next_offset;
-		assert(h->info.hook_entry[NF_IP_POST_ROUTING] == n);
-
-		n = get_chain_end(h, n);
-		n += get_entry(h, n)->next_offset;
-		assert(h->info.hook_entry[NF_IP_LOCAL_OUT] == n);
-
-		user_offset = h->info.hook_entry[NF_IP_LOCAL_OUT];
-	} else if (strcmp(h->info.name, "mangle") == 0) {
-		assert(h->info.valid_hooks
-		       == (1 << NF_IP_PRE_ROUTING
-			   | 1 << NF_IP_LOCAL_OUT));
-
-		/* Hooks should be first three */
-		assert(h->info.hook_entry[NF_IP_PRE_ROUTING] == 0);
-
-		n = get_chain_end(h, 0);
-		n += get_entry(h, n)->next_offset;
-		assert(h->info.hook_entry[NF_IP_LOCAL_OUT] == n);
-
-		user_offset = h->info.hook_entry[NF_IP_LOCAL_OUT];
-	} else
-		abort();
-
-	/* User chain == end of last builtin + policy entry */
-	user_offset = get_chain_end(h, user_offset);
-	user_offset += get_entry(h, user_offset)->next_offset;
-
-	/* Overflows should be end of entry chains, and unconditional
-           policy nodes. */
-	for (i = 0; i < NF_IP_NUMHOOKS; i++) {
-		struct ipt_entry *e;
-		struct ipt_standard_target *t;
-
-		if (!(h->info.valid_hooks & (1 << i)))
-			continue;
-		assert(h->info.underflow[i]
-		       == get_chain_end(h, h->info.hook_entry[i]));
-
-		e = get_entry(h, get_chain_end(h, h->info.hook_entry[i]));
-		assert(unconditional(&e->ip));
-		assert(e->target_offset == sizeof(*e));
-		assert(e->next_offset == sizeof(*e) + sizeof(*t));
-		t = (struct ipt_standard_target *)ipt_get_target(e);
-
-		assert(strcmp(t->target.u.user.name, IPT_STANDARD_TARGET)==0);
-		assert(t->verdict == -NF_DROP-1 || t->verdict == -NF_ACCEPT-1);
-
-		/* Hooks and underflows must be valid entries */
-		entry2index(h, get_entry(h, h->info.hook_entry[i]));
-		entry2index(h, get_entry(h, h->info.underflow[i]));
-	}
-
-	assert(h->info.size
-	       >= h->info.num_entries * (sizeof(struct ipt_entry)
-					 +sizeof(struct ipt_standard_target)));
-
-	assert(h->entries.size
-	       >= (h->new_number
-		   * (sizeof(struct ipt_entry)
-		      + sizeof(struct ipt_standard_target))));
-	assert(strcmp(h->info.name, h->entries.name) == 0);
-
-	i = 0; n = 0;
-	was_return = 0;
-	/* Check all the entries. */
-	IPT_ENTRY_ITERATE(h->entries.entries, h->entries.size,
-			  check_entry, &i, &n, user_offset, &was_return, h);
-
-	assert(i == h->new_number);
-	assert(n == h->entries.size);
-
-	/* Final entry must be error node */
-	assert(strcmp(ipt_get_target(index2entry(h, h->new_number-1))
-		      ->u.user.name,
-		      IPT_ERROR_TARGET) == 0);
-}
-#endif /*NDEBUG*/
