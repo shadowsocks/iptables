@@ -1,12 +1,12 @@
-#ifndef _IPT_IPLIMIT_H
-#define _IPT_IPLIMIT_H
+#ifndef _IPT_CONNLIMIT_H
+#define _IPT_CONNLIMIT_H
 
-struct ipt_iplimit_data;
+struct ipt_connlimit_data;
 
-struct ipt_iplimit_info {
+struct ipt_connlimit_info {
 	int limit;
 	int inverse;
 	u_int32_t mask;
-	struct ipt_iplimit_data *data;
+	struct ipt_connlimit_data *data;
 };
-#endif /* _IPT_IPLIMIT_H */
+#endif /* _IPT_CONNLIMIT_H */

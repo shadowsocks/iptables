@@ -1,4 +1,4 @@
-/* Shared library add-on to iptables to add state tracking support. */
+/* Shared library add-on to iptables to add connection limit support. */
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -7,22 +7,22 @@
 #include <getopt.h>
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ip_conntrack.h>
-#include <linux/netfilter_ipv4/ipt_iplimit.h>
+#include <linux/netfilter_ipv4/ipt_connlimit.h>
 
 /* Function which prints out usage message. */
 static void
 help(void)
 {
 	printf(
-"iplimit v%s options:\n"
-"[!] --iplimit-above n		match if the number of existing tcp connections is (not) above n\n"
-" --iplimit-mask n		group hosts using mask\n"
+"connlimit v%s options:\n"
+"[!] --connlimit-above n		match if the number of existing tcp connections is (not) above n\n"
+" --connlimit-mask n		group hosts using mask\n"
 "\n", IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
-	{ "iplimit-above", 1, 0, '1' },
-	{ "iplimit-mask",  1, 0, '2' },
+	{ "connlimit-above", 1, 0, '1' },
+	{ "connlimit-mask",  1, 0, '2' },
 	{0}
 };
 
@@ -42,7 +42,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct ipt_entry_match **match)
 {
-	struct ipt_iplimit_info *info = (struct ipt_iplimit_info*)(*match)->data;
+	struct ipt_connlimit_info *info = (struct ipt_connlimit_info*)(*match)->data;
 
 	if (0 == (*flags & 2)) {
 		/* set default mask unless we've already seen a mask option */
@@ -73,7 +73,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 static void final_check(unsigned int flags)
 {
 	if (!flags & 1)
-		exit_error(PARAMETER_PROBLEM, "You must specify `--iplimit-above'");
+		exit_error(PARAMETER_PROBLEM, "You must specify `--connlimit-above'");
 }
 
 static int
@@ -97,7 +97,7 @@ print(const struct ipt_ip *ip,
       const struct ipt_entry_match *match,
       int numeric)
 {
-	struct ipt_iplimit_info *info = (struct ipt_iplimit_info*)match->data;
+	struct ipt_connlimit_info *info = (struct ipt_connlimit_info*)match->data;
 
 	printf("#conn/%d %s %d ", count_bits(info->mask),
 	       info->inverse ? "<" : ">", info->limit);
@@ -106,17 +106,17 @@ print(const struct ipt_ip *ip,
 /* Saves the matchinfo in parsable form to stdout. */
 static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 {
-	struct ipt_iplimit_info *info = (struct ipt_iplimit_info*)match->data;
+	struct ipt_connlimit_info *info = (struct ipt_connlimit_info*)match->data;
 
-	printf("%s--iplimit-above %d ",info->inverse ? "! " : "",info->limit);
-	printf("--iplimit-mask %d ",count_bits(info->mask));
+	printf("%s--connlimit-above %d ",info->inverse ? "! " : "",info->limit);
+	printf("--connlimit-mask %d ",count_bits(info->mask));
 }
 
-static struct iptables_match iplimit = {
-	name:		"iplimit",
+static struct iptables_match connlimit = {
+	name:		"connlimit",
 	version:	IPTABLES_VERSION,
-	size:		IPT_ALIGN(sizeof(struct ipt_iplimit_info)),
-	userspacesize:	offsetof(struct ipt_iplimit_info,data),
+	size:		IPT_ALIGN(sizeof(struct ipt_connlimit_info)),
+	userspacesize:	offsetof(struct ipt_connlimit_info,data),
 	help:		help,
 	init:		init,
 	parse:		parse,
@@ -128,5 +128,5 @@ static struct iptables_match iplimit = {
 
 void _init(void)
 {
-	register_match(&iplimit);
+	register_match(&connlimit);
 }
