@@ -7,7 +7,7 @@
  * 	Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: ip6tables-restore.c,v 1.15 2004/01/31 19:28:13 gandalf Exp $
+ * $Id: ip6tables-restore.c,v 1.16 2004/01/31 19:33:47 gandalf Exp $
  */
 
 #include <getopt.h>
@@ -164,7 +164,8 @@ int main(int argc, char *argv[])
 		if (buffer[0] == '\n')
 			continue;
 		else if (buffer[0] == '#') {
-			if (verbose) fputs(buffer, stdout);
+			if (verbose)
+				fputs(buffer, stdout);
 			continue;
 		} else if ((strcmp(buffer, "COMMIT\n") == 0) && (in_table)) {
 			DEBUGP("Calling commit\n");
