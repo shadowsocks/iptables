@@ -89,7 +89,7 @@ static int k_itoa(char *string, int number)
 }
 
 
-static int k_atoi(char *string)
+static int k_atoi(signed char *string)
 {
 	unsigned int result = 0;
 	int maxoctet = IPT_RPC_CHAR_LEN;
