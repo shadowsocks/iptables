@@ -21,13 +21,15 @@ static void
 help(void)
 {
 	printf(
-"TCPMSS target v%s options:\n"
-"  --set-mss value                   Value to set MSS option to\n",
+"TCPMSS target v%s mutually-exclusive options:\n"
+"  --set-mss value               explicitly set MSS option to specified value\n"
+"  --clamp-mss-to-pmtu           automatically clamp MSS value to (path_MTU - 40)\n",
 NETFILTER_VERSION);
 }
 
 static struct option opts[] = {
 	{ "set-mss", 1, 0, '1' },
+	{ "clamp-mss-to-pmtu", 0, 0, '2' },
 	{ 0 }
 };
 
@@ -53,11 +55,19 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
-			           "TCPMSS target: Can't specify --set-mss twice");
-		if ((mssval = string_to_number(optarg, 0, 65535)) == -1)
+			           "TCPMSS target: Only one option may be specified");
+		if ((mssval = string_to_number(optarg, 0, 65535 - 40)) == -1)
 			exit_error(PARAMETER_PROBLEM, "Bad TCPMSS value `%s'", optarg);
 		
 		mssinfo->mss = mssval;
+		*flags = 1;
+		break;
+
+	case '2':
+		if (*flags)
+			exit_error(PARAMETER_PROBLEM,
+			           "TCPMSS target: Only one option may be specified");
+		mssinfo->mss = IPT_TCPMSS_CLAMP_PMTU;
 		*flags = 1;
 		break;
 
@@ -73,7 +83,7 @@ final_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
-		           "TCPMSS target: Parameter --set-mss is required");
+		           "TCPMSS target: At least one parameter is required");
 }
 
 /* Prints out the targinfo. */
@@ -84,7 +94,10 @@ print(const struct ipt_ip *ip,
 {
 	const struct ipt_tcpmss_info *mssinfo =
 		(const struct ipt_tcpmss_info *)target->data;
-	printf("TCPMSS set %u ", mssinfo->mss);
+	if(mssinfo->mss == IPT_TCPMSS_CLAMP_PMTU)
+		printf("TCPMSS clamp to PMTU ");
+	else
+		printf("TCPMSS set %u ", mssinfo->mss);
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
@@ -94,7 +107,10 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	const struct ipt_tcpmss_info *mssinfo =
 		(const struct ipt_tcpmss_info *)target->data;
 
-	printf("--set-mss %u ", mssinfo->mss);
+	if(mssinfo->mss == IPT_TCPMSS_CLAMP_PMTU)
+		printf("--clamp-mss-to-pmtu ");
+	else
+		printf("--set-mss %u ", mssinfo->mss);
 }
 
 struct iptables_target mss
