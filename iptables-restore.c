@@ -4,7 +4,7 @@
  *
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: iptables-restore.c,v 1.34 2004/05/26 16:04:48 gandalf Exp $
+ * $Id: iptables-restore.c,v 1.35 2004/06/25 11:18:57 kadlec Exp $
  */
 
 #include <getopt.h>
@@ -231,7 +231,7 @@ main(int argc, char *argv[])
 				exit(1);
 			}
 
-			if (!iptc_builtin(chain, handle)) {
+			if (iptc_builtin(chain, handle) <= 0) {
 				DEBUGP("Creating new chain '%s'\n", chain);
 				if (!iptc_create_chain(chain, &handle)) 
 					exit_error(PARAMETER_PROBLEM, 

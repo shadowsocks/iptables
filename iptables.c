@@ -1490,7 +1490,7 @@ for_each_chain(int (*fn)(const ipt_chainlabel, int, iptc_handle_t *),
 	for (i = 0; i < chaincount; i++) {
 		if (!builtinstoo
 		    && iptc_builtin(chains + i*sizeof(ipt_chainlabel),
-				    *handle))
+				    *handle) == 1)
 			continue;
 	        ret &= fn(chains + i*sizeof(ipt_chainlabel), verbose, handle);
 	}
