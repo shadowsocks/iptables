@@ -104,19 +104,14 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch(c) {
 	case '%':
-		if (check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
-				   "Unexpected `!' after --limit");
+		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!parse_rate(optarg, &r->avg))
 			exit_error(PARAMETER_PROBLEM,
 				   "bad rate `%s'", optarg);
 		break;
 
 	case '$':
-		if (check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
-				   "Unexpected `!' after --limit-burst");
-
+		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (string_to_number(optarg, 0, 10000, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				   "bad --limit-burst `%s'", optarg);
@@ -126,6 +121,10 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	default:
 		return 0;
 	}
+
+	if (invert)
+		exit_error(PARAMETER_PROBLEM,
+			   "limit does not support invert");
 
 	return 1;
 }
