@@ -1,0 +1,13 @@
+This target allows you to mark that connection with an arbitrary walue.  This
+value can later be matched via the 
+.B connmark
+match.
+.TP
+.BI "--set-mark " "mark"
+Set the conntrack mark,
+.TP
+.BI "--save-mark"
+Save the packet nfmark on the connection mark.
+.TP
+.BI "--restore-mark"
+Restore the saved nfmark value from the connection mark.

@@ -1,0 +1,1 @@
+This module matches the EUI64 part of a stateless autoconfigured IPv6 address.  It compares the source MAC address with the lower 64 bits of the IPv6 address. 

@@ -1,0 +1,17 @@
+This is used to modify the IPv6 HOPLIMIT header field.  The HOPLIMIT field is 
+similar to what is known as TTL value in IPv4.  Setting or incrementing the
+HOPLIMIT field can potentially be very dangerous, so it should be avoided at
+any cost.  
+.TP
+.B Don't ever set or increment the value on packets that leave your local network!
+.B mangle
+table.
+.TP
+.BI "--hl-set " "value"
+Set the HOPLIMIT value to `value'.
+.TP
+.BI "--hl-dec " "value"
+Decrement the HOPLIMIT value `value' times.
+.TP
+.BI "--hl-inc " "value"
+Increment the HOPLIMIT value `value' times.

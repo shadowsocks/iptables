@@ -1,0 +1,10 @@
+This matches if the current time is within a given range.
+.TP
+.BI "--timestart " "value"
+Match only if it is after `value' (Format: HH:MM).
+.TP
+.BI "--timestop " "value"
+Match only if it is before `value' (Format: HH:MM).
+.TP
+.BI "--days " "listofdays"
+Match only if today is one of the given days.  (Format: Mon,Tue,Wed,Thu,Fri)

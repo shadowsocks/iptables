@@ -53,7 +53,7 @@ LDFLAGS      = -static
 LDLIBS       =
 endif
 
-EXTRAS+=iptables iptables.o
+EXTRAS+=iptables iptables.o iptables.8
 EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables $(DESTDIR)$(MANDIR)/man8/iptables.8
 
 # No longer experimental.
@@ -61,7 +61,7 @@ EXTRAS+=iptables-save iptables-restore
 EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables-save $(DESTDIR)$(BINDIR)/iptables-restore $(DESTDIR)$(MANDIR)/man8/iptables-restore.8 $(DESTDIR)$(MANDIR)/man8/iptables-save.8
 
 ifeq ($(DO_IPV6), 1)
-EXTRAS+=ip6tables ip6tables.o
+EXTRAS+=ip6tables ip6tables.o ip6tables.8
 EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/ip6tables $(DESTDIR)$(MANDIR)/man8/ip6tables.8
 EXTRAS_EXP+=ip6tables-save ip6tables-restore
 EXTRA_INSTALLS_EXP+=$(DESTDIR)$(BINDIR)/ip6tables-save $(DESTDIR)$(BINDIR)/ip6tables-restore # $(DESTDIR)$(MANDIR)/man8/iptables-restore.8 $(DESTDIR)$(MANDIR)/man8/iptables-save.8 $(DESTDIR)$(MANDIR)/man8/ip6tables-save.8 $(DESTDIR)$(MANDIR)/man8/ip6tables-restore.8
@@ -147,6 +147,11 @@ EXTRA_DEPENDS+=iptables-standalone.d iptables.d
 iptables-standalone.d iptables.d: %.d: %.c
 	@-$(CC) -M -MG $(CFLAGS) $< | sed -e 's@^.*\.o:@$*.d $*.o:@' > $@
 
+iptables.8: iptables.8.in extensions/libipt_matches.man extensions/libipt_targets.man
+	sed -e '/@MATCH@/ r extensions/libipt_matches.man' -e '/@TARGET@/ r extensions/libipt_targets.man' iptables.8.in >iptables.8
+
+ip6tables.8: ip6tables.8.in extensions/libip6t_matches.man extensions/libip6t_targets.man
+	sed -e '/@MATCH@/ r extensions/libip6t_matches.man' -e '/@TARGET@/ r extensions/libiptt_targets.man' ip6tables.8.in >ip6tables.8
 
 # Development Targets
 .PHONY: install-devel-man3

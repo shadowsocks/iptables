@@ -1,0 +1,10 @@
+This module matches on IPv6 option headers
+.TP
+.BI "--header " "[!]" "headers"
+Matches the given type of headers.  
+Names: hop,dst,route,frag,auth,esp,none,proto
+Long Names: hop-by-hop,ipv6-opts,ipv6-route,ipv6-frag,ah,esp,ipv6-nonxt,protocol
+Numbers: 0,60,43,44,51,50,59
+.TP
+.BI "--soft"
+The header CONTAINS the specified extensions.

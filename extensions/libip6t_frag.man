@@ -1,0 +1,19 @@
+This module matches the time IPv6 fragmentathion header
+.TP
+.BI "--fragid " "[!]" "id[:id]"
+Matches the given fragmentation ID (range).
+.TP
+.BI "--fraglen " "[!]" "length"
+Matches the total length of this header.
+.TP
+.BI "--fragres "
+Matches the reserved field, too.
+.TP
+.BI "--fragfirst "
+Matches on the first fragment.
+.TP
+.BI "[--fragmore]"
+Matches if there are more fragments.
+.TP
+.BI "[--fraglast]"
+Matches if this is the last fragement.

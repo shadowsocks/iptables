@@ -12,6 +12,29 @@ PF6_EXT_SLIB:=eui64 hl icmpv6 length limit mac mark multiport owner standard tcp
 PF_EXT_SLIB_OPTS:=$(foreach T,$(wildcard extensions/.*-test),$(shell KERNEL_DIR=$(KERNEL_DIR) $(T)))
 PF6_EXT_SLIB_OPTS:=$(foreach T,$(wildcard extensions/.*-test6),$(shell KERNEL_DIR=$(KERNEL_DIR) $(T)))
 
+PF_EXT_ALL_SLIB:=$(patsubst extensions/libipt_%.c, %, $(wildcard extensions/libipt_*.c))
+PF6_EXT_ALL_SLIB:=$(patsubst extensions/libip6t_%.c, %, $(wildcard extensions/libipt_*.c))
+
+PF_EXT_MAN_ALL_MATCHES:=$(foreach T,$(PF_EXT_ALL_SLIB),$(shell test -f extensions/libipt_$(T).man && grep -q register_match extensions/libipt_$(T).c  && echo $(T)))
+PF_EXT_MAN_ALL_TARGETS:=$(foreach T,$(PF_EXT_ALL_SLIB),$(shell test -f extensions/libipt_$(T).man && grep -q register_target extensions/libipt_$(T).c && echo $(T)))
+PF6_EXT_MAN_ALL_MATCHES:=$(foreach T,$(PF6_EXT_ALL_SLIB),$(shell test -f extensions/libip6t_$(T).man && grep -q register_match6 extensions/libip6t_$(T).c  && echo $(T)))
+PF6_EXT_MAN_ALL_TARGETS:=$(foreach T,$(PF6_EXT_ALL_SLIB),$(shell test -f extensions/libip6t_$(T).man && grep -q register_target6 extensions/libip6t_$(T).c && echo $(T)))
+
+PF_EXT_MAN_MATCHES:=$(filter $(PF_EXT_ALL_SLIB), $(PF_EXT_MAN_ALL_MATCHES))
+PF_EXT_MAN_TARGETS:=$(filter $(PF_EXT_ALL_SLIB), $(PF_EXT_MAN_ALL_TARGETS))
+PF_EXT_MAN_EXTRA_MATCHES:=$(filter-out $(PF_EXT_MAN_MATCHES), $(PF_EXT_MAN_ALL_MATCHES))
+PF_EXT_MAN_EXTRA_TARGETS:=$(filter-out $(PF_EXT_MAN_TARGETS), $(PF_EXT_MAN_ALL_TARGETS))
+PF6_EXT_MAN_MATCHES:=$(filter $(PF6_EXT_ALL_SLIB), $(PF6_EXT_MAN_ALL_MATCHES))
+PF6_EXT_MAN_TARGETS:=$(filter $(PF6_EXT_ALL_SLIB), $(PF6_EXT_MAN_ALL_TARGETS))
+PF6_EXT_MAN_EXTRA_MATCHES:=$(filter-out $(PF6_EXT_MAN_MATCHES), $(PF6_EXT_MAN_ALL_MATCHES))
+PF6_EXT_MAN_EXTRA_TARGETS:=$(filter-out $(PF6_EXT_MAN_TARGETS), $(PF6_EXT_MAN_ALL_TARGETS))
+
+
+allman:
+	@echo ALL_SLIB: $(PF_EXT_ALL_SLIB)
+	@echo ALL_MATCH: $(PF_EXT_MAN_ALL_MATCHES)
+	@echo ALL_TARGET: $(PF_EXT_MAN_ALL_TARGETS)
+
 PF_EXT_SLIB+=$(PF_EXT_SLIB_OPTS)
 PF6_EXT_SLIB+=$(PF6_EXT_SLIB_OPTS)
 
@@ -79,6 +102,58 @@ extensions/lib%.o: extensions/lib%.c
 
 endif
  
+EXTRAS += extensions/libipt_targets.man
+extensions/libipt_targets.man: $(patsubst %,extensions/libipt_%.man,$(PF_EXT_MAN_ALL_TARGETS))
+	@for ext in $(PF_EXT_MAN_TARGETS); do \
+	    echo ".SS $$ext" ;\
+	    cat extensions/libipt_$$ext.man ;\
+	done >extensions/libipt_targets.man
+	@if [ -n "$(PF_EXT_MAN_EXTRA_TARGETS)" ]; then \
+	    for ext in $(PF_EXT_MAN_EXTRA_TARGETS); do \
+		echo ".SS $$ext (not supported, see Patch-O-Matic)" ;\
+		cat extensions/libipt_$$ext.man ;\
+	    done ;\
+       	fi >>extensions/libipt_targets.man
+
+EXTRAS += extensions/libipt_matches.man
+extensions/libipt_matches.man: $(patsubst %,extensions/libipt_%.man,$(PF_EXT_MAN_ALL_MATCHES))
+	@for ext in $(PF_EXT_MAN_MATCHES); do \
+	    echo ".SS $$ext" ;\
+	    cat extensions/libipt_$$ext.man ;\
+	done >extensions/libipt_matches.man
+	@if [ -n "$(PF_EXT_MAN_EXTRA_MATCHES)" ]; then \
+	    for ext in $(PF_EXT_MAN_EXTRA_MATCHES); do \
+		echo ".SS $$ext (not supported, see Patch-O-Matic)" ;\
+		cat extensions/libipt_$$ext.man ;\
+	    done ;\
+       	fi >>extensions/libipt_matches.man
+
+EXTRAS += extensions/libip6t_targets.man
+extensions/libip6t_targets.man: $(patsubst %, extensions/libip6t_%.man, $(PF6_EXT_MAN_ALL_TARGETS))
+	@for ext in $(PF6_EXT_MAN_TARGETS); do \
+	    echo ".SS $$ext" ;\
+	    cat extensions/libip6t_$$ext.man ;\
+	done >extensions/libip6t_targets.man
+	@if [ -n "$(PF6_EXT_MAN_EXTRA_TARGETS)" ]; then \
+	    for ext in $(PF6_EXT_MAN_EXTRA_TARGETS); do \
+		echo ".SS $$ext (not supported, see Patch-O-Matic)" ;\
+		cat extensions/libip6t_$$ext.man ;\
+	    done ;\
+       	fi >>extensions/libip6t_targets.man
+
+EXTRAS += extensions/libip6t_matches.man
+extensions/libip6t_matches.man: $(patsubst %, extensions/libip6t_%.man, $(PF6_EXT_MAN_ALL_MATCHES))
+	@for ext in $(PF6_EXT_MAN_MATCHES); do \
+	    echo ".SS $$ext" ;\
+	    cat extensions/libip6t_$$ext.man ;\
+	done >extensions/libip6t_matches.man
+	@if [ -n "$(PF6_EXT_MAN_EXTRA_MATCHES)" ]; then \
+	    for ext in $(PF6_EXT_MAN_EXTRA_MATCHES); do \
+		echo ".SS $$ext (not supported, see Patch-O-Matic)" ;\
+		cat extensions/libip6t_$$ext.man ;\
+	    done ;\
+       	fi >>extensions/libip6t_matches.man
+
 $(DESTDIR)$(LIBDIR)/iptables/libipt_%.so: extensions/libipt_%.so
 	@[ -d $(DESTDIR)$(LIBDIR)/iptables ] || mkdir -p $(DESTDIR)$(LIBDIR)/iptables
 	cp $< $@
