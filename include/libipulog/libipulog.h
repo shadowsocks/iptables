@@ -1,6 +1,8 @@
 #ifndef _LIBIPULOG_H
 #define _LIBIPULOG_H
 
+/* libipulog.h,v 1.3 2001/05/21 19:15:16 laforge Exp */
+
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -11,6 +13,11 @@
 #include <linux/netlink.h>
 #include <net/if.h>
 #include <linux/netfilter_ipv4/ipt_ULOG.h>
+
+/* FIXME: glibc sucks */
+#ifndef MSG_TRUNC 
+#define MSG_TRUNC	0x20
+#endif
 
 struct ipulog_handle;
 
