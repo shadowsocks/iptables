@@ -28,7 +28,7 @@ struct pkttypes {
 };
 
 static const struct pkttypes supported_types[] = {
-	{"host", PACKET_HOST, 1, "to us"},
+	{"unicast", PACKET_HOST, 1, "to us"},
 	{"broadcast", PACKET_BROADCAST, 1, "to all"},
 	{"multicast", PACKET_MULTICAST, 1, "to group"},
 /*
@@ -38,7 +38,7 @@ static const struct pkttypes supported_types[] = {
 	/* aliases */
 	{"bcast", PACKET_BROADCAST, 0, NULL},
 	{"mcast", PACKET_MULTICAST, 0, NULL},
-	{"for-us", PACKET_HOST, 0, NULL}
+	{"host", PACKET_HOST, 0, NULL}
 };
 
 static void print_types()
