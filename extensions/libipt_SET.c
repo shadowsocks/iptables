@@ -120,7 +120,9 @@ print_target(const char *prefix, const struct ipt_set_info *info)
 {
 	int i;
 	char setname[IP_SET_MAXNAMELEN];
-	
+
+	if (info->index == IP_SET_INVALID_ID)
+		return;
 	get_set_byid(setname, info->index);
 	printf("%s %s", prefix, setname);
 	for (i = 0; i < IP_SET_MAX_BINDINGS; i++) {
