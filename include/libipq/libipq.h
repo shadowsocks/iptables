@@ -26,7 +26,11 @@
 #include <asm/types.h>
 #include <linux/netlink.h>
 
+#ifdef KERNEL_64_USERSPACE_32
+#include "ip_queue_64.h"
+#else
 #include <linux/netfilter_ipv4/ip_queue.h>
+#endif
 
 #ifdef DEBUG_LIBIPQ
 #include <stdio.h>

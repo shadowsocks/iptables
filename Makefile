@@ -23,7 +23,7 @@ EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables $(DESTDIR)$(BINDIR)/ip6tables $(DES
 # Sparc64 hack
 ifeq ($(shell uname -m),sparc64)
 # The kernel is 64-bit, even though userspace is 32.
-CFLAGS+=-DIPT_MIN_MATCH_ALIGN=8 -DIPT_MIN_ENTRY_ALIGN=8
+CFLAGS+=-DIPT_MIN_MATCH_ALIGN=8 -DIPT_MIN_ENTRY_ALIGN=8 -DKERNEL_64_USERSPACE_32
 endif
 
 ifndef IPT_LIBDIR
