@@ -84,6 +84,12 @@ static void print_proto(u_int16_t proto, int invert)
 		unsigned int i;
 		const char *invertstr = invert ? "! " : "";
 
+		struct protoent *pent = getprotobynumber(proto);
+		if (pent) {
+			printf("-p %s%s ", invertstr, pent->p_name);
+			return;
+		}
+
 		for (i = 0; i < sizeof(chain_protos)/sizeof(struct pprot); i++)
 			if (chain_protos[i].num == proto) {
 				printf("-p %s%s ",
