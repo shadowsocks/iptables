@@ -25,3 +25,6 @@ x Fix ICMP errors for NAT.
   ipchains module doesn't load with CONFIG_MODVERSIONS.
   Investigate ping corruption with ipchains and iptables MASQ in -test2.
   touch userspace/libiptc/libiptc.c doesn't cause re-make.
+  skb_cow in NAT.
+  MTU change in route_me_harder + test.
+  LVS
