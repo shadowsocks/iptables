@@ -19,3 +19,4 @@ x Dependency problem with libiptc.c (change it, no remake).
 x Russell King's ipchains module crash report.
   -C utility.
   Static (dumb) NAT.
+  SNMP NAT module
