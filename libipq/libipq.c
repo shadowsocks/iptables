@@ -171,6 +171,10 @@ static ssize_t ipq_netlink_recvfrom(const struct ipq_handle *h,
 		ipq_errno = IPQ_ERR_RECV;
 		return -1;
 	}
+	if (h->peer.nl_pid != 0) {
+		ipq_errno = IPQ_ERR_RECV;
+		return -1;
+	}
 	if (status == 0) {
 		ipq_errno = IPQ_ERR_NLEOF;
 		return -1;
