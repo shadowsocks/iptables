@@ -91,7 +91,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 		if (*flags & ESP_SPI)
 			exit_error(PARAMETER_PROBLEM,
-				   "Only one `--spi' allowed");
+				   "Only one `--espspi' allowed");
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_esp_spis(argv[optind-1], espinfo->spis);
 		if (invert)
@@ -152,17 +152,17 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 {
 	const struct ipt_esp *espinfo = (struct ipt_esp *)match->data;
 
-	if (espinfo->spis[0] != 0
-	    && espinfo->spis[1] != 0xFFFFFFFF) {
-		if (espinfo->invflags & IPT_ESP_INV_SPI)
-			printf("! ");
+	if (!(espinfo->spis[0] == 0
+	    && espinfo->spis[1] == 0xFFFFFFFF)) {
+		printf("--espspi %s", 
+			(espinfo->invflags & IPT_ESP_INV_SPI) ? "! " : "");
 		if (espinfo->spis[0]
 		    != espinfo->spis[1])
-			printf("--spi %u-%u ",
+			printf("%u:%u ",
 			       espinfo->spis[0],
 			       espinfo->spis[1]);
 		else
-			printf("--spi %u ",
+			printf("%u ",
 			       espinfo->spis[0]);
 	}
 

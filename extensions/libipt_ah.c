@@ -91,7 +91,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 		if (*flags & AH_SPI)
 			exit_error(PARAMETER_PROBLEM,
-				   "Only one `--spi' allowed");
+				   "Only one `--ahspi' allowed");
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_ah_spis(argv[optind-1], ahinfo->spis);
 		if (invert)
@@ -152,17 +152,17 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 {
 	const struct ipt_ah *ahinfo = (struct ipt_ah *)match->data;
 
-	if (ahinfo->spis[0] != 0
-	    && ahinfo->spis[1] != 0xFFFFFFFF) {
-		if (ahinfo->invflags & IPT_AH_INV_SPI)
-			printf("! ");
+	if (!(ahinfo->spis[0] == 0
+	    && ahinfo->spis[1] == 0xFFFFFFFF)) {
+		printf("--ahspi %s", 
+			(ahinfo->invflags & IPT_AH_INV_SPI) ? "! " : "");
 		if (ahinfo->spis[0]
 		    != ahinfo->spis[1])
-			printf("--spi %u-%u ",
+			printf("%u:%u ",
 			       ahinfo->spis[0],
 			       ahinfo->spis[1]);
 		else
-			printf("--spi %u ",
+			printf("%u ",
 			       ahinfo->spis[0]);
 	}
 
