@@ -1460,7 +1460,7 @@ TC_COMMIT(TC_HANDLE_T *handle)
 
 	CHECK(*handle);
 #if 0
-	TC_TC_DUMP_ENTRIES(*handle);
+	TC_DUMP_ENTRIES(*handle);
 #endif
 
 	/* Don't commit if nothing changed. */
@@ -1511,6 +1511,15 @@ TC_COMMIT(TC_HANDLE_T *handle)
 		return 0;
 	}
 
+#if 1
+	fprintf(stderr, "Before adjust:\n");
+	for (i = 0; i < (*handle)->new_number; i++) {
+		fprintf(stderr, "counter %i/%i = %llu,%llu\n",
+			i, (*handle)->new_number,
+			repl->counters[i].pcnt,
+			repl->counters[i].bcnt);
+	}
+#endif
 	/* Put counters back. */
 	strcpy(newcounters->name, (*handle)->info.name);
 	newcounters->num_counters = (*handle)->new_number;
@@ -1547,6 +1556,15 @@ TC_COMMIT(TC_HANDLE_T *handle)
 			break;
 		}
 	}
+#if 1
+	fprintf(stderr, "After adjust:\n");
+	for (i = 0; i < (*handle)->new_number; i++) {
+		fprintf(stderr, "counter %i/%i = %llu,%llu\n",
+			i, (*handle)->new_number,
+			newcounters->counters[i].pcnt,
+			newcounters->counters[i].bcnt);
+	}
+#endif
 
 	if (setsockopt(sockfd, TC_IPPROTO, SO_SET_ADD_COUNTERS,
 		       newcounters, counterlen) < 0) {
