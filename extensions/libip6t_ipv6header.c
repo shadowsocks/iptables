@@ -143,12 +143,14 @@ help(void)
 "                         names: hop,dst,route,frag,auth,esp,none,proto\n"
 "                    long names: hop-by-hop,ipv6-opts,ipv6-route,\n"
 "                                ipv6-frag,ah,esp,ipv6-nonxt,protocol\n"
-"                       numbers: 0,60,43,44,51,50,59\n",
+"                       numbers: 0,60,43,44,51,50,59\n"
+"--soft                    The header CONTAINS the specified extensions\n",
 	NETFILTER_VERSION);
 }
 
 static struct option opts[] = {
 	{ "header", 1, 0, '1' },
+	{ "soft", 0, 0, '2' },
 	{ 0 }
 };
 
@@ -159,6 +161,7 @@ init(struct ip6t_entry_match *m, unsigned int *nfcache)
 
 	info->matchflags = 0x00;
 	info->invflags = 0x00;
+	info->modeflag = 0x00;
 	/* No caching (yet) */
 	*nfcache |= NFC_UNKNOWN;
 }
@@ -178,7 +181,8 @@ parse_header(const char *flags) {
         return ret;
 }
 
-#define IPV6_HDR_HEADER 0x01
+#define IPV6_HDR_HEADER	0x01
+#define IPV6_HDR_SOFT	0x02
 
 /* Parses command options; returns 0 if it ate an option */
 static int
@@ -203,10 +207,17 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 				exit_error(PARAMETER_PROBLEM, "ip6t_ipv6header: cannot parse header names");
 
 			if (invert) 
-				info->invflags |= 255;
-
+				info->invflags |= 0xFF;
 			*flags |= IPV6_HDR_HEADER;
+			break;
+		case '2' : 
+			/* Soft-mode requested? */
+			if (*flags & IPV6_HDR_SOFT)
+				exit_error(PARAMETER_PROBLEM,
+					"Only one `--soft' allowed");
 
+			info->modeflag |= 0xFF;
+			*flags |= IPV6_HDR_SOFT;
 			break;
 		default:
 			return 0;
@@ -263,6 +274,9 @@ print(const struct ip6t_ip6 *ip,
                 }
         }
 
+	if (info->modeflag)
+		printf("soft ");
+
 	return;
 }
 
@@ -278,6 +292,8 @@ save(const struct ip6t_ip6 *ip,
 	printf("%s", info->invflags ? "!" : "");
 	print_header(info->matchflags);
 	printf(" ");
+	if (info->modeflag)
+		printf("--soft ");
 
 	return;
 }
