@@ -7,7 +7,7 @@
  * 	Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: ip6tables-restore.c,v 1.11 2003/03/05 07:46:15 laforge Exp $
+ * $Id: ip6tables-restore.c,v 1.12 2003/05/02 15:30:11 laforge Exp $
  */
 
 #include <getopt.h>
@@ -321,7 +321,11 @@ int main(int argc, char *argv[])
 			
 			for (curchar = parsestart; *curchar; curchar++) {
 				if (*curchar == '"') {
-					if (quote_open) {
+					/* quote_open cannot be true if there
+					 * was no previous character.  Thus, 
+					 * curchar-1 has to be within bounds */
+					if (quote_open && 
+					    *(curchar-1) != '\\') {
 						quote_open = 0;
 						*curchar = ' ';
 					} else {

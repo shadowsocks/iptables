@@ -4,7 +4,7 @@
  *
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: iptables-restore.c,v 1.25 2003/03/06 11:56:31 laforge Exp $
+ * $Id: iptables-restore.c,v 1.26 2003/05/02 15:30:11 laforge Exp $
  */
 
 #include <getopt.h>
@@ -318,7 +318,11 @@ int main(int argc, char *argv[])
 			
 			for (curchar = parsestart; *curchar; curchar++) {
 				if (*curchar == '"') {
-					if (quote_open) {
+					/* quote_open cannot be true if there
+					 * was no previous character.  Thus, 
+					 * curchar-1 has to be within bounds */
+					if (quote_open && 
+					    *(curchar-1) != '\\') {
 						quote_open = 0;
 						*curchar = ' ';
 					} else {
