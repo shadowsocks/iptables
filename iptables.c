@@ -736,19 +736,18 @@ parse_interface(const char *arg, char *vianame, unsigned char *mask)
 	else if (vianame[vialen - 1] == '+') {
 		memset(mask, 0xFF, vialen - 1);
 		memset(mask + vialen - 1, 0, IFNAMSIZ - vialen + 1);
-		/* Remove `+' */
-		vianame[vialen - 1] = '\0';
+		/* Don't remove `+' here! -HW */
 	} else {
 		/* Include nul-terminator in match */
 		memset(mask, 0xFF, vialen + 1);
 		memset(mask + vialen + 1, 0, IFNAMSIZ - vialen - 1);
-	}
-	for (i = 0; vianame[i]; i++) {
-		if (!isalnum(vianame[i]) && vianame[i] != '_') {
-			printf("Warning: wierd character in interface"
-			       " `%s' (No aliases, :, ! or *).\n",
-			       vianame);
-			break;
+		for (i = 0; vianame[i]; i++) {
+			if (!isalnum(vianame[i]) && vianame[i] != '_') {
+				printf("Warning: wierd character in interface"
+				       " `%s' (No aliases, :, ! or *).\n",
+				       vianame);
+				break;
+			}
 		}
 	}
 }
@@ -1165,10 +1164,6 @@ print_firewall(const struct ipt_entry *fw,
 
 		if (fw->ip.iniface[0] != '\0') {
 			strcat(iface, fw->ip.iniface);
-			/* If it doesn't compare the nul-term, it's a
-			   wildcard. */
-			if (fw->ip.iniface_mask[strlen(fw->ip.iniface)] == 0)
-				strcat(iface, "+");
 		}
 		else if (format & FMT_NUMERIC) strcat(iface, "*");
 		else strcat(iface, "any");
@@ -1182,10 +1177,6 @@ print_firewall(const struct ipt_entry *fw,
 
 		if (fw->ip.outiface[0] != '\0') {
 			strcat(iface, fw->ip.outiface);
-			/* If it doesn't compare the nul-term, it's a
-			   wildcard. */
-			if (fw->ip.outiface_mask[strlen(fw->ip.outiface)] == 0)
-				strcat(iface, "+");
 		}
 		else if (format & FMT_NUMERIC) strcat(iface, "*");
 		else strcat(iface, "any");
