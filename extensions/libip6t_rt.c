@@ -6,8 +6,14 @@
 #include <getopt.h>
 #include <errno.h>
 #include <ip6tables.h>
+/*#include <linux/in6.h>*/
 #include <linux/netfilter_ipv6/ip6t_rt.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
                                         
+/*#define DEBUG	1*/
+
 /* Function which prints out usage message. */
 static void
 help(void)
@@ -18,8 +24,9 @@ help(void)
 " --rt-segsleft [!] num[:num]   match the Segments Left field (range)\n"
 " --rt-len [!] length           total length of this header\n"
 " --rt-0-res                    check the reserved filed, too (type 0)\n"
-" --rt-0-addrs                  Type=0 addresses (list) - NOT SUPPORTED, yet\n",
-NETFILTER_VERSION);
+" --rt-0-addrs ADDR[,ADDR...]   Type=0 addresses (list, max: %d)\n"
+" --rt-0-not-strict             List of Type=0 addresses not a strict list\n",
+NETFILTER_VERSION, IP6T_RT_HOPS);
 }
 
 static struct option opts[] = {
@@ -27,7 +34,8 @@ static struct option opts[] = {
 	{ "rt-segsleft", 1, 0, '2' },
 	{ "rt-len", 1, 0, '3' },
 	{ "rt-0-res", 0, 0, '4' },
-	{ "rt-0-addrs", 0, 0, '5' },
+	{ "rt-0-addrs", 1, 0, '5' },
+	{ "rt-0-not-strict", 0, 0, '6' },
 	{0}
 };
 
@@ -74,6 +82,61 @@ parse_rt_segsleft(const char *idstring, u_int32_t *ids)
 	free(buffer);
 }
 
+static char *
+addr_to_numeric(const struct in6_addr *addrp)
+{
+	static char buf[50+1];
+	return (char *)inet_ntop(AF_INET6, addrp, buf, sizeof(buf));
+}
+
+static struct in6_addr *
+numeric_to_addr(const char *num)
+{
+	static struct in6_addr ap;
+	int err;
+
+	if ((err=inet_pton(AF_INET6, num, &ap)) == 1)
+		return &ap;
+#ifdef DEBUG
+	fprintf(stderr, "\nnumeric2addr: %d\n", err);
+#endif
+        exit_error(PARAMETER_PROBLEM, "bad address: %s", num);
+
+	return (struct in6_addr *)NULL;
+}
+
+
+static int
+parse_addresses(const char *addrstr, struct in6_addr *addrp)
+{
+        char *buffer, *cp, *next;
+        unsigned int i;
+	
+	buffer = strdup(addrstr);
+        if (!buffer) exit_error(OTHER_PROBLEM, "strdup failed");
+			
+        for (cp=buffer, i=0; cp && i<IP6T_RT_HOPS; cp=next,i++)
+        {
+                next=strchr(cp, ',');
+                if (next) *next++='\0';
+		memcpy(&(addrp[i]), numeric_to_addr(cp), sizeof(struct in6_addr));
+#if DEBUG
+		printf("addr str: %s\n", cp);
+		printf("addr ip6: %s\n", addr_to_numeric((numeric_to_addr(cp))));
+		printf("addr [%d]: %s\n", i, addr_to_numeric(&(addrp[i])));
+#endif
+	}
+        if (cp) exit_error(PARAMETER_PROBLEM, "too many addresses specified");
+
+	free(buffer);
+
+#if DEBUG
+	printf("addr nr: %d\n", i);
+#endif
+
+	return i;
+}
+
 /* Initialize the match. */
 static void
 init(struct ip6t_entry_match *m, unsigned int *nfcache)
@@ -86,6 +149,7 @@ init(struct ip6t_entry_match *m, unsigned int *nfcache)
 	rtinfo->hdrlen = 0;
 	rtinfo->flags = 0;
 	rtinfo->invflags = 0;
+	rtinfo->addrnr = 0;
 }
 
 /* Function which parses command options; returns true if it
@@ -148,12 +212,24 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 				   "Only one `--rt-0-addrs' allowed");
 		if ( !(*flags & IP6T_RT_TYP) || (rtinfo->rt_type != 0) || (rtinfo->invflags & IP6T_RT_INV_TYP) )
 			exit_error(PARAMETER_PROBLEM,
-				   "`--rt-type 0' required before `--rt-0-res'");
-		/* TODO: implement it! */
-		exit_error(PARAMETER_PROBLEM,
-			" `--rt-0-addrs' not supported, yet");
+				   "`--rt-type 0' required before `--rt-0-addrs'");
+		check_inverse(optarg, &invert, &optind, 0);
+		if (invert)
+			exit_error(PARAMETER_PROBLEM,
+				   " '!' not allowed with `--rt-0-addrs'");
+		rtinfo->addrnr = parse_addresses(argv[optind-1], rtinfo->addrs);
 		rtinfo->flags |= IP6T_RT_FST;
 		*flags |= IP6T_RT_FST;
+		break;
+	case '6':
+		if (*flags & IP6T_RT_FST_NSTRICT)
+			exit_error(PARAMETER_PROBLEM,
+				   "Only one `--rt-0-not-strict' allowed");
+		if ( !(*flags & IP6T_RT_FST) )
+			exit_error(PARAMETER_PROBLEM,
+				   "`--rt-0-addr ...' required before `--rt-0-not-strict'");
+		rtinfo->flags |= IP6T_RT_FST_NSTRICT;
+		*flags |= IP6T_RT_FST_NSTRICT;
 		break;
 	default:
 		return 0;
@@ -189,6 +265,16 @@ print_nums(const char *name, u_int32_t min, u_int32_t max,
 	}
 }
 
+static void
+print_addresses(int addrnr, struct in6_addr *addrp)
+{
+	unsigned int i;
+
+	for(i=0; i<addrnr; i++){
+		printf("%s%c", addr_to_numeric(&(addrp[i])), (i!=addrnr-1)?',':' ');
+	}
+}
+
 /* Prints out the union ip6t_matchinfo. */
 static void
 print(const struct ip6t_ip6 *ip,
@@ -209,7 +295,9 @@ print(const struct ip6t_ip6 *ip,
 		printf(" ");
 	}
 	if (rtinfo->flags & IP6T_RT_RES) printf("reserved ");
-	if (rtinfo->flags & IP6T_RT_FST) printf("type0-addrs ");
+	if (rtinfo->flags & IP6T_RT_FST) printf("0-addrs ");
+	print_addresses(rtinfo->addrnr, rtinfo->addrs);
+	if (rtinfo->flags & IP6T_RT_FST_NSTRICT) printf("0-not-strict ");
 	if (rtinfo->invflags & ~IP6T_RT_INV_MASK)
 		printf("Unknown invflags: 0x%X ",
 		       rtinfo->invflags & ~IP6T_RT_INV_MASK);
@@ -248,6 +336,8 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 
 	if (rtinfo->flags & IP6T_RT_RES) printf("--rt-0-res ");
 	if (rtinfo->flags & IP6T_RT_FST) printf("--rt-0-addrs ");
+	print_addresses(rtinfo->addrnr, rtinfo->addrs);
+	if (rtinfo->flags & IP6T_RT_FST_NSTRICT) printf("--rt-0-not-strict ");
 
 }
 
