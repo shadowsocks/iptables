@@ -141,6 +141,12 @@ static struct option original_opts[] = {
 	{ 0 }
 };
 
+/* we need this for iptables-restore.  iptables-restore.c sets line to the
+ * current line of the input file, in order  to give a more precise error
+ * message.  iptables itself doesn't need this, so it is initialized to the
+ * magic number of -1 */
+int line = -1;
+
 #ifndef __OPTIMIZE__
 struct ipt_entry_target *
 ipt_get_target(struct ipt_entry *e)
@@ -330,6 +336,8 @@ exit_error(enum exittype status, char *msg, ...)
 void
 exit_tryhelp(int status)
 {
+	if (line =! -1)
+		fprintf(stderr, "Error occured at line: %d\n", line);
 	fprintf(stderr, "Try `%s -h' or '%s --help' for more information.\n",
 			program_name, program_name );
 	exit(status);

@@ -106,6 +106,8 @@ struct iptables_target
 #endif
 };
 
+extern int line;
+
 /* Your shared library should call one of these. */
 extern void register_match(struct iptables_match *me);
 extern void register_target(struct iptables_target *me);

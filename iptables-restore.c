@@ -4,7 +4,7 @@
  *
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: iptables-restore.c,v 1.22 2002/08/07 09:07:41 laforge Exp $
+ * $Id: iptables-restore.c,v 1.23 2003/03/03 08:05:07 laforge Exp $
  */
 
 #include <getopt.h>
@@ -101,7 +101,6 @@ int main(int argc, char *argv[])
 {
 	iptc_handle_t handle;
 	char buffer[10240];
-	unsigned int line = 0;
 	int c;
 	char curtable[IPT_TABLE_MAXNAMELEN + 1];
 	FILE *in;
@@ -110,6 +109,7 @@ int main(int argc, char *argv[])
 
 	program_name = "iptables-restore";
 	program_version = IPTABLES_VERSION;
+	line = 0;
 
 #ifdef NO_SHARED_LIBS
 	init_extensions();
