@@ -1,4 +1,4 @@
-/* Shared library add-on to iptables to add MAC address support. */
+/* Shared library add-on to iptables to add realm matching support. */
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
