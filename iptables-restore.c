@@ -4,7 +4,7 @@
  *
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: iptables-restore.c,v 1.23 2003/03/03 08:05:07 laforge Exp $
+ * $Id: iptables-restore.c,v 1.24 2003/03/03 08:08:37 laforge Exp $
  */
 
 #include <getopt.h>
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 	
 	/* Grab standard input. */
 	while (fgets(buffer, sizeof(buffer), in)) {
-		int ret;
+		int ret = 0;
 
 		line++;
 		if (buffer[0] == '\n') continue;
@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
 			DEBUGP("Calling commit\n");
 			ret = iptc_commit(&handle);
 			in_table = 0;
-		} else if ((buffer[0] == '*') && (!in_table)){
+		} else if ((buffer[0] == '*') && (!in_table)) {
 			/* New table */
 			char *table;
 
