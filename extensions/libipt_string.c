@@ -44,7 +44,7 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 static void
 parse_string(const unsigned char *s, struct ipt_string_info *info)
 {	
-        if (strlen(s) <= BM_MAX_LEN) strcpy(info->string, s);
+        if (strlen(s) <= BM_MAX_NLEN) strcpy(info->string, s);
 	else exit_error(PARAMETER_PROBLEM, "STRING too long `%s'", s);
 }
 
