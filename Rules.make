@@ -13,11 +13,11 @@ TAGS:
 
 dep: $(DEPFILES) $(EXTRA_DEPENDS)
 	@echo Dependencies will be generated on next make.
-	@rm -f $(DEPFILES) $(EXTRA_DEPENDS) .makefirst
+	rm -f $(DEPFILES) $(EXTRA_DEPENDS) .makefirst
 
 $(SHARED_LIBS:%.so=%.d): %.d: %.c
 	@-$(CC) -M -MG $(CFLAGS) $< | \
-	    sed -e 's@^.*\.o:@$*.d $*.o:@' > $@
+	    sed -e 's@^.*\.o:@$*.d $*_sh.o:@' > $@
 
 $(SHARED_LIBS): %.so : %_sh.o
 	$(LD) -shared -o $@ $<
@@ -28,6 +28,12 @@ $(SHARED_LIBS): %.so : %_sh.o
 .makefirst:
 	@echo Making dependencies: please wait...
 	@touch .makefirst
+
+# This is useful for when dependencies completely screwed
+%.h::
+	@echo Something wrong... deleting dependencies.
+	-rm -f $(DEPFILES) $(EXTRA_DEPENDS) .makefirst
+	@exit 1
 
 -include $(DEPFILES) $(EXTRA_DEPENDS)
 -include .makefirst

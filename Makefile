@@ -4,7 +4,7 @@ TOPLEVEL_INCLUDED=YES
 ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
-NETFILTER_VERSION:=1.0.1
+NETFILTER_VERSION:=1.1.0
 OLD_NETFILTER_VERSION:=1.0.0
 
 LIBDIR:=/usr/local/lib
@@ -14,9 +14,8 @@ MANDIR:=/usr/local/man
 COPT_FLAGS:=-O #-O2
 CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -Iinclude/ -I$(KERNEL_DIR)/include -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" -g #-pg # -DNDEBUG
 
-DEPFILES := $(SHARED_LIBS:%.so=%.d)
+DEPFILES = $(SHARED_LIBS:%.so=%.d)
 SH_CFLAGS:=$(CFLAGS) -fPIC
-DEPFILES := $(SHARED_LIBS:%.so=%.d)
 
 EXTRAS+=iptables iptables.o #iptables-save iptables-restore
 EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables $(DESTDIR)$(MANDIR)/man8/iptables.8 #$(DESTDIR)$(BINDIR)/iptables-save $(DESTDIR)$(BINDIR)/iptables-restore
