@@ -296,7 +296,7 @@ print(const struct ip6t_ip6 *ip,
 	}
 	if (rtinfo->flags & IP6T_RT_RES) printf("reserved ");
 	if (rtinfo->flags & IP6T_RT_FST) printf("0-addrs ");
-	print_addresses(rtinfo->addrnr, rtinfo->addrs);
+	print_addresses(rtinfo->addrnr, (struct in6_addr *)rtinfo->addrs);
 	if (rtinfo->flags & IP6T_RT_FST_NSTRICT) printf("0-not-strict ");
 	if (rtinfo->invflags & ~IP6T_RT_INV_MASK)
 		printf("Unknown invflags: 0x%X ",
@@ -336,7 +336,7 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 
 	if (rtinfo->flags & IP6T_RT_RES) printf("--rt-0-res ");
 	if (rtinfo->flags & IP6T_RT_FST) printf("--rt-0-addrs ");
-	print_addresses(rtinfo->addrnr, rtinfo->addrs);
+	print_addresses(rtinfo->addrnr, (struct in6_addr *)rtinfo->addrs);
 	if (rtinfo->flags & IP6T_RT_FST_NSTRICT) printf("--rt-0-not-strict ");
 
 }

@@ -185,27 +185,6 @@ final_check(unsigned int flags)
 }
 
 static void
-print_nums(const char *name, u_int32_t min, u_int32_t max,
-	    int invert)
-{
-	const char *inv = invert ? "!" : "";
-
-	if (min != 0 || max != 0xFFFFFFFF || invert) {
-		printf("%s", name);
-		if (min == max) {
-			printf(":%s", inv);
-			printf("%u", min);
-		} else {
-			printf("s:%s", inv);
-			printf("%u",min);
-			printf(":");
-			printf("%u",max);
-		}
-		printf(" ");
-	}
-}
-
-static void
 print_options(int optsnr, u_int16_t *optsp)
 {
 	unsigned int i;
@@ -234,7 +213,7 @@ print(const struct ip6t_ip6 *ip,
 		printf(" ");
 	}
 	if (optinfo->flags & IP6T_OPTS_OPTS) printf("opts ");
-	print_options(optinfo->optsnr, optinfo->opts);
+	print_options(optinfo->optsnr, (u_int16_t *)optinfo->opts);
 	if (optinfo->flags & IP6T_OPTS_NSTRICT) printf("not-strict ");
 	if (optinfo->invflags & ~IP6T_OPTS_INV_MASK)
 		printf("Unknown invflags: 0x%X ",
@@ -253,7 +232,7 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 	}
 
 	if (optinfo->flags & IP6T_OPTS_OPTS) printf("--%s-opts ", LNAME);
-	print_options(optinfo->optsnr, optinfo->opts);
+	print_options(optinfo->optsnr, (u_int16_t *)optinfo->opts);
 	if (optinfo->flags & IP6T_OPTS_NSTRICT) printf("--%s-not-strict ", LNAME);
 
 }

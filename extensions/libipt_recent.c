@@ -23,7 +23,7 @@ help(void)
 "                                the last 'seconds' seconds.\n"
 "    --hitcount hits             For check and update commands above.\n"
 "                                Specifies that the match will only occur if source address seen hits times.\n"
-"                                May be used in conjunction with the seconds option.\n",
+"                                May be used in conjunction with the seconds option.\n"
 "    --rttl                      For check and update commands above.\n"
 "                                Specifies that the match will only occur if the source address and the TTL\n"
 "                                match between this packet and the one which was set.\n"

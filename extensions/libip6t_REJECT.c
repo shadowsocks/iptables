@@ -110,6 +110,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		exit_error(PARAMETER_PROBLEM, "unknown reject type `%s'",optarg);
 	default:
 		/* Fall through */
+		break;
 	}
 	return 0;
 }
