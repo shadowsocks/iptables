@@ -1060,6 +1060,8 @@ print_match(const struct ipt_entry_match *m,
 	if (match) {
 		if (match->print)
 			match->print(ip, m, numeric);
+		else
+			printf("%s ", match->name)
 	} else {
 		if (m->u.user.name[0])
 			printf("UNKNOWN match `%s' ", m->u.user.name);
