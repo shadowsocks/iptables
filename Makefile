@@ -58,11 +58,14 @@ ifndef IPT_LIBDIR
 IPT_LIBDIR:=$(LIBDIR)/iptables
 endif
 
+.PHONY: default
 default: print-extensions all
 
+.PHONY: print-extensions
 print-extensions:
 	@[ -n "$(OPTIONALS)" ] && echo Extensions found: $(OPTIONALS)
 
+.PHONY: pending-patches
 pending-patches:
 	@cd patch-o-matic && KERNEL_DIR=$(KERNEL_DIR) ./runme $(PENDING_PATCHES)
 
@@ -125,20 +128,25 @@ iptables-standalone.d iptables.d: %.d: %.c
 
 
 # Development Targets
+.PHONY: install-devel-man3
 install-devel-man3: $(DEVEL_MAN3)
 	@[ -d $(DESTDIR)$(MANDIR)/man3 ] || mkdir -p $(DESTDIR)$(MANDIR)/man3
 	@cp -v $(DEVEL_MAN3) $(DESTDIR)$(MANDIR)/man3
 
+.PHONY: install-devel-headers
 install-devel-headers: $(DEVEL_HEADERS)
 	@[ -d $(DESTDIR)$(INCDIR) ] || mkdir -p $(DESTDIR)$(INCDIR)
 	@cp -v $(DEVEL_HEADERS) $(DESTDIR)$(INCDIR)
 
+.PHONY: install-devel-libs
 install-devel-libs: $(DEVEL_LIBS)
 	@[ -d $(DESTDIR)$(LIBDIR) ] || mkdir -p $(DESTDIR)$(LIBDIR)
 	@cp -v $(DEVEL_LIBS) $(DESTDIR)$(LIBDIR)
 
+.PHONY: install-devel
 install-devel: all install-devel-man3 install-devel-headers install-devel-libs
 
+.PHONY: distclean
 distclean: clean
 	@rm -f TAGS `find . -name '*~' -o -name '.*~'` `find . -name '*.rej'` `find . -name '*.d'` .makefirst
 
@@ -147,30 +155,36 @@ patch-o-matic/ patch-o-matic:
 	@cd $@ && KERNEL_DIR=$(KERNEL_DIR) ./runme
 
 # Rusty's distro magic.
+.PHONY: distrib
 distrib: check distclean delrelease /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2 diff md5sums # nowhitespace
 
 # Makefile must not define:
 # -g -pg
 # And must define -NDEBUG
+.PHONY: check
 check:
 	@if echo $(CFLAGS) | egrep -e '-g|-pg' >/dev/null; then echo Remove debugging flags; exit 1; else exit 0; fi
 	@if echo $(CFLAGS) | egrep -e NDEBUG >/dev/null; then exit 0; else echo Define -DNDEBUG; exit 1; fi
 
+.PHONY: nowhitespace
 nowhitespace:
 	@if grep -n '[ 	]$$' `find . -name 'Makefile' -o -name '*.[ch]'`; then exit 1; else exit 0; fi
 
+.PHONY: delrelease
 delrelease:
 	rm -f /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2
 
 /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2:
 	cd .. && ln -sf userspace iptables-$(NETFILTER_VERSION) && tar cvf - --exclude CVS iptables-$(NETFILTER_VERSION)/. | bzip2 -9 > $@ && rm iptables-$(NETFILTER_VERSION)
 
+.PHONY: diff
 diff: /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2
 	@mkdir /tmp/diffdir
 	@cd /tmp/diffdir && tar -x --bzip2 -f /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2
 	@set -e; cd /tmp/diffdir; tar -x --bzip2 -f /home/public/netfilter/iptables-$(OLD_NETFILTER_VERSION).tar.bz2; echo Creating patch-iptables-$(OLD_NETFILTER_VERSION)-$(NETFILTER_VERSION).bz2; diff -urN iptables-$(OLD_NETFILTER_VERSION) iptables-$(NETFILTER_VERSION) | bzip2 -9 > /home/public/netfilter/patch-iptables-$(OLD_NETFILTER_VERSION)-$(NETFILTER_VERSION).bz2
 	@rm -rf /tmp/diffdir
 
+.PHONY: md5sums
 md5sums:
 	cd /home/public/netfilter/ && md5sum patch-iptables-*-$(NETFILTER_VERSION).bz2 iptables-$(NETFILTER_VERSION).tar.bz2
 
