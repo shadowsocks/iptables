@@ -192,14 +192,22 @@ static void print_rule(const struct ipt_entry *e,
 		struct iptables_target *target
 			= find_target(t->u.user.name, TRY_LOAD);
 
-		if (target)
+		if (!target) {
+			fprintf(stderr, "Can't find library for target `%s'\n",
+				t->u.user.name);
+			exit(1);
+		}
+
+		if (target->save)
 			target->save(&e->ip, t);
 		else {
-			/* If some bits are non-zero, it implies we *need*
-			   to understand it */
-			if (t->u.target_size) {
-				fprintf(stderr,
-					"Can't find library for target `%s'\n",
+			/* If the target size is greater than ipt_entry_target
+			 * there is something to be saved, we just don't know
+			 * how to print it */
+			if (t->u.target_size != 
+			    sizeof(struct ipt_entry_target)) {
+				fprintf(stderr, "Target `%s' is missing "
+						"save function\n",
 					t->u.user.name);
 				exit(1);
 			}
