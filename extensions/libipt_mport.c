@@ -49,7 +49,7 @@ parse_port(const char *port, const char *proto)
 {
 	unsigned int portnum;
 
-	if (portnum = string_to_number(port, 0, 65535, &portnum) != -1 ||
+	if (string_to_number(port, 0, 65535, &portnum) != -1 ||
 	    (portnum = service_to_port(port, proto)) != -1)
 		return (u_int16_t)portnum;
 
