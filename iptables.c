@@ -928,6 +928,12 @@ register_match(struct iptables_match *me)
 		exit(1);
 	}
 
+	if (me->size != IPT_ALIGN(me->size)) {
+		fprintf(stderr, "%s: match `%s' has invalid size %u.\n",
+			program_name, me->name, me->size);
+		exit(1);
+	}
+
 	/* Prepend to list. */
 	me->next = iptables_matches;
 	iptables_matches = me;
@@ -949,6 +955,12 @@ register_target(struct iptables_target *me)
 	if (find_target(me->name, DONT_LOAD)) {
 		fprintf(stderr, "%s: target `%s' already registered.\n",
 			program_name, me->name);
+		exit(1);
+	}
+
+	if (me->size != IPT_ALIGN(me->size)) {
+		fprintf(stderr, "%s: target `%s' has invalid size %u.\n",
+			program_name, me->name, me->size);
 		exit(1);
 	}
 
@@ -1266,10 +1278,10 @@ make_delete_mask(struct ipt_entry *fw)
 
 	size = sizeof(struct ipt_entry);
 	for (m = iptables_matches; m; m = m->next)
-		size += sizeof(struct ipt_entry_match) + m->size;
+		size += IPT_ALIGN(sizeof(struct ipt_entry_match)) + m->size;
 
 	mask = fw_calloc(1, size
-			 + sizeof(struct ipt_entry_target)
+			 + IPT_ALIGN(sizeof(struct ipt_entry_target))
 			 + iptables_targets->size);
 
 	memset(mask, 0xFF, sizeof(struct ipt_entry));
@@ -1277,13 +1289,14 @@ make_delete_mask(struct ipt_entry *fw)
 
 	for (m = iptables_matches; m; m = m->next) {
 		memset(mptr, 0xFF,
-		       sizeof(struct ipt_entry_match) + m->userspacesize);
-		mptr += sizeof(struct ipt_entry_match) + m->size;
+		       IPT_ALIGN(sizeof(struct ipt_entry_match))
+		       + m->userspacesize);
+		mptr += IPT_ALIGN(sizeof(struct ipt_entry_match)) + m->size;
 	}
 
-	memset(mptr, 0xFF, sizeof(struct ipt_entry_target));
-	mptr += sizeof(struct ipt_entry_target);
-	memset(mptr, 0xFF, iptables_targets->userspacesize);
+	memset(mptr, 0xFF, 
+	       IPT_ALIGN(sizeof(struct ipt_entry_target))
+	       + iptables_targets->userspacesize);
 
 	return mask;
 }
@@ -1703,8 +1716,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			if (target) {
 				size_t size;
 
-				size = IPT_ALIGN(sizeof(struct ipt_entry_target)
-						 + target->size);
+				size = IPT_ALIGN(sizeof(struct ipt_entry_target))
+					+ target->size;
 
 				target->t = fw_calloc(1, size);
 				target->t->u.target_size = size;
@@ -1758,8 +1771,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 					   "unexpected ! flag before --match");
 
 			m = find_match(optarg, LOAD_MUST_SUCCEED);
-			size = IPT_ALIGN(sizeof(struct ipt_entry_match)
-					 + m->size);
+			size = IPT_ALIGN(sizeof(struct ipt_entry_match))
+					 + m->size;
 			m->m = fw_calloc(1, size);
 			m->m->u.match_size = size;
 			strcpy(m->m->u.user.name, m->name);
@@ -1839,8 +1852,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 					/* Try loading protocol */
 					size_t size;
 
-					size = IPT_ALIGN(sizeof(struct ipt_entry_match)
-							 + m->size);
+					size = IPT_ALIGN(sizeof(struct ipt_entry_match))
+							 + m->size;
 
 					m->m = fw_calloc(1, size);
 					m->m->u.match_size = size;

@@ -203,7 +203,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	const struct ipt_udp *udpinfo = (struct ipt_udp *)match->data;
 
 	if (udpinfo->spts[0] != 0
-	    && udpinfo->spts[1] != 0xFFFF) {
+	    || udpinfo->spts[1] != 0xFFFF) {
 		if (udpinfo->invflags & IPT_UDP_INV_SRCPT)
 			printf("! ");
 		if (udpinfo->spts[0]
@@ -217,7 +217,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	}
 
 	if (udpinfo->dpts[0] != 0
-	    && udpinfo->dpts[1] != 0xFFFF) {
+	    || udpinfo->dpts[1] != 0xFFFF) {
 		if (udpinfo->invflags & IPT_UDP_INV_DSTPT)
 			printf("! ");
 		if (udpinfo->dpts[0]
@@ -235,8 +235,8 @@ struct iptables_match udp
 = { NULL,
     "udp",
     NETFILTER_VERSION,
-    sizeof(struct ipt_udp),
-    sizeof(struct ipt_udp),
+    IPT_ALIGN(sizeof(struct ipt_udp)),
+    IPT_ALIGN(sizeof(struct ipt_udp)),
     &help,
     &init,
     &parse,

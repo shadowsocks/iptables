@@ -374,7 +374,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	const struct ipt_tcp *tcpinfo = (struct ipt_tcp *)match->data;
 
 	if (tcpinfo->spts[0] != 0
-	    && tcpinfo->spts[1] != 0xFFFF) {
+	    || tcpinfo->spts[1] != 0xFFFF) {
 		if (tcpinfo->invflags & IPT_TCP_INV_SRCPT)
 			printf("! ");
 		if (tcpinfo->spts[0]
@@ -388,7 +388,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	}
 
 	if (tcpinfo->dpts[0] != 0
-	    && tcpinfo->dpts[1] != 0xFFFF) {
+	    || tcpinfo->dpts[1] != 0xFFFF) {
 		if (tcpinfo->invflags & IPT_TCP_INV_DSTPT)
 			printf("! ");
 		if (tcpinfo->dpts[0]
@@ -425,8 +425,8 @@ struct iptables_match tcp
 = { NULL,
     "tcp",
     NETFILTER_VERSION,
-    sizeof(struct ipt_tcp),
-    sizeof(struct ipt_tcp),
+    IPT_ALIGN(sizeof(struct ipt_tcp)),
+    IPT_ALIGN(sizeof(struct ipt_tcp)),
     &help,
     &init,
     &parse,
