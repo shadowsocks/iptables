@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.29 2001/04/24 00:02:33 laforge Exp $
+CVS ID: $Id: TODO,v 1.30 2001/04/25 14:34:28 jamesm Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -26,7 +26,7 @@ NICE to have:
 - integrate HOPLIMIT for ipv6 in patch-o-matic [HW]
 - static 1:1 NAT (only ip address NAT in both directions)
 - u32 classifier (port from tc -> iptables) [YU]
-- pktlen match (not needed, when u32 available)
+X pktlen match (not needed, when u32 available) [FM]
 - MARK match / target with boolean OR / AND (to use nfmark bitwise)
 - documentation for libiptc
 - port conntrack to IPv6 (code reuse?) [BB]
@@ -37,7 +37,7 @@ X port matches (owner, limit, multiport, owner) to IPv6 [RJ]
 X integrate the ipt_NETLINK target from gianni@ecsc.co.uk [HW]
 X integrate PSD target / port it as match [HW]
 - various NAT performance optimizations possible! (which? ask HW)
-- ip_nat_ident module
+- ip_nat_ident module [FM]
 - provide daily CVS snapshots via ftp [HW]
 - 10.1.2.3.4 is accepted as a valid IP address by iptables -s / -d ?
 - make iptables / ip6tables use the same codebase (as libiptc)
@@ -56,3 +56,4 @@ FUTURE extensions:
 [YU]	Yon Uriarte <ukl2@rz.uni-karlsruhe.de>
 [RJ]	Jan Rekorajski <baggins@mimuw.edu.pl>
 [BB]	Bastian Blank <bastianb@gmx.de>
+[FM]	Fabrice Marie <fabrice@celestix.com>
