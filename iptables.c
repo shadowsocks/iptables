@@ -204,11 +204,11 @@ static const struct pprot chain_protos[] = {
 };
 
 static char *
-proto_to_name(u_int8_t proto)
+proto_to_name(u_int8_t proto, int nolookup)
 {
 	unsigned int i;
 
-	if (proto) {
+	if (proto && !nolookup) {
 		struct protoent *pent = getprotobynumber(proto);
 		if (pent)
 			return pent->p_name;
@@ -641,10 +641,23 @@ find_match(const char *name, enum ipt_tryload tryload)
 	return ptr;
 }
 
+/* Christophe Burki wants `-p 6' to imply `-m tcp'.  */
+static struct iptables_match *
+find_proto(const char *pname, enum ipt_tryload tryload, int nolookup)
+{
+	int proto;
+
+	proto = string_to_number(pname, 0, 255);
+	if (proto != -1) 
+		return find_match(proto_to_name(proto, nolookup), tryload);
+
+	return find_match(pname, tryload);
+}
+
 static u_int16_t
 parse_protocol(const char *s)
 {
-	int proto = string_to_number(s, 0, 65535);
+	int proto = string_to_number(s, 0, 255);
 
 	if (proto == -1) {
 		struct protoent *pent;
@@ -1069,7 +1082,7 @@ print_firewall(const struct ipt_entry *fw,
 
 	fputc(fw->ip.invflags & IPT_INV_PROTO ? '!' : ' ', stdout);
 	{
-		char *pname = proto_to_name(fw->ip.proto);
+		char *pname = proto_to_name(fw->ip.proto, format&FMT_NUMERIC);
 		if (pname)
 			printf(FMT("%-5s", "%s "), pname);
 		else
@@ -1811,11 +1824,13 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				}
 
 				/* If you listen carefully, you can
-				   acually hear this code suck. */
+				   actually hear this code suck. */
 				if (m == NULL
 				    && protocol
-				    && !find_match(protocol, DONT_LOAD)
-				    && (m = find_match(protocol, TRY_LOAD))) {
+				    && !find_proto(protocol, DONT_LOAD,
+						   options&OPT_NUMERIC)
+				    && (m = find_proto(protocol, TRY_LOAD,
+						       options&OPT_NUMERIC))) {
 					/* Try loading protocol */
 					size_t size;
 
