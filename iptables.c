@@ -1682,7 +1682,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	opterr = 0;
 
 	while ((c = getopt_long(argc, argv,
-	   "-A:C:D:R:I:L::F::Z::N:X::E:P:Vh::o:p:s:d:j:i:fbvnt:m:xc:",
+	   "-A:C:D:R:I:L::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:fbvnt:m:xc:",
 					   opts, NULL)) != -1) {
 		switch (c) {
 			/*
