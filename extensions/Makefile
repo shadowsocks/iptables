@@ -1,7 +1,7 @@
 #! /usr/bin/make
 
 PF_EXT_SLIB:=ah esp icmp limit mac mark multiport owner standard state tcp tcpmss tos ttl udp unclean DNAT DSCP ECN LOG MARK MASQUERADE MIRROR REDIRECT REJECT SAME SNAT TCPMSS TOS ULOG
-PF6_EXT_SLIB:=icmpv6 mark tcp udp standard MARK
+PF6_EXT_SLIB:=icmpv6 mark tcp udp standard MARK LOG
 
 # The following may not be present, but compile them anyway.
 PF_EXT_SLIB+=TTL iplimit
