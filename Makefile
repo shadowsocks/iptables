@@ -13,8 +13,8 @@ TOPLEVEL_INCLUDED=YES
 ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
-NETFILTER_VERSION:=1.2.3
-OLD_NETFILTER_VERSION:=1.2.2
+NETFILTER_VERSION:=1.2.4
+OLD_NETFILTER_VERSION:=1.2.3
 
 # Waiting for inclusions in the kernel tree.
 PENDING_PATCHES:=ipt_MIRROR-ttl.patch ipt_REJECT-checkentry.patch ipt_LOG.patch
