@@ -4,7 +4,7 @@
  *
  * This coude is distributed under the terms of GNU GPL
  *
- * $Id: iptables-restore.c,v 1.9 2001/02/26 17:31:20 laforge Exp $
+ * $Id: iptables-restore.c,v 1.10 2001/03/15 15:12:02 laforge Exp $
  */
 
 #include <getopt.h>
@@ -66,18 +66,25 @@ int parse_counters(char *string, struct ipt_counters *ctr)
 }
 
 /* global new argv and argc */
-static char* newargv[1024];
+static char *newargv[255];
 static int newargc;
 
 /* function adding one argument to newargv, updating newargc 
  * returns true if argument added, false otherwise */
 static int add_argv(char *what) {
 	if (what && ((newargc + 1) < sizeof(newargv)/sizeof(char *))) {
-		newargv[newargc] = what;
+		newargv[newargc] = strdup(what);
 		newargc++;
 		return 1;
 	} else 
 		return 0;
+}
+
+static void free_argv(void) {
+	int i;
+
+	for (i = 0; i < newargc; i++)
+		free(newargv[i]);
 }
 
 int main(int argc, char *argv[])
@@ -178,12 +185,13 @@ int main(int argc, char *argv[])
 				exit(1);
 			}
 
-			/* FIXME: abort if chain creation fails --RR */
 			if (!iptc_builtin(chain, handle)) {
 				DEBUGP("Creating new chain '%s'\n", chain);
-				if (!iptc_create_chain(chain, &handle))
-				DEBUGP("unable to create chain '%s':%s\n", chain,
-					strerror(errno));
+				if (!iptc_create_chain(chain, &handle)) 
+					exit_error(PARAMETER_PROBLEM, 
+						   "error creating chain "
+						   "'%s':%s\n", chain, 
+						   strerror(errno));
 			}
 
 			policy = strtok(NULL, " \t\n");
@@ -230,6 +238,10 @@ int main(int argc, char *argv[])
 			char *bcnt = NULL;
 			char *parsestart;
 
+			/* the parser */
+			char *param_start, *curchar;
+			int quote_open;
+
 			/* reset the newargv */
 			newargc = 0;
 
@@ -270,18 +282,56 @@ int main(int argc, char *argv[])
 				add_argv((char *) bcnt);
 			}
 
-			/* parse till end of line */
-			if (add_argv(strtok(parsestart, " \t\n"))) {
-				while (add_argv(strtok(NULL, " \t\n")));
+			/* After fighting with strtok enough, here's now
+			 * a 'real' parser. According to Rusty I'm now no
+			 * longer a real hacker, but I can live with that */
+
+			quote_open = 0;
+			param_start = parsestart;
+			
+			for (curchar = parsestart; *curchar; curchar++) {
+				if (*curchar == '"') {
+					if (quote_open) {
+						quote_open = 0;
+						*curchar = ' ';
+					} else {
+						quote_open = 1;
+						param_start++;
+					}
+				} 
+				if (*curchar == ' '
+				    || *curchar == '\t'
+				    || * curchar == '\n') {
+					char param_buffer[1024];
+					int param_len = curchar-param_start;
+
+					if (quote_open)
+						continue;
+
+					if (!param_len)
+						break;
+					
+					/* end of one parameter */
+					strncpy(param_buffer, param_start,
+						param_len);
+					*(param_buffer+param_len) = '\0';
+					add_argv(param_buffer);
+					param_start += param_len + 1;
+				} else {
+					/* regular character, skip */
+				}
 			}
 
-			DEBUGP("===>calling do_command(%u, argv, &%s, handle):\n",
-					newargc, curtable);
+			DEBUGP("calling do_command(%u, argv, &%s, handle):\n",
+				newargc, curtable);
 
 			for (a = 0; a <= newargc; a++)
 				DEBUGP("argv[%u]: %s\n", a, newargv[a]);
 
-			ret = do_command(newargc, newargv, &newargv[2], &handle);
+			ret = do_command(newargc, newargv, 
+					 &newargv[2], &handle);
+
+			free_argv();
 		}
 		if (!ret) {
 			fprintf(stderr, "%s: line %u failed\n",
