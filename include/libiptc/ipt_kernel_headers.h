@@ -19,5 +19,6 @@
 #include <linux/icmp.h>
 #include <linux/tcp.h>
 #include <linux/udp.h>
+#include <linux/types.h>
 #endif
 #endif
