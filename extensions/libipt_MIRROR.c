@@ -41,20 +41,6 @@ final_check(unsigned int flags)
 {
 }
 
-/* Prints out the targinfo. */
-static void
-print(const struct ipt_ip *ip,
-      const struct ipt_entry_target *target,
-      int numeric)
-{
-}
-
-/* Saves the union ipt_targinfo in parsable form to stdout. */
-static void
-save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
-{
-}
-
 struct iptables_target mirror
 = { NULL,
     "MIRROR",
@@ -65,8 +51,8 @@ struct iptables_target mirror
     &init,
     &parse,
     &final_check,
-    &print,
-    &save,
+    NULL, /* print */
+    NULL, /* save */
     opts
 };
 

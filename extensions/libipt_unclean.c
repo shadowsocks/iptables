@@ -41,11 +41,6 @@ static void final_check(unsigned int flags)
 {
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
-{
-}
-
 struct iptables_match unclean
 = { NULL,
     "unclean",
@@ -57,7 +52,7 @@ struct iptables_match unclean
     &parse,
     &final_check,
     NULL, /* print */
-    &save,
+    NULL, /* save */
     opts
 };
 
