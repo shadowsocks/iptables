@@ -980,8 +980,6 @@ register_match(struct iptables_match *me)
 
 	me->m = NULL;
 	me->mflags = 0;
-
-	opts = merge_options(opts, me->extra_opts, &me->option_offset);
 }
 
 void
@@ -1010,8 +1008,6 @@ register_target(struct iptables_target *me)
 	iptables_targets = me;
 	me->t = NULL;
 	me->tflags = 0;
-
-	opts = merge_options(opts, me->extra_opts, &me->option_offset);
 }
 
 static void
@@ -1320,8 +1316,12 @@ make_delete_mask(struct ipt_entry *fw)
 	unsigned char *mask, *mptr;
 
 	size = sizeof(struct ipt_entry);
-	for (m = iptables_matches; m && m->used; m = m->next)
+	for (m = iptables_matches; m; m = m->next) {
+		if (!m->used)
+			continue;
+
 		size += IPT_ALIGN(sizeof(struct ipt_entry_match)) + m->size;
+	}
 
 	mask = fw_calloc(1, size
 			 + IPT_ALIGN(sizeof(struct ipt_entry_target))
@@ -1330,7 +1330,10 @@ make_delete_mask(struct ipt_entry *fw)
 	memset(mask, 0xFF, sizeof(struct ipt_entry));
 	mptr = mask + sizeof(struct ipt_entry);
 
-	for (m = iptables_matches; m && m->used; m = m->next) {
+	for (m = iptables_matches; m; m = m->next) {
+		if (!m->used)
+			continue;
+
 		memset(mptr, 0xFF,
 		       IPT_ALIGN(sizeof(struct ipt_entry_match))
 		       + m->userspacesize);
@@ -1594,8 +1597,12 @@ generate_entry(const struct ipt_entry *fw,
 	struct ipt_entry *e;
 
 	size = sizeof(struct ipt_entry);
-	for (m = matches; m && m->used; m = m->next)
+	for (m = matches; m; m = m->next) {
+		if (!m->used)
+			continue;
+
 		size += m->m->u.match_size;
+	}
 
 	e = fw_malloc(size + target->u.target_size);
 	*e = *fw;
@@ -1603,7 +1610,10 @@ generate_entry(const struct ipt_entry *fw,
 	e->next_offset = size + target->u.target_size;
 
 	size = 0;
-	for (m = matches; m && m->used; m = m->next) {
+	for (m = matches; m; m = m->next) {
+		if (!m->used)
+			continue;
+
 		memcpy(e->elems + size, m->m, m->m->u.match_size);
 		size += m->m->u.match_size;
 	}
@@ -1634,6 +1644,9 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	const char *modprobe = NULL;
 
 	memset(&fw, 0, sizeof(fw));
+
+	opts = original_opts;
+	global_option_offset = 0;
 
 	/* re-set optind to 0 in case do_command gets called
 	 * a second time */
@@ -1845,6 +1858,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				target->t->u.target_size = size;
 				strcpy(target->t->u.user.name, jumpto);
 				target->init(target->t, &fw.nfcache);
+				opts = merge_options(opts, target->extra_opts, &target->option_offset);
 			}
 			break;
 
@@ -1899,6 +1913,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			m->m->u.match_size = size;
 			strcpy(m->m->u.user.name, m->name);
 			m->init(m->m, &fw.nfcache);
+			opts = merge_options(opts, m->extra_opts, &m->option_offset);
 		}
 		break;
 
@@ -1983,7 +1998,10 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 					       argv, invert,
 					       &target->tflags,
 					       &fw, &target->t))) {
-				for (m = iptables_matches; m && m->used; m = m->next) {
+				for (m = iptables_matches; m; m = m->next) {
+					if (!m->used)
+						continue;
+
 					if (m->parse(c - m->option_offset,
 						     argv, invert,
 						     &m->mflags,
@@ -2024,8 +2042,13 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		invert = FALSE;
 	}
 
-	for (m = iptables_matches; m && m->used; m = m->next)
+	for (m = iptables_matches; m; m = m->next) {
+		if (!m->used)
+			continue;
+
 		m->final_check(m->mflags);
+	}
+
 	if (target)
 		target->final_check(target->tflags);
 
