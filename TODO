@@ -24,3 +24,4 @@ x Russell King's ipchains module crash report.
 x Fix ICMP errors for NAT.
   ipchains module doesn't load with CONFIG_MODVERSIONS.
   Investigate ping corruption with ipchains and iptables MASQ in -test2.
+  touch userspace/libiptc/libiptc.c doesn't cause re-make.
