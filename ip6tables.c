@@ -135,7 +135,7 @@ static struct option original_opts[] = {
 
 #ifndef __OPTIMIZE__
 struct ip6t_entry_target *
-ip6t_get_target(struct ipt_entry *e)
+ip6t_get_target(struct ip6t_entry *e)
 {
 	        return (void *)e + e->target_offset;
 }
