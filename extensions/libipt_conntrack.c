@@ -13,13 +13,17 @@
 #include <linux/netfilter_ipv4/ip_conntrack_tuple.h>
 #include <linux/netfilter_ipv4/ipt_conntrack.h>
 
+#ifndef IPT_CONNTRACK_STATE_UNTRACKED
+#define IPT_CONNTRACK_STATE_UNTRACKED (1 << (IP_CT_NUMBER + 3))
+#endif
+
 /* Function which prints out usage message. */
 static void
 help(void)
 {
 	printf(
 "conntrack match v%s options:\n"
-" [!] --ctstate [INVALID|ESTABLISHED|NEW|RELATED|SNAT|DNAT][,...]\n"
+" [!] --ctstate [INVALID|ESTABLISHED|NEW|RELATED|UNTRACKED|SNAT|DNAT][,...]\n"
 "				State(s) to match\n"
 " [!] --ctproto	proto		Protocol to match; by number or name, eg. `tcp'\n"
 "     --ctorigsrc  [!] address[/mask]\n"
@@ -70,6 +74,8 @@ parse_state(const char *state, size_t strlen, struct ipt_conntrack_info *sinfo)
 		sinfo->statemask |= IPT_CONNTRACK_STATE_BIT(IP_CT_ESTABLISHED);
 	else if (strncasecmp(state, "RELATED", strlen) == 0)
 		sinfo->statemask |= IPT_CONNTRACK_STATE_BIT(IP_CT_RELATED);
+	else if (strncasecmp(state, "UNTRACKED", strlen) == 0)
+		sinfo->statemask |= IPT_CONNTRACK_STATE_UNTRACKED;
 	else if (strncasecmp(state, "SNAT", strlen) == 0)
 		sinfo->statemask |= IPT_CONNTRACK_STATE_SNAT;
 	else if (strncasecmp(state, "DNAT", strlen) == 0)
@@ -347,6 +353,10 @@ print_state(unsigned int statemask)
 	}
 	if (statemask & IPT_CONNTRACK_STATE_BIT(IP_CT_ESTABLISHED)) {
 		printf("%sESTABLISHED", sep);
+		sep = ",";
+	}
+	if (statemask & IPT_CONNTRACK_STATE_UNTRACKED) {
+		printf("%sUNTRACKED", sep);
 		sep = ",";
 	}
 	if (statemask & IPT_CONNTRACK_STATE_SNAT) {

@@ -8,13 +8,17 @@
 #include <linux/netfilter_ipv4/ip_conntrack.h>
 #include <linux/netfilter_ipv4/ipt_state.h>
 
+#ifndef IPT_STATE_UNTRACKED
+#define IPT_STATE_UNTRACKED (1 << (IP_CT_NUMBER + 1))
+#endif
+
 /* Function which prints out usage message. */
 static void
 help(void)
 {
 	printf(
 "state v%s options:\n"
-" [!] --state [INVALID|ESTABLISHED|NEW|RELATED][,...]\n"
+" [!] --state [INVALID|ESTABLISHED|NEW|RELATED|UNTRACKED][,...]\n"
 "				State(s) to match\n"
 "\n", IPTABLES_VERSION);
 }
@@ -43,6 +47,8 @@ parse_state(const char *state, size_t strlen, struct ipt_state_info *sinfo)
 		sinfo->statemask |= IPT_STATE_BIT(IP_CT_ESTABLISHED);
 	else if (strncasecmp(state, "RELATED", strlen) == 0)
 		sinfo->statemask |= IPT_STATE_BIT(IP_CT_RELATED);
+	else if (strncasecmp(state, "UNTRACKED", strlen) == 0)
+		sinfo->statemask |= IPT_STATE_UNTRACKED;
 	else
 		return 0;
 	return 1;
@@ -115,6 +121,10 @@ static void print_state(unsigned int statemask)
 	}
 	if (statemask & IPT_STATE_BIT(IP_CT_ESTABLISHED)) {
 		printf("%sESTABLISHED", sep);
+		sep = ",";
+	}
+	if (statemask & IPT_STATE_UNTRACKED) {
+		printf("%sUNTRACKED", sep);
 		sep = ",";
 	}
 	printf(" ");
