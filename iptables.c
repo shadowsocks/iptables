@@ -1814,7 +1814,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		exit_error(PARAMETER_PROBLEM,
 			   "nothing appropriate following !");
 
-	if (command & (CMD_REPLACE | CMD_INSERT | CMD_DELETE | CMD_APPEND)) {
+	if (command & (CMD_REPLACE | CMD_INSERT | CMD_DELETE | CMD_APPEND |
+	    CMD_CHECK)) {
 		if (!(options & OPT_DESTINATION))
 			dhostnetworkmask = "0.0.0.0/0";
 		if (!(options & OPT_SOURCE))
@@ -1855,7 +1856,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			   "can't initialize iptables table `%s': %s",
 			   *table, iptc_strerror(errno));
 
-	if (command == CMD_APPEND
+	if (command == CMD_CHECK
+	    || command == CMD_APPEND
 	    || command == CMD_DELETE
 	    || command == CMD_INSERT
 	    || command == CMD_REPLACE) {
