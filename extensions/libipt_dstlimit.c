@@ -320,21 +320,20 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 		printf("--dstlimit-htable-expire %u ", r->cfg.expire);
 }
 
-static
-struct iptables_match dstlimit
-= { NULL,
-    "dstlimit",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_dstlimit_info)),
-    IPT_ALIGN(sizeof(struct ipt_dstlimit_info)),
-    //offsetof(struct ipt_dstlimit_info, prev),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_match dstlimit = { 
+	.next		= NULL,
+	.name 		= "dstlimit",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_dstlimit_info)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_dstlimit_info)),
+	//offsetof(struct ipt_dstlimit_info, prev),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print 		= &print,
+	.save		= &save,
+	.opts_extra	= opts
 };
 
 void _init(void)

@@ -149,20 +149,19 @@ static struct option opts[] = {
 	{ 0 }
 };
 
-static
-struct iptables_match ttl = {
-	NULL,
-	"ttl",
-	IPTABLES_VERSION,
-	IPT_ALIGN(sizeof(struct ipt_ttl_info)),
-	IPT_ALIGN(sizeof(struct ipt_ttl_info)),
-	&help,
-	&init,
-	&parse,
-	&final_check,
-	&print,
-	&save,
-	opts
+static struct iptables_match ttl = {
+	.next		= NULL,
+	.name		= "ttl",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_ttl_info)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_ttl_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 

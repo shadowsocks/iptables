@@ -93,18 +93,19 @@ static struct option opts[] = {
 	{ 0 }
 };
 
-static struct iptables_target XOR = { NULL, 
-	"XOR",
-	IPTABLES_VERSION,
-	IPT_ALIGN(sizeof(struct ipt_XOR_info)),
-	IPT_ALIGN(sizeof(struct ipt_XOR_info)),
-	&help,
-	&init,
-	&parse,
-	&final_check,
-	&print,
-	&save,
-	opts 
+static struct iptables_target XOR = {
+	.next		= NULL, 
+	.name		= "XOR",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_XOR_info)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_XOR_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts 
 };
 
 void _init(void)

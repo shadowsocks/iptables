@@ -93,18 +93,19 @@ final_check(unsigned int flags)
 {
 }
 
-struct iptables_match quota = { NULL,
-        "quota",
-        IPTABLES_VERSION,
-        IPT_ALIGN(sizeof (struct ipt_quota_info)),
-        IPT_ALIGN(sizeof (struct ipt_quota_info)),
-        &help,
-        &init,
-        &parse,
-        &final_check,
-        &print,
-        &save,
-        opts
+struct iptables_match quota = { 
+	.next		= NULL,
+	.name		= "quota",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof (struct ipt_quota_info)),
+	.userspacesize	= IPT_ALIGN(sizeof (struct ipt_quota_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void

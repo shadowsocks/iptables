@@ -42,19 +42,19 @@ static void final_check(unsigned int flags)
 }
 
 static
-struct iptables_match unclean
-= { NULL,
-    "unclean",
-    IPTABLES_VERSION,
-    IPT_ALIGN(0),
-    IPT_ALIGN(0),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    NULL, /* print */
-    NULL, /* save */
-    opts
+struct iptables_match unclean = { 
+	.next		= NULL,
+	.name		= "unclean",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(0),
+	.userspacesize	= IPT_ALIGN(0),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= NULL,
+	.save		= NULL,
+	.extra_opts	= opts
 };
 
 void _init(void)

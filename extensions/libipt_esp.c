@@ -168,20 +168,19 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 
 }
 
-static
-struct iptables_match esp
-= { NULL,
-    "esp",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_esp)),
-    IPT_ALIGN(sizeof(struct ipt_esp)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_match esp = { 
+	.next 		= NULL,
+	.name 		= "esp",
+	.version 	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_esp)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_esp)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void

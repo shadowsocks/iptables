@@ -292,19 +292,19 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	printf(" ");
 }
 
-struct iptables_match mport
-= { NULL,
-    "mport",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_mport)),
-    IPT_ALIGN(sizeof(struct ipt_mport)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_match mport = { 
+	.next		= NULL,
+	.name		= "mport",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_mport)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_mport)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void

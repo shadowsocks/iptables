@@ -175,20 +175,19 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	printf("--psd-hi-ports-weight %u ", psdinfo->hi_ports_weight);
 }
 
-static
-struct iptables_match psd
-= { NULL,
-    "psd",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_psd_info)),
-    IPT_ALIGN(sizeof(struct ipt_psd_info)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_match psd = { 
+	.next		= NULL,
+	.name		= "psd",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_psd_info)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_psd_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)

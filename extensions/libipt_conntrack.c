@@ -531,20 +531,19 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	matchinfo_print(ip, match, 1, "--");
 }
 
-static
-struct iptables_match conntrack
-= { NULL,
-    "conntrack",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_conntrack_info)),
-    IPT_ALIGN(sizeof(struct ipt_conntrack_info)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_match conntrack = { 
+	.next 		= NULL,
+	.name		= "conntrack",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_conntrack_info)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_conntrack_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)

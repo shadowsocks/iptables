@@ -113,19 +113,18 @@ final_check(unsigned int flags)
 			   "REALM match: You must specify `--realm'");
 }
 
-struct iptables_match realm
-= { NULL,
-    "realm",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_realm_info)),
-    IPT_ALIGN(sizeof(struct ipt_realm_info)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_match realm = { NULL,
+	.name		= "realm",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_realm_info)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_realm_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)

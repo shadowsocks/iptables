@@ -250,19 +250,19 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	print_u32((struct ipt_u32 *)match->data);
 }
 
-struct iptables_match u32
-= { NULL,
-    "u32",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_u32)),
-    IPT_ALIGN(sizeof(struct ipt_u32)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+struct iptables_match u32 = {
+	.next		= NULL,
+	.name		= "u32",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_u32)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_u32)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void

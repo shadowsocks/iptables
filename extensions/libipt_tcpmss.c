@@ -139,20 +139,19 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 		     mssinfo->invert, 0);
 }
 
-static
-struct iptables_match tcpmss
-= { NULL,
-    "tcpmss",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_tcpmss_match_info)),
-    IPT_ALIGN(sizeof(struct ipt_tcpmss_match_info)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_match tcpmss = {
+	.next		= NULL,
+	.name		= "tcpmss",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_tcpmss_match_info)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_tcpmss_match_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)

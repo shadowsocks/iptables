@@ -177,20 +177,19 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 		printf("--limit-burst %u ", r->burst);
 }
 
-static
-struct iptables_match limit
-= { NULL,
-    "limit",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_rateinfo)),
-    offsetof(struct ipt_rateinfo, prev),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_match limit = { 
+	.next		= NULL,
+	.name		= "limit",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_rateinfo)),
+	.userspacesize	= offsetof(struct ipt_rateinfo, prev),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)

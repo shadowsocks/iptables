@@ -299,20 +299,19 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	printf(" ");
 }
 
-static
-struct iptables_match ipv4options_struct
-= { NULL,
-    "ipv4options",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_ipv4options_info)),
-    IPT_ALIGN(sizeof(struct ipt_ipv4options_info)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_match ipv4options_struct = { 
+	.next		= NULL,
+	.name		= "ipv4options",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_ipv4options_info)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_ipv4options_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)

@@ -1,7 +1,7 @@
 /* Shared library add-on to iptables for the TTL target
  * (C) 2000 by Harald Welte <laforge@gnumonks.org>
  *
- * $Id: libipt_TTL.c,v 1.6 2002/05/29 13:08:16 laforge Exp $
+ * $Id$
  *
  * This program is distributed under the terms of GNU GPL
  */
@@ -145,19 +145,19 @@ static struct option opts[] = {
 	{ 0 }
 };
 
-static
-struct iptables_target TTL = { NULL, 
-	"TTL",
-	IPTABLES_VERSION,
-	IPT_ALIGN(sizeof(struct ipt_TTL_info)),
-	IPT_ALIGN(sizeof(struct ipt_TTL_info)),
-	&help,
-	&init,
-	&parse,
-	&final_check,
-	&print,
-	&save,
-	opts 
+static struct iptables_target TTL = {
+	.next		= NULL, 
+	.name		= "TTL",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_TTL_info)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_TTL_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts 
 };
 
 void _init(void)

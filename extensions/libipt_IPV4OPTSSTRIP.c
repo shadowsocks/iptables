@@ -59,20 +59,19 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	/* nothing to print, we don't take option... */
 }
 
-static
-struct iptables_target IPV4OPTSSTRIP
-= { NULL,
-    "IPV4OPTSSTRIP",
-    IPTABLES_VERSION,
-    IPT_ALIGN(0),
-    IPT_ALIGN(0),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_target IPV4OPTSSTRIP = { 
+	.next		= NULL,
+	.name		= "IPV4OPTSSTRIP",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(0),
+	.userspacesize	= IPT_ALIGN(0),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)

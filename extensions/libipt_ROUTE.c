@@ -243,20 +243,19 @@ static void save(const struct ipt_ip *ip,
 }
 
 
-static
-struct iptables_target route
-= { NULL,
-    "ROUTE",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_route_target_info)),
-    IPT_ALIGN(sizeof(struct ipt_route_target_info)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_target route = { 
+	.next		= NULL,
+	.name		= "ROUTE",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_route_target_info)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_route_target_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)

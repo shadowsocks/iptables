@@ -249,20 +249,19 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	printf(" ");
 }
 
-static
-struct iptables_match multiport
-= { NULL,
-    "multiport",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_multiport)),
-    IPT_ALIGN(sizeof(struct ipt_multiport)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_match multiport = { 
+	.next		= NULL,
+	.name		= "multiport",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_multiport)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_multiport)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void

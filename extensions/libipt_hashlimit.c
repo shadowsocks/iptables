@@ -347,21 +347,19 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 		printf("--hashlimit-htable-expire %u ", r->cfg.expire);
 }
 
-static
-struct iptables_match hashlimit
-= { NULL,
-    "hashlimit",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_hashlimit_info)),
-    IPT_ALIGN(sizeof(struct ipt_hashlimit_info)),
-    //offsetof(struct ipt_hashlimit_info, prev),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_match hashlimit = { NULL,
+	.name		= "hashlimit",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_hashlimit_info)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_hashlimit_info)),
+    	//offsetof(struct ipt_hashlimit_info, prev),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)

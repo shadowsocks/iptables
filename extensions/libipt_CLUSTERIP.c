@@ -237,20 +237,19 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	*/
 }
 
-static
-struct iptables_target clusterip
-= { NULL,
-    "CLUSTERIP",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_clusterip_tgt_info)),
-    IPT_ALIGN(sizeof(struct ipt_clusterip_tgt_info)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_target clusterip = { 
+	.next		= NULL,
+	.name		= "CLUSTERIP",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_clusterip_tgt_info)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_clusterip_tgt_info)),
+ 	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)

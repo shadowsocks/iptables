@@ -45,20 +45,19 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 {
 }
 
-static
-struct iptables_target tarpit
-= { NULL,
-    "TARPIT",
-    IPTABLES_VERSION,
-    IPT_ALIGN(0),
-    IPT_ALIGN(0),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_target tarpit = {
+	.next		= NULL,
+	.name		= "TARPIT",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(0),
+	.userspacesize	= IPT_ALIGN(0),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)

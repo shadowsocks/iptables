@@ -287,20 +287,19 @@ static void final_check(unsigned int flags)
 {
 }
 
-static
-struct iptables_match icmp
-= { NULL,
-    "icmp",
-    IPTABLES_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_icmp)),
-    IPT_ALIGN(sizeof(struct ipt_icmp)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_match icmp = { 
+	.next		= NULL,
+	.name		= "icmp",
+	.version	= IPTABLES_VERSION,
+	.size		= IPT_ALIGN(sizeof(struct ipt_icmp)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_icmp)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)
