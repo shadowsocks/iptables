@@ -97,7 +97,7 @@ The tables are as follows:
 This is the default table (if no -t option is passed).  It contains
 the built-in chains
 .B INPUT
-(for packets coming into the box itself),
+(for packets desined to local sockets),
 .B FORWARD
 (for packets being routed through the box), and
 .B OUTPUT
