@@ -4,7 +4,7 @@
  *
  * This coude is distributed under the terms of GNU GPL
  *
- * $Id: iptables-restore.c,v 1.13 2001/06/16 18:25:25 laforge Exp $
+ * $Id: iptables-restore.c,v 1.14 2001/08/06 18:50:22 laforge Exp $
  */
 
 #include <getopt.h>
@@ -289,6 +289,22 @@ int main(int argc, char *argv[])
 				parsestart = buffer;
 			}
 
+			/* prevent iptables-restore from crashing in do_command
+			 * when someone passes a "-t" on the line.
+			 *  - Ben Reser <ben@reser.org> */
+			if (strstr(buffer, "-t")) {
+				exit_error(PARAMETER_PROBLEM, 
+					   "Line %u seems to have a "
+					   " -t table option.\n", line);
+				exit(1);
+			}
+			if (!strlen((char *) &curtable)) {
+				exit_error(PARAMETER_PROBLEM,
+					   "Line %u seems to to have a "
+					   " zero-length table name.\n", line);
+				exit(1);
+			} 
+			
 			add_argv(argv[0]);
 			add_argv("-t");
 			add_argv((char *) &curtable);
