@@ -91,7 +91,6 @@ static struct iptables_match helper = {
 	.next		= NULL,
 	.name		= "helper",
 	.version	= IPTABLES_VERSION,
-	.release	= IPT_ALIGN(sizeof(struct ipt_helper_info)),
 	.size		= IPT_ALIGN(sizeof(struct ipt_helper_info)),
 	.help		= &help,
 	.init		= &init,
