@@ -24,9 +24,9 @@ static void help(void)
 {
 	printf(
 "HL target v%s options\n"
-"  --hl-set value		Set HL to <value>\n"
-"  --hl-dec value		Decrement HL by <value>\n"
-"  --hl-inc value		Increment HL by <value>\n"
+"  --hl-set value		Set HL to <value 0-255>\n"
+"  --hl-dec value		Decrement HL by <value 1-255>\n"
+"  --hl-inc value		Increment HL by <value 1-255>\n"
 , IPTABLES_VERSION);
 }
 
@@ -35,7 +35,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		struct ip6t_entry_target **target)
 {
 	struct ip6t_HL_info *info = (struct ip6t_HL_info *) (*target)->data;
-	u_int8_t value;
+	unsigned int value;
 
 	if (*flags & IP6T_HL_USED) {
 		exit_error(PARAMETER_PROBLEM, 
@@ -50,7 +50,9 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		exit_error(PARAMETER_PROBLEM,
 				"HL: unexpected `!'");
 	
-	value = atoi(optarg);
+	if (string_to_number(optarg, 0, 255, &value) == -1)	
+		exit_error(PARAMETER_PROBLEM,	
+		           "HL: Expected value between 0 and 255");
 
 	switch (c) {
 
