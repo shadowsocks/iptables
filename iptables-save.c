@@ -48,7 +48,9 @@ print_iface(char letter, const char *iface, const unsigned char *mask,
 			if (iface[i] != '\0')
 				printf("%c", iface[i]);
 		} else {
-			if (iface[i] != '\0')
+			/* we can access iface[i-1] here, because 
+			 * a few lines above we make sure that mask[0] != 0 */
+			if (iface[i-1] != '\0')
 				printf("+");
 			break;
 		}
