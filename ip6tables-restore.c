@@ -7,7 +7,7 @@
  * 	Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: ip6tables-restore.c,v 1.21 2004/02/02 20:14:56 gandalf Exp $
+ * $Id: ip6tables-restore.c,v 1.22 2004/05/26 16:04:48 gandalf Exp $
  */
 
 #include <getopt.h>
@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
 				exit(1);
 			}
 
-			if (!ip6tc_builtin(chain, handle)) {
+			if (ip6tc_builtin(chain, handle) <= 0) {
 				DEBUGP("Creating new chain '%s'\n", chain);
 				if (!ip6tc_create_chain(chain, &handle))
 					exit_error(PARAMETER_PROBLEM,
