@@ -28,3 +28,4 @@ x Fix ICMP errors for NAT.
   skb_cow in NAT.
   MTU change in route_me_harder + test.
   LVS
+  Hard lockup with ip_queue under heavy load.
