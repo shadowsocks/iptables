@@ -12,5 +12,5 @@ EXTRA_DEPENDS+=libiptc/libiptc.d
 libiptc/libiptc.a: libiptc/libiptc.a(libiptc/libiptc.o)
 
 libiptc/libiptc.d: %.d: %.c
-	@-$(CC) -M -MG $(CFLAGS) $< | sed -e 's@^.*\.o:@$*.d $*.a:@' > $@
+	@-$(CC) -M -MG $(CFLAGS) $< | sed -e 's@^.*\.o:@$*.d $*.a($*.o):@' > $@
 endif
