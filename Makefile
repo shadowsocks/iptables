@@ -14,12 +14,13 @@ ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
 NETFILTER_VERSION:=1.2.6
-OLD_NETFILTER_VERSION:=1.2.6
+OLD_NETFILTER_VERSION:=1.2.5
 
-LIBDIR:=/usr/local/lib
-BINDIR:=/usr/local/sbin
-MANDIR:=/usr/local/man
-INCDIR:=/usr/local/include
+PREFIX:=/usr/local
+LIBDIR:=$(PREFIX)/lib
+BINDIR:=$(PREFIX)/sbin
+MANDIR:=$(PREFIX)/man
+INCDIR:=$(PREFIX)/include
 
 # directory for new iptables releases
 RELEASE_DIR:=/tmp
