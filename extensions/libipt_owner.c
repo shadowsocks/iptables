@@ -22,6 +22,7 @@ help(void)
 "[!] --pid-owner processid  Match local pid\n"
 "[!] --sid-owner sessionid  Match local sid\n"
 "[!] --cmd-owner name       Match local command name\n"
+"NOTE: pid, sid and command matching are broken on SMP\n"
 "\n",
 IPTABLES_VERSION);
 #else
@@ -31,6 +32,7 @@ IPTABLES_VERSION);
 "[!] --gid-owner groupid    Match local gid\n"
 "[!] --pid-owner processid  Match local pid\n"
 "[!] --sid-owner sessionid  Match local sid\n"
+"NOTE: pid and sid matching are broken on SMP\n"
 "\n",
 IPTABLES_VERSION);
 #endif /* IPT_OWNER_COMM */
