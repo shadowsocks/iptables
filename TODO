@@ -12,3 +12,7 @@ x IPv6 ping crash with NAT (should be fixed with patch-test8-ipv6-fixes)
   Redirecting loopback to external machines (LOCAL_IN hook for NAT).
 X Jules Bean: `Problems with large transfers'
   ftp tcp window tracking failure (ftp nat must update window info).
+  CONFIG_NF_IP_NAT_LOCAL
+  mangle should have hooks everywhere
+
+	
