@@ -109,7 +109,7 @@ extensions/libipt_targets.man: $(patsubst %,extensions/libipt_%.man,$(PF_EXT_MAN
 	    cat extensions/libipt_$$ext.man ;\
 	done >extensions/libipt_targets.man
 	@if [ -n "$(PF_EXT_MAN_EXTRA_TARGETS)" ]; then \
-	    extra=$(PF_EXT_MAN_EXTRA_TARGETS) \
+	    extra=$(PF_EXT_MAN_EXTRA_TARGETS) ;\
 	    for ext in $${extra:-""}; do \
 		echo ".SS $$ext (not supported, see Patch-O-Matic)" ;\
 		cat extensions/libipt_$$ext.man ;\
@@ -123,7 +123,7 @@ extensions/libipt_matches.man: $(patsubst %,extensions/libipt_%.man,$(PF_EXT_MAN
 	    cat extensions/libipt_$$ext.man ;\
 	done >extensions/libipt_matches.man
 	@if [ -n "$(PF_EXT_MAN_EXTRA_MATCHES)" ]; then \
-	    extra=$(PF_EXT_MAN_EXTRA_MATCHES) \
+	    extra=$(PF_EXT_MAN_EXTRA_MATCHES) ;\
 	    for ext in $${extra:-""}; do \
 		echo ".SS $$ext (not supported, see Patch-O-Matic)" ;\
 		cat extensions/libipt_$$ext.man ;\
@@ -137,7 +137,7 @@ extensions/libip6t_targets.man: $(patsubst %, extensions/libip6t_%.man, $(PF6_EX
 	    cat extensions/libip6t_$$ext.man ;\
 	done >extensions/libip6t_targets.man
 	@if [ -n "$(PF6_EXT_MAN_EXTRA_TARGETS)" ]; then \
-	    extra=$(PF6_EXT_MAN_EXTRA_TARGETS) \
+	    extra=$(PF6_EXT_MAN_EXTRA_TARGETS) ;\
 	    for ext in $${extra:-""}; do \
 		echo ".SS $$ext (not supported, see Patch-O-Matic)" ;\
 		cat extensions/libip6t_$$ext.man ;\
@@ -151,7 +151,7 @@ extensions/libip6t_matches.man: $(patsubst %, extensions/libip6t_%.man, $(PF6_EX
 	    cat extensions/libip6t_$$ext.man ;\
 	done >extensions/libip6t_matches.man
 	@if [ -n "$(PF6_EXT_MAN_EXTRA_MATCHES)" ]; then \
-	    extra=$(PF6_EXT_MAN_EXTRA_MATCHES) \
+	    extra=$(PF6_EXT_MAN_EXTRA_MATCHES) ;\
 	    for ext in $${extra:-""}; do \
 		echo ".SS $$ext (not supported, see Patch-O-Matic)" ;\
 		cat extensions/libip6t_$$ext.man ;\
