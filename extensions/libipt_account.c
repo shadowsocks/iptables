@@ -2,7 +2,7 @@
  * accounting match helper (libipt_account.c)
  * (C) 2003,2004 by Piotr Gasid³o (quaker@barbara.eu.org)
  *
- * Version: 0.1.5
+ * Version: 0.1.6
  *
  * This software is distributed under the terms of GNU GPL
  */
@@ -31,15 +31,18 @@ static void help(void) {
 			"--aname name\n"
 			"	defines name of list where statistics will be kept. If no is\n"
 			"	specified DEFAULT will be used.\n"
-
+			"--ashort\n"
+			"       table will colect only short statistics (only total counters\n"
+			"       without splitting it into protocols.\n"
 	, 
 	IPTABLES_VERSION);
 };
 
 static struct option opts[] = {
-	{ "aaddr", 1, NULL, 201 },
-	{ "aname", 1, NULL, 202 },
-	{ 0 }
+	{ .name = "aaddr",  .has_arg = 1, .flag = NULL, .val = 201 },
+	{ .name = "aname",  .has_arg = 1, .flag = NULL, .val = 202 },
+	{ .name = "ashort", .has_arg = 0, .flag = NULL, .val = 203 },
+	{ .name = 0, .has_arg = 0, .flag = 0, .val = 0 }
 };
 
 /* Helper functions for parse_network */
@@ -139,6 +142,26 @@ static void parse_network(const char *parameter, struct t_ipt_account_info *info
 	
 }
 
+/* validate netmask */
+inline int valid_netmask(u_int32_t netmask) {
+	while (netmask & 0x80000000)
+		netmask <<= 1;
+	if (netmask != 0)
+		return 0;
+        return 1;
+}
+
+/* validate network/netmask pair */
+inline int valid_network_and_netmask(struct t_ipt_account_info *info) {
+	if (!valid_netmask(info->netmask))
+		return 0;
+	if ((info->network & info->netmask) != info->network)
+		return 0;
+	return 1;
+}
+
+
+
 /* Function initializes match */
 static void init(struct ipt_entry_match *match, 
 		 unsigned int *nfcache) {
@@ -149,6 +172,7 @@ static void init(struct ipt_entry_match *match,
 
 	/* set default table name to DEFAULT */
 	strncpy(info->name, "DEFAULT", IPT_ACCOUNT_NAME_LEN);
+	info->shortlisting = 0;
 	
 }
 
@@ -166,7 +190,9 @@ static int parse(int c, char **argv,
 		
 		/* --aaddr */
 		case 201:
-			parse_network(optarg, info);			
+			parse_network(optarg, info);
+			if (!valid_network_and_netmask(info))
+				exit_error(PARAMETER_PROBLEM, "account: wrong network/netmask");
 			*flags = 1;
 			break;
 			
@@ -175,8 +201,12 @@ static int parse(int c, char **argv,
 			if (strlen(optarg) < IPT_ACCOUNT_NAME_LEN)
 				strncpy(info->name, optarg, IPT_ACCOUNT_NAME_LEN);
 			else
-				exit_error(PARAMETER_PROBLEM, "account: Too long list name");			
+				exit_error(PARAMETER_PROBLEM, "account: Too long table name");			
 			break;	
+		/* --ashort */
+		case 203:
+			info->shortlisting = 1;
+			break;
 		default:
 			return 0;			
 	}
@@ -204,6 +234,8 @@ static void print(const struct ipt_ip *ip,
 	      );
 	
 	printf("name: %s ", info->name);
+	if (info->shortlisting)
+		printf("short-listing ");
 }
 
 /* Function used for saving rule containing account match */
@@ -219,21 +251,23 @@ static void save(const struct ipt_ip *ip,
 	       );
 	
 	printf("--aname %s ", info->name);
+	if (info->shortlisting)
+		printf("--ashort ");
 }
 	
 static struct iptables_match account = {
-	NULL,			/* struct iptables_match *next; */
-	"account",		/* ipt_chainlabel name; */
-	IPTABLES_VERSION,	/* const char *version; */
-	IPT_ALIGN(sizeof(struct t_ipt_account_info)),		/* Size of match data. */
-	IPT_ALIGN(sizeof(struct t_ipt_account_info)),		/* Size of match data relevent for userspace comparison purposes */
-	&help,			/* Function which prints out usage message. */
-	&init,			/* Initialize the match. */
-	&parse,			/* Function which parses command options; returns true if it ate an option */
-	&final_check,		/* Final check; exit if not ok. */
-	&print,			/* Prints out the match iff non-NULL: put space at end */
-	&save,			/* Saves the match info in parsable form to stdout. */
-	opts			/* Pointer to list of extra command-line options */
+	.next = NULL,
+	.name = "account",
+	.version = IPTABLES_VERSION,
+	.size = IPT_ALIGN(sizeof(struct t_ipt_account_info)),
+	.userspacesize = IPT_ALIGN(sizeof(struct t_ipt_account_info)),
+	.help = &help,
+	.init = &init,
+	.parse = &parse,
+	.final_check = &final_check,
+	.print = &print,
+	.save = &save,
+	.extra_opts = opts
 };
 
 /* Function which registers match */
