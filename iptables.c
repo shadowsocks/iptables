@@ -2054,8 +2054,6 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				   actually hear this code suck. */
 				if (m == NULL
 				    && protocol
-				    && !find_proto(protocol, DONT_LOAD,
-						   options&OPT_NUMERIC)
 				    && (m = find_proto(protocol, TRY_LOAD,
 						       options&OPT_NUMERIC))) {
 					/* Try loading protocol */
