@@ -7,6 +7,8 @@
  * Based on ipt_limit.c by
  * Jérôme de Vivie   <devivie@info.enserb.u-bordeaux.fr>
  * Hervé Eychenne    <rv@wallfire.org>
+ * 
+ * Error corections by nmalykh@bilim.com (22.01.2005)
  */
 
 #include <stdio.h>
@@ -294,7 +296,7 @@ static void print_mode(const struct ipt_hashlimit_info *r, char separator)
 		fputs("dstip", stdout);
 		prevmode = 1;
 	}
-	if (r->cfg.mode & IPT_HASHLIMIT_HASH_SPT) {
+	if (r->cfg.mode & IPT_HASHLIMIT_HASH_DPT) {
 		if (prevmode)
 			putchar(separator);
 		fputs("dstport", stdout);
@@ -334,8 +336,10 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	if (r->cfg.burst != IPT_HASHLIMIT_BURST)
 		printf("--hashlimit-burst %u ", r->cfg.burst);
 
-	fputs("--mode ", stdout);
+	fputs("--hashlimit-mode ", stdout);
 	print_mode(r, ',');
+	
+	printf("--hashlimit-name %s ", r->name);
 
 	if (r->cfg.size)
 		printf("--hashlimit-htable-size %u ", r->cfg.size);
