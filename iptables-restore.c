@@ -19,12 +19,15 @@
 #define DEBUGP(x, args...) 
 #endif
 
+static int binary = 0, counters = 0, verbose = 0, noflush = 0;
+
 /* Keeping track of external matches and targets.  */
 static struct option options[] = {
-	{ "binary", 1, 0, 'b' },
-	{ "counters", 1, 0, 'c' },
-	{ "verbose", 1, 0, 'v' },
-	{ "help", 1, 0, 'h' },
+	{ "binary", 0, 0, 'b' },
+	{ "counters", 0, 0, 'c' },
+/*	{ "verbose", 1, 0, 'v' }, */
+	{ "help", 0, 0, 'h' },
+	{ "noflush", 0, 0, 'n'},
 	{ 0 }
 };
 
@@ -32,7 +35,13 @@ static void print_usage(const char *name, const char *version) __attribute__((no
 
 static void print_usage(const char *name, const char *version)
 {
-	fprintf(stderr, "Usage: %s [-b] [-c] [-v] [-h]\n", name);
+	fprintf(stderr, "Usage: %s [-b] [-c] [-v] [-h]\n"
+			"	   [ --binary ]\n"
+			"	   [ --counters ]\n"
+			"	   [ --verbose ]\n"
+			"	   [ --help ]\n"
+			"	   [ --noflush ]\n", name);
+		
 	exit(1);
 }
 
@@ -54,8 +63,8 @@ int main(int argc, char *argv[])
 {
 	iptc_handle_t handle;
 	char buffer[10240];
-	int counters = 0, binary = 0, verbose = 0;
 	unsigned int line = 0;
+	int c;
 	char curtable[IPT_TABLE_MAXNAMELEN + 1];
 	char curchain[IPT_FUNCTION_MAXNAMELEN + 1];
 	FILE *in;
@@ -63,7 +72,24 @@ int main(int argc, char *argv[])
 	program_name = "iptables-restore";
 	program_version = NETFILTER_VERSION;
 
-	/* Don't use getopt here; it would interfere 8-(. */
+	while ((c = getopt_long(argc, argv, "bcvhn", options, NULL)) != -1) {
+		switch (c) {
+			case 'b':
+				binary = 1;
+				break;
+			case 'c':
+				counters = 1;
+				break;
+			case 'h':
+				print_usage("iptables-restore",
+					    NETFILTER_VERSION);
+				break;
+			case 'n':
+				noflush = 1;
+				break;
+		}
+	}
+	
 	if (optind == argc - 1) {
 		in = fopen(argv[optind], "r");
 		if (!in) {
@@ -115,12 +141,17 @@ int main(int argc, char *argv[])
 			strncpy(curtable, table, IPT_TABLE_MAXNAMELEN);
 
 			handle = create_handle(table);
-
-			DEBUGP("Cleaning all chains of table '%s'\n", table);
-			for_each_chain(flush_entries, verbose, 1, &handle) ;
-
-			DEBUGP("Deleting all user-defined chains of table '%s'\n", table);
-			for_each_chain(delete_chain, verbose, 0, &handle) ;
+			if (noflush == 0) {
+				DEBUGP("Cleaning all chains of table '%s'\n",
+					table);
+				for_each_chain(flush_entries, verbose, 1, 
+						&handle);
+	
+				DEBUGP("Deleting all user-defined chains "
+				       "of table '%s'\n", table);
+				for_each_chain(delete_chain, verbose, 0, 
+						&handle) ;
+			}
 
 			ret = 1;
 
