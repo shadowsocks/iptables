@@ -634,6 +634,7 @@ parse_hostnetworkmask(const char *name, struct in_addr **addrpp,
 	int i, j, k, n;
 
 	strncpy(buf, name, sizeof(buf) - 1);
+	buf[sizeof(buf) - 1] = '\0';
 	if ((p = strrchr(buf, '/')) != NULL) {
 		*p = '\0';
 		addrp = parse_mask(p + 1);
