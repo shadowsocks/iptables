@@ -31,7 +31,7 @@ static void
 help(void)
 {
 	unsigned int i;
-	
+
 	printf(
 "TOS target v%s options:\n"
 "  --set-tos value                   Set Type of Service field to one of the\n"
@@ -100,7 +100,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		parse_tos(optarg, tosinfo);
 		*flags = 1;
 		break;
-		
+
 	default:
 		return 0;
 	}
@@ -120,7 +120,7 @@ static void
 print_tos(u_int8_t tos, int numeric)
 {
 	unsigned int i;
-	
+
 	if (!numeric) {
 		for (i = 0; i<sizeof(TOS_values)/sizeof(struct TOS_value); i++)
 			if (TOS_values[i].TOS == tos) {
@@ -140,7 +140,7 @@ print(const struct ipt_ip *ip,
 	const struct ipt_tos_target_info *tosinfo =
 		(const struct ipt_tos_target_info *)target->data;
 	printf("TOS set ");
-	print_tos(tosinfo->tos, numeric);	
+	print_tos(tosinfo->tos, numeric);
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
@@ -149,8 +149,8 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 {
 	const struct ipt_tos_target_info *tosinfo =
 		(const struct ipt_tos_target_info *)target->data;
-	
-	printf("--set-tos 0x%02x ", tosinfo->tos);	
+
+	printf("--set-tos 0x%02x ", tosinfo->tos);
 }
 
 struct iptables_target tos

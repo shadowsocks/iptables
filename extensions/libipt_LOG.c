@@ -113,7 +113,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_LOG_OPT_LEVEL)
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --log-level twice");
-			
+
 		if (check_inverse(optarg, &invert))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --log-level");
@@ -126,7 +126,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_LOG_OPT_PREFIX)
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --log-prefix twice");
-			
+
 		if (check_inverse(optarg, &invert))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --log-prefix");

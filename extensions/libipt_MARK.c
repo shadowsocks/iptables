@@ -56,7 +56,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			           "MARK target: Can't specify --set-mark twice");
 		*flags = 1;
 		break;
-		
+
 	default:
 		return 0;
 	}
@@ -87,7 +87,7 @@ print(const struct ipt_ip *ip,
 	const struct ipt_mark_target_info *markinfo =
 		(const struct ipt_mark_target_info *)target->data;
 	printf("MARK set ");
-	print_mark(markinfo->mark, numeric);	
+	print_mark(markinfo->mark, numeric);
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
@@ -96,8 +96,8 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 {
 	const struct ipt_mark_target_info *markinfo =
 		(const struct ipt_mark_target_info *)target->data;
-	
-	printf("--set-mark 0x%lx ", markinfo->mark);	
+
+	printf("--set-mark 0x%lx ", markinfo->mark);
 }
 
 struct iptables_target mark

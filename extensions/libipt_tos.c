@@ -26,7 +26,7 @@ static void
 help(void)
 {
 	unsigned int i;
-	
+
 	printf(
 "TOS match v%s options:\n"
 "[!] --tos value                 Match Type of Service field from one of the\n"
@@ -108,10 +108,10 @@ static void
 print_tos(u_int8_t tos, int invert, int numeric)
 {
 	unsigned int i;
-	
+
 	if (invert)
 		fputc('!', stdout);
-		
+
 	if (!numeric) {
 		for (i = 0; i<sizeof(TOS_values)/sizeof(struct TOS_value); i++)
 			if (TOS_values[i].TOS == tos) {

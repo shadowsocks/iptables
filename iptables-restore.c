@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
 						   "Bad line %u: need ]\n",
 						   line);
 			}
-					
+
 			/* strtok: a function only a coder could love */
 			newargv[0] = argv[0];
 			for (i = 1; i < sizeof(newargv)/sizeof(char *); i++) {

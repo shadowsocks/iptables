@@ -107,7 +107,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (!parse_rate(optarg, &r->avg))
 			exit_error(PARAMETER_PROBLEM,
 				   "bad rate `%s'", optarg);
-		break;	
+		break;
 
 	case '$':
 		if (check_inverse(optarg, &invert))

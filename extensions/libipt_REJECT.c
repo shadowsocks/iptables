@@ -18,7 +18,7 @@ struct reject_names {
 };
 
 static const struct reject_names reject_table[] = {
-	{"icmp-net-unreachable", "net-unreach", 
+	{"icmp-net-unreachable", "net-unreach",
 		IPT_ICMP_NET_UNREACHABLE, "ICMP network unreachable"},
 	{"icmp-host-unreachable", "host-unreach",
 		IPT_ICMP_HOST_UNREACHABLE, "ICMP host unreachable"},
@@ -26,17 +26,17 @@ static const struct reject_names reject_table[] = {
 		IPT_ICMP_PORT_UNREACHABLE, "ICMP port unreachable (default)"},
 	{"icmp-proto-unreachable", "proto-unreach",
 		IPT_ICMP_PROT_UNREACHABLE, "ICMP protocol unreachable"},
-	{"tcp-reset", "rst", 
+	{"tcp-reset", "rst",
 		IPT_TCP_RESET, "for TCP only: faked TCP RST"},
 	{"echo-reply", "echoreply",
 		IPT_ICMP_ECHOREPLY, "for ICMP echo only: faked ICMP echo reply"},
 };
 
-static void 
+static void
 print_reject_types()
 {
 	unsigned int i;
-	
+
 	printf("Valid reject types:\n");
 
 	for (i = 0; i < sizeof(reject_table)/sizeof(struct reject_names); i++) {
@@ -49,7 +49,7 @@ print_reject_types()
 /* Saves the union ipt_targinfo in parsable form to stdout. */
 
 /* Function which prints out usage message. */
-static void 
+static void
 help(void)
 {
 	printf(
@@ -70,10 +70,10 @@ static void
 init(struct ipt_entry_target *t, unsigned int *nfcache)
 {
 	struct ipt_reject_info *reject = (struct ipt_reject_info *)t->data;
-	
+
 	/* default */
 	reject->with = IPT_ICMP_PORT_UNREACHABLE;
-	
+
 	/* Can't cache this */
 	*nfcache |= NFC_UNKNOWN;
 }
@@ -84,15 +84,15 @@ static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
       struct ipt_entry_target **target)
-{	
+{
 	struct ipt_reject_info *reject = (struct ipt_reject_info *)(*target)->data;
 	unsigned int limit = sizeof(reject_table)/sizeof(struct reject_names);
 	unsigned int i;
-		
+
 	switch(c) {
 	case '1':
 		if (check_inverse(optarg, &invert))
-			exit_error(PARAMETER_PROBLEM, 
+			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --reject-with");
 		for (i = 0; i < limit; i++) {
 			if ((strncasecmp(reject_table[i].name, optarg, strlen(optarg)) == 0)
@@ -106,7 +106,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		/* Fall through */
 	}
 	return 0;
-}	
+}
 
 /* Final check; nothing. */
 static void final_check(unsigned int flags)
@@ -114,15 +114,15 @@ static void final_check(unsigned int flags)
 }
 
 /* Prints out ipt_reject_info. */
-static void 
+static void
 print(const struct ipt_ip *ip,
-      const struct ipt_entry_target *target, 
+      const struct ipt_entry_target *target,
       int numeric)
 {
-	const struct ipt_reject_info *reject 
+	const struct ipt_reject_info *reject
 		= (const struct ipt_reject_info *)target->data;
 	unsigned int i;
-	
+
 	for (i = 0; i < sizeof(reject_table)/sizeof(struct reject_names); i++) {
 		if (reject_table[i].with == reject->with)
 			break;
@@ -133,9 +133,9 @@ print(const struct ipt_ip *ip,
 /* Saves ipt_reject in parsable form to stdout. */
 static void save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 {
-	const struct ipt_reject_info *reject 
+	const struct ipt_reject_info *reject
 		= (const struct ipt_reject_info *)target->data;
-	
+
 	printf("--reject-with %s ", reject_table[reject->with].name);
 }
 

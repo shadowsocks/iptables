@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-        
+
 #include <libipq/libipq.h>
 
 /****************************************************************************
@@ -75,14 +75,14 @@ static int ipq_errno = IPQ_ERR_NONE;
 
 static ssize_t ipq_netlink_sendto(const struct ipq_handle *h,
                                   const void *msg, size_t len);
-                    
+
 static ssize_t ipq_netlink_recvfrom(const struct ipq_handle *h,
                                     unsigned char *buf, size_t len);
-                      
+
 static ssize_t ipq_netlink_sendmsg(const struct ipq_handle *h,
                                    const struct msghdr *msg,
                                    unsigned int flags);
-                     
+
 static char *ipq_strerror(int errcode);
 
 static ssize_t ipq_netlink_sendto(const struct ipq_handle *h,
@@ -92,7 +92,7 @@ static ssize_t ipq_netlink_sendto(const struct ipq_handle *h,
 	                    (struct sockaddr *)&h->peer, sizeof(h->peer));
 	if (status < 0)
 		ipq_errno = IPQ_ERR_SEND;
-	return status;	
+	return status;
 }
 
 static ssize_t ipq_netlink_sendmsg(const struct ipq_handle *h,
@@ -102,7 +102,7 @@ static ssize_t ipq_netlink_sendmsg(const struct ipq_handle *h,
 	int status = sendmsg(h->fd, msg, flags);
 	if (status < 0)
 		ipq_errno = IPQ_ERR_SEND;
-	return status;	
+	return status;
 }
 
 static ssize_t ipq_netlink_recvfrom(const struct ipq_handle *h,
@@ -110,7 +110,7 @@ static ssize_t ipq_netlink_recvfrom(const struct ipq_handle *h,
 {
 	int addrlen, status;
 	struct nlmsghdr *nlh;
-	
+
 	if (len < sizeof(struct nlmsgerr)) {
 		ipq_errno = IPQ_ERR_RECVBUF;
 		return -1;
@@ -151,7 +151,7 @@ static char *ipq_strerror(int errcode)
  *
  ****************************************************************************/
 
-/* 
+/*
  * Create and initialise an ipq handle.
  * FIXME: implement flags.
  */
@@ -159,7 +159,7 @@ struct ipq_handle *ipq_create_handle(u_int32_t flags)
 {
 	int status;
 	struct ipq_handle *h;
-	
+
 	h = (struct ipq_handle *)malloc(sizeof(struct ipq_handle));
 	if (h == NULL) {
 		ipq_errno = IPQ_ERR_HANDLE;
@@ -192,7 +192,7 @@ struct ipq_handle *ipq_create_handle(u_int32_t flags)
 }
 
 /*
- * No error condition is checked here at this stage, but it may happen 
+ * No error condition is checked here at this stage, but it may happen
  * if/when reliable messaging is implemented.
  */
 int ipq_destroy_handle(struct ipq_handle *h)
@@ -211,7 +211,7 @@ int ipq_set_mode(const struct ipq_handle *h,
 		struct nlmsghdr nlh;
 		ipq_peer_msg_t pm;
 	} req;
-	
+
 	memset(&req, 0, sizeof(req));
 	req.nlh.nlmsg_len = NLMSG_LENGTH(sizeof(req));
 	req.nlh.nlmsg_flags = NLM_F_REQUEST;

@@ -663,7 +663,7 @@ parse_interface(const char *arg, char *vianame, unsigned char *mask)
 		exit_error(PARAMETER_PROBLEM,
 			   "interface name `%s' must be shorter than IFNAMSIZ"
 			   " (%i)", arg, IFNAMSIZ-1);
-	
+
 	strcpy(vianame, arg);
 	if (vialen == 0)
 		memset(mask, 0, IFNAMSIZ);
@@ -1285,11 +1285,11 @@ flush_entries(const ipt_chainlabel chain, int verbose,
 {
 	if (!chain)
 		return for_each_chain(flush_entries, verbose, handle);
-	
-		if (verbose)
-			fprintf(stdout, "Flushing chain `%s'\n", chain);
-		return iptc_flush_entries(chain, handle);
-	}
+
+	if (verbose)
+		fprintf(stdout, "Flushing chain `%s'\n", chain);
+	return iptc_flush_entries(chain, handle);
+}
 
 static int
 zero_entries(const ipt_chainlabel chain, int verbose,
@@ -1297,7 +1297,7 @@ zero_entries(const ipt_chainlabel chain, int verbose,
 {
 	if (!chain)
 		return for_each_chain(zero_entries, verbose, handle);
-	
+
 	if (verbose)
 		fprintf(stdout, "Zeroing chain `%s'\n", chain);
 	return iptc_zero_entries(chain, handle);
@@ -1320,7 +1320,7 @@ delete_chain(const ipt_chainlabel chain, int verbose,
 		/* No user-defined chains? */
 		if (!i)
 			return ret;
-			
+
 		/* Be careful iterating: it isn't safe during delete. */
 		/* Re-iterate after each delete successful */
 		while ((i = iptc_next_chain(last, handle)) != NULL) {
@@ -1867,9 +1867,9 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			target->init(target->t, &fw.nfcache);
 		}
 
-		if (!target) {	
+		if (!target) {
 			struct ipt_entry_target unknown_target;
-	
+
 			/* Don't know it.  Must be extension with no
                            options? */
 			unknown_target.target_size = sizeof(unknown_target);

@@ -248,7 +248,7 @@ iptc_init(const char *tablename)
 		free(h);
 		return NULL;
 	}
-	
+
 	CHECK(h);
 	return h;
 }
@@ -802,7 +802,7 @@ standard_map(struct ipt_entry *e, int verdict)
 
 	return 1;
 }
-	
+
 static int
 map_target(const iptc_handle_t handle,
 	   struct ipt_entry *e,
@@ -1096,7 +1096,7 @@ iptc_delete_entry(const ipt_chainlabel chain,
 	free(fw);
 	errno = ENOENT;
 	return 0;
-}	
+}
 
 /* Delete the rule in position `rulenum' in `chain'. */
 int
@@ -1179,7 +1179,7 @@ int
 iptc_zero_entries(const ipt_chainlabel chain, iptc_handle_t *handle)
 {
 	unsigned int i, end;
-	
+
 	CHECK(*handle);
 	if (!find_label(&i, chain, *handle)) {
 		errno = ENOENT;
@@ -1305,7 +1305,7 @@ iptc_delete_chain(const ipt_chainlabel chain, iptc_handle_t *handle)
 	CHECK(*handle);
 	if (!iptc_get_references(&references, chain, handle))
 		return 0;
-	
+
 	iptc_fn = iptc_delete_chain;
 
 	if (iptc_builtin(chain, *handle)) {
@@ -1483,7 +1483,7 @@ iptc_commit(iptc_handle_t *handle)
 		errno = ENOMEM;
 		return 0;
 	}
-		
+
 	/* These are the counters we're going to put back, later. */
 	newcounters = malloc(counterlen);
 	if (!newcounters) {
@@ -1550,7 +1550,7 @@ iptc_commit(iptc_handle_t *handle)
 		}
 	}
 
-	if (setsockopt(sockfd, IPPROTO_IP, IPT_SO_SET_ADD_COUNTERS,	
+	if (setsockopt(sockfd, IPPROTO_IP, IPT_SO_SET_ADD_COUNTERS,
 	       newcounters, counterlen) < 0) {
 		free(repl->counters);
 		free(repl);

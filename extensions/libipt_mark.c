@@ -70,7 +70,7 @@ print_mark(unsigned long mark, unsigned long mask, int invert, int numeric)
 {
 	if (invert)
 		fputc('!', stdout);
-		
+
 	if(mask != 0xffffffff)
 		printf("0x%lx/0x%lx ", mark, mask);
 	else
