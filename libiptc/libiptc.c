@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision$ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.28 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -42,7 +42,8 @@ struct counter_map
 	enum {
 		COUNTER_MAP_NOMAP,
 		COUNTER_MAP_NORMAL_MAP,
-		COUNTER_MAP_ZEROED
+		COUNTER_MAP_ZEROED,
+		COUNTER_MAP_SET
 	} maptype;
 	unsigned int mappos;
 };
@@ -1207,6 +1208,112 @@ TC_ZERO_ENTRIES(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 	return 1;
 }
 
+STRUCT_COUNTERS *
+TC_READ_COUNTER(const IPT_CHAINLABEL chain,
+		unsigned int rulenum,
+		TC_HANDLE_T *handle)
+{
+	STRUCT_ENTRY *e;
+	struct chain_cache *c;
+	unsigned int chainindex, end;
+
+	iptc_fn = TC_READ_COUNTER;
+	CHECK(*handle);
+
+	if (!(c = find_label(chain, *handle))) {
+		errno = ENOENT;
+		return NULL;
+	}
+
+	chainindex = entry2index(*handle, c->start);
+	end = entry2index(*handle, c->end);
+
+	if (chainindex + rulenum > end) {
+		errno = E2BIG;
+		return NULL;
+	}
+
+	e = index2entry(*handle, chainindex + rulenum);
+
+	return &e->counters;
+}
+
+int
+TC_ZERO_COUNTER(const IPT_CHAINLABEL chain,
+		unsigned int rulenum,
+		TC_HANDLE_T *handle)
+{
+	STRUCT_ENTRY *e;
+	struct chain_cache *c;
+	unsigned int chainindex, end;
+	
+	iptc_fn = TC_ZERO_COUNTER;
+	CHECK(*handle);
+
+	if (!(c = find_label(chain, *handle))) {
+		errno = ENOENT;
+		return 0;
+	}
+
+	chainindex = entry2index(*handle, c->start);
+	end = entry2index(*handle, c->end);
+
+	if (chainindex + rulenum > end) {
+		errno = E2BIG;
+		return 0;
+	}
+
+	e = index2entry(*handle, chainindex + rulenum);
+
+	if ((*handle)->counter_map[chainindex + rulenum].maptype
+			== COUNTER_MAP_NORMAL_MAP) {
+		(*handle)->counter_map[chainindex + rulenum].maptype
+			 = COUNTER_MAP_ZEROED;
+	}
+
+	set_changed(*handle);
+
+	return 1;
+}
+
+int 
+TC_SET_COUNTER(const IPT_CHAINLABEL chain,
+	       unsigned int rulenum,
+	       STRUCT_COUNTERS *counters,
+	       TC_HANDLE_T *handle)
+{
+	STRUCT_ENTRY *e;
+	struct chain_cache *c;
+	unsigned int chainindex, end;
+
+	iptc_fn = TC_SET_COUNTER;
+	CHECK(*handle);
+
+	if (!(c = find_label(chain, *handle))) {
+		errno = ENOENT;
+		return 0;
+	}
+
+	chainindex = entry2index(*handle, c->start);
+	end = entry2index(*handle, c->end);
+
+	if (chainindex + rulenum > end) {
+		errno = E2BIG;
+		return 0;
+	}
+
+	e = index2entry(*handle, chainindex + rulenum);
+
+	(*handle)->counter_map[chainindex + rulenum].maptype
+		= COUNTER_MAP_SET;
+
+	memcpy(&e->counters, counters, sizeof(STRUCT_COUNTERS));
+
+	set_changed(*handle);
+
+	return 1;
+}
+
 /* Creates a new chain. */
 /* To create a chain, create two rules: error node and unconditional
  * return. */
@@ -1395,10 +1502,11 @@ int TC_RENAME_CHAIN(const IPT_CHAINLABEL oldname,
 int
 TC_SET_POLICY(const IPT_CHAINLABEL chain,
 	      const IPT_CHAINLABEL policy,
+	      STRUCT_COUNTERS *counters,
 	      TC_HANDLE_T *handle)
 {
 	unsigned int hook;
-	unsigned int policyoff;
+	unsigned int policyoff, ctrindex;
 	STRUCT_ENTRY *e;
 	STRUCT_STANDARD_TARGET *t;
 
@@ -1429,8 +1537,21 @@ TC_SET_POLICY(const IPT_CHAINLABEL chain,
 		errno = EINVAL;
 		return 0;
 	}
-	(*handle)->counter_map[entry2index(*handle, e)]
-		= ((struct counter_map){ COUNTER_MAP_NOMAP, 0 });
+
+	ctrindex = entry2index(*handle, e);
+
+	if (counters) {
+		/* set byte and packet counters */
+		memcpy(&e->counters, counters, sizeof(STRUCT_COUNTERS));
+
+		(*handle)->counter_map[ctrindex].maptype
+			= COUNTER_MAP_SET;
+
+	} else {
+		(*handle)->counter_map[ctrindex]
+			= ((struct counter_map){ COUNTER_MAP_NOMAP, 0 });
+	}
+
 	set_changed(*handle);
 
 	return 1;
@@ -1549,6 +1670,15 @@ TC_COMMIT(TC_HANDLE_T *handle)
 					  &repl->counters[mappos],
 					  &index2entry(*handle, i)->counters);
 			break;
+
+		case COUNTER_MAP_SET:
+			/* Want to set counter (iptables-restore) */
+
+			memcpy(&newcounters->counters[i],
+			       &index2entry(*handle, i)->counters,
+			       sizeof(STRUCT_COUNTERS));
+
+			break;
 		}
 	}
 
@@ -1619,6 +1749,8 @@ TC_STRERROR(int err)
 	    { TC_INSERT_ENTRY, E2BIG, "Index of insertion too big" },
 	    { TC_REPLACE_ENTRY, E2BIG, "Index of replacement too big" },
 	    { TC_DELETE_NUM_ENTRY, E2BIG, "Index of deletion too big" },
+	    { TC_READ_COUNTER, E2BIG, "Index of counter too big" },
+	    { TC_ZERO_COUNTER, E2BIG, "Index of counter too big" },
 	    { TC_INSERT_ENTRY, ELOOP, "Loop found in table" },
 	    { TC_INSERT_ENTRY, EINVAL, "Target problem" },
 	    /* EINVAL for CHECK probably means bad interface. */

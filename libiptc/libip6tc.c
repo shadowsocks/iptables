@@ -75,6 +75,9 @@ typedef unsigned int socklen_t;
 #define TC_CHECK_PACKET		ip6tc_check_packet
 #define TC_FLUSH_ENTRIES	ip6tc_flush_entries
 #define TC_ZERO_ENTRIES		ip6tc_zero_entries
+#define TC_ZERO_COUNTER		ip6tc_zero_counter
+#define TC_READ_COUNTER		ip6tc_read_counter
+#define TC_SET_COUNTER		ip6tc_set_counter
 #define TC_CREATE_CHAIN		ip6tc_create_chain
 #define TC_GET_REFERENCES	ip6tc_get_references
 #define TC_DELETE_CHAIN		ip6tc_delete_chain
