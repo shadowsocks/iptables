@@ -96,9 +96,9 @@ print(const struct ipt_ip *ip,
 	struct ipt_connbytes_info *sinfo = (struct ipt_connbytes_info *)match->data;
 
 	if (sinfo->from > sinfo->to) 
-		printf("connbytes ! %lu:%lu",sinfo->to,sinfo->from);
+		printf("connbytes ! %lu:%lu ",sinfo->to,sinfo->from);
 	else
-		printf("connbytes %lu:%lu",sinfo->from,sinfo->to);
+		printf("connbytes %lu:%lu ",sinfo->from,sinfo->to);
 }
 
 /* Saves the matchinfo in parsable form to stdout. */
@@ -107,9 +107,9 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	struct ipt_connbytes_info *sinfo = (struct ipt_connbytes_info *)match->data;
 
 	if (sinfo->from > sinfo->to) 
-		printf("! --connbytes %lu:%lu",sinfo->to,sinfo->from);
+		printf("! --connbytes %lu:%lu ",sinfo->to,sinfo->from);
 	else
-		printf("--connbytes %lu:%lu",sinfo->from,sinfo->to);
+		printf("--connbytes %lu:%lu ",sinfo->from,sinfo->to);
 }
 
 static
