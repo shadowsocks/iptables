@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.33 2001/05/05 00:01:55 laforge Exp $
+CVS ID: $Id: TODO,v 1.34 2001/05/05 04:39:39 laforge Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -44,6 +44,7 @@ X integrate PSD target / port it as match [HW]
 - provide daily CVS snapshots via ftp [HW]
 - 10.1.2.3.4 is accepted as a valid IP address by iptables -s / -d ?
 - make iptables / ip6tables use the same codebase (as libiptc) [KA]
+- string_to_number() does not work correctly for unsigned ints [JM]
 
 FUTURE extensions:
 - dealing with fragmented expectation-causes (i.e. DCC chat split
