@@ -1,6 +1,6 @@
 #! /usr/bin/make
 
-PF_EXT_SLIB:=tcp udp icmp mac limit standard REJECT LOG unclean state multiport tos TOS mark MARK owner SNAT DNAT MASQUERADE REDIRECT MIRROR
+PF_EXT_SLIB:=tcp udp icmp mac limit standard REJECT LOG unclean state multiport tos TOS mark MARK owner SNAT DNAT MASQUERADE REDIRECT MIRROR SAME
 PF6_EXT_SLIB:=tcp udp icmp standard MARK mark
 
 # The following may not be present, but compile them anyway.
