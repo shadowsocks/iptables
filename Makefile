@@ -18,7 +18,7 @@ DEPFILES = $(SHARED_LIBS:%.so=%.d)
 SH_CFLAGS:=$(CFLAGS) -fPIC
 
 EXTRAS+=iptables iptables.o ip6tables ip6tables.o #iptables-save iptables-restore
-EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables $(DESTDIR)$(MANDIR)/man8/iptables.8 #$(DESTDIR)$(BINDIR)/iptables-save $(DESTDIR)$(BINDIR)/iptables-restore
+EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables $(DESTDIR)$(BINDIR)/ip6tables $(DESTDIR)$(MANDIR)/man8/iptables.8 #$(DESTDIR)$(BINDIR)/iptables-save $(DESTDIR)$(BINDIR)/iptables-restore
 
 # Sparc64 hack
 ifeq ($(shell uname -m),sparc64)
