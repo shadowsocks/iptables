@@ -16,14 +16,15 @@ endif
 NETFILTER_VERSION:=1.2.4
 OLD_NETFILTER_VERSION:=1.2.3
 
-# Waiting for inclusions in the kernel tree.
-PENDING_PATCHES:=ipt_MIRROR-ttl.patch ipt_REJECT-checkentry.patch ipt_LOG.patch
-# These went in previous kernels.
-PENDING_PATCHES+=2.4.1.patch tos-fix.patch tcp-MSS.patch 2.4.4.patch ip6tables-export-symbols.patch sackperm.patch
-
-# these are working fine together and don't break themselves
-MOSTOFPOM_PATCHES=NETLINK.patch NETMAP.patch SAME.patch TTL.patch ah-esp.patch ftos.patch iplimit.patch ipv4options.patch irc-conntrack-nat.patch length.patch mport.patch nth.patch random.patch pkttype.patch pool.patch psd.patch realm.patch snmp-nat.patch time.patch ttl.patch ulog.patch # string.patch (2.4.9)
-MOSTOFPOM_PATCHES+=REJECT.patch.ipv6 LOG.patch.ipv6 ipv6-agr.patch.ipv6 ipv6-fixes.patch.ipv6 ipv6-ports.patch.ipv6 length.patch.ipv6
+# NOT NEEDED WITH NEW POM2
+## Waiting for inclusions in the kernel tree.
+#PENDING_PATCHES:=ipt_MIRROR-ttl.patch ipt_REJECT-checkentry.patch ipt_LOG.patch
+## These went in previous kernels.
+#PENDING_PATCHES+=2.4.1.patch tos-fix.patch tcp-MSS.patch 2.4.4.patch ip6tables-export-symbols.patch sackperm.patch
+#
+## these are working fine together and don't break themselves
+#MOSTOFPOM_PATCHES=NETLINK.patch NETMAP.patch SAME.patch TTL.patch ah-esp.patch ftos.patch iplimit.patch ipv4options.patch irc-conntrack-nat.patch length.patch mport.patch nth.patch random.patch pkttype.patch pool.patch psd.patch realm.patch snmp-nat.patch time.patch ttl.patch ulog.patch # string.patch (2.4.9)
+#MOSTOFPOM_PATCHES+=REJECT.patch.ipv6 LOG.patch.ipv6 ipv6-agr.patch.ipv6 ipv6-fixes.patch.ipv6 ipv6-ports.patch.ipv6 length.patch.ipv6
 
 LIBDIR:=/usr/local/lib
 BINDIR:=/usr/local/sbin
@@ -99,7 +100,7 @@ print-extensions:
 
 .PHONY: pending-patches
 pending-patches:
-	@cd patch-o-matic && KERNEL_DIR=$(KERNEL_DIR) ./runme $(PENDING_PATCHES)
+	@cd patch-o-matic && KERNEL_DIR=$(KERNEL_DIR) ./runme pending
 
 iptables.o: iptables.c
 	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -c -o $@ $<
@@ -184,11 +185,12 @@ distclean: clean
 
 .PHONY: patch-o-matic
 patch-o-matic/ patch-o-matic:
-	@cd $@ && KERNEL_DIR=$(KERNEL_DIR) ./runme
+	@echo "Are your sure you didn't want to use make most-of-pom?"
+	@cd $@ && KERNEL_DIR=$(KERNEL_DIR) ./runme extra
 
 .PHONY: most-of-pom
 most-of-pom:
-	@cd patch-o-matic && KERNEL_DIR=$(KERNEL_DIR) ./runme $(MOSTOFPOM_PATCHES)
+	@cd patch-o-matic && KERNEL_DIR=$(KERNEL_DIR) ./runme base
 
 # Rusty's distro magic.
 .PHONY: distrib
