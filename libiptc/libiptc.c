@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.56 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.57 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -1361,7 +1361,7 @@ TC_APPEND_ENTRY(const IPT_CHAINLABEL chain,
 	r->counter_map.maptype = COUNTER_MAP_SET;
 
 	if (!iptcc_map_target(*handle, r)) {
-		DEBUGP("unable to ma target of rule for chain `%s'\n", chain);
+		DEBUGP("unable to map target of rule for chain `%s'\n", chain);
 		free(r);
 		return 0;
 	}
