@@ -4,7 +4,7 @@
  *
  * This coude is distributed under the terms of GNU GPL
  *
- * $Id: iptables-restore.c,v 1.10 2001/03/15 15:12:02 laforge Exp $
+ * $Id: iptables-restore.c,v 1.11 2001/05/03 20:50:03 laforge Exp $
  */
 
 #include <getopt.h>
@@ -308,8 +308,11 @@ int main(int argc, char *argv[])
 					if (quote_open)
 						continue;
 
-					if (!param_len)
-						break;
+					if (!param_len) {
+						/* two spaces? */
+						param_start++;
+						continue;
+					}
 					
 					/* end of one parameter */
 					strncpy(param_buffer, param_start,
