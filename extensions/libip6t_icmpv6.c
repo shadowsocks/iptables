@@ -229,7 +229,7 @@ print(const struct ip6t_ip6 *ip,
 {
 	const struct ip6t_icmp *icmpv6 = (struct ip6t_icmp *)match->data;
 
-	printf("icmpv6 ");
+	printf("ipv6-icmp ");
 	print_icmpv6type(icmpv6->type, icmpv6->code[0], icmpv6->code[1],
 		       icmpv6->invflags & IP6T_ICMP_INV,
 		       numeric);
@@ -260,7 +260,7 @@ static void final_check(unsigned int flags)
 
 static struct ip6tables_match icmpv6
 = { NULL,
-    "icmpv6",
+    "icmp6",
     NETFILTER_VERSION,
     IP6T_ALIGN(sizeof(struct ip6t_icmp)),
     IP6T_ALIGN(sizeof(struct ip6t_icmp)),

@@ -517,8 +517,6 @@ host_to_addr(const char *name, unsigned int *naddr)
 	return (struct in6_addr *) NULL;
 }
 
-/* XXX: the getnameinfo() returns "ai_family not supported".
- *      it can be a glibc error. */
 static char *
 addr_to_host(const struct in6_addr *addr)
 {
@@ -678,17 +676,34 @@ struct ip6tables_match *
 find_match(const char *name, enum ip6t_tryload tryload)
 {
 	struct ip6tables_match *ptr;
-
-	for (ptr = ip6tables_matches; ptr; ptr = ptr->next) {
-		if (strcmp(name, ptr->name) == 0)
-			break;
-	}
+ 	int icmphack = 0;
+  
+	/* This is ugly as hell. Nonetheless, there is no way of changing
+	 * this without hurting backwards compatibility */
+ 	if ( (strcmp(name,"icmpv6") == 0) ||
+ 	     (strcmp(name,"ipv6-icmp") == 0) ||
+ 	     (strcmp(name,"icmp6") == 0) ) icmphack = 1;
+ 
+ 	if (!icmphack) {
+ 		for (ptr = ip6tables_matches; ptr; ptr = ptr->next) {
+ 			if (strcmp(name, ptr->name) == 0)
+ 				break;
+ 		}
+ 	} else {
+ 		for (ptr = ip6tables_matches; ptr; ptr = ptr->next) {
+ 			if (strcmp("icmp6", ptr->name) == 0)
+ 				break;
+ 		}
+  	}
 
 #ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != DONT_LOAD) {
 		char path[sizeof(IP6T_LIB_DIR) + sizeof("/libip6t_.so")
 			 + strlen(name)];
-		sprintf(path, IP6T_LIB_DIR "/libip6t_%s.so", name);
+		if (!icmphack)
+			sprintf(path, IP6T_LIB_DIR "/libip6t_%s.so", name);
+		else
+			sprintf(path, IP6T_LIB_DIR "/libip6t_%s.so", "icmpv6");
 		if (dlopen(path, RTLD_NOW)) {
 			/* Found library.  If it didn't register itself,
 			   maybe they specified target as match. */
@@ -1652,6 +1667,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	struct ip6tables_target *t;
 	const char *jumpto = "";
 	char *protocol = NULL;
+	char icmp6p[] = "icmpv6";
         const char *modprobe = NULL;
 
 	memset(&fw, 0, sizeof(fw));
@@ -1825,6 +1841,8 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 				*protocol = tolower(*protocol);
 
 			protocol = argv[optind-1];
+			if ( strcmp(protocol,"ipv6-icmp") == 0)
+				protocol = icmp6p;
 			fw.ipv6.proto = parse_protocol(protocol);
 			fw.ipv6.flags |= IP6T_F_PROTO;
 
