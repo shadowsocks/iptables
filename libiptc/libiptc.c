@@ -1009,7 +1009,7 @@ match_different(const struct ipt_entry_match *a,
 	unsigned int i;
 
 	/* Offset of b is the same as a. */
-	b = (void *)b_elems + ((char *)a-a_elems);
+	b = (void *)b_elems + ((unsigned char *)a-a_elems);
 
 	if (a->match_size != b->match_size)
 		return 1;
@@ -1087,7 +1087,7 @@ is_same(const struct ipt_entry *a, const struct ipt_entry *b,
 	if (strcmp(ta->u.name, tb->u.name) != 0)
 		return 0;
 
-	mptr += sizeof(*ta)
+	mptr += sizeof(*ta);
 	if (target_different(ta->data, tb->data,
 			     ta->target_size - sizeof(*ta), mptr))
 		return 0;
