@@ -118,6 +118,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & PARAM_MAC)
 			exit_error(PARAMETER_PROBLEM, "Can only specify MAC once\n");
 		parse_mac(optarg, cipinfo->clustermac);
+		if (!(cipinfo->clustermac[0] & 0x01))
+			exit_error(PARAMETER_PROBLEM, "MAC has to be a multicast ethernet address\n");
 		*flags |= PARAM_MAC;
 		break;
 	case '4':
