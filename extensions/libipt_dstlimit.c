@@ -333,7 +333,7 @@ static struct iptables_match dstlimit = {
 	.final_check	= &final_check,
 	.print 		= &print,
 	.save		= &save,
-	.opts_extra	= opts
+	.extra_opts	= opts
 };
 
 void _init(void)
