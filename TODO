@@ -1,4 +1,4 @@
-  TCP Window Tracking
+X TCP Window Tracking
   PPC heisenbug failure
   u32 classifier
   IPv6: `Hook 4 already set' message.
@@ -13,3 +13,6 @@
   IPv6 ping crash with NAT.
   Redirecting loopback to external machines (LOCAL_IN hook for NAT).
   Jules Bean: `Problems with large transfers'
+X Harald's multi-port ftp patch into patch-o-matic.
+X tcpmss match
+  ftp tcp window tracking failure (ftp nat must update window info).
