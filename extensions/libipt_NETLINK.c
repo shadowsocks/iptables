@@ -8,8 +8,7 @@
 #include <getopt.h>
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
-
-#include "ipt_NETLINK.h"
+#include <linux/netfilter_ipv4/ipt_NETLINK.h>
 
 static void help(void)
 {
