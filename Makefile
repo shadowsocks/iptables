@@ -10,7 +10,7 @@ OLD_NETFILTER_VERSION:=1.2.1a
 # Waiting for inclusions in the kernel tree.
 PENDING_PATCHES:=
 # These went in previous kernels.
-PENDING_PATCHES+=2.4.1.patch tos-fix.patch tcp-MSS.patch 2.4.4.patch ip6tables-export-symbols
+PENDING_PATCHES+=2.4.1.patch tos-fix.patch tcp-MSS.patch 2.4.4.patch ip6tables-export-symbols skb-fraglist
 
 LIBDIR:=/usr/local/lib
 BINDIR:=/usr/local/sbin
