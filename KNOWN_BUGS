@@ -1,0 +1,10 @@
+Known bugs with the 2.4.0 kernel:
+
+1) NAT in the OUTPUT chain does not work in general.  The fix is
+   intrusive, and means we will have a CONFIG_NF_IP_NAT_LOCAL option
+   when it comes back.
+
+2) tcpdump traffic is corrupted by OUTPUT NAT.
+
+3) Connection tracking doesn't wait very long for reply FIN, meaning
+   that half-closed pipes can time out early (seen frequently with squid).
