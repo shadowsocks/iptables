@@ -3,6 +3,7 @@
 #include <netdb.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stddef.h> /* for 'offsetof' */
 #include <getopt.h>
 
 #include <iptables.h>
