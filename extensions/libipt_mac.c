@@ -90,7 +90,7 @@ static void print_mac(unsigned char macaddress[ETH_ALEN], int invert)
 {
 	unsigned int i;
 
-	printf("%s%02X", invert ? "!" : "", macaddress[0]);
+	printf("%s%02X", invert ? "! " : "", macaddress[0]);
 	for (i = 1; i < ETH_ALEN; i++)
 		printf(":%02X", macaddress[i]);
 	printf(" ");
