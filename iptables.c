@@ -1254,14 +1254,14 @@ print_firewall(const struct ipt_entry *fw,
 
 	fputc(fw->ip.invflags & IPT_INV_DSTIP ? '!' : ' ', stdout);
 	if (fw->ip.dmsk.s_addr == 0L && !(format & FMT_NUMERIC))
-		printf(FMT("%-19s","-> %s"), "anywhere");
+		printf(FMT("%-19s ","-> %s"), "anywhere");
 	else {
 		if (format & FMT_NUMERIC)
 			sprintf(buf, "%s", addr_to_dotted(&(fw->ip.dst)));
 		else
 			sprintf(buf, "%s", addr_to_anyname(&(fw->ip.dst)));
 		strcat(buf, mask_to_dotted(&(fw->ip.dmsk)));
-		printf(FMT("%-19s","-> %s"), buf);
+		printf(FMT("%-19s ","-> %s"), buf);
 	}
 
 	if (format & FMT_NOTABLE)
