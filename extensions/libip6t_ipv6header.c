@@ -200,8 +200,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 				exit_error(PARAMETER_PROBLEM,
 					"Only one `--header' allowed");
 
-			if (check_inverse(optarg, &invert))
-				optind++;
+			check_inverse(optarg, &invert, &optind, 0);
 
 			if (! (info->matchflags = parse_header(argv[optind-1])) )
 				exit_error(PARAMETER_PROBLEM, "ip6t_ipv6header: cannot parse header names");

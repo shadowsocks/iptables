@@ -92,8 +92,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & ESP_SPI)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--spi' allowed");
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		parse_esp_spis(argv[optind-1], espinfo->spis);
 		if (invert)
 			espinfo->invflags |= IPT_ESP_INV_SPI;

@@ -70,7 +70,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			if (*flags) exit_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--check' "
 					"`--update' or `--remove' may be set");
-			if (check_inverse(optarg, &invert)) optind++;
+			check_inverse(optarg, &invert, &optind, 0);
 			info->check_set |= IPT_RECENT_SET;
 			if (invert) info->invert = 1;
 			*flags = 1;
@@ -80,7 +80,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			if (*flags) exit_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--check' "
 					"`--update' or `--remove' may be set");
-			if (check_inverse(optarg, &invert)) optind++;
+			check_inverse(optarg, &invert, &optind, 0);
 			info->check_set |= IPT_RECENT_CHECK;
 			if(invert) info->invert = 1;
 			*flags = 1;
@@ -90,7 +90,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			if (*flags) exit_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--check' "
 					"`--update' or `--remove' may be set");
-			if (check_inverse(optarg, &invert)) optind++;
+			check_inverse(optarg, &invert, &optind, 0);
 			info->check_set |= IPT_RECENT_UPDATE;
 			if (invert) info->invert = 1;
 			*flags = 1;
@@ -100,7 +100,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			if (*flags) exit_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--check' "
 					"`--update' or `--remove' may be set");
-			if (check_inverse(optarg, &invert)) optind++;
+			check_inverse(optarg, &invert, &optind, 0);
 			info->check_set |= IPT_RECENT_REMOVE;
 			if (invert) info->invert = 1;
 			*flags = 1;

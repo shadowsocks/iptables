@@ -9,7 +9,7 @@ enum exittype {
 };
 extern void exit_printhelp() __attribute__((noreturn));
 extern void exit_tryhelp(int) __attribute__((noreturn));
-int check_inverse(const char option[], int *invert);
+int check_inverse(const char option[], int *invert, int *optind, int argc);
 extern int string_to_number(const char *, 
 			    unsigned int, 
 			    unsigned int,

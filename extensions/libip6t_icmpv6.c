@@ -168,8 +168,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		*nfcache |= parse_icmpv6(argv[optind-1],
 				       &icmpv6info->type,
 				       icmpv6info->code);

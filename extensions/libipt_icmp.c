@@ -183,8 +183,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		*nfcache |= parse_icmp(argv[optind-1],
 				       &icmpinfo->type,
 				       icmpinfo->code);

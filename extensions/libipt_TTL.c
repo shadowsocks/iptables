@@ -1,7 +1,7 @@
 /* Shared library add-on to iptables for the TTL target
  * (C) 2000 by Harald Welte <laforge@gnumonks.org>
  *
- * $Id: libipt_TTL.c,v 1.3 2000/11/13 11:16:08 laforge Exp $
+ * $Id: libipt_TTL.c,v 1.4 2002/02/25 11:25:41 laforge Exp $
  *
  * This program is distributed under the terms of GNU GPL
  */
@@ -46,7 +46,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		exit_error(PARAMETER_PROBLEM, 
 				"TTL: You must specify a value");
 
-	if (check_inverse(optarg, &invert))
+	if (check_inverse(optarg, &invert, NULL, 0))
 		exit_error(PARAMETER_PROBLEM,
 				"TTL: unexpected `!'");
 	

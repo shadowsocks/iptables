@@ -476,14 +476,20 @@ add_command(int *cmd, const int newcmd, const int othercmds, int invert)
 }
 
 int
-check_inverse(const char option[], int *invert)
+check_inverse(const char option[], int *invert, int *optind, int argc)
 {
 	if (option && strcmp(option, "!") == 0) {
 		if (*invert)
 			exit_error(PARAMETER_PROBLEM,
 				   "Multiple `!' flags not allowed");
-
 		*invert = TRUE;
+		if (optind) {
+			*optind = *optind+1;
+			if (argc && *optind > argc)
+				exit_error(PARAMETER_PROBLEM,
+					   "no argument following `!'");
+		}
+
 		return TRUE;
 	}
 	return FALSE;
@@ -1834,8 +1840,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			 * Option selection
 			 */
 		case 'p':
-			if (check_inverse(optarg, &invert))
-				optind++;
+			check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_PROTOCOL, &fw.ip.invflags,
 				   invert);
 
@@ -1854,8 +1859,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			break;
 
 		case 's':
-			if (check_inverse(optarg, &invert))
-				optind++;
+			check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_SOURCE, &fw.ip.invflags,
 				   invert);
 			shostnetworkmask = argv[optind-1];
@@ -1863,8 +1867,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			break;
 
 		case 'd':
-			if (check_inverse(optarg, &invert))
-				optind++;
+			check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_DESTINATION, &fw.ip.invflags,
 				   invert);
 			dhostnetworkmask = argv[optind-1];
@@ -1894,8 +1897,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 
 
 		case 'i':
-			if (check_inverse(optarg, &invert))
-				optind++;
+			check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_VIANAMEIN, &fw.ip.invflags,
 				   invert);
 			parse_interface(argv[optind-1],
@@ -1905,8 +1907,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			break;
 
 		case 'o':
-			if (check_inverse(optarg, &invert))
-				optind++;
+			check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_VIANAMEOUT, &fw.ip.invflags,
 				   invert);
 			parse_interface(argv[optind-1],

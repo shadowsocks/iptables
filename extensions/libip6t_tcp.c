@@ -178,8 +178,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & TCP_SRC_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--source-port' allowed");
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_ports(argv[optind-1], tcpinfo->spts);
 		if (invert)
 			tcpinfo->invflags |= IP6T_TCP_INV_SRCPT;
@@ -191,8 +190,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & TCP_DST_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--destination-port' allowed");
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_ports(argv[optind-1], tcpinfo->dpts);
 		if (invert)
 			tcpinfo->invflags |= IP6T_TCP_INV_DSTPT;
@@ -215,8 +213,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one of `--syn' or `--tcp-flags' "
 				   " allowed");
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 
 		if (!argv[optind]
 		    || argv[optind][0] == '-' || argv[optind][0] == '!')
@@ -232,8 +229,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & TCP_OPTION)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--tcp-option' allowed");
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_option(argv[optind-1], &tcpinfo->option);
 		if (invert)
 			tcpinfo->invflags |= IP6T_TCP_INV_OPTION;

@@ -61,9 +61,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		struct passwd *pwd;
 		struct group *grp;
 	case '1':
-		if (check_inverse(optarg, &invert))
-			optind++;
-
+		check_inverse(optarg, &invert, &optind, 0);
 		if ((pwd = getpwnam(optarg)))
 			ownerinfo->uid = pwd->pw_uid;
 		else {
@@ -78,8 +76,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '2':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		if ((grp = getgrnam(optarg)))
 			ownerinfo->gid = grp->gr_gid;
 		else {
@@ -94,8 +91,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '3':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		ownerinfo->pid = strtoul(optarg, &end, 0);
 		if (*end != '\0' || end == optarg)
 			exit_error(PARAMETER_PROBLEM, "Bad OWNER PID value `%s'", optarg);
@@ -106,8 +102,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '4':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		ownerinfo->sid = strtoul(optarg, &end, 0);
 		if (*end != '\0' || end == optarg)
 			exit_error(PARAMETER_PROBLEM, "Bad OWNER SID value `%s'", optarg);
@@ -119,8 +114,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 #ifdef IPT_OWNER_COMM
 	case '5':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		if(strlen(optarg) > sizeof(ownerinfo->comm))
 			exit_error(PARAMETER_PROBLEM, "OWNER CMD `%s' too long, max %d characters", optarg, sizeof(ownerinfo->comm));
 

@@ -1,8 +1,9 @@
 /* Shared library add-on to iptables to add limit support.
  *
  * Jérôme de Vivie   <devivie@info.enserb.u-bordeaux.fr>
- * Hervé Eychenne   <eychenne@info.enserb.u-bordeaux.fr>
+ * Hervé Eychenne    <rv@wallfire.org>
  */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -102,7 +103,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch(c) {
 	case '%':
-		if (check_inverse(optarg, &invert))
+		if (check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --limit");
 		if (!parse_rate(optarg, &r->avg))
@@ -111,7 +112,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '$':
-		if (check_inverse(optarg, &invert))
+		if (check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --limit-burst");
 

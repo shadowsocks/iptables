@@ -85,8 +85,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 				exit_error(PARAMETER_PROBLEM,
 				           "length: `--length' may only be "
 				           "specified once");
-			if (check_inverse(optarg, &invert))
-				optind++;
+			check_inverse(optarg, &invert, &optind, 0);
 			parse_lengths(argv[optind-1], info);
 			if (invert)
 				info->invert = 1;

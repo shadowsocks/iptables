@@ -97,7 +97,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch(c) {
 	case '1':
-		if (check_inverse(optarg, &invert))
+		if (check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --reject-with");
 		for (i = 0; i < limit; i++) {

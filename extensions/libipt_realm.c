@@ -49,8 +49,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 		char *end;
 	case '1':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		realminfo->id = strtoul(optarg, &end, 0);
 		if (*end == '/') {
 			realminfo->mask = strtoul(end+1, &end, 0);

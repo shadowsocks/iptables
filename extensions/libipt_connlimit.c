@@ -51,8 +51,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		info->limit = atoi(argv[optind-1]);
 		info->inverse = invert;
 		*flags |= 1;

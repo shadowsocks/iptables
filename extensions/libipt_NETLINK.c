@@ -48,7 +48,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 				exit_error(PARAMETER_PROBLEM,
 				"Can't specify --nldrop twice");
 
-			if ( check_inverse(optarg, &invert) ) {
+			if ( check_inverse(optarg, &invert, NULL, 0) ) {
 				MASK_UNSET(nld->flags, USE_DROP);
 			} else {
 				MASK_SET(nld->flags, USE_DROP);
@@ -62,7 +62,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 				exit_error(PARAMETER_PROBLEM,
 				"Can't specify --nlmark twice");
 
-			if (check_inverse(optarg, &invert)) {
+			if (check_inverse(optarg, &invert, NULL, 0)) {
 				MASK_UNSET(nld->flags, USE_MARK);
 			}else{
 				MASK_SET(nld->flags, USE_MARK);
@@ -81,7 +81,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 				"--nlsize must be larger than zero");
 			
 
-			if (check_inverse(optarg, &invert)) {
+			if (check_inverse(optarg, &invert, NULL, 0)) {
 				MASK_UNSET(nld->flags, USE_SIZE);
 			}else{
 				MASK_SET(nld->flags, USE_SIZE);

@@ -1,7 +1,7 @@
 /* Shared library add-on to iptables to add TTL matching support 
  * (C) 2000 by Harald Welte <laforge@gnumonks.org>
  *
- * $Id: libipt_ttl.c,v 1.4 2000/11/13 11:16:08 laforge Exp $
+ * $Id: libipt_ttl.c,v 1.4 2002/02/25 11:25:41 laforge Exp $
  *
  * This program is released under the terms of GNU GPL */
 
@@ -37,8 +37,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 	struct ipt_ttl_info *info = (struct ipt_ttl_info *) (*match)->data;
 	u_int8_t value;
 
-	if (check_inverse(optarg, &invert))
-		optind++;
+	check_inverse(optarg, &invert, &optind, 0);
 	value = atoi(argv[optind-1]);
 
 	if (*flags) 

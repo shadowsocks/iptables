@@ -59,13 +59,13 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (check_inverse(optarg, &invert)) optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		info->src = ip_pool_get_index(argv[optind-1]);
 		if (invert) info->flags |= IPT_POOL_INV_SRC;
 		*flags = 1;
 		break;
 	case '2':
-		if (check_inverse(optarg, &invert)) optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		info->dst = ip_pool_get_index(argv[optind-1]);
 		if (invert) info->flags |= IPT_POOL_INV_DST;
 		*flags = 1;

@@ -92,8 +92,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & AH_SPI)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--spi' allowed");
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		parse_ah_spis(argv[optind-1], ahinfo->spis);
 		if (invert)
 			ahinfo->invflags |= IPT_AH_INV_SPI;

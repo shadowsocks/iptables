@@ -100,8 +100,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & UDP_SRC_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--source-port' allowed");
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		parse_udp_ports(argv[optind-1], udpinfo->spts);
 		if (invert)
 			udpinfo->invflags |= IPT_UDP_INV_SRCPT;
@@ -113,8 +112,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & UDP_DST_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--destination-port' allowed");
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 		parse_udp_ports(argv[optind-1], udpinfo->dpts);
 		if (invert)
 			udpinfo->invflags |= IPT_UDP_INV_DSTPT;

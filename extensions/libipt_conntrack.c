@@ -179,8 +179,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 
 		parse_states(argv[optind-1], sinfo);
 		if (invert) {
@@ -190,8 +189,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '2':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optdind, 0);
 
 		if(invert)
 			sinfo->invflags |= IPT_CONNTRACK_PROTO;
@@ -212,8 +210,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '3':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 9);
 
 		if (invert)
 			sinfo->invflags |= IPT_CONNTRACK_ORIGSRC;
@@ -233,8 +230,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '4':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
 			sinfo->invflags |= IPT_CONNTRACK_ORIGDST;
@@ -254,8 +250,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '5':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
 			sinfo->invflags |= IPT_CONNTRACK_REPLSRC;
@@ -275,8 +270,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '6':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
 			sinfo->invflags |= IPT_CONNTRACK_REPLDST;
@@ -296,8 +290,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '7':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 
 		parse_statuses(argv[optind-1], sinfo);
 		if (invert) {
@@ -307,8 +300,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '8':
-		if (check_inverse(optarg, &invert))
-			optind++;
+		check_inverse(optarg, &invert, &optind, 0);
 
 		parse_expires(argv[optind-1], sinfo);
 		if (invert) {
