@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.19 2001/02/02 10:53:46 laforge Exp $
+CVS ID: $Id: TODO,v 1.20 2001/02/04 14:41:22 laforge Exp $
 
 IMPORTANT before iptables-1.2.1 release:
 X generic tcp sequence number offset support for nat helpers [HW]
@@ -20,7 +20,7 @@ INDEPENDENT from iptables-1.2.1 release:
 - sysctl support for ftp-multi, irc-conntrack/nat, ftp-fxp
 - integrate HOPLIMIT for ipv6 in patch-o-matic [HW]
 - static 1:1 NAT (only ip address NAT in both directions)
-- u32 classifier (port from tc -> iptables)
+- u32 classifier (port from tc -> iptables) [YU]
 - pktlen match (not needed, when u32 available)
 - SMP locking for IRC buggy?
 - MARK match / target with boolean OR / AND (to use nfmark bitwise)
@@ -29,7 +29,6 @@ X multiple related connections [HW]
 - documentation for libiptc
 - port conntrack to IPv6 (code reuse?)
 - port matches (owner, limit, multiport, owner) to IPv6
-- HOPLIMIT IPv6 target / match [HW]
 - multicast connection tracking
 - conntrack / nat failover [HW]
 - Hard lockup with ip_queue under heavy load
@@ -38,7 +37,7 @@ X multiple related connections [HW]
 - CONFIG_NF_IP_NAT_LOCAL
 - fix and test the netfilter bridging stuff
 - integrate the ipt_NETLINK target from gianni@ecsc.co.uk
-- integrate PSD target / port it as match [HW]
+X integrate PSD target / port it as match [HW]
 - various NAT performance optimizations possible! (which? ask HW)
 
 ======================================================================
@@ -46,3 +45,4 @@ X multiple related connections [HW]
 [MB]	Marc Boucher <marc@mbsi.ca>
 [JM]	James Morris <jmorris@intercode.com.au>
 [HW]	Harald Welte <laforge@gnumonks.org>
+[YU]	Yon Uriarte <ukl2@rz.uni-karlsruhe.de>
