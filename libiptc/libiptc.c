@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.29 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.30 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -16,7 +16,7 @@
 #endif
 
 #ifndef __OPTIMIZE__
-static STRUCT_ENTRY_TARGET *
+STRUCT_ENTRY_TARGET *
 GET_TARGET(STRUCT_ENTRY *e)
 {
 	return (void *)e + e->target_offset;
