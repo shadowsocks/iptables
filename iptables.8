@@ -523,6 +523,7 @@ This target is only valid in the
 .B FORWARD
 and
 .B OUTPUT
+chains, and user-defined chains which are only called from those
 chains.  Several options control the nature of the error packet
 returned:
 .TP
@@ -557,7 +558,7 @@ It is only valid in the
 .B FORWARD
 and 
 .B OUTPUT
-chains.
+chains, and user-defined chains which are only called from those chains.
 .SS SNAT
 This target is only valid in the 
 .B nat
@@ -585,6 +586,7 @@ table, in the
 .B PREROUTING
 and
 .B OUTPUT
+chains, and user-defined chains which are only called from those
 chains.  It specifies that the destination address of the packet
 should be modified (and all future packets in this connection will
 also be mangled), and rules should cease being examined.  It takes one
@@ -629,10 +631,10 @@ table, in the
 .B PREROUTING
 and
 .B OUTPUT
+chains, and user-defined chains which are only called from those
 chains.  It alters the destination IP address to send the packet to
 the machine itself (locally-generated packets are mapped to the
-127.0.0.1 address).
-It takes one option:
+127.0.0.1 address).  It takes one option:
 .TP
 .BI "--to-ports " "<port>[-<port>]"
 This specifies a destination port or range or ports to use: without
