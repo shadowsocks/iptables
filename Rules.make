@@ -31,7 +31,7 @@ $(SHARED_LIBS:%.so=%.d): %.d: %.c
 	    sed -e 's@^.*\.o:@$*.d $*_sh.o:@' > $@
 
 $(SHARED_LIBS): %.so : %_sh.o
-	$(LD) -shared -o $@ $<
+	$(LD) -shared $(EXT_LDFLAGS) -o $@ $<
 
 %_sh.o : %.c
 	$(CC) $(SH_CFLAGS) -o $@ -c $<
