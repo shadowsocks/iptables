@@ -143,7 +143,7 @@ parse_tcp_option(const char *option, u_int8_t *result)
 {
 	unsigned int ret;
 
-	if (string_to_number(option, 1, 266, &ret) == -1)
+	if (string_to_number(option, 1, 255, &ret) == -1)
 		exit_error(PARAMETER_PROBLEM, "Bad TCP option `%s'", option);
 
 	*result = (u_int8_t)ret;
@@ -371,7 +371,7 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 	const struct ip6t_tcp *tcpinfo = (struct ip6t_tcp *)match->data;
 
 	if (tcpinfo->spts[0] != 0
-	    && tcpinfo->spts[1] != 0xFFFF) {
+	    || tcpinfo->spts[1] != 0xFFFF) {
 		if (tcpinfo->invflags & IP6T_TCP_INV_SRCPT)
 			printf("! ");
 		if (tcpinfo->spts[0]
