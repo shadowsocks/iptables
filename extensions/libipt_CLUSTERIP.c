@@ -182,7 +182,7 @@ static char *hashmode2str(enum clusterip_hashmode mode)
 	return retstr;
 }
 
-static char *mac2str(u_int8_t mac[ETH_ALEN])
+static char *mac2str(const u_int8_t mac[ETH_ALEN])
 {
 	static char buf[ETH_ALEN*3];
 	sprintf(buf, "%02X:%02X:%02X:%02X:%02X:%02X",
