@@ -18,6 +18,10 @@ To build, just do:
 
 	% make
 
+Finally, you need to to install the shared libraries, and the binary:
+
+	# make install
+
 If you want to specify alternate directories for installation (instead
 of /usr/local/  bin lib man), do this:
 
