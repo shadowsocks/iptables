@@ -47,9 +47,10 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 static int
 split_time(char **part1, char **part2, const char *str_2_parse)
 {
-	unsigned short int i,j;
+	unsigned short int i,j=0;
 	char *rpart1 = *part1;
 	char *rpart2 = *part2;
+	unsigned char found_column = 0;
 
 	/* Check the length of the string */
 	if (strlen(str_2_parse) > 5)
@@ -57,15 +58,16 @@ split_time(char **part1, char **part2, const char *str_2_parse)
 	/* parse the first part until the ':' */
 	for (i=0; i<2; i++)
 	{
-		if (str_2_parse[i] != ':') {
+		if (str_2_parse[i] == ':')
+			found_column = 1;
+		else
 			rpart1[i] = str_2_parse[i];
-		}
 	}
-	if (str_2_parse[i] != ':')
-		++i;
+	if (!found_column)
+		i++;
+	j=i;
 	/* parse the second part */
-	j=++i;
-	for (i=j; i<5; i++)
+	for (; i<strlen(str_2_parse); i++)
 	{
 		rpart2[i-j] = str_2_parse[i];
 	}
@@ -86,6 +88,12 @@ parse_time_string(int *hour, int *minute, const char *time)
 
 	if (split_time(&hours, &minutes, time) == 1)
 	{
+                /* if the number starts with 0, replace it with a space else
+                   this string_to_number will interpret it as octal !! */
+                if (hours[0] == '0')
+			hours[0] = ' ';
+		if (minutes[0] == '0')
+			minutes[0] = ' ';
 		*hour   = string_to_number(hours, 0, 23);
 		*minute = string_to_number(minutes, 0, 59);
 	}
@@ -174,8 +182,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
                         exit_error(PARAMETER_PROBLEM,
                                    "Can't specify --timestart twice");
 		parse_time_string(&hours, &minutes, optarg);
-		timeinfo->hour_start = hours;
-		timeinfo->minute_start = minutes;
+		timeinfo->time_start = (hours * 60) + minutes;
 		*flags |= IPT_TIME_START;
 		break;
 		/* timestop */
@@ -187,8 +194,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
                         exit_error(PARAMETER_PROBLEM,
                                    "Can't specify --timestop twice");
 		parse_time_string(&hours, &minutes, optarg);
-		timeinfo->hour_stop = hours;
-		timeinfo->minute_stop = minutes;
+		timeinfo->time_stop = (hours * 60) + minutes;
 		*flags |= IPT_TIME_STOP;
 		break;
 
@@ -239,6 +245,13 @@ print_days(int daynum)
 	}
 }
 
+static void
+divide_time(int fulltime, int *hours, int *minutes)
+{
+	*hours = fulltime / 60;
+	*minutes = fulltime % 60;
+}
+
 /* Prints out the matchinfo. */
 static void
 print(const struct ipt_ip *ip,
@@ -246,9 +259,13 @@ print(const struct ipt_ip *ip,
       int numeric)
 {
 	struct ipt_time_info *time = ((struct ipt_time_info *)match->data);
+	int hour_start, hour_stop, minute_start, minute_stop;
+
+	divide_time(time->time_start, &hour_start, &minute_start);
+	divide_time(time->time_stop, &hour_stop, &minute_stop);
 	printf(" TIME from %d:%d to %d:%d on ",
-	       time->hour_start, time->minute_start,
-	       time->hour_stop, time->minute_stop);
+	       hour_start, minute_start,
+	       hour_stop, minute_stop);
 	print_days(time->days_match);
 	printf(" ");
 }
@@ -258,10 +275,13 @@ static void
 save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 {
 	struct ipt_time_info *time = ((struct ipt_time_info *)match->data);
+	int hour_start, hour_stop, minute_start, minute_stop;
 
+	divide_time(time->time_start, &hour_start, &minute_start);
+	divide_time(time->time_stop, &hour_stop, &minute_stop);
 	printf(" --timestart %.2d:%.2d --timestop %.2d:%.2d --days ",
-	       time->hour_start, time->minute_start,
-	       time->hour_stop, time->minute_stop);
+	       hour_start, minute_start,
+	       hour_stop, minute_stop);
 	print_days(time->days_match);
 	printf(" ");
 }
