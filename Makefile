@@ -4,13 +4,18 @@ TOPLEVEL_INCLUDED=YES
 ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
-NETFILTER_VERSION:=1.1.2
-OLD_NETFILTER_VERSION:=1.1.1
+NETFILTER_VERSION:=1.1.3
+OLD_NETFILTER_VERSION:=1.1.2
 
 LIBDIR:=/usr/local/lib
 BINDIR:=/usr/local/bin
 MANDIR:=/usr/local/man
 INCDIR:=/usr/local/include
+
+# Need libc6 for this.  Should covert to autoconf.
+ifneq ($(shell ldd --version | fgrep 2.2),)
+DO_IPV6=1
+endif
 
 COPT_FLAGS:=-O2 -DNDEBUG
 CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -Iinclude/ -I$(KERNEL_DIR)/include -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" #-g #-pg
@@ -18,8 +23,13 @@ CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -Iinclude/ -I$(KERNEL_DIR)/include -DNETFIL
 DEPFILES = $(SHARED_LIBS:%.so=%.d)
 SH_CFLAGS:=$(CFLAGS) -fPIC
 
-EXTRAS+=iptables iptables.o iptables-save iptables-restore # ip6tables ip6tables.o 
-EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables $(DESTDIR)$(MANDIR)/man8/iptables.8 $(DESTDIR)$(BINDIR)/iptables-save $(DESTDIR)$(BINDIR)/iptables-restore # $(DESTDIR)$(BINDIR)/ip6tables 
+EXTRAS+=iptables iptables.o iptables-save iptables-restore
+EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables $(DESTDIR)$(MANDIR)/man8/iptables.8 $(DESTDIR)$(BINDIR)/iptables-save $(DESTDIR)$(BINDIR)/iptables-restore
+
+ifdef DO_IPV6
+EXTRAS+=ip6tables ip6tables.o
+EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/ip6tables 
+endif
 
 # Sparc64 hack
 ifeq ($(shell uname -m),sparc64)
