@@ -7,7 +7,7 @@
  * 	Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: ip6tables-restore.c,v 1.13 2004/01/05 09:41:51 laforge Exp $
+ * $Id: ip6tables-restore.c,v 1.14 2004/01/31 15:33:55 gandalf Exp $
  */
 
 #include <getopt.h>
@@ -30,7 +30,7 @@ static int binary = 0, counters = 0, verbose = 0, noflush = 0;
 static struct option options[] = {
 	{ "binary", 0, 0, 'b' },
 	{ "counters", 0, 0, 'c' },
-	{ "verbose", 1, 0, 'v' },
+	{ "verbose", 0, 0, 'v' },
 	{ "help", 0, 0, 'h' },
 	{ "noflush", 0, 0, 'n'},
 	{ "modprobe", 1, 0, 'M'},
