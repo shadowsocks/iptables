@@ -8,6 +8,8 @@
  *
  * Author: James Morris <jmorris@intercode.com.au>
  *
+ * 07-11-2001 Modified by Fernando Anton to add support for IPv6.
+ *
  * Copyright (c) 2000-2001 Netfilter Core Team
  *
  * This program is free software; you can redistribute it and/or modify
@@ -53,9 +55,10 @@ enum {
 	IPQ_ERR_SEND,
 	IPQ_ERR_SUPP,
 	IPQ_ERR_RECVBUF,
-	IPQ_ERR_TIMEOUT
+	IPQ_ERR_TIMEOUT,
+        IPQ_ERR_PROTOCOL
 };
-#define IPQ_MAXERR IPQ_ERR_TIMEOUT
+#define IPQ_MAXERR IPQ_ERR_PROTOCOL
 
 struct ipq_errmap_t {
 	int errcode;
@@ -76,7 +79,8 @@ struct ipq_errmap_t {
 	{ IPQ_ERR_SEND, "Failed to send netlink message" },
 	{ IPQ_ERR_SUPP, "Operation not supported" },
 	{ IPQ_ERR_RECVBUF, "Receive buffer size invalid" },
-	{ IPQ_ERR_TIMEOUT, "Timeout"}
+	{ IPQ_ERR_TIMEOUT, "Timeout"},
+	{ IPQ_ERR_PROTOCOL, "Invalid protocol specified" }
 };
 
 static int ipq_errno = IPQ_ERR_NONE;
@@ -194,9 +198,8 @@ static char *ipq_strerror(int errcode)
 
 /*
  * Create and initialise an ipq handle.
- * FIXME: implement flags.
  */
-struct ipq_handle *ipq_create_handle(u_int32_t flags)
+struct ipq_handle *ipq_create_handle(u_int32_t flags, u_int32_t protocol)
 {
 	int status;
 	struct ipq_handle *h;
@@ -206,8 +209,19 @@ struct ipq_handle *ipq_create_handle(u_int32_t flags)
 		ipq_errno = IPQ_ERR_HANDLE;
 		return NULL;
 	}
+	
 	memset(h, 0, sizeof(struct ipq_handle));
-	h->fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_FIREWALL);
+	
+        if (protocol == PF_INET)
+                h->fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_FIREWALL);
+        else if (protocol == PF_INET6)
+                h->fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_IP6_FW);
+        else {
+		ipq_errno = IPQ_ERR_PROTOCOL;
+		free(h);
+		return NULL;
+        }
+        
 	if (h->fd == -1) {
 		ipq_errno = IPQ_ERR_SOCKET;
 		close(h->fd);

@@ -1,6 +1,6 @@
 .TH LIBIPQ 3 "16 October 2001" "Linux iptables 1.2" "Linux Programmer's Manual" 
 .\"
-.\" $Id: libipq.3,v 1.3 2001/10/16 14:41:02 jamesm Exp $
+.\" $Id: libipq.3,v 1.4 2001/10/16 16:58:25 jamesm Exp $
 .\"
 .\"     Copyright (c) 2000-2001 Netfilter Core Team
 .\"
@@ -187,7 +187,7 @@ int main(int argc, char **argv)
 	unsigned char buf[BUFSIZE];
 	struct ipq_handle *h;
 	
-	h = ipq_create_handle(0);
+	h = ipq_create_handle(0, PF_INET);
 	if (!h)
 		die(h);
 		
@@ -257,6 +257,8 @@ Distributed under the GNU General Public License.
 Joost Remijn implemented the
 .B ipq_read
 timeout feature, which appeared in the 1.2.4 release of iptables.
+.PP
+Fernando Anton added support for IPv6.
 .SH SEE ALSO
 .BR iptables (8),
 .BR ipq_create_handle (3),

@@ -58,7 +58,7 @@ struct ipq_handle
 	struct sockaddr_nl peer;
 };
 
-struct ipq_handle *ipq_create_handle(u_int32_t flags);
+struct ipq_handle *ipq_create_handle(u_int32_t flags, u_int32_t protocol);
 
 int ipq_destroy_handle(struct ipq_handle *h);
 
