@@ -24,7 +24,8 @@ help(void)
 {
 	printf(
 "STRING match v%s options:\n"
-"--string [!] string             Match a string in a packet\n",
+"--string [!] string          Match a string in a packet\n"
+"--hex-string [!] string      Match a hex string in a packet\n",
 IPTABLES_VERSION);
 
 	fputc('\n', stdout);
@@ -32,6 +33,7 @@ IPTABLES_VERSION);
 
 static struct option opts[] = {
 	{ "string", 1, 0, '1' },
+	{ "hex-string", 1, 0, '2' },
 	{0}
 };
 
@@ -45,6 +47,13 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 static void
 parse_string(const unsigned char *s, struct ipt_string_info *info)
 {	
+	if (strlen(s) <= BM_MAX_NLEN) strcpy(info->string, s);
+	else exit_error(PARAMETER_PROBLEM, "STRING too long `%s'", s);
+}
+
+static void
+parse_hex_string(const unsigned char *s, struct ipt_string_info *info)
+{
 	int i=0, slen, sindex=0, schar;
 	short hex_f = 0, literal_f = 0;
 	char hextmp[3];
@@ -90,6 +99,10 @@ parse_string(const unsigned char *s, struct ipt_string_info *info)
 				/* must end with a "|" */
 				exit_error(PARAMETER_PROBLEM, "Invalid hex block");
 			}
+			if (! isxdigit(s[i])) /* check for valid hex char */
+				exit_error(PARAMETER_PROBLEM, "Invalid hex char `%c'", s[i]);
+			if (! isxdigit(s[i+1])) /* check for valid hex char */
+				exit_error(PARAMETER_PROBLEM, "Invalid hex char `%c'", s[i+1]);
 			hextmp[0] = s[i];
 			hextmp[1] = s[i+1];
 			hextmp[2] = '\0';
@@ -109,6 +122,7 @@ parse_string(const unsigned char *s, struct ipt_string_info *info)
 			exit_error(PARAMETER_PROBLEM, "STRING too long `%s'", s);
 		sindex++;
 	}
+	info->len = sindex;
 }
 
 /* Function which parses command options; returns true if it
@@ -127,7 +141,15 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		parse_string(argv[optind-1], stringinfo);
 		if (invert)
 			stringinfo->invert = 1;
-                stringinfo->len=strlen((char *)&stringinfo->string);
+		stringinfo->len=strlen((char *)&stringinfo->string);
+		*flags = 1;
+		break;
+
+	case '2':
+		check_inverse(optarg, &invert, &optind, 0);
+		parse_hex_string(argv[optind-1], stringinfo);  /* sets length */
+		if (invert)
+			stringinfo->invert = 1;
 		*flags = 1;
 		break;
 
