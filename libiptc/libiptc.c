@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.43 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.44 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -19,6 +19,9 @@
  * 	  don't rebuild the chain cache after every operation, instead fix it
  * 	  up after a ruleset change.  
  */
+
+#include<sys/types.h>
+#include<sys/socket.h>
 
 #ifndef IPT_LIB_DIR
 #define IPT_LIB_DIR "/usr/local/lib/iptables"
