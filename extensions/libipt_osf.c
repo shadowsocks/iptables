@@ -33,16 +33,24 @@
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ipt_osf.h>
 
+#define IPTABLES_VERSION	"1.2.6a" /* It looks like FIXME */
+
 static void help(void)
 {
 	printf("OS fingerprint match v%s options:\n"
-		"  --genre [!] string          Match a OS genre bypassive fingerprinting.\n",
+		"--genre [!] string	Match a OS genre by passive fingerprinting.\n"
+		"--smart		Use some smart extensions to determine OS (do not use TTL).\n"
+		"--log level		Log all(or only first) determined genres even if "
+					"they do not match desired one. "
+					"Level may be 0(all) or 1(only first entry).\n",
 		IPTABLES_VERSION);
 }
 
 
 static struct option opts[] = {
-	{ .name = "genre",     .has_arg = 1, .flag = 0, .val = '1' },
+	{ .name = "genre",	.has_arg = 1, .flag = 0, .val = '1' },
+	{ .name = "smart",	.has_arg = 0, .flag = 0, .val = '2' },
+	{ .name = "log",	.has_arg = 1, .flag = 0, .val = '3' },
 	{ .name = 0 }
 };
 
@@ -71,15 +79,28 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 	
 	switch(c) 
 	{
-		case '1':
-			if (*flags)
-				exit_error(PARAMETER_PROBLEM, "Can't specify multiple strings");
+		case '1': /* --genre */
+			if (*flags & IPT_OSF_GENRE)
+				exit_error(PARAMETER_PROBLEM, "Can't specify multiple genre parameter");
 			check_inverse(optarg, &invert, &optind, 0);
 			parse_string(argv[optind-1], info);
 			if (invert)
 				info->invert = 1;
 			info->len=strlen((char *)info->genre);
-			*flags = 1;
+			*flags |= IPT_OSF_GENRE;
+			break;
+		case '2': /* --smart */
+			if (*flags & IPT_OSF_SMART)
+				exit_error(PARAMETER_PROBLEM, "Can't specify multiple smart parameter");
+			*flags |= IPT_OSF_SMART;
+			info->flags |= IPT_OSF_SMART;
+			break;
+		case '3': /* --log */
+			if (*flags & IPT_OSF_LOG)
+				exit_error(PARAMETER_PROBLEM, "Can't specify multiple log parameter");
+			*flags |= IPT_OSF_LOG;
+			info->loglevel = atoi(argv[optind-1]);
+			info->flags |= IPT_OSF_LOG;
 			break;
 		default:
 			return 0;
