@@ -29,7 +29,10 @@ help(void)
 "                                match between this packet and the one which was set.\n"
 "                                Useful if you have problems with people spoofing their source address in order\n"
 "                                to DoS you via this module.\n"
-"    --name name                 Name of the recent list to be used.  DEFAULT used if none given.\n",
+"    --name name                 Name of the recent list to be used.  DEFAULT used if none given.\n"
+"    --rsource                   Save the source address of each packet in the recent list table (default).\n"
+"    --rdest                     Save the destination address of each packet in the recent list table.\n"
+,
 IPTABLES_VERSION);
 
 }
@@ -43,14 +46,21 @@ static struct option opts[] = {
 	{ "remove",0, 0, 206 },
 	{ "rttl",0, 0, 207},
 	{ "name", 1, 0, 208},
+	{ "rsource", 0, 0, 209},
+	{ "rdest", 0, 0, 210},
 	{0}
 };
 
 /* Initialize the match. */
 static void
-init(struct ipt_entry_match *m, unsigned int *nfcache)
+init(struct ipt_entry_match *match, unsigned int *nfcache)
 {
+	struct ipt_recent_info *info = (struct ipt_recent_info *)(match)->data;
+
 	*nfcache |= NFC_UNKNOWN;
+
+	strncpy(info->name,"DEFAULT",200);
+	info->side = IPT_RECENT_SOURCE;
 }
 
 /* Function which parses command options; returns true if it
@@ -62,9 +72,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       struct ipt_entry_match **match)
 {
 	struct ipt_recent_info *info = (struct ipt_recent_info *)(*match)->data;
-
-	info->name[0] = '\0';
-
 	switch (c) {
 		case 201:
 			if (*flags) exit_error(PARAMETER_PROBLEM,
@@ -122,11 +129,17 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			strncpy(info->name,optarg,200);
 			break;
 
+		case 209:
+			info->side = IPT_RECENT_SOURCE;
+			break;
+
+		case 210:
+			info->side = IPT_RECENT_DEST;
+			break;
+
 		default:
 			return 0;
 	}
-
-	if(!info->name[0]) strncpy(info->name,"DEFAULT",200);
 
 	return 1;
 }
@@ -135,6 +148,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 static void
 final_check(unsigned int flags)
 {
+
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
 			"recent: you must specify one of `--set', `--check' "
@@ -159,7 +173,9 @@ print(const struct ipt_ip *ip,
 	if(info->seconds) printf("seconds: %d ",info->seconds);
 	if(info->hit_count) printf("hit_count: %d ",info->hit_count);
 	if(info->check_set & IPT_RECENT_TTL) printf("TTL-Match ");
-	if(info->name) printf("name: %s",info->name);
+	if(info->name) printf("name: %s ",info->name);
+	if(info->side == IPT_RECENT_SOURCE) printf("side: source ");
+	if(info->side == IPT_RECENT_DEST) printf("side: dest");
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
@@ -178,7 +194,9 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	if(info->seconds) printf("seconds: %d ",info->seconds);
 	if(info->hit_count) printf("hit_count: %d ",info->hit_count);
 	if(info->check_set & IPT_RECENT_TTL) printf("TTL-Match ");
-	if(info->name) printf("name: %s",info->name);
+	if(info->name) printf("name: %s ",info->name);
+	if(info->side == IPT_RECENT_SOURCE) printf("side: source ");
+	if(info->side == IPT_RECENT_DEST) printf("side: dest");
 }
 
 static
