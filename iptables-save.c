@@ -165,7 +165,7 @@ static void print_rule(const struct ipt_entry *e,
 
 	/* print counters */
 	if (counters)
-		printf("[%llu:%llu] ", e->counters.pcnt, e->counters.bcnt);
+		printf("[%llu:%llu] ", (unsigned long long)e->counters.pcnt, (unsigned long long)e->counters.bcnt);
 
 	/* print chain name */
 	printf("-A %s ", chain);
@@ -284,7 +284,7 @@ static int do_output(const char *tablename)
 				struct ipt_counters count;
 				printf("%s ",
 				       iptc_get_policy(chain, &count, &h));
-				printf("[%llu:%llu]\n", count.pcnt, count.bcnt);
+				printf("[%llu:%llu]\n", (unsigned long long)count.pcnt, (unsigned long long)count.bcnt);
 			} else {
 				printf("- [0:0]\n");
 			}

@@ -145,7 +145,7 @@ dump_entry(STRUCT_ENTRY *e, const TC_HANDLE_T handle)
 	printf("Flags: %02X\n", e->ip.flags);
 	printf("Invflags: %02X\n", e->ip.invflags);
 	printf("Counters: %llu packets, %llu bytes\n",
-	       e->counters.pcnt, e->counters.bcnt);
+	       (unsigned long long)e->counters.pcnt, (unsigned long long)e->counters.bcnt);
 	printf("Cache: %08X ", e->nfcache);
 	if (e->nfcache & NFC_ALTERED) printf("ALTERED ");
 	if (e->nfcache & NFC_UNKNOWN) printf("UNKNOWN ");

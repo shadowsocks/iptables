@@ -176,7 +176,7 @@ dump_entry(struct ip6t_entry *e, const ip6tc_handle_t handle)
 	printf("Flags: %02X\n", e->ipv6.flags);
 	printf("Invflags: %02X\n", e->ipv6.invflags);
 	printf("Counters: %llu packets, %llu bytes\n",
-	       e->counters.pcnt, e->counters.bcnt);
+	       (unsigned long long)e->counters.pcnt, (unsigned long long)e->counters.bcnt);
 	printf("Cache: %08X ", e->nfcache);
 	if (e->nfcache & NFC_ALTERED) printf("ALTERED ");
 	if (e->nfcache & NFC_UNKNOWN) printf("UNKNOWN ");

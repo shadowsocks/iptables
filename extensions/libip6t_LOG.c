@@ -134,7 +134,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (strlen(optarg) > sizeof(loginfo->prefix) - 1)
 			exit_error(PARAMETER_PROBLEM,
 				   "Maximum prefix length %u for --log-prefix",
-				   sizeof(loginfo->prefix) - 1);
+				   (unsigned int)sizeof(loginfo->prefix) - 1);
 
 		strcpy(loginfo->prefix, optarg);
 		*flags |= IP6T_LOG_OPT_PREFIX;

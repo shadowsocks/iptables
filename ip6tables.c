@@ -889,8 +889,8 @@ parse_target(const char *targetname)
 
 	if (strlen(targetname)+1 > sizeof(ip6t_chainlabel))
 		exit_error(PARAMETER_PROBLEM,
-			   "Invalid target name `%s' (%i chars max)",
-			   targetname, sizeof(ip6t_chainlabel)-1);
+			   "Invalid target name `%s' (%u chars max)",
+			   targetname, (unsigned int)sizeof(ip6t_chainlabel)-1);
 
 	for (ptr = targetname; *ptr; ptr++)
 		if (isspace(*ptr))
@@ -1063,7 +1063,7 @@ register_match6(struct ip6tables_match *me)
 
 	if (me->size != IP6T_ALIGN(me->size)) {
 		fprintf(stderr, "%s: match `%s' has invalid size %u.\n",
-			program_name, me->name, me->size);
+			program_name, me->name, (unsigned int)me->size);
 		exit(1);
 	}
 
@@ -1093,7 +1093,7 @@ register_target6(struct ip6tables_target *me)
 
 	if (me->size != IP6T_ALIGN(me->size)) {
 		fprintf(stderr, "%s: target `%s' has invalid size %u.\n",
-			program_name, me->name, me->size);
+			program_name, me->name, (unsigned int)me->size);
 		exit(1);
 	}
 
@@ -1116,17 +1116,17 @@ print_num(u_int64_t number, unsigned int format)
 					number = (number + 500) / 1000;
 					if (number > 9999) {
 						number = (number + 500) / 1000;
-						printf(FMT("%4lluT ","%lluT "), number);
+						printf(FMT("%4lluT ","%lluT "), (unsigned long long)number);
 					}
-					else printf(FMT("%4lluG ","%lluG "), number);
+					else printf(FMT("%4lluG ","%lluG "), (unsigned long long)number);
 				}
-				else printf(FMT("%4lluM ","%lluM "), number);
+				else printf(FMT("%4lluM ","%lluM "), (unsigned long long)number);
 			} else
-				printf(FMT("%4lluK ","%lluK "), number);
+				printf(FMT("%4lluK ","%lluK "), (unsigned long long)number);
 		} else
-			printf(FMT("%5llu ","%llu "), number);
+			printf(FMT("%5llu ","%llu "), (unsigned long long)number);
 	} else
-		printf(FMT("%8llu ","%llu "), number);
+		printf(FMT("%8llu ","%llu "), (unsigned long long)number);
 }
 
 
@@ -1316,7 +1316,7 @@ print_firewall(const struct ip6t_entry *fw,
 			target->print(&fw->ipv6, t, format & FMT_NUMERIC);
 	} else if (t->u.target_size != sizeof(*t))
 		printf("[%u bytes of unknown target data] ",
-		       t->u.target_size - sizeof(*t));
+		       (unsigned int)(t->u.target_size - sizeof(*t)));
 
 	if (!(format & FMT_NONEWLINE))
 		fputc('\n', stdout);
@@ -2026,12 +2026,12 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 					"-%c requires packet and byte counter",
 					opt2char(OPT_COUNTERS));
 
-			if (sscanf(pcnt, "%llu", &fw.counters.pcnt) != 1)
+			if (sscanf(pcnt, "%llu", (unsigned long long *)&fw.counters.pcnt) != 1)
 				exit_error(PARAMETER_PROBLEM,
 					"-%c packet counter not numeric",
 					opt2char(OPT_COUNTERS));
 
-			if (sscanf(bcnt, "%llu", &fw.counters.bcnt) != 1)
+			if (sscanf(bcnt, "%llu", (unsigned long long *)&fw.counters.bcnt) != 1)
 				exit_error(PARAMETER_PROBLEM,
 					"-%c byte counter not numeric",
 					opt2char(OPT_COUNTERS));

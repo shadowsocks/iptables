@@ -125,7 +125,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	case '5':
 		check_inverse(optarg, &invert, &optind, 0);
 		if(strlen(optarg) > sizeof(ownerinfo->comm))
-			exit_error(PARAMETER_PROBLEM, "OWNER CMD `%s' too long, max %d characters", optarg, sizeof(ownerinfo->comm));
+			exit_error(PARAMETER_PROBLEM, "OWNER CMD `%s' too long, max %u characters", optarg, (unsigned int)sizeof(ownerinfo->comm));
 
 		strncpy(ownerinfo->comm, optarg, sizeof(ownerinfo->comm));
 		ownerinfo->comm[sizeof(ownerinfo->comm)-1] = '\0';

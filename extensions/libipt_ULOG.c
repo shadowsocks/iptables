@@ -110,7 +110,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		if (strlen(optarg) > sizeof(loginfo->prefix) - 1)
 			exit_error(PARAMETER_PROBLEM,
 				   "Maximum prefix length %u for --ulog-prefix",
-				   sizeof(loginfo->prefix) - 1);
+				   (unsigned int)sizeof(loginfo->prefix) - 1);
 
 		strcpy(loginfo->prefix, optarg);
 		*flags |= IPT_LOG_OPT_PREFIX;
@@ -177,10 +177,10 @@ static void save(const struct ipt_ip *ip,
 		printf("--ulog-qthreshold %llu ", loginfo->qthreshold);
 #else
 	if (loginfo->copy_range)
-		printf("--ulog-cprange %d ", loginfo->copy_range);
+		printf("--ulog-cprange %u ", (unsigned int)loginfo->copy_range);
 
 	if (loginfo->qthreshold != ULOG_DEFAULT_QTHRESHOLD)
-		printf("--ulog-qthreshold %d ", loginfo->qthreshold);
+		printf("--ulog-qthreshold %u ", (unsigned int)loginfo->qthreshold);
 #endif
 }
 
@@ -196,7 +196,7 @@ print(const struct ipt_ip *ip,
 #ifdef KERNEL_64_USERSPACE_32
 	printf("copy_range %llu nlgroup ", loginfo->copy_range);
 #else
-	printf("copy_range %d nlgroup ", loginfo->copy_range);
+	printf("copy_range %u nlgroup ", (unsigned int)loginfo->copy_range);
 #endif
 	print_groups(loginfo->nl_group);
 	if (strcmp(loginfo->prefix, "") != 0)
@@ -204,7 +204,7 @@ print(const struct ipt_ip *ip,
 #ifdef KERNEL_64_USERSPACE_32
 	printf("queue_threshold %llu ", loginfo->qthreshold);
 #else
-	printf("queue_threshold %d ", loginfo->qthreshold);
+	printf("queue_threshold %u ", (unsigned int)loginfo->qthreshold);
 #endif
 }
 

@@ -4,7 +4,7 @@
  *
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: iptables-restore.c,v 1.32 2004/02/01 21:46:04 gandalf Exp $
+ * $Id: iptables-restore.c,v 1.33 2004/02/01 22:03:27 gandalf Exp $
  */
 
 #include <getopt.h>
@@ -73,7 +73,7 @@ iptc_handle_t create_handle(const char *tablename, const char* modprobe )
 
 int parse_counters(char *string, struct ipt_counters *ctr)
 {
-	return (sscanf(string, "[%llu:%llu]", &ctr->pcnt, &ctr->bcnt) == 2);
+	return (sscanf(string, "[%llu:%llu]", (unsigned long long *)&ctr->pcnt, (unsigned long long *)&ctr->bcnt) == 2);
 }
 
 /* global new argv and argc */

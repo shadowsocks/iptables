@@ -7,7 +7,7 @@
  * 	Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: ip6tables-restore.c,v 1.20 2004/02/02 20:12:33 gandalf Exp $
+ * $Id: ip6tables-restore.c,v 1.21 2004/02/02 20:14:56 gandalf Exp $
  */
 
 #include <getopt.h>
@@ -76,7 +76,7 @@ ip6tc_handle_t create_handle(const char *tablename, const char* modprobe)
 
 int parse_counters(char *string, struct ip6t_counters *ctr)
 {
-	return (sscanf(string, "[%llu:%llu]", &ctr->pcnt, &ctr->bcnt) == 2);
+	return (sscanf(string, "[%llu:%llu]", (unsigned long long *)&ctr->pcnt, (unsigned long long *)&ctr->bcnt) == 2);
 }
 
 /* global new argv and argc */

@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.45 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.46 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -134,8 +134,8 @@ entry2index(const TC_HANDLE_T h, const STRUCT_ENTRY *seek)
 
 	if (ENTRY_ITERATE(h->entries.entrytable, h->entries.size,
 			  get_number, seek, &pos) == 0) {
-		fprintf(stderr, "ERROR: offset %i not an entry!\n",
-			(char *)seek - (char *)h->entries.entrytable);
+		fprintf(stderr, "ERROR: offset %u not an entry!\n",
+			(unsigned int)((char *)seek - (char *)h->entries.entrytable));
 		abort();
 	}
 	return pos;
