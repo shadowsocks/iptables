@@ -118,7 +118,7 @@ print(const struct ip6t_ip6 *ip,
 /* Saves the union ip6t_matchinfo in parsable form to stdout. */
 static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match)
 {
-	printf("--mac ");
+	printf("--mac-source ");
 	print_mac(((struct ip6t_mac_info *)match->data)->srcaddr,
 		  ((struct ip6t_mac_info *)match->data)->invert);
 }
