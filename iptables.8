@@ -483,6 +483,11 @@ process id.
 .BI "--sid-owner " "sessionid"
 Matches if the packet was created by a process in the given session
 group.
+.TP
+.BI "--cmd-owner " "name"
+Matches if the packet was created by a process with the given command name.
+(this option is present only if iptables was compiled under a kernel
+supporting this feature)
 .SS state
 This module, when combined with connection tracking, allows access to
 the connection tracking state for this packet.

@@ -20,6 +20,9 @@ help(void)
 "[!] --gid-owner groupid    Match local gid\n"
 "[!] --pid-owner processid  Match local pid\n"
 "[!] --sid-owner sessionid  Match local sid\n"
+#ifdef IPT_OWNER_COMM
+"[!] --cmd-owner name       Match local command name\n"
+#endif
 "\n",
 NETFILTER_VERSION);
 }
@@ -29,6 +32,9 @@ static struct option opts[] = {
 	{ "gid-owner", 1, 0, '2' },
 	{ "pid-owner", 1, 0, '3' },
 	{ "sid-owner", 1, 0, '4' },
+#ifdef IPT_OWNER_COMM
+	{ "cmd-owner", 1, 0, '5' },
+#endif
 	{0}
 };
 
@@ -111,6 +117,22 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags = 1;
 		break;
 
+#ifdef IPT_OWNER_COMM
+	case '5':
+		if (check_inverse(optarg, &invert))
+			optind++;
+		if(strlen(optarg) > sizeof(ownerinfo->comm))
+			exit_error(PARAMETER_PROBLEM, "OWNER CMD `%s' too long, max %d characters", optarg, sizeof(ownerinfo->comm));
+
+		strncpy(ownerinfo->comm, optarg, sizeof(ownerinfo->comm));
+
+		if (invert)
+			ownerinfo->invert |= IPT_OWNER_COMM;
+		ownerinfo->match |= IPT_OWNER_COMM;
+		*flags = 1;
+		break;
+#endif
+
 	default:
 		return 0;
 	}
@@ -158,6 +180,11 @@ print_item(struct ipt_owner_info *info, u_int8_t flag, int numeric, char *label)
 		case IPT_OWNER_SID:
 			printf("%u ", info->sid);
 			break;
+#ifdef IPT_OWNER_COMM
+		case IPT_OWNER_COMM:
+			printf("%.*s ", (int)sizeof(info->comm), info->comm);
+			break;
+#endif
 		default:
 			break;
 		}
@@ -185,6 +212,9 @@ print(const struct ipt_ip *ip,
 	print_item(info, IPT_OWNER_GID, numeric, "OWNER GID match ");
 	print_item(info, IPT_OWNER_PID, numeric, "OWNER PID match ");
 	print_item(info, IPT_OWNER_SID, numeric, "OWNER SID match ");
+#ifdef IPT_OWNER_COMM
+	print_item(info, IPT_OWNER_COMM, numeric, "OWNER CMD match ");
+#endif
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
@@ -197,6 +227,9 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	print_item(info, IPT_OWNER_GID, 0, "--gid-owner ");
 	print_item(info, IPT_OWNER_PID, 0, "--pid-owner ");
 	print_item(info, IPT_OWNER_SID, 0, "--sid-owner ");
+#ifdef IPT_OWNER_COMM
+	print_item(info, IPT_OWNER_COMM, 0, "--cmd-owner ");
+#endif
 }
 
 static
