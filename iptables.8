@@ -610,7 +610,9 @@ the connection tracking state for this packet.
 Where state is a comma separated list of the connection states to
 match.  Possible states are
 .B INVALID
-meaning that the packet is associated with no known connection,
+meaning that the packet could not be identified for some reason which
+includes running out of memory and ICMP errors which don't correspond to any
+known connection,
 .B ESTABLISHED
 meaning that the packet is associated with a connection which has seen
 packets in both directions,
