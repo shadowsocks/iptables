@@ -12,8 +12,8 @@ BINDIR:=/usr/local/sbin
 MANDIR:=/usr/local/man
 INCDIR:=/usr/local/include
 
-# Need libc6 for this.  Should covert to autoconf.
-ifneq ($(shell ldd -v | fgrep 2.2),)
+# Need libc6 for this.  FIXME: Should covert to autoconf.
+ifneq ($(shell ldd --version 2>/dev/null | fgrep 2.2),)
 DO_IPV6=1
 endif
 
