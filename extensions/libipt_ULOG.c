@@ -157,7 +157,7 @@ static void save(const struct ipt_ip *ip,
 	    = (const struct ipt_ulog_info *) target->data;
 
 	if (strcmp(loginfo->prefix, "") != 0)
-		printf("--ulog-prefix %s ", loginfo->prefix);
+		printf("--ulog-prefix \"%s\" ", loginfo->prefix);
 
 	if (loginfo->nl_group != ULOG_DEFAULT_NLGROUP) {
 		printf("--ulog-nlgroup ");
