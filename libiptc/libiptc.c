@@ -2047,7 +2047,6 @@ TC_COMMIT(TC_HANDLE_T *handle)
 
 	counterlen = sizeof(STRUCT_COUNTERS_INFO)
 			+ sizeof(STRUCT_COUNTERS) * new_number;
-	memset(repl, 0, sizeof(*repl) + (*handle)->entries->size);
 
 	/* These are the old counters we will get from kernel */
 	repl->counters = malloc(sizeof(STRUCT_COUNTERS)
@@ -2057,8 +2056,6 @@ TC_COMMIT(TC_HANDLE_T *handle)
 		errno = ENOMEM;
 		return 0;
 	}
-	memset(repl->counters, 0, sizeof(STRUCT_COUNTERS)
-			* (*handle)->info.num_entries);
 	/* These are the counters we're going to put back, later. */
 	newcounters = malloc(counterlen);
 	if (!newcounters) {
