@@ -69,10 +69,23 @@ struct iptc_handle
 	/* Array of hook names */
 	const char **hooknames;
 
+	/* This was taking us ~50 seconds to list 300 rules. */
+	/* Cached: last find_label result */
+	char cache_label_name[IPT_TABLE_MAXNAMELEN];
+	int cache_label_return;
+	unsigned int cache_label_offset;
+
 	/* Number in here reflects current state. */
 	unsigned int new_number;
 	struct ipt_get_entries entries;
 };
+
+static void
+set_changed(iptc_handle_t h)
+{
+	h->cache_label_name[0] = '\0';
+	h->changed = 1;
+}
 
 static void do_check(iptc_handle_t h, unsigned int line);
 #define CHECK(h) do_check((h), __LINE__)
@@ -178,6 +191,7 @@ alloc_handle(const char *tablename, unsigned int size, unsigned int num_rules)
 	}
 
 	h->changed = 0;
+	h->cache_label_name[0] = '\0';
 	h->counter_map = (void *)h
 		+ sizeof(struct iptc_handle)
 		+ size;
@@ -376,6 +390,13 @@ find_label(unsigned int *off,
 {
 	unsigned int i;
 
+	/* Cached? */
+	if (handle->cache_label_name[0]
+	    && strcmp(name, handle->cache_label_name) == 0) {
+		*off = handle->cache_label_offset;
+		return handle->cache_label_return;
+	}
+
 	/* Builtin chain name? */
 	i = iptc_builtin(name, handle);
 	if (i != 0) {
@@ -388,10 +409,16 @@ find_label(unsigned int *off,
 	if (IPT_ENTRY_ITERATE(handle->entries.entries, handle->entries.size,
 			      find_user_label, off, name) != 0) {
 		/* last error node doesn't count */
-		if (*off != handle->entries.size)
+		if (*off != handle->entries.size) {
+			strcpy(handle->cache_label_name, name);
+			handle->cache_label_offset = *off;
+			handle->cache_label_return = 1;
 			return 1;
+		}
 	}
 
+	strcpy(handle->cache_label_name, name);
+	handle->cache_label_return = 0;
 	return 0;
 }
 
@@ -651,7 +678,7 @@ set_verdict(unsigned int offset, int delta_offset, iptc_handle_t *handle)
 			  correct_verdict, (*handle)->entries.entries,
 			  offset, delta_offset);
 
-	(*handle)->changed = 1;
+	set_changed(*handle);
 	return 1;
 }
 
@@ -1194,7 +1221,7 @@ iptc_zero_entries(const ipt_chainlabel chain, iptc_handle_t *handle)
 		if ((*handle)->counter_map[i].maptype ==COUNTER_MAP_NORMAL_MAP)
 			(*handle)->counter_map[i].maptype = COUNTER_MAP_ZEROED;
 	}
-	(*handle)->changed = 1;
+	set_changed(*handle);
 
 	CHECK(*handle);
 	return 1;
@@ -1382,7 +1409,7 @@ int iptc_rename_chain(const ipt_chainlabel oldname,
 
 	memset(t->error, 0, sizeof(t->error));
 	strcpy(t->error, newname);
-	(*handle)->changed = 1;
+	set_changed(*handle);
 
 	CHECK(*handle);
 	return 1;
@@ -1428,7 +1455,7 @@ iptc_set_policy(const ipt_chainlabel chain,
 	}
 	(*handle)->counter_map[entry2index(*handle, e)]
 		= ((struct counter_map){ COUNTER_MAP_NOMAP, 0 });
-	(*handle)->changed = 1;
+	set_changed(*handle);
 
 	CHECK(*handle);
 	return 1;
