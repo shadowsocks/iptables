@@ -544,7 +544,7 @@ static const char *target_name(iptc_handle_t handle, struct ipt_entry *e)
 			return IPTC_LABEL_ACCEPT;
 		else if (spos == -NF_DROP-1)
 			return IPTC_LABEL_DROP;
-		else if (spos == -NF_ACCEPT-1)
+		else if (spos == -NF_QUEUE-1)
 			return IPTC_LABEL_QUEUE;
 
 		fprintf(stderr, "ERROR: off %lu/%u not a valid target (%i)\n",
