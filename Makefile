@@ -93,10 +93,10 @@ iptables-standalone.d iptables.d: %.d: %.c
 	@-$(CC) -M -MG $(CFLAGS) $< | sed -e 's@^.*\.o:@$*.d $*.o:@' > $@
 
 distclean: clean
-	@rm -f TAGS `find . -name '*~'` `find . -name '*.rej'` `find . -name '*.d'` .makefirst
+	@rm -f TAGS `find . -name '*~' -o -name '.*~'` `find . -name '*.rej'` `find . -name '*.d'` .makefirst
 
 .PHONY: patch-o-matic
-patch-o-matic:
+patch-o-matic/ patch-o-matic:
 	@cd $@ && KERNEL_DIR=$(KERNEL_DIR) ./runme
 
 # Rusty's distro magic.
