@@ -204,6 +204,8 @@ static int inverse_for_options[NUMBER_OF_OPT] =
 const char *program_version;
 const char *program_name;
 
+static char *lib_dir;
+
 /* Keeping track of external matches and targets: linked lists.  */
 struct ip6tables_match *ip6tables_matches = NULL;
 struct ip6tables_target *ip6tables_targets = NULL;
@@ -732,12 +734,12 @@ find_match(const char *name, enum ip6t_tryload tryload, struct ip6tables_rule_ma
 
 #ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != DONT_LOAD) {
-		char path[sizeof(IP6T_LIB_DIR) + sizeof("/libip6t_.so")
+		char path[strlen(lib_dir) + sizeof("/libip6t_.so")
 			 + strlen(name)];
 		if (!icmphack)
-			sprintf(path, IP6T_LIB_DIR "/libip6t_%s.so", name);
+			sprintf(path, "%s/libip6t_%s.so", lib_dir, name);
 		else
-			sprintf(path, IP6T_LIB_DIR "/libip6t_%s.so", "icmpv6");
+			sprintf(path, "%s/libip6t_%s.so", lib_dir, "icmpv6");
 		if (dlopen(path, RTLD_NOW)) {
 			/* Found library.  If it didn't register itself,
 			   maybe they specified target as match. */
@@ -985,9 +987,9 @@ find_target(const char *name, enum ip6t_tryload tryload)
 
 #ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != DONT_LOAD) {
-		char path[sizeof(IP6T_LIB_DIR) + sizeof("/libip6t_.so")
+		char path[strlen(lib_dir) + sizeof("/libip6t_.so")
 			 + strlen(name)];
-		sprintf(path, IP6T_LIB_DIR "/libip6t_%s.so", name);
+		sprintf(path, "%s/libip6t_%s.so", lib_dir, name);
 		if (dlopen(path, RTLD_NOW)) {
 			/* Found library.  If it didn't register itself,
 			   maybe they specified match as a target. */
@@ -1720,6 +1722,10 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	char icmp6p[] = "icmpv6";
 
 	memset(&fw, 0, sizeof(fw));
+
+	lib_dir = getenv("IP6TABLES_LIB_DIR");
+	if (!lib_dir)
+		lib_dir = IP6T_LIB_DIR;
 
 	/* re-set optind to 0 in case do_command gets called
 	 * a second time */

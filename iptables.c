@@ -218,6 +218,8 @@ struct pprot {
 	u_int8_t num;
 };
 
+static char *lib_dir;
+
 /* Primitive headers... */
 /* defined in netinet/in.h */
 #if 0
@@ -675,9 +677,9 @@ find_match(const char *name, enum ipt_tryload tryload, struct iptables_rule_matc
 
 #ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != DONT_LOAD) {
-		char path[sizeof(IPT_LIB_DIR) + sizeof("/libipt_.so")
+		char path[strlen(lib_dir) + sizeof("/libipt_.so")
 			 + strlen(name)];
-		sprintf(path, IPT_LIB_DIR "/libipt_%s.so", name);
+		sprintf(path, "%s/libipt_%s.so", lib_dir, name);
 		if (dlopen(path, RTLD_NOW)) {
 			/* Found library.  If it didn't register itself,
 			   maybe they specified target as match. */
@@ -985,9 +987,9 @@ find_target(const char *name, enum ipt_tryload tryload)
 
 #ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != DONT_LOAD) {
-		char path[sizeof(IPT_LIB_DIR) + sizeof("/libipt_.so")
+		char path[strlen(lib_dir) + sizeof("/libipt_.so")
 			 + strlen(name)];
-		sprintf(path, IPT_LIB_DIR "/libipt_%s.so", name);
+		sprintf(path, "%s/libipt_%s.so", lib_dir, name);
 		if (dlopen(path, RTLD_NOW)) {
 			/* Found library.  If it didn't register itself,
 			   maybe they specified match as a target. */
@@ -1717,6 +1719,10 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	int proto_used = 0;
 
 	memset(&fw, 0, sizeof(fw));
+
+	lib_dir = getenv("IPTABLES_LIB_DIR");
+	if (!lib_dir)
+		lib_dir = IPT_LIB_DIR;
 
 	/* re-set optind to 0 in case do_command gets called
 	 * a second time */
