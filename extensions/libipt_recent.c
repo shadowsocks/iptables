@@ -178,7 +178,8 @@ print(const struct ipt_ip *ip,
 {
 	struct ipt_recent_info *info = (struct ipt_recent_info *)match->data;
 
-	if (info->invert) fputc('!', stdout);
+	if (info->invert)
+		fputc('!', stdout);
 
 	printf("recent: ");
 	if(info->check_set & IPT_RECENT_SET) printf("SET ");
@@ -197,11 +198,11 @@ print(const struct ipt_ip *ip,
 static void
 save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 {
-	struct ipt_recent_info *info = (struct ipt_recent_info *)match;
+	struct ipt_recent_info *info = (struct ipt_recent_info *)match->data;
 
-	if (info->invert) fputc('!', stdout);
+	if (info->invert)
+		printf("! ");
 
-	printf("recent: ");
 	if(info->check_set & IPT_RECENT_SET) printf("--set ");
 	if(info->check_set & IPT_RECENT_CHECK) printf("--rcheck ");
 	if(info->check_set & IPT_RECENT_UPDATE) printf("--update ");
