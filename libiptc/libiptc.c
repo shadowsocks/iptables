@@ -1587,6 +1587,7 @@ TC_STRERROR(int err)
 	    { NULL, ENOMEM, "Memory allocation problem" },
 	    { TC_INIT, EPERM, "Permission denied (you must be root)" },
 	    { TC_INIT, EINVAL, "Module is wrong version" },
+	    { TC_INIT, ENOENT, "Table does not exist (do you need to insmod?)" },
 	    { TC_DELETE_CHAIN, ENOTEMPTY, "Chain is not empty" },
 	    { TC_DELETE_CHAIN, EINVAL, "Can't delete built-in chain" },
 	    { TC_DELETE_CHAIN, EMLINK,
