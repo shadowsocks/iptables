@@ -4,7 +4,7 @@
  *
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: iptables-restore.c,v 1.33 2004/02/01 22:03:27 gandalf Exp $
+ * $Id: iptables-restore.c,v 1.34 2004/05/26 16:04:48 gandalf Exp $
  */
 
 #include <getopt.h>
@@ -99,7 +99,13 @@ static void free_argv(void) {
 		free(newargv[i]);
 }
 
-int main(int argc, char *argv[])
+#ifdef IPTABLES_MULTI
+int
+iptables_restore_main(int argc, char *argv[])
+#else
+int
+main(int argc, char *argv[])
+#endif
 {
 	iptc_handle_t handle = NULL;
 	char buffer[10240];

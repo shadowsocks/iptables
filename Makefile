@@ -42,7 +42,9 @@ EXTRAS+=iptables iptables.o iptables.8
 EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables $(DESTDIR)$(MANDIR)/man8/iptables.8
 
 # No longer experimental.
+ifneq ($(DO_MULTI), 1)
 EXTRAS+=iptables-save iptables-restore
+endif
 EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables-save $(DESTDIR)$(BINDIR)/iptables-restore $(DESTDIR)$(MANDIR)/man8/iptables-restore.8 $(DESTDIR)$(MANDIR)/man8/iptables-save.8
 
 ifeq ($(DO_IPV6), 1)
@@ -114,8 +116,13 @@ print-extensions:
 iptables.o: iptables.c
 	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -c -o $@ $<
 
+ifeq ($(DO_MULTI), 1)
+iptables: iptables-multi.c iptables-save.c iptables-restore.c iptables-standalone.c iptables.o $(STATIC_LIBS) libiptc/libiptc.a
+	$(CC) $(CFLAGS) -DIPTABLES_MULTI -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" $(LDFLAGS) -o $@ $^ $(LDLIBS)
+else
 iptables: iptables-standalone.c iptables.o $(STATIC_LIBS) libiptc/libiptc.a
 	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" $(LDFLAGS) -o $@ $^ $(LDLIBS)
+endif
 
 $(DESTDIR)$(BINDIR)/iptables: iptables
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
@@ -124,16 +131,28 @@ $(DESTDIR)$(BINDIR)/iptables: iptables
 iptables-save: iptables-save.c iptables.o $(STATIC_LIBS) libiptc/libiptc.a
 	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
+ifeq ($(DO_MULTI), 1)
+$(DESTDIR)$(BINDIR)/iptables-save: iptables
+	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
+	ln -sf $< $@
+else
 $(DESTDIR)$(BINDIR)/iptables-save: iptables-save
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
 	cp $< $@
+endif
 
 iptables-restore: iptables-restore.c iptables.o $(STATIC_LIBS) libiptc/libiptc.a
 	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
+ifeq ($(DO_MULTI), 1)
+$(DESTDIR)$(BINDIR)/iptables-restore: iptables
+	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
+	ln -sf $< $@
+else
 $(DESTDIR)$(BINDIR)/iptables-restore: iptables-restore
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
 	cp $< $@
+endif
 
 ip6tables.o: ip6tables.c
 	$(CC) $(CFLAGS) -DIP6T_LIB_DIR=\"$(IPT_LIBDIR)\" -c -o $@ $<

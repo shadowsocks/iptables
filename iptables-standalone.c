@@ -37,8 +37,13 @@
 #include <string.h>
 #include <iptables.h>
 
+#ifdef IPTABLES_MULTI
+int
+iptables_main(int argc, char *argv[])
+#else
 int
 main(int argc, char *argv[])
+#endif
 {
 	int ret;
 	char *table = "filter";
