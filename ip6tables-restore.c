@@ -7,7 +7,7 @@
  * 	Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: ip6tables-restore.c,v 1.10 2002/08/14 11:40:41 laforge Exp $
+ * $Id: ip6tables-restore.c,v 1.11 2003/03/05 07:46:15 laforge Exp $
  */
 
 #include <getopt.h>
@@ -102,7 +102,7 @@ static void free_argv(void) {
 
 int main(int argc, char *argv[])
 {
-	ip6tc_handle_t handle;
+	ip6tc_handle_t handle = NULL;
 	char buffer[10240];
 	int c;
 	char curtable[IP6T_TABLE_MAXNAMELEN + 1];
@@ -182,6 +182,9 @@ int main(int argc, char *argv[])
 				exit(1);
 			}
 			strncpy(curtable, table, IP6T_TABLE_MAXNAMELEN);
+
+			if (handle)
+				ip6tc_free(&handle);
 
 			handle = create_handle(table, modprobe);
 			if (noflush == 0) {

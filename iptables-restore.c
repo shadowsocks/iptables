@@ -4,7 +4,7 @@
  *
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: iptables-restore.c,v 1.24 2003/03/03 08:08:37 laforge Exp $
+ * $Id: iptables-restore.c,v 1.25 2003/03/06 11:56:31 laforge Exp $
  */
 
 #include <getopt.h>
@@ -99,7 +99,7 @@ static void free_argv(void) {
 
 int main(int argc, char *argv[])
 {
-	iptc_handle_t handle;
+	iptc_handle_t handle = NULL;
 	char buffer[10240];
 	int c;
 	char curtable[IPT_TABLE_MAXNAMELEN + 1];
@@ -179,6 +179,9 @@ int main(int argc, char *argv[])
 				exit(1);
 			}
 			strncpy(curtable, table, IPT_TABLE_MAXNAMELEN);
+
+			if (handle)
+				iptc_free(&handle);
 
 			handle = create_handle(table, modprobe);
 			if (noflush == 0) {

@@ -86,6 +86,7 @@ typedef unsigned int socklen_t;
 #define TC_SET_POLICY		ip6tc_set_policy
 #define TC_GET_RAW_SOCKET	ip6tc_get_raw_socket
 #define TC_INIT			ip6tc_init
+#define TC_FREE			ip6tc_free
 #define TC_COMMIT		ip6tc_commit
 #define TC_STRERROR		ip6tc_strerror
 

@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.35 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.36 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -237,22 +237,26 @@ TC_INIT(const char *tablename)
 	if (sockfd != -1)
 		close(sockfd);
 
+	if (strlen(tablename) >= TABLE_MAXNAMELEN) {
+		errno = EINVAL;
+		return NULL;
+	}
+	
 	sockfd = socket(TC_AF, SOCK_RAW, IPPROTO_RAW);
 	if (sockfd < 0)
 		return NULL;
 
 	s = sizeof(info);
-	if (strlen(tablename) >= TABLE_MAXNAMELEN) {
-		errno = EINVAL;
-		return NULL;
-	}
+
 	strcpy(info.name, tablename);
 	if (getsockopt(sockfd, TC_IPPROTO, SO_GET_INFO, &info, &s) < 0)
 		return NULL;
 
 	if ((h = alloc_handle(info.name, info.size, info.num_entries))
-	    == NULL)
+	    == NULL) {
+		close(sockfd);
 		return NULL;
+	}
 
 /* Too hard --RR */
 #if 0
@@ -284,12 +288,23 @@ TC_INIT(const char *tablename)
 
 	if (getsockopt(sockfd, TC_IPPROTO, SO_GET_ENTRIES, &h->entries,
 		       &tmp) < 0) {
+		close(sockfd);
 		free(h);
 		return NULL;
 	}
 
 	CHECK(h);
 	return h;
+}
+
+void
+TC_FREE(TC_HANDLE_T *h)
+{
+	close(sockfd);
+	if ((*h)->cache_chain_heads)
+		free((*h)->cache_chain_heads);
+	free(*h);
+	*h = NULL;
 }
 
 static inline int
@@ -504,10 +519,8 @@ TC_NEXT_CHAIN(TC_HANDLE_T *handle)
 	(*handle)->cache_chain_iteration++;
 
 	if ((*handle)->cache_chain_iteration - (*handle)->cache_chain_heads
-	    == (*handle)->cache_num_chains) {
-		free((*handle)->cache_chain_heads);
+	    == (*handle)->cache_num_chains)
 		return NULL;
-	}
 
 	return (*handle)->cache_chain_iteration->name;
 }
@@ -1584,11 +1597,13 @@ TC_COMMIT(TC_HANDLE_T *handle)
 	STRUCT_REPLACE *repl;
 	STRUCT_COUNTERS_INFO *newcounters;
 	unsigned int i;
-	size_t counterlen
-		= sizeof(STRUCT_COUNTERS_INFO)
-		+ sizeof(STRUCT_COUNTERS) * (*handle)->new_number;
+	size_t counterlen;
 
 	CHECK(*handle);
+
+	counterlen = sizeof(STRUCT_COUNTERS_INFO)
+			+ sizeof(STRUCT_COUNTERS) * (*handle)->new_number;
+
 #if 0
 	TC_DUMP_ENTRIES(*handle);
 #endif
@@ -1715,10 +1730,7 @@ TC_COMMIT(TC_HANDLE_T *handle)
 	free(newcounters);
 
  finished:
-	if ((*handle)->cache_chain_heads)
-		free((*handle)->cache_chain_heads);
-	free(*handle);
-	*handle = NULL;
+	TC_FREE(handle);
 	return 1;
 }
 

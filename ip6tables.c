@@ -1670,6 +1670,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	const char *modprobe = NULL;
 	int proto_used = 0;
 	char icmp6p[] = "icmpv6";
+	int no_handle = 0;
 
 	memset(&fw, 0, sizeof(fw));
 
@@ -2147,8 +2148,10 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			   chain, IP6T_FUNCTION_MAXNAMELEN);
 
 	/* only allocate handle if we weren't called with a handle */
-	if (!*handle)
+	if (!*handle) {
 		*handle = ip6tc_init(*table);
+		no_handle = 1;
+	}
 
 	if (!*handle) {
 		/* try to insmod the module if iptc_init failed */
@@ -2292,6 +2295,9 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 
 	if (verbose > 1)
 		dump_entries6(*handle);
+
+	if (no_handle)
+		ip6tc_free(handle);
 
 	return ret;
 }

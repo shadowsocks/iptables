@@ -304,6 +304,8 @@ static int do_output(const char *tablename)
 		exit_error(OTHER_PROBLEM, "Binary NYI\n");
 	}
 
+	iptc_free(&h);
+
 	return 1;
 }
 
