@@ -195,7 +195,7 @@ static struct iptables_target targ =
 {
 next:	          0,
 name:             "TCPLAG",
-version:          "1.2.3",
+version:          IPTABLES_VERSION,
 size:             IPT_ALIGN( sizeof( struct ipt_tcplag )),
 userspacesize:    IPT_ALIGN( sizeof( struct ipt_tcplag )),
 help:             &help,
