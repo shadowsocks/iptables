@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.64 2002/07/24 07:25:20 laforge Exp $
+CVS ID: $Id: TODO,v 1.65 2002/08/18 22:19:26 laforge Exp $
 
 IMPORTANT issues:
 - erroneously too-fast dropped conntrack for half-open TCP connections [JK]
@@ -15,6 +15,8 @@ IMPORTANT issues:
 - fix for ICMP DNAT info leak
 - unaligned access of nulldevname during string match
 - update documentation to reflect newnat
+- ip6_tables not working on ultrasparc 
+  (20020912155314.GA20741@paradigm.rfc822.org)
 
 TO BE INVESTIGATED:
 - packet counters on ultrasparc platform (32bit userspace/64bit kernel issue)
