@@ -268,6 +268,7 @@ dotted_to_addr(const char *dotted)
 
 	/* copy dotted string, because we need to modify it */
 	strncpy(buf, dotted, sizeof(buf) - 1);
+	buf[sizeof(buf) - 1] = '\0';
 	addrp = (unsigned char *) &(addr.s_addr);
 
 	p = buf;
