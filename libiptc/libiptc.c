@@ -16,13 +16,14 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <linux/netfilter_ipv4/ipt_limit.h>
+#include <limits.h>
 
 #if !defined(__GLIBC__) || (__GLIBC__ < 2)
 typedef unsigned int socklen_t;
 #endif
 
 #include <libiptc/libiptc.h>
+#include <linux/netfilter_ipv4/ipt_limit.h>
 
 #define IP_VERSION	4
 #define IP_OFFSET	0x1FFF
@@ -1000,10 +1001,12 @@ iptc_append_entry(const ipt_chainlabel chain,
 
 static inline int
 match_different(const struct ipt_entry_match *a,
-		const char *a_elems,
-		const char *b_elems)
+		const unsigned char *a_elems,
+		const unsigned char *b_elems,
+		unsigned char **maskptr)
 {
 	const struct ipt_entry_match *b;
+	unsigned int i;
 
 	/* Offset of b is the same as a. */
 	b = (void *)b_elems + ((char *)a-a_elems);
@@ -1014,28 +1017,38 @@ match_different(const struct ipt_entry_match *a,
 	if (strcmp(a->u.name, b->u.name) != 0)
 		return 1;
 
-	/* FIXME: This is really, really gross --RR */
-        if (strcmp(a->u.name,"limit") == 0) {
-		/* Special case, the kernel writes in this data, so we
-		 *  need to make sure that we only check the parts
-		 *  that are user specified */
-		if (((struct ipt_rateinfo *)a->data)->avg
-		    != ((struct ipt_rateinfo *)b->data)->avg
-		    || ((struct ipt_rateinfo *)a->data)->burst
-		    != ((struct ipt_rateinfo *)b->data)->burst)
+	*maskptr += sizeof(*a);
+
+	for (i = 0; i < a->match_size - sizeof(*a); i++)
+		if (((a->data[i] ^ b->data[i]) & (*maskptr)[i]) != 0)
 			return 1;
-        } else if (memcmp(a->data, b->data, a->match_size - sizeof(*a)) != 0)
-		return 1;
+	*maskptr += i;
+	return 0;
+}
+
+static inline int
+target_different(const unsigned char *a_targdata,
+		 const unsigned char *b_targdata,
+		 unsigned int tdatasize,
+		 const unsigned char *mask)
+{
+	unsigned int i;
+	for (i = 0; i < tdatasize; i++)
+		if (((a_targdata[i] ^ b_targdata[i]) & mask[i]) != 0)
+			return 1;
 
 	return 0;
 }
 
 static inline int
-is_same(const struct ipt_entry *a, const struct ipt_entry *b)
+is_same(const struct ipt_entry *a, const struct ipt_entry *b,
+	unsigned char *matchmask)
 {
 	unsigned int i;
 	struct ipt_entry_target *ta, *tb;
+	unsigned char *mptr;
 
+	/* Always compare head structures: ignore mask here. */
 	if (a->ip.src.s_addr != b->ip.src.s_addr
 	    || a->ip.dst.s_addr != b->ip.dst.s_addr
 	    || a->ip.smsk.s_addr != b->ip.smsk.s_addr
@@ -1063,7 +1076,8 @@ is_same(const struct ipt_entry *a, const struct ipt_entry *b)
 	    || a->next_offset != b->next_offset)
 		return 0;
 
-	if (IPT_MATCH_ITERATE(a, match_different, a->elems, b->elems))
+	mptr = matchmask + sizeof(struct ipt_entry);
+	if (IPT_MATCH_ITERATE(a, match_different, a->elems, b->elems, &mptr))
 		return 0;
 
 	ta = ipt_get_target((struct ipt_entry *)a);
@@ -1072,12 +1086,12 @@ is_same(const struct ipt_entry *a, const struct ipt_entry *b)
 		return 0;
 	if (strcmp(ta->u.name, tb->u.name) != 0)
 		return 0;
-   
-        /* FIXME: If kernel modifies these, then we never match --RR */
-      
-        if (memcmp(ta->data, tb->data, ta->target_size - sizeof(*ta)) != 0)
-            return 0;                  
-   
+
+	mptr += sizeof(*ta)
+	if (target_different(ta->data, tb->data,
+			     ta->target_size - sizeof(*ta), mptr))
+		return 0;
+
    	return 1;
 }
 
@@ -1085,6 +1099,7 @@ is_same(const struct ipt_entry *a, const struct ipt_entry *b)
 int
 iptc_delete_entry(const ipt_chainlabel chain,
 		  const struct ipt_entry *origfw,
+		  unsigned char *matchmask,
 		  iptc_handle_t *handle)
 {
 	unsigned int offset, lastoff;
@@ -1120,7 +1135,7 @@ iptc_delete_entry(const ipt_chainlabel chain,
 		printf("Deleting:\n");
 		dump_entry(newe);
 #endif
-		if (is_same(e, fw)) {
+		if (is_same(e, fw, matchmask)) {
 			int ret;
 			ret = delete_rules(1, e->next_offset,
 					   offset, entry2index(*handle, e),

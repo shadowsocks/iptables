@@ -204,6 +204,7 @@ struct iptables_match owner
     "owner",
     NETFILTER_VERSION,
     sizeof(struct ipt_owner_info),
+    sizeof(struct ipt_owner_info),
     &help,
     &init,
     &parse,

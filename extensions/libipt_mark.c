@@ -113,6 +113,7 @@ struct iptables_match mark
     "mark",
     NETFILTER_VERSION,
     sizeof(struct ipt_mark_info),
+    sizeof(struct ipt_mark_info),
     &help,
     &init,
     &parse,

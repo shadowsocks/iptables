@@ -129,6 +129,7 @@ struct iptables_match mac
     "mac",
     NETFILTER_VERSION,
     sizeof(struct ipt_mac_info),
+    sizeof(struct ipt_mac_info),
     &help,
     &init,
     &parse,

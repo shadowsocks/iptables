@@ -105,6 +105,7 @@ struct iptables_target mark
     "MARK",
     NETFILTER_VERSION,
     sizeof(struct ipt_mark_target_info),
+    sizeof(struct ipt_mark_target_info),
     &help,
     &init,
     &parse,

@@ -158,6 +158,7 @@ struct iptables_target tos
     "TOS",
     NETFILTER_VERSION,
     sizeof(struct ipt_tos_target_info),
+    sizeof(struct ipt_tos_target_info),
     &help,
     &init,
     &parse,

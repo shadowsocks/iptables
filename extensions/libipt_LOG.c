@@ -245,6 +245,7 @@ struct iptables_target log
     "LOG",
     NETFILTER_VERSION,
     sizeof(struct ipt_log_info),
+    sizeof(struct ipt_log_info),
     &help,
     &init,
     &parse,

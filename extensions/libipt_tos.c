@@ -156,6 +156,7 @@ struct iptables_match tos
     "tos",
     NETFILTER_VERSION,
     sizeof(struct ipt_tos_info),
+    sizeof(struct ipt_tos_info),
     &help,
     &init,
     &parse,

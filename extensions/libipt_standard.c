@@ -52,6 +52,7 @@ struct iptables_target standard
     "standard",
     NETFILTER_VERSION,
     sizeof(int),
+    sizeof(int),
     &help,
     &init,
     &parse,

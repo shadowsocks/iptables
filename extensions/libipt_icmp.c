@@ -280,6 +280,7 @@ struct iptables_match icmp
     "icmp",
     NETFILTER_VERSION,
     sizeof(struct ipt_icmp),
+    sizeof(struct ipt_icmp),
     &help,
     &init,
     &parse,

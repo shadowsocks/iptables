@@ -15,6 +15,9 @@ struct iptables_match
 	/* Size of match data. */
 	size_t size;
 
+	/* Size of match data relevent for userspace comparison purposes */
+	size_t userspacesize;
+
 	/* Function which prints out usage message. */
 	void (*help)(void);
 
@@ -58,6 +61,9 @@ struct iptables_target
 
 	/* Size of target data. */
 	size_t size;
+
+	/* Size of target data relevent for userspace comparison purposes */
+	size_t userspacesize;
 
 	/* Function which prints out usage message. */
 	void (*help)(void);

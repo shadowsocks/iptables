@@ -147,6 +147,7 @@ struct iptables_match state
     "state",
     NETFILTER_VERSION,
     sizeof(struct ipt_state_info),
+    sizeof(struct ipt_state_info),
     &help,
     &init,
     &parse,

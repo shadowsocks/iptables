@@ -229,6 +229,7 @@ struct iptables_target snat
     "SNAT",
     NETFILTER_VERSION,
     sizeof(struct ip_nat_multi_range),
+    sizeof(struct ip_nat_multi_range),
     &help,
     &init,
     &parse,

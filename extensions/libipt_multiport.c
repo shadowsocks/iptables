@@ -246,6 +246,7 @@ struct iptables_match multiport
     "multiport",
     NETFILTER_VERSION,
     sizeof(struct ipt_multiport),
+    sizeof(struct ipt_multiport),
     &help,
     &init,
     &parse,

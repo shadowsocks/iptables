@@ -142,6 +142,7 @@ struct iptables_target reject
     "REJECT",
     NETFILTER_VERSION,
     sizeof(struct ipt_reject_info),
+    sizeof(struct ipt_reject_info),
     &help,
     &init,
     &parse,

@@ -181,6 +181,7 @@ struct iptables_match limit
     "limit",
     NETFILTER_VERSION,
     sizeof(struct ipt_rateinfo),
+    offsetof(struct ipt_rateinfo, prev),
     &help,
     &init,
     &parse,

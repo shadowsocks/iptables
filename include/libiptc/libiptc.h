@@ -73,9 +73,11 @@ int iptc_append_entry(const ipt_chainlabel chain,
 		      const struct ipt_entry *e,
 		      iptc_handle_t *handle);
 
-/* Delete the first rule in `chain' which matches `e'. */
+/* Delete the first rule in `chain' which matches `e', subject to
+   matchmask (array of length == origfw) */
 int iptc_delete_entry(const ipt_chainlabel chain,
 		      const struct ipt_entry *origfw,
+		      unsigned char *matchmask,
 		      iptc_handle_t *handle);
 
 /* Delete the rule in position `rulenum' in `chain'. */

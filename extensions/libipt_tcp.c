@@ -308,21 +308,23 @@ print_option(u_int8_t option, int invert, int numeric)
 static void
 print_tcpf(u_int8_t flags)
 {
-	int sole_flag = 1;
+	int have_flag = 0;
 
-	do {
+	while (flags) {
 		unsigned int i;
 
-		/* Terminates because last flag is 0 */
-		for (i = 0; !(flags & tcp_flag_names[i].flag); i++);
+		for (i = 0; (flags & tcp_flag_names[i].flag) == 0; i++);
 
-		if (!sole_flag)
+		if (have_flag)
 			printf(",");
 		printf("%s", tcp_flag_names[i].name);
-		sole_flag = 0;
+		have_flag = 1;
 
 		flags &= ~tcp_flag_names[i].flag;
-	} while (flags);
+	}
+
+	if (!have_flag)
+		printf("NONE");
 }
 
 static void
@@ -423,6 +425,7 @@ struct iptables_match tcp
 = { NULL,
     "tcp",
     NETFILTER_VERSION,
+    sizeof(struct ipt_tcp),
     sizeof(struct ipt_tcp),
     &help,
     &init,

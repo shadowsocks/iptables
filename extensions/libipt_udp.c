@@ -236,6 +236,7 @@ struct iptables_match udp
     "udp",
     NETFILTER_VERSION,
     sizeof(struct ipt_udp),
+    sizeof(struct ipt_udp),
     &help,
     &init,
     &parse,
