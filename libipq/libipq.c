@@ -296,6 +296,11 @@ int ipq_ctl(const struct ipq_handle *h, int request, ...)
 	return 1;
 }
 
+char *ipq_errstr(void)
+{
+	return ipq_strerror(ipq_errno);
+}
+
 void ipq_perror(const char *s)
 {
 	if (s)
@@ -303,7 +308,7 @@ void ipq_perror(const char *s)
 	else
 		fputs("ERROR", stderr);
 	if (ipq_errno)
-		fprintf(stderr, ": %s", ipq_strerror(ipq_errno));
+		fprintf(stderr, ": %s", ipq_errstr());
 	if (errno)
 		fprintf(stderr, ": %s", strerror(errno));
 	fputc('\n', stderr);

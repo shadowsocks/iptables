@@ -77,6 +77,7 @@ int ipq_set_verdict(const struct ipq_handle *h,
 
 int ipq_ctl(const struct ipq_handle *h, int request, ...);
 
+char *ipq_errstr(void);
 void ipq_perror(const char *s);
 
 #endif	/* _LIBIPQ_H */
