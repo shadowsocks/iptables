@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.57 2002/02/19 20:36:19 laforge Exp $
+CVS ID: $Id: TODO,v 1.58 2002/02/25 09:27:31 laforge Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -35,7 +35,7 @@ x interface names in ipv6 can contain _ and -
 - sysctl support for ftp-multi, irc-conntrack/nat, ftp-fxp
 - integrate HOPLIMIT for ipv6 in patch-o-matic [HW]
 - u32 classifier (port from tc -> iptables) [YU]
-- MARK match / target with boolean OR / AND (to use nfmark bitwise)
+- MARK match with boolean OR / AND (to use nfmark bitwise)
 - documentation for libiptc
 - port conntrack to IPv6 (code reuse?) [BC]
 x make patch-o-matic reversible
@@ -44,7 +44,7 @@ x fix and test the netfilter bridging stuff
 - ip_nat_ident module [FM]
 x provide daily CVS snapshots via ftp [HW]
 - make iptables / ip6tables use the same codebase (as libiptc) [KA]
-- REJECT optionally generates port unreachable with faked SOURCE
+x REJECT optionally generates port unreachable with faked SOURCE
 - libipq reentrancy [JM]
 - compiling without O2 issue
 x add more information like original addresses to the state match
