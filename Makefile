@@ -48,6 +48,12 @@ ifeq ($(shell uname -m),sparc64)
 CFLAGS+=-DIPT_MIN_ALIGN=8 -DKERNEL_64_USERSPACE_32
 endif
 
+# HPPA hack
+ifeq ($(shell uname -m),parisc64)
+# The kernel is 64-bit, even though userspace is 32.
+CFLAGS+=-DIPT_MIN_ALIGN=8 -DKERNEL_64_USERSPACE_32
+endif
+
 ifndef IPT_LIBDIR
 IPT_LIBDIR:=$(LIBDIR)/iptables
 endif
