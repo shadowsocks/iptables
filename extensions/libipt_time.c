@@ -291,13 +291,15 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	printf(" ");
 }
 
+/* have to use offsetof() instead of IPT_ALIGN(), since kerneltime must not
+ * be compared when user deletes rule with '-D' */
 static
 struct iptables_match timestruct
 = { NULL,
     "time",
     IPTABLES_VERSION,
     IPT_ALIGN(sizeof(struct ipt_time_info)),
-    IPT_ALIGN(sizeof(struct ipt_time_info)),
+    offsetof(struct ipt_time_info, kerneltime),
     &help,
     &init,
     &parse,
