@@ -147,14 +147,6 @@ static struct option original_opts[] = {
  * magic number of -1 */
 int line = -1;
 
-#ifndef __OPTIMIZE__
-struct ipt_entry_target *
-ipt_get_target(struct ipt_entry *e)
-{
-	return (void *)e + e->target_offset;
-}
-#endif
-
 static struct option *opts = original_opts;
 static unsigned int global_option_offset = 0;
 
@@ -1622,6 +1614,7 @@ int iptables_insmod(const char *modname, const char *modprobe)
 {
 	char *buf = NULL;
 	char *argv[3];
+	int status;
 
 	/* If they don't explicitly set it, read out of kernel */
 	if (!modprobe) {
@@ -1639,16 +1632,18 @@ int iptables_insmod(const char *modname, const char *modprobe)
 		execv(argv[0], argv);
 
 		/* not usually reached */
-		exit(0);
+		exit(1);
 	case -1:
 		return -1;
 
 	default: /* parent */
-		wait(NULL);
+		wait(&status);
 	}
 
 	free(buf);
-	return 0;
+	if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+		return 0;
+	return -1;
 }
 
 static struct ipt_entry *
@@ -2193,11 +2188,9 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	if (!*handle)
 		*handle = iptc_init(*table);
 
-	if (!*handle) {
-		/* try to insmod the module if iptc_init failed */
-		iptables_insmod("ip_tables", modprobe);
+	/* try to insmod the module if iptc_init failed */
+	if (!*handle && iptables_insmod("ip_tables", modprobe) != -1)
 		*handle = iptc_init(*table);
-	}
 
 	if (!*handle)
 		exit_error(VERSION_PROBLEM,
