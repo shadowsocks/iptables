@@ -745,7 +745,7 @@ parse_interface(const char *arg, char *vianame, unsigned char *mask)
 		memset(mask + vialen + 1, 0, IFNAMSIZ - vialen - 1);
 	}
 	for (i = 0; vianame[i]; i++) {
-		if (!isalnum(vianame[i])) {
+		if (!isalnum(vianame[i]) && vianame[i] != '_') {
 			printf("Warning: wierd character in interface"
 			       " `%s' (No aliases, :, ! or *).\n",
 			       vianame);
