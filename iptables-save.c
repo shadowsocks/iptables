@@ -148,7 +148,7 @@ static void print_rule(const struct ipt_entry *e,
 		iptc_handle_t *h, const char *chain, int counters)
 {
 	struct ipt_entry_target *t;
-	char *target_name;
+	const char *target_name;
 
 	/* print counters */
 	if (counters)

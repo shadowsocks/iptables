@@ -155,6 +155,7 @@ static void print_rule(const struct ip6t_entry *e,
 		ip6tc_handle_t *h, int counters)
 {
 	struct ip6t_entry_target *t;
+	const char *target_name;
 
 	/* print counters */
 	if (counters)
@@ -196,7 +197,9 @@ static void print_rule(const struct ip6t_entry *e,
 	}
 
 	/* Print target name */	
-	printf("-j %s ", ip6tc_get_target(e, h));
+	target_name = ip6tc_get_target(e, h);
+	if (target_name && *target_name != '\0')
+		printf("-j %s ", ip6tc_get_target(e, h));
 
 	/* Print targinfo part */
 	t = ip6t_get_target((struct ip6t_entry *)e);
