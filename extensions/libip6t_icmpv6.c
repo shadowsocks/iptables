@@ -258,7 +258,7 @@ static void final_check(unsigned int flags)
 {
 }
 
-struct ip6tables_match icmpv6
+static struct ip6tables_match icmpv6
 = { NULL,
     "icmpv6",
     NETFILTER_VERSION,

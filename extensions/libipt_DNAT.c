@@ -224,6 +224,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	}
 }
 
+static
 struct iptables_target dnat
 = { NULL,
     "DNAT",

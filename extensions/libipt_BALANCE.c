@@ -131,6 +131,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	printf("-%s ", addr_to_dotted(&a));
 }
 
+static
 struct iptables_target balance
 = { NULL,
     "BALANCE",

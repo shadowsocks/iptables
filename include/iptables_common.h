@@ -19,4 +19,11 @@ void exit_error(enum exittype, char *, ...)__attribute__((noreturn,
 							  format(printf,2,3)));
 extern const char *program_name, *program_version;
 
+#ifdef NO_SHARED_LIBS
+# ifdef _INIT
+#  define _init _INIT
+# endif
+  extern void init_extensions(void);
+#endif
+
 #endif /*_IPTABLES_COMMON_H*/

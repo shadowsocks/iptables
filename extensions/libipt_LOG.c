@@ -239,6 +239,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 		printf("--log-ip-options ");
 }
 
+static
 struct iptables_target log
 = { NULL,
     "LOG",

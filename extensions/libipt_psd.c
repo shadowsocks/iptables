@@ -174,6 +174,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	printf("--psd-hi-ports-weight %u ",psdinfo->hi_ports_weight);
 }
 
+static
 struct iptables_match psd
 = { NULL,
     "psd",

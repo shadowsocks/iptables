@@ -155,6 +155,7 @@ static struct option opts[] = {
 	{ 0 }
 };
 
+static
 struct iptables_match ttl = {
 	NULL,
 	"ttl",

@@ -165,6 +165,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 		printf("--nodst ");
 }
 
+static
 struct iptables_target same
 = { NULL,
     "SAME",

@@ -110,6 +110,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	printf("--set-ftos 0x%02x ", finfo->ftos);
 }
 
+static
 struct iptables_target ftos
 = { NULL,
     "FTOS",

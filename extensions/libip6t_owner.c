@@ -199,6 +199,7 @@ save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match)
 	print_item(info, IP6T_OWNER_SID, 0, "--sid-owner ");
 }
 
+static
 struct ip6tables_match owner
 = { NULL,
     "owner",

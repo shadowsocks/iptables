@@ -41,6 +41,7 @@ final_check(unsigned int flags)
 {
 }
 
+static
 struct iptables_target mirror
 = { NULL,
     "MIRROR",

@@ -40,6 +40,10 @@ main(int argc, char *argv[])
 	program_name = "iptables";
 	program_version = NETFILTER_VERSION;
 
+#ifdef NO_SHARED_LIBS
+	init_extensions();
+#endif
+
 	ret = do_command(argc, argv, &table, &handle);
 	if (ret)
 		ret = iptc_commit(&handle);

@@ -122,6 +122,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 			ip_pool_get_name(buf, sizeof(buf), info->dst, 0));
 }
 
+static
 struct iptables_match pool
 = { NULL,
     "pool",

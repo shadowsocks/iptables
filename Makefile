@@ -1,6 +1,9 @@
 # Standard part of Makefile for topdir.
 TOPLEVEL_INCLUDED=YES
 
+# uncomment this to get a fully statically linked version
+# NO_SHARED_LIBS = 1
+
 ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
@@ -25,8 +28,24 @@ endif
 COPT_FLAGS:=-O2 -DNDEBUG
 CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -I$(KERNEL_DIR)/include -Iinclude/ -DNETFILTER_VERSION=\"$(NETFILTER_VERSION)\" #-g #-pg
 
+ifdef NO_SHARED_LIBS
+CFLAGS += -DNO_SHARED_LIBS=1
+endif
+
+ifndef NO_SHARED_LIBS
 DEPFILES = $(SHARED_LIBS:%.so=%.d)
 SH_CFLAGS:=$(CFLAGS) -fPIC
+STATIC_LIBS  =
+STATIC6_LIBS =
+LDFLAGS      = -rdynamic
+LDLIBS       = -ldl
+else
+DEPFILES = $(EXT_OBJS:%.o=%.d)
+STATIC_LIBS  = extensions/libext.a
+STATIC6_LIBS = extensions/libext6.a
+LDFLAGS      =
+LDLIBS       =
+endif
 
 EXTRAS+=iptables iptables.o
 EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables $(DESTDIR)$(MANDIR)/man8/iptables.8
@@ -72,22 +91,22 @@ pending-patches:
 iptables.o: iptables.c
 	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -c -o $@ $<
 
-iptables: iptables-standalone.c iptables.o libiptc/libiptc.a
-	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ -ldl
+iptables: iptables-standalone.c iptables.o $(STATIC_LIBS) libiptc/libiptc.a
+	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 $(DESTDIR)$(BINDIR)/iptables: iptables
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
 	cp $< $@
 
-iptables-save: iptables-save.c iptables.o libiptc/libiptc.a
-	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ -ldl
+iptables-save: iptables-save.c iptables.o $(STATIC_LIBS) libiptc/libiptc.a
+	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 $(DESTDIR)$(BINDIR)/iptables-save: iptables-save
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
 	cp $< $@
 
-iptables-restore: iptables-restore.c iptables.o libiptc/libiptc.a
-	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ -ldl
+iptables-restore: iptables-restore.c iptables.o $(STATIC_LIBS) libiptc/libiptc.a
+	$(CC) $(CFLAGS) -DIPT_LIB_DIR=\"$(IPT_LIBDIR)\" $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 $(DESTDIR)$(BINDIR)/iptables-restore: iptables-restore
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
@@ -96,22 +115,22 @@ $(DESTDIR)$(BINDIR)/iptables-restore: iptables-restore
 ip6tables.o: ip6tables.c
 	$(CC) $(CFLAGS) -DIP6T_LIB_DIR=\"$(IPT_LIBDIR)\" -c -o $@ $<
 
-ip6tables: ip6tables-standalone.c ip6tables.o libiptc/libiptc.a
-	$(CC) $(CFLAGS) -DIP6T_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ -ldl
+ip6tables: ip6tables-standalone.c ip6tables.o $(STATIC6_LIBS) libiptc/libiptc.a
+	$(CC) $(CFLAGS) -DIP6T_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ $(LD_LIBS)
 
 $(DESTDIR)$(BINDIR)/ip6tables: ip6tables
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
 	cp $< $@
 
-ip6tables-save: ip6tables-save.c ip6tables.o libiptc/libiptc.a
-	$(CC) $(CFLAGS) -DIP6T_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ -ldl
+ip6tables-save: ip6tables-save.c ip6tables.o $(STATIC6_LIBS) libiptc/libiptc.a
+	$(CC) $(CFLAGS) -DIP6T_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ $(LD_LIBS)
 
 $(DESTDIR)$(BINDIR)/ip6tables-save: ip6tables-save
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
 	cp $< $@
 
-ip6tables-restore: ip6tables-restore.c ip6tables.o libiptc/libiptc.a
-	$(CC) $(CFLAGS) -DIP6T_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ -ldl
+ip6tables-restore: ip6tables-restore.c ip6tables.o $(STATIC6_LIBS) libiptc/libiptc.a
+	$(CC) $(CFLAGS) -DIP6T_LIB_DIR=\"$(IPT_LIBDIR)\" -rdynamic -o $@ $^ $(LD_LIBS)
 
 $(DESTDIR)$(BINDIR)/ip6tables-restore: ip6tables-restore
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)

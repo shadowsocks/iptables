@@ -187,6 +187,7 @@ print(const struct ipt_ip *ip,
 	printf("queue_threshold %d ", loginfo->qthreshold);
 }
 
+static
 struct iptables_target ulog = { NULL,
 	"ULOG",
 	NETFILTER_VERSION,

@@ -253,6 +253,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	printf(" ");
 }
 
+static
 struct iptables_match ipv4options_struct
 = { NULL,
     "ipv4options",

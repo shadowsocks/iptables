@@ -100,6 +100,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	printf("--set-mark 0x%lx ", markinfo->mark);
 }
 
+static
 struct iptables_target mark
 = { NULL,
     "MARK",

@@ -39,6 +39,10 @@ main(int argc, char *argv[])
 	program_name = "ip6tables";
 	program_version = NETFILTER_VERSION;
 
+#ifdef NO_SHARED_LIBS
+	init_extensions();
+#endif
+
 	ret = do_command6(argc, argv, &table, &handle);
 	if (ret)
 		ret = ip6tc_commit(&handle);

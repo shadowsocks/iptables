@@ -14,6 +14,7 @@ struct tosinfo {
 };
 
 /* TOS names and values. */
+static
 struct TOS_value
 {
 	unsigned char TOS;
@@ -152,6 +153,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	printf("--set-tos 0x%02x ", tosinfo->tos);
 }
 
+static
 struct iptables_target tos
 = { NULL,
     "TOS",

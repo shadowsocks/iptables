@@ -124,6 +124,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 		  ((struct ipt_mac_info *)match->data)->invert);
 }
 
+static
 struct iptables_match mac
 = { NULL,
     "mac",

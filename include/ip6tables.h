@@ -51,6 +51,9 @@ struct ip6tables_match
 	struct ip6t_entry_match *m;
 	unsigned int mflags;
 	unsigned int used;
+#ifdef NO_SHARED_LIBS
+	unsigned int loaded; /* simulate loading so options are merged properly */
+#endif
 };
 
 struct ip6tables_target
@@ -98,6 +101,9 @@ struct ip6tables_target
 	struct ip6t_entry_target *t;
 	unsigned int tflags;
 	unsigned int used;
+#ifdef NO_SHARED_LIBS
+	unsigned int loaded; /* simulate loading so options are merged properly */
+#endif
 };
 
 /* Your shared library should call one of these. */

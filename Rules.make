@@ -7,6 +7,7 @@ experimental: $(EXTRAS_EXP)
 # Have to handle extensions which no longer exist.
 clean: $(EXTRA_CLEANS)
 	rm -f $(SHARED_LIBS) $(EXTRAS) $(EXTRAS_EXP) $(SHARED_LIBS:%.so=%_sh.o)
+	rm -f extensions/initext.c extensions/initext6.c
 	@find . -name '*.[ao]' -o -name '*.so' | xargs rm -f
 
 install: all $(EXTRA_INSTALLS)

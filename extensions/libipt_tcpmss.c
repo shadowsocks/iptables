@@ -140,6 +140,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 		     mssinfo->invert, 0);
 }
 
+static
 struct iptables_match tcpmss
 = { NULL,
     "tcpmss",

@@ -100,6 +100,7 @@ save(const struct ip6t_ip6 *ip, const struct ip6t_entry_target *target)
 	printf("--set-mark 0x%lx ", markinfo->mark);
 }
 
+static
 struct ip6tables_target mark
 = { NULL,
     "MARK",

@@ -4,7 +4,7 @@
  *
  * This coude is distributed under the terms of GNU GPL
  *
- * $Id: iptables-restore.c,v 1.12 2001/05/26 04:41:56 laforge Exp $
+ * $Id: iptables-restore.c,v 1.13 2001/06/16 18:25:25 laforge Exp $
  */
 
 #include <getopt.h>
@@ -108,6 +108,10 @@ int main(int argc, char *argv[])
 
 	program_name = "iptables-restore";
 	program_version = NETFILTER_VERSION;
+
+#ifdef NO_SHARED_LIBS
+	init_extensions();
+#endif
 
 	while ((c = getopt_long(argc, argv, "bcvhnM:", options, NULL)) != -1) {
 		switch (c) {

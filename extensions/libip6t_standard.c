@@ -47,6 +47,7 @@ save(const struct ip6t_ip6 *ip6, const struct ip6t_entry_target *target)
 {
 }
 
+static
 struct ip6tables_target standard
 = { NULL,
     "standard",

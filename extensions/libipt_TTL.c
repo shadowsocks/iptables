@@ -143,6 +143,7 @@ static struct option opts[] = {
 	{ 0 }
 };
 
+static
 struct iptables_target TTL = { NULL, 
 	"TTL",
 	NETFILTER_VERSION,

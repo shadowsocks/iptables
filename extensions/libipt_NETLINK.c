@@ -136,6 +136,7 @@ print(const struct ipt_ip *ip,
 		printf("nlsize %i ", nld->size);
 }
 
+static
 struct iptables_target netlink = { NULL,
 	"NETLINK",
 	NETFILTER_VERSION,

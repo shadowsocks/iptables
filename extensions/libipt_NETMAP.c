@@ -179,6 +179,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	print(ip, target, 0);
 }
 
+static
 struct iptables_target target_module
 = { NULL,
     MODULENAME,

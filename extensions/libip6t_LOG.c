@@ -239,6 +239,7 @@ save(const struct ip6t_ip6 *ip, const struct ip6t_entry_target *target)
 		printf("--log-ip-options ");
 }
 
+static
 struct ip6tables_target log
 = { NULL,
     "LOG",

@@ -155,6 +155,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	printf("--reject-with %s ", reject_table[i].name);
 }
 
+static
 struct iptables_target reject
 = { NULL,
     "REJECT",

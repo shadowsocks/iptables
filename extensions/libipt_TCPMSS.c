@@ -113,6 +113,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 		printf("--set-mss %u ", mssinfo->mss);
 }
 
+static
 struct iptables_target mss
 = { NULL,
     "TCPMSS",

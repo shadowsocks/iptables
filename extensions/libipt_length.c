@@ -139,6 +139,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	print_length((struct ipt_length_info *)match->data);
 }
 
+static
 struct iptables_match length
 = { NULL,
     "length",

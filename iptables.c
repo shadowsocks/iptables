@@ -649,6 +649,7 @@ find_match(const char *name, enum ipt_tryload tryload)
 			break;
 	}
 
+#ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != DONT_LOAD) {
 		char path[sizeof(IPT_LIB_DIR) + sizeof("/libipt_.so")
 			 + strlen(name)];
@@ -667,6 +668,14 @@ find_match(const char *name, enum ipt_tryload tryload)
 				   "Couldn't load match `%s':%s\n",
 				   name, dlerror());
 	}
+#else
+	if (ptr && !ptr->loaded) {
+		if (tryload != DONT_LOAD)
+			ptr->loaded = 1;
+		else
+			ptr = NULL;
+	}
+#endif
 
 	if (ptr)
 		ptr->used = 1;
@@ -904,6 +913,7 @@ find_target(const char *name, enum ipt_tryload tryload)
 			break;
 	}
 
+#ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != DONT_LOAD) {
 		char path[sizeof(IPT_LIB_DIR) + sizeof("/libipt_.so")
 			 + strlen(name)];
@@ -921,6 +931,14 @@ find_target(const char *name, enum ipt_tryload tryload)
 				   "Couldn't load target `%s':%s\n",
 				   name, dlerror());
 	}
+#else
+	if (ptr && !ptr->loaded) {
+		if (tryload != DONT_LOAD)
+			ptr->loaded = 1;
+		else
+			ptr = NULL;
+	}
+#endif
 
 	if (ptr)
 		ptr->used = 1;

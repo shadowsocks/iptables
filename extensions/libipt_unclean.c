@@ -41,6 +41,7 @@ static void final_check(unsigned int flags)
 {
 }
 
+static
 struct iptables_match unclean
 = { NULL,
     "unclean",

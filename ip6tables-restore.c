@@ -93,6 +93,10 @@ int main(int argc, char *argv[])
 	program_name = "ip6tables-restore";
 	program_version = NETFILTER_VERSION;
 
+#ifdef NO_SHARED_LIBS
+	init_extensions();
+#endif
+
 	while ((c = getopt_long(argc, argv, "bcvhnM:", options, NULL)) != -1) {
 		switch (c) {
 			case 'b':

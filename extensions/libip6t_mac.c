@@ -124,6 +124,7 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 		  ((struct ip6t_mac_info *)match->data)->invert);
 }
 
+static
 struct ip6tables_match mac
 = { NULL,
     "mac",

@@ -142,6 +142,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	print_state(sinfo->statemask);
 }
 
+static
 struct iptables_match state
 = { NULL,
     "state",

@@ -9,6 +9,7 @@
 #include <linux/netfilter_ipv4/ipt_tos.h>
 
 /* TOS names and values. */
+static
 struct TOS_value
 {
 	unsigned char TOS;
@@ -151,6 +152,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 		  ((struct ipt_tos_info *)match->data)->invert, 0);
 }
 
+static
 struct iptables_match tos
 = { NULL,
     "tos",

@@ -113,6 +113,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	printf("--iplimit-mask %d ",count_bits(info->mask));
 }
 
+static
 static struct iptables_match iplimit = {
 	name:		"iplimit",
 	version:	NETFILTER_VERSION,

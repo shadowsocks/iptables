@@ -199,6 +199,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	print_item(info, IPT_OWNER_SID, 0, "--sid-owner ");
 }
 
+static
 struct iptables_match owner
 = { NULL,
     "owner",
