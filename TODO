@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.31 2001/05/03 11:53:27 jamesm Exp $
+CVS ID: $Id: TODO,v 1.32 2001/05/03 21:10:24 laforge Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
@@ -44,6 +44,8 @@ X integrate PSD target / port it as match [HW]
 - make iptables / ip6tables use the same codebase (as libiptc) [KA]
 
 FUTURE extensions:
+- dealing with fragmented expectation-causes (i.e. DCC chat split
+  over two packets, etc.)
 - conntrack / nat failover [HW]
 - brainstorming about 2.5 conntrack code
 - netlink interface for conntrack manipulation from userspace [HW]
