@@ -492,7 +492,7 @@ matchinfo_print(const struct ipt_ip *ip, const struct ipt_entry_match *match, in
 
 	if(sinfo->flags & IPT_CONNTRACK_STATUS) {
 		printf("%sctstatus ", optpfx);
-        	if (sinfo->invflags & IPT_CONNTRACK_STATE)
+        	if (sinfo->invflags & IPT_CONNTRACK_STATUS)
                 	printf("! ");
 		print_status(sinfo->statusmask);
 	}
