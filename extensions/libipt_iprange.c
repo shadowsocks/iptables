@@ -99,7 +99,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			info->flags |= IPRANGE_DST_INV;
 
 		parse_iprange(optarg, &info->dst);		
-		*flags = 1;
+
 		break;
 
 	default:
