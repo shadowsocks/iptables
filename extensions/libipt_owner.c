@@ -148,7 +148,7 @@ print_item(struct ipt_owner_info *info, u_int8_t flag, int numeric, char *label)
 	if(info->match & flag) {
 
 		if (info->invert & flag)
-			fputc('!', stdout);
+			printf("! ");
 
 		printf(label);
 
