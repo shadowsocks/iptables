@@ -168,7 +168,10 @@ It is legal to specify the
 .B -Z
 (zero) option as well, in which case the chain(s) will be atomically
 listed and zeroed.  The exact output is affected by the other
-arguments given.
+arguments given. The exact rules are suppressed until you use
+.br
+ ip6tables -L -v
+.br
 .TP
 .BR "-F, --flush " "[\fIchain\fP]"
 Flush the selected chain (all the chains in the table if none is given).
@@ -198,7 +201,7 @@ for the legal targets.  Only built-in (non-user-defined) chains can have
 policies, and neither built-in nor user-defined chains can be policy
 targets.
 .TP
-.B "-E, --rename-chain " "old-chain new-chain"
+.BI "-E, --rename-chain " "old-chain new-chain"
 Rename the user specified chain to the user supplied name.  This is
 cosmetic, and has no effect on the structure of the table.
 .TP
@@ -230,9 +233,10 @@ option is omitted.
 .BR "-s, --source " "[!] \fIaddress\fP[/\fImask\fP]"
 Source specification.
 .I Address
-can be either a hostname (please note that specifying any name to be
-resolved with a remote query such as DNS is a really bad idea),
-or a plain IPv6 address (the network name isn't supported now).
+can be either a hostname (please note that specifying
+any name to be resolved with a remote query such as DNS is a really bad idea),
+a network IPv6 address (with /mask), or a plain IPv6 address.
+(the network name isn't supported now).
 The
 .I mask
 can be either a network mask or a plain number,
@@ -310,7 +314,7 @@ The following additional options can be specified:
 .TP
 .B "-v, --verbose"
 Verbose output.  This option makes the list command show the interface
-address, the rule options (if any), and the TOS masks.  The packet and
+name, the rule options (if any), and the TOS masks.  The packet and
 byte counters are also listed, with the suffix 'K', 'M' or 'G' for
 1000, 1,000,000 and 1,000,000,000 multipliers respectively (but see
 the
@@ -736,6 +740,7 @@ invalid or abused command line parameters cause an exit code of 2, and
 other errors cause an exit code of 1.
 .SH BUGS
 Bugs?  What's this? ;-)
+Well... the counters are not reliable on sparc64.
 .SH COMPATIBILITY WITH IPCHAINS
 This 
 .B ip6tables
