@@ -1,0 +1,708 @@
+.TH IPTABLES 8 "Mar 20, 2000" "" ""
+.\"
+.\" Man page written by Herve Eychenne <eychenne@info.enserb.u-bordeaux.fr>
+.\" It is based on ipchains man page.
+.\"
+.\" ipchains page by Paul ``Rusty'' Russell March 1997
+.\" Based on the original ipfwadm man page by Jos Vos <jos@xos.nl> (see README)
+.\"
+.\"	This program is free software; you can redistribute it and/or modify
+.\"	it under the terms of the GNU General Public License as published by
+.\"	the Free Software Foundation; either version 2 of the License, or
+.\"	(at your option) any later version.
+.\"
+.\"	This program is distributed in the hope that it will be useful,
+.\"	but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"	GNU General Public License for more details.
+.\"
+.\"	You should have received a copy of the GNU General Public License
+.\"	along with this program; if not, write to the Free Software
+.\"	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.\"
+.SH NAME
+iptables \- IP packet filter administration
+.SH SYNOPSIS
+.BR "iptables -[ADC] " "chain rule-specification [options]"
+.br
+.BR "iptables -[RI] " "chain rulenum rule-specification [options]"
+.br
+.BR "iptables -D " "chain rulenum [options]"
+.br
+.BR "iptables -[LFZ] " "[chain] [options]"
+.br
+.BR "iptables -[NX] " "chain"
+.br
+.BR "iptables -P " "chain target [options]"
+.br
+.BR "iptables -E " "old-chain-name new-chain-name"
+.SH DESCRIPTION
+.B Iptables
+is used to set up, maintain, and inspect the tables of IP packet
+filter rules in the Linux kernel.  There are several different tables
+which may be defined, and each table contains a number of built-in
+chains, and may contain user-defined chains.
+
+Each chain is a list of rules which can match a set of packets: each
+rule specifies what to do with a packet which matches.  This is called
+a `target', which may be a jump to a user-defined chain in the same
+table.
+
+.SH TARGETS
+A firewall rule specifies criteria for a packet, and a target.  If the
+packet does not match, the next rule in the chain is the examined; if
+it does match, then the next rule is specified by the value of the
+target, which can be the name of a user-defined chain, or one of the
+special values 
+.IR ACCEPT ,
+.IR DROP ,
+.IR QUEUE ,
+or
+.IR RETURN .
+.PP
+.I ACCEPT 
+means to let the packet through.
+.I DROP
+means to drop the packet on the floor.
+.I QUEUE
+means to pass the packet to userspace.
+.I RETURN
+means stop traversing this chain, and resume at the next rule in the
+previous (calling) chain.  If the end of a built-in chain is reached,
+or a rule in a built-in chain with target
+.I RETURN
+is matched, the target specified by the chain policy determines the
+fate of the packet.
+.SH TABLES
+There are current three tables (which tables are present at any time
+depends on the kernel configuration options and which modules are
+present).
+.TP
+.B "-t, --table"
+This option specifies the packet matching table which the command
+should operate on.  If the kernel is configured with automatic module
+loading, an attempt will be made to load the appropriate module for
+that table if it is not already there.
+
+The tables are as follows:
+.BR "filter"
+This is the default table, and contains the built-in chains INPUT (for
+packets coming into the box itself), FORWARD (for packets being routed
+through the box), and OUTPUT (for locally-generated packets).
+.BR "nat"
+This table is consulted when a packet which is creates a new
+connection is encountered.  It consists of three built-ins: PREROUTING
+(for altering packets as soon as they come in), OUTPUT (for altering
+locally-generated packets before routing), and POSTROUTING (for
+altering packets as they are about to go out).
+.BR "mangle"
+This table is used for specialized packet alteration.  It has two
+built-in chains: PREROUTING (for altering incoming packets before
+routing) and OUTPUT (for altering locally-generated packets before
+routing).
+.SH OPTIONS
+The options that are recognized by
+.B iptables
+can be divided into several different groups.
+.SS COMMANDS
+These options specify the specific action to perform; only one of them
+can be specified on the command line, unless otherwise specified
+below.  For all the long versions of the command and option names, you
+only need to use enough letters to ensure that 
+.B iptables
+can differentiate it from all other options.
+.TP
+.BR "-A, --append"
+Append one or more rules to the end of the selected chain.
+When the source and/or destination names resolve to more than one
+address, a rule will be added for each possible address combination.
+.TP
+.BR "-D, --delete"
+Delete one or more rules from the selected chain.  There are two
+versions of this command: the rule can be specified as a number in the
+chain (starting at 1 for the first rule) or a rule to match.
+.TP
+.B "-R, --replace"
+Replace a rule in the selected chain.  If the source and/or
+destination names resolve to multiple addresses, the command will
+fail.  Rules are numbered starting at 1.
+.TP
+.B "-I, --insert"
+Insert one or more rules in the selected chain as the given rule
+number.  So, if the rule number is 1, the rule or rules are inserted
+at the head of the chain.  This is also the default if no rule number
+is specified.
+.TP
+.B "-L, --list"
+List all rules in the selected chain.  If no chain is selected, all
+chains are listed.  It is legal to specify the
+.B -Z
+(zero) option as well, in which case the chain(s) will be atomically
+listed and zeroed.  The exact output is effected by the other
+arguments given.
+.TP
+.B "-F, --flush"
+Flush the selected chain.  This is equivalent to deleting all the
+rules one by one.
+.TP
+.B "-Z, --zero"
+Zero the packet and byte counters in all chains.  It is legal to
+specify the
+.B "-L, --list"
+(list) option as well, to see the counters immediately before they are
+cleared; see above.
+.TP
+.B "-N, --new-chain"
+Create a new user-defined chain of the given name.  There must be no
+target of that name already.
+.TP
+.B "-X, --delete-chain"
+Delete the specified user-defined chain.  There must be no references
+to the chain (if there are you must delete or replace the referring
+rules before the chain can be deleted).  If no argument is given, it
+will attempt to delete every non-builtin chain.
+.TP
+.B "-P, --policy"
+Set the policy for the chain to the given target.  See the section
+.TP
+.B "-E, --rename-chain"
+Rename the user specified chain to the user supplied name; this is
+cosmetic, and has no effect on the structure of the table.
+.B TARGETS
+for the legal targets.  Only non-userdefined chains can have policies,
+and neither built-in nor user-defined chains can be policy targets.
+.TP
+.B -h
+Help.
+Give a (currently very brief) description of the command syntax.
+.SS PARAMETERS
+The following parameters make up a rule specification (as used in the
+add, delete, replace, append and check commands).
+.TP
+.BR "-p, --proto " "[!] \fIprotocol\fP"
+The protocol of the rule or of the packet to check.
+The specified protocol can be one of
+.IR tcp ,
+.IR udp ,
+.IR icmp ,
+or
+.IR all ,
+or it can be a numeric value, representing one of these protocols or a
+different one.  Also a protocol name from /etc/protocols is allowed.
+A "!" argument before the protocol inverts the
+test.  The number zero is equivalent to
+.IR all .
+Protocol
+.I all
+will match with all protocols and is taken as default when this
+option is omitted.
+.I All
+may not be used in in combination with the check command.
+.TP
+.BR "-s, --source " "[!] \fIaddress\fP[/\fImask\fP]"
+Source specification.
+.I Address
+can be either a hostname, a network name, or a plain IP address.
+The
+.I mask
+can be either a network mask or a plain number,
+specifying the number of 1's at the left side of the network mask.
+Thus, a mask of
+.I 24
+is equivalent to
+.IR 255.255.255.0 .
+A "!" argument before the address specification inverts the sense of
+the address. The flag
+.B --src
+is a convenient alias for this option.
+.TP
+.BR "-d, --destination " "[!] \fIaddress\fP[/\fImask\fP]"
+Destination specification. 
+See the description of the
+.B -s
+(source) flag for a detailed description of the syntax.  The flag
+.B --dst
+is an alias for this option.
+.TP
+.BI "-j, --jump " "target"
+This specifies the target of the rule; ie. what to do if the packet
+matches it.  The target can be a user-defined chain (not the one this
+rule is in), one of the special builtin targets which decide the fate
+of the packet immediately, or an extension (see 
+.B EXTENSIONS
+below).  If this
+option is omitted in a rule, then matching the rule will have no
+effect on the packet's fate, but the counters on the rule will be
+incremented.
+.TP
+.BR "-i, --in-interface " "[!] [\fIname\fP]"
+Optional name of an interface via which a packet is received (for
+packets entering the 
+.BR INPUT ,
+.B FORWARD
+and
+.B PREROUTING
+chains).  When the "!" argument is used before the interface name, the
+sense is inverted.  If the interface name ends in a "+", then any
+interface which begins with this name will match.  If this option is
+omitted, the string "+" is assumed, which will match with any
+interface name.
+.TP
+.BR "-o, --out-interface " "[!] [\fIname\fP]"
+Optional name of an interface via which a packet is going to
+be sent (for packets entering the
+.BR FORWARD ,
+.B OUTPUT
+and
+.B POSTROUTING
+chains).  When the "!" argument is used before the interface name,
+the sense is inverted.  If the interface name ends in a "+", then any
+interface which begins with this name will match.  If this option is
+omitted, the string "+" is assumed, which will match with any
+interface name.
+.TP
+.B "[!] " "-f, --fragment"
+This means that the rule only refers to second and further fragments
+of fragmented packets.  Since there is no way to tell the source or
+destination ports of such a packet (or ICMP type), such a packet will
+not match any rules which specify them.  When the "!" argument
+precedes the "-f" flag, the sense is inverted.
+.SS "OTHER OPTIONS"
+The following additional options can be specified:
+.TP
+.B "-v, --verbose"
+Verbose output.  This option makes the list command show the interface
+address, the rule options (if any), and the TOS masks.  The packet and
+byte counters are also listed, with the suffix 'K', 'M' or 'G' for
+1000, 1,000,000 and 1,000,000,000 multipliers respectively (but see
+the
+.B -x
+flag to change this).
+For appending, insertion, deletion and replacement, this causes
+detailed information on the rule or rules to be printed.
+.TP
+.B "-n, --numeric"
+Numeric output.
+IP addresses and port numbers will be printed in numeric format.
+By default, the program will try to display them as host names,
+network names, or services (whenever applicable).
+.TP
+.B "-x, --exact"
+Expand numbers.
+Display the exact value of the packet and byte counters,
+instead of only the rounded number in K's (multiples of 1000)
+M's (multiples of 1000K) or G's (multiples of 1000M).  This option is
+only relevent for the 
+.B -L
+command.
+.TP
+.B "--line-numbers"
+When listing rules, add line numbers to the beginning of each rule,
+corresponding to that rule's position in the chain.
+.SH MATCH EXTENSIONS
+iptables can use extended packet matching modules.  The following are
+included in the base package, and most of these can be preceeded by a
+.B !
+to invert the sense of the match.
+.SS tcp
+These extensions are loaded if `--protocol tcp' is specified, and no
+other match is specified. It provides the following options:
+.TP
+.BR "--source-port " "[!] [\fIport[:port]\fP] or [\fIport[-port]]\fP]"
+Source port or port range specification. This can either be a service
+name or a port number. An inclusive range can also be specified,
+using the format
+.IR port : port 
+or
+.IR port - port .
+If the first port is omitted, "0" is assumed; if the last is omitted,
+"65535" is assumed.
+If the second port greater then the first they will be swapped.
+The flag
+.B --sport
+is an alias for this option.
+.TP
+.BR "--destination-port " "[!] [\fIport[:port]\fP] or [\fIport[-port]]\fP"
+Destination port or port range specification. The flag
+.B --dport
+is an alias for this option.
+.TP
+.BR "--tcp-flags " "[!] \fImask\fP \fIcomp\fP"
+Match when the TCP flags are as specified.  The first argument is the
+flags which we should examine, written as a comma-separated list, and
+the second argument is a comma-separated list of flags which must be
+set.  Flags are: 
+.BR "SYN ACK FIN RST URG PSH ALL NONE" .
+Hence the command
+.br
+ ipchains -p tcp --tcp-flags SYN,ACK,FIN,RST SYN
+.br
+will only match packets with the SYN flag set, and the ACK, FIN and
+RST flags unset.
+.TP
+.B "[!] --syn"
+Only match TCP packets with the SYN bit set and the ACK and FIN bits
+cleared.  Such packets are used to request TCP connection initiation;
+for example, blocking such packets coming in an interface will prevent
+incoming TCP connections, but outgoing TCP connections will be
+unaffected.
+It is equivalent to \fB--tcp-flags SYN,RST,ACK SYN\fP.
+If the "!" flag precedes the "--syn", the sense of the
+option is inverted.
+.TP
+.BR "--tcp-option " "[!] \fInumber\fP"
+Match if TCP option set.
+.SS udp
+These extensions are loaded if `--protocol udp' is specified, and no
+other match is specified. It provides the following options:
+.TP
+.BR "--source-port " "[!] [\fIport[:port]\fP] or [\fIport[-port]]\fP"
+Source port or port range specification.
+See the description of the
+.B --source-port
+option of the TCP extension for details.
+.TP
+.BR "--destination-port " "[!] [\fIport[:port]\fP] or [\fIport[-port]]\fP"
+Destination port or port range specification.
+See the description of the
+.B --destination-port
+option of the TCP extension for details.
+.SS icmp
+This extension is loaded if `--protocol icmp' is specified, and no
+other match is specified. It provides the following option:
+.TP
+.BR "--icmp-type " "[!] \fItypename\fP"
+This allows specification of the ICMP type, which can be a numeric
+ICMP type, or one of the ICMP type names shown by the command
+.br
+ iptables -p icmp -h
+.br
+.SS mac
+.TP
+.BR "--mac-source " "[!] \fIaddress\fP"
+Match source MAC address.  It must be of the form XX:XX:XX:XX:XX:XX.
+Note that this only makes sense for packets entering the
+.BR PREROUTING ,
+or
+.B INPUT
+chains from an ethernet device.
+.SS limit
+This module matches at a limited rate using a token bucket filter: it
+can be used in combination with the LOG target to give limited
+logging.  A rule using this extension will match until this limit is
+reached (unless the `!' flag is used).
+.TP
+.BI "--limit " "rate"
+Maximum average matching rate: specified as a number, with an optional
+`/second', `/minute', `/hour', or `/day' suffix; the default is
+3/hour.
+.TP
+.BI "--limit-burst " "number"
+The maximum initial number of packets to match: this number gets
+recharged by one every time the limit specified above is not reached,
+up to this number; the default is 5.
+.SS multiport
+This module matches a set of source or destination ports. Up to 15
+ports can be specified. It can only be used in conjunction with
+.B "-p tcp"
+or
+.BR "-p udp" .
+.TP
+.BR "--source-port" " [\fIport[,port]\fP]"
+Match if the source port is one of the given ports.
+.TP
+.BR "--destination-port" " [\fIport[,port]\fP]"
+Match if the destination port is one of the given ports.
+.TP
+.BR "--port" " [\fIport[,port]\fP]"
+Match if the both the source and destination ports are equal to each
+other and to one of the given ports.
+.SS mark
+This module matches the netfilter mark field associated with a packet
+(which can be set using the
+.B MARK
+target below).
+.TP
+.BI "--mark " "value[/mask]"
+Matches packets with the given unsigned mark value (if a mask is
+specified, this is logically ANDed with the mark before the
+comparison).
+.SS owner
+This module attempts to match various characteristics of the packet
+creator, for locally-generated packets.  It is only valid in the
+OUTPUT chain, and even this some packets (such as ICMP ping responses)
+may have no owner, and hence never match.
+.TP
+.BI "--uid-owner" "userid"
+Matches if the packet was created by a process with the given
+effective user id.
+.TP
+.BI "--gid-owner" "groupid"
+Matches if the packet was created by a process with the given
+effective group id.
+.TP
+.BI "--pid-owner" "processid"
+Matches if the packet was created by a process with the given
+process id.
+.TP
+.BI "--sid-owner" "sessionid"
+Matches if the packet was created by a process in the given session
+group.
+.SS state
+This module, when combined with connection tracking, allows access to
+the connection tracking state for this packet.
+.TP
+.BI "--state" "state"
+Where state is a comma separated list of the connection states to
+match.  Possible states are 
+.B INVALID
+meaning that the packet is associated with no known connection,
+.B ESTABLISHED
+meaning that the packet is associated with a connection which has seen
+packets in both directions,
+.B NEW
+meaning that the packet has started a new connection, or otherwise
+associated with a connection which has not seen packets in both
+directions, and
+.B RELATED
+meaning that the packet is starting a new connection, but is
+associated with an existing connection, such as an FTP data transfer,
+or an ICMP error.
+.SS unclean
+This module takes no options, but attempts to match packets which seem
+malformed or unusual.  This is regarded as experimental.
+.SS tos
+This module matches the 8 bits of Type of Service field in the IP
+header (ie. including the precedence bits). 
+.TP
+.BI "--tos" "tos"
+The argument is either a standard name, (use
+.br
+ iptables -m tos -h
+.br
+to see the list), or a numeric value to match.
+.SH TARGET EXTENSIONS
+iptables can use extended target modules: the following are included
+in the standard distribution.
+.SS LOG
+Turn on kernel logging of matching packets.  When this option is set
+for a rule, the Linux kernel will print some information on all
+matching packets (like most IP header fields) via
+.IR printk ().
+.TP
+.BI "--log-level " "level"
+Level of logging (numeric or see \fIsyslog.conf\fP(5)).
+.TP
+.BI "--log-prefix " "prefix"
+Prefix log messages with the specified prefix; up to 14 letters long,
+and useful for distinguishing messages in the logs.
+.TP
+.B --log-tcp-sequence
+Log TCP sequence numbers. This is a security risk if the log is
+readable by users.
+.TP
+.B --log-tcp-options
+Log options from the TCP packet header.
+.TP
+.B --log-ip-options
+Log options from the IP packet header.
+.SS MARK
+This is used to set the netfilter mark value associated with the
+packet.  It is only valid in the
+.B mangle
+table.
+.TP
+.BI "--set-mark" "mark"
+.SS REJECT
+This is used to send back an error packet in response to the matched
+packet: otherwise it is equivalent to 
+.BR DROP .
+This target is only valid in the
+.BR INPUT ,
+.B FORWARD
+and
+.B OUTPUT
+chains.  Several options control the nature of the error packet
+returned:
+.TP
+.BI "--reject-with" "type"
+The type given can be 
+.BR icmp-net-unreachable ,
+.BR icmp-host-unreachable ,
+.BR icmp-port-unreachable or
+.BR icmp-proto-unreachable
+which return the appropriate ICMP error message (net-unreachable is
+the default).  The following special types are also allowed:
+.B tcp-reset 
+is only valid if the rule also specifies 
+.BR "-p tcp" ,
+and generates a TCP reset packet in response.  This is generally not a
+good idea (modern stacks should deal with ICMPs on TCP connection
+initiation attempts).
+.B echo-reply
+can only be used for rules which specify an ICMP ping packet, and
+generates a ping reply.
+.SS TOS
+This is used to set the 8-bit Type of Service field in the IP header.
+It is only valid in the
+.B mangle
+table.
+.TP
+.BI "--set-tos" "tos"
+You can use a numeric TOS values, or use
+.br
+ iptables -j TOS -h
+.br
+to see the list of valid TOS names.
+.SS MIRROR
+This is an experimental demonstration target which inverts the source
+and destination fields in the IP header and retransmits the packet.
+It is only valid in the
+.BR INPUT ,
+.B FORWARD
+and 
+.B OUTPUT
+chains.
+.SS SNAT
+This target is only valid in the 
+.B nat
+table, in the 
+.B POSTROUTING
+chain.  It specifies that the source address of the packet should be
+modified (and all future packets in this connection will also be
+mangled), and rules should cease being examined.  It takes one option:
+.TP
+.BI "--to-source" "<ipaddr>[-<ipaddr>][:port-port]"
+which can specify a single new source IP address, an inclusive range
+of IP addresses, and optionally, a port range (which is only valid if
+the rule also specifies
+.B "-p tcp"
+or
+.BR "-p udp" ).
+If no port range is specified, then source ports below 512 will be
+mapped to other ports below 512: those between 1024 will be mapped to
+ports below 1024, and other ports will be mapped to 1024 or above.
+Where possible, no port alteration will occur.
+.SS DNAT
+This target is only valid in the 
+.B nat
+table, in the 
+.B PREROUTING
+and
+.B OUTPUT
+chains.  It specifies that the destination address of the packet
+should be modified (and all future packets in this connection will
+also be mangled), and rules should cease being examined.  It takes one
+option:
+.TP
+.BI "--to-destination" "<ipaddr>[-<ipaddr>][:port-port]"
+which can specify a single new destination IP address, an inclusive
+range of IP addresses, and optionally, a port range (which is only
+valid if the rule also specifies
+.B "-p tcp"
+or
+.BR "-p udp" ).
+If no port range is specified, then the destination port will never be
+modified.
+.SS MASQUERADE
+This target is only valid in the 
+.B nat
+table, in the 
+.B POSTROUTING
+chain.  It should only be used with dynamically assigned IP (dialup)
+connections: if you have a static IP address, you should use the SNAT
+target.  Masquerading is equivalent to specifying a mapping to the IP
+address of the interface the packet is going out, but also has the
+effect that connections are 
+.I forgotten
+when the interface goes down.  This is the correct behaviour when the
+next dialup is unlikely to have the same interface address (and hence
+any established connections are lost anyway).  It takes one option:
+.TP
+.BI "--to-ports" "<port>[-<port>]"
+This specifies a range of source ports to use, overriding the default 
+.B SNAT
+source port-selection heuristics (see above).  This is only valid with
+if the rule also specifies
+.B "-p tcp"
+or
+.BR "-p udp" ).
+.SS REDIRECT
+This target is only valid in the 
+.B nat
+table, in the 
+.B PREROUTING
+and
+.B OUTPUT
+chains.  It alters the destination IP address to send the packet to
+the machine itself (locally-generated packets are mapped to the
+127.0.0.1 address).
+It takes one option:
+.TP
+.BI "--to-ports" "<port>[-<port>]"
+This specifies a destination port or range or ports to use: without
+this, the destination port is never altered.  This is only valid with
+if the rule also specifies
+.B "-p tcp"
+or
+.BR "-p udp" ).
+.TP
+.SH DIAGNOSTICS
+Various error messages are printed to standard error.  The exit code
+is 0 for correct functioning.  Errors which appear to be caused by
+invalid or abused command line parameters cause an exit code of 2, and
+other errors cause an exit code of 1.
+.SH BUGS
+Check is not implemented (yet).
+.SH COMPATIBILITY WITH IPCHAINS
+This 
+.B iptables
+is very similar to ipchains by Rusty Russell.  The main difference is
+that the chains 
+.B INPUT
+and
+.B OUTPUT
+are only traversed for packets coming into the local host and
+originating from the local host respectively.  Hence every packet only
+passes through one of the three chains; previously a forwarded packet
+would pass through all three.
+.PP
+The other main difference is that 
+.B -i
+refers to the input interface;
+.B -o
+refers to the output interface, and both are available for packets
+entering the
+.B FORWARD
+chain.
+.PP The various forms of NAT have been separated out; 
+.B iptables 
+is a pure packet filter when using the default `filter' table, with
+optional extension modules.  This should simplify much of the previous
+confusion over the combination of IP masquerading and packet filtering
+seen previously.  So the following options are handled differently:
+.br
+ -j MASQ
+.br
+ -M -S
+.br
+ -M -L
+.br
+There are several other changes in iptables.
+.SH SEE ALSO
+The iptables-HOWTO, which details more iptables usage, and the
+netfilter-hacking-HOWTO which details the internals.
+.SH AUTHOR
+Rusty Russell wrote iptables, in early consultation with Michael
+Neuling.
+.PP
+Marc Boucher wrote the owner match, the mark stuff, and ran around
+doing cool stuff everywhere.
+.PP
+James Morris wrote the TOS target, and tos match.
+.PP
+Jozsef Kadlecsik wrote the REJECT target.
+.PP
+The Netfilter Core Team is: Marc Boucher, Rusty Russell.
+.\" .. and did I mention that we are incredibly cool people?
