@@ -1,4 +1,4 @@
-/* Library which manipulates firewall rules.  Version $Revision: 1.48 $ */
+/* Library which manipulates firewall rules.  Version $Revision: 1.49 $ */
 
 /* Architecture of firewall rules is as follows:
  *
@@ -750,11 +750,12 @@ alloc_handle(const char *tablename, unsigned int size, unsigned int num_rules)
 	INIT_LIST_HEAD(&h->chains);
 	strcpy(h->info.name, tablename);
 
-	h->entries = malloc(size);
+	h->entries = malloc(sizeof(STRUCT_GET_ENTRIES) + size);
 	if (!h->entries)
 		goto out_free_handle;
 
 	strcpy(h->entries->name, tablename);
+	h->entries->size = size;
 
 	return h;
 
