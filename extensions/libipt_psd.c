@@ -11,6 +11,7 @@
   2000-08-18 Dennis Koslowski <koslowski@astaro.de> : first release
   2000-12-01 Dennis Koslowski <koslowski@astaro.de> : UDP scans detection added
   2001-02-04 Jan Rekorajski <baggins@pld.org.pl> : converted from target to match
+  2003-03-02 Harald Welte <laforge@netfilter.org>: fix 'storage' bug
 */
 
 #include <stdio.h>
@@ -82,11 +83,11 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 {
 	struct ipt_psd_info *psdinfo = (struct ipt_psd_info *)(*match)->data;
 	unsigned int num;
-	char storage[strlen(optarg) + 2];
+	
+	if (!optarg)
+		exit_error(PARAMETER_PROBLEM, "missing optarg");
 
 	/* string_to_number needs a leading space */
-	storage[0] = ' ';
-	strcpy(&storage[1], optarg);
 
 	switch (c) {
 	/* PSD-weight-threshold */
@@ -95,7 +96,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --psd-weight-threshold "
 				   "twice");
-                if (string_to_number(storage, 0, 10000, &num) == -1)
+                if (string_to_number(optarg, 0, 10000, &num) == -1)
                         exit_error(PARAMETER_PROBLEM,
                                    "bad --psd-weight-threshold `%s'", optarg);
 		psdinfo->weight_threshold = num;
@@ -107,7 +108,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_PSD_OPT_DTRESH)
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --psd-delay-threshold twice");
-                if (string_to_number(storage, 0, 10000, &num) == -1)
+                if (string_to_number(optarg, 0, 10000, &num) == -1)
                         exit_error(PARAMETER_PROBLEM,
                                    "bad --psd-delay-threshold `%s'", optarg);
 		psdinfo->delay_threshold = num;
@@ -119,7 +120,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_PSD_OPT_LPWEIGHT)
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --psd-lo-ports-weight twice");
-                if (string_to_number(storage, 0, 10000, &num) == -1)
+                if (string_to_number(optarg, 0, 10000, &num) == -1)
                         exit_error(PARAMETER_PROBLEM,
                                    "bad --psd-lo-ports-weight `%s'", optarg);
 		psdinfo->lo_ports_weight = num;
@@ -131,7 +132,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_PSD_OPT_HPWEIGHT)
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --psd-hi-ports-weight twice");
-                if (string_to_number(storage, 0, 10000, &num) == -1)
+                if (string_to_number(optarg, 0, 10000, &num) == -1)
                         exit_error(PARAMETER_PROBLEM,
                                    "bad --psd-hi-ports-weight `%s'", optarg);
 		psdinfo->hi_ports_weight = num;
@@ -160,10 +161,10 @@ print(const struct ipt_ip *ip,
 		= (const struct ipt_psd_info *)match->data;
 
 	printf("psd ");
-	printf("weight-threshold: %u ",psdinfo->weight_threshold);
-	printf("delay-threshold: %u ",psdinfo->delay_threshold);
-	printf("lo-ports-weight: %u ",psdinfo->lo_ports_weight);
-	printf("hi-ports-weight: %u ",psdinfo->hi_ports_weight);
+	printf("weight-threshold: %u ", psdinfo->weight_threshold);
+	printf("delay-threshold: %u ", psdinfo->delay_threshold);
+	printf("lo-ports-weight: %u ", psdinfo->lo_ports_weight);
+	printf("hi-ports-weight: %u ", psdinfo->hi_ports_weight);
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
@@ -175,8 +176,8 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 
 	printf("--psd-weight-threshold %u ", psdinfo->weight_threshold);
 	printf("--psd-delay-threshold %u ", psdinfo->delay_threshold);
-	printf("--psd-lo-ports-weight %u ",psdinfo->lo_ports_weight);
-	printf("--psd-hi-ports-weight %u ",psdinfo->hi_ports_weight);
+	printf("--psd-lo-ports-weight %u ", psdinfo->lo_ports_weight);
+	printf("--psd-hi-ports-weight %u ", psdinfo->hi_ports_weight);
 }
 
 static

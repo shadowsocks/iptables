@@ -276,10 +276,10 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
                     && minfo->ports[i-1] == minfo->ports[i])
                         break;
 		printf("%s", i ? "," : "");
-		print_port(minfo->ports[i], ip->proto, 0);
+		print_port(minfo->ports[i], ip->proto, 1);
                 if (pflags & (1<<i)) {
                         printf(":");
-                        print_port(minfo->ports[++i], ip->proto, 0);
+                        print_port(minfo->ports[++i], ip->proto, 1);
                 }
 	}
 	printf(" ");

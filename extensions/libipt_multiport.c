@@ -237,7 +237,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 
 	for (i=0; i < multiinfo->count; i++) {
 		printf("%s", i ? "," : "");
-		print_port(multiinfo->ports[i], ip->proto, 0);
+		print_port(multiinfo->ports[i], ip->proto, 1);
 	}
 	printf(" ");
 }
