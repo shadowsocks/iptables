@@ -4,11 +4,11 @@ TOPLEVEL_INCLUDED=YES
 ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
-NETFILTER_VERSION:=1.2.1a
-OLD_NETFILTER_VERSION:=1.2
+NETFILTER_VERSION:=1.2.2
+OLD_NETFILTER_VERSION:=1.2.1a
 
 # Waiting for inclusions in the kernel tree.
-PENDING_PATCHES:=dropped-table.patch seqoffset.patch irc-conntrack-nat.patch
+PENDING_PATCHES:=ftp-fixes.patch irc-conntrack-nat.patch
 # These went in previous kernels.
 PENDING_PATCHES+=ipv6-fixes.patch.ipv6 masquerade+fwmark.patch nat-overlap.patch ppc-sparc-mangle.patch tos-fix.patch masq-dynaddr.patch
 
