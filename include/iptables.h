@@ -4,6 +4,10 @@
 #include "iptables_common.h"
 #include "libiptc/libiptc.h"
 
+#ifndef IPPROTO_SCTP
+#define IPPROTO_SCTP 132
+#endif
+
 struct iptables_rule_match
 {
 	struct iptables_rule_match *next;
