@@ -1433,6 +1433,8 @@ delete_entry(const ip6t_chainlabel chain,
 			ret &= ip6tc_delete_entry(chain, fw, mask, handle);
 		}
 	}
+	free(mask);
+
 	return ret;
 }
 
@@ -1654,6 +1656,8 @@ void clear_rule_matches(struct ip6tables_rule_match **matches)
 
 	for (matchp = *matches; matchp;) {
 		tmp = matchp->next;
+		if (matchp->match->m)
+			free(matchp->match->m);
 		free(matchp);
 		matchp = tmp;
 	}
@@ -1687,9 +1691,6 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	char icmp6p[] = "icmpv6";
 
 	memset(&fw, 0, sizeof(fw));
-
-	opts = original_opts;
-	global_option_offset = 0;
 
 	/* re-set optind to 0 in case do_command gets called
 	 * a second time */
@@ -2196,6 +2197,9 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			printf("Warning: using chain %s, not extension\n",
 			       jumpto);
 
+			if (target->t)
+				free(target->t);
+
 			target = NULL;
 		}
 
@@ -2225,6 +2229,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			find_target(jumpto, LOAD_MUST_SUCCEED);
 		} else {
 			e = generate_entry(&fw, matches, target->t);
+			free(target->t);
 		}
 	}
 
@@ -2301,6 +2306,23 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 		dump_entries6(*handle);
 
 	clear_rule_matches(&matches);
+
+	if (e != NULL) {
+		free(e);
+		e = NULL;
+	}
+
+	for (c = 0; c < nsaddrs; c++)
+		free(&saddrs[c]);
+
+	for (c = 0; c < ndaddrs; c++)
+		free(&daddrs[c]);
+
+	if (opts != original_opts) {
+		free(opts);
+		opts = original_opts;
+		global_option_offset = 0;
+	}
 
 	return ret;
 }

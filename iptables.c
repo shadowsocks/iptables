@@ -1431,6 +1431,8 @@ delete_entry(const ipt_chainlabel chain,
 			ret &= iptc_delete_entry(chain, fw, mask, handle);
 		}
 	}
+	free(mask);
+
 	return ret;
 }
 
@@ -1652,6 +1654,8 @@ void clear_rule_matches(struct iptables_rule_match **matches)
 
 	for (matchp = *matches; matchp;) {
 		tmp = matchp->next;
+		if (matchp->match->m)
+			free(matchp->match->m);
 		free(matchp);
 		matchp = tmp;
 	}
@@ -1684,9 +1688,6 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	int proto_used = 0;
 
 	memset(&fw, 0, sizeof(fw));
-
-	opts = original_opts;
-	global_option_offset = 0;
 
 	/* re-set optind to 0 in case do_command gets called
 	 * a second time */
@@ -2196,6 +2197,9 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			printf("Warning: using chain %s, not extension\n",
 			       jumpto);
 
+			if (target->t)
+				free(target->t);
+
 			target = NULL;
 		}
 
@@ -2225,6 +2229,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			find_target(jumpto, LOAD_MUST_SUCCEED);
 		} else {
 			e = generate_entry(&fw, matches, target->t);
+			free(target->t);
 		}
 	}
 
@@ -2301,6 +2306,23 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		dump_entries(*handle);
 
 	clear_rule_matches(&matches);
+
+	if (e != NULL) {
+		free(e);
+		e = NULL;
+	}
+
+	for (c = 0; c < nsaddrs; c++)
+		free(&saddrs[c]);
+
+	for (c = 0; c < ndaddrs; c++)
+		free(&daddrs[c]);
+
+	if (opts != original_opts) {
+		free(opts);
+		opts = original_opts;
+		global_option_offset = 0;
+	}
 
 	return ret;
 }
