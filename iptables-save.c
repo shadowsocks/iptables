@@ -175,7 +175,7 @@ static void print_rule(const struct ipt_entry *e,
 	printf("-j %s ", iptc_get_target(e, h));
 
 	/* Print targinfo part */
-	t = ipt_get_target(e);
+	t = ipt_get_target((struct ipt_entry *)e);
 	if (t->u.user.name[0]) {
 		struct iptables_target *target
 			= find_target(t->u.user.name, TRY_LOAD);
