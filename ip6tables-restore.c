@@ -7,7 +7,7 @@
  * 	Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
  *
- * $Id: ip6tables-restore.c,v 1.14 2004/01/31 15:33:55 gandalf Exp $
+ * $Id: ip6tables-restore.c,v 1.15 2004/01/31 19:28:13 gandalf Exp $
  */
 
 #include <getopt.h>
@@ -161,7 +161,8 @@ int main(int argc, char *argv[])
 		int ret;
 
 		line++;
-		if (buffer[0] == '\n') continue;
+		if (buffer[0] == '\n')
+			continue;
 		else if (buffer[0] == '#') {
 			if (verbose) fputs(buffer, stdout);
 			continue;
