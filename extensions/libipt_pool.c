@@ -113,11 +113,11 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 		(struct ipt_pool_info *)match->data;
 
 	if (info->src != IP_POOL_NONE)
-		printf("%s--srcpool %s",
+		printf("%s--srcpool %s ",
 			(info->flags & IPT_POOL_INV_SRC) ? "! " : "",
 			ip_pool_get_name(buf, sizeof(buf), info->src, 0));
 	if (info->dst != IP_POOL_NONE)
-		printf("%s--dstpool %s",
+		printf("%s--dstpool %s ",
 			(info->flags & IPT_POOL_INV_DST) ? "! " : "",
 			ip_pool_get_name(buf, sizeof(buf), info->dst, 0));
 }
