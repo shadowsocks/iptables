@@ -21,7 +21,8 @@ help(void)
 " --log-prefix prefix		Prefix log messages with this prefix.\n\n"
 " --log-tcp-sequence		Log TCP sequence numbers.\n\n"
 " --log-tcp-options		Log TCP options.\n\n"
-" --log-ip-options		Log IP options.\n\n",
+" --log-ip-options		Log IP options.\n\n"
+" --log-uid			Log UID owning the local socket.\n\n",
 IPTABLES_VERSION);
 }
 
@@ -31,6 +32,7 @@ static struct option opts[] = {
 	{ .name = "log-tcp-sequence", .has_arg = 0, .flag = 0, .val = '1' },
 	{ .name = "log-tcp-options",  .has_arg = 0, .flag = 0, .val = '2' },
 	{ .name = "log-ip-options",   .has_arg = 0, .flag = 0, .val = '3' },
+	{ .name = "log-uid",          .has_arg = 0, .flag = 0, .val = '4' },
 	{ .name = 0 }
 };
 
@@ -98,6 +100,7 @@ parse_level(const char *level)
 #define IPT_LOG_OPT_TCPSEQ 0x04
 #define IPT_LOG_OPT_TCPOPT 0x08
 #define IPT_LOG_OPT_IPOPT 0x10
+#define IPT_LOG_OPT_UID 0x20
 
 /* Function which parses command options; returns true if it
    ate an option */
@@ -168,6 +171,15 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= IPT_LOG_OPT_IPOPT;
 		break;
 
+	case '4':
+		if (*flags & IPT_LOG_OPT_UID)
+			exit_error(PARAMETER_PROBLEM,
+				   "Can't specify --log-uid twice");
+
+		loginfo->logflags |= IPT_LOG_UID;
+		*flags |= IPT_LOG_OPT_UID;
+		break;
+
 	default:
 		return 0;
 	}
@@ -211,6 +223,8 @@ print(const struct ipt_ip *ip,
 			printf("tcp-options ");
 		if (loginfo->logflags & IPT_LOG_IPOPT)
 			printf("ip-options ");
+		if (loginfo->logflags & IPT_LOG_UID)
+			printf("uid ");
 		if (loginfo->logflags & ~(IPT_LOG_MASK))
 			printf("unknown-flags ");
 	}
@@ -238,6 +252,8 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 		printf("--log-tcp-options ");
 	if (loginfo->logflags & IPT_LOG_IPOPT)
 		printf("--log-ip-options ");
+	if (loginfo->logflags & IPT_LOG_UID)
+		printf("--log-uid ");
 }
 
 static

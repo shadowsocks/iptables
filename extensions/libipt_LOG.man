@@ -26,3 +26,6 @@ Log options from the TCP packet header.
 .TP
 .B --log-ip-options
 Log options from the IP packet header.
+.TP
+.B --log-uid
+Log the userid of the process which generated the packet.
