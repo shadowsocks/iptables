@@ -140,7 +140,7 @@ struct ip6tables_match rand_match = {
 	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
-	.print		= &print
+	.print		= &print,
 	.save		= &save,
 	.extra_opts	= opts,
 };
