@@ -1,5 +1,5 @@
 /* Code to save the iptables state, in human readable-form. */
-/* Authors: Paul 'Rusty' Russel <rusty@linuxcare.com.au> and
+/* Authors: Paul 'Rusty' Russell <rusty@rustcorp.com.au> and
  * 	    Harald Welte <laforge@gnumonks.org>
  */
 #include <getopt.h>
