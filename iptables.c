@@ -1430,7 +1430,7 @@ generate_entry(const struct ipt_entry *fw,
 
 	size = sizeof(struct ipt_entry);
 	for (m = matches; m; m = m->next)
-		size += m->m->match_size;
+		size += m->m ? m->m->match_size : 0;
 
 	e = fw_malloc(size + target->target_size);
 	*e = *fw;
@@ -1439,8 +1439,10 @@ generate_entry(const struct ipt_entry *fw,
 
 	size = 0;
 	for (m = matches; m; m = m->next) {
-		memcpy(e->elems + size, m->m, m->m->match_size);
-		size += m->m->match_size;
+		if (m->m) {
+			memcpy(e->elems + size, m->m, m->m->match_size);
+			size += m->m->match_size;
+		}
 	}
 	memcpy(e->elems + size, target, target->target_size);
 
