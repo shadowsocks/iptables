@@ -273,8 +273,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 
 	/* special hack for 'any' case */
 	if (icmp->type == 0xFF) {
-		print_icmptype(icmp->type, icmp->code[0], icmp->code[1],
-				icmp->invflags & IPT_ICMP_INV, 0);
+		printf("--icmp-type any ");
 	} else {
 		printf("--icmp-type %u", icmp->type);
 		if (icmp->code[0] != 0 || icmp->code[1] != 0xFF)
