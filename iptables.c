@@ -551,7 +551,7 @@ host_to_addr(const char *name, unsigned int *naddr)
 
 		while (host->h_addr_list[*naddr] != (char *) NULL)
 			(*naddr)++;
-		addr = fw_calloc(*naddr, sizeof(struct in_addr));
+		addr = fw_calloc(*naddr, sizeof(struct in_addr) * *naddr);
 		for (i = 0; i < *naddr; i++)
 			inaddrcpy(&(addr[i]),
 				  (struct in_addr *) host->h_addr_list[i]);
