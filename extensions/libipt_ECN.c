@@ -6,7 +6,7 @@
  *
  * libipt_ECN.c borrowed heavily from libipt_DSCP.c
  *
- * $Id: libipt_ECN.c,v 1.1 2002/02/17 21:32:32 laforge Exp $
+ * $Id: libipt_ECN.c,v 1.2 2002/02/18 21:32:56 laforge Exp $
  */
 #include <stdio.h>
 #include <string.h>
@@ -99,7 +99,6 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 		case IPT_ECN_OP_REMOVE:
 			printf("--ecn-remove ");
 			break;
-		default:
 	}
 }
 

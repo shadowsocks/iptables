@@ -14,17 +14,26 @@
 static void
 help(void)
 {
+#ifdef IPT_OWNER_COMM
 	printf(
 "OWNER match v%s options:\n"
 "[!] --uid-owner userid     Match local uid\n"
 "[!] --gid-owner groupid    Match local gid\n"
 "[!] --pid-owner processid  Match local pid\n"
 "[!] --sid-owner sessionid  Match local sid\n"
-#ifdef IPT_OWNER_COMM
 "[!] --cmd-owner name       Match local command name\n"
-#endif
 "\n",
 NETFILTER_VERSION);
+#else
+	printf(
+"OWNER match v%s options:\n"
+"[!] --uid-owner userid     Match local uid\n"
+"[!] --gid-owner groupid    Match local gid\n"
+"[!] --pid-owner processid  Match local pid\n"
+"[!] --sid-owner sessionid  Match local sid\n"
+"\n",
+NETFILTER_VERSION);
+#endif /* IPT_OWNER_COMM */
 }
 
 static struct option opts[] = {
