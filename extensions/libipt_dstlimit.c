@@ -20,6 +20,10 @@
 
 #define IPT_DSTLIMIT_BURST	5
 
+/* miliseconds */
+#define IPT_DSTLIMIT_GCINTERVAL	1000
+#define IPT_DSTLIMIT_EXPIRE	10
+
 /* Function which prints out usage message. */
 static void
 help(void)
@@ -30,6 +34,7 @@ help(void)
 "                                [Packets per second unless followed by \n"
 "                                /sec /minute /hour /day postfixes]\n"
 "--dstlimit-mode <mode>		mode (destip|destip-destport)\n"
+"--dstlimit-name <name>		name for /proc/net/ipt_dstlimit/\n"
 "[--dstlimit-burst <num>]	number to match in a burst, default %u\n"
 "[--dstlimit-htable-size <num>]	number of hashtable buckets\n"
 "[--dstlimit-htable-max <num>]	number of hashtable entries\n"
@@ -46,6 +51,7 @@ static struct option opts[] = {
 	{ "dstlimit-htable-gcinterval", 1, 0, '(' },
 	{ "dstlimit-htable-expire", 1, 0, ')' },
 	{ "dstlimit-mode", 1, 0, '_' },
+	{ "dstlimit-name", 1, 0, '"' },
 	{ 0 }
 };
 
@@ -92,6 +98,8 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 	struct ipt_dstlimit_info *r = (struct ipt_dstlimit_info *)m->data;
 
 	r->burst = IPT_DSTLIMIT_BURST;
+	r->gc_interval = IPT_DSTLIMIT_GCINTERVAL;
+	r->expire = IPT_DSTLIMIT_EXPIRE;
 
 	/* Can't cache this */
 	*nfcache |= NFC_UNKNOWN;
@@ -100,6 +108,7 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 #define PARAM_LIMIT		0x00000001
 #define PARAM_BURST		0x00000002
 #define PARAM_MODE		0x00000004
+#define PARAM_NAME		0x00000008
 #define PARAM_SIZE		0x00000010
 #define PARAM_MAX		0x00000020
 #define PARAM_GCINTERVAL	0x00000040
@@ -147,7 +156,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				"bad --dstlimit-htable-size: `%s'", optarg);
-		r->hinfo.size = num;
+		r->size = num;
 		*flags |= PARAM_SIZE;
 		break;
 	case '*':
@@ -157,7 +166,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				"bad --dstlimit-htable-max: `%s'", optarg);
-		r->hinfo.max = num;
+		r->max = num;
 		*flags |= PARAM_MAX;
 		break;
 	case '(':
@@ -169,7 +178,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 				"bad --dstlimit-htable-gcinterval: `%s'", 
 				optarg);
 		/* FIXME: not HZ dependent!! */
-		r->hinfo.gc_interval = num;
+		r->gc_interval = num;
 		*flags |= PARAM_GCINTERVAL;
 		break;
 	case ')':
@@ -180,7 +189,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				"bad --dstlimit-htable-expire: `%s'", optarg);
 		/* FIXME: not HZ dependent */
-		r->hinfo.expire = num;
+		r->expire = num;
 		*flags |= PARAM_EXPIRE;
 		break;
 	case '_':
@@ -195,6 +204,15 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM, 
 				"bad --dstlimit-mode: `%s'\n", optarg);
 		*flags |= PARAM_MODE;
+		break;
+	case '"':
+		if (check_inverse(optarg, &invert, NULL, 0))
+			exit_error(PARAMETER_PROBLEM, "Unexpected `!' after "
+					"--dstlimit-name");
+		if (strlen(optarg) == 0)
+			exit_error(PARAMETER_PROBLEM, "Zero-length name?");
+		strncpy(r->name, optarg, sizeof(r->name));
+		*flags |= PARAM_NAME;
 		break;
 	default:
 		return 0;
@@ -212,6 +230,9 @@ static void final_check(unsigned int flags)
 	if (!(flags & PARAM_MODE))
 		exit_error(PARAMETER_PROBLEM,
 				"You have to specify --dstlimit-mode");
+	if (!(flags & PARAM_NAME))
+		exit_error(PARAMETER_PROBLEM,
+				"You have to specify --dstlimit-name");
 }
 
 static struct rates
@@ -254,10 +275,10 @@ print(const struct ipt_ip *ip,
 			printf("mode dstip-dstport ");
 			break;
 	}
-	printf("htable-size %u ", r->hinfo.size);
-	printf("htable-max %u ", r->hinfo.max);
-	printf("htable-gcinterval %u ", r->hinfo.gc_interval);
-	printf("htable-expire %u ", r->hinfo.expire);
+	printf("htable-size %u ", r->size);
+	printf("htable-max %u ", r->max);
+	printf("htable-gcinterval %u ", r->gc_interval);
+	printf("htable-expire %u ", r->expire);
 }
 
 /* FIXME: Make minimalist: only print rate if not default --RR */
@@ -277,10 +298,10 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 			printf("--mode dstip-dstport ");
 			break;
 	}
-	printf("--htable-size %u ", r->hinfo.size);
-	printf("--htable-max %u ", r->hinfo.max);
-	printf("--htable-gcinterval %u", r->hinfo.gc_interval);
-	printf("--htable-expire %u ", r->hinfo.expire);
+	printf("--htable-size %u ", r->size);
+	printf("--htable-max %u ", r->max);
+	printf("--htable-gcinterval %u", r->gc_interval);
+	printf("--htable-expire %u ", r->expire);
 }
 
 static
