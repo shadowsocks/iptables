@@ -1,0 +1,28 @@
+- REJECT to UDP packets with wrong checksum
+	- fix in pending
+- save/restore problem of owner match
+	- userspace
+- ECN checksum problem
+	- fix in pending
+- 'mangle INPUT MARK problem' 
+	- route me harder?
+- ip6tables HOPLIMIT target
+	- can be put in pom
+- u32
+	- can wait
+- XDMCP conntrack/nat
+	- can wait
+- nf_debug stuff
+	- can wait
+- ipt_ACCOUNT
+	- can wait
+- ftp conntrack debug message
+	- fix in pending
+- ASSERT debug messages
+	- fix in submitted
+- ICMP de-nat problem at MTU transition
+	- fix needs testing
+- early_drop_backwards.diff 
+	- is in my local pom, needs testing before 'pending'
+- UDP stream timeout (180s) doens't apply for first reply packet
+	- fix by Martin Josefsson, needs review/testing
