@@ -53,7 +53,7 @@ append_range(struct ipt_natinfo *info, const struct ip_nat_range *range)
 	if (!info)
 		exit_error(OTHER_PROBLEM, "Out of memory\n");
 
-	info->t.target_size = size;
+	info->t.u.target_size = size;
 	info->mr.range[info->mr.rangesize] = *range;
 	info->mr.rangesize++;
 

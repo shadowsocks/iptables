@@ -1014,14 +1014,14 @@ print_match(const struct ipt_entry_match *m,
 	    const struct ipt_ip *ip,
 	    int numeric)
 {
-	struct iptables_match *match = find_match(m->u.name, 1);
+	struct iptables_match *match = find_match(m->u.user.name, 1);
 
 	if (match) {
 		if (match->print)
 			match->print(ip, m, numeric);
 	} else {
-		if (m->u.name[0])
-			printf("UNKNOWN match `%s' ", m->u.name);
+		if (m->u.user.name[0])
+			printf("UNKNOWN match `%s' ", m->u.user.name);
 	}
 	/* Don't stop iterating. */
 	return 0;
@@ -1150,9 +1150,9 @@ print_firewall(const struct ipt_entry *fw,
 		if (target->print)
 			/* Print the target information. */
 			target->print(&fw->ip, t, format & FMT_NUMERIC);
-	} else if (t->target_size != sizeof(*t))
+	} else if (t->u.target_size != sizeof(*t))
 		printf("[%u bytes of unknown target data] ",
-		       t->target_size - sizeof(*t));
+		       t->u.target_size - sizeof(*t));
 
 	if (!(format & FMT_NONEWLINE))
 		fputc('\n', stdout);
@@ -1165,7 +1165,7 @@ print_firewall_line(const struct ipt_entry *fw,
 	struct ipt_entry_target *t;
 
 	t = ipt_get_target((struct ipt_entry *)fw);
-	print_firewall(fw, t->u.name, 0, FMT_PRINT_RULE, h);
+	print_firewall(fw, t->u.user.name, 0, FMT_PRINT_RULE, h);
 }
 
 static int
@@ -1462,19 +1462,19 @@ generate_entry(const struct ipt_entry *fw,
 
 	size = sizeof(struct ipt_entry);
 	for (m = matches; m; m = m->next)
-		size += m->m->match_size;
+		size += m->m->u.match_size;
 
-	e = fw_malloc(size + target->target_size);
+	e = fw_malloc(size + target->u.target_size);
 	*e = *fw;
 	e->target_offset = size;
-	e->next_offset = size + target->target_size;
+	e->next_offset = size + target->u.target_size;
 
 	size = 0;
 	for (m = matches; m; m = m->next) {
-		memcpy(e->elems + size, m->m, m->m->match_size);
-		size += m->m->match_size;
+		memcpy(e->elems + size, m->m, m->m->u.match_size);
+		size += m->m->u.match_size;
 	}
-	memcpy(e->elems + size, target, target->target_size);
+	memcpy(e->elems + size, target, target->u.target_size);
 
 	return e;
 }
@@ -1678,12 +1678,14 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			target = find_target(jumpto, 1);
 
 			if (target) {
-				size_t size = sizeof(struct ipt_entry_target)
-					+ IPT_ALIGN(target->size);
+				size_t size;
+
+				size = IPT_ALIGN(sizeof(struct ipt_entry_target)
+						 + target->size);
 
 				target->t = fw_calloc(1, size);
-				target->t->target_size = size;
-				strcpy(target->t->u.name, jumpto);
+				target->t->u.target_size = size;
+				strcpy(target->t->u.user.name, jumpto);
 				target->init(target->t, &fw.nfcache);
 			}
 			break;
@@ -1735,11 +1737,13 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				exit_error(PARAMETER_PROBLEM,
 					   "Couldn't load match `%s'", optarg);
 			else {
-				size_t size = sizeof(struct ipt_entry_match)
-					+ IPT_ALIGN(m->size);
+				size_t size;
+
+				size = IPT_ALIGN(sizeof(struct ipt_entry_match)
+						 + m->size);
 				m->m = fw_calloc(1, size);
-				m->m->match_size = size;
-				strcpy(m->m->u.name, optarg);
+				m->m->u.match_size = size;
+				strcpy(m->m->u.user.name, optarg);
 				m->init(m->m, &fw.nfcache);
 			}
 			break;
@@ -1812,12 +1816,14 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				    && !find_match(protocol, 0)
 				    && (m = find_match(protocol, 1))) {
 					/* Try loading protocol */
-					size_t size = sizeof(struct ipt_entry_match)
-						+ IPT_ALIGN(m->size);
+					size_t size;
+
+					size = IPT_ALIGN(sizeof(struct ipt_entry_match)
+							 + m->size);
 
 					m->m = fw_calloc(1, size);
-					m->m->match_size = size;
-					strcpy(m->m->u.name, protocol);
+					m->m->u.match_size = size;
+					strcpy(m->m->u.user.name, protocol);
 					m->init(m->m, &fw.nfcache);
 
 					optind--;
@@ -1935,10 +1941,10 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 					   "Can't find standard target\n");
 
 			size = sizeof(struct ipt_entry_target)
-				+ IPT_ALIGN(target->size);
+				+ target->size;
 			target->t = fw_calloc(1, size);
-			target->t->target_size = size;
-			strcpy(target->t->u.name, jumpto);
+			target->t->u.target_size = size;
+			strcpy(target->t->u.user.name, jumpto);
 			target->init(target->t, &fw.nfcache);
 		}
 
@@ -1947,8 +1953,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 
 			/* Don't know it.  Must be extension with no
                            options? */
-			unknown_target.target_size = sizeof(unknown_target);
-			strcpy(unknown_target.u.name, jumpto);
+			unknown_target.u.target_size = sizeof(unknown_target);
+			strcpy(unknown_target.u.user.name, jumpto);
 
 			e = generate_entry(&fw, iptables_matches,
 					   &unknown_target);
