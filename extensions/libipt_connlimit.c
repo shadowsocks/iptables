@@ -3,6 +3,7 @@
 #include <netdb.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <getopt.h>
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ip_conntrack.h>
@@ -99,7 +100,7 @@ print(const struct ipt_ip *ip,
 {
 	struct ipt_iplimit_info *info = (struct ipt_iplimit_info*)match->data;
 
-	printf("#conn/%d %s %d", count_bits(info->mask),
+	printf("#conn/%d %s %d ", count_bits(info->mask),
 	       info->inverse ? "<" : ">", info->limit);
 }
 
@@ -108,23 +109,22 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 {
 	struct ipt_iplimit_info *info = (struct ipt_iplimit_info*)match->data;
 
-	printf("%s--iplimit-above %d",info->inverse ? "! " : "",info->limit);
-	printf(" --iplimit-mask %d",count_bits(info->mask));
+	printf("%s--iplimit-above %d ",info->inverse ? "! " : "",info->limit);
+	printf("--iplimit-mask %d ",count_bits(info->mask));
 }
 
-struct iptables_match iplimit
-= { NULL,
-    "iplimit",
-    NETFILTER_VERSION,
-    IPT_ALIGN(sizeof(struct ipt_iplimit_info)),
-    IPT_ALIGN(sizeof(struct ipt_iplimit_info)),
-    &help,
-    &init,
-    &parse,
-    &final_check,
-    &print,
-    &save,
-    opts
+static struct iptables_match iplimit = {
+	name:		"iplimit",
+	version:	NETFILTER_VERSION,
+	size:		IPT_ALIGN(sizeof(struct ipt_iplimit_info)),
+	userspacesize:	offsetof(struct ipt_iplimit_info,data),
+	help:		help,
+	init:		init,
+	parse:		parse,
+	final_check:	final_check,
+	print:		print,
+	save: 		save,
+	extra_opts:	opts
 };
 
 void _init(void)
