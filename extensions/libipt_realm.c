@@ -49,7 +49,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 		char *end;
 	case '1':
-		check_inverse(argv[optind], &invert, &optind, 0);
+		check_inverse(argv[optind-1], &invert, &optind, 0);
 		optarg = argv[optind-1];
 		realminfo->id = strtoul(optarg, &end, 0);
 		if (*end == '/') {
