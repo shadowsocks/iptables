@@ -4,7 +4,7 @@ TOPLEVEL_INCLUDED=YES
 ifndef KERNEL_DIR
 KERNEL_DIR=/usr/src/linux
 endif
-NETFILTER_VERSION:=1.1.3
+NETFILTER_VERSION:=1.2
 OLD_NETFILTER_VERSION:=1.1.2
 
 LIBDIR:=/usr/local/lib
@@ -13,7 +13,7 @@ MANDIR:=/usr/local/man
 INCDIR:=/usr/local/include
 
 # Need libc6 for this.  Should covert to autoconf.
-ifneq ($(shell ldd --version | fgrep 2.2),)
+ifneq ($(shell ldd --v | fgrep 2.2),)
 DO_IPV6=1
 endif
 
@@ -23,7 +23,7 @@ CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -Iinclude/ -I$(KERNEL_DIR)/include -DNETFIL
 DEPFILES = $(SHARED_LIBS:%.so=%.d)
 SH_CFLAGS:=$(CFLAGS) -fPIC
 
-EXTRAS+=iptables iptables.o 
+EXTRAS+=iptables iptables.o
 EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables $(DESTDIR)$(MANDIR)/man8/iptables.8
 
 # Still experimental.
@@ -32,7 +32,7 @@ EXTRA_INSTALLS_EXP:=$(DESTDIR)$(BINDIR)/iptables-save $(DESTDIR)$(BINDIR)/iptabl
 
 ifdef DO_IPV6
 EXTRAS+=ip6tables ip6tables.o
-EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/ip6tables 
+EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/ip6tables
 endif
 
 # Sparc64 hack
@@ -131,7 +131,7 @@ patch-o-matic/ patch-o-matic:
 	@cd $@ && KERNEL_DIR=$(KERNEL_DIR) ./runme
 
 # Rusty's distro magic.
-distrib: check nowhitespace distclean delrelease /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2 diff md5sums
+distrib: check distclean delrelease /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2 diff md5sums # nowhitespace
 
 # Makefile must not define:
 # -g -pg
@@ -141,7 +141,7 @@ check:
 	@if echo $(CFLAGS) | egrep -e NDEBUG >/dev/null; then exit 0; else echo Define -DNDEBUG; exit 1; fi
 
 nowhitespace:
-	@if grep -n '[ 	]$$' `find . -name 'Makefile' -o -name '*.[ch]'`; then exit 1; else exit 0; fi 
+	@if grep -n '[ 	]$$' `find . -name 'Makefile' -o -name '*.[ch]'`; then exit 1; else exit 0; fi
 
 delrelease:
 	rm -f /home/public/netfilter/iptables-$(NETFILTER_VERSION).tar.bz2
