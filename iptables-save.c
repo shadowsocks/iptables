@@ -111,7 +111,7 @@ static int print_match(const struct ipt_entry_match *e,
 			const struct ipt_ip *ip)
 {
 	struct iptables_match *match
-		= find_match(e->u.user.name, TRY_LOAD);
+		= find_match(e->u.user.name, TRY_LOAD, NULL);
 
 	if (match) {
 		printf("-m %s ", e->u.user.name);
