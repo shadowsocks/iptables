@@ -4,27 +4,28 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.30 2001/04/25 14:34:28 jamesm Exp $
+CVS ID: $Id: TODO,v 1.31 2001/05/03 11:53:27 jamesm Exp $
 
 IMPORTANT issues:
 - solution for nostate / notrack (we don't want to track specific conn's)
 - multiple related connections [HW]
 - ip_conntrack rmmod loop (sometimes, Yan's patch?)
 - conntrack helper not called for first packet (udp!)
-- why is nat_helper's expect() function called for all helpers?
+- why is nat_helper's expect() function called for all helpers? [HW]
 X full tcp window tracking incompatibility with nat helpers [HW]
-? Hard lockup with ip_queue under heavy load (was possibly some unrelated 2.3 problem) [JM]
+? Hard lockup with ip_queue under heavy load (was possibly some unrelated 2.3
+  problem) [JM]
 - mangle table should use all five netfilter hooks [HW]
-- merge EPRT / EPSV ftp stuff
+X merge EPRT / EPSV ftp stuff [RR] (reimplemented in ftp-fixes, included 2.4.4)
 X runme error with IPv6 stuff! [HW]
 - wrong 'Out of window' error message from tcp-windowtracking [HW]
-- SMP conntrack race [RR]
+X SMP conntrack race [RR] (ftp-fixes, included in 2.4.4)
 
 NICE to have:
 - multicast connection tracking
 - sysctl support for ftp-multi, irc-conntrack/nat, ftp-fxp
 - integrate HOPLIMIT for ipv6 in patch-o-matic [HW]
-- static 1:1 NAT (only ip address NAT in both directions)
+X static 1:1 NAT (only ip address NAT in both directions) (NETMAP target)
 - u32 classifier (port from tc -> iptables) [YU]
 X pktlen match (not needed, when u32 available) [FM]
 - MARK match / target with boolean OR / AND (to use nfmark bitwise)
@@ -40,7 +41,7 @@ X integrate PSD target / port it as match [HW]
 - ip_nat_ident module [FM]
 - provide daily CVS snapshots via ftp [HW]
 - 10.1.2.3.4 is accepted as a valid IP address by iptables -s / -d ?
-- make iptables / ip6tables use the same codebase (as libiptc)
+- make iptables / ip6tables use the same codebase (as libiptc) [KA]
 
 FUTURE extensions:
 - conntrack / nat failover [HW]
@@ -57,3 +58,4 @@ FUTURE extensions:
 [RJ]	Jan Rekorajski <baggins@mimuw.edu.pl>
 [BB]	Bastian Blank <bastianb@gmx.de>
 [FM]	Fabrice Marie <fabrice@celestix.com>
+[KA]	Kiz-Szabo Andras <kisza@sch.bme.hu>
