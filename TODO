@@ -4,7 +4,7 @@ Currently maintained by Harald Welte <laforge@gnumonks.org>
 Please inform me, if you want to work on any of the TODO items, so I
 can update this list and thus prevent two people doing the same work.
 
-CVS ID: $Id: TODO,v 1.65 2002/08/18 22:19:26 laforge Exp $
+CVS ID: $Id: TODO,v 1.66 2002/09/15 11:29:18 laforge Exp $
 
 IMPORTANT issues:
 - erroneously too-fast dropped conntrack for half-open TCP connections [JK]
@@ -43,6 +43,7 @@ NICE to have:
 - libipq runtime version, do before 1.2.5 [JM]
 - add ICMP type-3-code-13 option to REJECT
 - export list of matches/targets via proc-fs
+- ip6tables mangle needs 'route_me_harder' equivalent
 
 FUTURE extensions:
 - dealing with fragmented expectation-causes (i.e. DCC chat split

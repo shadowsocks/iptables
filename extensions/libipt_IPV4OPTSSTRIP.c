@@ -1,7 +1,7 @@
 /* Shared library add-on to iptables for IPV4OPTSSTRIP
  * This modules strip all the IP options.
  *
- * (C) 2001 by Fabrice MARIE <fabrice@celestix.com>
+ * (C) 2001 by Fabrice MARIE <fabrice@netfilter.org>
  * This program is distributed under the terms of GNU GPL v2, 1991
  */
 

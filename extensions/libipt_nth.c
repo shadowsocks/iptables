@@ -5,12 +5,11 @@
    License (GPL). Copies of the GPL can be obtained from:
    ftp://prep.ai.mit.edu/pub/gnu/GPL
 
-   2001-07-17 Fabrice MARIE <fabrice@celestix.com> : initial development.
+   2001-07-17 Fabrice MARIE <fabrice@netfilter.org> : initial development.
    2001-09-20 Richard Wagner (rwagner@cloudnet.com)
         * added support for multiple counters
         * added support for matching on individual packets
           in the counter cycle
-
 */
 
 #include <stdio.h>
