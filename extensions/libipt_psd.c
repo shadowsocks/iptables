@@ -82,12 +82,11 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 {
 	struct ipt_psd_info *psdinfo = (struct ipt_psd_info *)(*match)->data;
 	unsigned int num;
-	char storage[sizeof(optarg) + 1];
+	char storage[strlen(optarg) + 2];
 
-	/* string_to_number needs this */
+	/* string_to_number needs a leading space */
 	storage[0] = ' ';
-	strncpy(&storage[1], optarg, (size_t) sizeof(optarg));
-	storage[sizeof(optarg)] = 0;
+	strcpy(&storage[1], optarg);
 
 	switch (c) {
 	/* PSD-weight-threshold */
