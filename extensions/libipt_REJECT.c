@@ -146,8 +146,13 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 {
 	const struct ipt_reject_info *reject
 		= (const struct ipt_reject_info *)target->data;
+	unsigned int i;
 
-	printf("--reject-with %s ", reject_table[reject->with].name);
+	for (i = 0; i < sizeof(reject_table)/sizeof(struct reject_names); i++)
+		if (reject_table[i].with == reject->with)
+			break;
+
+	printf("--reject-with %s ", reject_table[i].name);
 }
 
 struct iptables_target reject
