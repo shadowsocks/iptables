@@ -578,10 +578,13 @@ addr_to_host(const struct in6_addr *addr)
 static char *
 mask_to_numeric(const struct in6_addr *addrp)
 {
-	static char buf[20];
+	static char buf[50+2];
 	int l = ipv6_prefix_length(addrp);
-	if (l == -1)
-		return addr_to_numeric(addrp);
+	if (l == -1) {
+		strcpy(buf, "/");
+		strcat(buf, addr_to_numeric(addrp));
+		return buf;
+	}
 	sprintf(buf, "/%d", l);
 	return buf;
 }
