@@ -4,13 +4,16 @@ FOLLOW THESE STEPS:
    in the official kernel.  To look through these, do:
 	% make pending-patches KERNEL_DIR=<<where-your-kernel-is>>
 
+   Please note that you have to recompile your kernel and your kernel modules
+   after this step of kernel patching.
+
 1) Next, make the package.
 	% make KERNEL_DIR=<<where-your-kernel-is>>
 
 2) Finally, you need to to install the shared libraries, and the binary:
 	# make install KERNEL_DIR=<<where-your-kernel-is>>
 
-If you are a developer, you can install the libipq headers, like:
+If you are a developer, you can install the header files, like:
 	# make install-devel
 
 That's it!
@@ -20,13 +23,26 @@ FEELING BRAVE?
 1) The netfilter core team is maintaining a set of extensions / new 
    features which are not yet committed to the mainstream kernel tree.
 
-If you want to try some extensions, you can do the following:
-	% make patch-o-matic KERNEL_DIR=<<where-your-kernel-is>>
+They are a collection of maybe-broken maybe-cool third-party extensions. 
 
-This offers you a collection of maybe-broken maybe-cool third-party
-extensions.  It will modify you kernel source (so back it up first!).
-Most of them will require you to recompile / rebuild your kernel and
-modules.
+Please note that you cannot apply any combination of any of those patches.
+Some of them are incompatible... 
+
+This is why we provide two ways of applying them:
+
+If you want to try some extensions, and be sure that they don't break each
+other, you can do the following:
+
+	% make most-of-pom KERNEL_DIR=<<where-your-kernel-is>>
+
+It will modify you kernel source (so back it up first!).  You will have
+to recompile / rebuild your kernel and modules.
+
+Alternatively, if you really know what your are doing, you can use the
+following command in order to offer you the full list of choices.  Be aware
+that we don't prevent you from shooting yourself in the foot.
+
+	% make patch-o-matic KERNEL_DIR=<<where-your-kernel-is>>
 
 ================================================================
 PROBLEMS YOU MAY ENCOUNTER:
