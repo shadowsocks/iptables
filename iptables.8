@@ -86,16 +86,19 @@ loading, an attempt will be made to load the appropriate module for
 that table if it is not already there.
 
 The tables are as follows:
+.TP
 .BR "filter"
 This is the default table.  It contains the built-in chains INPUT (for
 packets coming into the box itself), FORWARD (for packets being routed
 through the box), and OUTPUT (for locally-generated packets).
+.TP
 .BR "nat"
 This table is consulted when a packet that creates a new
 connection is encountered.  It consists of three built-ins: PREROUTING
 (for altering packets as soon as they come in), OUTPUT (for altering
 locally-generated packets before routing), and POSTROUTING (for
 altering packets as they are about to go out).
+.TP
 .BR "mangle"
 This table is used for specialized packet alteration.  It has two
 built-in chains: PREROUTING (for altering incoming packets before
@@ -456,7 +459,7 @@ target below).
 .TP
 .BI "--mark " "value[/mask]"
 Matches packets with the given unsigned mark value (if a mask is
-specified, this is logically ANDed with the mark before the
+specified, this is logically ANDed with the mask before the
 comparison).
 .SS owner
 This module attempts to match various characteristics of the packet
