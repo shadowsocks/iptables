@@ -21,6 +21,7 @@ The type given can be
 .B " icmp-net-prohibited"
 .B " icmp-host-prohibited or"
 .B " icmp-admin-prohibited (*)"
+.B " icmp-frag-needed"
 .fi
 which return the appropriate ICMP error message (\fBport-unreachable\fP is
 the default).  The option
@@ -30,5 +31,8 @@ TCP RST packet to be sent back.  This is mainly useful for blocking
 .I ident
 (113/tcp) probes which frequently occur when sending mail to broken mail
 hosts (which won't accept your mail otherwise).
+.TP
+.BI "--pmtu " "size"
+The next-hop MTU the icmp-frag-needed is sent back with.
 .TP
 (*) Using icmp-admin-prohibited with kernels that do not support it will result in a plain DROP instead of REJECT

@@ -46,6 +46,8 @@ static const struct reject_names reject_table[] = {
 	 IPT_ICMP_HOST_PROHIBITED, "ICMP host prohibited"},
 	{"tcp-reset", "tcp-reset",
 	 IPT_TCP_RESET, "TCP RST packet"},
+	{"icmp-frag-needed", "frag-needed",
+	 IPT_ICMP_FRAG_NEEDED, "ICMP fragmentation needed"},
 	{"icmp-admin-prohibited", "admin-prohib",
 	 IPT_ICMP_ADMIN_PROHIBITED, "ICMP administratively prohibited (*)"}
 };
@@ -73,7 +75,8 @@ help(void)
 	printf(
 "REJECT options:\n"
 "--reject-with type              drop input packet and send back\n"
-"                                a reply packet according to type:\n");
+"                                a reply packet according to type:\n"
+"--pmtu                          send back pmtu for icmp-frag-needed\n");
 
 	print_reject_types();
 
@@ -82,6 +85,7 @@ help(void)
 
 static struct option opts[] = {
 	{ "reject-with", 1, 0, '1' },
+	{ "pmtu", 1, 0, '2' },
 	{ 0 }
 };
 
@@ -90,6 +94,17 @@ static void
 init(struct ipt_entry_target *t, unsigned int *nfcache)
 {
 	struct ipt_reject_info *reject = (struct ipt_reject_info *)t->data;
+
+	/* default */
+	reject->with = IPT_ICMP_PORT_UNREACHABLE;
+
+}
+
+/* Allocate and initialize the target. */
+static void
+init_v1(struct ipt_entry_target *t, unsigned int *nfcache)
+{
+	struct ipt_reject_info_v1 *reject = (struct ipt_reject_info_v1 *)t->data;
 
 	/* default */
 	reject->with = IPT_ICMP_PORT_UNREACHABLE;
@@ -132,6 +147,51 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
+/* Function which parses command options; returns true if it
+   ate an option */
+static int
+parse_v1(int c, char **argv, int invert, unsigned int *flags,
+      const struct ipt_entry *entry,
+      struct ipt_entry_target **target)
+{
+	struct ipt_reject_info_v1 *reject = (struct ipt_reject_info_v1 *)(*target)->data;
+	unsigned int limit = sizeof(reject_table)/sizeof(struct reject_names);
+	unsigned int i;
+
+	switch(c) {
+	case '1':
+		if (check_inverse(optarg, &invert, NULL, 0))
+			exit_error(PARAMETER_PROBLEM,
+				   "Unexpected `!' after --reject-with");
+		for (i = 0; i < limit; i++) {
+			if ((strncasecmp(reject_table[i].name, optarg, strlen(optarg)) == 0)
+			    || (strncasecmp(reject_table[i].alias, optarg, strlen(optarg)) == 0)) {
+				reject->with = reject_table[i].with;
+				return 1;
+			}
+		}
+		/* This due to be dropped late in 2.4 pre-release cycle --RR */
+		if (strncasecmp("echo-reply", optarg, strlen(optarg)) == 0
+		    || strncasecmp("echoreply", optarg, strlen(optarg)) == 0)
+			fprintf(stderr, "--reject-with echo-reply no longer"
+				" supported\n");
+		exit_error(PARAMETER_PROBLEM, "unknown reject type `%s'",optarg);
+	case '2':
+		if (reject->with != IPT_ICMP_FRAG_NEEDED) 
+			exit_error(PARAMETER_PROBLEM, "--pmtu only valid with icmp-frag-needed");
+		if (string_to_number(optarg, 68, 65535, &i) == -1)
+			exit_error(PARAMETER_PROBLEM, "pmtu number `%s' out of range",optarg);
+
+		reject->value=i;
+		return 1;
+	default:
+		/* Fall through */
+		break;
+	}
+	return 0;
+}
+
+
 /* Final check; nothing. */
 static void final_check(unsigned int flags)
 {
@@ -154,6 +214,27 @@ print(const struct ipt_ip *ip,
 	printf("reject-with %s ", reject_table[i].name);
 }
 
+/* Prints out ipt_reject_info. */
+static void
+print_v1(const struct ipt_ip *ip,
+      const struct ipt_entry_target *target,
+      int numeric)
+{
+	const struct ipt_reject_info_v1 *reject
+		= (const struct ipt_reject_info_v1 *)target->data;
+	unsigned int i;
+
+	for (i = 0; i < sizeof(reject_table)/sizeof(struct reject_names); i++) {
+		if (reject_table[i].with == reject->with)
+			break;
+	}
+	printf("reject-with %s ", reject_table[i].name);
+
+	if (reject->with == IPT_ICMP_FRAG_NEEDED)
+		printf("pmtu %d ", reject->value);
+}
+
+
 /* Saves ipt_reject in parsable form to stdout. */
 static void save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 {
@@ -168,7 +249,25 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	printf("--reject-with %s ", reject_table[i].name);
 }
 
-static struct iptables_target reject = { 
+/* Saves ipt_reject in parsable form to stdout. */
+static void save_v1(const struct ipt_ip *ip, const struct ipt_entry_target *target)
+{
+	const struct ipt_reject_info_v1 *reject
+		= (const struct ipt_reject_info_v1 *)target->data;
+	unsigned int i;
+
+	for (i = 0; i < sizeof(reject_table)/sizeof(struct reject_names); i++)
+		if (reject_table[i].with == reject->with)
+			break;
+
+	printf("--reject-with %s ", reject_table[i].name);
+
+	if (reject->with == IPT_ICMP_FRAG_NEEDED)
+		printf("--pmtu %d ", reject->value);
+}
+
+
+static struct iptables_target reject_v0 = { 
 	.next		= NULL,
 	.name		= "REJECT",
 	.version	= IPTABLES_VERSION,
@@ -183,7 +282,25 @@ static struct iptables_target reject = {
 	.extra_opts	= opts
 };
 
+static struct iptables_target reject_v1 = { 
+	.next		= NULL,
+	.name		= "REJECT",
+	.version	= IPTABLES_VERSION,
+	.revision	= 1,
+	.size		= IPT_ALIGN(sizeof(struct ipt_reject_info_v1)),
+	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_reject_info_v1)),
+	.help		= &help,
+	.init		= &init_v1,
+	.parse		= &parse_v1,
+	.final_check	= &final_check,
+	.print		= &print_v1,
+	.save		= &save_v1,
+	.extra_opts	= opts
+};
+
+
 void _init(void)
 {
-	register_target(&reject);
+	register_target(&reject_v0);
+	register_target(&reject_v1);
 }
