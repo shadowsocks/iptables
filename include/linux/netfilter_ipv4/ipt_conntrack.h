@@ -22,11 +22,32 @@
 #define IPT_CONNTRACK_STATUS	0x40
 #define IPT_CONNTRACK_EXPIRES	0x80
 
+/* This is exposed to userspace, so remains frozen in time. */
+struct ip_conntrack_old_tuple
+{
+	struct {
+		u_int32_t ip;
+		union {
+			u_int16_t all;
+		} u;
+	} src;
+
+	struct {
+		u_int32_t ip;
+		union {
+			u_int16_t all;
+		} u;
+
+		/* The protocol. */
+		u_int16_t protonum;
+	} dst;
+};
+
 struct ipt_conntrack_info
 {
 	unsigned int statemask, statusmask;
 
-	struct ip_conntrack_tuple tuple[IP_CT_DIR_MAX];
+	struct ip_conntrack_old_tuple tuple[IP_CT_DIR_MAX];
 	struct in_addr sipmsk[IP_CT_DIR_MAX], dipmsk[IP_CT_DIR_MAX];
 
 #ifdef KERNEL_64_USERSPACE_32
