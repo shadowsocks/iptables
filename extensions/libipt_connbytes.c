@@ -93,6 +93,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Unknown --connbytes-mode `%s'", optarg);
 		*flags |= 4;
+		break;
 	default:
 		return 0;
 	}
