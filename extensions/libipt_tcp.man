@@ -32,12 +32,12 @@ will only match packets with the SYN flag set, and the ACK, FIN and
 RST flags unset.
 .TP
 .B "[!] --syn"
-Only match TCP packets with the SYN bit set and the ACK and RST bits
+Only match TCP packets with the SYN bit set and the ACK,RST and FIN bits
 cleared.  Such packets are used to request TCP connection initiation;
 for example, blocking such packets coming in an interface will prevent
 incoming TCP connections, but outgoing TCP connections will be
 unaffected.
-It is equivalent to \fB--tcp-flags SYN,RST,ACK SYN\fP.
+It is equivalent to \fB--tcp-flags SYN,RST,ACK,FIN SYN\fP.
 If the "!" flag precedes the "--syn", the sense of the
 option is inverted.
 .TP
