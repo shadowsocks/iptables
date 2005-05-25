@@ -15,5 +15,5 @@ Match if the destination port is one of the given ports.  The flag
 is a convenient alias for this option.
 .TP
 .BR "--ports " "\fIport\fP[,\fIport\fP[,\fIport\fP...]]"
-Match if the both the source and destination ports are equal to each
-other and to one of the given ports.
+Match if either the source or destination ports are equal to one of
+the given ports.
