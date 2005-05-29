@@ -252,6 +252,16 @@ in6addrcpy(struct in6_addr *dst, struct in6_addr *src)
 	/* dst->s6_addr = src->s6_addr; */
 }
 
+static void free_opts(int reset_offset)
+{
+	if (opts != original_opts) {
+		free(opts);
+		opts = original_opts;
+		if (reset_offset)
+			global_option_offset = 0;
+	}
+}
+
 void
 exit_error(enum exittype status, char *msg, ...)
 {
@@ -267,6 +277,8 @@ exit_error(enum exittype status, char *msg, ...)
 	if (status == VERSION_PROBLEM)
 		fprintf(stderr,
 			"Perhaps ip6tables or your kernel needs to be upgraded.\n");
+	/* On error paths, make sure that we don't leak memory */
+	free_opts(1);
 	exit(status);
 }
 
@@ -277,6 +289,7 @@ exit_tryhelp(int status)
 		fprintf(stderr, "Error occurred at line: %d\n", line);
 	fprintf(stderr, "Try `%s -h' or '%s --help' for more information.\n",
 			program_name, program_name );
+	free_opts(1);
 	exit(status);
 }
 
@@ -1015,6 +1028,9 @@ merge_options(struct option *oldopts, const struct option *newopts,
 {
 	unsigned int num_old, num_new, i;
 	struct option *merge;
+
+	/* Release previous options merged if any */
+	free_opts(0);
 
 	for (num_old = 0; oldopts[num_old].name; num_old++);
 	for (num_new = 0; newopts[num_new].name; num_new++);
@@ -2336,11 +2352,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	for (c = 0; c < ndaddrs; c++)
 		free(&daddrs[c]);
 
-	if (opts != original_opts) {
-		free(opts);
-		opts = original_opts;
-		global_option_offset = 0;
-	}
+	free_opts(1);
 
 	return ret;
 }
