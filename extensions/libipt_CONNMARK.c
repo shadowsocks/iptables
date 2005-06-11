@@ -150,7 +150,7 @@ static void
 print_mask(const char *text, unsigned long long mask)
 {
 	if (mask != ~0ULL)
-		printf("%s%llx", text, mask);
+		printf("%s0x%llx", text, mask);
 }
 
 #else
@@ -165,7 +165,7 @@ static void
 print_mask(const char *text, unsigned long mask)
 {
 	if (mask != ~0UL)
-		printf("%s%lx", text, mask);
+		printf("%s0x%lx", text, mask);
 }
 #endif
 
