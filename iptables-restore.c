@@ -236,12 +236,21 @@ main(int argc, char *argv[])
 			}
 
 			if (iptc_builtin(chain, handle) <= 0) {
-				DEBUGP("Creating new chain '%s'\n", chain);
-				if (!iptc_create_chain(chain, &handle)) 
-					exit_error(PARAMETER_PROBLEM, 
-						   "error creating chain "
-						   "'%s':%s\n", chain, 
-						   strerror(errno));
+				if (noflush && iptc_is_chain(chain, handle)) {
+					DEBUGP("Flushing existing user defined chain '%s'\n", chain);
+					if (!iptc_flush_entries(chain, &handle))
+						exit_error(PARAMETER_PROBLEM,
+							   "error flushing chain "
+							   "'%s':%s\n", chain,
+							   strerror(errno));
+				} else {
+					DEBUGP("Creating new chain '%s'\n", chain);
+					if (!iptc_create_chain(chain, &handle))
+						exit_error(PARAMETER_PROBLEM,
+							   "error creating chain "
+							   "'%s':%s\n", chain,
+							   strerror(errno));
+				}
 			}
 
 			policy = strtok(NULL, " \t\n");

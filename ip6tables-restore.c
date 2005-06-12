@@ -233,12 +233,21 @@ int main(int argc, char *argv[])
 			}
 
 			if (ip6tc_builtin(chain, handle) <= 0) {
-				DEBUGP("Creating new chain '%s'\n", chain);
-				if (!ip6tc_create_chain(chain, &handle))
-					exit_error(PARAMETER_PROBLEM,
-						   "error creating chain "
-						   "'%s':%s\n", chain,
-						   strerror(errno));
+				if (noflush && ip6tc_is_chain(chain, handle)) {
+					DEBUGP("Flushing existing user defined chain '%s'\n", chain);
+					if (!ip6tc_flush_entries(chain, &handle))
+						exit_error(PARAMETER_PROBLEM,
+							   "error flushing chain "
+							   "'%s':%s\n", chain,
+							   strerror(errno));
+				} else {
+					DEBUGP("Creating new chain '%s'\n", chain);
+					if (!ip6tc_create_chain(chain, &handle))
+						exit_error(PARAMETER_PROBLEM,
+							   "error creating chain "
+							   "'%s':%s\n", chain,
+							   strerror(errno));
+				}
 			}
 
 			policy = strtok(NULL, " \t\n");
