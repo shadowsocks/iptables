@@ -73,7 +73,7 @@ parse_to(char *arg, int portok, struct ipt_natinfo *info)
 		range.flags |= IP_NAT_RANGE_PROTO_SPECIFIED;
 
 		port = atoi(colon+1);
-		if (port == 0 || port > 65535)
+		if (port <= 0 || port > 65535)
 			exit_error(PARAMETER_PROBLEM,
 				   "Port `%s' not valid\n", colon+1);
 
@@ -91,7 +91,7 @@ parse_to(char *arg, int portok, struct ipt_natinfo *info)
 			int maxport;
 
 			maxport = atoi(dash + 1);
-			if (maxport == 0 || maxport > 65535)
+			if (maxport <= 0 || maxport > 65535)
 				exit_error(PARAMETER_PROBLEM,
 					   "Port `%s' not valid\n", dash+1);
 			if (maxport < port)
