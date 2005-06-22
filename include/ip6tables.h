@@ -137,6 +137,8 @@ enum ip6t_tryload {
 extern struct ip6tables_target *find_target(const char *name, enum ip6t_tryload);
 extern struct ip6tables_match *find_match(const char *name, enum ip6t_tryload, struct ip6tables_rule_match **match);
 
+extern void parse_interface(const char *arg, char *vianame, unsigned char *mask);
+
 extern int for_each_chain(int (*fn)(const ip6t_chainlabel, int, ip6tc_handle_t *), int verbose, int builtinstoo, ip6tc_handle_t *handle);
 extern int flush_entries(const ip6t_chainlabel chain, int verbose, ip6tc_handle_t *handle);
 extern int delete_chain(const ip6t_chainlabel chain, int verbose, ip6tc_handle_t *handle);

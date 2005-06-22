@@ -152,6 +152,7 @@ extern char *mask_to_dotted(const struct in_addr *mask);
 extern void parse_hostnetworkmask(const char *name, struct in_addr **addrpp,
                       struct in_addr *maskp, unsigned int *naddrs);
 extern u_int16_t parse_protocol(const char *s);
+extern void parse_interface(const char *arg, char *vianame, unsigned char *mask);
 
 extern int do_command(int argc, char *argv[], char **table,
 		      iptc_handle_t *handle);

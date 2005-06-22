@@ -769,8 +769,7 @@ parse_protocol(const char *s)
 	return (u_int16_t)proto;
 }
 
-static void
-parse_interface(const char *arg, char *vianame, unsigned char *mask)
+void parse_interface(const char *arg, char *vianame, unsigned char *mask)
 {
 	int vialen = strlen(arg);
 	unsigned int i;
