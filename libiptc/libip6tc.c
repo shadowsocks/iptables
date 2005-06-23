@@ -242,6 +242,7 @@ is_same(const STRUCT_ENTRY *a, const STRUCT_ENTRY *b,
 	mptr = matchmask + sizeof(STRUCT_ENTRY);
 	if (IP6T_MATCH_ITERATE(a, match_different, a->elems, b->elems, &mptr))
 		return NULL;
+	mptr += IP6T_ALIGN(sizeof(struct ip6t_entry_target));
 
 	return mptr;
 }

@@ -210,6 +210,7 @@ is_same(const STRUCT_ENTRY *a, const STRUCT_ENTRY *b, unsigned char *matchmask)
 	mptr = matchmask + sizeof(STRUCT_ENTRY);
 	if (IPT_MATCH_ITERATE(a, match_different, a->elems, b->elems, &mptr))
 		return NULL;
+	mptr += IPT_ALIGN(sizeof(struct ipt_entry_target));
 
 	return mptr;
 }
