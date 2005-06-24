@@ -400,6 +400,7 @@ invalid or abused command line parameters cause an exit code of 2, and
 other errors cause an exit code of 1.
 .SH BUGS
 Bugs?  What's this? ;-)
+Well, you might want to have a look at http://bugzilla.netfilter.org/
 .SH COMPATIBILITY WITH IPCHAINS
 This
 .B iptables
