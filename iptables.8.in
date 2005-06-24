@@ -400,7 +400,6 @@ invalid or abused command line parameters cause an exit code of 2, and
 other errors cause an exit code of 1.
 .SH BUGS
 Bugs?  What's this? ;-)
-Well... the counters are not reliable on sparc64.
 .SH COMPATIBILITY WITH IPCHAINS
 This
 .B iptables
