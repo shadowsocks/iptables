@@ -141,10 +141,10 @@ print_item(struct ip6t_owner_info *info, u_int8_t flag, int numeric, char *label
 {
 	if(info->match & flag) {
 
-		printf(label);
-
 		if (info->invert & flag)
 			printf("! ");
+
+		printf(label);
 
 		switch(info->match & flag) {
 		case IP6T_OWNER_UID:
