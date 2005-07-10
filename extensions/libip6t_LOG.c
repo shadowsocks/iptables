@@ -9,6 +9,12 @@
 #include <linux/netfilter_ipv6/ip6_tables.h>
 #include <linux/netfilter_ipv6/ip6t_LOG.h>
 
+#ifndef IP6T_LOG_UID	/* Old kernel */
+#define IP6T_LOG_UID	0x08
+#undef  IP6T_LOG_MASK
+#define IP6T_LOG_MASK	0x0f
+#endif
+
 #define LOG_DEFAULT_LEVEL LOG_WARNING
 
 /* Function which prints out usage message. */

@@ -5,6 +5,23 @@
 #ifndef _IPT_CONNTRACK_H
 #define _IPT_CONNTRACK_H
 
+#include <linux/netfilter_ipv4/ip_conntrack.h>
+
+/* backwards compatibility crap. only exists in userspace - HW */
+#include <linux/version.h>
+#ifndef KERNEL_VERSION
+#define KERNEL_VERSION(a,b,c) (((a) << 16) | ((b) << 8) | (c))
+#endif
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,4,18)
+#define IPS_EXPECTED	(1 << 0)
+#define IPS_SEEN_REPLY	(1 << 1)
+#define IPS_ASSURED	(1 << 2)
+#define IP_CT_DIR_ORIGINAL	0
+#define IP_CT_DIR_REPLY		1
+#define IP_CT_DIR_MAX		2
+#endif
+
 #define IPT_CONNTRACK_STATE_BIT(ctinfo) (1 << ((ctinfo)%IP_CT_IS_REPLY+1))
 #define IPT_CONNTRACK_STATE_INVALID (1 << 0)
 
