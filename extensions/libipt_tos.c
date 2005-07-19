@@ -48,10 +48,10 @@ static struct option opts[] = {
 };
 
 static void
-parse_tos(const unsigned char *s, struct ipt_tos_info *info)
+parse_tos(const char *s, struct ipt_tos_info *info)
 {
 	unsigned int i;
-	unsigned int tos;
+	int tos;
 
 	if (string_to_number(s, 0, 255, &tos) != -1) {
 		if (tos == IPTOS_LOWDELAY

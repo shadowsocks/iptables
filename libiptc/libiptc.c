@@ -674,7 +674,7 @@ static int iptcc_compile_chain(TC_HANDLE_T h, STRUCT_REPLACE *repl, struct chain
 
 /* calculate offset and number for every rule in the cache */
 static int iptcc_compile_chain_offsets(TC_HANDLE_T h, struct chain_head *c,
-				       int *offset, int *num)
+				       unsigned int *offset, unsigned int *num)
 {
 	struct rule_head *r;
 
@@ -798,7 +798,7 @@ TC_INIT(const char *tablename)
 {
 	TC_HANDLE_T h;
 	STRUCT_GETINFO info;
-	int tmp;
+	unsigned int tmp;
 	socklen_t s;
 
 	iptc_fn = TC_INIT;

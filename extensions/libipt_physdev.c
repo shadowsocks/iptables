@@ -53,7 +53,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_PHYSDEV_OP_IN)
 			goto multiple_use;
 		check_inverse(optarg, &invert, &optind, 0);
-		parse_interface(argv[optind-1], info->physindev, info->in_mask);
+		parse_interface(argv[optind-1], info->physindev,
+				(unsigned char *)info->in_mask);
 		if (invert)
 			info->invert |= IPT_PHYSDEV_OP_IN;
 		info->bitmask |= IPT_PHYSDEV_OP_IN;
@@ -65,7 +66,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			goto multiple_use;
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_interface(argv[optind-1], info->physoutdev,
-				info->out_mask);
+				(unsigned char *)info->out_mask);
 		if (invert)
 			info->invert |= IPT_PHYSDEV_OP_OUT;
 		info->bitmask |= IPT_PHYSDEV_OP_OUT;

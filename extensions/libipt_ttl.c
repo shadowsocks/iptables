@@ -29,7 +29,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		struct ipt_entry_match **match)
 {
 	struct ipt_ttl_info *info = (struct ipt_ttl_info *) (*match)->data;
-	int value;
+	unsigned int value;
 
 	check_inverse(optarg, &invert, &optind, 0);
 

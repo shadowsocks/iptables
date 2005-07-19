@@ -30,7 +30,7 @@ static struct option opts[] = {
 };
 
 static void
-parse_comment(const unsigned char *s, struct ipt_comment_info *info)
+parse_comment(const char *s, struct ipt_comment_info *info)
 {	
 	int slen = strlen(s);
 
@@ -38,7 +38,7 @@ parse_comment(const unsigned char *s, struct ipt_comment_info *info)
 		exit_error(PARAMETER_PROBLEM,
 			"COMMENT must be shorter than %i characters", IPT_MAX_COMMENT_LEN);
 	}
-	strcpy(info->comment, s);
+	strcpy((char *)info->comment, s);
 }
 
 /* Function which parses command options; returns true if it

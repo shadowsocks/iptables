@@ -59,7 +59,7 @@ init(struct ipt_entry_target *t, unsigned int *nfcache)
 }
 
 static void
-parse_tos(const unsigned char *s, struct ipt_tos_target_info *info)
+parse_tos(const char *s, struct ipt_tos_target_info *info)
 {
 	unsigned int i, tos;
 

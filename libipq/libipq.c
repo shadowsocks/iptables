@@ -122,7 +122,8 @@ static ssize_t ipq_netlink_recvfrom(const struct ipq_handle *h,
                                     unsigned char *buf, size_t len,
                                     int timeout)
 {
-	int addrlen, status;
+	unsigned int addrlen;
+	int status;
 	struct nlmsghdr *nlh;
 
 	if (len < sizeof(struct nlmsgerr)) {

@@ -49,7 +49,7 @@ static struct option opts[] = {
 };
 
 static void
-parse_dscp(const unsigned char *s, struct ipt_DSCP_info *dinfo)
+parse_dscp(const char *s, struct ipt_DSCP_info *dinfo)
 {
 	unsigned int dscp;
        
@@ -67,7 +67,7 @@ parse_dscp(const unsigned char *s, struct ipt_DSCP_info *dinfo)
 
 
 static void
-parse_class(const unsigned char *s, struct ipt_DSCP_info *dinfo)
+parse_class(const char *s, struct ipt_DSCP_info *dinfo)
 {
 	unsigned int dscp = class_to_dscp(s);
 

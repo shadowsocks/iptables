@@ -30,7 +30,7 @@ static u_int16_t
 parse_length(const char *s)
 {
 
-	int len;
+	unsigned int len;
 	
 	if (string_to_number(s, 0, 0xFFFF, &len) == -1)
 		exit_error(PARAMETER_PROBLEM, "length invalid: `%s'\n", s);
