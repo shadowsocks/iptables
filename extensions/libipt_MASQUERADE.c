@@ -81,7 +81,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		= (struct ip_nat_multi_range *)(*target)->data;
 
 	if (entry->ip.proto == IPPROTO_TCP
-	    || entry->ip.proto == IPPROTO_UDP)
+	    || entry->ip.proto == IPPROTO_UDP
+	    || entry->ip.proto == IPPROTO_ICMP)
 		portok = 1;
 	else
 		portok = 0;
