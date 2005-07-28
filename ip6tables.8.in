@@ -73,7 +73,19 @@ means to let the packet through.
 .I DROP
 means to drop the packet on the floor.
 .I QUEUE
-means to pass the packet to userspace (if supported by the kernel).
+means to pass the packet to userspace.  (How the packet can be received
+by a userspace process differs by the particular queue handler.  2.4.x
+and 2.6.x kernels up to 2.6.13 include the 
+.B
+ip_queue
+queue handler.  Kernels 2.6.14 and later additionally include the 
+.B
+nfnetlink_queue
+queue handler.  Packets with a target of QUEUE will be sent to queue number '0'
+in this case. Please also see the
+.B
+NFQUEUE
+target as described later in this man page.)
 .I RETURN
 means stop traversing this chain and resume at the next rule in the
 previous (calling) chain.  If the end of a built-in chain is reached
@@ -426,7 +438,8 @@ There are several other changes in ip6tables.
 .BR ip6tables-restore(8),
 .BR iptables (8),
 .BR iptables-save (8),
-.BR iptables-restore (8).
+.BR iptables-restore (8),
+.BR libipq (3).
 .P
 The packet-filtering-HOWTO details iptables usage for
 packet filtering, the NAT-HOWTO details NAT,
@@ -448,7 +461,7 @@ James Morris wrote the TOS target, and tos match.
 .PP
 Jozsef Kadlecsik wrote the REJECT target.
 .PP
-Harald Welte wrote the ULOG target, TTL match+target and libipulog.
+Harald Welte wrote the ULOG and NFQUEUE target, the new libiptc, aswell as TTL match+target and libipulog.
 .PP
 The Netfilter Core Team is: Marc Boucher, Martin Josefsson, Jozsef Kadlecsik,
 James Morris, Harald Welte and Rusty Russell.
