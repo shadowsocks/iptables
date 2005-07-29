@@ -1029,9 +1029,6 @@ merge_options(struct option *oldopts, const struct option *newopts,
 	unsigned int num_old, num_new, i;
 	struct option *merge;
 
-	/* Release previous options merged if any */
-	free_opts(0);
-
 	for (num_old = 0; oldopts[num_old].name; num_old++);
 	for (num_new = 0; newopts[num_new].name; num_new++);
 
@@ -1040,6 +1037,7 @@ merge_options(struct option *oldopts, const struct option *newopts,
 
 	merge = malloc(sizeof(struct option) * (num_new + num_old + 1));
 	memcpy(merge, oldopts, num_old * sizeof(struct option));
+	free_opts(0); /* Release previous options merged if any */
 	for (i = 0; i < num_new; i++) {
 		merge[num_old + i] = newopts[i];
 		merge[num_old + i].val += *option_offset;
