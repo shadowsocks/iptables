@@ -59,6 +59,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM, "NFQUEUE target: "
 				   "Only use --queue-num ONCE!");
 		parse_num(optarg, tinfo);
+		break;
 	default:
 		return 0;
 	}
