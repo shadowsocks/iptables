@@ -21,7 +21,10 @@ If no port range is specified, then the destination port will never be
 modified.
 .RS
 .PP
-You can add several --to-destination options.  If you specify more
-than one destination address, either via an address range or multiple
---to-destination options, a simple round-robin (one after another in
-cycle) load balancing takes place between these adresses.
+In Kernels up to 2.6.10 you can add several --to-destination options.  For
+those kernels, if you specify more than one destination address, either via an
+address range or multiple --to-destination options, a simple round-robin (one
+after another in cycle) load balancing takes place between these adresses.
+Later Kernels (>= 2.6.11-rc1) don't have the ability to NAT to multiple ranges
+anymore.
+
