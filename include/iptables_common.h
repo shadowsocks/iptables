@@ -7,6 +7,10 @@ enum exittype {
 	PARAMETER_PROBLEM,
 	VERSION_PROBLEM
 };
+
+/* this is a special 64bit data type that is 8-byte aligned */
+#define aligned_u64 unsigned long long __attribute__((aligned(8)))
+
 extern void exit_printhelp() __attribute__((noreturn));
 extern void exit_tryhelp(int) __attribute__((noreturn));
 int check_inverse(const char option[], int *invert, int *optind, int argc);
