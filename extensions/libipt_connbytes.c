@@ -84,11 +84,11 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '3':
 		if (!strcmp(optarg, "packets"))
-			sinfo->what = IPT_CONNBYTES_WHAT_PKTS;
+			sinfo->what = IPT_CONNBYTES_PKTS;
 		else if (!strcmp(optarg, "bytes"))
-			sinfo->what = IPT_CONNBYTES_WHAT_BYTES;
+			sinfo->what = IPT_CONNBYTES_BYTES;
 		else if (!strcmp(optarg, "avgpkt"))
-			sinfo->what = IPT_CONNBYTES_WHAT_AVGPKT;
+			sinfo->what = IPT_CONNBYTES_AVGPKT;
 		else
 			exit_error(PARAMETER_PROBLEM,
 				   "Unknown --connbytes-mode `%s'", optarg);
@@ -111,13 +111,13 @@ static void final_check(unsigned int flags)
 static void print_mode(struct ipt_connbytes_info *sinfo)
 {
 	switch (sinfo->what) {
-		case IPT_CONNBYTES_WHAT_PKTS:
+		case IPT_CONNBYTES_PKTS:
 			fputs("packets ", stdout);
 			break;
-		case IPT_CONNBYTES_WHAT_BYTES:
+		case IPT_CONNBYTES_BYTES:
 			fputs("bytes ", stdout);
 			break;
-		case IPT_CONNBYTES_WHAT_AVGPKT:
+		case IPT_CONNBYTES_AVGPKT:
 			fputs("avgpkt ", stdout);
 			break;
 		default:
