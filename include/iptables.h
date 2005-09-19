@@ -175,4 +175,13 @@ extern int flush_entries(const ipt_chainlabel chain, int verbose,
 			iptc_handle_t *handle);
 extern int for_each_chain(int (*fn)(const ipt_chainlabel, int, iptc_handle_t *),
 		int verbose, int builtinstoo, iptc_handle_t *handle);
+
+/* kernel revision handling */
+extern int kernel_version;
+extern void get_kernel_version(void);
+#define LINUX_VERSION(x,y,z)	(0x10000*(x) + 0x100*(y) + z)
+#define LINUX_VERSION_MAJOR(x)	(((x)>>16) & 0xFF)
+#define LINUX_VERSION_MINOR(x)	(((x)>> 8) & 0xFF)
+#define LINUX_VERSION_PATCH(x)	( (x)      & 0xFF)
+
 #endif /*_IPTABLES_USER_H*/

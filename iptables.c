@@ -39,6 +39,7 @@
 #include <iptables.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+#include <sys/utsname.h>
 
 #ifndef TRUE
 #define TRUE 1
@@ -192,6 +193,8 @@ static int inverse_for_options[NUMBER_OF_OPT] =
 const char *program_version;
 const char *program_name;
 char *lib_dir;
+
+int kernel_version;
 
 /* Keeping track of external matches and targets: linked lists.  */
 struct iptables_match *iptables_matches = NULL;
@@ -1802,6 +1805,21 @@ static void set_revision(char *name, u_int8_t revision)
 	   but we stole a byte from name. */
 	name[IPT_FUNCTION_MAXNAMELEN - 2] = '\0';
 	name[IPT_FUNCTION_MAXNAMELEN - 1] = revision;
+}
+
+void
+get_kernel_version(void) {
+	static struct utsname uts;
+	int x = 0, y = 0, z = 0;
+
+	if (uname(&uts) == -1) {
+		fprintf(stderr, "Unable to retrieve kernel version.\n");
+		free_opts(1);
+		exit(1); 
+	}
+
+	sscanf(uts.release, "%d.%d.%d", &x, &y, &z);
+	kernel_version = LINUX_VERSION(x, y, z);
 }
 
 int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
