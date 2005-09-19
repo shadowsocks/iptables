@@ -414,8 +414,8 @@ print_addr(struct in_addr *addr, struct in_addr *mask, int inv, int numeric)
 {
 	char buf[BUFSIZ];
 
-        if (inv)
-               	fputc('!', stdout);
+        if (inv) 
+               	printf("! ");
 
 	if (mask->s_addr == 0L && !numeric)
 		printf("%s ", "anywhere");
