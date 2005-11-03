@@ -72,25 +72,17 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	struct ipt_connmark_target_info *markinfo
 		= (struct ipt_connmark_target_info *)(*target)->data;
 
-#ifdef KERNEL_64_USERSPACE_32
-	markinfo->mask = ~0ULL;
-#else
-	markinfo->mask = ~0UL;
-#endif
+	markinfo->mask = 0xffffffffUL;
 
 	switch (c) {
 		char *end;
 	case '1':
 		markinfo->mode = IPT_CONNMARK_SET;
-#ifdef KERNEL_64_USERSPACE_32
-		markinfo->mark = strtoull(optarg, &end, 0);
-		if (*end == '/' && end[1] != '\0')
-		    markinfo->mask = strtoull(end+1, &end, 0);
-#else
+
 		markinfo->mark = strtoul(optarg, &end, 0);
 		if (*end == '/' && end[1] != '\0')
 		    markinfo->mask = strtoul(end+1, &end, 0);
-#endif
+
 		if (*end != '\0' || end == optarg)
 			exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
 		if (*flags)
@@ -116,11 +108,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (!*flags)
 			exit_error(PARAMETER_PROBLEM,
 			           "CONNMARK target: Can't specify --mask without a operation");
-#ifdef KERNEL_64_USERSPACE_32
-		markinfo->mask = strtoull(optarg, &end, 0);
-#else
 		markinfo->mask = strtoul(optarg, &end, 0);
-#endif
+
 		if (*end != '\0' || end == optarg)
 			exit_error(PARAMETER_PROBLEM, "Bad MASK value `%s'", optarg);
 		break;
@@ -139,22 +128,6 @@ final_check(unsigned int flags)
 		           "CONNMARK target: No operation specified");
 }
 
-#ifdef KERNEL_64_USERSPACE_32
-static void
-print_mark(unsigned long long mark)
-{
-	printf("0x%llx", mark);
-}
-
-static void
-print_mask(const char *text, unsigned long long mask)
-{
-	if (mask != ~0ULL)
-		printf("%s0x%llx", text, mask);
-}
-
-#else
-
 static void
 print_mark(unsigned long mark)
 {
@@ -164,10 +137,9 @@ print_mark(unsigned long mark)
 static void
 print_mask(const char *text, unsigned long mask)
 {
-	if (mask != ~0UL)
+	if (mask != 0xffffffffUL)
 		printf("%s0x%lx", text, mask);
 }
-#endif
 
 
 /* Prints out the target info. */
