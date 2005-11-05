@@ -296,9 +296,17 @@ one this rule is in), one of the special builtin targets which decide
 the fate of the packet immediately, or an extension (see
 .B EXTENSIONS
 below).  If this
-option is omitted in a rule, then matching the rule will have no
+option is omitted in a rule (and
+.B -g
+is not used), then matching the rule will have no
 effect on the packet's fate, but the counters on the rule will be
 incremented.
+.TP
+.BI "-g, --goto " "chain"
+This specifies that the processing should continue in a user
+specified chain. Unlike the --jump option return will not continue
+processing in this chain but instead in the chain that called us via
+--jump.
 .TP
 .BR "-i, --in-interface " "[!] \fIname\fP"
 Name of an interface via which a packet was received (only for
