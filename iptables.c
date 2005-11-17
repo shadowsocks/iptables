@@ -2394,7 +2394,9 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			target->t = fw_calloc(1, size);
 			target->t->u.target_size = size;
 			strcpy(target->t->u.user.name, jumpto);
-			set_revision(target->t->u.user.name, target->revision);
+			if (!iptc_is_chain(jumpto, *handle))
+				set_revision(target->t->u.user.name,
+					     target->revision);
 			if (target->init != NULL)
 				target->init(target->t, &fw.nfcache);
 		}
