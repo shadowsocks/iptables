@@ -442,6 +442,13 @@ matchinfo_print(const struct ipt_ip *ip, const struct ipt_entry_match *match, in
 		print_state(sinfo->statemask);
 	}
 
+	if(sinfo->flags & IPT_CONNTRACK_PROTO) {
+		printf("%sctproto ", optpfx);
+        	if (sinfo->invflags & IPT_CONNTRACK_PROTO)
+                	printf("! ");
+		printf("%u ", sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum);
+	}
+
 	if(sinfo->flags & IPT_CONNTRACK_ORIGSRC) {
 		printf("%sctorigsrc ", optpfx);
 
