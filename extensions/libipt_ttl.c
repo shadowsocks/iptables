@@ -33,12 +33,12 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 
 	check_inverse(optarg, &invert, &optind, 0);
 
-	if (string_to_number(optarg, 0, 255, &value) == -1)
-		exit_error(PARAMETER_PROBLEM,
-		           "ttl: Expected value between 0 and 255");
-
 	switch (c) {
 		case '2':
+			if (string_to_number(optarg, 0, 255, &value) == -1)
+				exit_error(PARAMETER_PROBLEM,
+				           "ttl: Expected value between 0 and 255");
+
 			if (invert)
 				info->mode = IPT_TTL_NE;
 			else
@@ -48,6 +48,10 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 			info->ttl = value;
 			break;
 		case '3':
+			if (string_to_number(optarg, 0, 255, &value) == -1)
+				exit_error(PARAMETER_PROBLEM,
+				           "ttl: Expected value between 0 and 255");
+
 			if (invert) 
 				exit_error(PARAMETER_PROBLEM,
 						"ttl: unexpected `!'");
@@ -56,6 +60,10 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 			info->ttl = value;
 			break;
 		case '4':
+			if (string_to_number(optarg, 0, 255, &value) == -1)
+				exit_error(PARAMETER_PROBLEM,
+				           "ttl: Expected value between 0 and 255");
+
 			if (invert)
 				exit_error(PARAMETER_PROBLEM,
 						"ttl: unexpected `!'");
