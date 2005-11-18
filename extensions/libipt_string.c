@@ -63,7 +63,7 @@ init(struct ipt_entry_match *m, unsigned int *nfcache)
 }
 
 static void
-parse_string(const unsigned char *s, struct ipt_string_info *info)
+parse_string(const char *s, struct ipt_string_info *info)
 {	
 	if (strlen(s) <= IPT_STRING_MAX_PATTERN_SIZE) {
 		strncpy(info->pattern, s, IPT_STRING_MAX_PATTERN_SIZE);
@@ -74,7 +74,7 @@ parse_string(const unsigned char *s, struct ipt_string_info *info)
 }
 
 static void
-parse_algo(const unsigned char *s, struct ipt_string_info *info)
+parse_algo(const char *s, struct ipt_string_info *info)
 {
 	if (strlen(s) <= IPT_STRING_MAX_ALGO_NAME_SIZE) {
 		strncpy(info->algo, s, IPT_STRING_MAX_ALGO_NAME_SIZE);
@@ -84,7 +84,7 @@ parse_algo(const unsigned char *s, struct ipt_string_info *info)
 }
 
 static void
-parse_hex_string(const unsigned char *s, struct ipt_string_info *info)
+parse_hex_string(const char *s, struct ipt_string_info *info)
 {
 	int i=0, slen, sindex=0, schar;
 	short hex_f = 0, literal_f = 0;

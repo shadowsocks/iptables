@@ -51,7 +51,7 @@ static void
 parse_tos(const char *s, struct ipt_tos_info *info)
 {
 	unsigned int i;
-	int tos;
+	unsigned int tos;
 
 	if (string_to_number(s, 0, 255, &tos) != -1) {
 		if (tos == IPTOS_LOWDELAY

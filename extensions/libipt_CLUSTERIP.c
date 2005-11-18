@@ -120,7 +120,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM, "Can only specify MAC combined with `--new'\n");
 		if (*flags & PARAM_MAC)
 			exit_error(PARAMETER_PROBLEM, "Can only specify MAC once\n");
-		parse_mac(optarg, cipinfo->clustermac);
+		parse_mac(optarg, (char *)cipinfo->clustermac);
 		if (!(cipinfo->clustermac[0] & 0x01))
 			exit_error(PARAMETER_PROBLEM, "MAC has to be a multicast ethernet address\n");
 		*flags |= PARAM_MAC;
@@ -169,7 +169,7 @@ final_check(unsigned int flags)
 	if (flags == 0)
 		return;
 
-	if (flags & (PARAM_NEW|PARAM_HMODE|PARAM_MAC|PARAM_TOTALNODE|PARAM_LOCALNODE)
+	if ((flags & (PARAM_NEW|PARAM_HMODE|PARAM_MAC|PARAM_TOTALNODE|PARAM_LOCALNODE))
 		== (PARAM_NEW|PARAM_HMODE|PARAM_MAC|PARAM_TOTALNODE|PARAM_LOCALNODE))
 		return;
 

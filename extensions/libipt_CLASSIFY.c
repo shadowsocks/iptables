@@ -32,7 +32,7 @@ init(struct ipt_entry_target *t, unsigned int *nfcache)
 {
 }
 
-int string_to_priority(const unsigned char *s, unsigned int *p)
+int string_to_priority(const char *s, unsigned int *p)
 {
 	unsigned int i, j;
 
