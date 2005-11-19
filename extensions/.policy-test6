@@ -1,0 +1,3 @@
+#!/bin/sh
+#
+[ -f $KERNEL_DIR/include/linux/netfilter_ipv6/ip6t_policy.h ] && echo policy
