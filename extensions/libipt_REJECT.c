@@ -44,7 +44,7 @@ static const struct reject_names reject_table[] = {
 	 IPT_ICMP_NET_PROHIBITED, "ICMP network prohibited"},
 	{"icmp-host-prohibited", "host-prohib",
 	 IPT_ICMP_HOST_PROHIBITED, "ICMP host prohibited"},
-	{"tcp-reset", "tcp-reset",
+	{"tcp-reset", "tcp-rst",
 	 IPT_TCP_RESET, "TCP RST packet"},
 	{"icmp-admin-prohibited", "admin-prohib",
 	 IPT_ICMP_ADMIN_PROHIBITED, "ICMP administratively prohibited (*)"}
