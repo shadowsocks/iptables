@@ -222,9 +222,10 @@ target of that name already.
 .TP
 .BR "-X, --delete-chain " "[\fIchain\fP]"
 Delete the optional user-defined chain specified.  There must be no references
-to the chain.  If there are, you must delete or replace the referring
-rules before the chain can be deleted.  If no argument is given, it
-will attempt to delete every non-builtin chain in the table.
+to the chain.  If there are, you must delete or replace the referring rules
+before the chain can be deleted.  The chain must be empty, i.e. not contain
+any rules.  If no argument is given, it will attempt to delete every
+non-builtin chain in the table.
 .TP
 .BI "-P, --policy " "chain target"
 Set the policy for the chain to the given target.  See the section
