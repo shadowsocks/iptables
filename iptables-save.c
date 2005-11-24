@@ -197,7 +197,11 @@ static void print_rule(const struct ipt_entry *e,
 	/* Print target name */	
 	target_name = iptc_get_target(e, h);
 	if (target_name && (*target_name != '\0'))
+#ifdef IPT_F_GOTO
 		printf("-%c %s ", e->ip.flags & IPT_F_GOTO ? 'g' : 'j', target_name);
+#else
+		printf("-j %s ", target_name);
+#endif
 
 	/* Print targinfo part */
 	t = ipt_get_target((struct ipt_entry *)e);

@@ -1415,8 +1415,10 @@ print_firewall(const struct ipt_entry *fw,
 	if (format & FMT_NOTABLE)
 		fputs("  ", stdout);
 
+#ifdef IPT_F_GOTO
 	if(fw->ip.flags & IPT_F_GOTO)
 		printf("[goto] ");
+#endif
 
 	IPT_MATCH_ITERATE(fw, print_match, &fw->ip, format & FMT_NUMERIC);
 
