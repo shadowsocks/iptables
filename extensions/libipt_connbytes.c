@@ -105,7 +105,7 @@ static void final_check(unsigned int flags)
 {
 	if (flags != 7)
 		exit_error(PARAMETER_PROBLEM, "You must specify `--connbytes'"
-			   "`--connbytes-direction' and `--connbytes-mode'");
+			   "`--connbytes-dir' and `--connbytes-mode'");
 }
 
 static void print_mode(struct ipt_connbytes_info *sinfo)
@@ -181,7 +181,7 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	fputs("--connbytes-mode ", stdout);
 	print_mode(sinfo);
 
-	fputs("--connbytes-direction ", stdout);
+	fputs("--connbytes-dir ", stdout);
 	print_direction(sinfo);
 }
 
