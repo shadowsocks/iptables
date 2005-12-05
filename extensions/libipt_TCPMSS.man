@@ -3,6 +3,9 @@ the maximum size for that connection (usually limiting it to your
 outgoing interface's MTU minus 40).  Of course, it can only be used
 in conjunction with
 .BR "-p tcp" .
+It is only valid in the
+.BR mangle
+table.
 .br
 This target is used to overcome criminally braindead ISPs or servers
 which block ICMP Fragmentation Needed packets.  The symptoms of this
@@ -25,7 +28,7 @@ ssh works fine, but scp hangs after initial handshaking.
 Workaround: activate this option and add a rule to your firewall
 configuration like:
 .nf
- iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN \\
+ iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN \\
              -j TCPMSS --clamp-mss-to-pmtu
 .fi
 .TP
