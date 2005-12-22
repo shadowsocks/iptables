@@ -130,6 +130,7 @@ extern struct ip6tables_target *ip6tables_targets;
 
 enum ip6t_tryload {
 	DONT_LOAD,
+	DURING_LOAD,
 	TRY_LOAD,
 	LOAD_MUST_SUCCEED
 };

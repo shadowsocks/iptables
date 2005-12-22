@@ -162,6 +162,7 @@ extern struct iptables_target *iptables_targets;
 
 enum ipt_tryload {
 	DONT_LOAD,
+	DURING_LOAD,
 	TRY_LOAD,
 	LOAD_MUST_SUCCEED
 };

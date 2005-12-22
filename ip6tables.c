@@ -734,7 +734,7 @@ find_match(const char *name, enum ip6t_tryload tryload, struct ip6tables_rule_ma
   	}
 
 #ifndef NO_SHARED_LIBS
-	if (!ptr && tryload != DONT_LOAD) {
+	if (!ptr && tryload != DONT_LOAD && tryload != DURING_LOAD) {
 		char path[strlen(lib_dir) + sizeof("/libip6t_.so")
 			 + strlen(name)];
 		if (!icmphack)
@@ -986,7 +986,7 @@ find_target(const char *name, enum ip6t_tryload tryload)
 	}
 
 #ifndef NO_SHARED_LIBS
-	if (!ptr && tryload != DONT_LOAD) {
+	if (!ptr && tryload != DONT_LOAD && tryload != DURING_LOAD) {
 		char path[strlen(lib_dir) + sizeof("/libip6t_.so")
 			 + strlen(name)];
 		sprintf(path, "%s/libip6t_%s.so", lib_dir, name);
@@ -1058,7 +1058,7 @@ register_match6(struct ip6tables_match *me)
 		exit(1);
 	}
 
-	if (find_match(me->name, DONT_LOAD, NULL)) {
+	if (find_match(me->name, DURING_LOAD, NULL)) {
 		fprintf(stderr, "%s: match `%s' already registered.\n",
 			program_name, me->name);
 		exit(1);
@@ -1088,7 +1088,7 @@ register_target6(struct ip6tables_target *me)
 		exit(1);
 	}
 
-	if (find_target(me->name, DONT_LOAD)) {
+	if (find_target(me->name, DURING_LOAD)) {
 		fprintf(stderr, "%s: target `%s' already registered.\n",
 			program_name, me->name);
 		exit(1);

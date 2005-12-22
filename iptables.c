@@ -685,7 +685,7 @@ find_match(const char *name, enum ipt_tryload tryload, struct iptables_rule_matc
 	}
 
 #ifndef NO_SHARED_LIBS
-	if (!ptr && tryload != DONT_LOAD) {
+	if (!ptr && tryload != DONT_LOAD && tryload != DURING_LOAD) {
 		char path[strlen(lib_dir) + sizeof("/libipt_.so")
 			 + strlen(name)];
 		sprintf(path, "%s/libipt_%s.so", lib_dir, name);
@@ -994,7 +994,7 @@ find_target(const char *name, enum ipt_tryload tryload)
 	}
 
 #ifndef NO_SHARED_LIBS
-	if (!ptr && tryload != DONT_LOAD) {
+	if (!ptr && tryload != DONT_LOAD && tryload != DURING_LOAD) {
 		char path[strlen(lib_dir) + sizeof("/libipt_.so")
 			 + strlen(name)];
 		sprintf(path, "%s/libipt_%s.so", lib_dir, name);
@@ -1119,7 +1119,7 @@ register_match(struct iptables_match *me)
 		exit(1);
 	}
 
-	old = find_match(me->name, DONT_LOAD, NULL);
+	old = find_match(me->name, DURING_LOAD, NULL);
 	if (old) {
 		if (old->revision == me->revision) {
 			fprintf(stderr,
@@ -1175,7 +1175,7 @@ register_target(struct iptables_target *me)
 		exit(1);
 	}
 
-	old = find_target(me->name, DONT_LOAD);
+	old = find_target(me->name, DURING_LOAD);
 	if (old) {
 		struct iptables_target **i;
 
