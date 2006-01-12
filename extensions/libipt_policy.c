@@ -180,7 +180,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		if (e->match.spi)
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: double --spi option");
-		
+
 		e->match.spi = 1;
 		e->invert.spi = invert;
 		e->spi = strtol(argv[optind-1], NULL, 0x10);
@@ -232,7 +232,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		if (e->match.mode)
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: double --mode option");
-		
+
 		mode = parse_mode(argv[optind-1]);
 		e->match.mode = 1;
 		e->invert.mode = invert;
@@ -242,6 +242,11 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: can't invert --next option");
+
+		if (!(e->match.reqid || e->match.spi || e->match.saddr ||
+		      e->match.daddr || e->match.proto || e->match.mode))
+			exit_error(PARAMETER_PROBLEM,
+			           "policy match: --next without policy element specification");
 
 		if (++info->len == IPT_POLICY_MAX_ELEM)
 			exit_error(PARAMETER_PROBLEM,
