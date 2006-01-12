@@ -243,11 +243,6 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: can't invert --next option");
 
-		if (!(e->match.reqid || e->match.spi || e->match.saddr ||
-		      e->match.daddr || e->match.proto || e->match.mode))
-			exit_error(PARAMETER_PROBLEM,
-			           "policy match: --next without policy element specification");
-
 		if (++info->len == IPT_POLICY_MAX_ELEM)
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: maximum policy depth reached");
@@ -291,6 +286,12 @@ static void final_check(unsigned int flags)
 
 	for (i = 0; i < info->len; i++) {
 		e = &info->pol[i];
+
+		if (!(e->match.reqid || e->match.spi || e->match.saddr ||
+		      e->match.daddr || e->match.proto || e->match.mode))
+			exit_error(PARAMETER_PROBLEM,
+			           "policy match: empty policy element");
+
 		if ((e->match.saddr || e->match.daddr)
 		    && ((e->mode == IPT_POLICY_MODE_TUNNEL && e->invert.mode) ||
 		        (e->mode == IPT_POLICY_MODE_TRANSPORT && !e->invert.mode)))
