@@ -36,10 +36,12 @@ Matches the encapsulation protocol.
 Matches the encapsulation mode.
 .TP
 .BI "--tunnel-src " "addr[/mask]"
-Matches the source address of a tunnel. Only valid with --mode tunnel.
+Matches the source end-point address of a tunnel mode SA.
+Only valid with --mode tunnel.
 .TP
 .BI "--tunnel-dst " "addr[/mask]"
-Matches the destination address of a tunnel. Only valid with --mode tunnel.
+Matches the destination end-point address of a tunnel mode SA.
+Only valid with --mode tunnel.
 .TP
 .BI "--next"
 Start the next element in the policy specification. Can only be used with
