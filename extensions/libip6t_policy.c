@@ -327,7 +327,8 @@ static void final_check(unsigned int flags)
 	for (i = 0; i < info->len; i++) {
 		e = &info->pol[i];
 
-                if (!(e->match.reqid || e->match.spi || e->match.saddr ||
+                if (info->flags & IP6T_POLICY_MATCH_STRICT &&
+		    !(e->match.reqid || e->match.spi || e->match.saddr ||
                       e->match.daddr || e->match.proto || e->match.mode))
                         exit_error(PARAMETER_PROBLEM,
                                    "policy match: empty policy element");
