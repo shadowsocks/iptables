@@ -23,7 +23,7 @@ The type given can be
 .B " icmp6-port-unreachable"
 .B " port-unreach"
 .fi
-which return the appropriate IPv6-ICMP error message (\fBport-unreach\fP is
+which return the appropriate ICMPv6 error message (\fBport-unreach\fP is
 the default). Finally, the option
 .B tcp-reset
 can be used on rules which only match the TCP protocol: this causes a
@@ -31,4 +31,6 @@ TCP RST packet to be sent back.  This is mainly useful for blocking
 .I ident
 (113/tcp) probes which frequently occur when sending mail to broken mail
 hosts (which won't accept your mail otherwise).
+.B tcp-reset
+can only be used with kernel versions 2.6.14 or latter.
 

@@ -1,7 +1,7 @@
-This module matches the IPv6 hop-by-hop header options
+This module matches the parameters in Hop-by-Hop Options header
 .TP
-.BI "--hbh-len" "[!]" "length"
-Total length of this header
+.BR "--hbh-len " "[!] \fIlength\fP"
+Total length of this header in octets.
 .TP
-.BI "--hbh-opts " "TYPE[:LEN],[,TYPE[:LEN]...]"
-Options and it's length (List).
+.BR "--hbh-opts " "\fItype\fP[:\fIlength\fP][,\fItype\fP[:\fIlength\fP]...]"
+numeric type of option and the length of the option data in octets.

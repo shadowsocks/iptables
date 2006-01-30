@@ -3,7 +3,7 @@ to a bridge device. This module is a part of the infrastructure that enables
 a transparent bridging IP firewall and is only useful for kernel versions
 above version 2.5.44.
 .TP
-.B --physdev-in name
+.BR --physdev-in " [!] \fIname\fP"
 Name of a bridge port via which a packet is received (only for
 packets entering the
 .BR INPUT ,
@@ -14,7 +14,7 @@ chains). If the interface name ends in a "+", then any
 interface which begins with this name will match. If the packet didn't arrive
 through a bridge device, this packet won't match this option, unless '!' is used.
 .TP
-.B --physdev-out name
+.BR --physdev-out " [!] \fIname\fP"
 Name of a bridge port via which a packet is going to be sent (for packets
 entering the
 .BR FORWARD ,
@@ -31,12 +31,12 @@ chain. If the packet won't leave by a bridge device or it is yet unknown what
 the output device will be, then the packet won't match this option, unless
 '!' is used.
 .TP
-.B --physdev-is-in
+.RB "[!] " --physdev-is-in
 Matches if the packet has entered through a bridge interface.
 .TP
-.B --physdev-is-out
+.RB "[!] " --physdev-is-out
 Matches if the packet will leave through a bridge interface.
 .TP
-.B --physdev-is-bridged
+.RB "[!] " --physdev-is-bridged
 Matches if the packet is being bridged and therefore is not being routed.
 This is only useful in the FORWARD and POSTROUTING chains.

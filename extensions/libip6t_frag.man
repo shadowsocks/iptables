@@ -1,19 +1,20 @@
-This module matches the time IPv6 fragmentathion header
+This module matches the parameters in Fragment header.
 .TP
-.BI "--fragid " "[!]" "id[:id]"
-Matches the given fragmentation ID (range).
+.BR "--fragid " "[!] \fIid\fP[:\fIid\fP]"
+Matches the given Identification or range of it.
 .TP
-.BI "--fraglen " "[!]" "length"
-Matches the total length of this header.
+.BR "--fraglen " "[!] \fIlength\fP"
+This option cannot be used with kernel version 2.6.10 or later. The length of
+Fragment header is static and this option doesn't make sense.
 .TP
-.BI "--fragres "
-Matches the reserved field, too.
+.BR "--fragres "
+Matches if the reserved fields are filled with zero.
 .TP
-.BI "--fragfirst "
+.BR "--fragfirst "
 Matches on the first fragment.
 .TP
-.BI "[--fragmore]"
+.BR "[--fragmore]"
 Matches if there are more fragments.
 .TP
-.BI "[--fraglast]"
+.BR "[--fraglast]"
 Matches if this is the last fragement.

@@ -1,6 +1,7 @@
 This module matches a set of source or destination ports.  Up to 15
 ports can be specified.  A port range (port:port) counts as two
-ports.  It can only be used in conjunction with
+ports, but range isn't supported now. It can only be used in conjunction
+with
 .B "-p tcp"
 or
 .BR "-p udp" .

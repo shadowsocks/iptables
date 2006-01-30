@@ -1,10 +1,29 @@
-This module matches on IPv6 option headers
+This module matches IPv6 extension headers and/or upper layer header.
 .TP
-.BI "--header " "[!]" "headers"
-Matches the given type of headers.  
-Names: hop,dst,route,frag,auth,esp,none,proto
-Long Names: hop-by-hop,ipv6-opts,ipv6-route,ipv6-frag,ah,esp,ipv6-nonxt,protocol
-Numbers: 0,60,43,44,51,50,59
+.BR "--header " "[!] \fIheader\fP[,\fIheader\fP...]"
+Matches the packet which EXACTLY includes all specified headers. The headers
+encapsulated with ESP header are out of scope.
+.IR header
+can be
+.IR hop | hop-by-hop
+(Hop-by-Hop Options header),
+.IR dst
+(Destination Options header),
+.IR route
+(Routing header),
+.IR frag
+(Fragment header),
+.IR auth
+(Authentication header),
+.IR esp
+(Encapsulating Security Payload header),
+.IR none
+(No Next header) which matches 59 in the 'Next Header field' of IPv6 header or any IPv6 extension headers, or
+.IR proto
+which matches any upper layer protocol header. A protocol name from /etc/protocols and numeric value also allowed. The number 255 is equivalent to
+.IR proto .
 .TP
-.BI "--soft"
-The header CONTAINS the specified extensions.
+.BR "[--soft]"
+Matches if the packet includes all specified headers with
+.BR --header ,
+AT LEAST.

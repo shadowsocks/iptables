@@ -1,19 +1,19 @@
 Match on IPv6 routing header
 .TP
-.BI "--rt-type " "[!]" "type"
+.BR "--rt-type" " [!] \fItype\fP"
 Match the type (numeric).
 .TP
-.BI "--rt-segsleft" "[!]" "num[:num]"
+.BR "--rt-segsleft" " [!] \fInum\fP[:\fInum\fP]"
 Match the `segments left' field (range).
 .TP
-.BI "--rt-len" "[!]" "length"
-Match the length of this header
+.BR "--rt-len" " [!] \fIlength\fP"
+Match the length of this header.
 .TP
-.BI "--rt-0-res"
+.BR "--rt-0-res"
 Match the reserved field, too (type=0)
 .TP
-.BI "--rt-0-addrs ADDR[,ADDR...]
+.BR "--rt-0-addrs" " \fIADDR\fP[,\fIADDR\fP...]"
 Match type=0 addresses (list).
 .TP
-.BI "--rt-0-not-strict"
+.BR "--rt-0-not-strict"
 List of type=0 addresses is not a strict list.
