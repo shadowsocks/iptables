@@ -327,9 +327,9 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	}
 	printf("--algo %s ", info->algo);
 	if (info->from_offset != 0)
-		printf("--from-offset %u ", info->from_offset);
+		printf("--from %u ", info->from_offset);
 	if (info->to_offset != 0)
-		printf("--to-offset %u ", info->to_offset);
+		printf("--to %u ", info->to_offset);
 }
 
 
