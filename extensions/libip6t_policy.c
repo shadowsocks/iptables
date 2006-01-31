@@ -237,8 +237,8 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 
 		e->match.saddr = 1;
 		e->invert.saddr = invert;
-		in6addrcpy(&e->saddr, addr);
-		in6addrcpy(&e->smask, &mask);
+		in6addrcpy(&e->saddr.a6, addr);
+		in6addrcpy(&e->smask.a6, &mask);
                 break;
 	case '7':
 		if (e->match.daddr)
@@ -252,8 +252,8 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 
 		e->match.daddr = 1;
 		e->invert.daddr = invert;
-		in6addrcpy(&e->daddr, addr);
-		in6addrcpy(&e->dmask, &mask);
+		in6addrcpy(&e->daddr.a6, addr);
+		in6addrcpy(&e->dmask.a6, &mask);
 		break;
 	case '8':
 		if (e->match.proto)

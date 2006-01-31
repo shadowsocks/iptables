@@ -197,8 +197,8 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 
 		e->match.saddr = 1;
 		e->invert.saddr = invert;
-		e->saddr = addr[0].s_addr;
-		e->smask = mask.s_addr;
+		e->saddr.a4 = addr[0];
+		e->smask.a4 = mask;
                 break;
 	case '7':
 		if (e->match.daddr)
@@ -212,8 +212,8 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 
 		e->match.daddr = 1;
 		e->invert.daddr = invert;
-		e->daddr = addr[0].s_addr;
-		e->dmask = mask.s_addr;
+		e->daddr.a4 = addr[0];
+		e->dmask.a4 = mask;
 		break;
 	case '8':
 		if (e->match.proto)
