@@ -3,6 +3,10 @@
 
 #define IPT_POLICY_MAX_ELEM	4
 
+#ifndef __KERNEL__
+#include <netinet/in.h>
+#endif
+
 enum ipt_policy_flags
 {
 	IPT_POLICY_MATCH_IN	= 0x1,

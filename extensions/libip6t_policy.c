@@ -14,7 +14,7 @@
 #include <ip6tables.h>
 
 #include <linux/netfilter_ipv6/ip6_tables.h>
-#include <linux/netfilter_ipv6/ip6t_policy.h>
+#include "../include/linux/netfilter_ipv6/ip6t_policy.h"
 
 /*
  * HACK: global pointer to current matchinfo for making
