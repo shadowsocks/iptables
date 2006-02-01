@@ -13,7 +13,7 @@
 #define KERNEL_VERSION(a,b,c) (((a) << 16) | ((b) << 8) | (c))
 #endif
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,4,18)
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,4,18)) || !defined IPS_EXPECTED
 #define IPS_EXPECTED	(1 << 0)
 #define IPS_SEEN_REPLY	(1 << 1)
 #define IPS_ASSURED	(1 << 2)
