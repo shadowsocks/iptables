@@ -269,7 +269,10 @@ main(int argc, char *argv[])
 					char *ctrs;
 					ctrs = strtok(NULL, " \t\n");
 
-					parse_counters(ctrs, &count);
+					if (!ctrs || !parse_counters(ctrs, &count))
+						exit_error(PARAMETER_PROBLEM,
+							   "invalid policy counters "
+							   "for chain '%s'\n", chain);
 
 				} else {
 					memset(&count, 0, 
