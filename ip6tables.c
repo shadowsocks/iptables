@@ -224,7 +224,6 @@ static const struct pprot chain_protos[] = {
 	{ "icmpv6", IPPROTO_ICMPV6 },
 	{ "esp", IPPROTO_ESP },
 	{ "ah", IPPROTO_AH },
-	{ "all", 0 },
 };
 
 static char *
@@ -807,6 +806,13 @@ parse_protocol(const char *s)
 
 	if (string_to_number(s, 0, 255, &proto) == -1) {
 		struct protoent *pent;
+
+		/* first deal with the special case of 'all' to prevent
+		 * people from being able to redefine 'all' in nsswitch
+		 * and/or provoke expensive [not working] ldap/nis/... 
+		 * lookups */
+		if (!strcmp(s, "all"))
+			return 0;
 
 		if ((pent = getprotobyname(s)))
 			proto = pent->p_proto;
