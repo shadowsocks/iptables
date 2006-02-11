@@ -1800,8 +1800,10 @@ void clear_rule_matches(struct iptables_rule_match **matches)
 
 	for (matchp = *matches; matchp;) {
 		tmp = matchp->next;
-		if (matchp->match->m)
+		if (matchp->match->m) {
 			free(matchp->match->m);
+			matchp->match->m = NULL;
+		}
 		free(matchp);
 		matchp = tmp;
 	}
