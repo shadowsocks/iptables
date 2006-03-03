@@ -679,9 +679,24 @@ find_match(const char *name, enum ipt_tryload tryload, struct iptables_rule_matc
 	struct iptables_match *ptr;
 
 	for (ptr = iptables_matches; ptr; ptr = ptr->next) {
-		if (strcmp(name, ptr->name) == 0)
+		if (strcmp(name, ptr->name) == 0) {
+			struct iptables_match *clone;
+			
+			/* First match of this type: */
+			if (ptr->m == NULL)
+				break;
+
+			/* Second and subsequent clones */
+			clone = fw_malloc(sizeof(struct iptables_match));
+			memcpy(clone, ptr, sizeof(struct iptables_match));
+			clone->mflags = 0;
+			/* This is a clone: */
+			clone->next = clone;
+
+			ptr = clone;
 			break;
-	}
+		}
+	}		
 
 #ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != DONT_LOAD && tryload != DURING_LOAD) {
@@ -721,8 +736,12 @@ find_match(const char *name, enum ipt_tryload tryload, struct iptables_rule_matc
 
 		newentry = fw_malloc(sizeof(struct iptables_rule_match));
 
-		for (i = matches; *i; i = &(*i)->next);
+		for (i = matches; *i; i = &(*i)->next) {
+			if (strcmp(name, (*i)->match->name) == 0)
+				(*i)->completed = 1;
+		}
 		newentry->match = ptr;
+		newentry->completed = 0;
 		newentry->next = NULL;
 		*i = newentry;
 	}
@@ -1810,6 +1829,10 @@ void clear_rule_matches(struct iptables_rule_match **matches)
 			free(matchp->match->m);
 			matchp->match->m = NULL;
 		}
+		if (matchp->match == matchp->match->next) {
+			free(matchp->match);
+			matchp->match = NULL;
+		}
 		free(matchp);
 		matchp = tmp;
 	}
@@ -2134,7 +2157,9 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			set_revision(m->m->u.user.name, m->revision);
 			if (m->init != NULL)
 				m->init(m->m, &fw.nfcache);
-			opts = merge_options(opts, m->extra_opts, &m->option_offset);
+			if (m != m->next)
+				/* Merge options for non-cloned matches */
+				opts = merge_options(opts, m->extra_opts, &m->option_offset);
 		}
 		break;
 
@@ -2212,14 +2237,14 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			exit_tryhelp(2);
 
 		default:
-			/* FIXME: This scheme doesn't allow two of the same
-			   matches --RR */
 			if (!target
 			    || !(target->parse(c - target->option_offset,
 					       argv, invert,
 					       &target->tflags,
 					       &fw, &target->t))) {
 				for (matchp = matches; matchp; matchp = matchp->next) {
+					if (matchp->completed) 
+						continue;
 					if (matchp->match->parse(c - matchp->match->option_offset,
 						     argv, invert,
 						     &matchp->match->mflags,
@@ -2234,7 +2259,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				   actually hear this code suck. */
 
 				/* some explanations (after four different bugs
-				 * in 3 different releases): If we encountere a
+				 * in 3 different releases): If we encounter a
 				 * parameter, that has not been parsed yet,
 				 * it's not an option of an explicitly loaded
 				 * match or a target.  However, we support

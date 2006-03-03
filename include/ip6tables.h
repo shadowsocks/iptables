@@ -13,6 +13,10 @@ struct ip6tables_rule_match
 	struct ip6tables_rule_match *next;
 
 	struct ip6tables_match *match;
+
+	/* Multiple matches of the same type: the ones before
+	   the current one are completed from parsing point of view */	
+	unsigned int completed;
 };
 
 /* Include file for additions: new matches and targets. */

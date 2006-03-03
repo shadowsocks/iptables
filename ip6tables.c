@@ -709,37 +709,46 @@ parse_hostnetworkmask(const char *name, struct in6_addr **addrpp,
 }
 
 struct ip6tables_match *
-find_match(const char *name, enum ip6t_tryload tryload, struct ip6tables_rule_match **matches)
+find_match(const char *match_name, enum ip6t_tryload tryload, struct ip6tables_rule_match **matches)
 {
 	struct ip6tables_match *ptr;
- 	int icmphack = 0;
+ 	const char *icmp6 = "icmp6";
+ 	const char *name;
   
 	/* This is ugly as hell. Nonetheless, there is no way of changing
 	 * this without hurting backwards compatibility */
- 	if ( (strcmp(name,"icmpv6") == 0) ||
- 	     (strcmp(name,"ipv6-icmp") == 0) ||
- 	     (strcmp(name,"icmp6") == 0) ) icmphack = 1;
+ 	if ( (strcmp(match_name,"icmpv6") == 0) ||
+ 	     (strcmp(match_name,"ipv6-icmp") == 0) ||
+ 	     (strcmp(match_name,"icmp6") == 0) )
+ 	     	name = icmp6;
+ 	else
+ 		name = match_name;
  
- 	if (!icmphack) {
- 		for (ptr = ip6tables_matches; ptr; ptr = ptr->next) {
- 			if (strcmp(name, ptr->name) == 0)
- 				break;
- 		}
- 	} else {
- 		for (ptr = ip6tables_matches; ptr; ptr = ptr->next) {
- 			if (strcmp("icmp6", ptr->name) == 0)
- 				break;
- 		}
-  	}
+	for (ptr = ip6tables_matches; ptr; ptr = ptr->next) {
+ 		if (strcmp(name, ptr->name) == 0) {
+			struct ip6tables_match *clone;
+			
+			/* First match of this type: */
+			if (ptr->m == NULL)
+				break;
+
+			/* Second and subsequent clones */
+			clone = fw_malloc(sizeof(struct ip6tables_match));
+			memcpy(clone, ptr, sizeof(struct ip6tables_match));
+			clone->mflags = 0;
+			/* This is a clone: */
+			clone->next = clone;
+
+			ptr = clone;
+			break;
+		}
+	}
 
 #ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != DONT_LOAD && tryload != DURING_LOAD) {
 		char path[strlen(lib_dir) + sizeof("/libip6t_.so")
 			 + strlen(name)];
-		if (!icmphack)
-			sprintf(path, "%s/libip6t_%s.so", lib_dir, name);
-		else
-			sprintf(path, "%s/libip6t_%s.so", lib_dir, "icmpv6");
+		sprintf(path, "%s/libip6t_%s.so", lib_dir, name);
 		if (dlopen(path, RTLD_NOW)) {
 			/* Found library.  If it didn't register itself,
 			   maybe they specified target as match. */
@@ -773,8 +782,12 @@ find_match(const char *name, enum ip6t_tryload tryload, struct ip6tables_rule_ma
 
 		newentry = fw_malloc(sizeof(struct ip6tables_rule_match));
 
-		for (i = matches; *i; i = &(*i)->next);
+		for (i = matches; *i; i = &(*i)->next) {
+			if (strcmp(name, (*i)->match->name) == 0)
+				(*i)->completed = 1;
+		}
 		newentry->match = ptr;
+		newentry->completed = 0;
 		newentry->next = NULL;
 		*i = newentry;
 	}
@@ -1701,6 +1714,10 @@ void clear_rule_matches(struct ip6tables_rule_match **matches)
 			free(matchp->match->m);
 			matchp->match->m = NULL;
 		}
+		if (matchp->match == matchp->match->next) {
+			free(matchp->match);
+			matchp->match = NULL;
+		}
 		free(matchp);
 		matchp = tmp;
 	}
@@ -1988,7 +2005,9 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			strcpy(m->m->u.user.name, m->name);
 			if (m->init != NULL)
 				m->init(m->m, &fw.nfcache);
-			opts = merge_options(opts, m->extra_opts, &m->option_offset);
+			if (m != m->next)
+				/* Merge options for non-cloned matches */
+				opts = merge_options(opts, m->extra_opts, &m->option_offset);
 		}
 		break;
 
@@ -2066,14 +2085,14 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			exit_tryhelp(2);
 
 		default:
-			/* FIXME: This scheme doesn't allow two of the same
-			   matches --RR */
 			if (!target
 			    || !(target->parse(c - target->option_offset,
 					       argv, invert,
 					       &target->tflags,
 					       &fw, &target->t))) {
 				for (matchp = matches; matchp; matchp = matchp->next) {
+					if (matchp->completed) 
+						continue;
 					if (matchp->match->parse(c - matchp->match->option_offset,
 						     argv, invert,
 						     &matchp->match->mflags,
@@ -2088,7 +2107,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 				   actually hear this code suck. */
 
 				/* some explanations (after four different bugs
-				 * in 3 different releases): If we encountere a
+				 * in 3 different releases): If we encounter a
 				 * parameter, that has not been parsed yet,
 				 * it's not an option of an explicitly loaded
 				 * match or a target.  However, we support
