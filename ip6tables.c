@@ -222,6 +222,7 @@ static const struct pprot chain_protos[] = {
 	{ "tcp", IPPROTO_TCP },
 	{ "udp", IPPROTO_UDP },
 	{ "icmpv6", IPPROTO_ICMPV6 },
+	{ "ipv6-icmp", IPPROTO_ICMPV6 },
 	{ "esp", IPPROTO_ESP },
 	{ "ah", IPPROTO_AH },
 };
@@ -1759,7 +1760,6 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	char *protocol = NULL;
 	const char *modprobe = NULL;
 	int proto_used = 0;
-	char icmp6p[] = "icmpv6";
 
 	memset(&fw, 0, sizeof(fw));
 
@@ -1928,8 +1928,6 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 				*protocol = tolower(*protocol);
 
 			protocol = argv[optind-1];
-			if ( strcmp(protocol,"ipv6-icmp") == 0)
-				protocol = icmp6p;
 			fw.ipv6.proto = parse_protocol(protocol);
 			fw.ipv6.flags |= IP6T_F_PROTO;
 
