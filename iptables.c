@@ -79,8 +79,7 @@
 #define CMD_NEW_CHAIN		0x0100U
 #define CMD_DELETE_CHAIN	0x0200U
 #define CMD_SET_POLICY		0x0400U
-#define CMD_CHECK		0x0800U
-#define CMD_RENAME_CHAIN	0x1000U
+#define CMD_RENAME_CHAIN	0x0800U
 #define NUMBER_OF_CMD	13
 static const char cmdflags[] = { 'I', 'D', 'D', 'R', 'A', 'L', 'F', 'Z',
 				 'N', 'X', 'P', 'E' };
