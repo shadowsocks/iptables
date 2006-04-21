@@ -2258,6 +2258,8 @@ TC_STRERROR(int err)
 	      "Bad built-in chain name" },
 	    { TC_SET_POLICY, EINVAL,
 	      "Bad policy name" },
+	    { TC_COMMIT, -1, 
+	      "Invalid argument (dmesg might have more information)" },
 
 	    { NULL, 0, "Incompatible with this kernel" },
 	    { NULL, ENOPROTOOPT, "iptables who? (do you need to insmod?)" },
