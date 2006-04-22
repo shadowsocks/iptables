@@ -2096,10 +2096,8 @@ TC_COMMIT(TC_HANDLE_T *handle)
 
 	ret = setsockopt(sockfd, TC_IPPROTO, SO_SET_REPLACE, repl,
 			 sizeof(*repl) + repl->size);
-	if (ret < 0) {
-		errno = ret;
+	if (ret < 0)
 		goto out_free_newcounters;
-	}
 
 	/* Put counters back. */
 	strcpy(newcounters->name, (*handle)->info.name);
@@ -2190,10 +2188,8 @@ TC_COMMIT(TC_HANDLE_T *handle)
 
 	ret = setsockopt(sockfd, TC_IPPROTO, SO_SET_ADD_COUNTERS,
 			 newcounters, counterlen);
-	if (ret < 0) {
-		errno = ret;
+	if (ret < 0)
 		goto out_free_newcounters;
-	}
 
 	free(repl->counters);
 	free(repl);
