@@ -158,20 +158,20 @@ static unsigned int global_option_offset = 0;
 static char commands_v_options[NUMBER_OF_CMD][NUMBER_OF_OPT] =
 /* Well, it's better than "Re: Linux vs FreeBSD" */
 {
-	/*     -n  -s  -d  -p  -j  -v  -x  -i  -o  --line */
-/*INSERT*/    {'x',' ',' ',' ',' ',' ','x',' ',' ','x'},
-/*DELETE*/    {'x',' ',' ',' ',' ',' ','x',' ',' ','x'},
-/*DELETE_NUM*/{'x','x','x','x','x',' ','x','x','x','x'},
-/*REPLACE*/   {'x',' ',' ',' ',' ',' ','x',' ',' ','x'},
-/*APPEND*/    {'x',' ',' ',' ',' ',' ','x',' ',' ','x'},
-/*LIST*/      {' ','x','x','x','x',' ',' ','x','x',' '},
-/*FLUSH*/     {'x','x','x','x','x',' ','x','x','x','x'},
-/*ZERO*/      {'x','x','x','x','x',' ','x','x','x','x'},
-/*NEW_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x'},
-/*DEL_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x'},
-/*SET_POLICY*/{'x','x','x','x','x',' ','x','x','x','x'},
-/*CHECK*/     {'x','+','+','+','x',' ','x',' ',' ','x'},
-/*RENAME*/    {'x','x','x','x','x',' ','x','x','x','x'}
+	/*     -n  -s  -d  -p  -j  -v  -x  -i  -o  --line -c */
+/*INSERT*/    {'x',' ',' ',' ',' ',' ','x',' ',' ','x',' '},
+/*DELETE*/    {'x',' ',' ',' ',' ',' ','x',' ',' ','x','x'},
+/*DELETE_NUM*/{'x','x','x','x','x',' ','x','x','x','x','x'},
+/*REPLACE*/   {'x',' ',' ',' ',' ',' ','x',' ',' ','x',' '},
+/*APPEND*/    {'x',' ',' ',' ',' ',' ','x',' ',' ','x',' '},
+/*LIST*/      {' ','x','x','x','x',' ',' ','x','x',' ','x'},
+/*FLUSH*/     {'x','x','x','x','x',' ','x','x','x','x','x'},
+/*ZERO*/      {'x','x','x','x','x',' ','x','x','x','x','x'},
+/*NEW_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x','x'},
+/*DEL_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x','x'},
+/*SET_POLICY*/{'x','x','x','x','x',' ','x','x','x','x','x'},
+/*CHECK*/     {'x','+','+','+','x',' ','x',' ',' ','x','x'},
+/*RENAME*/    {'x','x','x','x','x',' ','x','x','x','x','x'}
 };
 
 static int inverse_for_options[NUMBER_OF_OPT] =
@@ -185,7 +185,8 @@ static int inverse_for_options[NUMBER_OF_OPT] =
 /* -x */ 0,
 /* -i */ IP6T_INV_VIA_IN,
 /* -o */ IP6T_INV_VIA_OUT,
-/*--line*/ 0
+/*--line*/ 0,
+/* -c */ 0,
 };
 
 const char *program_version;
