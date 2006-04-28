@@ -11,6 +11,9 @@
 #ifndef IPPROTO_SCTP
 #define IPPROTO_SCTP 132
 #endif
+#ifndef IPPROTO_DCCP
+#define IPPROTO_DCCP 33
+#endif
 
 #ifndef IPT_SO_GET_REVISION_MATCH /* Old kernel source. */
 #define IPT_SO_GET_REVISION_MATCH	(IPT_BASE_CTL + 2)

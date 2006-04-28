@@ -8,6 +8,13 @@
 #define IP6T_LIB_DIR "/usr/local/lib/iptables"
 #endif
 
+#ifndef IPPROTO_SCTP
+#define IPPROTO_SCTP 132
+#endif
+#ifndef IPPROTO_DCCP
+#define IPPROTO_DCCP 33
+#endif
+
 struct ip6tables_rule_match
 {
 	struct ip6tables_rule_match *next;

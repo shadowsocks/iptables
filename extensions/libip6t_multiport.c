@@ -33,6 +33,23 @@ static struct option opts[] = {
 	{0}
 };
 
+static char *
+proto_to_name(u_int8_t proto)
+{
+	switch (proto) {
+	case IPPROTO_TCP:
+		return "tcp";
+	case IPPROTO_UDP:
+		return "udp";
+	case IPPROTO_SCTP:
+		return "sctp";
+	case IPPROTO_DCCP:
+		return "dccp";
+	default:
+		return NULL;
+	}
+}
+
 static int
 service_to_port(const char *name, const char *proto)
 {
@@ -86,16 +103,16 @@ init(struct ip6t_entry_match *m, unsigned int *nfcache)
 static const char *
 check_proto(const struct ip6t_entry *entry)
 {
-	if (entry->ipv6.proto == IPPROTO_TCP)
-		return "tcp";
-	else if (entry->ipv6.proto == IPPROTO_UDP)
-		return "udp";
+	char *proto;
+
+	if ((proto = proto_to_name(entry->ipv6.proto)) != NULL)
+		return proto;
 	else if (!entry->ipv6.proto)
 		exit_error(PARAMETER_PROBLEM,
-			   "multiport needs `-p tcp' or `-p udp'");
+			   "multiport needs `-p tcp', `-p udp', `-p sctp' or `-p dccp'");
 	else
 		exit_error(PARAMETER_PROBLEM,
-			   "multiport only works with TCP or UDP");
+			   "multiport only works with TCP, UDP, SCTP and DCCP");
 }
 
 /* Function which parses command options; returns true if it
@@ -163,8 +180,7 @@ port_to_service(int port, u_int8_t proto)
 {
 	struct servent *service;
 
-	if ((service = getservbyport(htons(port),
-				     proto == IPPROTO_TCP ? "tcp" : "udp")))
+	if ((service = getservbyport(htons(port), proto_to_name(proto))))
 		return service->s_name;
 
 	return NULL;
