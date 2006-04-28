@@ -42,7 +42,7 @@ $(SHARED_LIBS): %.so : %_sh.o
 
 # This is useful for when dependencies completely screwed
 %.h::
-	@echo Something wrong... deleting dependencies.
+	@echo "Unable to resolve dependency on $@. Try 'make clean'."
 	@-rm -f $(DEPFILES) $(EXTRA_DEPENDS) .makefirst
 	@[ -d $(KERNEL_DIR)/include/linux/netfilter_ipv4 ] || echo -e '\n\n    Please try `make KERNEL_DIR=path-to-correct-kernel'\'.'\n\n'
 	@exit 1
