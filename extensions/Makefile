@@ -10,7 +10,7 @@ PF6_EXT_SLIB:=connmark eui64 hl icmp6 length limit mac mark multiport owner phys
 
 ifeq ($(DO_SELINUX), 1)
 PF_EXT_SE_SLIB:=SECMARK CONNSECMARK
-PF6_EXT_SE_SLIB:=SECMARK
+PF6_EXT_SE_SLIB:=SECMARK CONNSECMARK
 endif
 
 # Optionals
