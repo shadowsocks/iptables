@@ -31,6 +31,11 @@ ifeq ($(shell [ -f /usr/include/netinet/ip6.h ] && echo YES), YES)
 DO_IPV6:=1
 endif
 
+# Enable linking to libselinux via enviornment 'DO_SELINUX=1'
+ifndef DO_SELINUX
+DO_SELINUX=0
+endif
+
 COPT_FLAGS:=-O2
 CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -I$(KERNEL_DIR)/include -Iinclude/ -DIPTABLES_VERSION=\"$(IPTABLES_VERSION)\" #-g -DDEBUG #-pg # -DIPTC_DEBUG
 
@@ -93,17 +98,24 @@ endif
 
 ifndef NO_SHARED_LIBS
 DEPFILES = $(SHARED_LIBS:%.so=%.d)
+DEPFILES += $(SHARED_SE_LIBS:%.so=%.d)
 SH_CFLAGS:=$(CFLAGS) -fPIC
 STATIC_LIBS  =
 STATIC6_LIBS =
 LDFLAGS      = -rdynamic
 LDLIBS       = -ldl -lnsl
+ifeq ($(DO_SELINUX), 1)
+LDLIBS       += -lselinux
+endif
 else
 DEPFILES = $(EXT_OBJS:%.o=%.d)
 STATIC_LIBS  = extensions/libext.a
 STATIC6_LIBS = extensions/libext6.a
 LDFLAGS      = -static
-LDLIBS       =
+LDLIBS	     =
+ifeq ($(DO_SELINUX), 1)
+LDLIBS       += -lselinux
+endif
 endif
 
 .PHONY: default
