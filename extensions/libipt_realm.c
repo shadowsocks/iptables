@@ -17,7 +17,7 @@ static void
 help(void)
 {
 	printf(
-"REALM v%s options:\n"
+"realm v%s options:\n"
 " --realm [!] value[/mask]\n"
 "				Match realm\n"
 "\n", IPTABLES_VERSION);
@@ -49,7 +49,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		} else
 			realminfo->mask = 0xffffffff;
 		if (*end != '\0' || end == optarg)
-			exit_error(PARAMETER_PROBLEM, "Bad REALM value `%s'", optarg);
+			exit_error(PARAMETER_PROBLEM, "Bad realm value `%s'", optarg);
 		if (invert)
 			realminfo->invert = 1;
 		*flags = 1;
@@ -81,7 +81,7 @@ print(const struct ipt_ip *ip,
 	if (ri->invert)
 		printf("! ");
 
-	printf("REALM match ");
+	printf("realm ");
 	print_realm(ri->id, ri->mask);
 }
 
@@ -105,7 +105,7 @@ final_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
-			   "REALM match: You must specify `--realm'");
+			   "realm match: You must specify `--realm'");
 }
 
 static struct iptables_match realm = { NULL,
