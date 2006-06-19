@@ -5,7 +5,8 @@
 enum exittype {
 	OTHER_PROBLEM = 1,
 	PARAMETER_PROBLEM,
-	VERSION_PROBLEM
+	VERSION_PROBLEM,
+	RESOURCE_PROBLEM
 };
 
 /* this is a special 64bit data type that is 8-byte aligned */
