@@ -37,7 +37,7 @@ parse_bindings(const char *optarg, struct ipt_set_info *info)
 	free(saved);
 }
 
-static int get_set_getsockopt(void *data, size_t * size)
+static int get_set_getsockopt(void *data, socklen_t * size)
 {
 	int sockfd = -1;
 	sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
@@ -51,7 +51,7 @@ static int get_set_getsockopt(void *data, size_t * size)
 static void get_set_byname(const char *setname, struct ipt_set_info *info)
 {
 	struct ip_set_req_get_set req;
-	size_t size = sizeof(struct ip_set_req_get_set);
+	socklen_t size = sizeof(struct ip_set_req_get_set);
 	int res;
 
 	req.op = IP_SET_OP_GET_BYNAME;
@@ -78,7 +78,7 @@ static void get_set_byname(const char *setname, struct ipt_set_info *info)
 static void get_set_byid(char * setname, ip_set_id_t index)
 {
 	struct ip_set_req_get_set req;
-	size_t size = sizeof(struct ip_set_req_get_set);
+	socklen_t size = sizeof(struct ip_set_req_get_set);
 	int res;
 
 	req.op = IP_SET_OP_GET_BYINDEX;
