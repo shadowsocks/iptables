@@ -462,7 +462,8 @@ print_chunks(u_int32_t chunk_match_type,
 	flag = 0;
 	for (i = 0; i < 256; i++) {
 		if (SCTP_CHUNKMAP_IS_SET(chunkmap, i)) {
-			flag && printf(",");
+			if (flag)
+				printf(",");
 			flag = 1;
 			print_chunk(i, numeric);
 			for (j = 0; j < flag_count; j++) {
@@ -474,7 +475,8 @@ print_chunks(u_int32_t chunk_match_type,
 		}
 	}
 
-	flag && printf(" ");
+	if (flag)
+		printf(" ");
 out:
 	return;
 }
