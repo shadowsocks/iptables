@@ -164,11 +164,15 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
+		if (*flags == 1)
+			exit_error(PARAMETER_PROBLEM,
+				   "icmpv6 match: only use --icmpv6-type once!");
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_icmpv6(argv[optind-1], &icmpv6info->type, 
 			     icmpv6info->code);
 		if (invert)
 			icmpv6info->invflags |= IP6T_ICMP_INV;
+		*flags = 1;
 		break;
 
 	default:
@@ -247,9 +251,11 @@ static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match
 	printf(" ");
 }
 
-/* Final check; we don't care. */
 static void final_check(unsigned int flags)
 {
+	if (!flags)
+		exit_error(PARAMETER_PROBLEM,
+			   "icmpv6 match: You must specify `--icmpv6-type'");
 }
 
 static struct ip6tables_match icmpv6 = {
