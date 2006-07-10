@@ -583,6 +583,34 @@ addr_to_host(const struct in_addr *addr)
 	return (char *) NULL;
 }
 
+static void 
+pad_cidr(char *cidr)
+{
+	char *p, *q;
+	unsigned int onebyte;
+	int i, j;
+	char buf[20];
+
+	/* copy dotted string, because we need to modify it */
+	strncpy(buf, cidr, sizeof(buf) - 1);
+	buf[sizeof(buf) - 1] = '\0';
+
+	p = buf;
+	for (i = 0; i <= 3; i++) {
+		if ((q = strchr(p, '.')) == NULL)
+			break;
+		*q = '\0';
+		if (string_to_number(p, 0, 255, &onebyte) == -1)
+			return;
+		p = q + 1;
+	}
+
+	/* pad remaining octets with zeros */
+	for (j = i; j < 3; j++) {
+		strcat(cidr, ".0");
+	}
+}
+
 /*
  *	All functions starting with "parse" should succeed, otherwise
  *	the program fails.
@@ -651,6 +679,8 @@ parse_hostnetworkmask(const char *name, struct in_addr **addrpp,
 	if ((p = strrchr(buf, '/')) != NULL) {
 		*p = '\0';
 		addrp = parse_mask(p + 1);
+		if (strrchr(p + 1, '.') == NULL)
+			pad_cidr(buf);
 	} else
 		addrp = parse_mask(NULL);
 	inaddrcpy(maskp, addrp);
