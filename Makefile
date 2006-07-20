@@ -67,7 +67,7 @@ ifeq ($(shell uname -m),sparc64)
 		# The kernel is 64-bit, even though userspace is 32.
 		CFLAGS+=-DIPT_MIN_ALIGN=8 -DKERNEL_64_USERSPACE_32
 	else
-		EXT_LDFLAGS=-m elf64_sparc
+		EXT_LDFLAGS+=-Wl,-m,elf64_sparc
 	endif
 endif
 

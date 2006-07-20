@@ -33,8 +33,10 @@ void exit_error(enum exittype, char *, ...)__attribute__((noreturn,
 extern const char *program_name, *program_version;
 extern char *lib_dir;
 
+#define _init __attribute__((constructor)) my_init
 #ifdef NO_SHARED_LIBS
 # ifdef _INIT
+#  undef _init
 #  define _init _INIT
 # endif
   extern void init_extensions(void);
