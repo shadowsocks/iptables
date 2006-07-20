@@ -56,17 +56,6 @@ static struct option opts[] = {
 	{ .name = 0 }
 };
 
-static int
-service_to_port(const char *name)
-{
-	struct servent *service;
-
-	if ((service = getservbyname(name, "dccp")) != NULL)
-		return ntohs((unsigned short) service->s_port);
-
-	return -1;
-}
-
 static u_int16_t
 parse_dccp_port(const char *port)
 {
@@ -74,7 +63,7 @@ parse_dccp_port(const char *port)
 
 	DEBUGP("%s\n", port);
 	if (string_to_number(port, 0, 65535, &portnum) != -1 ||
-	    (portnum = service_to_port(port)) != -1)
+	    (portnum = service_to_port(port, "dccp")) != -1)
 		return (u_int16_t)portnum;
 
 	exit_error(PARAMETER_PROBLEM,

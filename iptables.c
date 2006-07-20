@@ -249,6 +249,17 @@ proto_to_name(u_int8_t proto, int nolookup)
 	return NULL;
 }
 
+int
+service_to_port(const char *name, const char *proto)
+{
+	struct servent *service;
+
+	if ((service = getservbyname(name, proto)) != NULL)
+		return ntohs((unsigned short) service->s_port);
+
+	return -1;
+}
+
 struct in_addr *
 dotted_to_addr(const char *dotted)
 {

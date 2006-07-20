@@ -245,6 +245,17 @@ proto_to_name(u_int8_t proto, int nolookup)
 	return NULL;
 }
 
+int
+service_to_port(const char *name, const char *proto)
+{
+	struct servent *service;
+
+	if ((service = getservbyname(name, proto)) != NULL)
+		return ntohs((unsigned short) service->s_port);
+
+	return -1;
+}
+
 static void
 in6addrcpy(struct in6_addr *dst, struct in6_addr *src)
 {

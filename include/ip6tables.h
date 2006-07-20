@@ -133,6 +133,7 @@ extern int line;
 extern void register_match6(struct ip6tables_match *me);
 extern void register_target6(struct ip6tables_target *me);
 
+extern int service_to_port(const char *name, const char *proto);
 extern int do_command6(int argc, char *argv[], char **table,
 		       ip6tc_handle_t *handle);
 /* Keeping track of external matches and targets: linked lists. */
