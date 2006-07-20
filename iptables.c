@@ -260,6 +260,19 @@ service_to_port(const char *name, const char *proto)
 	return -1;
 }
 
+u_int16_t
+parse_port(const char *port, const char *proto)
+{
+	unsigned int portnum;
+
+	if ((string_to_number(port, 0, 65535, &portnum)) != -1 ||
+	    (portnum = service_to_port(port, proto)) != -1)
+		return (u_int16_t)portnum;
+
+	exit_error(PARAMETER_PROBLEM,
+		   "invalid port/service `%s' specified", port);
+}
+
 struct in_addr *
 dotted_to_addr(const char *dotted)
 {

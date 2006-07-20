@@ -79,20 +79,6 @@ static struct option opts[] = {
 	{ .name = 0 }
 };
 
-static u_int16_t
-parse_sctp_port(const char *port)
-{
-	unsigned int portnum;
-
-	DEBUGP("%s\n", port);
-	if (string_to_number(port, 0, 65535, &portnum) != -1 ||
-	    (portnum = service_to_port(port, "sctp")) != -1)
-		return (u_int16_t)portnum;
-
-	exit_error(PARAMETER_PROBLEM,
-		   "invalid SCTP port/service `%s' specified", port);
-}
-
 static void
 parse_sctp_ports(const char *portstring, 
 		 u_int16_t *ports)
@@ -103,14 +89,14 @@ parse_sctp_ports(const char *portstring,
 	buffer = strdup(portstring);
 	DEBUGP("%s\n", portstring);
 	if ((cp = strchr(buffer, ':')) == NULL) {
-		ports[0] = ports[1] = parse_sctp_port(buffer);
+		ports[0] = ports[1] = parse_port(buffer, "sctp");
 	}
 	else {
 		*cp = '\0';
 		cp++;
 
-		ports[0] = buffer[0] ? parse_sctp_port(buffer) : 0;
-		ports[1] = cp[0] ? parse_sctp_port(cp) : 0xFFFF;
+		ports[0] = buffer[0] ? parse_port(buffer, "sctp") : 0;
+		ports[1] = cp[0] ? parse_port(cp, "sctp") : 0xFFFF;
 
 		if (ports[0] > ports[1])
 			exit_error(PARAMETER_PROBLEM,
