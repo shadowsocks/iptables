@@ -229,9 +229,10 @@ static const struct pprot chain_protos[] = {
 	{ "esp", IPPROTO_ESP },
 	{ "ah", IPPROTO_AH },
 	{ "sctp", IPPROTO_SCTP },
+	{ "dccp", IPPROTO_DCCP },
 };
 
-static char *
+char *
 proto_to_name(u_int8_t proto, int nolookup)
 {
 	unsigned int i;
