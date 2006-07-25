@@ -1519,6 +1519,14 @@ TC_DELETE_ENTRY(const IPT_CHAINLABEL chain,
 		DEBUGP("unable to map target of rule for chain `%s'\n", chain);
 		free(r);
 		return 0;
+	} else {
+		/* iptcc_map_target increment target chain references
+		 * since this is a fake rule only used for matching
+		 * the chain references count is decremented again. 
+		 */
+		if (r->type == IPTCC_R_JUMP
+		    && r->jump)
+			r->jump->references--;
 	}
 
 	list_for_each_entry(i, &c->rules, list) {
