@@ -1656,6 +1656,9 @@ TC_ZERO_ENTRIES(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 		return 0;
 	}
 
+	if (c->counter_map.maptype == COUNTER_MAP_NORMAL_MAP)
+		c->counter_map.maptype = COUNTER_MAP_ZEROED;
+
 	list_for_each_entry(r, &c->rules, list) {
 		if (r->counter_map.maptype == COUNTER_MAP_NORMAL_MAP)
 			r->counter_map.maptype = COUNTER_MAP_ZEROED;
