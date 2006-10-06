@@ -66,7 +66,7 @@ static void get_set_byname(const char *setname, struct ipt_set_info *info)
 	if (size != sizeof(struct ip_set_req_get_set))
 		exit_error(OTHER_PROBLEM,
 			   "Incorrect return size from kernel during ipset lookup, "
-			   "(want %d, got %d)\n",
+			   "(want %ld, got %ld)\n",
 			   sizeof(struct ip_set_req_get_set), size);
 	if (req.set.index == IP_SET_INVALID_ID)
 		exit_error(PARAMETER_PROBLEM,
@@ -92,7 +92,7 @@ static void get_set_byid(char * setname, ip_set_id_t index)
 	if (size != sizeof(struct ip_set_req_get_set))
 		exit_error(OTHER_PROBLEM,
 			   "Incorrect return size from kernel during ipset lookup, "
-			   "(want %d, got %d)\n",
+			   "(want %ld, got %ld)\n",
 			   sizeof(struct ip_set_req_get_set), size);
 	if (req.set.name[0] == '\0')
 		exit_error(PARAMETER_PROBLEM,
