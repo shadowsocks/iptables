@@ -42,4 +42,9 @@ extern char *lib_dir;
   extern void init_extensions(void);
 #endif
 
+#define __be32	u_int32_t
+#define __le32	u_int32_t
+#define __be16	u_int16_t
+#define __le16	u_int16_t
+
 #endif /*_IPTABLES_COMMON_H*/
