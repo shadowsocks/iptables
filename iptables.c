@@ -885,7 +885,7 @@ void parse_interface(const char *arg, char *vianame, unsigned char *mask)
 			if (vianame[i] == ':' ||
 			    vianame[i] == '!' ||
 			    vianame[i] == '*') {
-				printf("Warning: wierd character in interface"
+				printf("Warning: weird character in interface"
 				       " `%s' (No aliases, :, ! or *).\n",
 				       vianame);
 				break;
