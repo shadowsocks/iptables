@@ -15,6 +15,18 @@
 #define IPPROTO_DCCP 33
 #endif
 
+#ifndef IP6T_SO_GET_REVISION_MATCH /* Old kernel source. */
+#define IP6T_SO_GET_REVISION_MATCH	(IP6T_BASE_CTL + 2)
+#define IP6T_SO_GET_REVISION_TARGET	(IP6T_BASE_CTL + 3)
+
+struct ip6t_get_revision
+{
+	char name[IP6T_FUNCTION_MAXNAMELEN-1];
+
+	u_int8_t revision;
+};
+#endif /* IP6T_SO_GET_REVISION_MATCH   Old kernel source */
+
 struct ip6tables_rule_match
 {
 	struct ip6tables_rule_match *next;
@@ -32,6 +44,9 @@ struct ip6tables_match
 	struct ip6tables_match *next;
 
 	ip6t_chainlabel name;
+
+	/* Revision of match (0 by default). */
+	u_int8_t revision;
 
 	const char *version;
 
