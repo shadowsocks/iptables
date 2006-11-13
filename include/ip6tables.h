@@ -16,8 +16,8 @@
 #endif
 
 #ifndef IP6T_SO_GET_REVISION_MATCH /* Old kernel source. */
-#define IP6T_SO_GET_REVISION_MATCH	(IP6T_BASE_CTL + 2)
-#define IP6T_SO_GET_REVISION_TARGET	(IP6T_BASE_CTL + 3)
+#define IP6T_SO_GET_REVISION_MATCH	68
+#define IP6T_SO_GET_REVISION_TARGET	69
 
 struct ip6t_get_revision
 {
