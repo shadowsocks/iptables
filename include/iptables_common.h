@@ -28,6 +28,7 @@ extern int string_to_number_ll(const char *,
 			    unsigned long long int,
 			    unsigned long long *);
 extern int iptables_insmod(const char *modname, const char *modprobe);
+extern int load_iptables_ko(const char *modprobe);
 void exit_error(enum exittype, char *, ...)__attribute__((noreturn,
 							  format(printf,2,3)));
 extern const char *program_name, *program_version;

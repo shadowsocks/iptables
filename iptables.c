@@ -197,6 +197,9 @@ char *lib_dir;
 
 int kernel_version;
 
+/* the path to command to load kernel module */
+const char *modprobe = NULL;
+
 /* Keeping track of external matches and targets: linked lists.  */
 struct iptables_match *iptables_matches = NULL;
 struct iptables_target *iptables_targets = NULL;
@@ -1147,6 +1150,8 @@ static int compatible_revision(const char *name, u_int8_t revision, int opt)
 		exit(1);
 	}
 
+	load_iptables_ko(modprobe);
+
 	strcpy(rev.name, name);
 	rev.revision = revision;
 
@@ -1845,6 +1850,19 @@ int iptables_insmod(const char *modname, const char *modprobe)
 	return -1;
 }
 
+int load_iptables_ko(const char *modprobe)
+{
+	static int loaded = 0;
+	static int ret = -1;
+
+	if (!loaded) {
+		ret = iptables_insmod("ip_tables", NULL);
+		loaded = 1;
+	}
+
+	return ret;
+}
+
 static struct ipt_entry *
 generate_entry(const struct ipt_entry *fw,
 	       struct iptables_rule_match *matches,
@@ -1938,7 +1956,6 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	struct iptables_target *t;
 	const char *jumpto = "";
 	char *protocol = NULL;
-	const char *modprobe = NULL;
 	int proto_used = 0;
 
 	memset(&fw, 0, sizeof(fw));
@@ -2426,7 +2443,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		*handle = iptc_init(*table);
 
 	/* try to insmod the module if iptc_init failed */
-	if (!*handle && iptables_insmod("ip_tables", modprobe) != -1)
+	if (!*handle && load_iptables_ko(modprobe) != -1)
 		*handle = iptc_init(*table);
 
 	if (!*handle)

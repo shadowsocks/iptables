@@ -172,5 +172,6 @@ extern int for_each_chain(int (*fn)(const ip6t_chainlabel, int, ip6tc_handle_t *
 extern int flush_entries(const ip6t_chainlabel chain, int verbose, ip6tc_handle_t *handle);
 extern int delete_chain(const ip6t_chainlabel chain, int verbose, ip6tc_handle_t *handle);
 extern int ip6tables_insmod(const char *modname, const char *modprobe);
+extern int load_ip6tables_ko(const char *modprobe);
 
 #endif /*_IP6TABLES_USER_H*/

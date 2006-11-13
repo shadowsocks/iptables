@@ -193,6 +193,9 @@ const char *program_version;
 const char *program_name;
 char *lib_dir;
 
+/* the path to command to load kernel module */
+const char *modprobe = NULL;
+
 /* Keeping track of external matches and targets: linked lists.  */
 struct ip6tables_match *ip6tables_matches = NULL;
 struct ip6tables_target *ip6tables_targets = NULL;
@@ -1118,6 +1121,8 @@ static int compatible_revision(const char *name, u_int8_t revision, int opt)
 	strcpy(rev.name, name);
 	rev.revision = revision;
 
+	load_ip6tables_ko(modprobe);
+
 	max_rev = getsockopt(sockfd, IPPROTO_IPV6, opt, &rev, &s);
 	if (max_rev < 0) {
 		/* Definitely don't support this? */
@@ -1777,6 +1782,19 @@ int ip6tables_insmod(const char *modname, const char *modprobe)
 	return -1;
 }
 
+int load_ip6tables_ko(const char *modprobe)
+{
+	static int loaded = 0;
+	static int ret = -1;
+
+	if (!loaded) {
+		ret = ip6tables_insmod("ip6_tables", modprobe);
+		loaded = 1;
+	}
+
+	return ret;
+}
+
 static struct ip6t_entry *
 generate_entry(const struct ip6t_entry *fw,
 	       struct ip6tables_rule_match *matches,
@@ -1855,7 +1873,6 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	struct ip6tables_target *t;
 	const char *jumpto = "";
 	char *protocol = NULL;
-	const char *modprobe = NULL;
 	int proto_used = 0;
 
 	memset(&fw, 0, sizeof(fw));
@@ -2333,7 +2350,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 		*handle = ip6tc_init(*table);
 
 	/* try to insmod the module if iptc_init failed */
-	if (!*handle && ip6tables_insmod("ip6_tables", modprobe) != -1)
+	if (!*handle && load_ip6tables_ko(modprobe) != -1)
 		*handle = ip6tc_init(*table);
 
 	if (!*handle)
