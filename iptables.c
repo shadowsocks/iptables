@@ -171,7 +171,6 @@ static char commands_v_options[NUMBER_OF_CMD][NUMBER_OF_OPT] =
 /*NEW_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x','x','x'},
 /*DEL_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x','x','x'},
 /*SET_POLICY*/{'x','x','x','x','x',' ','x','x','x','x','x','x'},
-/*CHECK*/     {'x','+','+','+','x',' ','x',' ',' ',' ','x','x'},
 /*RENAME*/    {'x','x','x','x','x',' ','x','x','x','x','x','x'}
 };
 
