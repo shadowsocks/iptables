@@ -12,7 +12,7 @@
 TOPLEVEL_INCLUDED=YES
 
 ifndef KERNEL_DIR
-KERNEL_DIR=/usr/src/linux
+KERNEL_DIR="/lib/modules/$(shell uname -r)/build"
 endif
 IPTABLES_VERSION:=1.3.6
 OLD_IPTABLES_VERSION:=1.3.5
