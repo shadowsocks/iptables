@@ -154,6 +154,7 @@ extern void register_target(struct iptables_target *me);
 extern int service_to_port(const char *name, const char *proto);
 extern u_int16_t parse_port(const char *port, const char *proto);
 extern struct in_addr *dotted_to_addr(const char *dotted);
+extern struct in_addr *dotted_to_mask(const char *dotted);
 extern char *addr_to_dotted(const struct in_addr *addrp);
 extern char *addr_to_anyname(const struct in_addr *addr);
 extern char *mask_to_dotted(const struct in_addr *mask);
