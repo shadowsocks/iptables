@@ -170,7 +170,7 @@ iptables-xml: iptables-xml.c #iptables.o # $(STATIC_LIBS) libiptc/libiptc.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 ifeq ($(DO_MULTI), 1)
-$(DESTDIR)$(BINDIR)/iptables-xml: iptables-xml
+$(DESTDIR)$(BINDIR)/iptables-xml: iptables
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
 	ln -sf $< $@
 else
