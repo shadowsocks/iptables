@@ -249,7 +249,7 @@ distrib: check distclean delrelease $(RELEASE_DIR)/iptables-$(IPTABLES_VERSION).
 # -g -pg -DIPTC_DEBUG
 .PHONY: check
 check:
-	@if echo $(CFLAGS) | egrep -e '-g|-pg|IPTC_DEBUG' >/dev/null; then echo Remove debugging flags; exit 1; else exit 0; fi
+	@if echo $(CFLAGS) | egrep -e '(^|[[:space:]])(-g|-pg|-DIPTC_DEBUG)([[:space:]]|$)' >/dev/null; then echo Remove debugging flags; exit 1; else exit 0; fi
 
 .PHONY: nowhitespace
 nowhitespace:
