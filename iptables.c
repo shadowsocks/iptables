@@ -227,6 +227,7 @@ struct pprot {
 static const struct pprot chain_protos[] = {
 	{ "tcp", IPPROTO_TCP },
 	{ "udp", IPPROTO_UDP },
+	{ "udplite", IPPROTO_UDPLITE },
 	{ "icmp", IPPROTO_ICMP },
 	{ "esp", IPPROTO_ESP },
 	{ "ah", IPPROTO_AH },

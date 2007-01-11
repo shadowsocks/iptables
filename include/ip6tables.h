@@ -14,6 +14,9 @@
 #ifndef IPPROTO_DCCP
 #define IPPROTO_DCCP 33
 #endif
+#ifndef IPPROTO_UDPLITE
+#define IPPROTO_UDPLITE 136
+#endif
 
 #ifndef IP6T_SO_GET_REVISION_MATCH /* Old kernel source. */
 #define IP6T_SO_GET_REVISION_MATCH	68
