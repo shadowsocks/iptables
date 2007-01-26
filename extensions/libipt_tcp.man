@@ -43,7 +43,3 @@ option is inverted.
 .TP
 .BR "--tcp-option " "[!] \fInumber\fP"
 Match if TCP option set.
-.TP
-.BR "--mss " "\fIvalue\fP[:\fIvalue\fP]"
-Match TCP SYN or SYN/ACK packets with the specified MSS value (or range),
-which control the maximum packet size for that connection.
