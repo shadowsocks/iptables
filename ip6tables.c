@@ -219,6 +219,9 @@ struct pprot {
 #define IPPROTO_AH 51
 #endif
 #endif
+#ifndef IPPROTO_MH
+#define IPPROTO_MH 135
+#endif
 
 static const struct pprot chain_protos[] = {
 	{ "tcp", IPPROTO_TCP },
@@ -228,6 +231,8 @@ static const struct pprot chain_protos[] = {
 	{ "ipv6-icmp", IPPROTO_ICMPV6 },
 	{ "esp", IPPROTO_ESP },
 	{ "ah", IPPROTO_AH },
+	{ "ipv6-mh", IPPROTO_MH },
+	{ "mh", IPPROTO_MH },
 };
 
 static char *
