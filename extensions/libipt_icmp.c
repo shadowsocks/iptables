@@ -284,6 +284,9 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 /* Final check; we don't care. */
 static void final_check(unsigned int flags)
 {
+	if (!flags)
+		exit_error(PARAMETER_PROBLEM,
+			   "icmp match: You must specify `--icmp-type'");
 }
 
 static struct iptables_match icmp = { 
