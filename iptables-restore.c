@@ -64,7 +64,7 @@ iptc_handle_t create_handle(const char *tablename, const char* modprobe )
 	}
 
 	if (!handle) {
-		exit_error(PARAMETER_PROBLEM, "%s: unable to initialize"
+		exit_error(PARAMETER_PROBLEM, "%s: unable to initialize "
 			"table '%s'\n", program_name, tablename);
 		exit(1);
 	}
