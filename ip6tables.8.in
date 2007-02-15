@@ -481,7 +481,8 @@ Jozsef Kadlecsik wrote the REJECT target.
 Harald Welte wrote the ULOG and NFQUEUE target, the new libiptc, aswell as TTL match+target and libipulog.
 .PP
 The Netfilter Core Team is: Marc Boucher, Martin Josefsson, Yasuyuki Kozakai,
-Jozsef Kadlecsik, Patrick McHardy, James Morris, Harald Welte and Rusty Russell.
+Jozsef Kadlecsik, Patrick McHardy, James Morris, Pablo Neira Ayuso,
+Harald Welte and Rusty Russell.
 .PP
 ip6tables man page created by Andras Kis-Szabo, based on
 iptables man page written by Herve Eychenne <rv@wallfire.org>.
