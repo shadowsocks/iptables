@@ -281,12 +281,9 @@ static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	}
 }
 
-/* Final check; we don't care. */
+/* Final check; we don't care. We can pass 0xFF to match any type */
 static void final_check(unsigned int flags)
 {
-	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
-			   "icmp match: You must specify `--icmp-type'");
 }
 
 static struct iptables_match icmp = { 
