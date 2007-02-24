@@ -8,6 +8,11 @@
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ip_nat_rule.h>
 
+#define IPT_SNAT_OPT_SOURCE 0x01
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+#	define IPT_SNAT_OPT_RANDOM 0x02
+#endif
+
 /* Source NAT data consists of a multi-range, indicating where to map
    to. */
 struct ipt_natinfo
@@ -22,7 +27,11 @@ help(void)
 {
 	printf(
 "SNAT v%s options:\n"
-" --to-source <ipaddr>[-<ipaddr>][:port-port]\n"
+" --to-source <ipaddr>[-<ipaddr>][:port-port]"
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+"[--random]"
+#endif
+"\n"
 "				Address to map source to.\n"
 "				(You can use this more than once)\n\n",
 IPTABLES_VERSION);
@@ -30,6 +39,9 @@ IPTABLES_VERSION);
 
 static struct option opts[] = {
 	{ "to-source", 1, 0, '1' },
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+	{ "random", 0, 0, '2' },
+#endif
 	{ 0 }
 };
 
@@ -155,7 +167,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --to-source");
 
-		if (*flags) {
+		if (*flags & IPT_SNAT_OPT_SOURCE) {
 			if (!kernel_version)
 				get_kernel_version();
 			if (kernel_version > LINUX_VERSION(2, 6, 10))
@@ -163,8 +175,22 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 					   "Multiple --to-source not supported");
 		}
 		*target = parse_to(optarg, portok, info);
-		*flags = 1;
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+		if (*flags & IPT_SNAT_OPT_RANDOM)
+			info->mr.range[0].flags |=  IP_NAT_RANGE_PROTO_RANDOM;
+#endif
+		*flags = IPT_SNAT_OPT_SOURCE;
 		return 1;
+
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+	case '2':
+		if (*flags & IPT_SNAT_OPT_SOURCE) {
+			info->mr.range[0].flags |=  IP_NAT_RANGE_PROTO_RANDOM;
+			*flags |= IPT_SNAT_OPT_RANDOM;
+		} else
+			*flags |= IPT_SNAT_OPT_RANDOM;
+		return 1;
+#endif
 
 	default:
 		return 0;
@@ -174,7 +200,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 /* Final check; must have specfied --to-source. */
 static void final_check(unsigned int flags)
 {
-	if (!flags)
+	if (!(flags & IPT_SNAT_OPT_SOURCE))
 		exit_error(PARAMETER_PROBLEM,
 			   "You must specify --to-source");
 }
@@ -197,6 +223,11 @@ static void print_range(const struct ip_nat_range *r)
 		if (r->max.tcp.port != r->min.tcp.port)
 			printf("-%hu", ntohs(r->max.tcp.port));
 	}
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+	if (r->flags & IP_NAT_RANGE_PROTO_RANDOM) {
+		printf(" random");
+	}
+#endif
 }
 
 /* Prints out the targinfo. */

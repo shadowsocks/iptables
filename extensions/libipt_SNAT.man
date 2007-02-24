@@ -7,7 +7,7 @@ modified (and all future packets in this connection will also be
 mangled), and rules should cease being examined.  It takes one type
 of option:
 .TP
-.BR "--to-source  " "\fIipaddr\fP[-\fIipaddr\fP][:\fIport\fP-\fIport\fP]"
+.BR "--to-source  " "\fIipaddr\fP[-\fIipaddr\fP][:\fIport\fP-\fIport\fP]" [ "--random" ]
 which can specify a single new source IP address, an inclusive range
 of IP addresses, and optionally, a port range (which is only valid if
 the rule also specifies
@@ -17,7 +17,10 @@ or
 If no port range is specified, then source ports below 512 will be
 mapped to other ports below 512: those between 512 and 1023 inclusive
 will be mapped to ports below 1024, and other ports will be mapped to
-1024 or above. Where possible, no port alteration will occur.
+1024 or above. Where possible, no port alteration will  If option
+.B "--random"
+is used then port mapping will be forcely randomized to avoid
+attacks based on port prediction (kernel >= 2.6.21).
 .RS
 .PP
 In Kernels up to 2.6.10, you can add several --to-source options.  For those

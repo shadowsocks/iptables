@@ -22,13 +22,22 @@ help(void)
 "				  once for multiple ranges.\n"
 " --nodst\n"
 "				Don't use destination-ip in\n"
-"				           source selection\n",
+"				           source selection\n"
+
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+" --random\n"
+"				Randomize source port\n"
+#endif
+,
 IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
 	{ "to", 1, 0, '1' },
 	{ "nodst", 0, 0, '2'},
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+	{ "random", 0, 0, '3' },
+#endif
 	{ 0 }
 };
 
@@ -79,6 +88,9 @@ parse_to(char *arg, struct ip_nat_range *range)
 
 #define IPT_SAME_OPT_TO			0x01
 #define IPT_SAME_OPT_NODST		0x02
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+#	define IPT_SAME_OPT_RANDOM		0x04
+#endif
 
 /* Function which parses command options; returns true if it
    ate an option */
@@ -89,6 +101,9 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 {
 	struct ipt_same_info *mr
 		= (struct ipt_same_info *)(*target)->data;
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+	int count;
+#endif
 
 	switch (c) {
 	case '1':
@@ -102,6 +117,11 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 				   "Unexpected `!' after --to");
 
 		parse_to(optarg, &mr->range[mr->rangesize]);
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+		if (*flags & IPT_SAME_OPT_RANDOM)
+			mr->range[mr->rangesize].flags 
+				|= IP_NAT_RANGE_PROTO_RANDOM;
+#endif
 		mr->rangesize++;
 		*flags |= IPT_SAME_OPT_TO;
 		break;
@@ -114,7 +134,14 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		mr->info |= IPT_SAME_NODST;
 		*flags |= IPT_SAME_OPT_NODST;
 		break;
-		
+
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+	case '3':	
+		*flags |= IPT_SAME_OPT_RANDOM;
+		for (count=0; count < mr->rangesize; count++)
+			mr->range[count].flags |= IP_NAT_RANGE_PROTO_RANDOM;
+		break;
+#endif
 	default:
 		return 0;
 	}
@@ -139,6 +166,9 @@ print(const struct ipt_ip *ip,
 	int count;
 	struct ipt_same_info *mr
 		= (struct ipt_same_info *)target->data;
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+	int random = 0;
+#endif
 	
 	printf("same:");
 	
@@ -155,10 +185,19 @@ print(const struct ipt_ip *ip,
 			printf(" ");
 		else
 			printf("-%s ", addr_to_dotted(&a));
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+		if (r->flags & IP_NAT_RANGE_PROTO_RANDOM) 
+			random = 1;
+#endif
 	}
 	
 	if (mr->info & IPT_SAME_NODST)
 		printf("nodst ");
+
+#ifdef IP_NAT_RANGE_PROTO_RANDOM
+	if (random)
+		printf("random ");
+#endif
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
