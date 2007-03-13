@@ -1149,7 +1149,7 @@ static int compatible_revision(const char *name, u_int8_t revision, int opt)
 		exit(1);
 	}
 
-	load_iptables_ko(modprobe);
+	load_iptables_ko(modprobe, 1);
 
 	strcpy(rev.name, name);
 	rev.revision = revision;
@@ -1813,10 +1813,10 @@ static char *get_modprobe(void)
 	return NULL;
 }
 
-int iptables_insmod(const char *modname, const char *modprobe)
+int iptables_insmod(const char *modname, const char *modprobe, int quit)
 {
 	char *buf = NULL;
-	char *argv[3];
+	char *argv[4];
 	int status;
 
 	/* If they don't explicitly set it, read out of kernel */
@@ -1831,7 +1831,13 @@ int iptables_insmod(const char *modname, const char *modprobe)
 	case 0:
 		argv[0] = (char *)modprobe;
 		argv[1] = (char *)modname;
-		argv[2] = NULL;
+		if (quit) {
+			argv[2] = "-q";
+			argv[3] = NULL;
+		} else {
+			argv[2] = NULL;
+			argv[3] = NULL;
+		}
 		execv(argv[0], argv);
 
 		/* not usually reached */
@@ -1849,14 +1855,14 @@ int iptables_insmod(const char *modname, const char *modprobe)
 	return -1;
 }
 
-int load_iptables_ko(const char *modprobe)
+int load_iptables_ko(const char *modprobe, int quit)
 {
 	static int loaded = 0;
 	static int ret = -1;
 
 	if (!loaded) {
-		ret = iptables_insmod("ip_tables", NULL);
-		loaded = 1;
+		ret = iptables_insmod("ip_tables", NULL, quit);
+		loaded = (ret == 0);
 	}
 
 	return ret;
@@ -2442,7 +2448,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		*handle = iptc_init(*table);
 
 	/* try to insmod the module if iptc_init failed */
-	if (!*handle && load_iptables_ko(modprobe) != -1)
+	if (!*handle && load_iptables_ko(modprobe, 0) != -1)
 		*handle = iptc_init(*table);
 
 	if (!*handle)

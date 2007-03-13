@@ -1126,7 +1126,7 @@ static int compatible_revision(const char *name, u_int8_t revision, int opt)
 	strcpy(rev.name, name);
 	rev.revision = revision;
 
-	load_ip6tables_ko(modprobe);
+	load_ip6tables_ko(modprobe, 1);
 
 	max_rev = getsockopt(sockfd, IPPROTO_IPV6, opt, &rev, &s);
 	if (max_rev < 0) {
@@ -1751,10 +1751,10 @@ static char *get_modprobe(void)
 	return NULL;
 }
 
-int ip6tables_insmod(const char *modname, const char *modprobe)
+int ip6tables_insmod(const char *modname, const char *modprobe, int quit)
 {
 	char *buf = NULL;
-	char *argv[3];
+	char *argv[4];
 	int status;
 
 	/* If they don't explicitly set it, read out of kernel */
@@ -1769,7 +1769,13 @@ int ip6tables_insmod(const char *modname, const char *modprobe)
 	case 0:
 		argv[0] = (char *)modprobe;
 		argv[1] = (char *)modname;
-		argv[2] = NULL;
+		if (quit) {
+			argv[2] = "-q";
+			argv[3] = NULL;
+		} else {
+			argv[2] = NULL;
+			argv[3] = NULL;
+		}
 		execv(argv[0], argv);
 
 		/* not usually reached */
@@ -1787,14 +1793,14 @@ int ip6tables_insmod(const char *modname, const char *modprobe)
 	return -1;
 }
 
-int load_ip6tables_ko(const char *modprobe)
+int load_ip6tables_ko(const char *modprobe, int quit)
 {
 	static int loaded = 0;
 	static int ret = -1;
 
 	if (!loaded) {
-		ret = ip6tables_insmod("ip6_tables", modprobe);
-		loaded = 1;
+		ret = ip6tables_insmod("ip6_tables", modprobe, quit);
+		loaded = (ret == 0);
 	}
 
 	return ret;
@@ -2355,7 +2361,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 		*handle = ip6tc_init(*table);
 
 	/* try to insmod the module if iptc_init failed */
-	if (!*handle && load_ip6tables_ko(modprobe) != -1)
+	if (!*handle && load_ip6tables_ko(modprobe, 0) != -1)
 		*handle = ip6tc_init(*table);
 
 	if (!*handle)
