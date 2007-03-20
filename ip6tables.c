@@ -1751,7 +1751,7 @@ static char *get_modprobe(void)
 	return NULL;
 }
 
-int ip6tables_insmod(const char *modname, const char *modprobe, int quit)
+int ip6tables_insmod(const char *modname, const char *modprobe, int quiet)
 {
 	char *buf = NULL;
 	char *argv[4];
@@ -1769,7 +1769,7 @@ int ip6tables_insmod(const char *modname, const char *modprobe, int quit)
 	case 0:
 		argv[0] = (char *)modprobe;
 		argv[1] = (char *)modname;
-		if (quit) {
+		if (quiet) {
 			argv[2] = "-q";
 			argv[3] = NULL;
 		} else {
@@ -1793,13 +1793,13 @@ int ip6tables_insmod(const char *modname, const char *modprobe, int quit)
 	return -1;
 }
 
-int load_ip6tables_ko(const char *modprobe, int quit)
+int load_ip6tables_ko(const char *modprobe, int quiet)
 {
 	static int loaded = 0;
 	static int ret = -1;
 
 	if (!loaded) {
-		ret = ip6tables_insmod("ip6_tables", modprobe, quit);
+		ret = ip6tables_insmod("ip6_tables", modprobe, quiet);
 		loaded = (ret == 0);
 	}
 

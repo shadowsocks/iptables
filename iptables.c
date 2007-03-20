@@ -1813,7 +1813,7 @@ static char *get_modprobe(void)
 	return NULL;
 }
 
-int iptables_insmod(const char *modname, const char *modprobe, int quit)
+int iptables_insmod(const char *modname, const char *modprobe, int quiet)
 {
 	char *buf = NULL;
 	char *argv[4];
@@ -1831,7 +1831,7 @@ int iptables_insmod(const char *modname, const char *modprobe, int quit)
 	case 0:
 		argv[0] = (char *)modprobe;
 		argv[1] = (char *)modname;
-		if (quit) {
+		if (quiet) {
 			argv[2] = "-q";
 			argv[3] = NULL;
 		} else {
@@ -1855,13 +1855,13 @@ int iptables_insmod(const char *modname, const char *modprobe, int quit)
 	return -1;
 }
 
-int load_iptables_ko(const char *modprobe, int quit)
+int load_iptables_ko(const char *modprobe, int quiet)
 {
 	static int loaded = 0;
 	static int ret = -1;
 
 	if (!loaded) {
-		ret = iptables_insmod("ip_tables", NULL, quit);
+		ret = iptables_insmod("ip_tables", NULL, quiet);
 		loaded = (ret == 0);
 	}
 
