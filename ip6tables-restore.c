@@ -62,7 +62,7 @@ ip6tc_handle_t create_handle(const char *tablename, const char* modprobe)
 
 	if (!handle) {
 		/* try to insmod the module if iptc_init failed */
-		ip6tables_insmod("ip6_tables", modprobe, 1);
+		ip6tables_insmod("ip6_tables", modprobe, 0);
 		handle = ip6tc_init(tablename);
 	}
 
