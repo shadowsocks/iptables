@@ -1861,7 +1861,7 @@ int load_iptables_ko(const char *modprobe, int quiet)
 	static int ret = -1;
 
 	if (!loaded) {
-		ret = iptables_insmod("ip_tables", NULL, quiet);
+		ret = iptables_insmod("ip_tables", modprobe, quiet);
 		loaded = (ret == 0);
 	}
 
