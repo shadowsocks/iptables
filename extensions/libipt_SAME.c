@@ -190,6 +190,7 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 	int count;
 	struct ipt_same_info *mr
 		= (struct ipt_same_info *)target->data;
+	int random = 0;
 
 	for (count = 0; count < mr->rangesize; count++) {
 		struct ip_nat_range *r = &mr->range[count];
@@ -203,10 +204,15 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 			printf(" ");
 		else
 			printf("-%s ", addr_to_dotted(&a));
+		if (r->flags & IP_NAT_RANGE_PROTO_RANDOM) 
+			random = 1;
 	}
 	
 	if (mr->info & IPT_SAME_NODST)
 		printf("--nodst ");
+
+	if (random)
+		printf("--random ");
 }
 
 static struct iptables_target same = {

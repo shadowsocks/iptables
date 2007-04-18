@@ -138,7 +138,7 @@ print(const struct ipt_ip *ip,
 	}
 
 	if (r->flags & IP_NAT_RANGE_PROTO_RANDOM)
-		printf("random");
+		printf("random ");
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
@@ -155,6 +155,9 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 			printf("-%hu", ntohs(r->max.tcp.port));
 		printf(" ");
 	}
+
+	if (r->flags & IP_NAT_RANGE_PROTO_RANDOM)
+		printf("--random ");
 }
 
 static struct iptables_target masq = { NULL,

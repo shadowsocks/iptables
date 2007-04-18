@@ -214,8 +214,6 @@ static void print_range(const struct ip_nat_range *r)
 		if (r->max.tcp.port != r->min.tcp.port)
 			printf("-%hu", ntohs(r->max.tcp.port));
 	}
-	if (r->flags & IP_NAT_RANGE_PROTO_RANDOM)
-		printf(" random");
 }
 
 /* Prints out the targinfo. */
@@ -231,6 +229,8 @@ print(const struct ipt_ip *ip,
 	for (i = 0; i < info->mr.rangesize; i++) {
 		print_range(&info->mr.range[i]);
 		printf(" ");
+		if (info->mr.range[i].flags & IP_NAT_RANGE_PROTO_RANDOM)
+			printf("random ");
 	}
 }
 
@@ -245,6 +245,8 @@ save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
 		printf("--to-source ");
 		print_range(&info->mr.range[i]);
 		printf(" ");
+		if (info->mr.range[i].flags & IP_NAT_RANGE_PROTO_RANDOM)
+			printf("--random ");
 	}
 }
 
