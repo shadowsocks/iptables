@@ -16,10 +16,8 @@ help(void)
 "MASQUERADE v%s options:\n"
 " --to-ports <port>[-<port>]\n"
 "				Port (range) to map to.\n"
-#ifdef IP_NAT_RANGE_PROTO_RANDOM
 " --random\n"
 "				Randomize source port.\n"
-#endif
 "\n"
 ,
 IPTABLES_VERSION);
@@ -27,9 +25,7 @@ IPTABLES_VERSION);
 
 static struct option opts[] = {
 	{ "to-ports", 1, 0, '1' },
-#ifdef IP_NAT_RANGE_PROTO_RANDOM
 	{ "random", 0, 0, '2' },
-#endif
 	{ 0 }
 };
 
@@ -109,11 +105,9 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		parse_ports(optarg, mr);
 		return 1;
 
-#ifdef IP_NAT_RANGE_PROTO_RANDOM
 	case '2':
 		mr->range[0].flags |=  IP_NAT_RANGE_PROTO_RANDOM;
 		return 1;
-#endif
 
 	default:
 		return 0;
@@ -143,11 +137,8 @@ print(const struct ipt_ip *ip,
 		printf(" ");
 	}
 
-#ifdef IP_NAT_RANGE_PROTO_RANDOM
-	if (r->flags & IP_NAT_RANGE_PROTO_RANDOM) {
+	if (r->flags & IP_NAT_RANGE_PROTO_RANDOM)
 		printf("random");
-	}
-#endif
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */

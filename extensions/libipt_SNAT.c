@@ -9,9 +9,7 @@
 #include <linux/netfilter/nf_nat.h>
 
 #define IPT_SNAT_OPT_SOURCE 0x01
-#ifdef IP_NAT_RANGE_PROTO_RANDOM
-#	define IPT_SNAT_OPT_RANDOM 0x02
-#endif
+#define IPT_SNAT_OPT_RANDOM 0x02
 
 /* Source NAT data consists of a multi-range, indicating where to map
    to. */
@@ -28,9 +26,7 @@ help(void)
 	printf(
 "SNAT v%s options:\n"
 " --to-source <ipaddr>[-<ipaddr>][:port-port]"
-#ifdef IP_NAT_RANGE_PROTO_RANDOM
 "[--random]"
-#endif
 "\n"
 "				Address to map source to.\n"
 "				(You can use this more than once)\n\n",
@@ -39,9 +35,7 @@ IPTABLES_VERSION);
 
 static struct option opts[] = {
 	{ "to-source", 1, 0, '1' },
-#ifdef IP_NAT_RANGE_PROTO_RANDOM
 	{ "random", 0, 0, '2' },
-#endif
 	{ 0 }
 };
 
@@ -175,14 +169,12 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 					   "Multiple --to-source not supported");
 		}
 		*target = parse_to(optarg, portok, info);
-#ifdef IP_NAT_RANGE_PROTO_RANDOM
+		/* WTF do we need this for?? */
 		if (*flags & IPT_SNAT_OPT_RANDOM)
 			info->mr.range[0].flags |=  IP_NAT_RANGE_PROTO_RANDOM;
-#endif
 		*flags = IPT_SNAT_OPT_SOURCE;
 		return 1;
 
-#ifdef IP_NAT_RANGE_PROTO_RANDOM
 	case '2':
 		if (*flags & IPT_SNAT_OPT_SOURCE) {
 			info->mr.range[0].flags |=  IP_NAT_RANGE_PROTO_RANDOM;
@@ -190,7 +182,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		} else
 			*flags |= IPT_SNAT_OPT_RANDOM;
 		return 1;
-#endif
 
 	default:
 		return 0;
@@ -223,11 +214,8 @@ static void print_range(const struct ip_nat_range *r)
 		if (r->max.tcp.port != r->min.tcp.port)
 			printf("-%hu", ntohs(r->max.tcp.port));
 	}
-#ifdef IP_NAT_RANGE_PROTO_RANDOM
-	if (r->flags & IP_NAT_RANGE_PROTO_RANDOM) {
+	if (r->flags & IP_NAT_RANGE_PROTO_RANDOM)
 		printf(" random");
-	}
-#endif
 }
 
 /* Prints out the targinfo. */
