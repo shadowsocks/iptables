@@ -103,7 +103,7 @@ SH_CFLAGS:=$(CFLAGS) -fPIC
 STATIC_LIBS  =
 STATIC6_LIBS =
 LDFLAGS      = -rdynamic
-LDLIBS       = -ldl -lnsl
+LDLIBS       = -ldl
 ifeq ($(DO_SELINUX), 1)
 LDLIBS       += -lselinux
 endif
