@@ -233,6 +233,7 @@ static const struct pprot chain_protos[] = {
 	{ "ah", IPPROTO_AH },
 	{ "ipv6-mh", IPPROTO_MH },
 	{ "mh", IPPROTO_MH },
+	{ "all", 0 },
 };
 
 static char *
