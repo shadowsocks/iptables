@@ -79,7 +79,7 @@ endif
 # Generic test if arch wasn't found above
 ifneq ($(POINTERTEST),1)
 	# Try to determine if kernel is 64bit and we are compiling for 32bit
-	ifeq ($(shell [ -a $(KERNEL_DIR)/include/asm ] && echo YES), YES)
+	ifeq ($(shell [ -d $(KERNEL_DIR)/include/asm ] && echo YES), YES)
 		64bitkernel := $(shell echo -e "\#include <asm/types.h>\n\#if BITS_PER_LONG == 64\nkernel_is_64bits\n\#endif" | $(CC) $(CFLAGS) -D__KERNEL__ -E - | grep kernel_is_64bits)
 		ifdef 64bitkernel
 			32bituser := $(shell echo -e "\#include <stdio.h>\n\#if !defined(__arch64__) && !defined(_LP64)\nuserspace_is_32bit\n\#endif" | $(CC) $(CFLAGS) -E - | grep userspace_is_32bit)
