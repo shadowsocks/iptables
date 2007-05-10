@@ -157,13 +157,13 @@ main(int argc, char *argv[])
 	if (optind == argc - 1) {
 		in = fopen(argv[optind], "r");
 		if (!in) {
-			fprintf(stderr, "Can't open %s: %s", argv[optind],
+			fprintf(stderr, "Can't open %s: %s\n", argv[optind],
 				strerror(errno));
 			exit(1);
 		}
 	}
 	else if (optind < argc) {
-		fprintf(stderr, "Unknown arguments found on commandline");
+		fprintf(stderr, "Unknown arguments found on commandline\n");
 		exit(1);
 	}
 	else in = stdin;
