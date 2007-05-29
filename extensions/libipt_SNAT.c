@@ -25,11 +25,10 @@ help(void)
 {
 	printf(
 "SNAT v%s options:\n"
-" --to-source <ipaddr>[-<ipaddr>][:port-port]"
-"[--random]"
-"\n"
+" --to-source <ipaddr>[-<ipaddr>][:port-port]\n"
 "				Address to map source to.\n"
-"				(You can use this more than once)\n\n",
+"[--random]\n"
+"\n",
 IPTABLES_VERSION);
 }
 
@@ -171,13 +170,13 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		*target = parse_to(optarg, portok, info);
 		/* WTF do we need this for?? */
 		if (*flags & IPT_SNAT_OPT_RANDOM)
-			info->mr.range[0].flags |=  IP_NAT_RANGE_PROTO_RANDOM;
-		*flags = IPT_SNAT_OPT_SOURCE;
+			info->mr.range[0].flags |= IP_NAT_RANGE_PROTO_RANDOM;
+		*flags |= IPT_SNAT_OPT_SOURCE;
 		return 1;
 
 	case '2':
 		if (*flags & IPT_SNAT_OPT_SOURCE) {
-			info->mr.range[0].flags |=  IP_NAT_RANGE_PROTO_RANDOM;
+			info->mr.range[0].flags |= IP_NAT_RANGE_PROTO_RANDOM;
 			*flags |= IPT_SNAT_OPT_RANDOM;
 		} else
 			*flags |= IPT_SNAT_OPT_RANDOM;

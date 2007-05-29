@@ -14,19 +14,17 @@ any established connections are lost anyway).  It takes one option:
 .TP
 .BR "--to-ports " "\fIport\fP[-\fIport\fP]"
 This specifies a range of source ports to use, overriding the default
-.TP
-.BR "--random"
-Randomize source port mapping
-.TP
 .B SNAT
 source port-selection heuristics (see above).  This is only valid
 if the rule also specifies
 .B "-p tcp"
 or
 .BR "-p udp" .
+.TP
+.BR "--random"
+Randomize source port mapping
 If option
 .B "--random"
-is used then port mapping will be forcely randomized to avoid
-attacks based on port prediction (kernel >= 2.6.21).
-
-
+is used then port mapping will be randomized (kernel >= 2.6.21).
+.RS
+.PP
