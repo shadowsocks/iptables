@@ -883,13 +883,11 @@ parse_protocol(const char *s)
 	return (u_int16_t)proto;
 }
 
-/* proto means IPv6 extension header ? */
+/* These are invalid numbers as upper layer protocol */
 static int is_exthdr(u_int16_t proto)
 {
-	return (proto == IPPROTO_HOPOPTS ||
-		proto == IPPROTO_ROUTING ||
+	return (proto == IPPROTO_ROUTING ||
 		proto == IPPROTO_FRAGMENT ||
-		proto == IPPROTO_ESP ||
 		proto == IPPROTO_AH ||
 		proto == IPPROTO_DSTOPTS);
 }
@@ -2062,10 +2060,11 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 				exit_error(PARAMETER_PROBLEM,
 					   "rule would never match protocol");
 			
-			if (fw.ipv6.proto != IPPROTO_ESP &&
-			    is_exthdr(fw.ipv6.proto))
+			if (is_exthdr(fw.ipv6.proto)
+			    && (fw.ipv6.invflags & IP6T_INV_PROTO) == 0)
 				printf("Warning: never matched protocol: %s. "
-				       "use exension match instead.", protocol);
+				       "use extension match instead.\n",
+				       protocol);
 			break;
 
 		case 's':
