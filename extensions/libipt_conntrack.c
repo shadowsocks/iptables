@@ -10,7 +10,6 @@
 #include <ctype.h>
 #include <iptables.h>
 #include <linux/netfilter/nf_conntrack_common.h>
-#include <linux/netfilter_ipv4/ip_conntrack_tuple.h>
 /* For 64bit kernel / 32bit userspace */
 #include "../include/linux/netfilter_ipv4/ipt_conntrack.h"
 
