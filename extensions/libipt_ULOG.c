@@ -128,11 +128,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		if (atoi(optarg) < 0)
 			exit_error(PARAMETER_PROBLEM,
 				   "Negative copy range?");
-#ifdef KERNEL_64_USERSPACE_32
-		loginfo->copy_range = (unsigned long long)atoll(optarg);
-#else
 		loginfo->copy_range = atoi(optarg);
-#endif
 		*flags |= IPT_LOG_OPT_CPRANGE;
 		break;
 	case 'B':
@@ -145,11 +141,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 		if (atoi(optarg) > ULOG_MAX_QLEN)
 			exit_error(PARAMETER_PROBLEM,
 				   "Maximum queue length exceeded");
-#ifdef KERNEL_64_USERSPACE_32
-		loginfo->qthreshold = (unsigned long long)atoll(optarg);
-#else
 		loginfo->qthreshold = atoi(optarg);
-#endif
 		*flags |= IPT_LOG_OPT_QTHRESHOLD;
 		break;
 	default:
@@ -177,19 +169,11 @@ static void save(const struct ipt_ip *ip,
 		printf("--ulog-nlgroup ");
 		print_groups(loginfo->nl_group);
 	}
-#ifdef KERNEL_64_USERSPACE_32
-	if (loginfo->copy_range)
-		printf("--ulog-cprange %llu ", loginfo->copy_range);
-
-	if (loginfo->qthreshold != ULOG_DEFAULT_QTHRESHOLD)
-		printf("--ulog-qthreshold %llu ", loginfo->qthreshold);
-#else
 	if (loginfo->copy_range)
 		printf("--ulog-cprange %u ", (unsigned int)loginfo->copy_range);
 
 	if (loginfo->qthreshold != ULOG_DEFAULT_QTHRESHOLD)
 		printf("--ulog-qthreshold %u ", (unsigned int)loginfo->qthreshold);
-#endif
 }
 
 /* Prints out the targinfo. */
@@ -201,19 +185,11 @@ print(const struct ipt_ip *ip,
 	    = (const struct ipt_ulog_info *) target->data;
 
 	printf("ULOG ");
-#ifdef KERNEL_64_USERSPACE_32
-	printf("copy_range %llu nlgroup ", loginfo->copy_range);
-#else
 	printf("copy_range %u nlgroup ", (unsigned int)loginfo->copy_range);
-#endif
 	print_groups(loginfo->nl_group);
 	if (strcmp(loginfo->prefix, "") != 0)
 		printf("prefix `%s' ", loginfo->prefix);
-#ifdef KERNEL_64_USERSPACE_32
-	printf("queue_threshold %llu ", loginfo->qthreshold);
-#else
 	printf("queue_threshold %u ", (unsigned int)loginfo->qthreshold);
-#endif
 }
 
 static struct iptables_target ulog = {

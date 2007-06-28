@@ -43,13 +43,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-#ifdef KERNEL_64_USERSPACE_32
-		if (string_to_number_ll(optarg, 0, 0, 
-				     &markinfo->mark))
-#else
 		if (string_to_number_l(optarg, 0, 0, 
 				     &markinfo->mark))
-#endif
 			exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
@@ -72,19 +67,11 @@ final_check(unsigned int flags)
 		           "MARK target: Parameter --set-mark is required");
 }
 
-#ifdef KERNEL_64_USERSPACE_32
-static void
-print_mark(unsigned long long mark)
-{
-	printf("0x%llx ", mark);
-}
-#else
 static void
 print_mark(unsigned long mark)
 {
 	printf("0x%lx ", mark);
 }
-#endif
 
 /* Prints out the targinfo. */
 static void

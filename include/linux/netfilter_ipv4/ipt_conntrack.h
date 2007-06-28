@@ -67,11 +67,7 @@ struct ipt_conntrack_info
 	struct ip_conntrack_old_tuple tuple[IP_CT_DIR_MAX];
 	struct in_addr sipmsk[IP_CT_DIR_MAX], dipmsk[IP_CT_DIR_MAX];
 
-#ifdef KERNEL_64_USERSPACE_32
-	unsigned long long expires_min, expires_max;
-#else
 	unsigned long expires_min, expires_max;
-#endif
 
 	/* Flags word */
 	u_int8_t flags;

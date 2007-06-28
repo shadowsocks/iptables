@@ -127,18 +127,6 @@ parse_statuses(const char *arg, struct ipt_conntrack_info *sinfo)
 		exit_error(PARAMETER_PROBLEM, "Bad ctstatus `%s'", arg);
 }
 
-#ifdef KERNEL_64_USERSPACE_32
-static unsigned long long
-parse_expire(const char *s)
-{
-	unsigned long long len;
-	
-	if (string_to_number_ll(s, 0, 0, &len) == -1)
-		exit_error(PARAMETER_PROBLEM, "expire value invalid: `%s'\n", s);
-	else
-		return len;
-}
-#else
 static unsigned long
 parse_expire(const char *s)
 {
@@ -149,7 +137,6 @@ parse_expire(const char *s)
 	else
 		return len;
 }
-#endif
 
 /* If a single value is provided, min and max are both set to the value */
 static void
@@ -172,13 +159,8 @@ parse_expires(const char *s, struct ipt_conntrack_info *sinfo)
 	
 	if (sinfo->expires_min > sinfo->expires_max)
 		exit_error(PARAMETER_PROBLEM,
-#ifdef KERNEL_64_USERSPACE_32
-		           "expire min. range value `%llu' greater than max. "
-		           "range value `%llu'", sinfo->expires_min, sinfo->expires_max);
-#else
 		           "expire min. range value `%lu' greater than max. "
 		           "range value `%lu'", sinfo->expires_min, sinfo->expires_max);
-#endif
 }
 
 /* Function which parses command options; returns true if it
@@ -500,17 +482,10 @@ matchinfo_print(const struct ipt_ip *ip, const struct ipt_entry_match *match, in
         	if (sinfo->invflags & IPT_CONNTRACK_EXPIRES)
                 	printf("! ");
 
-#ifdef KERNEL_64_USERSPACE_32
-        	if (sinfo->expires_max == sinfo->expires_min)
-                	printf("%llu ", sinfo->expires_min);
-        	else
-                	printf("%llu:%llu ", sinfo->expires_min, sinfo->expires_max);
-#else
         	if (sinfo->expires_max == sinfo->expires_min)
                 	printf("%lu ", sinfo->expires_min);
         	else
                 	printf("%lu:%lu ", sinfo->expires_min, sinfo->expires_max);
-#endif
 	}
 }
 

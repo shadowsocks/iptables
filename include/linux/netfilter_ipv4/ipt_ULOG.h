@@ -26,13 +26,8 @@
 /* private data structure for each rule with a ULOG target */
 struct ipt_ulog_info {
 	unsigned int nl_group;
-#ifdef KERNEL_64_USERSPACE_32
-	unsigned long long copy_range;
-	unsigned long long qthreshold;
-#else
 	size_t copy_range;
 	size_t qthreshold;
-#endif
 	char prefix[ULOG_PREFIX_LEN];
 };
 
