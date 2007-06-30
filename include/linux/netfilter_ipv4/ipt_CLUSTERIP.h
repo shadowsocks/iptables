@@ -27,11 +27,7 @@ struct ipt_clusterip_tgt_info {
 	enum clusterip_hashmode hash_mode;
 	u_int32_t hash_initval;
 	
-#ifdef KERNEL_64_USERSPACE_32
-	u_int64_t config;
-#else
 	struct clusterip_config *config;
-#endif
 };
 
 #endif /*_IPT_CLUSTERIP_H_target*/
