@@ -113,6 +113,15 @@ final_check(unsigned int flags)
 	if (flags & 0x8 && info->mode != XT_STATISTIC_MODE_NTH)
 		exit_error(PARAMETER_PROBLEM,
 			   "--packet can only be used in nth mode");
+	if ((flags & 0x8) && !(flags & 0x4))
+		exit_error(PARAMETER_PROBLEM,
+			   "--packet can only be used with --every");
+	/* at this point, info->u.nth.every have been decreased. */
+	if (!(info->u.nth.packet >= 0 && info->u.nth.packet <= info->u.nth.every))
+		exit_error(PARAMETER_PROBLEM,
+			  "the --packet p must be 0 <= p <= n-1");
+
+
 	info->u.nth.count = info->u.nth.every - info->u.nth.packet;
 }
 
