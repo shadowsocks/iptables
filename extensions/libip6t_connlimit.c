@@ -145,7 +145,7 @@ static struct ip6tables_match connlimit_reg = {
 	.extra_opts    = connlimit_opts,
 };
 
-static __attribute__((constructor)) void libipt_connlimit_init(void)
+void _init(void)
 {
 	register_match6(&connlimit_reg);
 }

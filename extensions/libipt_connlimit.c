@@ -122,7 +122,7 @@ static struct iptables_match connlimit_reg = {
 	.extra_opts    = connlimit_opts,
 };
 
-static __attribute__((constructor)) void libipt_connlimit_init(void)
+void _init(void)
 {
 	register_match(&connlimit_reg);
 }
