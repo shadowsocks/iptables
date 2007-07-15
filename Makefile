@@ -11,8 +11,14 @@
 # Standard part of Makefile for topdir.
 TOPLEVEL_INCLUDED=YES
 
+# For recent kernels we only need the source in KERNEL_DIR to build. Older
+# kernels have a bug, where linux/netfilter_ipv4.h includes linux/config.h,
+# which includes linux/autoconf.h, which is placed into KBUILD_OUTPUT.
 ifndef KERNEL_DIR
-KERNEL_DIR="/lib/modules/$(shell uname -r)/build"
+KERNEL_DIR="/lib/modules/$(shell uname -r)/source"
+endif
+ifndef KBUILD_OUTPUT
+KBUILD_OUTPUT="/lib/modules/$(shell uname -r)/build"
 endif
 IPTABLES_VERSION:=1.3.8
 OLD_IPTABLES_VERSION:=1.3.7
@@ -37,7 +43,7 @@ DO_SELINUX=0
 endif
 
 COPT_FLAGS:=-O2
-CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -I$(KERNEL_DIR)/include -Iinclude/ -DIPTABLES_VERSION=\"$(IPTABLES_VERSION)\" #-g -DDEBUG #-pg # -DIPTC_DEBUG
+CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -I$(KBUILD_OUTPUT)/include -I$(KERNEL_DIR)/include -Iinclude/ -DIPTABLES_VERSION=\"$(IPTABLES_VERSION)\" #-g -DDEBUG #-pg # -DIPTC_DEBUG
 
 ifdef NO_SHARED_LIBS
 CFLAGS += -DNO_SHARED_LIBS=1
