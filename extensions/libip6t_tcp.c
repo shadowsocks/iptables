@@ -181,7 +181,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one of `--syn' or `--tcp-flags' "
 				   " allowed");
-		parse_tcp_flags(tcpinfo, "SYN,RST,ACK", "SYN", invert);
+		parse_tcp_flags(tcpinfo, "SYN,RST,ACK,FIN", "SYN", invert);
 		*flags |= TCP_FLAGS;
 		break;
 
