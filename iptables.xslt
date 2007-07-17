@@ -44,7 +44,7 @@
   </xsl:template>
   
   <!-- all child action nodes -->
-  <xsl:template match="iptables-rules/table/chain/rule/actions/*/*|iptables-rules/table/chain/rule/actions/*//*|iptables-rules/table/chain/rule/conditions/*/*|iptables-rules/table/chain/rule/conditions/*//*">
+  <xsl:template match="iptables-rules/table/chain/rule/actions//*|iptables-rules/table/chain/rule/conditions//*" priority="0">
     <xsl:if test="@invert=1"><xsl:text> !</xsl:text></xsl:if>
     <xsl:text> -</xsl:text>
     <!-- if length of name is 1 character, then only do 1 - not 2 -->
@@ -52,7 +52,8 @@
       <xsl:text>-</xsl:text>
     </xsl:if>
     <xsl:value-of select="name()"/>
-    <xsl:text> </xsl:text><xsl:value-of select="."/>
+    <xsl:text> </xsl:text>
+    <xsl:apply-templates select="node()"/>
   </xsl:template>
 
   <xsl:template match="iptables-rules/table/chain/rule/actions/call/*|iptables-rules/table/chain/rule/actions/goto/*">
