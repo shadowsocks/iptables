@@ -10,8 +10,9 @@ PF6_EXT_SLIB:=connlimit connmark eui64 hl icmp6 owner policy state CONNMARK HL L
 PFX_EXT_SLIB:=comment dscp esp length limit mac mark multiport physdev pkttype sctp standard tcp tcpmss udp NOTRACK TCPMSS
 
 ifeq ($(DO_SELINUX), 1)
-PF_EXT_SE_SLIB:=SECMARK CONNSECMARK
-PF6_EXT_SE_SLIB:=SECMARK CONNSECMARK
+PF_EXT_SE_SLIB:=CONNSECMARK
+PF6_EXT_SE_SLIB:=CONNSECMARK
+PFX_EXT_SE_SLIB:=SECMARK 
 endif
 
 # Optionals
@@ -66,15 +67,19 @@ EXTRA_INSTALLS+=$(foreach T, $(PFX_EXT_SLIB), $(DEST_IPT_LIBDIR)/libip6t_$(T).so
 endif
 
 SHARED_LIBS+=$(foreach T,$(PFX_EXT_SLIB),extensions/libxt_$(T).so)
+SHARED_SE_LIBS+=$(foreach T,$(PFX_EXT_SE_SLIB),extensions/libxt_$(T).so)
 EXTRA_INSTALLS+=$(foreach T, $(PFX_EXT_SLIB), $(DEST_IPT_LIBDIR)/libxt_$(T).so)
+EXTRA_INSTALLS+=$(foreach T, $(PFX_EXT_SE_SLIB), $(DEST_IPT_LIBDIR)/libxt_$(T).so)
 
 else 	# NO_SHARED_LIBS
 EXT_OBJS+=$(foreach T,$(PF_EXT_SLIB),extensions/libipt_$(T).o)
 EXT_OBJS+=$(foreach T,$(PF_EXT_SE_SLIB),extensions/libipt_$(T).o)
 EXT_OBJS+=$(foreach T,$(PFX_EXT_SLIB),extensions/libxt_$(T).o)
+EXT_OBJS+=$(foreach T,$(PFX_EXT_SE_SLIB),extensions/libxt_$(T).o)
 EXT_FUNC+=$(foreach T,$(PF_EXT_SLIB),ipt_$(T))
 EXT_FUNC+=$(foreach T,$(PF_EXT_SE_SLIB),ipt_$(T))
 EXT_FUNC+=$(foreach T,$(PFX_EXT_SLIB),xt_$(T))
+EXT_FUNC+=$(foreach T,$(PFX_EXT_SE_SLIB),xt_$(T))
 EXT_OBJS+= extensions/initext.o
 ifeq ($(DO_IPV6), 1)
 EXT6_OBJS+=$(foreach T,$(PF6_EXT_SLIB),extensions/libip6t_$(T).o)
@@ -83,6 +88,8 @@ EXT6_OBJS+=$(foreach T,$(PFX_EXT_SLIB),extensions/libxt_$(T).o)
 EXT6_FUNC+=$(foreach T,$(PF6_EXT_SLIB),ip6t_$(T))
 EXT6_FUNC+=$(foreach T,$(PF6_EXT_SE_SLIB),ip6t_$(T))
 EXT6_FUNC+=$(foreach T,$(PFX_EXT_SLIB),xt_$(T))
+EXT6_OBJS+=$(foreach T,$(PFX_EXT_SE_SLIB),extensions/libxt_$(T).o)
+EXT6_FUNC+=$(foreach T,$(PFX_EXT_SE_SLIB),xt_$(T))
 EXT6_OBJS+= extensions/initext6.o
 endif	# DO_IPV6
 endif	# NO_SHARED_LIBS

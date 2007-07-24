@@ -3,15 +3,13 @@
  *
  * Based on the MARK target.
  *
- * IPv6 version.
- *
  * Copyright (C) 2006 Red Hat, Inc., James Morris <jmorris@redhat.com>
  */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <ip6tables.h>
+#include <xtables.h>
 #include <linux/netfilter/xt_SECMARK.h>
 
 #define PFX "SECMARK target: "
@@ -105,11 +103,31 @@ static void save(const void *ip, const struct xt_entry_target *target)
 	print_secmark(info);
 }
 
-static struct ip6tables_target secmark = {
+static struct xtables_target secmark = {
+	.next		= NULL,
+	.family		= AF_INET,
 	.name		= "SECMARK",
 	.version	= IPTABLES_VERSION,
-	.size		= IP6T_ALIGN(sizeof(struct xt_secmark_target_info)),
-	.userspacesize	= IP6T_ALIGN(sizeof(struct xt_secmark_target_info)),
+	.revision	= 0,
+	.size		= XT_ALIGN(sizeof(struct xt_secmark_target_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_secmark_target_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
+};
+
+static struct xtables_target secmark6 = {
+	.next		= NULL,
+	.family		= AF_INET6,
+	.name		= "SECMARK",
+	.version	= IPTABLES_VERSION,
+	.revision	= 0,
+	.size		= XT_ALIGN(sizeof(struct xt_secmark_target_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_secmark_target_info)),
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
@@ -121,5 +139,6 @@ static struct ip6tables_target secmark = {
 
 void _init(void)
 {
-	register_target6(&secmark);
+	xtables_register_target(&secmark);
+	xtables_register_target(&secmark6);
 }
