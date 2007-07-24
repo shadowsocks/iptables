@@ -12,7 +12,7 @@
 #include <linux/netfilter_ipv6/ip6t_TCPMSS.h>
 
 struct mssinfo {
-	struct ip6t_entry_target t;
+	struct xt_entry_target t;
 	struct ip6t_tcpmss_info mss;
 };
 
@@ -35,7 +35,7 @@ static struct option opts[] = {
 
 /* Initialize the target. */
 static void
-init(struct ip6t_entry_target *t, unsigned int *nfcache)
+init(struct xt_entry_target *t, unsigned int *nfcache)
 {
 }
 
@@ -44,7 +44,7 @@ init(struct ip6t_entry_target *t, unsigned int *nfcache)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ip6t_entry *entry,
-      struct ip6t_entry_target **target)
+      struct xt_entry_target **target)
 {
 	struct ip6t_tcpmss_info *mssinfo
 		= (struct ip6t_tcpmss_info *)(*target)->data;
@@ -89,7 +89,7 @@ final_check(unsigned int flags)
 /* Prints out the targinfo. */
 static void
 print(const struct ip6t_ip6 *ip6,
-      const struct ip6t_entry_target *target,
+      const struct xt_entry_target *target,
       int numeric)
 {
 	const struct ip6t_tcpmss_info *mssinfo =
@@ -102,7 +102,7 @@ print(const struct ip6t_ip6 *ip6,
 
 /* Saves the union ip6t_targinfo in parsable form to stdout. */
 static void
-save(const struct ip6t_ip6 *ip, const struct ip6t_entry_target *target)
+save(const struct ip6t_ip6 *ip, const struct xt_entry_target *target)
 {
 	const struct ip6t_tcpmss_info *mssinfo =
 		(const struct ip6t_tcpmss_info *)target->data;

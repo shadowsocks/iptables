@@ -31,7 +31,7 @@ static struct option opts[] = {
 };
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
-                 const struct ip6t_entry *entry, struct ip6t_entry_target **target)
+                 const struct ip6t_entry *entry, struct xt_entry_target **target)
 {
 	struct xt_connsecmark_target_info *info =
 		(struct xt_connsecmark_target_info*)(*target)->data;
@@ -87,7 +87,7 @@ static void print_connsecmark(struct xt_connsecmark_target_info *info)
 }
 
 static void print(const struct ip6t_ip6 *ip,
-		  const struct ip6t_entry_target *target, int numeric)
+		  const struct xt_entry_target *target, int numeric)
 {
 	struct xt_connsecmark_target_info *info =
 		(struct xt_connsecmark_target_info*)(target)->data;
@@ -96,7 +96,7 @@ static void print(const struct ip6t_ip6 *ip,
 	print_connsecmark(info);
 }
 
-static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_target *target)
+static void save(const struct ip6t_ip6 *ip, const struct xt_entry_target *target)
 {
 	struct xt_connsecmark_target_info *info =
 		(struct xt_connsecmark_target_info*)target->data;

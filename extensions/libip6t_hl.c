@@ -27,7 +27,7 @@ static void help(void)
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
 		const struct ip6t_entry *entry, unsigned int *nfcache,
-		struct ip6t_entry_match **match)
+		struct xt_entry_match **match)
 {
 	struct ip6t_hl_info *info = (struct ip6t_hl_info *) (*match)->data;
 	u_int8_t value;
@@ -90,7 +90,7 @@ static void final_check(unsigned int flags)
 }
 
 static void print(const struct ip6t_ip6 *ip, 
-		const struct ip6t_entry_match *match,
+		const struct xt_entry_match *match,
 		int numeric)
 {
 	static const char *op[] = {
@@ -106,7 +106,7 @@ static void print(const struct ip6t_ip6 *ip,
 }
 
 static void save(const struct ip6t_ip6 *ip, 
-		const struct ip6t_entry_match *match)
+		const struct xt_entry_match *match)
 {
 	static const char *op[] = {
 		[IP6T_HL_EQ] = "eq",

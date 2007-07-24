@@ -16,7 +16,7 @@
 
 #define IP6T_HL_USED	1
 
-static void init(struct ip6t_entry_target *t, unsigned int *nfcache) 
+static void init(struct xt_entry_target *t, unsigned int *nfcache)
 {
 }
 
@@ -32,7 +32,7 @@ static void help(void)
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
 		const struct ip6t_entry *entry,
-		struct ip6t_entry_target **target)
+		struct xt_entry_target **target)
 {
 	struct ip6t_HL_info *info = (struct ip6t_HL_info *) (*target)->data;
 	unsigned int value;
@@ -97,7 +97,7 @@ static void final_check(unsigned int flags)
 }
 
 static void save(const struct ip6t_ip6 *ip,
-		const struct ip6t_entry_target *target)
+		const struct xt_entry_target *target)
 {
 	const struct ip6t_HL_info *info = 
 		(struct ip6t_HL_info *) target->data;
@@ -118,7 +118,7 @@ static void save(const struct ip6t_ip6 *ip,
 }
 
 static void print(const struct ip6t_ip6 *ip,
-		const struct ip6t_entry_target *target, int numeric)
+		const struct xt_entry_target *target, int numeric)
 {
 	const struct ip6t_HL_info *info =
 		(struct ip6t_HL_info *) target->data;

@@ -155,7 +155,7 @@ static struct option opts[] = {
 };
 
 static void
-init(struct ip6t_entry_match *m, unsigned int *nfcache)
+init(struct xt_entry_match *m, unsigned int *nfcache)
 {
 	struct ip6t_ipv6header_info *info = (struct ip6t_ipv6header_info *)m->data;
 
@@ -187,7 +187,7 @@ static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ip6t_entry *entry,
       unsigned int *nfcache,
-      struct ip6t_entry_match **match)
+      struct xt_entry_match **match)
 {
 	struct ip6t_ipv6header_info *info = (struct ip6t_ipv6header_info *)(*match)->data;
 
@@ -255,7 +255,7 @@ print_header(u_int8_t flags){
 /* Prints out the match */
 static void
 print(const struct ip6t_ip6 *ip,
-      const struct ip6t_entry_match *match,
+      const struct xt_entry_match *match,
       int numeric)
 {
 	const struct ip6t_ipv6header_info *info = (const struct ip6t_ipv6header_info *)match->data;
@@ -280,7 +280,7 @@ print(const struct ip6t_ip6 *ip,
 /* Saves the match */
 static void
 save(const struct ip6t_ip6 *ip,
-     const struct ip6t_entry_match *match)
+     const struct xt_entry_match *match)
 {
 
 	const struct ip6t_ipv6header_info *info = (const struct ip6t_ipv6header_info *)match->data;

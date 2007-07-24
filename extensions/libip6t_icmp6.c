@@ -145,7 +145,7 @@ parse_icmpv6(const char *icmpv6type, u_int8_t *type, u_int8_t code[])
 
 /* Initialize the match. */
 static void
-init(struct ip6t_entry_match *m, unsigned int *nfcache)
+init(struct xt_entry_match *m, unsigned int *nfcache)
 {
 	struct ip6t_icmp *icmpv6info = (struct ip6t_icmp *)m->data;
 
@@ -158,7 +158,7 @@ static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ip6t_entry *entry,
       unsigned int *nfcache,
-      struct ip6t_entry_match **match)
+      struct xt_entry_match **match)
 {
 	struct ip6t_icmp *icmpv6info = (struct ip6t_icmp *)(*match)->data;
 
@@ -222,7 +222,7 @@ static void print_icmpv6type(u_int8_t type,
 /* Prints out the union ipt_matchinfo. */
 static void
 print(const struct ip6t_ip6 *ip,
-      const struct ip6t_entry_match *match,
+      const struct xt_entry_match *match,
       int numeric)
 {
 	const struct ip6t_icmp *icmpv6 = (struct ip6t_icmp *)match->data;
@@ -238,7 +238,7 @@ print(const struct ip6t_ip6 *ip,
 }
 
 /* Saves the match in parsable form to stdout. */
-static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match)
+static void save(const struct ip6t_ip6 *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_icmp *icmpv6 = (struct ip6t_icmp *)match->data;
 

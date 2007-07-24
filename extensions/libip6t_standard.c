@@ -22,7 +22,7 @@ static struct option opts[] = {
 
 /* Initialize the target. */
 static void
-init(struct ip6t_entry_target *t, unsigned int *nfcache)
+init(struct xt_entry_target *t, unsigned int *nfcache)
 {
 }
 
@@ -31,7 +31,7 @@ init(struct ip6t_entry_target *t, unsigned int *nfcache)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ip6t_entry *entry,
-      struct ip6t_entry_target **target)
+      struct xt_entry_target **target)
 {
 	return 0;
 }
@@ -43,7 +43,7 @@ static void final_check(unsigned int flags)
 
 /* Saves the targinfo in parsable form to stdout. */
 static void
-save(const struct ip6t_ip6 *ip6, const struct ip6t_entry_target *target)
+save(const struct ip6t_ip6 *ip6, const struct xt_entry_target *target)
 {
 }
 

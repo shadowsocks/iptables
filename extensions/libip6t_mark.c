@@ -31,7 +31,7 @@ static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ip6t_entry *entry,
       unsigned int *nfcache,
-      struct ip6t_entry_match **match)
+      struct xt_entry_match **match)
 {
 	struct ip6t_mark_info *markinfo = (struct ip6t_mark_info *)(*match)->data;
 
@@ -78,7 +78,7 @@ final_check(unsigned int flags)
 /* Prints out the matchinfo. */
 static void
 print(const struct ip6t_ip6 *ip,
-      const struct ip6t_entry_match *match,
+      const struct xt_entry_match *match,
       int numeric)
 {
 	struct ip6t_mark_info *info = (struct ip6t_mark_info *)match->data;
@@ -93,7 +93,7 @@ print(const struct ip6t_ip6 *ip,
 
 /* Saves the union ip6t_matchinfo in parsable form to stdout. */
 static void
-save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match)
+save(const struct ip6t_ip6 *ip, const struct xt_entry_match *match)
 {
 	struct ip6t_mark_info *info = (struct ip6t_mark_info *)match->data;
 

@@ -27,7 +27,7 @@ static struct option opts[] = {
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ip6t_entry *entry, unsigned int *nfcache,
-      struct ip6t_entry_match **match)
+      struct xt_entry_match **match)
 {
 	struct condition6_info *info =
 	    (struct condition6_info *) (*match)->data;
@@ -65,7 +65,7 @@ final_check(unsigned int flags)
 
 static void
 print(const struct ip6t_ip6 *ip,
-		  const struct ip6t_entry_match *match, int numeric)
+		  const struct xt_entry_match *match, int numeric)
 {
 	const struct condition6_info *info =
 	    (const struct condition6_info *) match->data;
@@ -76,7 +76,7 @@ print(const struct ip6t_ip6 *ip,
 
 static void
 save(const struct ip6t_ip6 *ip,
-		 const struct ip6t_entry_match *match)
+		 const struct xt_entry_match *match)
 {
 	const struct condition6_info *info =
 	    (const struct condition6_info *) match->data;

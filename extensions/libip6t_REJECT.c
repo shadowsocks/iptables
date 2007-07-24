@@ -72,7 +72,7 @@ static struct option opts[] = {
 
 /* Allocate and initialize the target. */
 static void
-init(struct ip6t_entry_target *t, unsigned int *nfcache)
+init(struct xt_entry_target *t, unsigned int *nfcache)
 {
 	struct ip6t_reject_info *reject = (struct ip6t_reject_info *)t->data;
 
@@ -86,7 +86,7 @@ init(struct ip6t_entry_target *t, unsigned int *nfcache)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ip6t_entry *entry,
-      struct ip6t_entry_target **target)
+      struct xt_entry_target **target)
 {
 	struct ip6t_reject_info *reject = 
 		(struct ip6t_reject_info *)(*target)->data;
@@ -121,7 +121,7 @@ static void final_check(unsigned int flags)
 /* Prints out ipt_reject_info. */
 static void
 print(const struct ip6t_ip6 *ip,
-      const struct ip6t_entry_target *target,
+      const struct xt_entry_target *target,
       int numeric)
 {
 	const struct ip6t_reject_info *reject
@@ -137,7 +137,7 @@ print(const struct ip6t_ip6 *ip,
 
 /* Saves ipt_reject in parsable form to stdout. */
 static void save(const struct ip6t_ip6 *ip, 
-		 const struct ip6t_entry_target *target)
+		 const struct xt_entry_target *target)
 {
 	const struct ip6t_reject_info *reject
 		= (const struct ip6t_reject_info *)target->data;

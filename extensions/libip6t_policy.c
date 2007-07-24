@@ -133,7 +133,7 @@ extern void parse_hostnetworkmask(const char *name, struct in6_addr **addrpp,
 
 /* End duplicated code from ip6tables.c */
 
-static void init(struct ip6t_entry_match *m, unsigned int *nfcache)
+static void init(struct xt_entry_match *m, unsigned int *nfcache)
 {
 	*nfcache |= NFC_UNKNOWN;
 }
@@ -168,7 +168,7 @@ static int parse_mode(char *s)
 static int parse(int c, char **argv, int invert, unsigned int *flags,
                  const struct ip6t_entry *entry,
                  unsigned int *nfcache,
-                 struct ip6t_entry_match **match)
+                 struct xt_entry_match **match)
 {
 	struct ip6t_policy_info *info = (void *)(*match)->data;
 	struct ip6t_policy_elem *e = &info->pol[info->len];
@@ -428,7 +428,7 @@ static void print_flags(char *prefix, const struct ip6t_policy_info *info)
 }
 
 static void print(const struct ip6t_ip6 *ip,
-                  const struct ip6t_entry_match *match,
+                  const struct xt_entry_match *match,
 		  int numeric)
 {
 	const struct ip6t_policy_info *info = (void *)match->data;
@@ -445,7 +445,7 @@ static void print(const struct ip6t_ip6 *ip,
 	printf("\n");
 }
 
-static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match)
+static void save(const struct ip6t_ip6 *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_policy_info *info = (void *)match->data;
 	unsigned int i;

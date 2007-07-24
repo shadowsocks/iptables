@@ -46,7 +46,7 @@ static struct option opts[] = {
 
 /* Initialize the match. */
 static void
-init(struct ip6t_entry_match *m, unsigned int *nfcache)
+init(struct xt_entry_match *m, unsigned int *nfcache)
 {
 	/* Can't cache this. */
 	*nfcache |= NFC_UNKNOWN;
@@ -58,7 +58,7 @@ static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ip6t_entry *entry,
       unsigned int *nfcache,
-      struct ip6t_entry_match **match)
+      struct xt_entry_match **match)
 {
 	struct ipt_connmark_info *markinfo = (struct ipt_connmark_info *)(*match)->data;
 
@@ -107,7 +107,7 @@ final_check(unsigned int flags)
 /* Prints out the matchinfo. */
 static void
 print(const struct ip6t_ip6 *ip,
-      const struct ip6t_entry_match *match,
+      const struct xt_entry_match *match,
       int numeric)
 {
 	struct ipt_connmark_info *info = (struct ipt_connmark_info *)match->data;
@@ -120,7 +120,7 @@ print(const struct ip6t_ip6 *ip,
 
 /* Saves the matchinfo in parsable form to stdout. */
 static void
-save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match)
+save(const struct ip6t_ip6 *ip, const struct xt_entry_match *match)
 {
 	struct ipt_connmark_info *info = (struct ipt_connmark_info *)match->data;
 

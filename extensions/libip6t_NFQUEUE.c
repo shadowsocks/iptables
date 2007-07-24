@@ -14,7 +14,7 @@
 #include <linux/netfilter_ipv6/ip6_tables.h>
 #include <linux/netfilter_ipv4/ipt_NFQUEUE.h>
 
-static void init(struct ip6t_entry_target *t, unsigned int *nfcache) 
+static void init(struct xt_entry_target *t, unsigned int *nfcache)
 {
 }
 
@@ -48,7 +48,7 @@ parse_num(const char *s, struct ipt_NFQ_info *tinfo)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ip6t_entry *entry,
-      struct ip6t_entry_target **target)
+      struct xt_entry_target **target)
 {
 	struct ipt_NFQ_info *tinfo
 		= (struct ipt_NFQ_info *)(*target)->data;
@@ -75,7 +75,7 @@ final_check(unsigned int flags)
 /* Prints out the targinfo. */
 static void
 print(const struct ip6t_ip6 *ip,
-      const struct ip6t_entry_target *target,
+      const struct xt_entry_target *target,
       int numeric)
 {
 	const struct ipt_NFQ_info *tinfo =
@@ -85,7 +85,7 @@ print(const struct ip6t_ip6 *ip,
 
 /* Saves the union ip6t_targinfo in parsable form to stdout. */
 static void
-save(const struct ip6t_ip6 *ip, const struct ip6t_entry_target *target)
+save(const struct ip6t_ip6 *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_NFQ_info *tinfo =
 		(const struct ipt_NFQ_info *)target->data;

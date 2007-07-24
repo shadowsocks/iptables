@@ -67,7 +67,7 @@ IPTABLES_VERSION);
 	print_types_all();
 }
 
-static void init(struct ip6t_entry_match *m, unsigned int *nfcache)
+static void init(struct xt_entry_match *m, unsigned int *nfcache)
 {
 	struct ip6t_mh *mhinfo = (struct ip6t_mh *)m->data;
 
@@ -128,7 +128,7 @@ static void parse_mh_types(const char *mhtype, u_int8_t *types)
 static int parse(int c, char **argv, int invert, unsigned int *flags,
 		 const struct ip6t_entry *entry,
 		 unsigned int *nfcache,
-		 struct ip6t_entry_match **match)
+		 struct xt_entry_match **match)
 {
 	struct ip6t_mh *mhinfo = (struct ip6t_mh *)(*match)->data;
 
@@ -196,7 +196,7 @@ static void print_types(u_int8_t min, u_int8_t max, int invert, int numeric)
 }
 
 static void print(const struct ip6t_ip6 *ip,
-		  const struct ip6t_entry_match *match,
+		  const struct xt_entry_match *match,
 		  int numeric)
 {
 	const struct ip6t_mh *mhinfo = (struct ip6t_mh *)match->data;
@@ -210,8 +210,7 @@ static void print(const struct ip6t_ip6 *ip,
 		       mhinfo->invflags & ~IP6T_MH_INV_MASK);
 }
 
-static void save(const struct ip6t_ip6 *ip,
-		 const struct ip6t_entry_match *match)
+static void save(const struct ip6t_ip6 *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_mh *mhinfo = (struct ip6t_mh *)match->data;
 

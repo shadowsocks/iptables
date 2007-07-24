@@ -44,7 +44,7 @@ static struct option opts[] = {
 
 /* Initialize the target. */
 static void
-init(struct ip6t_entry_target *t, unsigned int *nfcache)
+init(struct xt_entry_target *t, unsigned int *nfcache)
 {
 	struct ip6t_log_info *loginfo = (struct ip6t_log_info *)t->data;
 
@@ -111,7 +111,7 @@ parse_level(const char *level)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ip6t_entry *entry,
-      struct ip6t_entry_target **target)
+      struct xt_entry_target **target)
 {
 	struct ip6t_log_info *loginfo = (struct ip6t_log_info *)(*target)->data;
 
@@ -207,7 +207,7 @@ static void final_check(unsigned int flags)
 /* Prints out the targinfo. */
 static void
 print(const struct ip6t_ip6 *ip,
-      const struct ip6t_entry_target *target,
+      const struct xt_entry_target *target,
       int numeric)
 {
 	const struct ip6t_log_info *loginfo
@@ -247,7 +247,7 @@ print(const struct ip6t_ip6 *ip,
 
 /* Saves the union ip6t_targinfo in parsable form to stdout. */
 static void
-save(const struct ip6t_ip6 *ip, const struct ip6t_entry_target *target)
+save(const struct ip6t_ip6 *ip, const struct xt_entry_target *target)
 {
 	const struct ip6t_log_info *loginfo
 		= (const struct ip6t_log_info *)target->data;
