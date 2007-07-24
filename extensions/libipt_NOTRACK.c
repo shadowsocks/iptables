@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include <iptables.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
+#include <xtables.h>
+#include <linux/netfilter/x_tables.h>
 
 /* Function which prints out usage message. */
 static void
@@ -42,22 +42,21 @@ final_check(unsigned int flags)
 }
 
 static
-struct iptables_target notrack 
-= {	.next = NULL,
-	.name = "NOTRACK",
-	.version = IPTABLES_VERSION,
-	.size = IPT_ALIGN(0),
-	.userspacesize = IPT_ALIGN(0),
-	.help = &help,
-	.init = &init,
-	.parse = &parse,
-	.final_check = &final_check,
-	.print = NULL, /* print */
-	.save = NULL, /* save */
-	.extra_opts = opts
+struct xtables_target notrack =
+{
+	.family		= AF_INET,
+	.name		= "NOTRACK",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(0),
+	.userspacesize	= XT_ALIGN(0),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.extra_opts	= opts,
 };
 
 void _init(void)
 {
-	register_target(&notrack);
+	xtables_register_target(&notrack);
 }
