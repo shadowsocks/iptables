@@ -47,7 +47,7 @@ parse_num(const char *s, struct ipt_NFQ_info *tinfo)
 
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ip6t_entry *entry,
+      const void *entry,
       struct xt_entry_target **target)
 {
 	struct ipt_NFQ_info *tinfo
@@ -74,7 +74,7 @@ final_check(unsigned int flags)
 
 /* Prints out the targinfo. */
 static void
-print(const struct ip6t_ip6 *ip,
+print(const void *ip,
       const struct xt_entry_target *target,
       int numeric)
 {
@@ -85,7 +85,7 @@ print(const struct ip6t_ip6 *ip,
 
 /* Saves the union ip6t_targinfo in parsable form to stdout. */
 static void
-save(const struct ip6t_ip6 *ip, const struct xt_entry_target *target)
+save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_NFQ_info *tinfo =
 		(const struct ipt_NFQ_info *)target->data;

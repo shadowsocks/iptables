@@ -156,7 +156,7 @@ init(struct xt_entry_match *m, unsigned int *nfcache)
    ate an option */
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ip6t_entry *entry,
+      const void *entry,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
@@ -221,7 +221,7 @@ static void print_icmpv6type(u_int8_t type,
 
 /* Prints out the union ipt_matchinfo. */
 static void
-print(const struct ip6t_ip6 *ip,
+print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
@@ -238,7 +238,7 @@ print(const struct ip6t_ip6 *ip,
 }
 
 /* Saves the match in parsable form to stdout. */
-static void save(const struct ip6t_ip6 *ip, const struct xt_entry_match *match)
+static void save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_icmp *icmpv6 = (struct ip6t_icmp *)match->data;
 

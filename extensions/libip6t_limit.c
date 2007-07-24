@@ -93,7 +93,7 @@ init(struct xt_entry_match *m, unsigned int *nfcache)
    ate an option */
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ip6t_entry *entry,
+      const void *entry,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
@@ -156,7 +156,7 @@ static void print_rate(u_int32_t period)
 
 /* Prints out the matchinfo. */
 static void
-print(const struct ip6t_ip6 *ip,
+print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
@@ -166,7 +166,7 @@ print(const struct ip6t_ip6 *ip,
 }
 
 /* FIXME: Make minimalist: only print rate if not default --RR */
-static void save(const struct ip6t_ip6 *ip, const struct xt_entry_match *match)
+static void save(const void *ip, const struct xt_entry_match *match)
 {
 	struct ip6t_rateinfo *r = (struct ip6t_rateinfo *)match->data;
 

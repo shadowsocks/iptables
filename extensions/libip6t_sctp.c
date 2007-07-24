@@ -263,7 +263,7 @@ parse_sctp_chunks(struct xt_sctp_info *einfo,
 
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ip6t_entry *entry,
+      const void *entry,
       unsigned int *nfcache,
       struct ip6t_entry_match **match)
 {
@@ -458,7 +458,7 @@ out:
 
 /* Prints out the matchinfo. */
 static void
-print(const struct ip6t_ip6 *ip,
+print(const void *ip,
       const struct ip6t_entry_match *match,
       int numeric)
 {
@@ -492,7 +492,7 @@ print(const struct ip6t_ip6 *ip,
 
 /* Saves the union xt_matchinfo in parsable form to stdout. */
 static void
-save(const struct ip6t_ip6 *ip, 
+save(const void *ip,
      const struct ip6t_entry_match *match)
 {
 	const struct xt_sctp_info *einfo =

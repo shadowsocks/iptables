@@ -41,7 +41,7 @@ init(struct xt_entry_match *m, unsigned int *nfcache)
 
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ip6t_entry *entry,
+      const void *entry,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
@@ -121,7 +121,7 @@ static void final_check(unsigned int flags)
 }
 
 static void
-print(const struct ip6t_ip6 *ip,
+print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
@@ -148,7 +148,7 @@ print(const struct ip6t_ip6 *ip,
 	printf(" ");
 }
 
-static void save(const struct ip6t_ip6 *ip, const struct xt_entry_match *match)
+static void save(const void *ip, const struct xt_entry_match *match)
 {
 	struct ip6t_physdev_info *info =
 		(struct ip6t_physdev_info*)match->data;

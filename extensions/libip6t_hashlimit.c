@@ -151,7 +151,7 @@ static int parse_mode(struct xt_hashlimit_info *r, char *optarg)
    ate an option */
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ip6t_entry *entry,
+      const void *entry,
       unsigned int *nfcache,
       struct ip6t_entry_match **match)
 {
@@ -304,7 +304,7 @@ static void print_mode(const struct xt_hashlimit_info *r, char separator)
 
 /* Prints out the matchinfo. */
 static void
-print(const struct ip6t_ip6 *ip,
+print(const void *ip,
       const struct ip6t_entry_match *match,
       int numeric)
 {
@@ -325,7 +325,7 @@ print(const struct ip6t_ip6 *ip,
 }
 
 /* FIXME: Make minimalist: only print rate if not default --RR */
-static void save(const struct ip6t_ip6 *ip, const struct ip6t_entry_match *match)
+static void save(const void *ip, const struct ip6t_entry_match *match)
 {
 	struct xt_hashlimit_info *r = 
 		(struct xt_hashlimit_info *)match->data;

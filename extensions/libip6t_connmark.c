@@ -56,7 +56,7 @@ init(struct xt_entry_match *m, unsigned int *nfcache)
    ate an option */
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ip6t_entry *entry,
+      const void *entry,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
@@ -106,7 +106,7 @@ final_check(unsigned int flags)
 
 /* Prints out the matchinfo. */
 static void
-print(const struct ip6t_ip6 *ip,
+print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
@@ -120,7 +120,7 @@ print(const struct ip6t_ip6 *ip,
 
 /* Saves the matchinfo in parsable form to stdout. */
 static void
-save(const struct ip6t_ip6 *ip, const struct xt_entry_match *match)
+save(const void *ip, const struct xt_entry_match *match)
 {
 	struct ipt_connmark_info *info = (struct ipt_connmark_info *)match->data;
 

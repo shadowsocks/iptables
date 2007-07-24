@@ -43,7 +43,7 @@ init(struct xt_entry_target *t, unsigned int *nfcache)
    ate an option */
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ip6t_entry *entry,
+      const void *entry,
       struct xt_entry_target **target)
 {
 	struct ip6t_tcpmss_info *mssinfo
@@ -88,7 +88,7 @@ final_check(unsigned int flags)
 
 /* Prints out the targinfo. */
 static void
-print(const struct ip6t_ip6 *ip6,
+print(const void *ip6,
       const struct xt_entry_target *target,
       int numeric)
 {
@@ -102,7 +102,7 @@ print(const struct ip6t_ip6 *ip6,
 
 /* Saves the union ip6t_targinfo in parsable form to stdout. */
 static void
-save(const struct ip6t_ip6 *ip, const struct xt_entry_target *target)
+save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ip6t_tcpmss_info *mssinfo =
 		(const struct ip6t_tcpmss_info *)target->data;

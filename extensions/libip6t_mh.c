@@ -126,7 +126,7 @@ static void parse_mh_types(const char *mhtype, u_int8_t *types)
 #define MH_TYPES 0x01
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
-		 const struct ip6t_entry *entry,
+		 const void *entry,
 		 unsigned int *nfcache,
 		 struct xt_entry_match **match)
 {
@@ -195,7 +195,7 @@ static void print_types(u_int8_t min, u_int8_t max, int invert, int numeric)
 	}
 }
 
-static void print(const struct ip6t_ip6 *ip,
+static void print(const void *ip,
 		  const struct xt_entry_match *match,
 		  int numeric)
 {
@@ -210,7 +210,7 @@ static void print(const struct ip6t_ip6 *ip,
 		       mhinfo->invflags & ~IP6T_MH_INV_MASK);
 }
 
-static void save(const struct ip6t_ip6 *ip, const struct xt_entry_match *match)
+static void save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_mh *mhinfo = (struct ip6t_mh *)match->data;
 

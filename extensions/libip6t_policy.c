@@ -166,7 +166,7 @@ static int parse_mode(char *s)
 }
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
-                 const struct ip6t_entry *entry,
+                 const void *entry,
                  unsigned int *nfcache,
                  struct xt_entry_match **match)
 {
@@ -427,7 +427,7 @@ static void print_flags(char *prefix, const struct ip6t_policy_info *info)
 		printf("%sstrict ", prefix);
 }
 
-static void print(const struct ip6t_ip6 *ip,
+static void print(const void *ip,
                   const struct xt_entry_match *match,
 		  int numeric)
 {
@@ -445,7 +445,7 @@ static void print(const struct ip6t_ip6 *ip,
 	printf("\n");
 }
 
-static void save(const struct ip6t_ip6 *ip, const struct xt_entry_match *match)
+static void save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_policy_info *info = (void *)match->data;
 	unsigned int i;

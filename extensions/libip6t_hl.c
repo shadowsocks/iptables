@@ -26,7 +26,7 @@ static void help(void)
 }
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
-		const struct ip6t_entry *entry, unsigned int *nfcache,
+		const void *entry, unsigned int *nfcache,
 		struct xt_entry_match **match)
 {
 	struct ip6t_hl_info *info = (struct ip6t_hl_info *) (*match)->data;
@@ -89,7 +89,7 @@ static void final_check(unsigned int flags)
 			"`--hl-eq', `--hl-lt', `--hl-gt'");
 }
 
-static void print(const struct ip6t_ip6 *ip, 
+static void print(const void *ip,
 		const struct xt_entry_match *match,
 		int numeric)
 {
@@ -105,7 +105,7 @@ static void print(const struct ip6t_ip6 *ip,
 	printf("HL match HL %s %u ", op[info->mode], info->hop_limit);
 }
 
-static void save(const struct ip6t_ip6 *ip, 
+static void save(const void *ip,
 		const struct xt_entry_match *match)
 {
 	static const char *op[] = {

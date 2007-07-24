@@ -185,7 +185,7 @@ parse_header(const char *flags) {
 /* Parses command options; returns 0 if it ate an option */
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ip6t_entry *entry,
+      const void *entry,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
@@ -254,7 +254,7 @@ print_header(u_int8_t flags){
 
 /* Prints out the match */
 static void
-print(const struct ip6t_ip6 *ip,
+print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
@@ -279,7 +279,7 @@ print(const struct ip6t_ip6 *ip,
 
 /* Saves the match */
 static void
-save(const struct ip6t_ip6 *ip,
+save(const void *ip,
      const struct xt_entry_match *match)
 {
 

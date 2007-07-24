@@ -31,7 +31,7 @@ static void help(void)
 }
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
-		const struct ip6t_entry *entry,
+		const void *entry,
 		struct xt_entry_target **target)
 {
 	struct ip6t_HL_info *info = (struct ip6t_HL_info *) (*target)->data;
@@ -96,7 +96,7 @@ static void final_check(unsigned int flags)
 				"HL: You must specify an action");
 }
 
-static void save(const struct ip6t_ip6 *ip,
+static void save(const void *ip,
 		const struct xt_entry_target *target)
 {
 	const struct ip6t_HL_info *info = 
@@ -117,7 +117,7 @@ static void save(const struct ip6t_ip6 *ip,
 	printf("%u ", info->hop_limit);
 }
 
-static void print(const struct ip6t_ip6 *ip,
+static void print(const void *ip,
 		const struct xt_entry_target *target, int numeric)
 {
 	const struct ip6t_HL_info *info =

@@ -85,7 +85,7 @@ init(struct xt_entry_target *t, unsigned int *nfcache)
    ate an option */
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ip6t_entry *entry,
+      const void *entry,
       struct xt_entry_target **target)
 {
 	struct ip6t_reject_info *reject = 
@@ -120,7 +120,7 @@ static void final_check(unsigned int flags)
 
 /* Prints out ipt_reject_info. */
 static void
-print(const struct ip6t_ip6 *ip,
+print(const void *ip,
       const struct xt_entry_target *target,
       int numeric)
 {
@@ -136,7 +136,7 @@ print(const struct ip6t_ip6 *ip,
 }
 
 /* Saves ipt_reject in parsable form to stdout. */
-static void save(const struct ip6t_ip6 *ip, 
+static void save(const void *ip,
 		 const struct xt_entry_target *target)
 {
 	const struct ip6t_reject_info *reject

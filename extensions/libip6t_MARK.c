@@ -35,7 +35,7 @@ init(struct xt_entry_target *t, unsigned int *nfcache)
    ate an option */
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ip6t_entry *entry,
+      const void *entry,
       struct xt_entry_target **target)
 {
 	struct ip6t_mark_target_info *markinfo
@@ -75,7 +75,7 @@ print_mark(unsigned long mark)
 
 /* Prints out the targinfo. */
 static void
-print(const struct ip6t_ip6 *ip,
+print(const void *ip,
       const struct xt_entry_target *target,
       int numeric)
 {
@@ -88,7 +88,7 @@ print(const struct ip6t_ip6 *ip,
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
 static void
-save(const struct ip6t_ip6 *ip, const struct xt_entry_target *target)
+save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ip6t_mark_target_info *markinfo =
 		(const struct ip6t_mark_target_info *)target->data;
