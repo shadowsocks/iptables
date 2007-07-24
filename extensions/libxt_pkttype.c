@@ -14,9 +14,9 @@
 #else
 #include <linux/if_ether.h>
 #endif
-#include <iptables.h>
+#include <xtables.h>
 #include <linux/if_packet.h>
-#include <linux/netfilter_ipv4/ipt_pkttype.h>
+#include <linux/netfilter/xt_pkttype.h>
 
 #define	PKTTYPE_VERSION	"0.1"
 
@@ -69,7 +69,7 @@ static struct option opts[] = {
 	{0}
 };
 
-static void parse_pkttype(const char *pkttype, struct ipt_pkttype_info *info)
+static void parse_pkttype(const char *pkttype, struct xt_pkttype_info *info)
 {
 	unsigned int	i;
 	
@@ -90,7 +90,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ipt_pkttype_info *info = (struct ipt_pkttype_info *)(*match)->data;
+	struct xt_pkttype_info *info = (struct xt_pkttype_info *)(*match)->data;
 	
 	switch(c)
 	{
@@ -115,7 +115,7 @@ static void final_check(unsigned int flags)
 		exit_error(PARAMETER_PROBLEM, "You must specify `--pkt-type'");
 }
 
-static void print_pkttype(struct ipt_pkttype_info *info)
+static void print_pkttype(struct xt_pkttype_info *info)
 {
 	unsigned int	i;
 	
@@ -133,7 +133,7 @@ static void print_pkttype(struct ipt_pkttype_info *info)
 
 static void print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
-	struct ipt_pkttype_info *info = (struct ipt_pkttype_info *)match->data;
+	struct xt_pkttype_info *info = (struct xt_pkttype_info *)match->data;
 	
 	printf("PKTTYPE %s= ", info->invert?"!":"");
 	print_pkttype(info);
@@ -141,18 +141,34 @@ static void print(const void *ip, const struct xt_entry_match *match, int numeri
 
 static void save(const void *ip, const struct xt_entry_match *match)
 {
-	struct ipt_pkttype_info *info = (struct ipt_pkttype_info *)match->data;
+	struct xt_pkttype_info *info = (struct xt_pkttype_info *)match->data;
 	
 	printf("--pkt-type %s", info->invert?"! ":"");
 	print_pkttype(info);
 }
 
-static struct iptables_match pkttype = {
+static struct xtables_match pkttype = {
 	.next		= NULL,
+	.family		= AF_INET,
 	.name		= "pkttype",
 	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_pkttype_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_pkttype_info)),
+	.size		= XT_ALIGN(sizeof(struct xt_pkttype_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_pkttype_info)),
+	.help		= &help,
+	.parse		= &parse, 
+	.final_check	= &final_check, 
+	.print		= &print,
+	.save		= &save, 
+	.extra_opts	= opts
+};
+
+static struct xtables_match pkttype6 = {
+	.next		= NULL,
+	.family		= AF_INET6,
+	.name		= "pkttype",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_pkttype_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_pkttype_info)),
 	.help		= &help,
 	.parse		= &parse, 
 	.final_check	= &final_check, 
@@ -163,5 +179,6 @@ static struct iptables_match pkttype = {
 
 void _init(void)
 {
-	register_match(&pkttype);
+	xtables_register_match(&pkttype);
+	xtables_register_match(&pkttype6);
 }
