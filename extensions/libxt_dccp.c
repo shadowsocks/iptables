@@ -12,10 +12,10 @@
 #include <netdb.h>
 #include <ctype.h>
 
-#include <iptables.h>
+#include <xtables.h>
 #include <linux/dccp.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
-#include <linux/netfilter_ipv4/ipt_dccp.h>
+#include <linux/netfilter/x_tables.h>
+#include <linux/netfilter/xt_dccp.h>
 
 #if 0
 #define DEBUGP(format, first...) printf(format, ##first)
@@ -29,9 +29,9 @@ static void
 init(struct xt_entry_match *m,
      unsigned int *nfcache)
 {
-	struct ipt_dccp_info *einfo = (struct ipt_dccp_info *)m->data;
+	struct xt_dccp_info *einfo = (struct xt_dccp_info *)m->data;
 
-	memset(einfo, 0, sizeof(struct ipt_dccp_info));
+	memset(einfo, 0, sizeof(struct xt_dccp_info));
 }
 
 static void help(void)
@@ -138,56 +138,56 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ipt_dccp_info *einfo
-		= (struct ipt_dccp_info *)(*match)->data;
+	struct xt_dccp_info *einfo
+		= (struct xt_dccp_info *)(*match)->data;
 
 	switch (c) {
 	case '1':
-		if (*flags & IPT_DCCP_SRC_PORTS)
+		if (*flags & XT_DCCP_SRC_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 			           "Only one `--source-port' allowed");
-		einfo->flags |= IPT_DCCP_SRC_PORTS;
+		einfo->flags |= XT_DCCP_SRC_PORTS;
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_dccp_ports(argv[optind-1], einfo->spts);
 		if (invert)
-			einfo->invflags |= IPT_DCCP_SRC_PORTS;
-		*flags |= IPT_DCCP_SRC_PORTS;
+			einfo->invflags |= XT_DCCP_SRC_PORTS;
+		*flags |= XT_DCCP_SRC_PORTS;
 		break;
 
 	case '2':
-		if (*flags & IPT_DCCP_DEST_PORTS)
+		if (*flags & XT_DCCP_DEST_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--destination-port' allowed");
-		einfo->flags |= IPT_DCCP_DEST_PORTS;
+		einfo->flags |= XT_DCCP_DEST_PORTS;
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_dccp_ports(argv[optind-1], einfo->dpts);
 		if (invert)
-			einfo->invflags |= IPT_DCCP_DEST_PORTS;
-		*flags |= IPT_DCCP_DEST_PORTS;
+			einfo->invflags |= XT_DCCP_DEST_PORTS;
+		*flags |= XT_DCCP_DEST_PORTS;
 		break;
 
 	case '3':
-		if (*flags & IPT_DCCP_TYPE)
+		if (*flags & XT_DCCP_TYPE)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--dccp-types' allowed");
-		einfo->flags |= IPT_DCCP_TYPE;
+		einfo->flags |= XT_DCCP_TYPE;
 		check_inverse(optarg, &invert, &optind, 0);
 		einfo->typemask = parse_dccp_types(argv[optind-1]);
 		if (invert)
-			einfo->invflags |= IPT_DCCP_TYPE;
-		*flags |= IPT_DCCP_TYPE;
+			einfo->invflags |= XT_DCCP_TYPE;
+		*flags |= XT_DCCP_TYPE;
 		break;
 
 	case '4':
-		if (*flags & IPT_DCCP_OPTION)
+		if (*flags & XT_DCCP_OPTION)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--dccp-option' allowed");
-		einfo->flags |= IPT_DCCP_OPTION;
+		einfo->flags |= XT_DCCP_OPTION;
 		check_inverse(optarg, &invert, &optind, 0);
 		einfo->option = parse_dccp_option(argv[optind-1]);
 		if (invert)
-			einfo->invflags |= IPT_DCCP_OPTION;
-		*flags |= IPT_DCCP_OPTION;
+			einfo->invflags |= XT_DCCP_OPTION;
+		*flags |= XT_DCCP_OPTION;
 		break;
 	default:
 		return 0;
@@ -283,32 +283,32 @@ print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
-	const struct ipt_dccp_info *einfo =
-		(const struct ipt_dccp_info *)match->data;
+	const struct xt_dccp_info *einfo =
+		(const struct xt_dccp_info *)match->data;
 
 	printf("dccp ");
 
-	if (einfo->flags & IPT_DCCP_SRC_PORTS) {
+	if (einfo->flags & XT_DCCP_SRC_PORTS) {
 		print_ports("spt", einfo->spts[0], einfo->spts[1],
-			einfo->invflags & IPT_DCCP_SRC_PORTS,
+			einfo->invflags & XT_DCCP_SRC_PORTS,
 			numeric);
 	}
 
-	if (einfo->flags & IPT_DCCP_DEST_PORTS) {
+	if (einfo->flags & XT_DCCP_DEST_PORTS) {
 		print_ports("dpt", einfo->dpts[0], einfo->dpts[1],
-			einfo->invflags & IPT_DCCP_DEST_PORTS,
+			einfo->invflags & XT_DCCP_DEST_PORTS,
 			numeric);
 	}
 
-	if (einfo->flags & IPT_DCCP_TYPE) {
+	if (einfo->flags & XT_DCCP_TYPE) {
 		print_types(einfo->typemask,
-			   einfo->invflags & IPT_DCCP_TYPE,
+			   einfo->invflags & XT_DCCP_TYPE,
 			   numeric);
 	}
 
-	if (einfo->flags & IPT_DCCP_OPTION) {
+	if (einfo->flags & XT_DCCP_OPTION) {
 		print_option(einfo->option,
-			     einfo->invflags & IPT_DCCP_OPTION, numeric);
+			     einfo->invflags & XT_DCCP_OPTION, numeric);
 	}
 }
 
@@ -317,11 +317,11 @@ static void
 save(const void *ip,
      const struct xt_entry_match *match)
 {
-	const struct ipt_dccp_info *einfo =
-		(const struct ipt_dccp_info *)match->data;
+	const struct xt_dccp_info *einfo =
+		(const struct xt_dccp_info *)match->data;
 
-	if (einfo->flags & IPT_DCCP_SRC_PORTS) {
-		if (einfo->invflags & IPT_DCCP_SRC_PORTS)
+	if (einfo->flags & XT_DCCP_SRC_PORTS) {
+		if (einfo->invflags & XT_DCCP_SRC_PORTS)
 			printf("! ");
 		if (einfo->spts[0] != einfo->spts[1])
 			printf("--sport %u:%u ", 
@@ -330,8 +330,8 @@ save(const void *ip,
 			printf("--sport %u ", einfo->spts[0]);
 	}
 
-	if (einfo->flags & IPT_DCCP_DEST_PORTS) {
-		if (einfo->invflags & IPT_DCCP_DEST_PORTS)
+	if (einfo->flags & XT_DCCP_DEST_PORTS) {
+		if (einfo->invflags & XT_DCCP_DEST_PORTS)
 			printf("! ");
 		if (einfo->dpts[0] != einfo->dpts[1])
 			printf("--dport %u:%u ",
@@ -340,35 +340,53 @@ save(const void *ip,
 			printf("--dport %u ", einfo->dpts[0]);
 	}
 
-	if (einfo->flags & IPT_DCCP_TYPE) {
+	if (einfo->flags & XT_DCCP_TYPE) {
 		printf("--dccp-type ");
-		print_types(einfo->typemask, einfo->invflags & IPT_DCCP_TYPE,0);
+		print_types(einfo->typemask, einfo->invflags & XT_DCCP_TYPE,0);
 	}
 
-	if (einfo->flags & IPT_DCCP_OPTION) {
+	if (einfo->flags & XT_DCCP_OPTION) {
 		printf("--dccp-option %s%u ", 
-			einfo->typemask & IPT_DCCP_OPTION ? "! " : "",
+			einfo->typemask & XT_DCCP_OPTION ? "! " : "",
 			einfo->option);
 	}
 }
 
-static
-struct iptables_match dccp
-= { .name          = "dccp",
-    .version       = IPTABLES_VERSION,
-    .size          = IPT_ALIGN(sizeof(struct ipt_dccp_info)),
-    .userspacesize = IPT_ALIGN(sizeof(struct ipt_dccp_info)),
-    .help          = &help,
-    .init          = &init,
-    .parse         = &parse,
-    .final_check   = &final_check,
-    .print         = &print,
-    .save          = &save,
-    .extra_opts    = opts
+static struct xtables_match dccp =
+{
+	.name		= "dccp",
+	.family		= AF_INET,
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_dccp_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_dccp_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
+};
+
+static struct xtables_match dccp6 =
+{
+	.name		= "dccp",
+	.family		= AF_INET6,
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_dccp_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_dccp_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)
 {
-	register_match(&dccp);
+	xtables_register_match(&dccp);
+	xtables_register_match(&dccp6);
 }
 
