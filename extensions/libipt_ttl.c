@@ -25,7 +25,7 @@ static void help(void)
 }
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
-		const struct ipt_entry *entry, unsigned int *nfcache,
+		const void *entry, unsigned int *nfcache,
 		struct xt_entry_match **match)
 {
 	struct ipt_ttl_info *info = (struct ipt_ttl_info *) (*match)->data;
@@ -92,7 +92,7 @@ static void final_check(unsigned int flags)
 			"`--ttl-eq', `--ttl-lt', `--ttl-gt");
 }
 
-static void print(const struct ipt_ip *ip, 
+static void print(const void *ip,
 		const struct xt_entry_match *match,
 		int numeric)
 {
@@ -117,7 +117,7 @@ static void print(const struct ipt_ip *ip,
 	printf("%u ", info->ttl);
 }
 
-static void save(const struct ipt_ip *ip, 
+static void save(const void *ip,
 		const struct xt_entry_match *match)
 {
 	const struct ipt_ttl_info *info =

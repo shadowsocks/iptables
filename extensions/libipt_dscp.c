@@ -75,7 +75,7 @@ parse_class(const char *s, struct ipt_dscp_info *dinfo)
 
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ipt_entry *entry,
+      const void *entry,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
@@ -131,7 +131,7 @@ print_dscp(u_int8_t dscp, int invert, int numeric)
 
 /* Prints out the matchinfo. */
 static void
-print(const struct ipt_ip *ip,
+print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
@@ -143,7 +143,7 @@ print(const struct ipt_ip *ip,
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void
-save(const struct ipt_ip *ip, const struct xt_entry_match *match)
+save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ipt_dscp_info *dinfo =
 		(const struct ipt_dscp_info *)match->data;

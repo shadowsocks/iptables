@@ -47,7 +47,7 @@ int string_to_priority(const char *s, unsigned int *p)
    ate an option */
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ipt_entry *entry,
+      const void *entry,
       struct xt_entry_target **target)
 {
 	struct ipt_classify_target_info *clinfo
@@ -87,7 +87,7 @@ print_class(unsigned int priority, int numeric)
 
 /* Prints out the targinfo. */
 static void
-print(const struct ipt_ip *ip,
+print(const void *ip,
       const struct xt_entry_target *target,
       int numeric)
 {
@@ -99,7 +99,7 @@ print(const struct ipt_ip *ip,
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
 static void
-save(const struct ipt_ip *ip, const struct xt_entry_target *target)
+save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_classify_target_info *clinfo =
 		(const struct ipt_classify_target_info *)target->data;

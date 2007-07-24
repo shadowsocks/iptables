@@ -167,7 +167,7 @@ parse_expires(const char *s, struct ipt_conntrack_info *sinfo)
    ate an option */
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ipt_entry *entry,
+      const void *entry,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
@@ -412,7 +412,7 @@ print_addr(struct in_addr *addr, struct in_addr *mask, int inv, int numeric)
 
 /* Saves the matchinfo in parsable form to stdout. */
 static void
-matchinfo_print(const struct ipt_ip *ip, const struct xt_entry_match *match, int numeric, const char *optpfx)
+matchinfo_print(const void *ip, const struct xt_entry_match *match, int numeric, const char *optpfx)
 {
 	struct ipt_conntrack_info *sinfo = (struct ipt_conntrack_info *)match->data;
 
@@ -491,7 +491,7 @@ matchinfo_print(const struct ipt_ip *ip, const struct xt_entry_match *match, int
 
 /* Prints out the matchinfo. */
 static void
-print(const struct ipt_ip *ip,
+print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
@@ -499,7 +499,7 @@ print(const struct ipt_ip *ip,
 }
 
 /* Saves the matchinfo in parsable form to stdout. */
-static void save(const struct ipt_ip *ip, const struct xt_entry_match *match)
+static void save(const void *ip, const struct xt_entry_match *match)
 {
 	matchinfo_print(ip, match, 1, "--");
 }

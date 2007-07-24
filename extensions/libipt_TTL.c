@@ -31,7 +31,7 @@ static void help(void)
 }
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
-		const struct ipt_entry *entry,
+		const void *entry,
 		struct xt_entry_target **target)
 {
 	struct ipt_TTL_info *info = (struct ipt_TTL_info *) (*target)->data;
@@ -96,7 +96,7 @@ static void final_check(unsigned int flags)
 				"TTL: You must specify an action");
 }
 
-static void save(const struct ipt_ip *ip,
+static void save(const void *ip,
 		const struct xt_entry_target *target)
 {
 	const struct ipt_TTL_info *info = 
@@ -117,7 +117,7 @@ static void save(const struct ipt_ip *ip,
 	printf("%u ", info->ttl);
 }
 
-static void print(const struct ipt_ip *ip,
+static void print(const void *ip,
 		const struct xt_entry_target *target, int numeric)
 {
 	const struct ipt_TTL_info *info =

@@ -37,7 +37,7 @@ static void init(struct xt_entry_target *t, unsigned int *nfcache)
  * ate an option.
  */
 static int parse(int c, char **argv, int invert, unsigned int *flags,
-                 const struct ipt_entry *entry, struct xt_entry_target **target)
+                 const void *entry, struct xt_entry_target **target)
 {
 	struct xt_secmark_target_info *info =
 		(struct xt_secmark_target_info*)(*target)->data;
@@ -83,7 +83,7 @@ static void print_secmark(struct xt_secmark_target_info *info)
 	}
 }
 
-static void print(const struct ipt_ip *ip,
+static void print(const void *ip,
 		  const struct xt_entry_target *target, int numeric)
 {
 	struct xt_secmark_target_info *info =
@@ -94,7 +94,7 @@ static void print(const struct ipt_ip *ip,
 }
 
 /* Saves the target info in parsable form to stdout. */
-static void save(const struct ipt_ip *ip, const struct xt_entry_target *target)
+static void save(const void *ip, const struct xt_entry_target *target)
 {
 	struct xt_secmark_target_info *info =
 		(struct xt_secmark_target_info*)target->data;

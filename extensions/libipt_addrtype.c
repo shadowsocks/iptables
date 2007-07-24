@@ -82,7 +82,7 @@ static void parse_types(const char *arg, u_int16_t *mask)
 #define IPT_ADDRTYPE_OPT_DSTTYPE	0x2
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
-		const struct ipt_entry *entry, unsigned int *nfcache,
+		const void *entry, unsigned int *nfcache,
 		struct xt_entry_match **match)
 {
 	struct ipt_addrtype_info *info =
@@ -137,7 +137,7 @@ static void print_types(u_int16_t mask)
 	printf(" ");
 }
 
-static void print(const struct ipt_ip *ip, 
+static void print(const void *ip,
 		const struct xt_entry_match *match,
 		int numeric)
 {
@@ -159,7 +159,7 @@ static void print(const struct ipt_ip *ip,
 	}
 }
 
-static void save(const struct ipt_ip *ip, 
+static void save(const void *ip,
 		const struct xt_entry_match *match)
 {
 	const struct ipt_addrtype_info *info =

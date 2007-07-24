@@ -40,7 +40,7 @@ static void init(struct xt_entry_target *t, unsigned int *nfcache)
 }
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
-		 const struct ipt_entry *entry,
+		 const void *entry,
 		 struct xt_entry_target **target)
 {
 	struct xt_nflog_info *info = (struct xt_nflog_info *)(*target)->data;
@@ -126,7 +126,7 @@ static void nflog_print(const struct xt_nflog_info *info, char *prefix)
 		printf("%snflog-threshold %u ", prefix, info->threshold);
 }
 
-static void print(const struct ipt_ip *ip, const struct xt_entry_target *target,
+static void print(const void *ip, const struct xt_entry_target *target,
 		  int numeric)
 {
 	const struct xt_nflog_info *info = (struct xt_nflog_info *)target->data;
@@ -134,7 +134,7 @@ static void print(const struct ipt_ip *ip, const struct xt_entry_target *target,
 	nflog_print(info, "");
 }
 
-static void save(const struct ipt_ip *ip, const struct xt_entry_target *target)
+static void save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_nflog_info *info = (struct xt_nflog_info *)target->data;
 

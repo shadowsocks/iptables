@@ -86,7 +86,7 @@ static void parse_pkttype(const char *pkttype, struct ipt_pkttype_info *info)
 }
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ipt_entry *entry,
+      const void *entry,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
@@ -131,7 +131,7 @@ static void print_pkttype(struct ipt_pkttype_info *info)
 	printf("%d ", info->pkttype);	/* in case we didn't find an entry in named-packtes */
 }
 
-static void print(const struct ipt_ip *ip, const struct xt_entry_match *match, int numeric)
+static void print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	struct ipt_pkttype_info *info = (struct ipt_pkttype_info *)match->data;
 	
@@ -139,7 +139,7 @@ static void print(const struct ipt_ip *ip, const struct xt_entry_match *match, i
 	print_pkttype(info);
 }
 
-static void save(const struct ipt_ip *ip, const struct xt_entry_match *match)
+static void save(const void *ip, const struct xt_entry_match *match)
 {
 	struct ipt_pkttype_info *info = (struct ipt_pkttype_info *)match->data;
 	

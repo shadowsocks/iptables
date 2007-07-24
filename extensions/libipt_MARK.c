@@ -39,7 +39,7 @@ init(struct xt_entry_target *t, unsigned int *nfcache)
    ate an option */
 static int
 parse_v0(int c, char **argv, int invert, unsigned int *flags,
-	 const struct ipt_entry *entry,
+	 const void *entry,
 	 struct xt_entry_target **target)
 {
 	struct ipt_mark_target_info *markinfo
@@ -81,7 +81,7 @@ final_check(unsigned int flags)
    ate an option */
 static int
 parse_v1(int c, char **argv, int invert, unsigned int *flags,
-	 const struct ipt_entry *entry,
+	 const void *entry,
 	 struct xt_entry_target **target)
 {
 	struct ipt_mark_target_info_v1 *markinfo
@@ -120,7 +120,7 @@ print_mark(unsigned long mark)
 
 /* Prints out the targinfo. */
 static void
-print_v0(const struct ipt_ip *ip,
+print_v0(const void *ip,
 	 const struct xt_entry_target *target,
 	 int numeric)
 {
@@ -132,7 +132,7 @@ print_v0(const struct ipt_ip *ip,
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
 static void
-save_v0(const struct ipt_ip *ip, const struct xt_entry_target *target)
+save_v0(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_mark_target_info *markinfo =
 		(const struct ipt_mark_target_info *)target->data;
@@ -143,7 +143,7 @@ save_v0(const struct ipt_ip *ip, const struct xt_entry_target *target)
 
 /* Prints out the targinfo. */
 static void
-print_v1(const struct ipt_ip *ip,
+print_v1(const void *ip,
 	 const struct xt_entry_target *target,
 	 int numeric)
 {
@@ -166,7 +166,7 @@ print_v1(const struct ipt_ip *ip,
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
 static void
-save_v1(const struct ipt_ip *ip, const struct xt_entry_target *target)
+save_v1(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_mark_target_info_v1 *markinfo =
 		(const struct ipt_mark_target_info_v1 *)target->data;

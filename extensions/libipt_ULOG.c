@@ -70,7 +70,7 @@ static void init(struct xt_entry_target *t, unsigned int *nfcache)
 /* Function which parses command options; returns true if it
    ate an option */
 static int parse(int c, char **argv, int invert, unsigned int *flags,
-		 const struct ipt_entry *entry,
+		 const void *entry,
 		 struct xt_entry_target **target)
 {
 	struct ipt_ulog_info *loginfo =
@@ -156,7 +156,7 @@ static void final_check(unsigned int flags)
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
-static void save(const struct ipt_ip *ip,
+static void save(const void *ip,
 		 const struct xt_entry_target *target)
 {
 	const struct ipt_ulog_info *loginfo
@@ -178,7 +178,7 @@ static void save(const struct ipt_ip *ip,
 
 /* Prints out the targinfo. */
 static void
-print(const struct ipt_ip *ip,
+print(const void *ip,
       const struct xt_entry_target *target, int numeric)
 {
 	const struct ipt_ulog_info *loginfo
