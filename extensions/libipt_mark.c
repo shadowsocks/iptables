@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include <iptables.h>
+#include <xtables.h>
 /* For 64bit kernel / 32bit userspace */
-#include "../include/linux/netfilter_ipv4/ipt_mark.h"
+#include "../include/linux/netfilter/xt_mark.h"
 
 /* Function which prints out usage message. */
 static void
@@ -33,7 +33,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ipt_mark_info *markinfo = (struct ipt_mark_info *)(*match)->data;
+	struct xt_mark_info *markinfo = (struct xt_mark_info *)(*match)->data;
 
 	switch (c) {
 		char *end;
@@ -81,7 +81,7 @@ print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
-	struct ipt_mark_info *info = (struct ipt_mark_info *)match->data;
+	struct xt_mark_info *info = (struct xt_mark_info *)match->data;
 
 	printf("MARK match ");
 
@@ -95,7 +95,7 @@ print(const void *ip,
 static void
 save(const void *ip, const struct xt_entry_match *match)
 {
-	struct ipt_mark_info *info = (struct ipt_mark_info *)match->data;
+	struct xt_mark_info *info = (struct xt_mark_info *)match->data;
 
 	if (info->invert)
 		printf("! ");
@@ -104,12 +104,13 @@ save(const void *ip, const struct xt_entry_match *match)
 	print_mark(info->mark, info->mask, 0);
 }
 
-static struct iptables_match mark = { 
+static struct xtables_match mark = { 
 	.next		= NULL,
+	.family		= AF_INET,
 	.name		= "mark",
 	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_mark_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_mark_info)),
+	.size		= XT_ALIGN(sizeof(struct xt_mark_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_info)),
 	.help		= &help,
 	.parse		= &parse,
 	.final_check	= &final_check,
@@ -120,5 +121,5 @@ static struct iptables_match mark = {
 
 void _init(void)
 {
-	register_match(&mark);
+	xtables_register_match(&mark);
 }
