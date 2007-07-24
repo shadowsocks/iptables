@@ -17,9 +17,9 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include <iptables.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
-#include <linux/netfilter_ipv4/ipt_dscp.h>
+#include <xtables.h>
+#include <linux/netfilter/x_tables.h>
+#include <linux/netfilter/xt_dscp.h>
 
 /* This is evil, but it's my code - HW*/
 #include "libipt_dscp_helper.c"
@@ -46,7 +46,7 @@ static struct option opts[] = {
 };
 
 static void
-parse_dscp(const char *s, struct ipt_dscp_info *dinfo)
+parse_dscp(const char *s, struct xt_dscp_info *dinfo)
 {
 	unsigned int dscp;
        
@@ -54,7 +54,7 @@ parse_dscp(const char *s, struct ipt_dscp_info *dinfo)
 		exit_error(PARAMETER_PROBLEM,
 			   "Invalid dscp `%s'\n", s);
 
-	if (dscp > IPT_DSCP_MAX)
+	if (dscp > XT_DSCP_MAX)
 		exit_error(PARAMETER_PROBLEM,
 			   "DSCP `%d` out of range\n", dscp);
 
@@ -64,7 +64,7 @@ parse_dscp(const char *s, struct ipt_dscp_info *dinfo)
 
 
 static void
-parse_class(const char *s, struct ipt_dscp_info *dinfo)
+parse_class(const char *s, struct xt_dscp_info *dinfo)
 {
 	unsigned int dscp = class_to_dscp(s);
 
@@ -79,8 +79,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ipt_dscp_info *dinfo
-		= (struct ipt_dscp_info *)(*match)->data;
+	struct xt_dscp_info *dinfo
+		= (struct xt_dscp_info *)(*match)->data;
 
 	switch (c) {
 	case 'F':
@@ -135,8 +135,8 @@ print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
-	const struct ipt_dscp_info *dinfo =
-		(const struct ipt_dscp_info *)match->data;
+	const struct xt_dscp_info *dinfo =
+		(const struct xt_dscp_info *)match->data;
 	printf("DSCP match ");
 	print_dscp(dinfo->dscp, dinfo->invert, numeric);
 }
@@ -145,19 +145,35 @@ print(const void *ip,
 static void
 save(const void *ip, const struct xt_entry_match *match)
 {
-	const struct ipt_dscp_info *dinfo =
-		(const struct ipt_dscp_info *)match->data;
+	const struct xt_dscp_info *dinfo =
+		(const struct xt_dscp_info *)match->data;
 
 	printf("--dscp ");
 	print_dscp(dinfo->dscp, dinfo->invert, 1);
 }
 
-static struct iptables_match dscp = { 
+static struct xtables_match dscp = { 
 	.next 		= NULL,
+	.family		= AF_INET,
 	.name 		= "dscp",
 	.version 	= IPTABLES_VERSION,
-	.size 		= IPT_ALIGN(sizeof(struct ipt_dscp_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_dscp_info)),
+	.size 		= XT_ALIGN(sizeof(struct xt_dscp_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_dscp_info)),
+	.help		= &help,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
+};
+
+static struct xtables_match dscp6 = { 
+	.next 		= NULL,
+	.family		= AF_INET6,
+	.name 		= "dscp",
+	.version 	= IPTABLES_VERSION,
+	.size 		= XT_ALIGN(sizeof(struct xt_dscp_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_dscp_info)),
 	.help		= &help,
 	.parse		= &parse,
 	.final_check	= &final_check,
@@ -168,5 +184,6 @@ static struct iptables_match dscp = {
 
 void _init(void)
 {
-	register_match(&dscp);
+	xtables_register_match(&dscp);
+	xtables_register_match(&dscp6);
 }
