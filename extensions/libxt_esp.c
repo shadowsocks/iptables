@@ -1,12 +1,12 @@
-/* Shared library add-on to ip6tables to add ESP support. */
+/* Shared library add-on to iptables to add ESP support. */
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
 #include <errno.h>
-#include <ip6tables.h>
-#include <linux/netfilter_ipv6/ip6t_esp.h>
+#include <xtables.h>
+#include <linux/netfilter/xt_esp.h>
 
 /* Function which prints out usage message. */
 static void
@@ -14,13 +14,14 @@ help(void)
 {
 	printf(
 "ESP v%s options:\n"
-" --espspi [!] spi[:spi]        match spi (range)\n",
+" --espspi [!] spi[:spi]\n"
+"				match spi (range)\n",
 IPTABLES_VERSION);
 }
 
 static struct option opts[] = {
-	{ .name = "espspi", .has_arg = 1, .flag = 0, .val = '1' },
-	{ .name = 0 }
+	{ "espspi", 1, 0, '1' },
+	{0}
 };
 
 static u_int32_t
@@ -29,7 +30,7 @@ parse_esp_spi(const char *spistr)
 	unsigned long int spi;
 	char* ep;
 
-	spi = strtoul(spistr, &ep, 0);
+	spi =  strtoul(spistr,&ep,0) ;
 
 	if ( spistr == ep ) {
 		exit_error(PARAMETER_PROBLEM,
@@ -72,7 +73,7 @@ parse_esp_spis(const char *spistring, u_int32_t *spis)
 static void
 init(struct xt_entry_match *m, unsigned int *nfcache)
 {
-	struct ip6t_esp *espinfo = (struct ip6t_esp *)m->data;
+	struct xt_esp *espinfo = (struct xt_esp *)m->data;
 
 	espinfo->spis[1] = 0xFFFFFFFF;
 }
@@ -87,7 +88,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ip6t_esp *espinfo = (struct ip6t_esp *)(*match)->data;
+	struct xt_esp *espinfo = (struct xt_esp *)(*match)->data;
 
 	switch (c) {
 	case '1':
@@ -97,7 +98,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_esp_spis(argv[optind-1], espinfo->spis);
 		if (invert)
-			espinfo->invflags |= IP6T_ESP_INV_SPI;
+			espinfo->invflags |= XT_ESP_INV_SPI;
 		*flags |= ESP_SPI;
 		break;
 	default:
@@ -127,30 +128,30 @@ print_spis(const char *name, u_int32_t min, u_int32_t max,
 	}
 }
 
-/* Prints out the union ip6t_matchinfo. */
+/* Prints out the union ipt_matchinfo. */
 static void
 print(const void *ip,
       const struct xt_entry_match *match, int numeric)
 {
-	const struct ip6t_esp *esp = (struct ip6t_esp *)match->data;
+	const struct xt_esp *esp = (struct xt_esp *)match->data;
 
 	printf("esp ");
 	print_spis("spi", esp->spis[0], esp->spis[1],
-		    esp->invflags & IP6T_ESP_INV_SPI);
-	if (esp->invflags & ~IP6T_ESP_INV_MASK)
+		    esp->invflags & XT_ESP_INV_SPI);
+	if (esp->invflags & ~XT_ESP_INV_MASK)
 		printf("Unknown invflags: 0x%X ",
-		       esp->invflags & ~IP6T_ESP_INV_MASK);
+		       esp->invflags & ~XT_ESP_INV_MASK);
 }
 
-/* Saves the union ip6t_matchinfo in parsable form to stdout. */
+/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void save(const void *ip, const struct xt_entry_match *match)
 {
-	const struct ip6t_esp *espinfo = (struct ip6t_esp *)match->data;
+	const struct xt_esp *espinfo = (struct xt_esp *)match->data;
 
 	if (!(espinfo->spis[0] == 0
 	    && espinfo->spis[1] == 0xFFFFFFFF)) {
 		printf("--espspi %s", 
-			(espinfo->invflags & IP6T_ESP_INV_SPI) ? "! " : "");
+			(espinfo->invflags & XT_ESP_INV_SPI) ? "! " : "");
 		if (espinfo->spis[0]
 		    != espinfo->spis[1])
 			printf("%u:%u ",
@@ -163,23 +164,41 @@ static void save(const void *ip, const struct xt_entry_match *match)
 
 }
 
-static
-struct ip6tables_match esp = {
-	.name          = "esp",
-	.version       = IPTABLES_VERSION,
-	.size          = IP6T_ALIGN(sizeof(struct ip6t_esp)),
-	.userspacesize = IP6T_ALIGN(sizeof(struct ip6t_esp)),
-	.help          = &help,
-	.init          = &init,
-	.parse         = &parse,
-	.final_check   = &final_check,
-	.print         = &print,
-	.save          = &save,
-	.extra_opts    = opts
+static struct xtables_match esp = { 
+	.next 		= NULL,
+	.family		= AF_INET,
+	.name 		= "esp",
+	.version 	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_esp)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_esp)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
+};
+
+static struct xtables_match esp6 = { 
+	.next 		= NULL,
+	.family		= AF_INET6,
+	.name 		= "esp",
+	.version 	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_esp)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_esp)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void
 _init(void)
 {
-	register_match6(&esp);
+	xtables_register_match(&esp);
+	xtables_register_match(&esp6);
 }
