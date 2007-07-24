@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include <iptables.h>
-#include <linux/netfilter_ipv4/ipt_comment.h>
+#include <xtables.h>
+#include <linux/netfilter/xt_comment.h>
 
 /* Function which prints out usage message. */
 static void
@@ -30,13 +30,13 @@ static struct option opts[] = {
 };
 
 static void
-parse_comment(const char *s, struct ipt_comment_info *info)
+parse_comment(const char *s, struct xt_comment_info *info)
 {	
 	int slen = strlen(s);
 
-	if (slen >= IPT_MAX_COMMENT_LEN) {
+	if (slen >= XT_MAX_COMMENT_LEN) {
 		exit_error(PARAMETER_PROBLEM,
-			"COMMENT must be shorter than %i characters", IPT_MAX_COMMENT_LEN);
+			"COMMENT must be shorter than %i characters", XT_MAX_COMMENT_LEN);
 	}
 	strcpy((char *)info->comment, s);
 }
@@ -49,7 +49,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ipt_comment_info *commentinfo = (struct ipt_comment_info *)(*match)->data;
+	struct xt_comment_info *commentinfo = (struct xt_comment_info *)(*match)->data;
 
 	switch (c) {
 	case '1':
@@ -83,9 +83,9 @@ print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
-	struct ipt_comment_info *commentinfo = (struct ipt_comment_info *)match->data;
+	struct xt_comment_info *commentinfo = (struct xt_comment_info *)match->data;
 
-	commentinfo->comment[IPT_MAX_COMMENT_LEN-1] = '\0';
+	commentinfo->comment[XT_MAX_COMMENT_LEN-1] = '\0';
 	printf("/* %s */ ", commentinfo->comment);
 }
 
@@ -93,27 +93,44 @@ print(const void *ip,
 static void
 save(const void *ip, const struct xt_entry_match *match)
 {
-	struct ipt_comment_info *commentinfo = (struct ipt_comment_info *)match->data;
+	struct xt_comment_info *commentinfo = (struct xt_comment_info *)match->data;
 
-	commentinfo->comment[IPT_MAX_COMMENT_LEN-1] = '\0';
+	commentinfo->comment[XT_MAX_COMMENT_LEN-1] = '\0';
 	printf("--comment \"%s\" ", commentinfo->comment);
 }
 
-static struct iptables_match comment = {
-    .next 		= NULL,
-    .name 		= "comment",
-    .version 		= IPTABLES_VERSION,
-    .size 		= IPT_ALIGN(sizeof(struct ipt_comment_info)),
-    .userspacesize	= IPT_ALIGN(sizeof(struct ipt_comment_info)),
-    .help		= &help,
-    .parse 		= &parse,
-    .final_check 	= &final_check,
-    .print 		= &print,
-    .save 		= &save,
-    .extra_opts		= opts
+static struct xtables_match comment = {
+	.next		= NULL,
+	.family		= AF_INET,
+	.name		= "comment",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_comment_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_comment_info)),
+	.help		= &help,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print 		= &print,
+	.save 		= &save,
+	.extra_opts	= opts
+};
+
+static struct xtables_match comment6 = {
+	.next		= NULL,
+	.family		= AF_INET6,
+	.name		= "comment",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_comment_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_comment_info)),
+	.help		= &help,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print 		= &print,
+	.save 		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)
 {
-	register_match(&comment);
+	xtables_register_match(&comment);
+	xtables_register_match(&comment6);
 }
