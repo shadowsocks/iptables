@@ -7,6 +7,7 @@
 
 #include <xtables.h>
 #include <libiptc/libiptc.h>
+#include <libiptc/libip6tc.h>
 /* To ensure that iptables compiles with an old kernel */
 #include "../include/linux/netfilter/xt_multiport.h"
 
@@ -221,6 +222,17 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static int
+parse6(int c, char **argv, int invert, unsigned int *flags,
+	 const void *e,
+	 unsigned int *nfcache,
+	 struct xt_entry_match **match)
+{
+	const struct ip6t_entry *entry = (const struct ip6t_entry *)e;
+	return __parse(c, argv, invert, flags, match, entry->ipv6.proto,
+		       entry->ipv6.invflags);
+}
+
+static int
 __parse_v1(int c, char **argv, int invert, unsigned int *flags,
 	   struct xt_entry_match **match,
 	   u_int16_t pnum, u_int8_t invflags)
@@ -274,6 +286,17 @@ parse_v1(int c, char **argv, int invert, unsigned int *flags,
 	const struct ipt_entry *entry = e;
 	return __parse_v1(c, argv, invert, flags, match, entry->ip.proto,
 			  entry->ip.invflags);
+}
+
+static int
+parse6_v1(int c, char **argv, int invert, unsigned int *flags,
+	  const void *e,
+	  unsigned int *nfcache,
+	  struct xt_entry_match **match)
+{
+	const struct ip6t_entry *entry = (const struct ip6t_entry *)e;
+	return __parse_v1(c, argv, invert, flags, match, entry->ipv6.proto,
+			  entry->ipv6.invflags);
 }
 
 /* Final check; must specify something. */
@@ -349,6 +372,13 @@ print(const void *ip_void, const struct xt_entry_match *match, int numeric)
 }
 
 static void
+print6(const void *ip_void, const struct xt_entry_match *match, int numeric)
+{
+	const struct ip6t_ip6 *ip = (const struct ip6t_ip6 *)ip_void;
+	__print(match, numeric, ip->proto);
+}
+
+static void
 __print_v1(const struct xt_entry_match *match, int numeric, u_int16_t proto)
 {
 	const struct xt_multiport_v1 *multiinfo
@@ -396,6 +426,13 @@ print_v1(const void *ip_void, const struct xt_entry_match *match, int numeric)
 	__print_v1(match, numeric, ip->proto);
 }
 
+static void
+print6_v1(const void *ip_void, const struct xt_entry_match *match, int numeric)
+{
+	const struct ip6t_ip6 *ip = (const struct ip6t_ip6 *)ip_void;
+	__print_v1(match, numeric, ip->proto);
+}
+
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void __save(const struct xt_entry_match *match, u_int16_t proto)
 {
@@ -427,6 +464,12 @@ static void __save(const struct xt_entry_match *match, u_int16_t proto)
 static void save(const void *ip_void, const struct xt_entry_match *match)
 {
 	const struct ipt_ip *ip = ip_void;
+	__save(match, ip->proto);
+}
+
+static void save6(const void *ip_void, const struct xt_entry_match *match)
+{
+	const struct ip6t_ip6 *ip = (const struct ip6t_ip6 *)ip_void;
 	__save(match, ip->proto);
 }
 
@@ -470,6 +513,12 @@ static void save_v1(const void *ip_void, const struct xt_entry_match *match)
 	__save_v1(match, ip->proto);
 }
 
+static void save6_v1(const void *ip_void, const struct xt_entry_match *match)
+{
+	const struct ip6t_ip6 *ip = (const struct ip6t_ip6 *)ip_void;
+	__save_v1(match, ip->proto);
+}
+
 static struct xtables_match multiport = { 
 	.next		= NULL,
 	.family		= AF_INET,
@@ -484,6 +533,23 @@ static struct xtables_match multiport = {
 	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
+	.extra_opts	= opts
+};
+
+static struct xtables_match multiport6 = { 
+	.next		= NULL,
+	.family		= AF_INET6,
+	.name		= "multiport",
+	.revision	= 0,
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_multiport)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse6,
+	.final_check	= &final_check,
+	.print		= &print6,
+	.save		= &save6,
 	.extra_opts	= opts
 };
 
@@ -504,9 +570,28 @@ static struct xtables_match multiport_v1 = {
 	.extra_opts	= opts
 };
 
+static struct xtables_match multiport6_v1 = { 
+	.next		= NULL,
+	.family		= AF_INET6,
+	.name		= "multiport",
+	.version	= IPTABLES_VERSION,
+	.revision	= 1,
+	.size		= XT_ALIGN(sizeof(struct xt_multiport_v1)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport_v1)),
+	.help		= &help_v1,
+	.init		= &init,
+	.parse		= &parse6_v1,
+	.final_check	= &final_check,
+	.print		= &print6_v1,
+	.save		= &save6_v1,
+	.extra_opts	= opts
+};
+
 void
 _init(void)
 {
 	xtables_register_match(&multiport);
+	xtables_register_match(&multiport6);
 	xtables_register_match(&multiport_v1);
+	xtables_register_match(&multiport6_v1);
 }
