@@ -349,7 +349,23 @@ static struct xtables_match string = {
 };
 
 
+static struct xtables_match string6 = {
+    .name		= "string",
+    .family			= AF_INET6,
+    .version		= IPTABLES_VERSION,
+    .size		= XT_ALIGN(sizeof(struct xt_string_info)),
+    .userspacesize	= offsetof(struct xt_string_info, config),
+    .help		= help,
+    .init		= init,
+    .parse		= parse,
+    .final_check	= final_check,
+    .print		= print,
+    .save		= save,
+    .extra_opts		= opts
+};
+
 void _init(void)
 {
 	xtables_register_match(&string);
+	xtables_register_match(&string6);
 }
