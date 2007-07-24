@@ -29,7 +29,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#include <iptables_common.h>
 #include <xtables.h>
 
 #define NPROTO	255

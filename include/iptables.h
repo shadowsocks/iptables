@@ -2,7 +2,6 @@
 #define _IPTABLES_USER_H
 
 #include "xtables.h"
-#include "iptables_common.h"
 #include "libiptc/libiptc.h"
 
 #ifndef IPT_LIB_DIR

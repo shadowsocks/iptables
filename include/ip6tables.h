@@ -3,7 +3,6 @@
 
 #include <xtables.h>
 
-#include "iptables_common.h"
 #include "libiptc/libip6tc.h"
 
 #ifndef IP6T_LIB_DIR
