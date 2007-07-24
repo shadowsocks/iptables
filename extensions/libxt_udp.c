@@ -4,8 +4,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <ip6tables.h>
-#include <linux/netfilter_ipv6/ip6_tables.h>
+#include <xtables.h>
+#include <linux/netfilter/xt_tcpudp.h>
 
 /* Function which prints out usage message. */
 static void
@@ -57,7 +57,7 @@ parse_udp_ports(const char *portstring, u_int16_t *ports)
 static void
 init(struct xt_entry_match *m, unsigned int *nfcache)
 {
-	struct ip6t_udp *udpinfo = (struct ip6t_udp *)m->data;
+	struct xt_udp *udpinfo = (struct xt_udp *)m->data;
 
 	udpinfo->spts[1] = udpinfo->dpts[1] = 0xFFFF;
 }
@@ -73,7 +73,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ip6t_udp *udpinfo = (struct ip6t_udp *)(*match)->data;
+	struct xt_udp *udpinfo = (struct xt_udp *)(*match)->data;
 
 	switch (c) {
 	case '1':
@@ -83,7 +83,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_udp_ports(argv[optind-1], udpinfo->spts);
 		if (invert)
-			udpinfo->invflags |= IP6T_UDP_INV_SRCPT;
+			udpinfo->invflags |= XT_UDP_INV_SRCPT;
 		*flags |= UDP_SRC_PORTS;
 		break;
 
@@ -94,7 +94,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_udp_ports(argv[optind-1], udpinfo->dpts);
 		if (invert)
-			udpinfo->invflags |= IP6T_UDP_INV_DSTPT;
+			udpinfo->invflags |= XT_UDP_INV_DSTPT;
 		*flags |= UDP_DST_PORTS;
 		break;
 
@@ -159,28 +159,28 @@ static void
 print(const void *ip,
       const struct xt_entry_match *match, int numeric)
 {
-	const struct ip6t_udp *udp = (struct ip6t_udp *)match->data;
+	const struct xt_udp *udp = (struct xt_udp *)match->data;
 
 	printf("udp ");
 	print_ports("spt", udp->spts[0], udp->spts[1],
-		    udp->invflags & IP6T_UDP_INV_SRCPT,
+		    udp->invflags & XT_UDP_INV_SRCPT,
 		    numeric);
 	print_ports("dpt", udp->dpts[0], udp->dpts[1],
-		    udp->invflags & IP6T_UDP_INV_DSTPT,
+		    udp->invflags & XT_UDP_INV_DSTPT,
 		    numeric);
-	if (udp->invflags & ~IP6T_UDP_INV_MASK)
+	if (udp->invflags & ~XT_UDP_INV_MASK)
 		printf("Unknown invflags: 0x%X ",
-		       udp->invflags & ~IP6T_UDP_INV_MASK);
+		       udp->invflags & ~XT_UDP_INV_MASK);
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void save(const void *ip, const struct xt_entry_match *match)
 {
-	const struct ip6t_udp *udpinfo = (struct ip6t_udp *)match->data;
+	const struct xt_udp *udpinfo = (struct xt_udp *)match->data;
 
 	if (udpinfo->spts[0] != 0
 	    || udpinfo->spts[1] != 0xFFFF) {
-		if (udpinfo->invflags & IP6T_UDP_INV_SRCPT)
+		if (udpinfo->invflags & XT_UDP_INV_SRCPT)
 			printf("! ");
 		if (udpinfo->spts[0]
 		    != udpinfo->spts[1])
@@ -194,7 +194,7 @@ static void save(const void *ip, const struct xt_entry_match *match)
 
 	if (udpinfo->dpts[0] != 0
 	    || udpinfo->dpts[1] != 0xFFFF) {
-		if (udpinfo->invflags & IP6T_UDP_INV_DSTPT)
+		if (udpinfo->invflags & XT_UDP_INV_DSTPT)
 			printf("! ");
 		if (udpinfo->dpts[0]
 		    != udpinfo->dpts[1])
@@ -207,22 +207,43 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-static struct ip6tables_match udp = {
+static
+struct xtables_match udp = { 
+	.next		= NULL,
+	.family		= AF_INET,
 	.name		= "udp",
 	.version	= IPTABLES_VERSION,
-	.size		= IP6T_ALIGN(sizeof(struct ip6t_udp)),
-	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_udp)),
+	.size		= XT_ALIGN(sizeof(struct xt_udp)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_udp)),
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
-	.extra_opts	= opts,
+	.extra_opts	= opts
+};
+
+static
+struct xtables_match udp6 = { 
+	.next		= NULL,
+	.family		= AF_INET6,
+	.name		= "udp",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_udp)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_udp)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void
 _init(void)
 {
-	register_match6(&udp);
+	xtables_register_match(&udp);
+	xtables_register_match(&udp6);
 }
