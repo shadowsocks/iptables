@@ -27,7 +27,7 @@ help(void)
 
 /* print matchinfo */
 static void
-print(const struct ipt_ip *ip, const struct ipt_entry_match *match, int numeric)
+print(const struct ipt_ip *ip, const struct xt_entry_match *match, int numeric)
 {
         struct xt_quota_info *q = (struct xt_quota_info *) match->data;
         printf("quota: %llu bytes", (unsigned long long) q->quota);
@@ -35,7 +35,7 @@ print(const struct ipt_ip *ip, const struct ipt_entry_match *match, int numeric)
 
 /* save matchinfo */
 static void
-save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
+save(const struct ipt_ip *ip, const struct xt_entry_match *match)
 {
         struct xt_quota_info *q = (struct xt_quota_info *) match->data;
         printf("--quota %llu ", (unsigned long long) q->quota);
@@ -61,7 +61,7 @@ parse_quota(const char *s, u_int64_t * quota)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
-      unsigned int *nfcache, struct ipt_entry_match **match)
+      unsigned int *nfcache, struct xt_entry_match **match)
 {
         struct xt_quota_info *info = (struct xt_quota_info *) (*match)->data;
 

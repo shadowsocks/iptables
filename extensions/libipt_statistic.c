@@ -37,7 +37,7 @@ static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
       unsigned int *nfcache,
-      struct ipt_entry_match **match)
+      struct xt_entry_match **match)
 {
 	double prob;
 
@@ -147,7 +147,7 @@ static void print_match(const struct xt_statistic_info *info, char *prefix)
 
 static void
 print(const struct ipt_ip *ip,
-      const struct ipt_entry_match *match,
+      const struct xt_entry_match *match,
       int numeric)
 {
 	struct xt_statistic_info *info = (struct xt_statistic_info *)match->data;
@@ -158,7 +158,7 @@ print(const struct ipt_ip *ip,
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void
-save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
+save(const struct ipt_ip *ip, const struct xt_entry_match *match)
 {
 	struct xt_statistic_info *info = (struct xt_statistic_info *)match->data;
 

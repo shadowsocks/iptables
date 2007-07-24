@@ -43,7 +43,7 @@ print_chunk(u_int32_t chunknum, int numeric);
 
 /* Initialize the match. */
 static void
-init(struct ipt_entry_match *m, 
+init(struct xt_entry_match *m,
      unsigned int *nfcache)
 {
 	int i;
@@ -265,7 +265,7 @@ static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
       unsigned int *nfcache,
-      struct ipt_entry_match **match)
+      struct xt_entry_match **match)
 {
 	struct ipt_sctp_info *einfo
 		= (struct ipt_sctp_info *)(*match)->data;
@@ -459,7 +459,7 @@ out:
 /* Prints out the matchinfo. */
 static void
 print(const struct ipt_ip *ip,
-      const struct ipt_entry_match *match,
+      const struct xt_entry_match *match,
       int numeric)
 {
 	const struct ipt_sctp_info *einfo =
@@ -493,7 +493,7 @@ print(const struct ipt_ip *ip,
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void
 save(const struct ipt_ip *ip, 
-     const struct ipt_entry_match *match)
+     const struct xt_entry_match *match)
 {
 	const struct ipt_sctp_info *einfo =
 		(const struct ipt_sctp_info *)match->data;

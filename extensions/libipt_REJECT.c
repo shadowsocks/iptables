@@ -87,7 +87,7 @@ static struct option opts[] = {
 
 /* Allocate and initialize the target. */
 static void
-init(struct ipt_entry_target *t, unsigned int *nfcache)
+init(struct xt_entry_target *t, unsigned int *nfcache)
 {
 	struct ipt_reject_info *reject = (struct ipt_reject_info *)t->data;
 
@@ -101,7 +101,7 @@ init(struct ipt_entry_target *t, unsigned int *nfcache)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
-      struct ipt_entry_target **target)
+      struct xt_entry_target **target)
 {
 	struct ipt_reject_info *reject = (struct ipt_reject_info *)(*target)->data;
 	unsigned int limit = sizeof(reject_table)/sizeof(struct reject_names);
@@ -140,7 +140,7 @@ static void final_check(unsigned int flags)
 /* Prints out ipt_reject_info. */
 static void
 print(const struct ipt_ip *ip,
-      const struct ipt_entry_target *target,
+      const struct xt_entry_target *target,
       int numeric)
 {
 	const struct ipt_reject_info *reject
@@ -155,7 +155,7 @@ print(const struct ipt_ip *ip,
 }
 
 /* Saves ipt_reject in parsable form to stdout. */
-static void save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
+static void save(const struct ipt_ip *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_reject_info *reject
 		= (const struct ipt_reject_info *)target->data;

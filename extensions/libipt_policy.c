@@ -93,7 +93,7 @@ static struct option opts[] =
 	{ }
 };
 
-static void init(struct ipt_entry_match *m, unsigned int *nfcache)
+static void init(struct xt_entry_match *m, unsigned int *nfcache)
 {
 	*nfcache |= NFC_UNKNOWN;
 }
@@ -128,7 +128,7 @@ static int parse_mode(char *s)
 static int parse(int c, char **argv, int invert, unsigned int *flags,
                  const struct ipt_entry *entry,
                  unsigned int *nfcache,
-                 struct ipt_entry_match **match)
+                 struct xt_entry_match **match)
 {
 	struct ipt_policy_info *info = (void *)(*match)->data;
 	struct ipt_policy_elem *e = &info->pol[info->len];
@@ -388,7 +388,7 @@ static void print_flags(char *prefix, const struct ipt_policy_info *info)
 }
 
 static void print(const struct ipt_ip *ip,
-                  const struct ipt_entry_match *match,
+                  const struct xt_entry_match *match,
 		  int numeric)
 {
 	const struct ipt_policy_info *info = (void *)match->data;
@@ -403,7 +403,7 @@ static void print(const struct ipt_ip *ip,
 	}
 }
 
-static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
+static void save(const struct ipt_ip *ip, const struct xt_entry_match *match)
 {
 	const struct ipt_policy_info *info = (void *)match->data;
 	unsigned int i;

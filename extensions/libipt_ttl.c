@@ -26,7 +26,7 @@ static void help(void)
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
 		const struct ipt_entry *entry, unsigned int *nfcache,
-		struct ipt_entry_match **match)
+		struct xt_entry_match **match)
 {
 	struct ipt_ttl_info *info = (struct ipt_ttl_info *) (*match)->data;
 	unsigned int value;
@@ -93,7 +93,7 @@ static void final_check(unsigned int flags)
 }
 
 static void print(const struct ipt_ip *ip, 
-		const struct ipt_entry_match *match,
+		const struct xt_entry_match *match,
 		int numeric)
 {
 	const struct ipt_ttl_info *info = 
@@ -118,7 +118,7 @@ static void print(const struct ipt_ip *ip,
 }
 
 static void save(const struct ipt_ip *ip, 
-		const struct ipt_entry_match *match)
+		const struct xt_entry_match *match)
 {
 	const struct ipt_ttl_info *info =
 		(struct ipt_ttl_info *) match->data;

@@ -131,7 +131,7 @@ parse_tcp_option(const char *option, u_int8_t *result)
 
 /* Initialize the match. */
 static void
-init(struct ipt_entry_match *m, unsigned int *nfcache)
+init(struct xt_entry_match *m, unsigned int *nfcache)
 {
 	struct ipt_tcp *tcpinfo = (struct ipt_tcp *)m->data;
 
@@ -149,7 +149,7 @@ static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
       unsigned int *nfcache,
-      struct ipt_entry_match **match)
+      struct xt_entry_match **match)
 {
 	struct ipt_tcp *tcpinfo = (struct ipt_tcp *)(*match)->data;
 
@@ -318,7 +318,7 @@ print_flags(u_int8_t mask, u_int8_t cmp, int invert, int numeric)
 /* Prints out the union ipt_matchinfo. */
 static void
 print(const struct ipt_ip *ip,
-      const struct ipt_entry_match *match, int numeric)
+      const struct xt_entry_match *match, int numeric)
 {
 	const struct ipt_tcp *tcp = (struct ipt_tcp *)match->data;
 
@@ -341,7 +341,7 @@ print(const struct ipt_ip *ip,
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
+static void save(const struct ipt_ip *ip, const struct xt_entry_match *match)
 {
 	const struct ipt_tcp *tcpinfo = (struct ipt_tcp *)match->data;
 

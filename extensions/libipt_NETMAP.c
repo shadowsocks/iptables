@@ -56,7 +56,7 @@ netmask2bits(u_int32_t netmask)
 
 /* Initialize the target. */
 static void
-init(struct ipt_entry_target *t, unsigned int *nfcache)
+init(struct xt_entry_target *t, unsigned int *nfcache)
 {
 	struct ip_nat_multi_range *mr = (struct ip_nat_multi_range *)t->data;
 
@@ -119,7 +119,7 @@ parse_to(char *arg, struct ip_nat_range *range)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
-      struct ipt_entry_target **target)
+      struct xt_entry_target **target)
 {
 	struct ip_nat_multi_range *mr
 		= (struct ip_nat_multi_range *)(*target)->data;
@@ -150,7 +150,7 @@ static void final_check(unsigned int flags)
 /* Prints out the targinfo. */
 static void
 print(const struct ipt_ip *ip,
-      const struct ipt_entry_target *target,
+      const struct xt_entry_target *target,
       int numeric)
 {
 	struct ip_nat_multi_range *mr
@@ -171,7 +171,7 @@ print(const struct ipt_ip *ip,
 
 /* Saves the targinfo in parsable form to stdout. */
 static void
-save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
+save(const struct ipt_ip *ip, const struct xt_entry_target *target)
 {
 	printf("--%s ", opts[0].name);
 	print(ip, target, 0);

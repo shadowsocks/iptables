@@ -16,7 +16,7 @@
 
 #define IPT_TTL_USED	1
 
-static void init(struct ipt_entry_target *t, unsigned int *nfcache) 
+static void init(struct xt_entry_target *t, unsigned int *nfcache)
 {
 }
 
@@ -32,7 +32,7 @@ static void help(void)
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
 		const struct ipt_entry *entry,
-		struct ipt_entry_target **target)
+		struct xt_entry_target **target)
 {
 	struct ipt_TTL_info *info = (struct ipt_TTL_info *) (*target)->data;
 	unsigned int value;
@@ -97,7 +97,7 @@ static void final_check(unsigned int flags)
 }
 
 static void save(const struct ipt_ip *ip,
-		const struct ipt_entry_target *target)
+		const struct xt_entry_target *target)
 {
 	const struct ipt_TTL_info *info = 
 		(struct ipt_TTL_info *) target->data;
@@ -118,7 +118,7 @@ static void save(const struct ipt_ip *ip,
 }
 
 static void print(const struct ipt_ip *ip,
-		const struct ipt_entry_target *target, int numeric)
+		const struct xt_entry_target *target, int numeric)
 {
 	const struct ipt_TTL_info *info =
 		(struct ipt_TTL_info *) target->data;

@@ -74,7 +74,7 @@ int parse_rate(const char *rate, u_int32_t *val)
 
 /* Initialize the match. */
 static void
-init(struct ipt_entry_match *m, unsigned int *nfcache)
+init(struct xt_entry_match *m, unsigned int *nfcache)
 {
 	struct ipt_rateinfo *r = (struct ipt_rateinfo *)m->data;
 
@@ -95,7 +95,7 @@ static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
       unsigned int *nfcache,
-      struct ipt_entry_match **match)
+      struct xt_entry_match **match)
 {
 	struct ipt_rateinfo *r = (struct ipt_rateinfo *)(*match)->data;
 	unsigned int num;
@@ -157,7 +157,7 @@ static void print_rate(u_int32_t period)
 /* Prints out the matchinfo. */
 static void
 print(const struct ipt_ip *ip,
-      const struct ipt_entry_match *match,
+      const struct xt_entry_match *match,
       int numeric)
 {
 	struct ipt_rateinfo *r = (struct ipt_rateinfo *)match->data;
@@ -166,7 +166,7 @@ print(const struct ipt_ip *ip,
 }
 
 /* FIXME: Make minimalist: only print rate if not default --RR */
-static void save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
+static void save(const struct ipt_ip *ip, const struct xt_entry_match *match)
 {
 	struct ipt_rateinfo *r = (struct ipt_rateinfo *)match->data;
 

@@ -9,7 +9,7 @@
 #include <linux/netfilter_ipv4/ipt_TOS.h>
 
 struct tosinfo {
-	struct ipt_entry_target t;
+	struct xt_entry_target t;
 	struct ipt_tos_target_info tos;
 };
 
@@ -54,7 +54,7 @@ static struct option opts[] = {
 
 /* Initialize the target. */
 static void
-init(struct ipt_entry_target *t, unsigned int *nfcache)
+init(struct xt_entry_target *t, unsigned int *nfcache)
 {
 }
 
@@ -87,7 +87,7 @@ parse_tos(const char *s, struct ipt_tos_target_info *info)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
-      struct ipt_entry_target **target)
+      struct xt_entry_target **target)
 {
 	struct ipt_tos_target_info *tosinfo
 		= (struct ipt_tos_target_info *)(*target)->data;
@@ -134,7 +134,7 @@ print_tos(u_int8_t tos, int numeric)
 /* Prints out the targinfo. */
 static void
 print(const struct ipt_ip *ip,
-      const struct ipt_entry_target *target,
+      const struct xt_entry_target *target,
       int numeric)
 {
 	const struct ipt_tos_target_info *tosinfo =
@@ -145,7 +145,7 @@ print(const struct ipt_ip *ip,
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
 static void
-save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
+save(const struct ipt_ip *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_tos_target_info *tosinfo =
 		(const struct ipt_tos_target_info *)target->data;

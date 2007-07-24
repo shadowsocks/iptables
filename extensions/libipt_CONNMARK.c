@@ -30,7 +30,7 @@
 
 #if 0
 struct markinfo {
-	struct ipt_entry_target t;
+	struct xt_entry_target t;
 	struct ipt_connmark_target_info mark;
 };
 #endif
@@ -58,7 +58,7 @@ static struct option opts[] = {
 
 /* Initialize the target. */
 static void
-init(struct ipt_entry_target *t, unsigned int *nfcache)
+init(struct xt_entry_target *t, unsigned int *nfcache)
 {
 }
 
@@ -67,7 +67,7 @@ init(struct ipt_entry_target *t, unsigned int *nfcache)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
-      struct ipt_entry_target **target)
+      struct xt_entry_target **target)
 {
 	struct ipt_connmark_target_info *markinfo
 		= (struct ipt_connmark_target_info *)(*target)->data;
@@ -145,7 +145,7 @@ print_mask(const char *text, unsigned long mask)
 /* Prints out the target info. */
 static void
 print(const struct ipt_ip *ip,
-      const struct ipt_entry_target *target,
+      const struct xt_entry_target *target,
       int numeric)
 {
 	const struct ipt_connmark_target_info *markinfo =
@@ -174,7 +174,7 @@ print(const struct ipt_ip *ip,
 
 /* Saves the target into in parsable form to stdout. */
 static void
-save(const struct ipt_ip *ip, const struct ipt_entry_target *target)
+save(const struct ipt_ip *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_connmark_target_info *markinfo =
 		(const struct ipt_connmark_target_info *)target->data;

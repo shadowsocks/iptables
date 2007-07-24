@@ -26,7 +26,7 @@
 
 /* Initialize the match. */
 static void
-init(struct ipt_entry_match *m, 
+init(struct xt_entry_match *m,
      unsigned int *nfcache)
 {
 	struct ipt_dccp_info *einfo = (struct ipt_dccp_info *)m->data;
@@ -136,7 +136,7 @@ static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const struct ipt_entry *entry,
       unsigned int *nfcache,
-      struct ipt_entry_match **match)
+      struct xt_entry_match **match)
 {
 	struct ipt_dccp_info *einfo
 		= (struct ipt_dccp_info *)(*match)->data;
@@ -280,7 +280,7 @@ print_option(u_int8_t option, int invert, int numeric)
 /* Prints out the matchinfo. */
 static void
 print(const struct ipt_ip *ip,
-      const struct ipt_entry_match *match,
+      const struct xt_entry_match *match,
       int numeric)
 {
 	const struct ipt_dccp_info *einfo =
@@ -315,7 +315,7 @@ print(const struct ipt_ip *ip,
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void
 save(const struct ipt_ip *ip, 
-     const struct ipt_entry_match *match)
+     const struct xt_entry_match *match)
 {
 	const struct ipt_dccp_info *einfo =
 		(const struct ipt_dccp_info *)match->data;
