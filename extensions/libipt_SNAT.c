@@ -141,9 +141,10 @@ parse_to(char *arg, int portok, struct ipt_natinfo *info)
    ate an option */
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ipt_entry *entry,
+      const void *e,
       struct xt_entry_target **target)
 {
+	const struct ipt_entry *entry = e;
 	struct ipt_natinfo *info = (void *)*target;
 	int portok;
 
@@ -217,7 +218,7 @@ static void print_range(const struct ip_nat_range *r)
 
 /* Prints out the targinfo. */
 static void
-print(const struct ipt_ip *ip,
+print(const void *ip,
       const struct xt_entry_target *target,
       int numeric)
 {
@@ -235,7 +236,7 @@ print(const struct ipt_ip *ip,
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
 static void
-save(const struct ipt_ip *ip, const struct xt_entry_target *target)
+save(const void *ip, const struct xt_entry_target *target)
 {
 	struct ipt_natinfo *info = (void *)target;
 	unsigned int i = 0;

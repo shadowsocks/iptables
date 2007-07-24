@@ -135,8 +135,9 @@ init(struct xt_entry_match *m, unsigned int *nfcache)
 }
 
 static const char *
-check_proto(const struct ip6t_entry *entry)
+check_proto(const void *e)
 {
+	const struct ip6t_entry *entry = e;
 	char *proto;
 
 	if ((proto = proto_to_name(entry->ipv6.proto)) != NULL)
@@ -153,10 +154,11 @@ check_proto(const struct ip6t_entry *entry)
    ate an option */
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ip6t_entry *entry,
+      const void *e,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
+	const struct ip6t_entry *entry = e;
 	const char *proto;
 	struct ip6t_multiport *multiinfo
 		= (struct ip6t_multiport *)(*match)->data;
@@ -203,10 +205,11 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 static int
 parse_v1(int c, char **argv, int invert, unsigned int *flags,
-	 const struct ip6t_entry *entry,
+	 const void *e,
 	 unsigned int *nfcache,
-	 struct ip6t_entry_match **match)
+	 struct xt_entry_match **match)
 {
+	const struct ip6t_entry *entry = e;
 	const char *proto;
 	struct ip6t_multiport_v1 *multiinfo
 		= (struct ip6t_multiport_v1 *)(*match)->data;
@@ -279,10 +282,11 @@ print_port(u_int16_t port, u_int8_t protocol, int numeric)
 
 /* Prints out the matchinfo. */
 static void
-print(const struct ip6t_ip6 *ip,
+print(const void *ip_void,
       const struct xt_entry_match *match,
       int numeric)
 {
+	const struct ip6t_ip6 *ip = ip_void;
 	const struct ip6t_multiport *multiinfo
 		= (const struct ip6t_multiport *)match->data;
 	unsigned int i;
@@ -315,10 +319,11 @@ print(const struct ip6t_ip6 *ip,
 }
 
 static void
-print_v1(const struct ip6t_ip6 *ip,
-	 const struct ip6t_entry_match *match,
+print_v1(const void *ip_void,
+	 const struct xt_entry_match *match,
 	 int numeric)
 {
+	const struct ip6t_ip6 *ip = ip_void;
 	const struct ip6t_multiport_v1 *multiinfo
 		= (const struct ip6t_multiport_v1 *)match->data;
 	unsigned int i;
@@ -358,8 +363,9 @@ print_v1(const struct ip6t_ip6 *ip,
 }
 
 /* Saves the union ip6t_matchinfo in parsable form to stdout. */
-static void save(const struct ip6t_ip6 *ip, const struct xt_entry_match *match)
+static void save(const void *ip_void, const struct xt_entry_match *match)
 {
+	const struct ip6t_ip6 *ip = ip_void;
 	const struct ip6t_multiport *multiinfo
 		= (const struct ip6t_multiport *)match->data;
 	unsigned int i;
@@ -385,9 +391,9 @@ static void save(const struct ip6t_ip6 *ip, const struct xt_entry_match *match)
 	printf(" ");
 }
 
-static void save_v1(const struct ip6t_ip6 *ip, 
-		    const struct ip6t_entry_match *match)
+static void save_v1(const void *ip_void, const struct xt_entry_match *match)
 {
+	const struct ip6t_ip6 *ip = ip_void;
 	const struct ip6t_multiport_v1 *multiinfo
 		= (const struct ip6t_multiport_v1 *)match->data;
 	unsigned int i;

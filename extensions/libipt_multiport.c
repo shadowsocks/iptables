@@ -137,8 +137,9 @@ init(struct xt_entry_match *m, unsigned int *nfcache)
 }
 
 static const char *
-check_proto(const struct ipt_entry *entry)
+check_proto(const void *e)
 {
+	const struct ipt_entry *entry = e;
 	char *proto;
 
 	if (entry->ip.invflags & IPT_INV_PROTO)
@@ -160,10 +161,11 @@ check_proto(const struct ipt_entry *entry)
    ate an option */
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const struct ipt_entry *entry,
+      const void *e,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
+	const struct ipt_entry *entry = e;
 	const char *proto;
 	struct ipt_multiport *multiinfo
 		= (struct ipt_multiport *)(*match)->data;
@@ -210,10 +212,11 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 static int
 parse_v1(int c, char **argv, int invert, unsigned int *flags,
-	 const struct ipt_entry *entry,
+	 const void *e,
 	 unsigned int *nfcache,
 	 struct xt_entry_match **match)
 {
+	const struct ipt_entry *entry = e;
 	const char *proto;
 	struct ipt_multiport_v1 *multiinfo
 		= (struct ipt_multiport_v1 *)(*match)->data;
@@ -286,10 +289,11 @@ print_port(u_int16_t port, u_int8_t protocol, int numeric)
 
 /* Prints out the matchinfo. */
 static void
-print(const struct ipt_ip *ip,
+print(const void *ip_void,
       const struct xt_entry_match *match,
       int numeric)
 {
+	const struct ipt_ip *ip = ip_void;
 	const struct ipt_multiport *multiinfo
 		= (const struct ipt_multiport *)match->data;
 	unsigned int i;
@@ -322,10 +326,11 @@ print(const struct ipt_ip *ip,
 }
 
 static void
-print_v1(const struct ipt_ip *ip,
+print_v1(const void *ip_void,
 	 const struct xt_entry_match *match,
 	 int numeric)
 {
+	const struct ipt_ip *ip = ip_void;
 	const struct ipt_multiport_v1 *multiinfo
 		= (const struct ipt_multiport_v1 *)match->data;
 	unsigned int i;
@@ -365,8 +370,9 @@ print_v1(const struct ipt_ip *ip,
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void save(const struct ipt_ip *ip, const struct xt_entry_match *match)
+static void save(const void *ip_void, const struct xt_entry_match *match)
 {
+	const struct ipt_ip *ip = ip_void;
 	const struct ipt_multiport *multiinfo
 		= (const struct ipt_multiport *)match->data;
 	unsigned int i;
@@ -392,9 +398,10 @@ static void save(const struct ipt_ip *ip, const struct xt_entry_match *match)
 	printf(" ");
 }
 
-static void save_v1(const struct ipt_ip *ip, 
+static void save_v1(const void *ip_void,
 		    const struct xt_entry_match *match)
 {
+	const struct ipt_ip *ip = ip_void;
 	const struct ipt_multiport_v1 *multiinfo
 		= (const struct ipt_multiport_v1 *)match->data;
 	unsigned int i;
