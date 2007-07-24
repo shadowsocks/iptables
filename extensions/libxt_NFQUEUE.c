@@ -10,9 +10,9 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include <iptables.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
-#include <linux/netfilter_ipv4/ipt_NFQUEUE.h>
+#include <xtables.h>
+#include <linux/netfilter/x_tables.h>
+#include <linux/netfilter/xt_NFQUEUE.h>
 
 static void init(struct xt_entry_target *t, unsigned int *nfcache)
 {
@@ -33,7 +33,7 @@ static struct option opts[] = {
 };
 
 static void
-parse_num(const char *s, struct ipt_NFQ_info *tinfo)
+parse_num(const char *s, struct xt_NFQ_info *tinfo)
 {
 	unsigned int num;
        
@@ -50,8 +50,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
       struct xt_entry_target **target)
 {
-	struct ipt_NFQ_info *tinfo
-		= (struct ipt_NFQ_info *)(*target)->data;
+	struct xt_NFQ_info *tinfo
+		= (struct xt_NFQ_info *)(*target)->data;
 
 	switch (c) {
 	case 'F':
@@ -78,8 +78,8 @@ print(const void *ip,
       const struct xt_entry_target *target,
       int numeric)
 {
-	const struct ipt_NFQ_info *tinfo =
-		(const struct ipt_NFQ_info *)target->data;
+	const struct xt_NFQ_info *tinfo =
+		(const struct xt_NFQ_info *)target->data;
 	printf("NFQUEUE num %u", tinfo->queuenum);
 }
 
@@ -87,18 +87,35 @@ print(const void *ip,
 static void
 save(const void *ip, const struct xt_entry_target *target)
 {
-	const struct ipt_NFQ_info *tinfo =
-		(const struct ipt_NFQ_info *)target->data;
+	const struct xt_NFQ_info *tinfo =
+		(const struct xt_NFQ_info *)target->data;
 
 	printf("--queue-num %u ", tinfo->queuenum);
 }
 
-static struct iptables_target nfqueue = { 
+static struct xtables_target nfqueue = { 
 	.next		= NULL,
+	.family		= AF_INET,
 	.name		= "NFQUEUE",
 	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_NFQ_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_NFQ_info)),
+	.size		= XT_ALIGN(sizeof(struct xt_NFQ_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_NFQ_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
+};
+
+static struct xtables_target nfqueue6 = { 
+	.next		= NULL,
+	.family		= AF_INET6,
+	.name		= "NFQUEUE",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_NFQ_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_NFQ_info)),
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
@@ -110,5 +127,6 @@ static struct iptables_target nfqueue = {
 
 void _init(void)
 {
-	register_target(&nfqueue);
+	xtables_register_target(&nfqueue);
+	xtables_register_target(&nfqueue6);
 }

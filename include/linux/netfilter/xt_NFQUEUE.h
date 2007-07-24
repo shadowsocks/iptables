@@ -5,12 +5,12 @@
  * This software is distributed under GNU GPL v2, 1991
  * 
 */
-#ifndef _IPT_NFQ_TARGET_H
-#define _IPT_NFQ_TARGET_H
+#ifndef _XT_NFQ_TARGET_H
+#define _XT_NFQ_TARGET_H
 
 /* target info */
-struct ipt_NFQ_info {
+struct xt_NFQ_info {
 	u_int16_t queuenum;
 };
 
-#endif /* _IPT_DSCP_TARGET_H */
+#endif /* _XT_NFQ_TARGET_H */
