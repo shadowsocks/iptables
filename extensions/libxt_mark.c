@@ -119,7 +119,23 @@ static struct xtables_match mark = {
 	.extra_opts	= opts
 };
 
+static struct xtables_match mark6 = { 
+	.next		= NULL,
+	.family		= AF_INET6,
+	.name		= "mark",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_mark_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_info)),
+	.help		= &help,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
+};
+
 void _init(void)
 {
 	xtables_register_match(&mark);
+	xtables_register_match(&mark6);
 }
