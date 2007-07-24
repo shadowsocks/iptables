@@ -1,13 +1,12 @@
-/* Shared library add-on to ip6tables to add packet length matching support. */
-
+/* Shared library add-on to iptables to add packet length matching support. */
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
 
-#include <ip6tables.h>
-#include <linux/netfilter_ipv6/ip6t_length.h>
+#include <xtables.h>
+#include <linux/netfilter/xt_length.h>
 
 /* Function which prints out usage message. */
 static void
@@ -29,7 +28,6 @@ static struct option opts[] = {
 static u_int16_t
 parse_length(const char *s)
 {
-
 	unsigned int len;
 	
 	if (string_to_number(s, 0, 0xFFFF, &len) == -1)
@@ -40,7 +38,7 @@ parse_length(const char *s)
 
 /* If a single value is provided, min and max are both set to the value */
 static void
-parse_lengths(const char *s, struct ip6t_length_info *info)
+parse_lengths(const char *s, struct xt_length_info *info)
 {
 	char *buffer;
 	char *cp;
@@ -72,7 +70,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ip6t_length_info *info = (struct ip6t_length_info *)(*match)->data;
+	struct xt_length_info *info = (struct xt_length_info *)(*match)->data;
 
 	switch (c) {
 		case '1':
@@ -104,7 +102,7 @@ final_check(unsigned int flags)
 
 /* Common match printing code. */
 static void
-print_length(struct ip6t_length_info *info)
+print_length(struct xt_length_info *info)
 {
 	if (info->invert)
 		printf("! ");
@@ -122,31 +120,49 @@ print(const void *ip,
       int numeric)
 {
 	printf("length ");
-	print_length((struct ip6t_length_info *)match->data);
+	print_length((struct xt_length_info *)match->data);
 }
 
-/* Saves the union ip6t_matchinfo in parsable form to stdout. */
+/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void
 save(const void *ip, const struct xt_entry_match *match)
 {
 	printf("--length ");
-	print_length((struct ip6t_length_info *)match->data);
+	print_length((struct xt_length_info *)match->data);
 }
 
-struct ip6tables_match length = {
+static struct xtables_match length = { 
+	.next		= NULL,
+	.family		= AF_INET,
 	.name		= "length",
 	.version	= IPTABLES_VERSION,
-	.size		= IP6T_ALIGN(sizeof(struct ip6t_length_info)),
-	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_length_info)),
+	.size		= XT_ALIGN(sizeof(struct xt_length_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_length_info)),
 	.help		= &help,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
-	.extra_opts	= opts,
+	.extra_opts	= opts
+};
+
+static struct xtables_match length6 = { 
+	.next		= NULL,
+	.family		= AF_INET6,
+	.name		= "length",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_length_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_length_info)),
+	.help		= &help,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)
 {
-	register_match6(&length);
+	xtables_register_match(&length);
+	xtables_register_match(&length6);
 }
