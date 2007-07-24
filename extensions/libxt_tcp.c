@@ -4,8 +4,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <iptables.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
+#include <xtables.h>
+#include <linux/netfilter/xt_tcpudp.h>
 
 /* Function which prints out usage message. */
 static void
@@ -106,7 +106,7 @@ parse_tcp_flag(const char *flags)
 }
 
 static void
-parse_tcp_flags(struct ipt_tcp *tcpinfo,
+parse_tcp_flags(struct xt_tcp *tcpinfo,
 		const char *mask,
 		const char *cmp,
 		int invert)
@@ -115,7 +115,7 @@ parse_tcp_flags(struct ipt_tcp *tcpinfo,
 	tcpinfo->flg_cmp = parse_tcp_flag(cmp);
 
 	if (invert)
-		tcpinfo->invflags |= IPT_TCP_INV_FLAGS;
+		tcpinfo->invflags |= XT_TCP_INV_FLAGS;
 }
 
 static void
@@ -133,7 +133,7 @@ parse_tcp_option(const char *option, u_int8_t *result)
 static void
 init(struct xt_entry_match *m, unsigned int *nfcache)
 {
-	struct ipt_tcp *tcpinfo = (struct ipt_tcp *)m->data;
+	struct xt_tcp *tcpinfo = (struct xt_tcp *)m->data;
 
 	tcpinfo->spts[1] = tcpinfo->dpts[1] = 0xFFFF;
 }
@@ -151,7 +151,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ipt_tcp *tcpinfo = (struct ipt_tcp *)(*match)->data;
+	struct xt_tcp *tcpinfo = (struct xt_tcp *)(*match)->data;
 
 	switch (c) {
 	case '1':
@@ -161,7 +161,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_ports(argv[optind-1], tcpinfo->spts);
 		if (invert)
-			tcpinfo->invflags |= IPT_TCP_INV_SRCPT;
+			tcpinfo->invflags |= XT_TCP_INV_SRCPT;
 		*flags |= TCP_SRC_PORTS;
 		break;
 
@@ -172,7 +172,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_ports(argv[optind-1], tcpinfo->dpts);
 		if (invert)
-			tcpinfo->invflags |= IPT_TCP_INV_DSTPT;
+			tcpinfo->invflags |= XT_TCP_INV_DSTPT;
 		*flags |= TCP_DST_PORTS;
 		break;
 
@@ -210,7 +210,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_option(argv[optind-1], &tcpinfo->option);
 		if (invert)
-			tcpinfo->invflags |= IPT_TCP_INV_OPTION;
+			tcpinfo->invflags |= XT_TCP_INV_OPTION;
 		*flags |= TCP_OPTION;
 		break;
 
@@ -320,34 +320,34 @@ static void
 print(const void *ip,
       const struct xt_entry_match *match, int numeric)
 {
-	const struct ipt_tcp *tcp = (struct ipt_tcp *)match->data;
+	const struct xt_tcp *tcp = (struct xt_tcp *)match->data;
 
 	printf("tcp ");
 	print_ports("spt", tcp->spts[0], tcp->spts[1],
-		    tcp->invflags & IPT_TCP_INV_SRCPT,
+		    tcp->invflags & XT_TCP_INV_SRCPT,
 		    numeric);
 	print_ports("dpt", tcp->dpts[0], tcp->dpts[1],
-		    tcp->invflags & IPT_TCP_INV_DSTPT,
+		    tcp->invflags & XT_TCP_INV_DSTPT,
 		    numeric);
 	print_option(tcp->option,
-		     tcp->invflags & IPT_TCP_INV_OPTION,
+		     tcp->invflags & XT_TCP_INV_OPTION,
 		     numeric);
 	print_flags(tcp->flg_mask, tcp->flg_cmp,
-		    tcp->invflags & IPT_TCP_INV_FLAGS,
+		    tcp->invflags & XT_TCP_INV_FLAGS,
 		    numeric);
-	if (tcp->invflags & ~IPT_TCP_INV_MASK)
+	if (tcp->invflags & ~XT_TCP_INV_MASK)
 		printf("Unknown invflags: 0x%X ",
-		       tcp->invflags & ~IPT_TCP_INV_MASK);
+		       tcp->invflags & ~XT_TCP_INV_MASK);
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void save(const void *ip, const struct xt_entry_match *match)
 {
-	const struct ipt_tcp *tcpinfo = (struct ipt_tcp *)match->data;
+	const struct xt_tcp *tcpinfo = (struct xt_tcp *)match->data;
 
 	if (tcpinfo->spts[0] != 0
 	    || tcpinfo->spts[1] != 0xFFFF) {
-		if (tcpinfo->invflags & IPT_TCP_INV_SRCPT)
+		if (tcpinfo->invflags & XT_TCP_INV_SRCPT)
 			printf("! ");
 		if (tcpinfo->spts[0]
 		    != tcpinfo->spts[1])
@@ -361,7 +361,7 @@ static void save(const void *ip, const struct xt_entry_match *match)
 
 	if (tcpinfo->dpts[0] != 0
 	    || tcpinfo->dpts[1] != 0xFFFF) {
-		if (tcpinfo->invflags & IPT_TCP_INV_DSTPT)
+		if (tcpinfo->invflags & XT_TCP_INV_DSTPT)
 			printf("! ");
 		if (tcpinfo->dpts[0]
 		    != tcpinfo->dpts[1])
@@ -374,15 +374,15 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	}
 
 	if (tcpinfo->option
-	    || (tcpinfo->invflags & IPT_TCP_INV_OPTION)) {
-		if (tcpinfo->invflags & IPT_TCP_INV_OPTION)
+	    || (tcpinfo->invflags & XT_TCP_INV_OPTION)) {
+		if (tcpinfo->invflags & XT_TCP_INV_OPTION)
 			printf("! ");
 		printf("--tcp-option %u ", tcpinfo->option);
 	}
 
 	if (tcpinfo->flg_mask
-	    || (tcpinfo->invflags & IPT_TCP_INV_FLAGS)) {
-		if (tcpinfo->invflags & IPT_TCP_INV_FLAGS)
+	    || (tcpinfo->invflags & XT_TCP_INV_FLAGS)) {
+		if (tcpinfo->invflags & XT_TCP_INV_FLAGS)
 			printf("! ");
 		printf("--tcp-flags ");
 		if (tcpinfo->flg_mask != 0xFF) {
@@ -394,23 +394,41 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-static struct iptables_match tcp = { 
+static struct xtables_match tcp = { 
 	.next		= NULL,
+	.family		= AF_INET,
 	.name		= "tcp",
 	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_tcp)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_tcp)),
+	.size		= XT_ALIGN(sizeof(struct xt_tcp)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcp)),
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
-	.extra_opts	= opts
+	.extra_opts	= opts,
+};
+
+static struct xtables_match tcp6 = { 
+	.next		= NULL,
+	.family		= AF_INET6,
+	.name		= "tcp",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_tcp)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcp)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts,
 };
 
 void
 _init(void)
 {
-	register_match(&tcp);
+	xtables_register_match(&tcp);
+	xtables_register_match(&tcp6);
 }
