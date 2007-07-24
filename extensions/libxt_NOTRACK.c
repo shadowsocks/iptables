@@ -56,7 +56,23 @@ struct xtables_target notrack =
 	.extra_opts	= opts,
 };
 
+static
+struct xtables_target notrack6 =
+{
+	.family		= AF_INET6,
+	.name		= "NOTRACK",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(0),
+	.userspacesize	= XT_ALIGN(0),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.extra_opts	= opts,
+};
+
 void _init(void)
 {
 	xtables_register_target(&notrack);
+	xtables_register_target(&notrack6);
 }
