@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include <iptables.h>
-#include <linux/netfilter_ipv4/ipt_tcpmss.h>
+#include <xtables.h>
+#include <linux/netfilter/xt_tcpmss.h>
 
 /* Function which prints out usage message. */
 static void
@@ -64,8 +64,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ipt_tcpmss_match_info *mssinfo =
-		(struct ipt_tcpmss_match_info *)(*match)->data;
+	struct xt_tcpmss_match_info *mssinfo =
+		(struct xt_tcpmss_match_info *)(*match)->data;
 
 	switch (c) {
 	case '1':
@@ -112,8 +112,8 @@ print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
-	const struct ipt_tcpmss_match_info *mssinfo =
-		(const struct ipt_tcpmss_match_info *)match->data;
+	const struct xt_tcpmss_match_info *mssinfo =
+		(const struct xt_tcpmss_match_info *)match->data;
 
 	printf("tcpmss match ");
 	print_tcpmss(mssinfo->mss_min, mssinfo->mss_max,
@@ -124,20 +124,36 @@ print(const void *ip,
 static void
 save(const void *ip, const struct xt_entry_match *match)
 {
-	const struct ipt_tcpmss_match_info *mssinfo =
-		(const struct ipt_tcpmss_match_info *)match->data;
+	const struct xt_tcpmss_match_info *mssinfo =
+		(const struct xt_tcpmss_match_info *)match->data;
 
 	printf("--mss ");
 	print_tcpmss(mssinfo->mss_min, mssinfo->mss_max,
 		     mssinfo->invert, 0);
 }
 
-static struct iptables_match tcpmss = {
+static struct xtables_match tcpmss = {
 	.next		= NULL,
+	.family		= AF_INET,
 	.name		= "tcpmss",
 	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_tcpmss_match_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_tcpmss_match_info)),
+	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_match_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcpmss_match_info)),
+	.help		= &help,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
+};
+
+static struct xtables_match tcpmss6 = {
+	.next		= NULL,
+	.family		= AF_INET6,
+	.name		= "tcpmss",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_match_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcpmss_match_info)),
 	.help		= &help,
 	.parse		= &parse,
 	.final_check	= &final_check,
@@ -148,5 +164,6 @@ static struct iptables_match tcpmss = {
 
 void _init(void)
 {
-	register_match(&tcpmss);
+	xtables_register_match(&tcpmss);
+	xtables_register_match(&tcpmss6);
 }
