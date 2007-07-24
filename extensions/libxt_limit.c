@@ -8,14 +8,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <iptables.h>
+#include <xtables.h>
 #include <stddef.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
+#include <linux/netfilter/x_tables.h>
 /* For 64bit kernel / 32bit userspace */
-#include "../include/linux/netfilter_ipv4/ipt_limit.h"
+#include "../include/linux/netfilter/xt_limit.h"
 
-#define IPT_LIMIT_AVG	"3/hour"
-#define IPT_LIMIT_BURST	5
+#define XT_LIMIT_AVG	"3/hour"
+#define XT_LIMIT_BURST	5
 
 /* Function which prints out usage message. */
 static void
@@ -23,11 +23,11 @@ help(void)
 {
 	printf(
 "limit v%s options:\n"
-"--limit avg			max average match rate: default "IPT_LIMIT_AVG"\n"
+"--limit avg			max average match rate: default "XT_LIMIT_AVG"\n"
 "                                [Packets per second unless followed by \n"
 "                                /sec /minute /hour /day postfixes]\n"
 "--limit-burst number		number to match in a burst, default %u\n"
-"\n", IPTABLES_VERSION, IPT_LIMIT_BURST);
+"\n", IPTABLES_VERSION, XT_LIMIT_BURST);
 }
 
 static struct option opts[] = {
@@ -65,10 +65,10 @@ int parse_rate(const char *rate, u_int32_t *val)
 
 	/* This would get mapped to infinite (1/day is minimum they
            can specify, so we're ok at that end). */
-	if (r / mult > IPT_LIMIT_SCALE)
+	if (r / mult > XT_LIMIT_SCALE)
 		exit_error(PARAMETER_PROBLEM, "Rate too fast `%s'\n", rate);
 
-	*val = IPT_LIMIT_SCALE * mult / r;
+	*val = XT_LIMIT_SCALE * mult / r;
 	return 1;
 }
 
@@ -76,10 +76,10 @@ int parse_rate(const char *rate, u_int32_t *val)
 static void
 init(struct xt_entry_match *m, unsigned int *nfcache)
 {
-	struct ipt_rateinfo *r = (struct ipt_rateinfo *)m->data;
+	struct xt_rateinfo *r = (struct xt_rateinfo *)m->data;
 
-	parse_rate(IPT_LIMIT_AVG, &r->avg);
-	r->burst = IPT_LIMIT_BURST;
+	parse_rate(XT_LIMIT_AVG, &r->avg);
+	r->burst = XT_LIMIT_BURST;
 
 }
 
@@ -97,7 +97,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ipt_rateinfo *r = (struct ipt_rateinfo *)(*match)->data;
+	struct xt_rateinfo *r = (struct xt_rateinfo *)(*match)->data;
 	unsigned int num;
 
 	switch(c) {
@@ -136,10 +136,10 @@ static struct rates
 {
 	const char *name;
 	u_int32_t mult;
-} rates[] = { { "day", IPT_LIMIT_SCALE*24*60*60 },
-	      { "hour", IPT_LIMIT_SCALE*60*60 },
-	      { "min", IPT_LIMIT_SCALE*60 },
-	      { "sec", IPT_LIMIT_SCALE } };
+} rates[] = { { "day", XT_LIMIT_SCALE*24*60*60 },
+	      { "hour", XT_LIMIT_SCALE*60*60 },
+	      { "min", XT_LIMIT_SCALE*60 },
+	      { "sec", XT_LIMIT_SCALE } };
 
 static void print_rate(u_int32_t period)
 {
@@ -160,7 +160,7 @@ print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
-	struct ipt_rateinfo *r = (struct ipt_rateinfo *)match->data;
+	struct xt_rateinfo *r = (struct xt_rateinfo *)match->data;
 	printf("limit: avg "); print_rate(r->avg);
 	printf("burst %u ", r->burst);
 }
@@ -168,19 +168,36 @@ print(const void *ip,
 /* FIXME: Make minimalist: only print rate if not default --RR */
 static void save(const void *ip, const struct xt_entry_match *match)
 {
-	struct ipt_rateinfo *r = (struct ipt_rateinfo *)match->data;
+	struct xt_rateinfo *r = (struct xt_rateinfo *)match->data;
 
 	printf("--limit "); print_rate(r->avg);
-	if (r->burst != IPT_LIMIT_BURST)
+	if (r->burst != XT_LIMIT_BURST)
 		printf("--limit-burst %u ", r->burst);
 }
 
-static struct iptables_match limit = { 
+static struct xtables_match limit = { 
 	.next		= NULL,
+	.family		= AF_INET,
 	.name		= "limit",
 	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_rateinfo)),
-	.userspacesize	= offsetof(struct ipt_rateinfo, prev),
+	.size		= XT_ALIGN(sizeof(struct xt_rateinfo)),
+	.userspacesize	= offsetof(struct xt_rateinfo, prev),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
+};
+
+static struct xtables_match limit6 = { 
+	.next		= NULL,
+	.family		= AF_INET6,
+	.name		= "limit",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_rateinfo)),
+	.userspacesize	= offsetof(struct xt_rateinfo, prev),
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
@@ -192,5 +209,6 @@ static struct iptables_match limit = {
 
 void _init(void)
 {
-	register_match(&limit);
+	xtables_register_match(&limit);
+	xtables_register_match(&limit6);
 }
