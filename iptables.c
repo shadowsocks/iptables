@@ -248,30 +248,6 @@ proto_to_name(u_int8_t proto, int nolookup)
 	return NULL;
 }
 
-int
-service_to_port(const char *name, const char *proto)
-{
-	struct servent *service;
-
-	if ((service = getservbyname(name, proto)) != NULL)
-		return ntohs((unsigned short) service->s_port);
-
-	return -1;
-}
-
-u_int16_t
-parse_port(const char *port, const char *proto)
-{
-	unsigned int portnum;
-
-	if ((string_to_number(port, 0, 65535, &portnum)) != -1 ||
-	    (portnum = service_to_port(port, proto)) != -1)
-		return (u_int16_t)portnum;
-
-	exit_error(PARAMETER_PROBLEM,
-		   "invalid port/service `%s' specified", port);
-}
-
 enum {
 	IPT_DOTTED_ADDR = 0,
 	IPT_DOTTED_MASK
@@ -755,43 +731,6 @@ parse_protocol(const char *s)
 	return (u_int16_t)proto;
 }
 
-void parse_interface(const char *arg, char *vianame, unsigned char *mask)
-{
-	int vialen = strlen(arg);
-	unsigned int i;
-
-	memset(mask, 0, IFNAMSIZ);
-	memset(vianame, 0, IFNAMSIZ);
-
-	if (vialen + 1 > IFNAMSIZ)
-		exit_error(PARAMETER_PROBLEM,
-			   "interface name `%s' must be shorter than IFNAMSIZ"
-			   " (%i)", arg, IFNAMSIZ-1);
-
-	strcpy(vianame, arg);
-	if ((vialen == 0) || (vialen == 1 && vianame[0] == '+'))
-		memset(mask, 0, IFNAMSIZ);
-	else if (vianame[vialen - 1] == '+') {
-		memset(mask, 0xFF, vialen - 1);
-		memset(mask + vialen - 1, 0, IFNAMSIZ - vialen + 1);
-		/* Don't remove `+' here! -HW */
-	} else {
-		/* Include nul-terminator in match */
-		memset(mask, 0xFF, vialen + 1);
-		memset(mask + vialen + 1, 0, IFNAMSIZ - vialen - 1);
-		for (i = 0; vianame[i]; i++) {
-			if (vianame[i] == ':' ||
-			    vianame[i] == '!' ||
-			    vianame[i] == '*') {
-				printf("Warning: weird character in interface"
-				       " `%s' (No aliases, :, ! or *).\n",
-				       vianame);
-				break;
-			}
-		}
-	}
-}
-
 /* Can't be zero. */
 static int
 parse_rulenumber(const char *rule)
@@ -884,51 +823,6 @@ mask_to_dotted(const struct in_addr *mask)
 		sprintf(buf, "/%s", addr_to_dotted(mask));
 
 	return buf;
-}
-
-int
-string_to_number_ll(const char *s, unsigned long long min, unsigned long long max,
-		 unsigned long long *ret)
-{
-	unsigned long long number;
-	char *end;
-
-	/* Handle hex, octal, etc. */
-	errno = 0;
-	number = strtoull(s, &end, 0);
-	if (*end == '\0' && end != s) {
-		/* we parsed a number, let's see if we want this */
-		if (errno != ERANGE && min <= number && (!max || number <= max)) {
-			*ret = number;
-			return 0;
-		}
-	}
-	return -1;
-}
-
-int
-string_to_number_l(const char *s, unsigned long min, unsigned long max,
-		 unsigned long *ret)
-{
-	int result;
-	unsigned long long number;
-
-	result = string_to_number_ll(s, min, max, &number);
-	*ret = (unsigned long)number;
-
-	return result;
-}
-
-int string_to_number(const char *s, unsigned int min, unsigned int max,
-		unsigned int *ret)
-{
-	int result;
-	unsigned long number;
-
-	result = string_to_number_l(s, min, max, &number);
-	*ret = (unsigned int)number;
-
-	return result;
 }
 
 static void

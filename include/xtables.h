@@ -180,4 +180,21 @@ extern struct xtables_match *find_match(const char *name, enum xt_tryload,
 					struct xtables_rule_match **match);
 extern struct xtables_target *find_target(const char *name, enum xt_tryload);
 
+extern int string_to_number_ll(const char *s,
+			       unsigned long long min,
+			       unsigned long long max,
+			       unsigned long long *ret);
+extern int string_to_number_l(const char *s,
+			      unsigned long min,
+			      unsigned long max,
+			      unsigned long *ret);
+extern int string_to_number(const char *s,
+			    unsigned int min,
+			    unsigned int max,
+			    unsigned int *ret);
+extern int service_to_port(const char *name, const char *proto);
+extern u_int16_t parse_port(const char *port, const char *proto);
+extern void
+parse_interface(const char *arg, char *vianame, unsigned char *mask);
+
 #endif /* _XTABLES_H */

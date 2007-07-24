@@ -35,8 +35,6 @@ extern int line;
 extern void register_match(struct iptables_match *me);
 extern void register_target(struct iptables_target *me);
 
-extern int service_to_port(const char *name, const char *proto);
-extern u_int16_t parse_port(const char *port, const char *proto);
 extern struct in_addr *dotted_to_addr(const char *dotted);
 extern struct in_addr *dotted_to_mask(const char *dotted);
 extern char *addr_to_dotted(const struct in_addr *addrp);
@@ -46,7 +44,6 @@ extern char *mask_to_dotted(const struct in_addr *mask);
 extern void parse_hostnetworkmask(const char *name, struct in_addr **addrpp,
                       struct in_addr *maskp, unsigned int *naddrs);
 extern u_int16_t parse_protocol(const char *s);
-extern void parse_interface(const char *arg, char *vianame, unsigned char *mask);
 
 extern int do_command(int argc, char *argv[], char **table,
 		      iptc_handle_t *handle);
