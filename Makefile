@@ -68,6 +68,7 @@ endif
 ifndef IPT_LIBDIR
 IPT_LIBDIR:=$(LIBDIR)/iptables
 endif
+DEST_IPT_LIBDIR:=$(DESTDIR)$(LIBDIR)/iptables
 
 ifndef NO_SHARED_LIBS
 DEPFILES = $(SHARED_LIBS:%.so=%.d)
