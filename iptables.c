@@ -31,7 +31,6 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <dlfcn.h>
 #include <ctype.h>
 #include <stdarg.h>
 #include <limits.h>
@@ -39,7 +38,6 @@
 #include <iptables.h>
 #include <xtables.h>
 #include <fcntl.h>
-#include <sys/wait.h>
 #include <sys/utsname.h>
 
 #ifndef TRUE
@@ -47,10 +45,6 @@
 #endif
 #ifndef FALSE
 #define FALSE 0
-#endif
-
-#ifndef PROC_SYS_MODPROBE
-#define PROC_SYS_MODPROBE "/proc/sys/kernel/modprobe"
 #endif
 
 #define FMT_NUMERIC	0x0001
@@ -196,9 +190,6 @@ const char *program_name;
 char *lib_dir;
 
 int kernel_version;
-
-/* the path to command to load kernel module */
-const char *modprobe = NULL;
 
 /* Keeping track of external matches and targets: linked lists.  */
 struct iptables_match *iptables_matches = NULL;
@@ -1763,83 +1754,13 @@ list_entries(const ipt_chainlabel chain, int verbose, int numeric,
 	return found;
 }
 
-static char *get_modprobe(void)
-{
-	int procfile;
-	char *ret;
-
-#define PROCFILE_BUFSIZ	1024
-	procfile = open(PROC_SYS_MODPROBE, O_RDONLY);
-	if (procfile < 0)
-		return NULL;
-
-	ret = (char *) malloc(PROCFILE_BUFSIZ);
-	if (ret) {
-		memset(ret, 0, PROCFILE_BUFSIZ);
-		switch (read(procfile, ret, PROCFILE_BUFSIZ)) {
-		case -1: goto fail;
-		case PROCFILE_BUFSIZ: goto fail; /* Partial read.  Wierd */
-		}
-		if (ret[strlen(ret)-1]=='\n') 
-			ret[strlen(ret)-1]=0;
-		close(procfile);
-		return ret;
-	}
- fail:
-	free(ret);
-	close(procfile);
-	return NULL;
-}
-
-int iptables_insmod(const char *modname, const char *modprobe, int quiet)
-{
-	char *buf = NULL;
-	char *argv[4];
-	int status;
-
-	/* If they don't explicitly set it, read out of kernel */
-	if (!modprobe) {
-		buf = get_modprobe();
-		if (!buf)
-			return -1;
-		modprobe = buf;
-	}
-
-	switch (fork()) {
-	case 0:
-		argv[0] = (char *)modprobe;
-		argv[1] = (char *)modname;
-		if (quiet) {
-			argv[2] = "-q";
-			argv[3] = NULL;
-		} else {
-			argv[2] = NULL;
-			argv[3] = NULL;
-		}
-		execv(argv[0], argv);
-
-		/* not usually reached */
-		exit(1);
-	case -1:
-		return -1;
-
-	default: /* parent */
-		wait(&status);
-	}
-
-	free(buf);
-	if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
-		return 0;
-	return -1;
-}
-
 int load_iptables_ko(const char *modprobe, int quiet)
 {
 	static int loaded = 0;
 	static int ret = -1;
 
 	if (!loaded) {
-		ret = iptables_insmod("ip_tables", modprobe, quiet);
+		ret = xtables_insmod("ip_tables", modprobe, quiet);
 		loaded = (ret == 0);
 	}
 

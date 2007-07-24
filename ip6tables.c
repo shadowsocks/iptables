@@ -31,7 +31,6 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <dlfcn.h>
 #include <ctype.h>
 #include <stdarg.h>
 #include <limits.h>
@@ -40,7 +39,6 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 
@@ -49,10 +47,6 @@
 #endif
 #ifndef FALSE
 #define FALSE 0
-#endif
-
-#ifndef PROC_SYS_MODPROBE
-#define PROC_SYS_MODPROBE "/proc/sys/kernel/modprobe"
 #endif
 
 #define FMT_NUMERIC	0x0001
@@ -192,9 +186,6 @@ static int inverse_for_options[NUMBER_OF_OPT] =
 const char *program_version;
 const char *program_name;
 char *lib_dir;
-
-/* the path to command to load kernel module */
-const char *modprobe = NULL;
 
 /* Keeping track of external matches and targets: linked lists.  */
 struct ip6tables_match *ip6tables_matches = NULL;
@@ -1699,83 +1690,13 @@ list_entries(const ip6t_chainlabel chain, int verbose, int numeric,
 	return found;
 }
 
-static char *get_modprobe(void)
-{
-	int procfile;
-	char *ret;
-
-#define PROCFILE_BUFSIZ 1024
-	procfile = open(PROC_SYS_MODPROBE, O_RDONLY);
-	if (procfile < 0)
-		return NULL;
-
-	ret = malloc(PROCFILE_BUFSIZ);
-	if (ret) {
-		memset(ret, 0, PROCFILE_BUFSIZ);
-		switch (read(procfile, ret, PROCFILE_BUFSIZ)) {
-		case -1: goto fail;
-		case PROCFILE_BUFSIZ: goto fail; /* Partial read.  Wierd */
-		}
-		if (ret[strlen(ret)-1]=='\n') 
-			ret[strlen(ret)-1]=0;
-		close(procfile);
-		return ret;
-	}
- fail:
-	free(ret);
-	close(procfile);
-	return NULL;
-}
-
-int ip6tables_insmod(const char *modname, const char *modprobe, int quiet)
-{
-	char *buf = NULL;
-	char *argv[4];
-	int status;
-
-	/* If they don't explicitly set it, read out of kernel */
-	if (!modprobe) {
-		buf = get_modprobe();
-		if (!buf)
-			return -1;
-		modprobe = buf;
-	}
-
-	switch (fork()) {
-	case 0:
-		argv[0] = (char *)modprobe;
-		argv[1] = (char *)modname;
-		if (quiet) {
-			argv[2] = "-q";
-			argv[3] = NULL;
-		} else {
-			argv[2] = NULL;
-			argv[3] = NULL;
-		}
-		execv(argv[0], argv);
-
-		/* not usually reached */
-		exit(1);
-	case -1:
-		return -1;
-
-	default: /* parent */
-		wait(&status);
-	}
-
-	free(buf);
-	if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
-		return 0;
-	return -1;
-}
-
 int load_ip6tables_ko(const char *modprobe, int quiet)
 {
 	static int loaded = 0;
 	static int ret = -1;
 
 	if (!loaded) {
-		ret = ip6tables_insmod("ip6_tables", modprobe, quiet);
+		ret = xtables_insmod("ip6_tables", modprobe, quiet);
 		loaded = (ret == 0);
 	}
 

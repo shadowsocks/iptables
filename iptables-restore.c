@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "iptables.h"
+#include "xtables.h"
 #include "libiptc/libiptc.h"
 
 #ifdef DEBUG
@@ -59,7 +60,7 @@ iptc_handle_t create_handle(const char *tablename, const char* modprobe )
 
 	if (!handle) {
 		/* try to insmod the module if iptc_init failed */
-		iptables_insmod("ip_tables", modprobe, 0);
+		xtables_insmod("ip_tables", modprobe, 0);
 		handle = iptc_init(tablename);
 	}
 
