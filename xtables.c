@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -30,12 +31,20 @@
 #include <iptables_common.h>
 #include <xtables.h>
 
+#define NPROTO	255
+
 #ifndef PROC_SYS_MODPROBE
 #define PROC_SYS_MODPROBE "/proc/sys/kernel/modprobe"
 #endif
 
+char *lib_dir;
+
 /* the path to command to load kernel module */
 const char *modprobe = NULL;
+
+/* Keeping track of external matches and targets: linked lists.  */
+struct xtables_match *xtables_matches;
+struct xtables_target *xtables_targets;
 
 void *fw_calloc(size_t count, size_t size)
 {
@@ -131,3 +140,336 @@ int xtables_insmod(const char *modname, const char *modprobe, int quiet)
 	return -1;
 }
 
+int load_xtables_ko(const char *modprobe, int quiet)
+{
+	static int loaded = 0;
+	static int ret = -1;
+
+	if (!loaded) {
+		ret = xtables_insmod(afinfo.kmod, modprobe, quiet);
+		loaded = (ret == 0);
+	}
+
+	return ret;
+}
+
+struct xtables_match *find_match(const char *name, enum xt_tryload tryload,
+				 struct xtables_rule_match **matches)
+{
+	struct xtables_match *ptr;
+	const char *icmp6 = "icmp6";
+
+	/* This is ugly as hell. Nonetheless, there is no way of changing
+	 * this without hurting backwards compatibility */
+	if ( (strcmp(name,"icmpv6") == 0) ||
+	     (strcmp(name,"ipv6-icmp") == 0) ||
+	     (strcmp(name,"icmp6") == 0) )
+		name = icmp6;
+
+	for (ptr = xtables_matches; ptr; ptr = ptr->next) {
+		if (strcmp(name, ptr->name) == 0) {
+			struct xtables_match *clone;
+
+			/* First match of this type: */
+			if (ptr->m == NULL)
+				break;
+
+			/* Second and subsequent clones */
+			clone = fw_malloc(sizeof(struct xtables_match));
+			memcpy(clone, ptr, sizeof(struct xtables_match));
+			clone->mflags = 0;
+			/* This is a clone: */
+			clone->next = clone;
+
+			ptr = clone;
+			break;
+		}
+	}
+
+#ifndef NO_SHARED_LIBS
+	if (!ptr && tryload != DONT_LOAD && tryload != DURING_LOAD) {
+		char path[strlen(lib_dir) + sizeof("/.so")
+			  + strlen(afinfo.libprefix) + strlen(name)];
+		sprintf(path, "%s/%s%s.so", lib_dir, afinfo.libprefix,
+			name);
+		if (dlopen(path, RTLD_NOW)) {
+			/* Found library.  If it didn't register itself,
+			   maybe they specified target as match. */
+			ptr = find_match(name, DONT_LOAD, NULL);
+
+			if (!ptr)
+				exit_error(PARAMETER_PROBLEM,
+					   "Couldn't load match `%s'\n",
+					   name);
+		} else if (tryload == LOAD_MUST_SUCCEED)
+			exit_error(PARAMETER_PROBLEM,
+				   "Couldn't load match `%s':%s\n",
+				   name, dlerror());
+	}
+#else
+	if (ptr && !ptr->loaded) {
+		if (tryload != DONT_LOAD)
+			ptr->loaded = 1;
+		else
+			ptr = NULL;
+	}
+	if(!ptr && (tryload == LOAD_MUST_SUCCEED)) {
+		exit_error(PARAMETER_PROBLEM,
+			   "Couldn't find match `%s'\n", name);
+	}
+#endif
+
+	if (ptr && matches) {
+		struct xtables_rule_match **i;
+		struct xtables_rule_match *newentry;
+
+		newentry = fw_malloc(sizeof(struct xtables_rule_match));
+
+		for (i = matches; *i; i = &(*i)->next) {
+			if (strcmp(name, (*i)->match->name) == 0)
+				(*i)->completed = 1;
+		}
+		newentry->match = ptr;
+		newentry->completed = 0;
+		newentry->next = NULL;
+		*i = newentry;
+	}
+
+	return ptr;
+}
+
+
+struct xtables_target *find_target(const char *name, enum xt_tryload tryload)
+{
+	struct xtables_target *ptr;
+
+	/* Standard target? */
+	if (strcmp(name, "") == 0
+	    || strcmp(name, XTC_LABEL_ACCEPT) == 0
+	    || strcmp(name, XTC_LABEL_DROP) == 0
+	    || strcmp(name, XTC_LABEL_QUEUE) == 0
+	    || strcmp(name, XTC_LABEL_RETURN) == 0)
+		name = "standard";
+
+	for (ptr = xtables_targets; ptr; ptr = ptr->next) {
+		if (strcmp(name, ptr->name) == 0)
+			break;
+	}
+
+#ifndef NO_SHARED_LIBS
+	if (!ptr && tryload != DONT_LOAD && tryload != DURING_LOAD) {
+		char path[strlen(lib_dir) + sizeof("/.so")
+			  + strlen(afinfo.libprefix) + strlen(name)];
+		sprintf(path, "%s/%s%s.so", lib_dir, afinfo.libprefix, name);
+		if (dlopen(path, RTLD_NOW)) {
+			/* Found library.  If it didn't register itself,
+			   maybe they specified match as a target. */
+			ptr = find_target(name, DONT_LOAD);
+			if (!ptr)
+				exit_error(PARAMETER_PROBLEM,
+					   "Couldn't load target `%s'\n",
+					   name);
+		} else if (tryload == LOAD_MUST_SUCCEED)
+			exit_error(PARAMETER_PROBLEM,
+				   "Couldn't load target `%s':%s\n",
+				   name, dlerror());
+	}
+#else
+	if (ptr && !ptr->loaded) {
+		if (tryload != DONT_LOAD)
+			ptr->loaded = 1;
+		else
+			ptr = NULL;
+	}
+	if(!ptr && (tryload == LOAD_MUST_SUCCEED)) {
+		exit_error(PARAMETER_PROBLEM,
+			   "Couldn't find target `%s'\n", name);
+	}
+#endif
+
+	if (ptr)
+		ptr->used = 1;
+
+	return ptr;
+}
+
+static int compatible_revision(const char *name, u_int8_t revision, int opt)
+{
+	struct xt_get_revision rev;
+	socklen_t s = sizeof(rev);
+	int max_rev, sockfd;
+
+	sockfd = socket(afinfo.family, SOCK_RAW, IPPROTO_RAW);
+	if (sockfd < 0) {
+		fprintf(stderr, "Could not open socket to kernel: %s\n",
+			strerror(errno));
+		exit(1);
+	}
+
+	load_xtables_ko(modprobe, 1);
+
+	strcpy(rev.name, name);
+	rev.revision = revision;
+
+	max_rev = getsockopt(sockfd, afinfo.ipproto, opt, &rev, &s);
+	if (max_rev < 0) {
+		/* Definitely don't support this? */
+		if (errno == ENOENT || errno == EPROTONOSUPPORT) {
+			close(sockfd);
+			return 0;
+		} else if (errno == ENOPROTOOPT) {
+			close(sockfd);
+			/* Assume only revision 0 support (old kernel) */
+			return (revision == 0);
+		} else {
+			fprintf(stderr, "getsockopt failed strangely: %s\n",
+				strerror(errno));
+			exit(1);
+		}
+	}
+	close(sockfd);
+	return 1;
+}
+
+
+static int compatible_match_revision(const char *name, u_int8_t revision)
+{
+	return compatible_revision(name, revision, afinfo.so_rev_match);
+}
+
+static int compatible_target_revision(const char *name, u_int8_t revision)
+{
+	return compatible_revision(name, revision, afinfo.so_rev_target);
+}
+
+void xtables_register_match(struct xtables_match *me)
+{
+	struct xtables_match **i, *old;
+
+	if (strcmp(me->version, program_version) != 0) {
+		fprintf(stderr, "%s: match `%s' v%s (I'm v%s).\n",
+			program_name, me->name, me->version, program_version);
+		exit(1);
+	}
+
+	/* Revision field stole a char from name. */
+	if (strlen(me->name) >= XT_FUNCTION_MAXNAMELEN-1) {
+		fprintf(stderr, "%s: target `%s' has invalid name\n",
+			program_name, me->name);
+		exit(1);
+	}
+
+	if (me->family >= NPROTO) {
+		fprintf(stderr,
+			"%s: BUG: match %s has invalid protocol family\n",
+			program_name, me->name);
+		exit(1);
+	}
+
+	/* ignore not interested match */
+	if (me->family != afinfo.family)
+		return;
+
+	old = find_match(me->name, DURING_LOAD, NULL);
+	if (old) {
+		if (old->revision == me->revision) {
+			fprintf(stderr,
+				"%s: match `%s' already registered.\n",
+				program_name, me->name);
+			exit(1);
+		}
+
+		/* Now we have two (or more) options, check compatibility. */
+		if (compatible_match_revision(old->name, old->revision)
+		    && old->revision > me->revision)
+			return;
+
+		/* Replace if compatible. */
+		if (!compatible_match_revision(me->name, me->revision))
+			return;
+
+		/* Delete old one. */
+		for (i = &xtables_matches; *i!=old; i = &(*i)->next);
+		*i = old->next;
+	}
+
+	if (me->size != XT_ALIGN(me->size)) {
+		fprintf(stderr, "%s: match `%s' has invalid size %u.\n",
+			program_name, me->name, (unsigned int)me->size);
+		exit(1);
+	}
+
+	/* Append to list. */
+	for (i = &xtables_matches; *i; i = &(*i)->next);
+	me->next = NULL;
+	*i = me;
+
+	me->m = NULL;
+	me->mflags = 0;
+}
+
+void xtables_register_target(struct xtables_target *me)
+{
+	struct xtables_target *old;
+
+	if (strcmp(me->version, program_version) != 0) {
+		fprintf(stderr, "%s: target `%s' v%s (I'm v%s).\n",
+			program_name, me->name, me->version, program_version);
+		exit(1);
+	}
+
+	/* Revision field stole a char from name. */
+	if (strlen(me->name) >= XT_FUNCTION_MAXNAMELEN-1) {
+		fprintf(stderr, "%s: target `%s' has invalid name\n",
+			program_name, me->name);
+		exit(1);
+	}
+
+	if (me->family >= NPROTO) {
+		fprintf(stderr,
+			"%s: BUG: target %s has invalid protocol family\n",
+			program_name, me->name);
+		exit(1);
+	}
+
+	/* ignore not interested target */
+	if (me->family != afinfo.family)
+		return;
+
+	old = find_target(me->name, DURING_LOAD);
+	if (old) {
+		struct xtables_target **i;
+
+		if (old->revision == me->revision) {
+			fprintf(stderr,
+				"%s: target `%s' already registered.\n",
+				program_name, me->name);
+			exit(1);
+		}
+
+		/* Now we have two (or more) options, check compatibility. */
+		if (compatible_target_revision(old->name, old->revision)
+		    && old->revision > me->revision)
+			return;
+
+		/* Replace if compatible. */
+		if (!compatible_target_revision(me->name, me->revision))
+			return;
+
+		/* Delete old one. */
+		for (i = &xtables_targets; *i!=old; i = &(*i)->next);
+		*i = old->next;
+	}
+
+	if (me->size != XT_ALIGN(me->size)) {
+		fprintf(stderr, "%s: target `%s' has invalid size %u.\n",
+			program_name, me->name, (unsigned int)me->size);
+		exit(1);
+	}
+
+	/* Prepend to list. */
+	me->next = xtables_targets;
+	xtables_targets = me;
+	me->t = NULL;
+	me->tflags = 0;
+}
