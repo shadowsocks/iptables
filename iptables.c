@@ -37,6 +37,7 @@
 #include <limits.h>
 #include <unistd.h>
 #include <iptables.h>
+#include <xtables.h>
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <sys/utsname.h>
@@ -577,30 +578,6 @@ check_inverse(const char option[], int *invert, int *optind, int argc)
 		return TRUE;
 	}
 	return FALSE;
-}
-
-static void *
-fw_calloc(size_t count, size_t size)
-{
-	void *p;
-
-	if ((p = calloc(count, size)) == NULL) {
-		perror("iptables: calloc failed");
-		exit(1);
-	}
-	return p;
-}
-
-static void *
-fw_malloc(size_t size)
-{
-	void *p;
-
-	if ((p = malloc(size)) == NULL) {
-		perror("iptables: malloc failed");
-		exit(1);
-	}
-	return p;
 }
 
 static struct in_addr *

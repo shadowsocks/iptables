@@ -36,6 +36,7 @@
 #include <stdarg.h>
 #include <limits.h>
 #include <ip6tables.h>
+#include <xtables.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -492,30 +493,6 @@ check_inverse(const char option[], int *invert, int *optind, int argc)
 		return TRUE;
 	}
 	return FALSE;
-}
-
-static void *
-fw_calloc(size_t count, size_t size)
-{
-	void *p;
-
-	if ((p = calloc(count, size)) == NULL) {
-		perror("ip6tables: calloc failed");
-		exit(1);
-	}
-	return p;
-}
-
-static void *
-fw_malloc(size_t size)
-{
-	void *p;
-
-	if ((p = malloc(size)) == NULL) {
-		perror("ip6tables: malloc failed");
-		exit(1);
-	}
-	return p;
 }
 
 static char *
