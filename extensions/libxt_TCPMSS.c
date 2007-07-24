@@ -7,24 +7,33 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include <iptables.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
-#include <linux/netfilter_ipv4/ipt_TCPMSS.h>
+#include <xtables.h>
+#include <linux/netfilter/x_tables.h>
+#include <linux/netfilter/xt_TCPMSS.h>
 
 struct mssinfo {
 	struct xt_entry_target t;
-	struct ipt_tcpmss_info mss;
+	struct xt_tcpmss_info mss;
 };
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void __help(int hdrsize)
 {
 	printf(
 "TCPMSS target v%s mutually-exclusive options:\n"
 "  --set-mss value               explicitly set MSS option to specified value\n"
-"  --clamp-mss-to-pmtu           automatically clamp MSS value to (path_MTU - 40)\n",
-IPTABLES_VERSION);
+"  --clamp-mss-to-pmtu           automatically clamp MSS value to (path_MTU - %d)\n",
+IPTABLES_VERSION, hdrsize);
+}
+
+static void help(void)
+{
+	__help(40);
+}
+
+static void help6(void)
+{
+	__help(60);
 }
 
 static struct option opts[] = {
@@ -42,12 +51,13 @@ init(struct xt_entry_target *t, unsigned int *nfcache)
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
+__parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      struct xt_entry_target **target)
+      struct xt_entry_target **target,
+      int hdrsize)
 {
-	struct ipt_tcpmss_info *mssinfo
-		= (struct ipt_tcpmss_info *)(*target)->data;
+	struct xt_tcpmss_info *mssinfo
+		= (struct xt_tcpmss_info *)(*target)->data;
 
 	switch (c) {
 		unsigned int mssval;
@@ -56,7 +66,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
 			           "TCPMSS target: Only one option may be specified");
-		if (string_to_number(optarg, 0, 65535 - 40, &mssval) == -1)
+		if (string_to_number(optarg, 0, 65535 - hdrsize, &mssval) == -1)
 			exit_error(PARAMETER_PROBLEM, "Bad TCPMSS value `%s'", optarg);
 		
 		mssinfo->mss = mssval;
@@ -67,7 +77,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
 			           "TCPMSS target: Only one option may be specified");
-		mssinfo->mss = IPT_TCPMSS_CLAMP_PMTU;
+		mssinfo->mss = XT_TCPMSS_CLAMP_PMTU;
 		*flags = 1;
 		break;
 
@@ -76,6 +86,22 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	}
 
 	return 1;
+}
+
+static int
+parse(int c, char **argv, int invert, unsigned int *flags,
+      const void *entry,
+      struct xt_entry_target **target)
+{
+	return __parse(c, argv, invert, flags, entry, target, 40);
+}
+
+static int
+parse6(int c, char **argv, int invert, unsigned int *flags,
+      const void *entry,
+      struct xt_entry_target **target)
+{
+	return __parse(c, argv, invert, flags, entry, target, 60);
 }
 
 static void
@@ -92,9 +118,9 @@ print(const void *ip,
       const struct xt_entry_target *target,
       int numeric)
 {
-	const struct ipt_tcpmss_info *mssinfo =
-		(const struct ipt_tcpmss_info *)target->data;
-	if(mssinfo->mss == IPT_TCPMSS_CLAMP_PMTU)
+	const struct xt_tcpmss_info *mssinfo =
+		(const struct xt_tcpmss_info *)target->data;
+	if(mssinfo->mss == XT_TCPMSS_CLAMP_PMTU)
 		printf("TCPMSS clamp to PMTU ");
 	else
 		printf("TCPMSS set %u ", mssinfo->mss);
@@ -104,21 +130,22 @@ print(const void *ip,
 static void
 save(const void *ip, const struct xt_entry_target *target)
 {
-	const struct ipt_tcpmss_info *mssinfo =
-		(const struct ipt_tcpmss_info *)target->data;
+	const struct xt_tcpmss_info *mssinfo =
+		(const struct xt_tcpmss_info *)target->data;
 
-	if(mssinfo->mss == IPT_TCPMSS_CLAMP_PMTU)
+	if(mssinfo->mss == XT_TCPMSS_CLAMP_PMTU)
 		printf("--clamp-mss-to-pmtu ");
 	else
 		printf("--set-mss %u ", mssinfo->mss);
 }
 
-static struct iptables_target mss = {
+static struct xtables_target mss = {
 	.next		= NULL,
+	.family		= AF_INET,
 	.name		= "TCPMSS",
 	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_tcpmss_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_tcpmss_info)),
+	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
@@ -128,7 +155,24 @@ static struct iptables_target mss = {
 	.extra_opts	= opts
 };
 
+static struct xtables_target mss6 = {
+	.next		= NULL,
+	.family		= AF_INET6,
+	.name		= "TCPMSS",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
+	.help		= &help6,
+	.init		= &init,
+	.parse		= &parse6,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
+};
+
 void _init(void)
 {
-	register_target(&mss);
+	xtables_register_target(&mss);
+	xtables_register_target(&mss6);
 }
