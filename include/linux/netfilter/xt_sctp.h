@@ -1,24 +1,24 @@
-#ifndef _IPT_SCTP_H_
-#define _IPT_SCTP_H_
+#ifndef _XT_SCTP_H_
+#define _XT_SCTP_H_
 
-#define IPT_SCTP_SRC_PORTS	        0x01
-#define IPT_SCTP_DEST_PORTS	        0x02
-#define IPT_SCTP_CHUNK_TYPES		0x04
+#define XT_SCTP_SRC_PORTS	        0x01
+#define XT_SCTP_DEST_PORTS	        0x02
+#define XT_SCTP_CHUNK_TYPES		0x04
 
-#define IPT_SCTP_VALID_FLAGS		0x07
+#define XT_SCTP_VALID_FLAGS		0x07
 
 #define ELEMCOUNT(x) (sizeof(x)/sizeof(x[0]))
 
 
-struct ipt_sctp_flag_info {
+struct xt_sctp_flag_info {
 	u_int8_t chunktype;
 	u_int8_t flag;
 	u_int8_t flag_mask;
 };
 
-#define IPT_NUM_SCTP_FLAGS	4
+#define XT_NUM_SCTP_FLAGS	4
 
-struct ipt_sctp_info {
+struct xt_sctp_info {
 	u_int16_t dpts[2];  /* Min, Max */
 	u_int16_t spts[2];  /* Min, Max */
 
@@ -29,7 +29,7 @@ struct ipt_sctp_info {
 #define SCTP_CHUNK_MATCH_ONLY  0x04  /* Match if these are the only chunk types present */
 
 	u_int32_t chunk_match_type;
-	struct ipt_sctp_flag_info flag_info[IPT_NUM_SCTP_FLAGS];
+	struct xt_sctp_flag_info flag_info[XT_NUM_SCTP_FLAGS];
 	int flag_count;
 
 	u_int32_t flags;
@@ -103,5 +103,5 @@ struct ipt_sctp_info {
         flag;						\
 })
 
-#endif /* _IPT_SCTP_H_ */
+#endif /* _XT_SCTP_H_ */
 

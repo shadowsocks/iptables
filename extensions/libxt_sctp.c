@@ -14,14 +14,13 @@
 #include <netdb.h>
 #include <ctype.h>
 
-#include <iptables.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
+#include <xtables.h>
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 #endif
 
-#include <linux/netfilter_ipv4/ipt_sctp.h>
+#include <linux/netfilter/xt_sctp.h>
 
 /* Some ZS!#@:$%*#$! has replaced the ELEMCOUNT macro in ipt_sctp.h with
  * ARRAY_SIZE without noticing that this file is used from userserspace,
@@ -47,11 +46,11 @@ init(struct xt_entry_match *m,
      unsigned int *nfcache)
 {
 	int i;
-	struct ipt_sctp_info *einfo = (struct ipt_sctp_info *)m->data;
+	struct xt_sctp_info *einfo = (struct xt_sctp_info *)m->data;
 
-	memset(einfo, 0, sizeof(struct ipt_sctp_info));
+	memset(einfo, 0, sizeof(struct xt_sctp_info));
 
-	for (i = 0; i < IPT_NUM_SCTP_FLAGS; i++) {
+	for (i = 0; i < XT_NUM_SCTP_FLAGS; i++) {
 		einfo->flag_info[i].chunktype = -1;
 	}
 }
@@ -133,7 +132,7 @@ static struct sctp_chunk_names sctp_chunk_names[]
 };
 
 static void
-save_chunk_flag_info(struct ipt_sctp_flag_info *flag_info,
+save_chunk_flag_info(struct xt_sctp_flag_info *flag_info,
 		     int *flag_count,
 		     int chunktype, 
 		     int bit, 
@@ -154,7 +153,7 @@ save_chunk_flag_info(struct ipt_sctp_flag_info *flag_info,
 		}
 	}
 	
-	if (*flag_count == IPT_NUM_SCTP_FLAGS) {
+	if (*flag_count == XT_NUM_SCTP_FLAGS) {
 		exit_error (PARAMETER_PROBLEM,
 			"Number of chunk types with flags exceeds currently allowed limit."
 			"Increasing this limit involves changing IPT_NUM_SCTP_FLAGS and"
@@ -170,7 +169,7 @@ save_chunk_flag_info(struct ipt_sctp_flag_info *flag_info,
 }
 
 static void
-parse_sctp_chunk(struct ipt_sctp_info *einfo, 
+parse_sctp_chunk(struct xt_sctp_info *einfo, 
 		 const char *chunks)
 {
 	char *ptr;
@@ -241,7 +240,7 @@ out:
 }
 
 static void
-parse_sctp_chunks(struct ipt_sctp_info *einfo,
+parse_sctp_chunks(struct xt_sctp_info *einfo,
 		  const char *match_type,
 		  const char *chunks)
 {
@@ -267,36 +266,36 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ipt_sctp_info *einfo
-		= (struct ipt_sctp_info *)(*match)->data;
+	struct xt_sctp_info *einfo
+		= (struct xt_sctp_info *)(*match)->data;
 
 	switch (c) {
 	case '1':
-		if (*flags & IPT_SCTP_SRC_PORTS)
+		if (*flags & XT_SCTP_SRC_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 			           "Only one `--source-port' allowed");
-		einfo->flags |= IPT_SCTP_SRC_PORTS;
+		einfo->flags |= XT_SCTP_SRC_PORTS;
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_sctp_ports(argv[optind-1], einfo->spts);
 		if (invert)
-			einfo->invflags |= IPT_SCTP_SRC_PORTS;
-		*flags |= IPT_SCTP_SRC_PORTS;
+			einfo->invflags |= XT_SCTP_SRC_PORTS;
+		*flags |= XT_SCTP_SRC_PORTS;
 		break;
 
 	case '2':
-		if (*flags & IPT_SCTP_DEST_PORTS)
+		if (*flags & XT_SCTP_DEST_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--destination-port' allowed");
-		einfo->flags |= IPT_SCTP_DEST_PORTS;
+		einfo->flags |= XT_SCTP_DEST_PORTS;
 		check_inverse(optarg, &invert, &optind, 0);
 		parse_sctp_ports(argv[optind-1], einfo->dpts);
 		if (invert)
-			einfo->invflags |= IPT_SCTP_DEST_PORTS;
-		*flags |= IPT_SCTP_DEST_PORTS;
+			einfo->invflags |= XT_SCTP_DEST_PORTS;
+		*flags |= XT_SCTP_DEST_PORTS;
 		break;
 
 	case '3':
-		if (*flags & IPT_SCTP_CHUNK_TYPES)
+		if (*flags & XT_SCTP_CHUNK_TYPES)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--chunk-types' allowed");
 		check_inverse(optarg, &invert, &optind, 0);
@@ -306,12 +305,12 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "--chunk-types requires two args");
 
-		einfo->flags |= IPT_SCTP_CHUNK_TYPES;
+		einfo->flags |= XT_SCTP_CHUNK_TYPES;
 		parse_sctp_chunks(einfo, argv[optind-1], argv[optind]);
 		if (invert)
-			einfo->invflags |= IPT_SCTP_CHUNK_TYPES;
+			einfo->invflags |= XT_SCTP_CHUNK_TYPES;
 		optind++;
-		*flags |= IPT_SCTP_CHUNK_TYPES;
+		*flags |= XT_SCTP_CHUNK_TYPES;
 		break;
 
 	default:
@@ -410,7 +409,7 @@ print_chunk(u_int32_t chunknum, int numeric)
 static void
 print_chunks(u_int32_t chunk_match_type, 
 	     const u_int32_t *chunkmap, 
-	     const struct ipt_sctp_flag_info *flag_info,
+	     const struct xt_sctp_flag_info *flag_info,
 	     int flag_count,
 	     int numeric)
 {
@@ -462,27 +461,27 @@ print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
-	const struct ipt_sctp_info *einfo =
-		(const struct ipt_sctp_info *)match->data;
+	const struct xt_sctp_info *einfo =
+		(const struct xt_sctp_info *)match->data;
 
 	printf("sctp ");
 
-	if (einfo->flags & IPT_SCTP_SRC_PORTS) {
+	if (einfo->flags & XT_SCTP_SRC_PORTS) {
 		print_ports("spt", einfo->spts[0], einfo->spts[1],
-			einfo->invflags & IPT_SCTP_SRC_PORTS,
+			einfo->invflags & XT_SCTP_SRC_PORTS,
 			numeric);
 	}
 
-	if (einfo->flags & IPT_SCTP_DEST_PORTS) {
+	if (einfo->flags & XT_SCTP_DEST_PORTS) {
 		print_ports("dpt", einfo->dpts[0], einfo->dpts[1],
-			einfo->invflags & IPT_SCTP_DEST_PORTS,
+			einfo->invflags & XT_SCTP_DEST_PORTS,
 			numeric);
 	}
 
-	if (einfo->flags & IPT_SCTP_CHUNK_TYPES) {
+	if (einfo->flags & XT_SCTP_CHUNK_TYPES) {
 		/* FIXME: print_chunks() is used in save() where the printing of '!'
 		s taken care of, so we need to do that here as well */
-		if (einfo->invflags & IPT_SCTP_CHUNK_TYPES) {
+		if (einfo->invflags & XT_SCTP_CHUNK_TYPES) {
 			printf("! ");
 		}
 		print_chunks(einfo->chunk_match_type, einfo->chunkmap,
@@ -495,11 +494,11 @@ static void
 save(const void *ip,
      const struct xt_entry_match *match)
 {
-	const struct ipt_sctp_info *einfo =
-		(const struct ipt_sctp_info *)match->data;
+	const struct xt_sctp_info *einfo =
+		(const struct xt_sctp_info *)match->data;
 
-	if (einfo->flags & IPT_SCTP_SRC_PORTS) {
-		if (einfo->invflags & IPT_SCTP_SRC_PORTS)
+	if (einfo->flags & XT_SCTP_SRC_PORTS) {
+		if (einfo->invflags & XT_SCTP_SRC_PORTS)
 			printf("! ");
 		if (einfo->spts[0] != einfo->spts[1])
 			printf("--sport %u:%u ", 
@@ -508,8 +507,8 @@ save(const void *ip,
 			printf("--sport %u ", einfo->spts[0]);
 	}
 
-	if (einfo->flags & IPT_SCTP_DEST_PORTS) {
-		if (einfo->invflags & IPT_SCTP_DEST_PORTS)
+	if (einfo->flags & XT_SCTP_DEST_PORTS) {
+		if (einfo->invflags & XT_SCTP_DEST_PORTS)
 			printf("! ");
 		if (einfo->dpts[0] != einfo->dpts[1])
 			printf("--dport %u:%u ",
@@ -518,8 +517,8 @@ save(const void *ip,
 			printf("--dport %u ", einfo->dpts[0]);
 	}
 
-	if (einfo->flags & IPT_SCTP_CHUNK_TYPES) {
-		if (einfo->invflags & IPT_SCTP_CHUNK_TYPES)
+	if (einfo->flags & XT_SCTP_CHUNK_TYPES) {
+		if (einfo->invflags & XT_SCTP_CHUNK_TYPES)
 			printf("! ");
 		printf("--chunk-types ");
 
@@ -528,23 +527,39 @@ save(const void *ip,
 	}
 }
 
-static
-struct iptables_match sctp
-= { .name          = "sctp",
-    .version       = IPTABLES_VERSION,
-    .size          = IPT_ALIGN(sizeof(struct ipt_sctp_info)),
-    .userspacesize = IPT_ALIGN(sizeof(struct ipt_sctp_info)),
-    .help          = &help,
-    .init          = &init,
-    .parse         = &parse,
-    .final_check   = &final_check,
-    .print         = &print,
-    .save          = &save,
-    .extra_opts    = opts
+static struct xtables_match sctp = {
+	.name		= "sctp",
+	.family		= AF_INET,
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_sctp_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_sctp_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
+};
+
+static struct xtables_match sctp6 = {
+	.name		= "sctp",
+	.family		= AF_INET6,
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_sctp_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_sctp_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
 };
 
 void _init(void)
 {
-	register_match(&sctp);
+	xtables_register_match(&sctp);
+	xtables_register_match(&sctp6);
 }
 
