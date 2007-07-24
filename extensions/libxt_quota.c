@@ -7,10 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <iptables.h>
+#include <xtables.h>
 
 #include <linux/netfilter/xt_quota.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
 
 static struct option opts[] = {
         {"quota", 1, 0, '1'},
@@ -47,7 +46,7 @@ parse_quota(const char *s, u_int64_t * quota)
 {
         *quota = strtoull(s, (char **) NULL, 10);
 
-#ifdef DEBUG_IPT_QUOTA
+#ifdef DEBUG_XT_QUOTA
         printf("Quota: %llu\n", *quota);
 #endif
 
@@ -86,11 +85,27 @@ final_check(unsigned int flags)
 {
 }
 
-struct iptables_match quota = { 
+struct xtables_match quota = { 
 	.next		= NULL,
+	.family		= AF_INET,
 	.name		= "quota",
 	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof (struct xt_quota_info)),
+	.size		= XT_ALIGN(sizeof (struct xt_quota_info)),
+	.userspacesize	= offsetof(struct xt_quota_info, quota),
+	.help		= &help,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts
+};
+
+struct xtables_match quota6 = { 
+	.next		= NULL,
+	.family		= AF_INET6,
+	.name		= "quota",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof (struct xt_quota_info)),
 	.userspacesize	= offsetof(struct xt_quota_info, quota),
 	.help		= &help,
 	.parse		= &parse,
@@ -103,5 +118,6 @@ struct iptables_match quota = {
 void
 _init(void)
 {
-        register_match(&quota);
+	xtables_register_match(&quota);
+	xtables_register_match(&quota6);
 }
