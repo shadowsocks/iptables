@@ -5,6 +5,20 @@
 #include <linux/netfilter/x_tables.h>
 #include <libiptc/libxtc.h>
 
+#ifndef XT_LIB_DIR
+#define XT_LIB_DIR "/usr/local/lib/iptables"
+#endif
+
+#ifndef IPPROTO_SCTP
+#define IPPROTO_SCTP 132
+#endif
+#ifndef IPPROTO_DCCP
+#define IPPROTO_DCCP 33
+#endif
+#ifndef IPPROTO_UDPLITE
+#define IPPROTO_UDPLITE	136
+#endif
+
 /* protocol family dependent informations */
 struct afinfo {
 	/* protocol family */

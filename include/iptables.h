@@ -6,17 +6,7 @@
 #include "libiptc/libiptc.h"
 
 #ifndef IPT_LIB_DIR
-#define IPT_LIB_DIR "/usr/local/lib/iptables"
-#endif
-
-#ifndef IPPROTO_SCTP
-#define IPPROTO_SCTP 132
-#endif
-#ifndef IPPROTO_DCCP
-#define IPPROTO_DCCP 33
-#endif
-#ifndef IPPROTO_UDPLITE
-#define IPPROTO_UDPLITE	136
+#define IPT_LIB_DIR XT_LIB_DIR
 #endif
 
 #ifndef IPT_SO_GET_REVISION_MATCH /* Old kernel source. */
