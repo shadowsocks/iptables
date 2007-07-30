@@ -853,6 +853,9 @@ merge_options(struct option *oldopts, const struct option *newopts,
 	unsigned int num_old, num_new, i;
 	struct option *merge;
 
+	if (newopts == NULL)
+		return oldopts;
+
 	for (num_old = 0; oldopts[num_old].name; num_old++);
 	for (num_new = 0; newopts[num_new].name; num_new++);
 

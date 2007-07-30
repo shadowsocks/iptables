@@ -13,10 +13,6 @@ help(void)
 "\n", IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
-	{0}
-};
-
 /* Function which parses command options; returns true if it
    ate an option */
 static int
@@ -44,7 +40,6 @@ struct iptables_match unclean = {
 	.final_check	= &final_check,
 	.print		= NULL,
 	.save		= NULL,
-	.extra_opts	= opts
 };
 
 void _init(void)

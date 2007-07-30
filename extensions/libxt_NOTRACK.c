@@ -16,10 +16,6 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
-	{ 0 }
-};
-
 /* Initialize the target. */
 static void
 init(struct xt_entry_target *t, unsigned int *nfcache)
@@ -53,7 +49,6 @@ struct xtables_target notrack =
 	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
-	.extra_opts	= opts,
 };
 
 static
@@ -68,7 +63,6 @@ struct xtables_target notrack6 =
 	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
-	.extra_opts	= opts,
 };
 
 void _init(void)

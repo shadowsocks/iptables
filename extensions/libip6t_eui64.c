@@ -22,10 +22,6 @@ help(void)
 "\n", IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
-	{0}
-};
-
 /* Function which parses command options; returns true if it
    ate an option */
 static int
@@ -67,7 +63,6 @@ static struct ip6tables_match eui64 = {
 	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
-	.extra_opts	= opts,
 };
 
 void _init(void)

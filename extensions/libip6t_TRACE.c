@@ -16,10 +16,6 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
-	{ 0 }
-};
-
 /* Initialize the target. */
 static void
 init(struct ip6t_entry_target *t, unsigned int *nfcache)
@@ -54,7 +50,6 @@ struct ip6tables_target trace
 	.final_check = &final_check,
 	.print = NULL, /* print */
 	.save = NULL, /* save */
-	.extra_opts = opts
 };
 
 void _init(void)

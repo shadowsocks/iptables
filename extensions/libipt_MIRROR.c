@@ -16,10 +16,6 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
-	{ 0 }
-};
-
 /* Initialize the target. */
 static void
 init(struct xt_entry_target *t, unsigned int *nfcache)
@@ -52,7 +48,6 @@ static struct iptables_target mirror = {
 	.final_check 	= &final_check,
 	.print		= NULL,
 	.save		= NULL,
-	.extra_opts	= opts
 };
 
 void _init(void)

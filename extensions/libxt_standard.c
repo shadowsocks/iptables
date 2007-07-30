@@ -16,10 +16,6 @@ help(void)
 "(If target is DROP, ACCEPT, RETURN or nothing)\n", IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
-	{0}
-};
-
 /* Initialize the target. */
 static void
 init(struct xt_entry_target *t, unsigned int *nfcache)
@@ -60,7 +56,6 @@ struct xtables_target standard = {
 	.final_check	= &final_check,
 	.print		= NULL,
 	.save		= &save,
-	.extra_opts	= opts
 };
 
 static
@@ -76,7 +71,6 @@ struct xtables_target standard6 = {
 	.final_check	= &final_check,
 	.print		= NULL,
 	.save		= &save,
-	.extra_opts	= opts
 };
 
 void _init(void)
