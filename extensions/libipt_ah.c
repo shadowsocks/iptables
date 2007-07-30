@@ -169,7 +169,6 @@ static void save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct iptables_match ah = { 
-	.next 		= NULL,
 	.name 		= "ah",
 	.version 	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_ah)),

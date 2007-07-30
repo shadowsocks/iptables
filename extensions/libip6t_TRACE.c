@@ -43,7 +43,7 @@ final_check(unsigned int flags)
 
 static
 struct ip6tables_target trace 
-= {	.next = NULL,
+= {
 	.name = "TRACE",
 	.version = IPTABLES_VERSION,
 	.size = IP6T_ALIGN(0),

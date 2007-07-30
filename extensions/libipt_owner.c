@@ -231,7 +231,6 @@ save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct iptables_match owner = { 
-	.next		= NULL,
 	.name		= "owner",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_owner_info)),

@@ -153,7 +153,6 @@ save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct iptables_match tos = { 
-	.next		= NULL,
 	.name		= "tos",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_tos_info)),

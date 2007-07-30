@@ -176,7 +176,6 @@ static void save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match limit = { 
-	.next		= NULL,
 	.family		= AF_INET,
 	.name		= "limit",
 	.version	= IPTABLES_VERSION,
@@ -192,7 +191,6 @@ static struct xtables_match limit = {
 };
 
 static struct xtables_match limit6 = { 
-	.next		= NULL,
 	.family		= AF_INET6,
 	.name		= "limit",
 	.version	= IPTABLES_VERSION,

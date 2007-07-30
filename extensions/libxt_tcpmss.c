@@ -133,7 +133,6 @@ save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match tcpmss = {
-	.next		= NULL,
 	.family		= AF_INET,
 	.name		= "tcpmss",
 	.version	= IPTABLES_VERSION,
@@ -148,7 +147,6 @@ static struct xtables_match tcpmss = {
 };
 
 static struct xtables_match tcpmss6 = {
-	.next		= NULL,
 	.family		= AF_INET6,
 	.name		= "tcpmss",
 	.version	= IPTABLES_VERSION,

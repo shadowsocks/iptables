@@ -105,7 +105,6 @@ save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match mark = { 
-	.next		= NULL,
 	.family		= AF_INET,
 	.name		= "mark",
 	.version	= IPTABLES_VERSION,
@@ -120,7 +119,6 @@ static struct xtables_match mark = {
 };
 
 static struct xtables_match mark6 = { 
-	.next		= NULL,
 	.family		= AF_INET6,
 	.name		= "mark",
 	.version	= IPTABLES_VERSION,

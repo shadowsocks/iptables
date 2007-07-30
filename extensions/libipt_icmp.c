@@ -287,7 +287,6 @@ static void final_check(unsigned int flags)
 }
 
 static struct iptables_match icmp = { 
-	.next		= NULL,
 	.name		= "icmp",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_icmp)),

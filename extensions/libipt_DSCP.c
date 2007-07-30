@@ -144,7 +144,6 @@ save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct iptables_target dscp = { 
-	.next		= NULL,
 	.name		= "DSCP",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_DSCP_info)),

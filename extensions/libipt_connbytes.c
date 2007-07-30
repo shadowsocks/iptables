@@ -186,7 +186,6 @@ static void save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct iptables_match state = {
-	.next 		= NULL,
 	.name 		= "connbytes",
 	.version 	= IPTABLES_VERSION,
 	.size 		= IPT_ALIGN(sizeof(struct ipt_connbytes_info)),

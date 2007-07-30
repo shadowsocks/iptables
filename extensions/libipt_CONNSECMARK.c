@@ -106,7 +106,6 @@ static void save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct iptables_target connsecmark = {
-	.next		= NULL,
 	.name		= "CONNSECMARK",
 	.version	= IPTABLES_VERSION,
 	.revision	= 0,

@@ -209,7 +209,6 @@ static void save(const void *ip, const struct xt_entry_match *match)
 
 static
 struct xtables_match udp = { 
-	.next		= NULL,
 	.family		= AF_INET,
 	.name		= "udp",
 	.version	= IPTABLES_VERSION,
@@ -226,7 +225,6 @@ struct xtables_match udp = {
 
 static
 struct xtables_match udp6 = { 
-	.next		= NULL,
 	.family		= AF_INET6,
 	.name		= "udp",
 	.version	= IPTABLES_VERSION,

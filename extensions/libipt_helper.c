@@ -83,7 +83,6 @@ save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct iptables_match helper = { 
-	.next		= NULL,
 	.name		= "helper",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_helper_info)),

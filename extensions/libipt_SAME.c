@@ -216,7 +216,6 @@ save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct iptables_target same = {
-	.next		= NULL,
 	.name		= "SAME",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_same_info)),

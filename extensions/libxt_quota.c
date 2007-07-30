@@ -86,7 +86,6 @@ final_check(unsigned int flags)
 }
 
 struct xtables_match quota = { 
-	.next		= NULL,
 	.family		= AF_INET,
 	.name		= "quota",
 	.version	= IPTABLES_VERSION,
@@ -101,7 +100,6 @@ struct xtables_match quota = {
 };
 
 struct xtables_match quota6 = { 
-	.next		= NULL,
 	.family		= AF_INET6,
 	.name		= "quota",
 	.version	= IPTABLES_VERSION,

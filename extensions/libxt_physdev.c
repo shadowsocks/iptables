@@ -173,7 +173,6 @@ static void save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match physdev = { 
-	.next		= NULL,
 	.family		= AF_INET,
 	.name		= "physdev",
 	.version	= IPTABLES_VERSION,
@@ -189,7 +188,6 @@ static struct xtables_match physdev = {
 };
 
 static struct xtables_match physdev6 = { 
-	.next		= NULL,
 	.family		= AF_INET6,
 	.name		= "physdev",
 	.version	= IPTABLES_VERSION,

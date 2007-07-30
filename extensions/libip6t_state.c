@@ -144,7 +144,6 @@ static void save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct ip6tables_match state = { 
-	.next		= NULL,
 	.name		= "state",
 	.version	= IPTABLES_VERSION,
 	.size		= IP6T_ALIGN(sizeof(struct ipt_state_info)),

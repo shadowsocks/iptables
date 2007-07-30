@@ -35,7 +35,6 @@ static void final_check(unsigned int flags)
 
 static
 struct iptables_match unclean = { 
-	.next		= NULL,
 	.name		= "unclean",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(0),

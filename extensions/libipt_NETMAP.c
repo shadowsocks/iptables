@@ -178,7 +178,6 @@ save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct iptables_target target_module = {
-	.next		= NULL,
 	.name		= MODULENAME,
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),

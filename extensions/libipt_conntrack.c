@@ -505,7 +505,6 @@ static void save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct iptables_match conntrack = { 
-	.next 		= NULL,
 	.name		= "conntrack",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_conntrack_info)),

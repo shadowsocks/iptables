@@ -154,7 +154,6 @@ save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct iptables_target tos = {
-	.next		= NULL,
 	.name		= "TOS",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_tos_target_info)),

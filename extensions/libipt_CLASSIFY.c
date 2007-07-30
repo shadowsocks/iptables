@@ -109,7 +109,6 @@ save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct iptables_target classify = { 
-	.next		= NULL,
 	.name		= "CLASSIFY",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_classify_target_info)),

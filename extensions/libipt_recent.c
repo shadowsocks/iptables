@@ -220,7 +220,6 @@ save(const void *ip, const struct xt_entry_match *match)
 
 /* Structure for iptables to use to communicate with module */
 static struct iptables_match recent = { 
-    .next          = NULL,
     .name          = "recent",
     .version       = IPTABLES_VERSION,
     .size          = IPT_ALIGN(sizeof(struct ipt_recent_info)),

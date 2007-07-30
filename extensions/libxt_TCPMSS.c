@@ -140,7 +140,6 @@ save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target mss = {
-	.next		= NULL,
 	.family		= AF_INET,
 	.name		= "TCPMSS",
 	.version	= IPTABLES_VERSION,
@@ -156,7 +155,6 @@ static struct xtables_target mss = {
 };
 
 static struct xtables_target mss6 = {
-	.next		= NULL,
 	.family		= AF_INET6,
 	.name		= "TCPMSS",
 	.version	= IPTABLES_VERSION,

@@ -187,7 +187,6 @@ save_v1(const void *ip, const struct xt_entry_target *target)
 
 static
 struct iptables_target mark_v0 = {
-	.next		= NULL,
 	.name		= "MARK",
 	.version	= IPTABLES_VERSION,
 	.revision	= 0,
@@ -204,7 +203,6 @@ struct iptables_target mark_v0 = {
 
 static
 struct iptables_target mark_v1 = {
-	.next		= NULL,
 	.name		= "MARK",
 	.version	= IPTABLES_VERSION,
 	.revision	= 1,

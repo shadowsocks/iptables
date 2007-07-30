@@ -104,7 +104,6 @@ static void save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target secmark = {
-	.next		= NULL,
 	.family		= AF_INET,
 	.name		= "SECMARK",
 	.version	= IPTABLES_VERSION,
@@ -121,7 +120,6 @@ static struct xtables_target secmark = {
 };
 
 static struct xtables_target secmark6 = {
-	.next		= NULL,
 	.family		= AF_INET6,
 	.name		= "SECMARK",
 	.version	= IPTABLES_VERSION,

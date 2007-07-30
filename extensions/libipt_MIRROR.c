@@ -42,7 +42,6 @@ final_check(unsigned int flags)
 }
 
 static struct iptables_target mirror = {
-	.next		= NULL,
 	.name		= "MIRROR",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(0),

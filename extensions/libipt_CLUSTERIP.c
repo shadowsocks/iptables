@@ -248,7 +248,6 @@ save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct iptables_target clusterip = { 
-	.next		= NULL,
 	.name		= "CLUSTERIP",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_clusterip_tgt_info)),

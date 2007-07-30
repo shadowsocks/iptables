@@ -152,7 +152,6 @@ static struct option opts[] = {
 };
 
 static struct iptables_match ttl = {
-	.next		= NULL,
 	.name		= "ttl",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_ttl_info)),

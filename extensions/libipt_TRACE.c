@@ -43,7 +43,7 @@ final_check(unsigned int flags)
 
 static
 struct iptables_target trace 
-= {	.next = NULL,
+= {
 	.name = "TRACE",
 	.version = IPTABLES_VERSION,
 	.size = IPT_ALIGN(0),

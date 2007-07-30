@@ -49,7 +49,6 @@ save(const void *ip, const struct xt_entry_target *target)
 
 static
 struct xtables_target standard = { 
-	.next		= NULL,
 	.family		= AF_INET,
 	.name		= "standard",
 	.version	= IPTABLES_VERSION,
@@ -66,7 +65,6 @@ struct xtables_target standard = {
 
 static
 struct xtables_target standard6 = { 
-	.next		= NULL,
 	.family		= AF_INET6,
 	.name		= "standard",
 	.version	= IPTABLES_VERSION,

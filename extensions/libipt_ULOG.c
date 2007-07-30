@@ -193,7 +193,6 @@ print(const void *ip,
 }
 
 static struct iptables_target ulog = {
-	.next		= NULL,
 	.name		= "ULOG",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_ulog_info)),

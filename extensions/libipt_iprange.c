@@ -165,7 +165,6 @@ save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct iptables_match iprange = { 
-	.next		= NULL,
 	.name		= "iprange",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_iprange_info)),

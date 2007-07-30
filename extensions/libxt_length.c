@@ -132,7 +132,6 @@ save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match length = { 
-	.next		= NULL,
 	.family		= AF_INET,
 	.name		= "length",
 	.version	= IPTABLES_VERSION,
@@ -147,7 +146,6 @@ static struct xtables_match length = {
 };
 
 static struct xtables_match length6 = { 
-	.next		= NULL,
 	.family		= AF_INET6,
 	.name		= "length",
 	.version	= IPTABLES_VERSION,

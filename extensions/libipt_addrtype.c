@@ -187,7 +187,6 @@ static struct option opts[] = {
 
 static
 struct iptables_match addrtype = {
-	.next 		= NULL,
 	.name 		= "addrtype",
 	.version 	= IPTABLES_VERSION,
 	.size 		= IPT_ALIGN(sizeof(struct ipt_addrtype_info)),
