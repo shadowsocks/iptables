@@ -19,6 +19,7 @@ static struct option opts[] = {
 	{ "nflog-prefix",    1, 0, NFLOG_PREFIX },
 	{ "nflog-range",     1, 0, NFLOG_RANGE },
 	{ "nflog-threshold", 1, 0, NFLOG_THRESHOLD },
+	{NULL},
 };
 
 static void help(void)
