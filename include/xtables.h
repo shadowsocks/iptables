@@ -158,7 +158,7 @@ struct xtables_target
 		     const struct xt_entry_target *target);
 
 	/* Pointer to list of extra command-line options */
-	struct option *extra_opts;
+	const struct option *extra_opts;
 
 	/* Ignore these men behind the curtain: */
 	unsigned int option_offset;
