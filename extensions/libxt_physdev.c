@@ -25,7 +25,7 @@ help(void)
 "\n", IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "physdev-in", 1, 0, '1' },
 	{ "physdev-out", 1, 0, '2' },
 	{ "physdev-is-in", 0, 0, '3' },

@@ -44,7 +44,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "from", 1, 0, '1' },
 	{ "to", 1, 0, '2' },
 	{ "algo", 1, 0, '3' },

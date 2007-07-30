@@ -45,7 +45,7 @@ help_v1(void)
 IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "source-ports", 1, 0, '1' },
 	{ "sports", 1, 0, '1' }, /* synonym */
 	{ "destination-ports", 1, 0, '2' },

@@ -32,7 +32,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ .name = "log-level",        .has_arg = 1, .flag = 0, .val = '!' },
 	{ .name = "log-prefix",       .has_arg = 1, .flag = 0, .val = '#' },
 	{ .name = "log-tcp-sequence", .has_arg = 0, .flag = 0, .val = '1' },

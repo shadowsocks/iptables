@@ -64,7 +64,7 @@ static void help(void)
 	print_types();
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{"pkt-type", 1, 0, '1'},
 	{0}
 };

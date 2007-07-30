@@ -29,7 +29,7 @@ help(void)
 IPTABLES_VERSION, IP6T_RT_HOPS);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "rt-type", 1, 0, '1' },
 	{ "rt-segsleft", 1, 0, '2' },
 	{ "rt-len", 1, 0, '3' },

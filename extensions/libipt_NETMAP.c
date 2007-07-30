@@ -13,7 +13,7 @@
 
 #define MODULENAME "NETMAP"
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "to", 1, 0, '1' },
 	{ 0 }
 };

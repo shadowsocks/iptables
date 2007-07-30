@@ -31,7 +31,7 @@ UNAME " v%s options:\n"
 IPTABLES_VERSION, IP6T_OPTS_OPTSNR);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ .name = LNAME "-len",        .has_arg = 1, .flag = 0, .val = '1' },
 	{ .name = LNAME "-opts",       .has_arg = 1, .flag = 0, .val = '2' },
 	{ .name = LNAME "-not-strict", .has_arg = 1, .flag = 0, .val = '3' },

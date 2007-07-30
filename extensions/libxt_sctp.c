@@ -69,7 +69,7 @@ static void help(void)
 	IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ .name = "source-port", .has_arg = 1, .flag = 0, .val = '1' },
 	{ .name = "sport", .has_arg = 1, .flag = 0, .val = '1' },
 	{ .name = "destination-port", .has_arg = 1, .flag = 0, .val = '2' },

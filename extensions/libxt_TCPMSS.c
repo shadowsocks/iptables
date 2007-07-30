@@ -36,7 +36,7 @@ static void help6(void)
 	__help(60);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "set-mss", 1, 0, '1' },
 	{ "clamp-mss-to-pmtu", 0, 0, '2' },
 	{ 0 }

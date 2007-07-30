@@ -226,7 +226,7 @@ static void save(const void *ip, const struct xt_entry_match *match)
 		printf("--mh-type %u ", mhinfo->types[0]);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "mh-type", 1, 0, '1' },
 	{0}
 };

@@ -65,7 +65,7 @@ help(void)
 	print_reject_types();
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "reject-with", 1, 0, '1' },
 	{ 0 }
 };

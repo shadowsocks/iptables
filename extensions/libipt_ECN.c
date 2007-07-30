@@ -37,7 +37,7 @@ static void help(void)
 #endif
 
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "ecn-tcp-remove", 0, 0, 'F' },
 	{ "ecn-tcp-cwr", 1, 0, 'G' },
 	{ "ecn-tcp-ece", 1, 0, 'H' },

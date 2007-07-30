@@ -46,7 +46,7 @@ help(void)
 "\n", IPTABLES_VERSION, XT_HASHLIMIT_BURST);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "hashlimit", 1, 0, '%' },
 	{ "hashlimit-burst", 1, 0, '$' },
 	{ "hashlimit-htable-size", 1, 0, '&' },

@@ -120,7 +120,7 @@ static void save(const void *ip,
 	printf("--hl-%s %u ", op[info->mode], info->hop_limit);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ .name = "hl",    .has_arg = 1, .flag = 0, .val = '2' },
 	{ .name = "hl-eq", .has_arg = 1, .flag = 0, .val = '2' },
 	{ .name = "hl-lt", .has_arg = 1, .flag = 0, .val = '3' },

@@ -23,7 +23,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ .name = "fragid",    .has_arg = 1, .flag = 0, .val = '1' },
 	{ .name = "fraglen",   .has_arg = 1, .flag = 0, .val = '2' },
 	{ .name = "fragres",   .has_arg = 0, .flag = 0, .val = '3' },

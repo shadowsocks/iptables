@@ -19,7 +19,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "helper", 1, 0, '1' },
 	{0}
 };

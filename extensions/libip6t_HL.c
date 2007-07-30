@@ -138,7 +138,7 @@ static void print(const void *ip,
 	printf("%u ", info->hop_limit);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "hl-set", 1, 0, '1' },
 	{ "hl-dec", 1, 0, '2' },
 	{ "hl-inc", 1, 0, '3' },

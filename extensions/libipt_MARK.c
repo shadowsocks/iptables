@@ -22,7 +22,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "set-mark", 1, 0, '1' },
 	{ "and-mark", 1, 0, '2' },
 	{ "or-mark", 1, 0, '3' },

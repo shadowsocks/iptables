@@ -41,7 +41,7 @@ static void help(void)
 	IPTABLES_VERSION);
 }
 
-static struct option opts[] =
+static const struct option opts[] =
 {
 	{
 		.name		= "dir",

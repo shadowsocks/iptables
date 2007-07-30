@@ -36,7 +36,7 @@ IPTABLES_VERSION);
 #endif /* IP6T_OWNER_COMM */
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "uid-owner", 1, 0, '1' },
 	{ "gid-owner", 1, 0, '2' },
 	{ "pid-owner", 1, 0, '3' },

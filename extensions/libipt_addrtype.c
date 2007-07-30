@@ -12,7 +12,7 @@
 #include <linux/netfilter_ipv4/ipt_addrtype.h>
 
 /* from linux/rtnetlink.h, must match order of enumeration */
-static char *rtn_names[] = {
+static const char *const rtn_names[] = {
 	"UNSPEC",
 	"UNICAST",
 	"LOCAL",
@@ -179,7 +179,7 @@ static void save(const void *ip,
 	}
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "src-type", 1, 0, '1' },
 	{ "dst-type", 1, 0, '2' },
 	{ 0 }

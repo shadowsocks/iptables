@@ -26,7 +26,7 @@ static void help(void)
 	IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ .name = "ecn-tcp-cwr", .has_arg = 0, .flag = 0, .val = 'F' },
 	{ .name = "ecn-tcp-ece", .has_arg = 0, .flag = 0, .val = 'G' },
 	{ .name = "ecn-ip-ect",  .has_arg = 1, .flag = 0, .val = 'H' },

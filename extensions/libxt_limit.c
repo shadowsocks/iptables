@@ -30,7 +30,7 @@ help(void)
 "\n", IPTABLES_VERSION, XT_LIMIT_BURST);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "limit", 1, 0, '%' },
 	{ "limit-burst", 1, 0, '$' },
 	{ 0 }

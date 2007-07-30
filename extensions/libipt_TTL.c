@@ -138,7 +138,7 @@ static void print(const void *ip,
 	printf("%u ", info->ttl);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "ttl-set", 1, 0, '1' },
 	{ "ttl-dec", 1, 0, '2' },
 	{ "ttl-inc", 1, 0, '3' },

@@ -34,7 +34,7 @@ static void help(void)
 	       "\n", IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{"add-set",   1, 0, '1'},
 	{"del-set",   1, 0, '2'},
 	{0}

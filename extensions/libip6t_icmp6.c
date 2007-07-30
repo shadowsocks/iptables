@@ -85,7 +85,7 @@ help(void)
 	print_icmpv6types();
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "icmpv6-type", 1, 0, '1' },
 	{0}
 };

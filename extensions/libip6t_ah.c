@@ -20,7 +20,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ .name = "ahspi", .has_arg = 1, .flag = 0, .val = '1' },
 	{ .name = "ahlen", .has_arg = 1, .flag = 0, .val = '2' },
 	{ .name = "ahres", .has_arg = 0, .flag = 0, .val = '3' },

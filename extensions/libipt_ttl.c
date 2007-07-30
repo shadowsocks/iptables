@@ -143,7 +143,7 @@ static void save(const void *ip,
 	printf("%u ", info->ttl);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "ttl", 1, 0, '2' },
 	{ "ttl-eq", 1, 0, '2'},
 	{ "ttl-lt", 1, 0, '3'},

@@ -20,7 +20,7 @@ help(void)
 "\n", IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "connbytes", 1, 0, '1' },
 	{ "connbytes-dir", 1, 0, '2' },
 	{ "connbytes-mode", 1, 0, '3' },

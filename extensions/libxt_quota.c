@@ -11,7 +11,7 @@
 
 #include <linux/netfilter/xt_quota.h>
 
-static struct option opts[] = {
+static const struct option opts[] = {
         {"quota", 1, 0, '1'},
         {0}
 };

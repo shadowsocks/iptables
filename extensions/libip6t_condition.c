@@ -19,7 +19,7 @@ help(void)
 }
 
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ .name = "condition", .has_arg = 1, .flag = 0, .val = 'X' },
 	{ .name = 0 }
 };

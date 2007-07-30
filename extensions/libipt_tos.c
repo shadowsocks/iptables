@@ -9,7 +9,7 @@
 #include <linux/netfilter_ipv4/ipt_tos.h>
 
 /* TOS names and values. */
-static
+static const
 struct TOS_value
 {
 	unsigned char TOS;
@@ -42,7 +42,7 @@ IPTABLES_VERSION);
 	fputc('\n', stdout);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "tos", 1, 0, '1' },
 	{0}
 };

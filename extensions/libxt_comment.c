@@ -24,7 +24,7 @@ help(void)
 		);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "comment", 1, 0, '1' },
 	{0}
 };

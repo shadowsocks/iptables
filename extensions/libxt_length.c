@@ -20,7 +20,7 @@ IPTABLES_VERSION);
 
 }
   
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "length", 1, 0, '1' },
 	{0}
 };

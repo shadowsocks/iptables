@@ -109,7 +109,7 @@ help(void)
 	print_icmptypes();
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "icmp-type", 1, 0, '1' },
 	{0}
 };

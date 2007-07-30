@@ -14,7 +14,7 @@ enum {
 	NFLOG_THRESHOLD	= 0x8,
 };
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "nflog-group",     1, 0, NFLOG_GROUP },
 	{ "nflog-prefix",    1, 0, NFLOG_PREFIX },
 	{ "nflog-range",     1, 0, NFLOG_RANGE },

@@ -44,7 +44,7 @@ static void help(void)
 	       IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{"ulog-nlgroup", 1, 0, '!'},
 	{"ulog-prefix", 1, 0, '#'},
 	{"ulog-cprange", 1, 0, 'A'},

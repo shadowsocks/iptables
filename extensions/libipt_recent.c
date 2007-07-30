@@ -22,7 +22,7 @@
 #endif /* IPT_RECENT_NAME_LEN */
 
 /* Options for this module */
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ .name = "set",      .has_arg = 0, .flag = 0, .val = 201 }, 
 	{ .name = "rcheck",   .has_arg = 0, .flag = 0, .val = 202 }, 
 	{ .name = "update",   .has_arg = 0, .flag = 0, .val = 203 },

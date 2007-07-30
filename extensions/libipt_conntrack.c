@@ -43,7 +43,7 @@ help(void)
 
 
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "ctstate", 1, 0, '1' },
 	{ "ctproto", 1, 0, '2' },
 	{ "ctorigsrc", 1, 0, '3' },

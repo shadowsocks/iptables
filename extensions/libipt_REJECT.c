@@ -80,7 +80,7 @@ help(void)
 	printf("(*) See man page or read the INCOMPATIBILITES file for compatibility issues.\n");
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "reject-with", 1, 0, '1' },
 	{ 0 }
 };

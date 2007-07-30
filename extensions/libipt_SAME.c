@@ -29,7 +29,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "to", 1, 0, '1' },
 	{ "nodst", 0, 0, '2'},
 	{ "random", 0, 0, '3' },

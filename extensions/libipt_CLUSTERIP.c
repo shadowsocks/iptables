@@ -44,7 +44,7 @@ IPTABLES_VERSION);
 #define PARAM_LOCALNODE	0x0010
 #define PARAM_HASHINIT	0x0020
 
-static struct option opts[] = {
+static const struct option opts[] = {
 	{ "new", 0, 0, '1' },
 	{ "hashmode", 1, 0, '2' },
 	{ "clustermac", 1, 0, '3' },
