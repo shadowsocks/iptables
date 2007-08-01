@@ -268,7 +268,7 @@ static void free_opts(int reset_offset)
 }
 
 void
-exit_error(enum exittype status, char *msg, ...)
+exit_error(enum exittype status, const char *msg, ...)
 {
 	va_list args;
 
