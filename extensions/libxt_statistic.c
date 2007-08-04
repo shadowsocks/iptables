@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <getopt.h>
 
-#include <iptables.h>
+#include <xtables.h>
 #include <linux/netfilter/xt_statistic.h>
 
 static void
@@ -165,10 +165,25 @@ save(const void *ip, const struct xt_entry_match *match)
 	print_match(info, "--");
 }
 
-static struct iptables_match statistic = { 
+static struct xtables_match statistic = { 
+	.family		= AF_INET,
 	.name		= "statistic",
 	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct xt_statistic_info)),
+	.size		= XT_ALIGN(sizeof(struct xt_statistic_info)),
+	.userspacesize	= offsetof(struct xt_statistic_info, u.nth.count),
+	.help		= help,
+	.parse		= parse,
+	.final_check	= final_check,
+	.print		= print,
+	.save		= save,
+	.extra_opts	= opts
+};
+
+static struct xtables_match statistic6 = { 
+	.family		= AF_INET6,
+	.name		= "statistic",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_statistic_info)),
 	.userspacesize	= offsetof(struct xt_statistic_info, u.nth.count),
 	.help		= help,
 	.parse		= parse,
@@ -180,5 +195,6 @@ static struct iptables_match statistic = {
 
 void _init(void)
 {
-	register_match(&statistic);
+	xtables_register_match(&statistic);
+	xtables_register_match(&statistic6);
 }
