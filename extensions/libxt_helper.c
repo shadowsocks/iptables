@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include <iptables.h>
-#include <linux/netfilter_ipv4/ipt_helper.h>
+#include <xtables.h>
+#include <linux/netfilter/xt_helper.h>
 
 /* Function which prints out usage message. */
 static void
@@ -32,7 +32,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ipt_helper_info *info = (struct ipt_helper_info *)(*match)->data;
+	struct xt_helper_info *info = (struct xt_helper_info *)(*match)->data;
 
 	switch (c) {
 	case '1':
@@ -68,7 +68,7 @@ print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
-	struct ipt_helper_info *info = (struct ipt_helper_info *)match->data;
+	struct xt_helper_info *info = (struct xt_helper_info *)match->data;
 
 	printf("helper match %s\"%s\" ", info->invert ? "! " : "", info->name);
 }
@@ -77,24 +77,39 @@ print(const void *ip,
 static void
 save(const void *ip, const struct xt_entry_match *match)
 {
-	struct ipt_helper_info *info = (struct ipt_helper_info *)match->data;
+	struct xt_helper_info *info = (struct xt_helper_info *)match->data;
 
 	printf("%s--helper \"%s\" ",info->invert ? "! " : "", info->name);
 }
 
-static struct iptables_match helper = { 
+static struct xtables_match helper = { 
+	.family		= AF_INET,
 	.name		= "helper",
 	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_helper_info)),
+	.size		= XT_ALIGN(sizeof(struct xt_helper_info)),
 	.help		= &help,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
-	.extra_opts	= opts
+	.extra_opts	= opts,
+};
+
+static struct xtables_match helper6 = { 
+	.family		= AF_INET6,
+	.name		= "helper",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_helper_info)),
+	.help		= &help,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts,
 };
 
 void _init(void)
 {
-	register_match(&helper);
+	xtables_register_match(&helper);
+	xtables_register_match(&helper6);
 }
