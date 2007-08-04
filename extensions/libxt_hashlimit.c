@@ -15,9 +15,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <ip6tables.h>
+#include <xtables.h>
 #include <stddef.h>
-#include <linux/netfilter_ipv6/ip6_tables.h>
+#include <linux/netfilter/x_tables.h>
 #include <linux/netfilter/xt_hashlimit.h>
 
 #define XT_HASHLIMIT_BURST	5
@@ -96,7 +96,7 @@ int parse_rate(const char *rate, u_int32_t *val)
 
 /* Initialize the match. */
 static void
-init(struct ip6t_entry_match *m, unsigned int *nfcache)
+init(struct xt_entry_match *m, unsigned int *nfcache)
 {
 	struct xt_hashlimit_info *r = (struct xt_hashlimit_info *)m->data;
 
@@ -153,7 +153,7 @@ static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
       unsigned int *nfcache,
-      struct ip6t_entry_match **match)
+      struct xt_entry_match **match)
 {
 	struct xt_hashlimit_info *r = 
 			(struct xt_hashlimit_info *)(*match)->data;
@@ -305,7 +305,7 @@ static void print_mode(const struct xt_hashlimit_info *r, char separator)
 /* Prints out the matchinfo. */
 static void
 print(const void *ip,
-      const struct ip6t_entry_match *match,
+      const struct xt_entry_match *match,
       int numeric)
 {
 	struct xt_hashlimit_info *r = 
@@ -325,7 +325,7 @@ print(const void *ip,
 }
 
 /* FIXME: Make minimalist: only print rate if not default --RR */
-static void save(const void *ip, const struct ip6t_entry_match *match)
+static void save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_hashlimit_info *r = 
 		(struct xt_hashlimit_info *)match->data;
@@ -349,10 +349,11 @@ static void save(const void *ip, const struct ip6t_entry_match *match)
 		printf("--hashlimit-htable-expire %u ", r->cfg.expire);
 }
 
-static struct ip6tables_match hashlimit = { NULL,
+static struct xtables_match hashlimit = {
+	.family		= AF_INET,
 	.name		= "hashlimit",
 	.version	= IPTABLES_VERSION,
-	.size		= IP6T_ALIGN(sizeof(struct xt_hashlimit_info)),
+	.size		= XT_ALIGN(sizeof(struct xt_hashlimit_info)),
 	.userspacesize	= offsetof(struct xt_hashlimit_info, hinfo),
 	.help		= &help,
 	.init		= &init,
@@ -360,10 +361,26 @@ static struct ip6tables_match hashlimit = { NULL,
 	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
-	.extra_opts	= opts
+	.extra_opts	= opts,
+};
+
+static struct xtables_match hashlimit6 = {
+	.family		= AF_INET6,
+	.name		= "hashlimit",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_hashlimit_info)),
+	.userspacesize	= offsetof(struct xt_hashlimit_info, hinfo),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts,
 };
 
 void _init(void)
 {
-	register_match6(&hashlimit);
+	xtables_register_match(&hashlimit);
+	xtables_register_match(&hashlimit6);
 }

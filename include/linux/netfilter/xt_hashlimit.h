@@ -1,18 +1,18 @@
-#ifndef _IPT_HASHLIMIT_H
-#define _IPT_HASHLIMIT_H
+#ifndef _XT_HASHLIMIT_H
+#define _XT_HASHLIMIT_H
 
 /* timings are in milliseconds. */
-#define IPT_HASHLIMIT_SCALE 10000
+#define XT_HASHLIMIT_SCALE 10000
 /* 1/10,000 sec period => max of 10,000/sec.  Min rate is then 429490
    seconds, or one every 59 hours. */
 
 /* details of this structure hidden by the implementation */
-struct ipt_hashlimit_htable;
+struct xt_hashlimit_htable;
 
-#define IPT_HASHLIMIT_HASH_DIP	0x0001
-#define IPT_HASHLIMIT_HASH_DPT	0x0002
-#define IPT_HASHLIMIT_HASH_SIP	0x0004
-#define IPT_HASHLIMIT_HASH_SPT	0x0008
+#define XT_HASHLIMIT_HASH_DIP	0x0001
+#define XT_HASHLIMIT_HASH_DPT	0x0002
+#define XT_HASHLIMIT_HASH_SIP	0x0004
+#define XT_HASHLIMIT_HASH_SPT	0x0008
 
 struct hashlimit_cfg {
 	u_int32_t mode;	  /* bitmask of IPT_HASHLIMIT_HASH_* */
@@ -26,15 +26,15 @@ struct hashlimit_cfg {
 	u_int32_t expire;	/* when do entries expire? */
 };
 
-struct ipt_hashlimit_info {
+struct xt_hashlimit_info {
 	char name [IFNAMSIZ];		/* name */
 	struct hashlimit_cfg cfg;
-	struct ipt_hashlimit_htable *hinfo;
+	struct xt_hashlimit_htable *hinfo;
 
 	/* Used internally by the kernel */
 	union {
 		void *ptr;
-		struct ipt_hashlimit_info *master;
+		struct xt_hashlimit_info *master;
 	} u;
 };
-#endif /*_IPT_HASHLIMIT_H*/
+#endif /*_XT_HASHLIMIT_H*/
