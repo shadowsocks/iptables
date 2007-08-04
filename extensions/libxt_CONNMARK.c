@@ -24,13 +24,13 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include <ip6tables.h>
-#include <linux/netfilter_ipv6/ip6_tables.h>
-#include "../include/linux/netfilter_ipv4/ipt_CONNMARK.h"
+#include <xtables.h>
+#include <linux/netfilter/x_tables.h>
+#include <linux/netfilter/xt_CONNMARK.h>
 
 #if 0
 struct markinfo {
-	struct ipt_entry_target t;
+	struct xt_entry_target t;
 	struct ipt_connmark_target_info mark;
 };
 #endif
@@ -69,15 +69,15 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
       struct xt_entry_target **target)
 {
-	struct ipt_connmark_target_info *markinfo
-		= (struct ipt_connmark_target_info *)(*target)->data;
+	struct xt_connmark_target_info *markinfo
+		= (struct xt_connmark_target_info *)(*target)->data;
 
 	markinfo->mask = 0xffffffffUL;
 
 	switch (c) {
 		char *end;
 	case '1':
-		markinfo->mode = IPT_CONNMARK_SET;
+		markinfo->mode = XT_CONNMARK_SET;
 
 		markinfo->mark = strtoul(optarg, &end, 0);
 		if (*end == '/' && end[1] != '\0')
@@ -91,14 +91,14 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags = 1;
 		break;
 	case '2':
-		markinfo->mode = IPT_CONNMARK_SAVE;
+		markinfo->mode = XT_CONNMARK_SAVE;
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
 			           "CONNMARK target: Can't specify --save-mark twice");
 		*flags = 1;
 		break;
 	case '3':
-		markinfo->mode = IPT_CONNMARK_RESTORE;
+		markinfo->mode = XT_CONNMARK_RESTORE;
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
 			           "CONNMARK target: Can't specify --restore-mark twice");
@@ -148,21 +148,21 @@ print(const void *ip,
       const struct xt_entry_target *target,
       int numeric)
 {
-	const struct ipt_connmark_target_info *markinfo =
-		(const struct ipt_connmark_target_info *)target->data;
+	const struct xt_connmark_target_info *markinfo =
+		(const struct xt_connmark_target_info *)target->data;
 	switch (markinfo->mode) {
-	case IPT_CONNMARK_SET:
+	case XT_CONNMARK_SET:
 	    printf("CONNMARK set ");
 	    print_mark(markinfo->mark);
 	    print_mask("/", markinfo->mask);
 	    printf(" ");
 	    break;
-	case IPT_CONNMARK_SAVE:
+	case XT_CONNMARK_SAVE:
 	    printf("CONNMARK save ");
 	    print_mask("mask ", markinfo->mask);
 	    printf(" ");
 	    break;
-	case IPT_CONNMARK_RESTORE:
+	case XT_CONNMARK_RESTORE:
 	    printf("CONNMARK restore ");
 	    print_mask("mask ", markinfo->mask);
 	    break;
@@ -176,21 +176,21 @@ print(const void *ip,
 static void
 save(const void *ip, const struct xt_entry_target *target)
 {
-	const struct ipt_connmark_target_info *markinfo =
-		(const struct ipt_connmark_target_info *)target->data;
+	const struct xt_connmark_target_info *markinfo =
+		(const struct xt_connmark_target_info *)target->data;
 
 	switch (markinfo->mode) {
-	case IPT_CONNMARK_SET:
+	case XT_CONNMARK_SET:
 	    printf("--set-mark ");
 	    print_mark(markinfo->mark);
 	    print_mask("/", markinfo->mask);
 	    printf(" ");
 	    break;
-	case IPT_CONNMARK_SAVE:
+	case XT_CONNMARK_SAVE:
 	    printf("--save-mark ");
 	    print_mask("--mask ", markinfo->mask);
 	    break;
-	case IPT_CONNMARK_RESTORE:
+	case XT_CONNMARK_RESTORE:
 	    printf("--restore-mark ");
 	    print_mask("--mask ", markinfo->mask);
 	    break;
@@ -200,21 +200,38 @@ save(const void *ip, const struct xt_entry_target *target)
 	}
 }
 
-static struct ip6tables_target connmark_target = {
-    .name          = "CONNMARK",
-    .version       = IPTABLES_VERSION,
-    .size          = IP6T_ALIGN(sizeof(struct ipt_connmark_target_info)),
-    .userspacesize = IP6T_ALIGN(sizeof(struct ipt_connmark_target_info)),
-    .help          = &help,
-    .init          = &init,
-    .parse         = &parse,
-    .final_check   = &final_check,
-    .print         = &print,
-    .save          = &save,
-    .extra_opts    = opts
+static struct xtables_target connmark_target = {
+	.family		= AF_INET,
+	.name		= "CONNMARK",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts,
+};
+
+static struct xtables_target connmark_target6 = {
+	.family		= AF_INET6,
+	.name		= "CONNMARK",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts,
 };
 
 void _init(void)
 {
-	register_target6(&connmark_target);
+	xtables_register_target(&connmark_target);
+	xtables_register_target(&connmark_target6);
 }

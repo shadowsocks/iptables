@@ -5,9 +5,9 @@
 # header files are present in the include/linux directory of this iptables
 # package (HW)
 #
-PF_EXT_SLIB:=ah addrtype connmark conntrack ecn hashlimit helper icmp iprange owner policy realm state tos ttl unclean CLASSIFY CONNMARK DNAT DSCP ECN LOG MARK MASQUERADE MIRROR NETMAP REDIRECT REJECT SAME SNAT TOS TTL TRACE ULOG
-PF6_EXT_SLIB:=connmark eui64 hl icmp6 owner policy state CONNMARK HL LOG MARK TRACE
-PFX_EXT_SLIB:=comment connlimit dscp esp length limit mac mark multiport physdev pkttype sctp standard tcp tcpmss udp NFQUEUE NOTRACK TCPMSS
+PF_EXT_SLIB:=ah addrtype connmark conntrack ecn hashlimit helper icmp iprange owner policy realm state tos ttl unclean CLASSIFY DNAT DSCP ECN LOG MARK MASQUERADE MIRROR NETMAP REDIRECT REJECT SAME SNAT TOS TTL TRACE ULOG
+PF6_EXT_SLIB:=connmark eui64 hl icmp6 owner policy state HL LOG MARK TRACE
+PFX_EXT_SLIB:=comment connlimit dscp esp length limit mac mark multiport physdev pkttype sctp standard tcp tcpmss udp CONNMARK NFQUEUE NOTRACK TCPMSS
 
 ifeq ($(DO_SELINUX), 1)
 PF_EXT_SE_SLIB:=CONNSECMARK
