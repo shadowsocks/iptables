@@ -14,9 +14,9 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include <iptables.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
-#include <linux/netfilter_ipv4/ipt_DSCP.h>
+#include <xtables.h>
+#include <linux/netfilter/x_tables.h>
+#include <linux/netfilter/xt_DSCP.h>
 
 /* This is evil, but it's my code - HW*/
 #include "libipt_dscp_helper.c"
@@ -49,7 +49,7 @@ static const struct option opts[] = {
 };
 
 static void
-parse_dscp(const char *s, struct ipt_DSCP_info *dinfo)
+parse_dscp(const char *s, struct xt_DSCP_info *dinfo)
 {
 	unsigned int dscp;
        
@@ -57,7 +57,7 @@ parse_dscp(const char *s, struct ipt_DSCP_info *dinfo)
 		exit_error(PARAMETER_PROBLEM,
 			   "Invalid dscp `%s'\n", s);
 
-	if (dscp > IPT_DSCP_MAX)
+	if (dscp > XT_DSCP_MAX)
 		exit_error(PARAMETER_PROBLEM,
 			   "DSCP `%d` out of range\n", dscp);
 
@@ -67,7 +67,7 @@ parse_dscp(const char *s, struct ipt_DSCP_info *dinfo)
 
 
 static void
-parse_class(const char *s, struct ipt_DSCP_info *dinfo)
+parse_class(const char *s, struct xt_DSCP_info *dinfo)
 {
 	unsigned int dscp = class_to_dscp(s);
 
@@ -81,8 +81,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
       struct xt_entry_target **target)
 {
-	struct ipt_DSCP_info *dinfo
-		= (struct ipt_DSCP_info *)(*target)->data;
+	struct xt_DSCP_info *dinfo
+		= (struct xt_DSCP_info *)(*target)->data;
 
 	switch (c) {
 	case 'F':
@@ -127,8 +127,8 @@ print(const void *ip,
       const struct xt_entry_target *target,
       int numeric)
 {
-	const struct ipt_DSCP_info *dinfo =
-		(const struct ipt_DSCP_info *)target->data;
+	const struct xt_DSCP_info *dinfo =
+		(const struct xt_DSCP_info *)target->data;
 	printf("DSCP set ");
 	print_dscp(dinfo->dscp, numeric);
 }
@@ -137,27 +137,44 @@ print(const void *ip,
 static void
 save(const void *ip, const struct xt_entry_target *target)
 {
-	const struct ipt_DSCP_info *dinfo =
-		(const struct ipt_DSCP_info *)target->data;
+	const struct xt_DSCP_info *dinfo =
+		(const struct xt_DSCP_info *)target->data;
 
 	printf("--set-dscp 0x%02x ", dinfo->dscp);
 }
 
-static struct iptables_target dscp = { 
+static struct xtables_target dscp = { 
+	.family		= AF_INET,
 	.name		= "DSCP",
 	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_DSCP_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_DSCP_info)),
+	.size		= XT_ALIGN(sizeof(struct xt_DSCP_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_DSCP_info)),
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
-	.extra_opts	= opts
+	.extra_opts	= opts,
+};
+
+static struct xtables_target dscp6 = { 
+	.family		= AF_INET6,
+	.name		= "DSCP",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_DSCP_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_DSCP_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts,
 };
 
 void _init(void)
 {
-	register_target(&dscp);
+	xtables_register_target(&dscp);
+	xtables_register_target(&dscp6);
 }
