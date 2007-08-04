@@ -4,9 +4,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <iptables.h>
+#include <xtables.h>
 #include <linux/netfilter/nf_conntrack_common.h>
-#include <linux/netfilter_ipv4/ipt_connbytes.h>
+#include <linux/netfilter/xt_connbytes.h>
 
 /* Function which prints out usage message. */
 static void
@@ -28,7 +28,7 @@ static const struct option opts[] = {
 };
 
 static void
-parse_range(const char *arg, struct ipt_connbytes_info *si)
+parse_range(const char *arg, struct xt_connbytes_info *si)
 {
 	char *colon,*p;
 
@@ -53,7 +53,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ipt_connbytes_info *sinfo = (struct ipt_connbytes_info *)(*match)->data;
+	struct xt_connbytes_info *sinfo = (struct xt_connbytes_info *)(*match)->data;
 	unsigned long i;
 
 	switch (c) {
@@ -71,11 +71,11 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '2':
 		if (!strcmp(optarg, "original"))
-			sinfo->direction = IPT_CONNBYTES_DIR_ORIGINAL;
+			sinfo->direction = XT_CONNBYTES_DIR_ORIGINAL;
 		else if (!strcmp(optarg, "reply"))
-			sinfo->direction = IPT_CONNBYTES_DIR_REPLY;
+			sinfo->direction = XT_CONNBYTES_DIR_REPLY;
 		else if (!strcmp(optarg, "both"))
-			sinfo->direction = IPT_CONNBYTES_DIR_BOTH;
+			sinfo->direction = XT_CONNBYTES_DIR_BOTH;
 		else
 			exit_error(PARAMETER_PROBLEM,
 				   "Unknown --connbytes-dir `%s'", optarg);
@@ -84,11 +84,11 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '3':
 		if (!strcmp(optarg, "packets"))
-			sinfo->what = IPT_CONNBYTES_PKTS;
+			sinfo->what = XT_CONNBYTES_PKTS;
 		else if (!strcmp(optarg, "bytes"))
-			sinfo->what = IPT_CONNBYTES_BYTES;
+			sinfo->what = XT_CONNBYTES_BYTES;
 		else if (!strcmp(optarg, "avgpkt"))
-			sinfo->what = IPT_CONNBYTES_AVGPKT;
+			sinfo->what = XT_CONNBYTES_AVGPKT;
 		else
 			exit_error(PARAMETER_PROBLEM,
 				   "Unknown --connbytes-mode `%s'", optarg);
@@ -108,16 +108,16 @@ static void final_check(unsigned int flags)
 			   "`--connbytes-dir' and `--connbytes-mode'");
 }
 
-static void print_mode(struct ipt_connbytes_info *sinfo)
+static void print_mode(struct xt_connbytes_info *sinfo)
 {
 	switch (sinfo->what) {
-		case IPT_CONNBYTES_PKTS:
+		case XT_CONNBYTES_PKTS:
 			fputs("packets ", stdout);
 			break;
-		case IPT_CONNBYTES_BYTES:
+		case XT_CONNBYTES_BYTES:
 			fputs("bytes ", stdout);
 			break;
-		case IPT_CONNBYTES_AVGPKT:
+		case XT_CONNBYTES_AVGPKT:
 			fputs("avgpkt ", stdout);
 			break;
 		default:
@@ -126,16 +126,16 @@ static void print_mode(struct ipt_connbytes_info *sinfo)
 	}
 }
 
-static void print_direction(struct ipt_connbytes_info *sinfo)
+static void print_direction(struct xt_connbytes_info *sinfo)
 {
 	switch (sinfo->direction) {
-		case IPT_CONNBYTES_DIR_ORIGINAL:
+		case XT_CONNBYTES_DIR_ORIGINAL:
 			fputs("original ", stdout);
 			break;
-		case IPT_CONNBYTES_DIR_REPLY:
+		case XT_CONNBYTES_DIR_REPLY:
 			fputs("reply ", stdout);
 			break;
-		case IPT_CONNBYTES_DIR_BOTH:
+		case XT_CONNBYTES_DIR_BOTH:
 			fputs("both ", stdout);
 			break;
 		default:
@@ -150,7 +150,7 @@ print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
-	struct ipt_connbytes_info *sinfo = (struct ipt_connbytes_info *)match->data;
+	struct xt_connbytes_info *sinfo = (struct xt_connbytes_info *)match->data;
 
 	if (sinfo->count.from > sinfo->count.to) 
 		printf("connbytes ! %llu:%llu ", sinfo->count.to,
@@ -169,7 +169,7 @@ print(const void *ip,
 /* Saves the matchinfo in parsable form to stdout. */
 static void save(const void *ip, const struct xt_entry_match *match)
 {
-	struct ipt_connbytes_info *sinfo = (struct ipt_connbytes_info *)match->data;
+	struct xt_connbytes_info *sinfo = (struct xt_connbytes_info *)match->data;
 
 	if (sinfo->count.from > sinfo->count.to) 
 		printf("! --connbytes %llu:%llu ", sinfo->count.to,
@@ -185,11 +185,26 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	print_direction(sinfo);
 }
 
-static struct iptables_match state = {
+static struct xtables_match state = {
+	.family		= AF_INET,
 	.name 		= "connbytes",
 	.version 	= IPTABLES_VERSION,
-	.size 		= IPT_ALIGN(sizeof(struct ipt_connbytes_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_connbytes_info)),
+	.size 		= XT_ALIGN(sizeof(struct xt_connbytes_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_connbytes_info)),
+	.help		= &help,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save 		= &save,
+	.extra_opts	= opts
+};
+
+static struct xtables_match state6 = {
+	.family		= AF_INET6,
+	.name 		= "connbytes",
+	.version 	= IPTABLES_VERSION,
+	.size 		= XT_ALIGN(sizeof(struct xt_connbytes_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_connbytes_info)),
 	.help		= &help,
 	.parse		= &parse,
 	.final_check	= &final_check,
@@ -200,5 +215,6 @@ static struct iptables_match state = {
 
 void _init(void)
 {
-	register_match(&state);
+	xtables_register_match(&state);
+	xtables_register_match(&state6);
 }
