@@ -1,5 +1,5 @@
-#ifndef _IPT_CONNMARK_H
-#define _IPT_CONNMARK_H
+#ifndef _XT_CONNMARK_H
+#define _XT_CONNMARK_H
 
 /* Copyright (C) 2002,2004 MARA Systems AB <http://www.marasystems.com>
  * by Henrik Nordstrom <hno@marasystems.com>
@@ -10,9 +10,9 @@
  * (at your option) any later version.
  */
 
-struct ipt_connmark_info {
+struct xt_connmark_info {
 	unsigned long mark, mask;
 	u_int8_t invert;
 };
 
-#endif /*_IPT_CONNMARK_H*/
+#endif /*_XT_CONNMARK_H*/
