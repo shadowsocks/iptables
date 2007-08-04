@@ -4,12 +4,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <iptables.h>
+#include <xtables.h>
 #include <linux/netfilter/nf_conntrack_common.h>
-#include <linux/netfilter_ipv4/ipt_state.h>
+#include <linux/netfilter/xt_state.h>
 
-#ifndef IPT_STATE_UNTRACKED
-#define IPT_STATE_UNTRACKED (1 << (IP_CT_NUMBER + 1))
+#ifndef XT_STATE_UNTRACKED
+#define XT_STATE_UNTRACKED (1 << (IP_CT_NUMBER + 1))
 #endif
 
 /* Function which prints out usage message. */
@@ -29,25 +29,25 @@ static const struct option opts[] = {
 };
 
 static int
-parse_state(const char *state, size_t strlen, struct ipt_state_info *sinfo)
+parse_state(const char *state, size_t strlen, struct xt_state_info *sinfo)
 {
 	if (strncasecmp(state, "INVALID", strlen) == 0)
-		sinfo->statemask |= IPT_STATE_INVALID;
+		sinfo->statemask |= XT_STATE_INVALID;
 	else if (strncasecmp(state, "NEW", strlen) == 0)
-		sinfo->statemask |= IPT_STATE_BIT(IP_CT_NEW);
+		sinfo->statemask |= XT_STATE_BIT(IP_CT_NEW);
 	else if (strncasecmp(state, "ESTABLISHED", strlen) == 0)
-		sinfo->statemask |= IPT_STATE_BIT(IP_CT_ESTABLISHED);
+		sinfo->statemask |= XT_STATE_BIT(IP_CT_ESTABLISHED);
 	else if (strncasecmp(state, "RELATED", strlen) == 0)
-		sinfo->statemask |= IPT_STATE_BIT(IP_CT_RELATED);
+		sinfo->statemask |= XT_STATE_BIT(IP_CT_RELATED);
 	else if (strncasecmp(state, "UNTRACKED", strlen) == 0)
-		sinfo->statemask |= IPT_STATE_UNTRACKED;
+		sinfo->statemask |= XT_STATE_UNTRACKED;
 	else
 		return 0;
 	return 1;
 }
 
 static void
-parse_states(const char *arg, struct ipt_state_info *sinfo)
+parse_states(const char *arg, struct xt_state_info *sinfo)
 {
 	const char *comma;
 
@@ -69,7 +69,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       unsigned int *nfcache,
       struct xt_entry_match **match)
 {
-	struct ipt_state_info *sinfo = (struct ipt_state_info *)(*match)->data;
+	struct xt_state_info *sinfo = (struct xt_state_info *)(*match)->data;
 
 	switch (c) {
 	case '1':
@@ -99,23 +99,23 @@ static void print_state(unsigned int statemask)
 {
 	const char *sep = "";
 
-	if (statemask & IPT_STATE_INVALID) {
+	if (statemask & XT_STATE_INVALID) {
 		printf("%sINVALID", sep);
 		sep = ",";
 	}
-	if (statemask & IPT_STATE_BIT(IP_CT_NEW)) {
+	if (statemask & XT_STATE_BIT(IP_CT_NEW)) {
 		printf("%sNEW", sep);
 		sep = ",";
 	}
-	if (statemask & IPT_STATE_BIT(IP_CT_RELATED)) {
+	if (statemask & XT_STATE_BIT(IP_CT_RELATED)) {
 		printf("%sRELATED", sep);
 		sep = ",";
 	}
-	if (statemask & IPT_STATE_BIT(IP_CT_ESTABLISHED)) {
+	if (statemask & XT_STATE_BIT(IP_CT_ESTABLISHED)) {
 		printf("%sESTABLISHED", sep);
 		sep = ",";
 	}
-	if (statemask & IPT_STATE_UNTRACKED) {
+	if (statemask & XT_STATE_UNTRACKED) {
 		printf("%sUNTRACKED", sep);
 		sep = ",";
 	}
@@ -128,7 +128,7 @@ print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
-	struct ipt_state_info *sinfo = (struct ipt_state_info *)match->data;
+	struct xt_state_info *sinfo = (struct xt_state_info *)match->data;
 
 	printf("state ");
 	print_state(sinfo->statemask);
@@ -137,26 +137,42 @@ print(const void *ip,
 /* Saves the matchinfo in parsable form to stdout. */
 static void save(const void *ip, const struct xt_entry_match *match)
 {
-	struct ipt_state_info *sinfo = (struct ipt_state_info *)match->data;
+	struct xt_state_info *sinfo = (struct xt_state_info *)match->data;
 
 	printf("--state ");
 	print_state(sinfo->statemask);
 }
 
-static struct iptables_match state = { 
+static struct xtables_match state = { 
+	.family		= AF_INET,
 	.name		= "state",
 	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_state_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_state_info)),
+	.size		= XT_ALIGN(sizeof(struct xt_state_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_state_info)),
 	.help		= &help,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
-	.extra_opts	= opts
+	.extra_opts	= opts,
+};
+
+static struct xtables_match state6 = { 
+	.family		= AF_INET6,
+	.name		= "state",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_state_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_state_info)),
+	.help		= &help,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts,
 };
 
 void _init(void)
 {
-	register_match(&state);
+	xtables_register_match(&state);
+	xtables_register_match(&state6);
 }
