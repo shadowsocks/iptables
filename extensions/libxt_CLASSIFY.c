@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include <iptables.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
-#include <linux/netfilter_ipv4/ipt_CLASSIFY.h>
+#include <xtables.h>
+#include <linux/netfilter/x_tables.h>
+#include <linux/netfilter/xt_CLASSIFY.h>
 #include <linux/types.h>
 #include <linux/pkt_sched.h>
 
@@ -50,8 +50,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
       struct xt_entry_target **target)
 {
-	struct ipt_classify_target_info *clinfo
-		= (struct ipt_classify_target_info *)(*target)->data;
+	struct xt_classify_target_info *clinfo
+		= (struct xt_classify_target_info *)(*target)->data;
 
 	switch (c) {
 	case '1':
@@ -91,8 +91,8 @@ print(const void *ip,
       const struct xt_entry_target *target,
       int numeric)
 {
-	const struct ipt_classify_target_info *clinfo =
-		(const struct ipt_classify_target_info *)target->data;
+	const struct xt_classify_target_info *clinfo =
+		(const struct xt_classify_target_info *)target->data;
 	printf("CLASSIFY set ");
 	print_class(clinfo->priority, numeric);
 }
@@ -101,28 +101,45 @@ print(const void *ip,
 static void
 save(const void *ip, const struct xt_entry_target *target)
 {
-	const struct ipt_classify_target_info *clinfo =
-		(const struct ipt_classify_target_info *)target->data;
+	const struct xt_classify_target_info *clinfo =
+		(const struct xt_classify_target_info *)target->data;
 
 	printf("--set-class %.4x:%.4x ",
 	       TC_H_MAJ(clinfo->priority)>>16, TC_H_MIN(clinfo->priority));
 }
 
-static struct iptables_target classify = { 
+static struct xtables_target classify = { 
+	.family		= AF_INET,
 	.name		= "CLASSIFY",
 	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_classify_target_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_classify_target_info)),
+	.size		= XT_ALIGN(sizeof(struct xt_classify_target_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_classify_target_info)),
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
-	.extra_opts	= opts
+	.extra_opts	= opts,
+};
+
+static struct xtables_target classify6 = { 
+	.family		= AF_INET6,
+	.name		= "CLASSIFY",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_classify_target_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_classify_target_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts,
 };
 
 void _init(void)
 {
-	register_target(&classify);
+	xtables_register_target(&classify);
+	xtables_register_target(&classify6);
 }
