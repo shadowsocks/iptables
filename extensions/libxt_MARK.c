@@ -4,10 +4,9 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include <iptables.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
-/* For 64bit kernel / 32bit userspace */
-#include "../include/linux/netfilter_ipv4/ipt_MARK.h"
+#include <xtables.h>
+#include <linux/netfilter/x_tables.h>
+#include <linux/netfilter/xt_MARK.h>
 
 /* Function which prints out usage message. */
 static void
@@ -42,8 +41,8 @@ parse_v0(int c, char **argv, int invert, unsigned int *flags,
 	 const void *entry,
 	 struct xt_entry_target **target)
 {
-	struct ipt_mark_target_info *markinfo
-		= (struct ipt_mark_target_info *)(*target)->data;
+	struct xt_mark_target_info *markinfo
+		= (struct xt_mark_target_info *)(*target)->data;
 
 	switch (c) {
 	case '1':
@@ -84,18 +83,18 @@ parse_v1(int c, char **argv, int invert, unsigned int *flags,
 	 const void *entry,
 	 struct xt_entry_target **target)
 {
-	struct ipt_mark_target_info_v1 *markinfo
-		= (struct ipt_mark_target_info_v1 *)(*target)->data;
+	struct xt_mark_target_info_v1 *markinfo
+		= (struct xt_mark_target_info_v1 *)(*target)->data;
 
 	switch (c) {
 	case '1':
-	        markinfo->mode = IPT_MARK_SET;
+	        markinfo->mode = XT_MARK_SET;
 		break;
 	case '2':
-	        markinfo->mode = IPT_MARK_AND;
+	        markinfo->mode = XT_MARK_AND;
 		break;
 	case '3':
-	        markinfo->mode = IPT_MARK_OR;
+	        markinfo->mode = XT_MARK_OR;
 		break;
 	default:
 		return 0;
@@ -124,8 +123,8 @@ print_v0(const void *ip,
 	 const struct xt_entry_target *target,
 	 int numeric)
 {
-	const struct ipt_mark_target_info *markinfo =
-		(const struct ipt_mark_target_info *)target->data;
+	const struct xt_mark_target_info *markinfo =
+		(const struct xt_mark_target_info *)target->data;
 	printf("MARK set ");
 	print_mark(markinfo->mark);
 }
@@ -134,8 +133,8 @@ print_v0(const void *ip,
 static void
 save_v0(const void *ip, const struct xt_entry_target *target)
 {
-	const struct ipt_mark_target_info *markinfo =
-		(const struct ipt_mark_target_info *)target->data;
+	const struct xt_mark_target_info *markinfo =
+		(const struct xt_mark_target_info *)target->data;
 
 	printf("--set-mark ");
 	print_mark(markinfo->mark);
@@ -147,17 +146,17 @@ print_v1(const void *ip,
 	 const struct xt_entry_target *target,
 	 int numeric)
 {
-	const struct ipt_mark_target_info_v1 *markinfo =
-		(const struct ipt_mark_target_info_v1 *)target->data;
+	const struct xt_mark_target_info_v1 *markinfo =
+		(const struct xt_mark_target_info_v1 *)target->data;
 
 	switch (markinfo->mode) {
-	case IPT_MARK_SET:
+	case XT_MARK_SET:
 		printf("MARK set ");
 		break;
-	case IPT_MARK_AND:
+	case XT_MARK_AND:
 		printf("MARK and ");
 		break;
-	case IPT_MARK_OR: 
+	case XT_MARK_OR: 
 		printf("MARK or ");
 		break;
 	}
@@ -168,57 +167,74 @@ print_v1(const void *ip,
 static void
 save_v1(const void *ip, const struct xt_entry_target *target)
 {
-	const struct ipt_mark_target_info_v1 *markinfo =
-		(const struct ipt_mark_target_info_v1 *)target->data;
+	const struct xt_mark_target_info_v1 *markinfo =
+		(const struct xt_mark_target_info_v1 *)target->data;
 
 	switch (markinfo->mode) {
-	case IPT_MARK_SET:
+	case XT_MARK_SET:
 		printf("--set-mark ");
 		break;
-	case IPT_MARK_AND:
+	case XT_MARK_AND:
 		printf("--and-mark ");
 		break;
-	case IPT_MARK_OR: 
+	case XT_MARK_OR: 
 		printf("--or-mark ");
 		break;
 	}
 	print_mark(markinfo->mark);
 }
 
-static
-struct iptables_target mark_v0 = {
+static struct xtables_target mark_v0 = {
+	.family		= AF_INET,
 	.name		= "MARK",
 	.version	= IPTABLES_VERSION,
 	.revision	= 0,
-	.size		= IPT_ALIGN(sizeof(struct ipt_mark_target_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_mark_target_info)),
+	.size		= XT_ALIGN(sizeof(struct xt_mark_target_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_target_info)),
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse_v0,
 	.final_check	= &final_check,
 	.print		= &print_v0,
 	.save		= &save_v0,
-	.extra_opts	= opts
+	.extra_opts	= opts,
 };
 
-static
-struct iptables_target mark_v1 = {
+static struct xtables_target mark_v1 = {
+	.family		= AF_INET,
 	.name		= "MARK",
 	.version	= IPTABLES_VERSION,
 	.revision	= 1,
-	.size		= IPT_ALIGN(sizeof(struct ipt_mark_target_info_v1)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_mark_target_info_v1)),
+	.size		= XT_ALIGN(sizeof(struct xt_mark_target_info_v1)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_target_info_v1)),
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse_v1,
 	.final_check	= &final_check,
 	.print		= &print_v1,
 	.save		= &save_v1,
-	.extra_opts	= opts
+	.extra_opts	= opts,
+};
+
+static struct xtables_target mark6_v0 = {
+	.family		= AF_INET6,
+	.name		= "MARK",
+	.version	= IPTABLES_VERSION,
+	.revision	= 0,
+	.size		= XT_ALIGN(sizeof(struct xt_mark_target_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_target_info)),
+	.help		= &help,
+	.init		= &init,
+	.parse		= &parse_v0,
+	.final_check	= &final_check,
+	.print		= &print_v0,
+	.save		= &save_v0,
+	.extra_opts	= opts,
 };
 
 void _init(void)
 {
-	register_target(&mark_v0);
-	register_target(&mark_v1);
+	xtables_register_target(&mark_v0);
+	xtables_register_target(&mark_v1);
+	xtables_register_target(&mark6_v0);
 }
