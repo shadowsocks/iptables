@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <iptables.h>
+#include <xtables.h>
 #include <linux/netfilter/xt_CONNSECMARK.h>
 
 #define PFX "CONNSECMARK target: "
@@ -105,21 +105,38 @@ static void save(const void *ip, const struct xt_entry_target *target)
 	print_connsecmark(info);
 }
 
-static struct iptables_target connsecmark = {
+static struct xtables_target connsecmark = {
+	.family		= AF_INET,
 	.name		= "CONNSECMARK",
 	.version	= IPTABLES_VERSION,
 	.revision	= 0,
-	.size		= IPT_ALIGN(sizeof(struct xt_connsecmark_target_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct xt_connsecmark_target_info)),
+	.size		= XT_ALIGN(sizeof(struct xt_connsecmark_target_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_connsecmark_target_info)),
 	.parse		= &parse,
 	.help		= &help,
 	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
-	.extra_opts	= opts
+	.extra_opts	= opts,
+};
+
+static struct xtables_target connsecmark6 = {
+	.family		= AF_INET6,
+	.name		= "CONNSECMARK",
+	.version	= IPTABLES_VERSION,
+	.revision	= 0,
+	.size		= XT_ALIGN(sizeof(struct xt_connsecmark_target_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_connsecmark_target_info)),
+	.parse		= &parse,
+	.help		= &help,
+	.final_check	= &final_check,
+	.print		= &print,
+	.save		= &save,
+	.extra_opts	= opts,
 };
 
 void _init(void)
 {
-	register_target(&connsecmark);
+	xtables_register_target(&connsecmark);
+	xtables_register_target(&connsecmark6);
 }

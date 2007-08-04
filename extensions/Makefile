@@ -10,9 +10,9 @@ PF6_EXT_SLIB:=connmark eui64 hl icmp6 owner policy state HL LOG MARK TRACE
 PFX_EXT_SLIB:=comment connlimit dscp esp length limit mac mark multiport physdev pkttype sctp standard tcp tcpmss udp CONNMARK NFQUEUE NOTRACK TCPMSS
 
 ifeq ($(DO_SELINUX), 1)
-PF_EXT_SE_SLIB:=CONNSECMARK
-PF6_EXT_SE_SLIB:=CONNSECMARK
-PFX_EXT_SE_SLIB:=SECMARK 
+PF_EXT_SE_SLIB:=
+PF6_EXT_SE_SLIB:=
+PFX_EXT_SE_SLIB:=CONNSECMARK SECMARK
 endif
 
 # Optionals
