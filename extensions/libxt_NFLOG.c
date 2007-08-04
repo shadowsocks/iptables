@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <getopt.h>
-#include <ip6tables.h>
+#include <xtables.h>
 
-#include <linux/netfilter_ipv6/ip6_tables.h>
+#include <linux/netfilter/x_tables.h>
 #include <linux/netfilter/xt_NFLOG.h>
 
 enum {
@@ -32,7 +32,7 @@ static void help(void)
 	       IPTABLES_VERSION);
 }
 
-static void init(struct ip6t_entry_target *t, unsigned int *nfcache)
+static void init(struct xt_entry_target *t, unsigned int *nfcache)
 {
 	struct xt_nflog_info *info = (struct xt_nflog_info *)t->data;
 
@@ -142,7 +142,23 @@ static void save(const void *ip, const struct xt_entry_target *target)
 	nflog_print(info, "--");
 }
 
-static struct ip6tables_target nflog = {
+static struct xtables_target nflog = {
+	.family		= AF_INET,
+	.name		= "NFLOG",
+	.version	= IPTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_nflog_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_nflog_info)),
+	.help		= help,
+	.init		= init,
+	.parse		= parse,
+	.final_check	= final_check,
+	.print		= print,
+	.save		= save,
+	.extra_opts	= opts,
+};
+
+static struct xtables_target nflog6 = {
+	.family		= AF_INET6,
 	.name		= "NFLOG",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_nflog_info)),
@@ -158,5 +174,6 @@ static struct ip6tables_target nflog = {
 
 void _init(void)
 {
-	register_target6(&nflog);
+	xtables_register_target(&nflog);
+	xtables_register_target(&nflog6);
 }
