@@ -292,18 +292,21 @@ struct xtables_match *find_match(const char *name, enum xt_tryload tryload,
 	if (!ptr && tryload != DONT_LOAD && tryload != DURING_LOAD) {
 		char path[strlen(lib_dir) + sizeof("/.so")
 			  + strlen(afinfo.libprefix) + strlen(name)];
-		sprintf(path, "%s/%s%s.so", lib_dir, afinfo.libprefix,
-			name);
-		if (dlopen(path, RTLD_NOW)) {
+
+		sprintf(path, "%s/libxt_%s.so", lib_dir, name);
+		if (dlopen(path, RTLD_NOW) != NULL)
 			/* Found library.  If it didn't register itself,
 			   maybe they specified target as match. */
 			ptr = find_match(name, DONT_LOAD, NULL);
 
-			if (!ptr)
-				exit_error(PARAMETER_PROBLEM,
-					   "Couldn't load match `%s'\n",
-					   name);
-		} else if (tryload == LOAD_MUST_SUCCEED)
+		if (ptr == NULL) {
+			sprintf(path, "%s/%s%s.so", lib_dir, afinfo.libprefix,
+				name);
+			if (dlopen(path, RTLD_NOW) != NULL)
+				ptr = find_match(name, DONT_LOAD, NULL);
+		}
+
+		if (ptr == NULL && tryload == LOAD_MUST_SUCCEED)
 			exit_error(PARAMETER_PROBLEM,
 				   "Couldn't load match `%s':%s\n",
 				   name, dlerror());
@@ -362,16 +365,20 @@ struct xtables_target *find_target(const char *name, enum xt_tryload tryload)
 	if (!ptr && tryload != DONT_LOAD && tryload != DURING_LOAD) {
 		char path[strlen(lib_dir) + sizeof("/.so")
 			  + strlen(afinfo.libprefix) + strlen(name)];
-		sprintf(path, "%s/%s%s.so", lib_dir, afinfo.libprefix, name);
-		if (dlopen(path, RTLD_NOW)) {
+
+		sprintf(path, "%s/libxt_%s.so", lib_dir, name);
+		if (dlopen(path, RTLD_NOW) != NULL)
 			/* Found library.  If it didn't register itself,
 			   maybe they specified match as a target. */
 			ptr = find_target(name, DONT_LOAD);
-			if (!ptr)
-				exit_error(PARAMETER_PROBLEM,
-					   "Couldn't load target `%s'\n",
-					   name);
-		} else if (tryload == LOAD_MUST_SUCCEED)
+
+		if (ptr == NULL) {
+			sprintf(path, "%s/%s%s.so", lib_dir, afinfo.libprefix,
+				name);
+			if (dlopen(path, RTLD_NOW) != NULL)
+				ptr = find_target(name, DONT_LOAD);
+		}
+		if (ptr == NULL && tryload == LOAD_MUST_SUCCEED)
 			exit_error(PARAMETER_PROBLEM,
 				   "Couldn't load target `%s':%s\n",
 				   name, dlerror());
