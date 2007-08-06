@@ -116,7 +116,7 @@
   </xsl:template>
   
   <xsl:template name="counters">
-    <xsl:param name="$node"/>
+    <xsl:param name="node"/>
     <xsl:text>[</xsl:text>
     <xsl:if test="string-length($node/@packet-count)"><xsl:value-of select="$node/@packet-count"/></xsl:if>
     <xsl:if test="string-length($node/@packet-count)=0">0</xsl:if>
