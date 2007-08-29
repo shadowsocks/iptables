@@ -2,7 +2,7 @@ This module matches the 6 bit DSCP field within the TOS field in the
 IP header.  DSCP has superseded TOS within the IETF.
 .TP
 .BI "--dscp " "value"
-Match against a numeric (decimal or hex) value [0-32].
+Match against a numeric (decimal or hex) value [0-63].
 .TP
 .BI "--dscp-class " "\fIDiffServ Class\fP"
 Match the DiffServ class. This value may be any of the
