@@ -16,7 +16,7 @@
 
 #define IPT_TTL_USED	1
 
-static void init(struct xt_entry_target *t, unsigned int *nfcache)
+static void init(struct xt_entry_target *t)
 {
 }
 

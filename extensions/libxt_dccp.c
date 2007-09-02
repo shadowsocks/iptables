@@ -26,8 +26,7 @@
 
 /* Initialize the match. */
 static void
-init(struct xt_entry_match *m,
-     unsigned int *nfcache)
+init(struct xt_entry_match *m)
 {
 	struct xt_dccp_info *einfo = (struct xt_dccp_info *)m->data;
 
@@ -135,7 +134,6 @@ static u_int8_t parse_dccp_option(char *optstring)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct xt_dccp_info *einfo

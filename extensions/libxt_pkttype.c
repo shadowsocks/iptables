@@ -87,7 +87,6 @@ static void parse_pkttype(const char *pkttype, struct xt_pkttype_info *info)
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct xt_pkttype_info *info = (struct xt_pkttype_info *)(*match)->data;

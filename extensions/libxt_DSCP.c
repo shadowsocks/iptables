@@ -22,7 +22,7 @@
 #include "libipt_dscp_helper.c"
 
 
-static void init(struct xt_entry_target *t, unsigned int *nfcache)
+static void init(struct xt_entry_target *t)
 {
 }
 

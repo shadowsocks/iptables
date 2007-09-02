@@ -42,8 +42,7 @@ print_chunk(u_int32_t chunknum, int numeric);
 
 /* Initialize the match. */
 static void
-init(struct xt_entry_match *m,
-     unsigned int *nfcache)
+init(struct xt_entry_match *m)
 {
 	int i;
 	struct xt_sctp_info *einfo = (struct xt_sctp_info *)m->data;
@@ -263,7 +262,6 @@ parse_sctp_chunks(struct xt_sctp_info *einfo,
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct xt_sctp_info *einfo

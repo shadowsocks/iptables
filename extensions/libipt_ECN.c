@@ -17,7 +17,7 @@
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_ECN.h>
 
-static void init(struct xt_entry_target *t, unsigned int *nfcache)
+static void init(struct xt_entry_target *t)
 {
 }
 

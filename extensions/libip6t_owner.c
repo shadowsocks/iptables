@@ -52,7 +52,6 @@ static const struct option opts[] = {
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct ip6t_owner_info *ownerinfo = (struct ip6t_owner_info *)(*match)->data;

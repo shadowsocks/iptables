@@ -14,7 +14,7 @@
 #include <linux/netfilter/x_tables.h>
 #include <linux/netfilter/xt_NFQUEUE.h>
 
-static void init(struct xt_entry_target *t, unsigned int *nfcache)
+static void init(struct xt_entry_target *t)
 {
 }
 

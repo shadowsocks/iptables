@@ -67,7 +67,6 @@ parse_lengths(const char *s, struct xt_length_info *info)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct xt_length_info *info = (struct xt_length_info *)(*match)->data;

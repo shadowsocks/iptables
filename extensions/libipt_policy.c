@@ -93,9 +93,8 @@ static const struct option opts[] =
 	{ }
 };
 
-static void init(struct xt_entry_match *m, unsigned int *nfcache)
+static void init(struct xt_entry_match *m)
 {
-	*nfcache |= NFC_UNKNOWN;
 }
 
 static int parse_direction(char *s)
@@ -127,7 +126,6 @@ static int parse_mode(char *s)
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
                  const void *entry,
-                 unsigned int *nfcache,
                  struct xt_entry_match **match)
 {
 	struct ipt_policy_info *info = (void *)(*match)->data;

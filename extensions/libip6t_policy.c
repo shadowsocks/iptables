@@ -133,9 +133,8 @@ extern void parse_hostnetworkmask(const char *name, struct in6_addr **addrpp,
 
 /* End duplicated code from ip6tables.c */
 
-static void init(struct xt_entry_match *m, unsigned int *nfcache)
+static void init(struct xt_entry_match *m)
 {
-	*nfcache |= NFC_UNKNOWN;
 }
 
 static int parse_direction(char *s)
@@ -167,7 +166,6 @@ static int parse_mode(char *s)
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
                  const void *entry,
-                 unsigned int *nfcache,
                  struct xt_entry_match **match)
 {
 	struct ip6t_policy_info *info = (void *)(*match)->data;

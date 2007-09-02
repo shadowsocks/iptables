@@ -76,7 +76,6 @@ parse_class(const char *s, struct xt_dscp_info *dinfo)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct xt_dscp_info *dinfo

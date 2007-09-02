@@ -57,7 +57,6 @@ parse_mac(const char *mac, struct xt_mac_info *info)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct xt_mac_info *macinfo = (struct xt_mac_info *)(*match)->data;

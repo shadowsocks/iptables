@@ -46,7 +46,6 @@ parse_comment(const char *s, struct xt_comment_info *info)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct xt_comment_info *commentinfo = (struct xt_comment_info *)(*match)->data;

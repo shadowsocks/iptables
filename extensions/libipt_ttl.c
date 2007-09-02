@@ -25,7 +25,7 @@ static void help(void)
 }
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
-		const void *entry, unsigned int *nfcache,
+		const void *entry,
 		struct xt_entry_match **match)
 {
 	struct ipt_ttl_info *info = (struct ipt_ttl_info *) (*match)->data;

@@ -36,7 +36,6 @@ static struct xt_statistic_info *info;
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	double prob;

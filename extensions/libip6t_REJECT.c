@@ -72,7 +72,7 @@ static const struct option opts[] = {
 
 /* Allocate and initialize the target. */
 static void
-init(struct xt_entry_target *t, unsigned int *nfcache)
+init(struct xt_entry_target *t)
 {
 	struct ip6t_reject_info *reject = (struct ip6t_reject_info *)t->data;
 

@@ -60,7 +60,7 @@ parse_quota(const char *s, u_int64_t * quota)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache, struct xt_entry_match **match)
+      struct xt_entry_match **match)
 {
         struct xt_quota_info *info = (struct xt_quota_info *) (*match)->data;
 

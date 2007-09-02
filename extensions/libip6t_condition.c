@@ -26,7 +26,7 @@ static const struct option opts[] = {
 
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry, unsigned int *nfcache,
+      const void *entry,
       struct xt_entry_match **match)
 {
 	struct condition6_info *info =

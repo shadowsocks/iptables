@@ -50,7 +50,6 @@ parse_range(const char *arg, struct xt_connbytes_info *si)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct xt_connbytes_info *sinfo = (struct xt_connbytes_info *)(*match)->data;

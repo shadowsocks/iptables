@@ -77,7 +77,6 @@ parse_tos(const char *s, struct ipt_tos_info *info)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct ipt_tos_info *tosinfo = (struct ipt_tos_info *)(*match)->data;

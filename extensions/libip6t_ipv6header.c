@@ -155,7 +155,7 @@ static const struct option opts[] = {
 };
 
 static void
-init(struct xt_entry_match *m, unsigned int *nfcache)
+init(struct xt_entry_match *m)
 {
 	struct ip6t_ipv6header_info *info = (struct ip6t_ipv6header_info *)m->data;
 
@@ -186,7 +186,6 @@ parse_header(const char *flags) {
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct ip6t_ipv6header_info *info = (struct ip6t_ipv6header_info *)(*match)->data;

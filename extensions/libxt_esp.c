@@ -71,7 +71,7 @@ parse_esp_spis(const char *spistring, u_int32_t *spis)
 
 /* Initialize the match. */
 static void
-init(struct xt_entry_match *m, unsigned int *nfcache)
+init(struct xt_entry_match *m)
 {
 	struct xt_esp *espinfo = (struct xt_esp *)m->data;
 
@@ -85,7 +85,6 @@ init(struct xt_entry_match *m, unsigned int *nfcache)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct xt_esp *espinfo = (struct xt_esp *)(*match)->data;

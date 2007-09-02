@@ -30,7 +30,7 @@ static const struct option opts[] = {
 
 /* Initialize the target. */
 static void
-init(struct xt_entry_target *t, unsigned int *nfcache)
+init(struct xt_entry_target *t)
 {
 	struct ip_nat_multi_range *mr = (struct ip_nat_multi_range *)t->data;
 

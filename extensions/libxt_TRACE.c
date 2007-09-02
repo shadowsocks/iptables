@@ -18,7 +18,7 @@ IPTABLES_VERSION);
 
 /* Initialize the target. */
 static void
-init(struct xt_entry_target *t, unsigned int *nfcache)
+init(struct xt_entry_target *t)
 {
 }
 

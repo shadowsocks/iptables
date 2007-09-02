@@ -96,7 +96,7 @@ int parse_rate(const char *rate, u_int32_t *val)
 
 /* Initialize the match. */
 static void
-init(struct xt_entry_match *m, unsigned int *nfcache)
+init(struct xt_entry_match *m)
 {
 	struct xt_hashlimit_info *r = (struct xt_hashlimit_info *)m->data;
 
@@ -152,7 +152,6 @@ static int parse_mode(struct xt_hashlimit_info *r, char *optarg)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct xt_hashlimit_info *r = 

@@ -38,7 +38,7 @@ static const struct option opts[] = {
 };
 
 /* Initialize the match. */
-static void init(struct xt_entry_match *match, unsigned int *nfcache)
+static void init(struct xt_entry_match *match)
 {
 	struct ipt_set_info_match *info = 
 		(struct ipt_set_info_match *) match->data;
@@ -52,7 +52,7 @@ static void init(struct xt_entry_match *match, unsigned int *nfcache)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache, struct xt_entry_match **match)
+      struct xt_entry_match **match)
 {
 	struct ipt_set_info_match *myinfo = 
 		(struct ipt_set_info_match *) (*match)->data;

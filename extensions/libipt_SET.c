@@ -41,7 +41,7 @@ static const struct option opts[] = {
 };
 
 /* Initialize the target. */
-static void init(struct xt_entry_target *target, unsigned int *nfcache)
+static void init(struct xt_entry_target *target)
 {
 	struct ipt_set_info_target *info =
 	    (struct ipt_set_info_target *) target->data;

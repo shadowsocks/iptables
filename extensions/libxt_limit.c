@@ -74,7 +74,7 @@ int parse_rate(const char *rate, u_int32_t *val)
 
 /* Initialize the match. */
 static void
-init(struct xt_entry_match *m, unsigned int *nfcache)
+init(struct xt_entry_match *m)
 {
 	struct xt_rateinfo *r = (struct xt_rateinfo *)m->data;
 
@@ -94,7 +94,6 @@ init(struct xt_entry_match *m, unsigned int *nfcache)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct xt_rateinfo *r = (struct xt_rateinfo *)(*match)->data;

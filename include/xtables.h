@@ -80,14 +80,13 @@ struct xtables_match
 	void (*help)(void);
 
 	/* Initialize the match. */
-	void (*init)(struct xt_entry_match *m, unsigned int *nfcache);
+	void (*init)(struct xt_entry_match *m);
 
 	/* Function which parses command options; returns true if it
            ate an option */
 	/* entry is struct ipt_entry for example */
 	int (*parse)(int c, char **argv, int invert, unsigned int *flags,
 		     const void *entry,
-		     unsigned int *nfcache,
 		     struct xt_entry_match **match);
 
 	/* Final check; exit if not ok. */
@@ -137,7 +136,7 @@ struct xtables_target
 	void (*help)(void);
 
 	/* Initialize the target. */
-	void (*init)(struct xt_entry_target *t, unsigned int *nfcache);
+	void (*init)(struct xt_entry_target *t);
 
 	/* Function which parses command options; returns true if it
            ate an option */

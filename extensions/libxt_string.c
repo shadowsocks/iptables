@@ -54,7 +54,7 @@ static const struct option opts[] = {
 };
 
 static void
-init(struct xt_entry_match *m, unsigned int *nfcache)
+init(struct xt_entry_match *m)
 {
 	struct xt_string_info *i = (struct xt_string_info *) m->data;
 
@@ -171,7 +171,6 @@ parse_hex_string(const char *s, struct xt_string_info *info)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct xt_string_info *stringinfo = (struct xt_string_info *)(*match)->data;

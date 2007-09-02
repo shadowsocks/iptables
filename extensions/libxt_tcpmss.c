@@ -61,7 +61,6 @@ parse_tcp_mssvalues(const char *mssvaluestring,
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct xt_tcpmss_match_info *mssinfo =

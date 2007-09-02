@@ -77,7 +77,6 @@ parse_range(const char *arg, struct ipt_connrate_info *si)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct ipt_connrate_info *sinfo = (struct ipt_connrate_info *)(*match)->data;

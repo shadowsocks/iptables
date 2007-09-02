@@ -168,7 +168,6 @@ parse_expires(const char *s, struct ipt_conntrack_info *sinfo)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct ipt_conntrack_info *sinfo = (struct ipt_conntrack_info *)(*match)->data;

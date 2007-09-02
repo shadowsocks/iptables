@@ -55,7 +55,7 @@ parse_udp_ports(const char *portstring, u_int16_t *ports)
 
 /* Initialize the match. */
 static void
-init(struct xt_entry_match *m, unsigned int *nfcache)
+init(struct xt_entry_match *m)
 {
 	struct xt_udp *udpinfo = (struct xt_udp *)m->data;
 
@@ -70,7 +70,6 @@ init(struct xt_entry_match *m, unsigned int *nfcache)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct xt_udp *udpinfo = (struct xt_udp *)(*match)->data;

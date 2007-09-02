@@ -135,7 +135,7 @@ parse_multi_ports_v1(const char *portstring,
 
 /* Initialize the match. */
 static void
-init(struct xt_entry_match *m, unsigned int *nfcache)
+init(struct xt_entry_match *m)
 {
 }
 
@@ -213,7 +213,6 @@ __parse(int c, char **argv, int invert, unsigned int *flags,
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
 	 const void *e,
-	 unsigned int *nfcache,
 	 struct xt_entry_match **match)
 {
 	const struct ipt_entry *entry = e;
@@ -224,7 +223,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 static int
 parse6(int c, char **argv, int invert, unsigned int *flags,
 	 const void *e,
-	 unsigned int *nfcache,
 	 struct xt_entry_match **match)
 {
 	const struct ip6t_entry *entry = (const struct ip6t_entry *)e;
@@ -280,7 +278,6 @@ __parse_v1(int c, char **argv, int invert, unsigned int *flags,
 static int
 parse_v1(int c, char **argv, int invert, unsigned int *flags,
 	 const void *e,
-	 unsigned int *nfcache,
 	 struct xt_entry_match **match)
 {
 	const struct ipt_entry *entry = e;
@@ -291,7 +288,6 @@ parse_v1(int c, char **argv, int invert, unsigned int *flags,
 static int
 parse6_v1(int c, char **argv, int invert, unsigned int *flags,
 	  const void *e,
-	  unsigned int *nfcache,
 	  struct xt_entry_match **match)
 {
 	const struct ip6t_entry *entry = (const struct ip6t_entry *)e;

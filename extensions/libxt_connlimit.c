@@ -24,7 +24,7 @@ static const struct option connlimit_opts[] = {
 	{NULL},
 };
 
-static void connlimit_init(struct ipt_entry_match *match, unsigned int *nfc)
+static void connlimit_init(struct ipt_entry_match *match)
 {
 	struct xt_connlimit_info *info = (void *)match->data;
 	info->v4_mask = 0xFFFFFFFFUL;
@@ -101,7 +101,6 @@ static int connlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 
 static int connlimit_parse4(int c, char **argv, int invert,
                             unsigned int *flags, const void *entry,
-                            unsigned int *nfcache,
                             struct xt_entry_match **match)
 {
 	return connlimit_parse(c, argv, invert, flags,
@@ -110,7 +109,6 @@ static int connlimit_parse4(int c, char **argv, int invert,
 
 static int connlimit_parse6(int c, char **argv, int invert,
                             unsigned int *flags, const void *entry,
-                            unsigned int *nfcache,
                             struct xt_entry_match **match)
 {
 	return connlimit_parse(c, argv, invert, flags,

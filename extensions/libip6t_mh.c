@@ -67,7 +67,7 @@ IPTABLES_VERSION);
 	print_types_all();
 }
 
-static void init(struct xt_entry_match *m, unsigned int *nfcache)
+static void init(struct xt_entry_match *m)
 {
 	struct ip6t_mh *mhinfo = (struct ip6t_mh *)m->data;
 
@@ -127,7 +127,6 @@ static void parse_mh_types(const char *mhtype, u_int8_t *types)
 
 static int parse(int c, char **argv, int invert, unsigned int *flags,
 		 const void *entry,
-		 unsigned int *nfcache,
 		 struct xt_entry_match **match)
 {
 	struct ip6t_mh *mhinfo = (struct ip6t_mh *)(*match)->data;

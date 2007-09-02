@@ -78,7 +78,7 @@ parse_frag_ids(const char *idstring, u_int32_t *ids)
 
 /* Initialize the match. */
 static void
-init(struct xt_entry_match *m, unsigned int *nfcache)
+init(struct xt_entry_match *m)
 {
 	struct ip6t_frag *fraginfo = (struct ip6t_frag *)m->data;
 
@@ -94,7 +94,6 @@ init(struct xt_entry_match *m, unsigned int *nfcache)
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
-      unsigned int *nfcache,
       struct xt_entry_match **match)
 {
 	struct ip6t_frag *fraginfo = (struct ip6t_frag *)(*match)->data;

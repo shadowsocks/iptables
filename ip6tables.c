@@ -1627,7 +1627,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 				target->t->u.target_size = size;
 				strcpy(target->t->u.user.name, jumpto);
 				if (target->init != NULL)
-					target->init(target->t, &fw.nfcache);
+					target->init(target->t);
 				opts = merge_options(opts, target->extra_opts, &target->option_offset);
 			}
 			break;
@@ -1673,7 +1673,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			strcpy(m->m->u.user.name, m->name);
 			set_revision(m->m->u.user.name, m->revision);
 			if (m->init != NULL)
-				m->init(m->m, &fw.nfcache);
+				m->init(m->m);
 			if (m != m->next)
 				/* Merge options for non-cloned matches */
 				opts = merge_options(opts, m->extra_opts, &m->option_offset);
@@ -1766,7 +1766,6 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 						     argv, invert,
 						     &matchp->match->mflags,
 						     &fw,
-						     &fw.nfcache,
 						     &matchp->match->m))
 						break;
 				}
@@ -1819,7 +1818,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 					set_revision(m->m->u.user.name,
 						     m->revision);
 					if (m->init != NULL)
-						m->init(m->m, &fw.nfcache);
+						m->init(m->m);
 
 					opts = merge_options(opts,
 					    m->extra_opts, &m->option_offset);
@@ -1948,7 +1947,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			target->t->u.target_size = size;
 			strcpy(target->t->u.user.name, jumpto);
 			if (target->init != NULL)
-				target->init(target->t, &fw.nfcache);
+				target->init(target->t);
 		}
 
 		if (!target) {
