@@ -1469,6 +1469,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	const char *jumpto = "";
 	char *protocol = NULL;
 	int proto_used = 0;
+	u_int64_t *cnt;
 
 	memset(&fw, 0, sizeof(fw));
 
@@ -1793,12 +1794,14 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 					"-%c requires packet and byte counter",
 					opt2char(OPT_COUNTERS));
 
-			if (sscanf(pcnt, "%llu", (unsigned long long *)&fw.counters.pcnt) != 1)
+			cnt = &fw.counters.pcnt;
+			if (sscanf(pcnt, "%llu", (unsigned long long *)cnt) != 1)
 				exit_error(PARAMETER_PROBLEM,
 					"-%c packet counter not numeric",
 					opt2char(OPT_COUNTERS));
 
-			if (sscanf(bcnt, "%llu", (unsigned long long *)&fw.counters.bcnt) != 1)
+			cnt = &fw.counters.bcnt;
+			if (sscanf(bcnt, "%llu", (unsigned long long *)cnt) != 1)
 				exit_error(PARAMETER_PROBLEM,
 					"-%c byte counter not numeric",
 					opt2char(OPT_COUNTERS));
