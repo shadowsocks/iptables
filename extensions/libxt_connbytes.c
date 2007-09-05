@@ -42,7 +42,8 @@ parse_range(const char *arg, struct xt_connbytes_info *si)
 	}
 	if (si->count.from > si->count.to)
 		exit_error(PARAMETER_PROBLEM, "%llu should be less than %llu",
-			   si->count.from, si->count.to);
+			   (unsigned long long)si->count.from,
+			   (unsigned long long)si->count.to);
 }
 
 /* Function which parses command options; returns true if it
@@ -152,11 +153,13 @@ print(const void *ip,
 	struct xt_connbytes_info *sinfo = (struct xt_connbytes_info *)match->data;
 
 	if (sinfo->count.from > sinfo->count.to) 
-		printf("connbytes ! %llu:%llu ", sinfo->count.to,
-			sinfo->count.from);
+		printf("connbytes ! %llu:%llu ",
+			(unsigned long long)sinfo->count.to,
+			(unsigned long long)sinfo->count.from);
 	else
-		printf("connbytes %llu:%llu ",sinfo->count.from,
-			sinfo->count.to);
+		printf("connbytes %llu:%llu ",
+			(unsigned long long)sinfo->count.from,
+			(unsigned long long)sinfo->count.to);
 
 	fputs("connbytes mode ", stdout);
 	print_mode(sinfo);
@@ -171,11 +174,13 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	struct xt_connbytes_info *sinfo = (struct xt_connbytes_info *)match->data;
 
 	if (sinfo->count.from > sinfo->count.to) 
-		printf("! --connbytes %llu:%llu ", sinfo->count.to,
-			sinfo->count.from);
+		printf("! --connbytes %llu:%llu ",
+			(unsigned long long)sinfo->count.to,
+			(unsigned long long)sinfo->count.from);
 	else
-		printf("--connbytes %llu:%llu ", sinfo->count.from,
-			sinfo->count.to);
+		printf("--connbytes %llu:%llu ",
+			(unsigned long long)sinfo->count.from,
+			(unsigned long long)sinfo->count.to);
 
 	fputs("--connbytes-mode ", stdout);
 	print_mode(sinfo);
