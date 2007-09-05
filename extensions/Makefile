@@ -29,6 +29,11 @@ PF_EXT_MAN_ALL_TARGETS:=$(foreach T,$(PF_EXT_ALL_SLIB),$(shell test -f extension
 PF6_EXT_MAN_ALL_MATCHES:=$(foreach T,$(PF6_EXT_ALL_SLIB),$(shell test -f extensions/libip6t_$(T).man && grep -q register_match6 extensions/libip6t_$(T).c  && echo $(T)))
 PF6_EXT_MAN_ALL_TARGETS:=$(foreach T,$(PF6_EXT_ALL_SLIB),$(shell test -f extensions/libip6t_$(T).man && grep -q register_target6 extensions/libip6t_$(T).c && echo $(T)))
 
+PF_EXT_MAN_ALL_MATCHES+=$(foreach T,$(PFX_EXT_ALL_SLIB),$(shell test -f extensions/libipt_$(T).man && grep -q xtables_register_match extensions/libxt_$(T).c  && echo $(T)))
+PF_EXT_MAN_ALL_TARGETS+=$(foreach T,$(PFX_EXT_ALL_SLIB),$(shell test -f extensions/libipt_$(T).man && grep -q xtables_register_target extensions/libxt_$(T).c && echo $(T)))
+PF6_EXT_MAN_ALL_MATCHES+=$(foreach T,$(PFX_EXT_ALL_SLIB),$(shell test -f extensions/libip6t_$(T).man && grep -q xtables_register_match extensions/libxt_$(T).c  && echo $(T)))
+PF6_EXT_MAN_ALL_TARGETS+=$(foreach T,$(PFX_EXT_ALL_SLIB),$(shell test -f extensions/libip6t_$(T).man && grep -q xtables_register_target extensions/libxt_$(T).c && echo $(T)))
+
 PF_EXT_MAN_MATCHES:=$(filter $(PF_EXT_ALL_SLIB), $(PF_EXT_MAN_ALL_MATCHES))
 PF_EXT_MAN_TARGETS:=$(filter $(PF_EXT_ALL_SLIB), $(PF_EXT_MAN_ALL_TARGETS))
 PF_EXT_MAN_EXTRA_MATCHES:=$(filter-out $(PF_EXT_MAN_MATCHES), $(PF_EXT_MAN_ALL_MATCHES))
@@ -141,7 +146,7 @@ extensions/libipt_targets.man: $(patsubst %,extensions/libipt_%.man,$(PF_EXT_MAN
 	    cat extensions/libipt_$$ext.man ;\
 	done >extensions/libipt_targets.man
 	@if [ -n "$(PF_EXT_MAN_EXTRA_TARGETS)" ]; then \
-	    extra=$(PF_EXT_MAN_EXTRA_TARGETS) ;\
+	    extra="$(PF_EXT_MAN_EXTRA_TARGETS)" ;\
 	    for ext in $${extra:-""}; do \
 		echo ".SS $$ext (not supported, see Patch-O-Matic)" ;\
 		cat extensions/libipt_$$ext.man ;\
@@ -155,7 +160,7 @@ extensions/libipt_matches.man: $(patsubst %,extensions/libipt_%.man,$(PF_EXT_MAN
 	    cat extensions/libipt_$$ext.man ;\
 	done >extensions/libipt_matches.man
 	@if [ -n "$(PF_EXT_MAN_EXTRA_MATCHES)" ]; then \
-	    extra=$(PF_EXT_MAN_EXTRA_MATCHES) ;\
+	    extra="$(PF_EXT_MAN_EXTRA_MATCHES)" ;\
 	    for ext in $${extra:-""}; do \
 		echo ".SS $$ext (not supported, see Patch-O-Matic)" ;\
 		cat extensions/libipt_$$ext.man ;\
@@ -169,7 +174,7 @@ extensions/libip6t_targets.man: $(patsubst %, extensions/libip6t_%.man, $(PF6_EX
 	    cat extensions/libip6t_$$ext.man ;\
 	done >extensions/libip6t_targets.man
 	@if [ -n "$(PF6_EXT_MAN_EXTRA_TARGETS)" ]; then \
-	    extra=$(PF6_EXT_MAN_EXTRA_TARGETS) ;\
+	    extra="$(PF6_EXT_MAN_EXTRA_TARGETS)" ;\
 	    for ext in $${extra:-""}; do \
 		echo ".SS $$ext (not supported, see Patch-O-Matic)" ;\
 		cat extensions/libip6t_$$ext.man ;\
@@ -183,7 +188,7 @@ extensions/libip6t_matches.man: $(patsubst %, extensions/libip6t_%.man, $(PF6_EX
 	    cat extensions/libip6t_$$ext.man ;\
 	done >extensions/libip6t_matches.man
 	@if [ -n "$(PF6_EXT_MAN_EXTRA_MATCHES)" ]; then \
-	    extra=$(PF6_EXT_MAN_EXTRA_MATCHES) ;\
+	    extra="$(PF6_EXT_MAN_EXTRA_MATCHES)" ;\
 	    for ext in $${extra:-""}; do \
 		echo ".SS $$ext (not supported, see Patch-O-Matic)" ;\
 		cat extensions/libip6t_$$ext.man ;\
