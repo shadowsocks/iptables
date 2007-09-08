@@ -48,14 +48,14 @@ static int sockfd = -1;
 static int sockfd_use = 0;
 static void *iptc_fn = NULL;
 
-static const char *hooknames[]
-= { [HOOK_PRE_ROUTING]  "PREROUTING",
-    [HOOK_LOCAL_IN]     "INPUT",
-    [HOOK_FORWARD]      "FORWARD",
-    [HOOK_LOCAL_OUT]    "OUTPUT",
-    [HOOK_POST_ROUTING] "POSTROUTING",
+static const char *hooknames[] = {
+	[HOOK_PRE_ROUTING]	= "PREROUTING",
+	[HOOK_LOCAL_IN]		= "INPUT",
+	[HOOK_FORWARD]		= "FORWARD",
+	[HOOK_LOCAL_OUT]	= "OUTPUT",
+	[HOOK_POST_ROUTING]	= "POSTROUTING",
 #ifdef HOOK_DROPPING
-    [HOOK_DROPPING]	"DROPPING"
+	[HOOK_DROPPING]		= "DROPPING"
 #endif
 };
 
@@ -2206,7 +2206,7 @@ out_zero:
 
 /* Get raw socket. */
 int
-TC_GET_RAW_SOCKET()
+TC_GET_RAW_SOCKET(void)
 {
 	return sockfd;
 }

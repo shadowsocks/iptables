@@ -220,8 +220,6 @@ enum exittype {
 /* this is a special 64bit data type that is 8-byte aligned */
 #define aligned_u64 u_int64_t __attribute__((aligned(8)))
 
-extern void exit_printhelp() __attribute__((noreturn));
-extern void exit_tryhelp(int) __attribute__((noreturn));
 int check_inverse(const char option[], int *invert, int *optind, int argc);
 void exit_error(enum exittype, const char *, ...)__attribute__((noreturn,
 							  format(printf,2,3)));

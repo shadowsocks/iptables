@@ -99,38 +99,38 @@ static const char optflags[NUMBER_OF_OPT]
 = { 'n', 's', 'd', 'p', 'j', 'v', 'x', 'i', 'o', 'f', '0', 'c'};
 
 static struct option original_opts[] = {
-	{ "append", 1, 0, 'A' },
-	{ "delete", 1, 0,  'D' },
-	{ "insert", 1, 0,  'I' },
-	{ "replace", 1, 0,  'R' },
-	{ "list", 2, 0,  'L' },
-	{ "flush", 2, 0,  'F' },
-	{ "zero", 2, 0,  'Z' },
-	{ "new-chain", 1, 0,  'N' },
-	{ "delete-chain", 2, 0,  'X' },
-	{ "rename-chain", 1, 0,  'E' },
-	{ "policy", 1, 0,  'P' },
-	{ "source", 1, 0, 's' },
-	{ "destination", 1, 0,  'd' },
-	{ "src", 1, 0,  's' }, /* synonym */
-	{ "dst", 1, 0,  'd' }, /* synonym */
-	{ "protocol", 1, 0,  'p' },
-	{ "in-interface", 1, 0, 'i' },
-	{ "jump", 1, 0, 'j' },
-	{ "table", 1, 0, 't' },
-	{ "match", 1, 0, 'm' },
-	{ "numeric", 0, 0, 'n' },
-	{ "out-interface", 1, 0, 'o' },
-	{ "verbose", 0, 0, 'v' },
-	{ "exact", 0, 0, 'x' },
-	{ "fragments", 0, 0, 'f' },
-	{ "version", 0, 0, 'V' },
-	{ "help", 2, 0, 'h' },
-	{ "line-numbers", 0, 0, '0' },
-	{ "modprobe", 1, 0, 'M' },
-	{ "set-counters", 1, 0, 'c' },
-	{ "goto", 1, 0, 'g' },
-	{ 0 }
+	{ "append", 1, NULL, 'A' },
+	{ "delete", 1, NULL,  'D' },
+	{ "insert", 1, NULL,  'I' },
+	{ "replace", 1, NULL,  'R' },
+	{ "list", 2, NULL,  'L' },
+	{ "flush", 2, NULL,  'F' },
+	{ "zero", 2, NULL,  'Z' },
+	{ "new-chain", 1, NULL,  'N' },
+	{ "delete-chain", 2, NULL,  'X' },
+	{ "rename-chain", 1, NULL,  'E' },
+	{ "policy", 1, NULL,  'P' },
+	{ "source", 1, NULL, 's' },
+	{ "destination", 1, NULL,  'd' },
+	{ "src", 1, NULL,  's' }, /* synonym */
+	{ "dst", 1, NULL,  'd' }, /* synonym */
+	{ "protocol", 1, NULL,  'p' },
+	{ "in-interface", 1, NULL, 'i' },
+	{ "jump", 1, NULL, 'j' },
+	{ "table", 1, NULL, 't' },
+	{ "match", 1, NULL, 'm' },
+	{ "numeric", 0, NULL, 'n' },
+	{ "out-interface", 1, NULL, 'o' },
+	{ "verbose", 0, NULL, 'v' },
+	{ "exact", 0, NULL, 'x' },
+	{ "fragments", 0, NULL, 'f' },
+	{ "version", 0, NULL, 'V' },
+	{ "help", 2, NULL, 'h' },
+	{ "line-numbers", 0, NULL, '0' },
+	{ "modprobe", 1, NULL, 'M' },
+	{ "set-counters", 1, NULL, 'c' },
+	{ "goto", 1, NULL, 'g' },
+	{ }
 };
 
 /* we need this for iptables-restore.  iptables-restore.c sets line to the
@@ -347,27 +347,7 @@ static void free_opts(int reset_offset)
 	}
 }
 
-void
-exit_error(enum exittype status, const char *msg, ...)
-{
-	va_list args;
-
-	va_start(args, msg);
-	fprintf(stderr, "%s v%s: ", program_name, program_version);
-	vfprintf(stderr, msg, args);
-	va_end(args);
-	fprintf(stderr, "\n");
-	if (status == PARAMETER_PROBLEM)
-		exit_tryhelp(status);
-	if (status == VERSION_PROBLEM)
-		fprintf(stderr,
-			"Perhaps iptables or your kernel needs to be upgraded.\n");
-	/* On error paths, make sure that we don't leak memory */
-	free_opts(1);
-	exit(status);
-}
-
-void
+static void
 exit_tryhelp(int status)
 {
 	if (line != -1)
@@ -378,7 +358,7 @@ exit_tryhelp(int status)
 	exit(status);
 }
 
-void
+static void
 exit_printhelp(struct iptables_rule_match *matches)
 {
 	struct iptables_rule_match *matchp = NULL;
@@ -462,6 +442,26 @@ exit_printhelp(struct iptables_rule_match *matches)
 		matchp->match->help();
 	}
 	exit(0);
+}
+
+void
+exit_error(enum exittype status, const char *msg, ...)
+{
+	va_list args;
+
+	va_start(args, msg);
+	fprintf(stderr, "%s v%s: ", program_name, program_version);
+	vfprintf(stderr, msg, args);
+	va_end(args);
+	fprintf(stderr, "\n");
+	if (status == PARAMETER_PROBLEM)
+		exit_tryhelp(status);
+	if (status == VERSION_PROBLEM)
+		fprintf(stderr,
+			"Perhaps iptables or your kernel needs to be upgraded.\n");
+	/* On error paths, make sure that we don't leak memory */
+	free_opts(1);
+	exit(status);
 }
 
 static void

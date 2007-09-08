@@ -267,27 +267,7 @@ static void free_opts(int reset_offset)
 	}
 }
 
-void
-exit_error(enum exittype status, const char *msg, ...)
-{
-	va_list args;
-
-	va_start(args, msg);
-	fprintf(stderr, "%s v%s: ", program_name, program_version);
-	vfprintf(stderr, msg, args);
-	va_end(args);
-	fprintf(stderr, "\n");
-	if (status == PARAMETER_PROBLEM)
-		exit_tryhelp(status);
-	if (status == VERSION_PROBLEM)
-		fprintf(stderr,
-			"Perhaps ip6tables or your kernel needs to be upgraded.\n");
-	/* On error paths, make sure that we don't leak memory */
-	free_opts(1);
-	exit(status);
-}
-
-void
+static void
 exit_tryhelp(int status)
 {
 	if (line != -1)
@@ -298,7 +278,7 @@ exit_tryhelp(int status)
 	exit(status);
 }
 
-void
+static void
 exit_printhelp(struct ip6tables_rule_match *matches)
 {
 	struct ip6tables_rule_match *matchp = NULL;
@@ -378,6 +358,26 @@ exit_printhelp(struct ip6tables_rule_match *matches)
 		matchp->match->help();
 	}
 	exit(0);
+}
+
+void
+exit_error(enum exittype status, const char *msg, ...)
+{
+	va_list args;
+
+	va_start(args, msg);
+	fprintf(stderr, "%s v%s: ", program_name, program_version);
+	vfprintf(stderr, msg, args);
+	va_end(args);
+	fprintf(stderr, "\n");
+	if (status == PARAMETER_PROBLEM)
+		exit_tryhelp(status);
+	if (status == VERSION_PROBLEM)
+		fprintf(stderr,
+			"Perhaps ip6tables or your kernel needs to be upgraded.\n");
+	/* On error paths, make sure that we don't leak memory */
+	free_opts(1);
+	exit(status);
 }
 
 static void
