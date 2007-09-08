@@ -226,8 +226,8 @@ static void save(const void *ip, const struct xt_entry_match *match)
 }
 
 static const struct option opts[] = {
-	{ "mh-type", 1, 0, '1' },
-	{0}
+	{ "mh-type", 1, NULL, '1' },
+	{ }
 };
 
 static struct ip6tables_match mh = {

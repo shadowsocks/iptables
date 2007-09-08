@@ -53,7 +53,7 @@ static const struct icmpv6_names icmpv6_codes[] = {
 };
 
 static void
-print_icmpv6types()
+print_icmpv6types(void)
 {
 	unsigned int i;
 	printf("Valid ICMPv6 Types:");
@@ -86,8 +86,8 @@ help(void)
 }
 
 static const struct option opts[] = {
-	{ "icmpv6-type", 1, 0, '1' },
-	{0}
+	{ "icmpv6-type", 1, NULL, '1' },
+	{ }
 };
 
 static void

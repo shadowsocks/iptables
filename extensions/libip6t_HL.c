@@ -139,10 +139,10 @@ static void print(const void *ip,
 }
 
 static const struct option opts[] = {
-	{ "hl-set", 1, 0, '1' },
-	{ "hl-dec", 1, 0, '2' },
-	{ "hl-inc", 1, 0, '3' },
-	{ 0 }
+	{ "hl-set", 1, NULL, '1' },
+	{ "hl-dec", 1, NULL, '2' },
+	{ "hl-inc", 1, NULL, '3' },
+	{ }
 };
 
 static

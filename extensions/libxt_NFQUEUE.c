@@ -28,8 +28,8 @@ static void help(void)
 }
 
 static const struct option opts[] = {
-	{ "queue-num", 1, 0, 'F' },
-	{ 0 }
+	{ "queue-num", 1, NULL, 'F' },
+	{ }
 };
 
 static void

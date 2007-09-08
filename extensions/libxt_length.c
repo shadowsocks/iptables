@@ -21,8 +21,8 @@ IPTABLES_VERSION);
 }
   
 static const struct option opts[] = {
-	{ "length", 1, 0, '1' },
-	{0}
+	{ "length", 1, NULL, '1' },
+	{ }
 };
 
 static u_int16_t

@@ -48,8 +48,8 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "set-tos", 1, 0, '1' },
-	{ 0 }
+	{ "set-tos", 1, NULL, '1' },
+	{ }
 };
 
 /* Initialize the target. */

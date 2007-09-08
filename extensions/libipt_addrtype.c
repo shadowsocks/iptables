@@ -180,9 +180,9 @@ static void save(const void *ip,
 }
 
 static const struct option opts[] = {
-	{ "src-type", 1, 0, '1' },
-	{ "dst-type", 1, 0, '2' },
-	{ 0 }
+	{ "src-type", 1, NULL, '1' },
+	{ "dst-type", 1, NULL, '2' },
+	{ }
 };
 
 static

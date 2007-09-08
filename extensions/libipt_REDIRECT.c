@@ -23,9 +23,9 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "to-ports", 1, 0, '1' },
-	{ "random", 1, 0, '2' },
-	{ 0 }
+	{ "to-ports", 1, NULL, '1' },
+	{ "random", 1, NULL, '2' },
+	{ }
 };
 
 /* Initialize the target. */

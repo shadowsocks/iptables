@@ -31,17 +31,17 @@ UNAME , IPTABLES_VERSION, LNAME, LNAME, IP6T_OPTS_OPTSNR);
 
 #if HOPBYHOP
 static const struct option opts[] = {
-	{ "hbh-len", 1, 0, '1' },
-	{ "hbh-opts", 1, 0, '2' },
-	{ "hbh-not-strict", 1, 0, '3' },
-	{0}
+	{ "hbh-len", 1, NULL, '1' },
+	{ "hbh-opts", 1, NULL, '2' },
+	{ "hbh-not-strict", 1, NULL, '3' },
+	{ }
 };
 #else
 static const struct option opts[] = {
-	{ "dst-len", 1, 0, '1' },
-	{ "dst-opts", 1, 0, '2' },
-	{ "dst-not-strict", 1, 0, '3' },
-	{0}
+	{ "dst-len", 1, NULL, '1' },
+	{ "dst-opts", 1, NULL, '2' },
+	{ "dst-not-strict", 1, NULL, '3' },
+	{ }
 };
 #endif
 

@@ -20,8 +20,8 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "espspi", 1, 0, '1' },
-	{0}
+	{ "espspi", 1, NULL, '1' },
+	{ }
 };
 
 static u_int32_t

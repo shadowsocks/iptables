@@ -27,10 +27,10 @@ static void help(void)
 }
 
 static const struct option opts[] = {
-	{ .name = "ecn-tcp-cwr", .has_arg = 0, .flag = 0, .val = 'F' },
-	{ .name = "ecn-tcp-ece", .has_arg = 0, .flag = 0, .val = 'G' },
-	{ .name = "ecn-ip-ect",  .has_arg = 1, .flag = 0, .val = 'H' },
-	{ .name = 0 }
+	{ .name = "ecn-tcp-cwr", .has_arg = 0, .val = 'F' },
+	{ .name = "ecn-tcp-ece", .has_arg = 0, .val = 'G' },
+	{ .name = "ecn-ip-ect",  .has_arg = 1, .val = 'H' },
+	{ }
 };
 
 static int

@@ -40,8 +40,8 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "mark", 1, 0, '1' },
-	{0}
+	{ "mark", 1, NULL, '1' },
+	{ }
 };
 
 /* Function which parses command options; returns true if it

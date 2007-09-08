@@ -46,13 +46,13 @@ static void help(void)
 }
 
 static const struct option opts[] = {
-	{ .name = "source-port", .has_arg = 1, .flag = 0, .val = '1' },
-	{ .name = "sport", .has_arg = 1, .flag = 0, .val = '1' },
-	{ .name = "destination-port", .has_arg = 1, .flag = 0, .val = '2' },
-	{ .name = "dport", .has_arg = 1, .flag = 0, .val = '2' },
-	{ .name = "dccp-types", .has_arg = 1, .flag = 0, .val = '3' },
-	{ .name = "dccp-option", .has_arg = 1, .flag = 0, .val = '4' },
-	{ .name = 0 }
+	{ .name = "source-port", .has_arg = 1, .val = '1' },
+	{ .name = "sport", .has_arg = 1, .val = '1' },
+	{ .name = "destination-port", .has_arg = 1, .val = '2' },
+	{ .name = "dport", .has_arg = 1, .val = '2' },
+	{ .name = "dccp-types", .has_arg = 1, .val = '3' },
+	{ .name = "dccp-option", .has_arg = 1, .val = '4' },
+	{ }
 };
 
 static void

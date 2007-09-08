@@ -139,10 +139,10 @@ static void print(const void *ip,
 }
 
 static const struct option opts[] = {
-	{ "ttl-set", 1, 0, '1' },
-	{ "ttl-dec", 1, 0, '2' },
-	{ "ttl-inc", 1, 0, '3' },
-	{ 0 }
+	{ "ttl-set", 1, NULL, '1' },
+	{ "ttl-dec", 1, NULL, '2' },
+	{ "ttl-inc", 1, NULL, '3' },
+	{ }
 };
 
 static struct iptables_target TTL = {

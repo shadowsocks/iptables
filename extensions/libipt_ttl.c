@@ -144,11 +144,11 @@ static void save(const void *ip,
 }
 
 static const struct option opts[] = {
-	{ "ttl", 1, 0, '2' },
-	{ "ttl-eq", 1, 0, '2'},
-	{ "ttl-lt", 1, 0, '3'},
-	{ "ttl-gt", 1, 0, '4'},
-	{ 0 }
+	{ "ttl", 1, NULL, '2' },
+	{ "ttl-eq", 1, NULL, '2'},
+	{ "ttl-lt", 1, NULL, '3'},
+	{ "ttl-gt", 1, NULL, '4'},
+	{ }
 };
 
 static struct iptables_match ttl = {

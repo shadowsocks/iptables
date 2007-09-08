@@ -33,13 +33,13 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ .name = "log-level",        .has_arg = 1, .flag = 0, .val = '!' },
-	{ .name = "log-prefix",       .has_arg = 1, .flag = 0, .val = '#' },
-	{ .name = "log-tcp-sequence", .has_arg = 0, .flag = 0, .val = '1' },
-	{ .name = "log-tcp-options",  .has_arg = 0, .flag = 0, .val = '2' },
-	{ .name = "log-ip-options",   .has_arg = 0, .flag = 0, .val = '3' },
-	{ .name = "log-uid",          .has_arg = 0, .flag = 0, .val = '4' },
-	{ .name = 0 }
+	{ .name = "log-level",        .has_arg = 1, .val = '!' },
+	{ .name = "log-prefix",       .has_arg = 1, .val = '#' },
+	{ .name = "log-tcp-sequence", .has_arg = 0, .val = '1' },
+	{ .name = "log-tcp-options",  .has_arg = 0, .val = '2' },
+	{ .name = "log-ip-options",   .has_arg = 0, .val = '3' },
+	{ .name = "log-uid",          .has_arg = 0, .val = '4' },
+	{ }
 };
 
 /* Initialize the target. */

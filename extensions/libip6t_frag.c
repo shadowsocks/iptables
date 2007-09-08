@@ -24,13 +24,13 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ .name = "fragid",    .has_arg = 1, .flag = 0, .val = '1' },
-	{ .name = "fraglen",   .has_arg = 1, .flag = 0, .val = '2' },
-	{ .name = "fragres",   .has_arg = 0, .flag = 0, .val = '3' },
-	{ .name = "fragfirst", .has_arg = 0, .flag = 0, .val = '4' },
-	{ .name = "fragmore",  .has_arg = 0, .flag = 0, .val = '5' },
-	{ .name = "fraglast",  .has_arg = 0, .flag = 0, .val = '6' },
-	{ .name = 0 }
+	{ .name = "fragid",    .has_arg = 1, .val = '1' },
+	{ .name = "fraglen",   .has_arg = 1, .val = '2' },
+	{ .name = "fragres",   .has_arg = 0, .val = '3' },
+	{ .name = "fragfirst", .has_arg = 0, .val = '4' },
+	{ .name = "fragmore",  .has_arg = 0, .val = '5' },
+	{ .name = "fraglast",  .has_arg = 0, .val = '6' },
+	{ }
 };
 
 static u_int32_t

@@ -47,15 +47,15 @@ help(void)
 }
 
 static const struct option opts[] = {
-	{ "hashlimit", 1, 0, '%' },
-	{ "hashlimit-burst", 1, 0, '$' },
-	{ "hashlimit-htable-size", 1, 0, '&' },
-	{ "hashlimit-htable-max", 1, 0, '*' },
-	{ "hashlimit-htable-gcinterval", 1, 0, '(' },
-	{ "hashlimit-htable-expire", 1, 0, ')' },
-	{ "hashlimit-mode", 1, 0, '_' },
-	{ "hashlimit-name", 1, 0, '"' },
-	{ 0 }
+	{ "hashlimit", 1, NULL, '%' },
+	{ "hashlimit-burst", 1, NULL, '$' },
+	{ "hashlimit-htable-size", 1, NULL, '&' },
+	{ "hashlimit-htable-max", 1, NULL, '*' },
+	{ "hashlimit-htable-gcinterval", 1, NULL, '(' },
+	{ "hashlimit-htable-expire", 1, NULL, ')' },
+	{ "hashlimit-mode", 1, NULL, '_' },
+	{ "hashlimit-name", 1, NULL, '"' },
+	{ }
 };
 
 static

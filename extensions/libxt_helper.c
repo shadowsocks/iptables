@@ -20,8 +20,8 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "helper", 1, 0, '1' },
-	{0}
+	{ "helper", 1, NULL, '1' },
+	{ }
 };
 
 /* Function which parses command options; returns true if it

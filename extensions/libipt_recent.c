@@ -23,17 +23,17 @@
 
 /* Options for this module */
 static const struct option opts[] = {
-	{ .name = "set",      .has_arg = 0, .flag = 0, .val = 201 }, 
-	{ .name = "rcheck",   .has_arg = 0, .flag = 0, .val = 202 }, 
-	{ .name = "update",   .has_arg = 0, .flag = 0, .val = 203 },
-	{ .name = "seconds",  .has_arg = 1, .flag = 0, .val = 204 }, 
-	{ .name = "hitcount", .has_arg = 1, .flag = 0, .val = 205 },
-	{ .name = "remove",   .has_arg = 0, .flag = 0, .val = 206 },
-	{ .name = "rttl",     .has_arg = 0, .flag = 0, .val = 207 },
-	{ .name = "name",     .has_arg = 1, .flag = 0, .val = 208 },
-	{ .name = "rsource",  .has_arg = 0, .flag = 0, .val = 209 },
-	{ .name = "rdest",    .has_arg = 0, .flag = 0, .val = 210 },
-	{ .name = 0,          .has_arg = 0, .flag = 0, .val = 0   }
+	{ .name = "set",      .has_arg = 0, .val = 201 }, 
+	{ .name = "rcheck",   .has_arg = 0, .val = 202 }, 
+	{ .name = "update",   .has_arg = 0, .val = 203 },
+	{ .name = "seconds",  .has_arg = 1, .val = 204 }, 
+	{ .name = "hitcount", .has_arg = 1, .val = 205 },
+	{ .name = "remove",   .has_arg = 0, .val = 206 },
+	{ .name = "rttl",     .has_arg = 0, .val = 207 },
+	{ .name = "name",     .has_arg = 1, .val = 208 },
+	{ .name = "rsource",  .has_arg = 0, .val = 209 },
+	{ .name = "rdest",    .has_arg = 0, .val = 210 },
+	{ }
 };
 
 /* Function which prints out usage message. */

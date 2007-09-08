@@ -43,8 +43,8 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "tos", 1, 0, '1' },
-	{0}
+	{ "tos", 1, NULL, '1' },
+	{ }
 };
 
 static void

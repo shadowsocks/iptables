@@ -22,8 +22,8 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "set-class", 1, 0, '1' },
-	{ 0 }
+	{ "set-class", 1, NULL, '1' },
+	{ }
 };
 
 /* Initialize the target. */

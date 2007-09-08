@@ -32,10 +32,10 @@ IPTABLES_VERSION, IP6T_OPTS_OPTSNR);
 }
 
 static const struct option opts[] = {
-	{ .name = LNAME "-len",        .has_arg = 1, .flag = 0, .val = '1' },
-	{ .name = LNAME "-opts",       .has_arg = 1, .flag = 0, .val = '2' },
-	{ .name = LNAME "-not-strict", .has_arg = 1, .flag = 0, .val = '3' },
-	{ .name = 0 }
+	{ .name = LNAME "-len",        .has_arg = 1, .val = '1' },
+	{ .name = LNAME "-opts",       .has_arg = 1, .val = '2' },
+	{ .name = LNAME "-not-strict", .has_arg = 1, .val = '3' },
+	{ }
 };
 
 static u_int32_t

@@ -20,8 +20,8 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "mss", 1, 0, '1' },
-	{0}
+	{ "mss", 1, NULL, '1' },
+	{ }
 };
 
 static u_int16_t

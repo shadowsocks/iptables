@@ -40,9 +40,9 @@ static void help(void)
 }
 
 static const struct option opts[] = {
-	{ "dscp", 1, 0, 'F' },
-	{ "dscp-class", 1, 0, 'G' },
-	{ 0 }
+	{ "dscp", 1, NULL, 'F' },
+	{ "dscp-class", 1, NULL, 'G' },
+	{ }
 };
 
 static void

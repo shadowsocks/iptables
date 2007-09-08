@@ -38,11 +38,11 @@ static void help(void)
 
 
 static const struct option opts[] = {
-	{ "ecn-tcp-remove", 0, 0, 'F' },
-	{ "ecn-tcp-cwr", 1, 0, 'G' },
-	{ "ecn-tcp-ece", 1, 0, 'H' },
-	{ "ecn-ip-ect", 1, 0, '9' },
-	{ 0 }
+	{ "ecn-tcp-remove", 0, NULL, 'F' },
+	{ "ecn-tcp-cwr", 1, NULL, 'G' },
+	{ "ecn-tcp-ece", 1, NULL, 'H' },
+	{ "ecn-ip-ect", 1, NULL, '9' },
+	{ }
 };
 
 static int

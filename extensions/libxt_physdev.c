@@ -26,12 +26,12 @@ help(void)
 }
 
 static const struct option opts[] = {
-	{ "physdev-in", 1, 0, '1' },
-	{ "physdev-out", 1, 0, '2' },
-	{ "physdev-is-in", 0, 0, '3' },
-	{ "physdev-is-out", 0, 0, '4' },
-	{ "physdev-is-bridged", 0, 0, '5' },
-	{0}
+	{ "physdev-in", 1, NULL, '1' },
+	{ "physdev-out", 1, NULL, '2' },
+	{ "physdev-is-in", 0, NULL, '3' },
+	{ "physdev-is-out", 0, NULL, '4' },
+	{ "physdev-is-bridged", 0, NULL, '5' },
+	{ }
 };
 
 static void

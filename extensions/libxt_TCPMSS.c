@@ -37,9 +37,9 @@ static void help6(void)
 }
 
 static const struct option opts[] = {
-	{ "set-mss", 1, 0, '1' },
-	{ "clamp-mss-to-pmtu", 0, 0, '2' },
-	{ 0 }
+	{ "set-mss", 1, NULL, '1' },
+	{ "clamp-mss-to-pmtu", 0, NULL, '2' },
+	{ }
 };
 
 /* Initialize the target. */

@@ -49,11 +49,11 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "set-mark", 1, 0, '1' },
-	{ "save-mark", 0, 0, '2' },
-	{ "restore-mark", 0, 0, '3' },
-	{ "mask", 1, 0, '4' },
-	{ 0 }
+	{ "set-mark", 1, NULL, '1' },
+	{ "save-mark", 0, NULL, '2' },
+	{ "restore-mark", 0, NULL, '3' },
+	{ "mask", 1, NULL, '4' },
+	{ }
 };
 
 /* Initialize the target. */

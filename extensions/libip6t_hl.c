@@ -121,11 +121,11 @@ static void save(const void *ip,
 }
 
 static const struct option opts[] = {
-	{ .name = "hl",    .has_arg = 1, .flag = 0, .val = '2' },
-	{ .name = "hl-eq", .has_arg = 1, .flag = 0, .val = '2' },
-	{ .name = "hl-lt", .has_arg = 1, .flag = 0, .val = '3' },
-	{ .name = "hl-gt", .has_arg = 1, .flag = 0, .val = '4' },
-	{ 0 }
+	{ .name = "hl",    .has_arg = 1, .val = '2' },
+	{ .name = "hl-eq", .has_arg = 1, .val = '2' },
+	{ .name = "hl-lt", .has_arg = 1, .val = '3' },
+	{ .name = "hl-gt", .has_arg = 1, .val = '4' },
+	{ }
 };
 
 static

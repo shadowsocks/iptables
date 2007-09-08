@@ -30,13 +30,13 @@ IPTABLES_VERSION, IP6T_RT_HOPS);
 }
 
 static const struct option opts[] = {
-	{ "rt-type", 1, 0, '1' },
-	{ "rt-segsleft", 1, 0, '2' },
-	{ "rt-len", 1, 0, '3' },
-	{ "rt-0-res", 0, 0, '4' },
-	{ "rt-0-addrs", 1, 0, '5' },
-	{ "rt-0-not-strict", 0, 0, '6' },
-	{0}
+	{ "rt-type", 1, NULL, '1' },
+	{ "rt-segsleft", 1, NULL, '2' },
+	{ "rt-len", 1, NULL, '3' },
+	{ "rt-0-res", 0, NULL, '4' },
+	{ "rt-0-addrs", 1, NULL, '5' },
+	{ "rt-0-not-strict", 0, NULL, '6' },
+	{ }
 };
 
 static u_int32_t

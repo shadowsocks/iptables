@@ -39,14 +39,14 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "uid-owner", 1, 0, '1' },
-	{ "gid-owner", 1, 0, '2' },
-	{ "pid-owner", 1, 0, '3' },
-	{ "sid-owner", 1, 0, '4' },
+	{ "uid-owner", 1, NULL, '1' },
+	{ "gid-owner", 1, NULL, '2' },
+	{ "pid-owner", 1, NULL, '3' },
+	{ "sid-owner", 1, NULL, '4' },
 #ifdef IPT_OWNER_COMM
-	{ "cmd-owner", 1, 0, '5' },
+	{ "cmd-owner", 1, NULL, '5' },
 #endif
-	{0}
+	{ }
 };
 
 /* Function which parses command options; returns true if it

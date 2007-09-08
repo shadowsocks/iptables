@@ -21,9 +21,9 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "src-range", 1, 0, '1' },
-	{ "dst-range", 1, 0, '2' },
-	{0}
+	{ "src-range", 1, NULL, '1' },
+	{ "dst-range", 1, NULL, '2' },
+	{ }
 };
 
 static void

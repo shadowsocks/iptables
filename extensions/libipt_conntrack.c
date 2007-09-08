@@ -44,15 +44,15 @@ help(void)
 
 
 static const struct option opts[] = {
-	{ "ctstate", 1, 0, '1' },
-	{ "ctproto", 1, 0, '2' },
-	{ "ctorigsrc", 1, 0, '3' },
-	{ "ctorigdst", 1, 0, '4' },
-	{ "ctreplsrc", 1, 0, '5' },
-	{ "ctrepldst", 1, 0, '6' },
-	{ "ctstatus", 1, 0, '7' },
-	{ "ctexpire", 1, 0, '8' },
-	{0}
+	{ "ctstate", 1, NULL, '1' },
+	{ "ctproto", 1, NULL, '2' },
+	{ "ctorigsrc", 1, NULL, '3' },
+	{ "ctorigdst", 1, NULL, '4' },
+	{ "ctreplsrc", 1, NULL, '5' },
+	{ "ctrepldst", 1, NULL, '6' },
+	{ "ctstatus", 1, NULL, '7' },
+	{ "ctexpire", 1, NULL, '8' },
+	{ }
 };
 
 static int

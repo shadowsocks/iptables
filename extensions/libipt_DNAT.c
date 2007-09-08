@@ -33,9 +33,9 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "to-destination", 1, 0, '1' },
-	{ "random", 0, 0, '2' },
-	{ 0 }
+	{ "to-destination", 1, NULL, '1' },
+	{ "random", 0, NULL, '2' },
+	{ }
 };
 
 static struct ipt_natinfo *

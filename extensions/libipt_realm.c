@@ -26,8 +26,8 @@ help(void)
 }
 
 static const struct option opts[] = {
-	{ "realm", 1, 0, '1' },
-	{0}
+	{ "realm", 1, NULL, '1' },
+	{ }
 };
 
 struct realmname { 
@@ -43,7 +43,7 @@ static struct realmname *realms = NULL;
 static int rdberr = 0;
 
 
-void load_realms()
+static void load_realms(void)
 {
 	const char* rfnm = "/etc/iproute2/rt_realms";
 	char buf[512];

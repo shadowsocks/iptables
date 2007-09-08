@@ -77,7 +77,7 @@ static const struct icmp_names icmp_codes[] = {
 };
 
 static void
-print_icmptypes()
+print_icmptypes(void)
 {
 	unsigned int i;
 	printf("Valid ICMP Types:");
@@ -110,8 +110,8 @@ help(void)
 }
 
 static const struct option opts[] = {
-	{ "icmp-type", 1, 0, '1' },
-	{0}
+	{ "icmp-type", 1, NULL, '1' },
+	{ }
 };
 
 static void 

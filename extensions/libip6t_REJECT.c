@@ -38,7 +38,7 @@ static const struct reject_names reject_table[] = {
 };
 
 static void
-print_reject_types()
+print_reject_types(void)
 {
 	unsigned int i;
 
@@ -66,8 +66,8 @@ help(void)
 }
 
 static const struct option opts[] = {
-	{ "reject-with", 1, 0, '1' },
-	{ 0 }
+	{ "reject-with", 1, NULL, '1' },
+	{ }
 };
 
 /* Allocate and initialize the target. */

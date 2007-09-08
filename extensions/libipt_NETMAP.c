@@ -14,8 +14,8 @@
 #define MODULENAME "NETMAP"
 
 static const struct option opts[] = {
-	{ "to", 1, 0, '1' },
-	{ 0 }
+	{ "to", 1, NULL, '1' },
+	{ }
 };
 
 /* Function which prints out usage message. */

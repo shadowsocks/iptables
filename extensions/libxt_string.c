@@ -45,12 +45,12 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "from", 1, 0, '1' },
-	{ "to", 1, 0, '2' },
-	{ "algo", 1, 0, '3' },
-	{ "string", 1, 0, '4' },
-	{ "hex-string", 1, 0, '5' },
-	{0}
+	{ "from", 1, NULL, '1' },
+	{ "to", 1, NULL, '2' },
+	{ "algo", 1, NULL, '3' },
+	{ "string", 1, NULL, '4' },
+	{ "hex-string", 1, NULL, '5' },
+	{ }
 };
 
 static void

@@ -45,13 +45,13 @@ IPTABLES_VERSION);
 #define PARAM_HASHINIT	0x0020
 
 static const struct option opts[] = {
-	{ "new", 0, 0, '1' },
-	{ "hashmode", 1, 0, '2' },
-	{ "clustermac", 1, 0, '3' },
-	{ "total-nodes", 1, 0, '4' },
-	{ "local-node", 1, 0, '5' },
-	{ "hash-init", 1, 0, '6' },
-	{ 0 }
+	{ "new", 0, NULL, '1' },
+	{ "hashmode", 1, NULL, '2' },
+	{ "clustermac", 1, NULL, '3' },
+	{ "total-nodes", 1, NULL, '4' },
+	{ "local-node", 1, NULL, '5' },
+	{ "hash-init", 1, NULL, '6' },
+	{ }
 };
 
 static void

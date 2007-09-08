@@ -24,11 +24,11 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "mode", 1, 0, '1' },
-	{ "probability", 1, 0, '2' },
-	{ "every", 1, 0, '3' },
-	{ "packet", 1, 0, '4' },
-	{ 0 }
+	{ "mode", 1, NULL, '1' },
+	{ "probability", 1, NULL, '2' },
+	{ "every", 1, NULL, '3' },
+	{ "packet", 1, NULL, '4' },
+	{ }
 };
 
 static struct xt_statistic_info *info;

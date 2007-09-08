@@ -45,11 +45,11 @@ static void help(void)
 }
 
 static const struct option opts[] = {
-	{"ulog-nlgroup", 1, 0, '!'},
-	{"ulog-prefix", 1, 0, '#'},
-	{"ulog-cprange", 1, 0, 'A'},
-	{"ulog-qthreshold", 1, 0, 'B'},
-	{0}
+	{"ulog-nlgroup", 1, NULL, '!'},
+	{"ulog-prefix", 1, NULL, '#'},
+	{"ulog-cprange", 1, NULL, 'A'},
+	{"ulog-qthreshold", 1, NULL, 'B'},
+	{ }
 };
 
 /* Initialize the target. */

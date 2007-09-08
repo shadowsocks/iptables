@@ -41,7 +41,7 @@ static const struct pkttypes supported_types[] = {
 	{"host", PACKET_HOST, 0, NULL}
 };
 
-static void print_types()
+static void print_types(void)
 {
 	unsigned int	i;
 	
@@ -65,8 +65,8 @@ static void help(void)
 }
 
 static const struct option opts[] = {
-	{"pkt-type", 1, 0, '1'},
-	{0}
+	{"pkt-type", 1, NULL, '1'},
+	{ }
 };
 
 static void parse_pkttype(const char *pkttype, struct xt_pkttype_info *info)

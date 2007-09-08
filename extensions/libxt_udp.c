@@ -23,11 +23,11 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "source-port", 1, 0, '1' },
-	{ "sport", 1, 0, '1' }, /* synonym */
-	{ "destination-port", 1, 0, '2' },
-	{ "dport", 1, 0, '2' }, /* synonym */
-	{0}
+	{ "source-port", 1, NULL, '1' },
+	{ "sport", 1, NULL, '1' }, /* synonym */
+	{ "destination-port", 1, NULL, '2' },
+	{ "dport", 1, NULL, '2' }, /* synonym */
+	{ }
 };
 
 static void

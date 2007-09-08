@@ -24,8 +24,8 @@ help(void)
 }
 
 static const struct option opts[] = {
-	{ "mac-source", 1, 0, '1' },
-	{0}
+	{ "mac-source", 1, NULL, '1' },
+	{ }
 };
 
 static void

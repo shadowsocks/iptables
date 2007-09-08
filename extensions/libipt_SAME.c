@@ -30,10 +30,10 @@ IPTABLES_VERSION);
 }
 
 static const struct option opts[] = {
-	{ "to", 1, 0, '1' },
-	{ "nodst", 0, 0, '2'},
-	{ "random", 0, 0, '3' },
-	{ 0 }
+	{ "to", 1, NULL, '1' },
+	{ "nodst", 0, NULL, '2'},
+	{ "random", 0, NULL, '3' },
+	{ }
 };
 
 /* Initialize the target. */

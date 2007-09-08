@@ -15,10 +15,10 @@ enum {
 };
 
 static const struct option opts[] = {
-	{ "nflog-group",     1, 0, NFLOG_GROUP },
-	{ "nflog-prefix",    1, 0, NFLOG_PREFIX },
-	{ "nflog-range",     1, 0, NFLOG_RANGE },
-	{ "nflog-threshold", 1, 0, NFLOG_THRESHOLD },
+	{ "nflog-group",     1, NULL, NFLOG_GROUP },
+	{ "nflog-prefix",    1, NULL, NFLOG_PREFIX },
+	{ "nflog-range",     1, NULL, NFLOG_RANGE },
+	{ "nflog-threshold", 1, NULL, NFLOG_THRESHOLD },
 	{NULL},
 };
 

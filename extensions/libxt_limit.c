@@ -31,9 +31,9 @@ help(void)
 }
 
 static const struct option opts[] = {
-	{ "limit", 1, 0, '%' },
-	{ "limit-burst", 1, 0, '$' },
-	{ 0 }
+	{ "limit", 1, NULL, '%' },
+	{ "limit-burst", 1, NULL, '$' },
+	{ }
 };
 
 static

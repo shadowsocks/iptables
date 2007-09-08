@@ -21,10 +21,10 @@ help(void)
 }
 
 static const struct option opts[] = {
-	{ "connbytes", 1, 0, '1' },
-	{ "connbytes-dir", 1, 0, '2' },
-	{ "connbytes-mode", 1, 0, '3' },
-	{0}
+	{ "connbytes", 1, NULL, '1' },
+	{ "connbytes-dir", 1, NULL, '2' },
+	{ "connbytes-mode", 1, NULL, '3' },
+	{ }
 };
 
 static void
