@@ -915,7 +915,7 @@ TC_DUMP_ENTRIES(const TC_HANDLE_T handle)
 {
 	iptc_fn = TC_DUMP_ENTRIES;
 	CHECK(handle);
-#if 0
+
 	printf("libiptc v%s. %u bytes.\n",
 	       IPTABLES_VERSION, handle->entries->size);
 	printf("Table `%s'\n", handle->info.name);
@@ -934,7 +934,6 @@ TC_DUMP_ENTRIES(const TC_HANDLE_T handle)
 
 	ENTRY_ITERATE(handle->entries->entrytable, handle->entries->size,
 		      dump_entry, handle);
-#endif
 }
 
 /* Does this chain exist? */
