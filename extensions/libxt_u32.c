@@ -142,8 +142,8 @@ static int u32_parse(int c, char **argv, int invert, unsigned int *flags,
 
 			if (testind > XT_U32_MAXSIZE)
 				exit_error(PARAMETER_PROBLEM,
-				           "u32: at char %ld: too many \"&&\"s",
-				           arg - start);
+				           "u32: at char %u: too many \"&&\"s",
+				           (unsigned int)(arg - start));
 			return 1;
 		}
 
@@ -155,9 +155,9 @@ static int u32_parse(int c, char **argv, int invert, unsigned int *flags,
 			if (*arg == '=') {
 				if (locind == 0) {
 					exit_error(PARAMETER_PROBLEM,
-					           "u32: at char %ld: "
+					           "u32: at char %u: "
 					           "location spec missing",
-					           arg - start);
+					           (unsigned int)(arg - start));
 				} else {
 					++arg;
 					state = 1;
@@ -170,18 +170,18 @@ static int u32_parse(int c, char **argv, int invert, unsigned int *flags,
 					} else if (*arg == '<') {
 						if (*++arg != '<')
 							exit_error(PARAMETER_PROBLEM,
-								   "u32: at char %ld: a second < expected", arg - start);
+								   "u32: at char %u: a second '<' was expected", (unsigned int)(arg - start));
 						ct->location[locind].nextop = XT_U32_LEFTSH;
 					} else if (*arg == '>') {
 						if (*++arg != '>')
 							exit_error(PARAMETER_PROBLEM,
-								   "u32: at char %ld: a second > expected", arg - start);
+								   "u32: at char %u: a second '>' was expected", (unsigned int)(arg - start));
 						ct->location[locind].nextop = XT_U32_RIGHTSH;
 					} else if (*arg == '@') {
 						ct->location[locind].nextop = XT_U32_AT;
 					} else {
 						exit_error(PARAMETER_PROBLEM,
-							"u32: at char %ld: operator expected", arg - start);
+							"u32: at char %u: operator expected", (unsigned int)(arg - start));
 					}
 					++arg;
 				}
@@ -190,7 +190,7 @@ static int u32_parse(int c, char **argv, int invert, unsigned int *flags,
 					parse_number(&arg, arg - start);
 				if (++locind > XT_U32_MAXSIZE)
 					exit_error(PARAMETER_PROBLEM,
-						   "u32: at char %ld: too many operators", arg - start);
+						   "u32: at char %u: too many operators", (unsigned int)(arg - start));
 			}
 		} else {
 			/*
@@ -201,17 +201,17 @@ static int u32_parse(int c, char **argv, int invert, unsigned int *flags,
 			if (*arg == '&') {
 				if (*++arg != '&')
 					exit_error(PARAMETER_PROBLEM,
-						   "u32: at char %ld: a second & was expected", arg - start);
+						   "u32: at char %u: a second '&' was expected", (unsigned int)(arg - start));
 				if (valind == 0) {
 					exit_error(PARAMETER_PROBLEM,
-						   "u32: at char %ld: value spec missing", arg - start);
+						   "u32: at char %u: value spec missing", (unsigned int)(arg - start));
 				} else {
 					ct->nnums   = locind;
 					ct->nvalues = valind;
 					ct = &data->tests[++testind];
 					if (testind > XT_U32_MAXSIZE)
 						exit_error(PARAMETER_PROBLEM,
-							   "u32: at char %ld: too many \"&&\"s", arg - start);
+							   "u32: at char %u: too many \"&&\"s", (unsigned int)(arg - start));
 					++arg;
 					state  = 0;
 					locind = 0;
@@ -221,7 +221,7 @@ static int u32_parse(int c, char **argv, int invert, unsigned int *flags,
 				if (valind > 0) { /* need , before number */
 					if (*arg != ',')
 						exit_error(PARAMETER_PROBLEM,
-							   "u32: at char %ld: expected , or &&", arg - start);
+							   "u32: at char %u: expected \",\" or \"&&\"", (unsigned int)(arg - start));
 					++arg;
 				}
 				ct->value[valind].min =
@@ -241,7 +241,7 @@ static int u32_parse(int c, char **argv, int invert, unsigned int *flags,
 
 				if (++valind > XT_U32_MAXSIZE)
 					exit_error(PARAMETER_PROBLEM,
-						   "u32: at char %ld: too many \",\"s", arg - start);
+						   "u32: at char %u: too many \",\"s", (unsigned int)(arg - start));
 			}
 		}
 	}
