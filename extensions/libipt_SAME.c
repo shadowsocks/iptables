@@ -11,8 +11,7 @@
 #include "../include/linux/netfilter_ipv4/ipt_SAME.h"
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void SAME_help(void)
 {
 	printf(
 "SAME v%s options:\n"
@@ -29,7 +28,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option SAME_opts[] = {
 	{ "to", 1, NULL, '1' },
 	{ "nodst", 0, NULL, '2'},
 	{ "random", 0, NULL, '3' },
@@ -37,8 +36,7 @@ static const struct option opts[] = {
 };
 
 /* Initialize the target. */
-static void
-init(struct xt_entry_target *t)
+static void SAME_init(struct xt_entry_target *t)
 {
 	struct ipt_same_info *mr = (struct ipt_same_info *)t->data;
 
@@ -87,10 +85,8 @@ parse_to(char *arg, struct ip_nat_range *range)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_target **target)
+static int SAME_parse(int c, char **argv, int invert, unsigned int *flags,
+                      const void *entry, struct xt_entry_target **target)
 {
 	struct ipt_same_info *mr
 		= (struct ipt_same_info *)(*target)->data;
@@ -139,7 +135,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Final check; need --to. */
-static void final_check(unsigned int flags)
+static void SAME_check(unsigned int flags)
 {
 	if (!(flags & IPT_SAME_OPT_TO))
 		exit_error(PARAMETER_PROBLEM,
@@ -147,10 +143,8 @@ static void final_check(unsigned int flags)
 }
 
 /* Prints out the targinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_target *target,
-      int numeric)
+static void SAME_print(const void *ip, const struct xt_entry_target *target,
+                       int numeric)
 {
 	int count;
 	struct ipt_same_info *mr
@@ -184,8 +178,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_target *target)
+static void SAME_save(const void *ip, const struct xt_entry_target *target)
 {
 	int count;
 	struct ipt_same_info *mr
@@ -215,21 +208,21 @@ save(const void *ip, const struct xt_entry_target *target)
 		printf("--random ");
 }
 
-static struct iptables_target same = {
+static struct iptables_target same_target = {
 	.name		= "SAME",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_same_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_same_info)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= SAME_help,
+	.init		= SAME_init,
+	.parse		= SAME_parse,
+	.final_check	= SAME_check,
+	.print		= SAME_print,
+	.save		= SAME_save,
+	.extra_opts	= SAME_opts,
 };
 
 void _init(void)
 {
-	register_target(&same);
+	register_target(&same_target);
 }

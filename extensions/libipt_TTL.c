@@ -16,7 +16,7 @@
 
 #define IPT_TTL_USED	1
 
-static void help(void) 
+static void TTL_help(void)
 {
 	printf(
 "TTL target v%s options\n"
@@ -26,9 +26,8 @@ static void help(void)
 , IPTABLES_VERSION);
 }
 
-static int parse(int c, char **argv, int invert, unsigned int *flags,
-		const void *entry,
-		struct xt_entry_target **target)
+static int TTL_parse(int c, char **argv, int invert, unsigned int *flags,
+                     const void *entry, struct xt_entry_target **target)
 {
 	struct ipt_TTL_info *info = (struct ipt_TTL_info *) (*target)->data;
 	unsigned int value;
@@ -85,15 +84,14 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void final_check(unsigned int flags)
+static void TTL_check(unsigned int flags)
 {
 	if (!(flags & IPT_TTL_USED))
 		exit_error(PARAMETER_PROBLEM,
 				"TTL: You must specify an action");
 }
 
-static void save(const void *ip,
-		const struct xt_entry_target *target)
+static void TTL_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_TTL_info *info = 
 		(struct ipt_TTL_info *) target->data;
@@ -113,8 +111,8 @@ static void save(const void *ip,
 	printf("%u ", info->ttl);
 }
 
-static void print(const void *ip,
-		const struct xt_entry_target *target, int numeric)
+static void TTL_print(const void *ip, const struct xt_entry_target *target,
+                      int numeric)
 {
 	const struct ipt_TTL_info *info =
 		(struct ipt_TTL_info *) target->data;
@@ -134,28 +132,28 @@ static void print(const void *ip,
 	printf("%u ", info->ttl);
 }
 
-static const struct option opts[] = {
+static const struct option TTL_opts[] = {
 	{ "ttl-set", 1, NULL, '1' },
 	{ "ttl-dec", 1, NULL, '2' },
 	{ "ttl-inc", 1, NULL, '3' },
 	{ }
 };
 
-static struct iptables_target TTL = {
+static struct iptables_target ttl_target = {
 	.next		= NULL, 
 	.name		= "TTL",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_TTL_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_TTL_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts 
+	.help		= TTL_help,
+	.parse		= TTL_parse,
+	.final_check	= TTL_check,
+	.print		= TTL_print,
+	.save		= TTL_save,
+	.extra_opts	= TTL_opts,
 };
 
 void _init(void)
 {
-	register_target(&TTL);
+	register_target(&ttl_target);
 }

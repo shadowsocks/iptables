@@ -23,7 +23,7 @@
 #include "libipt_set.h"
 
 /* Function which prints out usage message. */
-static void help(void)
+static void SET_help(void)
 {
 	printf("SET v%s options:\n"
 	       " --add-set name flags\n"
@@ -34,14 +34,14 @@ static void help(void)
 	       "\n", IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option SET_opts[] = {
 	{"add-set",   1, 0, '1'},
 	{"del-set",   1, 0, '2'},
 	{0}
 };
 
 /* Initialize the target. */
-static void init(struct xt_entry_target *target)
+static void SET_init(struct xt_entry_target *target)
 {
 	struct ipt_set_info_target *info =
 	    (struct ipt_set_info_target *) target->data;
@@ -83,9 +83,8 @@ parse_target(char **argv, int invert, unsigned int *flags,
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry, struct xt_entry_target **target)
+static int SET_parse(int c, char **argv, int invert, unsigned int *flags,
+                     const void *entry, struct xt_entry_target **target)
 {
 	struct ipt_set_info_target *myinfo =
 	    (struct ipt_set_info_target *) (*target)->data;
@@ -107,7 +106,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Final check; must specify at least one. */
-static void final_check(unsigned int flags)
+static void SET_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -135,9 +134,8 @@ print_target(const char *prefix, const struct ipt_set_info *info)
 }
 
 /* Prints out the targinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_target *target, int numeric)
+static void SET_print(const void *ip, const struct xt_entry_target *target,
+                      int numeric)
 {
 	struct ipt_set_info_target *info =
 	    (struct ipt_set_info_target *) target->data;
@@ -147,8 +145,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_target *target)
+static void SET_save(const void *ip, const struct xt_entry_target *target)
 {
 	struct ipt_set_info_target *info =
 	    (struct ipt_set_info_target *) target->data;
@@ -157,23 +154,21 @@ save(const void *ip, const struct xt_entry_target *target)
 	print_target("--del-set", &info->del_set);
 }
 
-static
-struct iptables_target ipt_set_target 
-= {
+static struct iptables_target set_target = {
 	.name		= "SET",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_set_info_target)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_set_info_target)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= SET_help,
+	.init		= SET_init,
+	.parse		= SET_parse,
+	.final_check	= SET_check,
+	.print		= SET_print,
+	.save		= SET_save,
+	.extra_opts	= SET_opts,
 };
 
 void _init(void)
 {
-	register_target(&ipt_set_target);
+	register_target(&set_target);
 }

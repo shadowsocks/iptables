@@ -34,7 +34,7 @@ void print_groups(unsigned int gmask)
 }
 
 /* Function which prints out usage message. */
-static void help(void)
+static void ULOG_help(void)
 {
 	printf("ULOG v%s options:\n"
 	       " --ulog-nlgroup nlgroup		NETLINK group used for logging\n"
@@ -44,7 +44,7 @@ static void help(void)
 	       IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option ULOG_opts[] = {
 	{"ulog-nlgroup", 1, NULL, '!'},
 	{"ulog-prefix", 1, NULL, '#'},
 	{"ulog-cprange", 1, NULL, 'A'},
@@ -53,7 +53,7 @@ static const struct option opts[] = {
 };
 
 /* Initialize the target. */
-static void init(struct xt_entry_target *t)
+static void ULOG_init(struct xt_entry_target *t)
 {
 	struct ipt_ulog_info *loginfo = (struct ipt_ulog_info *) t->data;
 
@@ -69,9 +69,8 @@ static void init(struct xt_entry_target *t)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int parse(int c, char **argv, int invert, unsigned int *flags,
-		 const void *entry,
-		 struct xt_entry_target **target)
+static int ULOG_parse(int c, char **argv, int invert, unsigned int *flags,
+                      const void *entry, struct xt_entry_target **target)
 {
 	struct ipt_ulog_info *loginfo =
 	    (struct ipt_ulog_info *) (*target)->data;
@@ -151,8 +150,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
-static void save(const void *ip,
-		 const struct xt_entry_target *target)
+static void ULOG_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_ulog_info *loginfo
 	    = (const struct ipt_ulog_info *) target->data;
@@ -172,9 +170,8 @@ static void save(const void *ip,
 }
 
 /* Prints out the targinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_target *target, int numeric)
+static void ULOG_print(const void *ip, const struct xt_entry_target *target,
+                       int numeric)
 {
 	const struct ipt_ulog_info *loginfo
 	    = (const struct ipt_ulog_info *) target->data;
@@ -187,20 +184,20 @@ print(const void *ip,
 	printf("queue_threshold %u ", (unsigned int)loginfo->qthreshold);
 }
 
-static struct iptables_target ulog = {
+static struct iptables_target ulog_target = {
 	.name		= "ULOG",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_ulog_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_ulog_info)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= ULOG_help,
+	.init		= ULOG_init,
+	.parse		= ULOG_parse,
+	.print		= ULOG_print,
+	.save		= ULOG_save,
+	.extra_opts	= ULOG_opts,
 };
 
 void _init(void)
 {
-	register_target(&ulog);
+	register_target(&ulog_target);
 }

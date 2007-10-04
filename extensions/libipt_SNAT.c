@@ -20,8 +20,7 @@ struct ipt_natinfo
 };
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void SNAT_help(void)
 {
 	printf(
 "SNAT v%s options:\n"
@@ -32,7 +31,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option SNAT_opts[] = {
 	{ "to-source", 1, NULL, '1' },
 	{ "random", 0, NULL, '2' },
 	{ }
@@ -139,10 +138,8 @@ parse_to(char *arg, int portok, struct ipt_natinfo *info)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *e,
-      struct xt_entry_target **target)
+static int SNAT_parse(int c, char **argv, int invert, unsigned int *flags,
+                      const void *e, struct xt_entry_target **target)
 {
 	const struct ipt_entry *entry = e;
 	struct ipt_natinfo *info = (void *)*target;
@@ -189,7 +186,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Final check; must have specfied --to-source. */
-static void final_check(unsigned int flags)
+static void SNAT_check(unsigned int flags)
 {
 	if (!(flags & IPT_SNAT_OPT_SOURCE))
 		exit_error(PARAMETER_PROBLEM,
@@ -217,10 +214,8 @@ static void print_range(const struct ip_nat_range *r)
 }
 
 /* Prints out the targinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_target *target,
-      int numeric)
+static void SNAT_print(const void *ip, const struct xt_entry_target *target,
+                       int numeric)
 {
 	struct ipt_natinfo *info = (void *)target;
 	unsigned int i = 0;
@@ -235,8 +230,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_target *target)
+static void SNAT_save(const void *ip, const struct xt_entry_target *target)
 {
 	struct ipt_natinfo *info = (void *)target;
 	unsigned int i = 0;
@@ -250,20 +244,20 @@ save(const void *ip, const struct xt_entry_target *target)
 	}
 }
 
-static struct iptables_target snat = {
+static struct iptables_target snat_target = {
 	.name		= "SNAT",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= SNAT_help,
+	.parse		= SNAT_parse,
+	.final_check	= SNAT_check,
+	.print		= SNAT_print,
+	.save		= SNAT_save,
+	.extra_opts	= SNAT_opts,
 };
 
 void _init(void)
 {
-	register_target(&snat);
+	register_target(&snat_target);
 }

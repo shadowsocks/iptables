@@ -28,8 +28,7 @@ struct TOS_value
 };
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void TOS_help(void)
 {
 	unsigned int i;
 
@@ -47,7 +46,7 @@ IPTABLES_VERSION);
 	fputc('\n', stdout);
 }
 
-static const struct option opts[] = {
+static const struct option TOS_opts[] = {
 	{ "set-tos", 1, NULL, '1' },
 	{ }
 };
@@ -78,10 +77,8 @@ parse_tos(const char *s, struct ipt_tos_target_info *info)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_target **target)
+static int TOS_parse(int c, char **argv, int invert, unsigned int *flags,
+                     const void *entry, struct xt_entry_target **target)
 {
 	struct ipt_tos_target_info *tosinfo
 		= (struct ipt_tos_target_info *)(*target)->data;
@@ -102,8 +99,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void
-final_check(unsigned int flags)
+static void TOS_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -126,10 +122,8 @@ print_tos(u_int8_t tos, int numeric)
 }
 
 /* Prints out the targinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_target *target,
-      int numeric)
+static void TOS_print(const void *ip, const struct xt_entry_target *target,
+                      int numeric)
 {
 	const struct ipt_tos_target_info *tosinfo =
 		(const struct ipt_tos_target_info *)target->data;
@@ -138,8 +132,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_target *target)
+static void TOS_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_tos_target_info *tosinfo =
 		(const struct ipt_tos_target_info *)target->data;
@@ -147,20 +140,20 @@ save(const void *ip, const struct xt_entry_target *target)
 	printf("--set-tos 0x%02x ", tosinfo->tos);
 }
 
-static struct iptables_target tos = {
+static struct iptables_target tos_target = {
 	.name		= "TOS",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_tos_target_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_tos_target_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= TOS_help,
+	.parse		= TOS_parse,
+	.final_check	= TOS_check,
+	.print		= TOS_print,
+	.save		= TOS_save,
+	.extra_opts	= TOS_opts,
 };
 
 void _init(void)
 {
-	register_target(&tos);
+	register_target(&tos_target);
 }

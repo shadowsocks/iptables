@@ -12,8 +12,7 @@
 #define IPT_REDIRECT_OPT_RANDOM	0x02
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void REDIRECT_help(void)
 {
 	printf(
 "REDIRECT v%s options:\n"
@@ -22,15 +21,14 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option REDIRECT_opts[] = {
 	{ "to-ports", 1, NULL, '1' },
 	{ "random", 1, NULL, '2' },
 	{ }
 };
 
 /* Initialize the target. */
-static void
-init(struct xt_entry_target *t)
+static void REDIRECT_init(struct xt_entry_target *t)
 {
 	struct ip_nat_multi_range *mr = (struct ip_nat_multi_range *)t->data;
 
@@ -78,10 +76,8 @@ parse_ports(const char *arg, struct ip_nat_multi_range *mr)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *e,
-      struct xt_entry_target **target)
+static int REDIRECT_parse(int c, char **argv, int invert, unsigned int *flags,
+                          const void *e, struct xt_entry_target **target)
 {
 	const struct ipt_entry *entry = e;
 	struct ip_nat_multi_range *mr
@@ -125,10 +121,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Prints out the targinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_target *target,
-      int numeric)
+static void REDIRECT_print(const void *ip, const struct xt_entry_target *target,
+                           int numeric)
 {
 	struct ip_nat_multi_range *mr
 		= (struct ip_nat_multi_range *)target->data;
@@ -146,8 +140,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_target *target)
+static void REDIRECT_save(const void *ip, const struct xt_entry_target *target)
 {
 	struct ip_nat_multi_range *mr
 		= (struct ip_nat_multi_range *)target->data;
@@ -164,20 +157,20 @@ save(const void *ip, const struct xt_entry_target *target)
 	}
 }
 
-static struct iptables_target redir = { 
+static struct iptables_target redirect_target = {
 	.name		= "REDIRECT",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
-	.help		= &help,
-	.init		= &init,
- 	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= REDIRECT_help,
+	.init		= REDIRECT_init,
+ 	.parse		= REDIRECT_parse,
+	.print		= REDIRECT_print,
+	.save		= REDIRECT_save,
+	.extra_opts	= REDIRECT_opts,
 };
 
 void _init(void)
 {
-	register_target(&redir);
+	register_target(&redirect_target);
 }
