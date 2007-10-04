@@ -134,8 +134,7 @@ add_proto_to_mask(int proto){
 	return flag;
 }	
 
-static void
-help(void)
+static void ipv6header_help(void)
 {
 	printf(
 "ipv6header v%s match options:\n"
@@ -148,14 +147,13 @@ help(void)
 	IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option ipv6header_opts[] = {
 	{ "header", 1, NULL, '1' },
 	{ "soft", 0, NULL, '2' },
 	{ }
 };
 
-static void
-init(struct xt_entry_match *m)
+static void ipv6header_init(struct xt_entry_match *m)
 {
 	struct ip6t_ipv6header_info *info = (struct ip6t_ipv6header_info *)m->data;
 
@@ -184,9 +182,8 @@ parse_header(const char *flags) {
 
 /* Parses command options; returns 0 if it ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+ipv6header_parse(int c, char **argv, int invert, unsigned int *flags,
+                 const void *entry, struct xt_entry_match **match)
 {
 	struct ip6t_ipv6header_info *info = (struct ip6t_ipv6header_info *)(*match)->data;
 
@@ -223,8 +220,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Checks the flags variable */
-static void
-final_check(unsigned int flags)
+static void ipv6header_check(unsigned int flags)
 {
 	if (!flags) exit_error(PARAMETER_PROBLEM, "ip6t_ipv6header: no options specified");
 }
@@ -252,10 +248,8 @@ print_header(u_int8_t flags){
 }
 
 /* Prints out the match */
-static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+static void ipv6header_print(const void *ip,
+                             const struct xt_entry_match *match, int numeric)
 {
 	const struct ip6t_ipv6header_info *info = (const struct ip6t_ipv6header_info *)match->data;
 	printf("ipv6header ");
@@ -277,9 +271,7 @@ print(const void *ip,
 }
 
 /* Saves the match */
-static void
-save(const void *ip,
-     const struct xt_entry_match *match)
+static void ipv6header_save(const void *ip, const struct xt_entry_match *match)
 {
 
 	const struct ip6t_ipv6header_info *info = (const struct ip6t_ipv6header_info *)match->data;
@@ -294,22 +286,21 @@ save(const void *ip,
 	return;
 }
 
-static
-struct ip6tables_match ipv6header = {
+static struct ip6tables_match ipv6header_match6 = {
 	.name		= "ipv6header",
 	.version	= IPTABLES_VERSION,
 	.size		= IP6T_ALIGN(sizeof(struct ip6t_ipv6header_info)),
 	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_ipv6header_info)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= ipv6header_help,
+	.init		= ipv6header_init,
+	.parse		= ipv6header_parse,
+	.final_check	= ipv6header_check,
+	.print		= ipv6header_print,
+	.save		= ipv6header_save,
+	.extra_opts	= ipv6header_opts,
 };
 
 void _init(void)
 {
-	register_match6(&ipv6header);
+	register_match6(&ipv6header_match6);
 }

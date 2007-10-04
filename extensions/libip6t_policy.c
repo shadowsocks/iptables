@@ -22,7 +22,7 @@
  */
 static struct ip6t_policy_info *policy_info;
 
-static void help(void)
+static void policy_help(void)
 {
 	printf(
 "policy v%s options:\n"
@@ -41,7 +41,7 @@ static void help(void)
 	IPTABLES_VERSION);
 }
 
-static const struct option opts[] =
+static const struct option policy_opts[] =
 {
 	{
 		.name		= "dir",
@@ -160,9 +160,8 @@ static int parse_mode(char *s)
 	exit_error(PARAMETER_PROBLEM, "policy match: invalid mode `%s'", s);
 }
 
-static int parse(int c, char **argv, int invert, unsigned int *flags,
-                 const void *entry,
-                 struct xt_entry_match **match)
+static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
+                        const void *entry, struct xt_entry_match **match)
 {
 	struct ip6t_policy_info *info = (void *)(*match)->data;
 	struct ip6t_policy_elem *e = &info->pol[info->len];
@@ -289,7 +288,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void final_check(unsigned int flags)
+static void policy_check(unsigned int flags)
 {
 	struct ip6t_policy_info *info = policy_info;
 	struct ip6t_policy_elem *e;
@@ -421,9 +420,8 @@ static void print_flags(char *prefix, const struct ip6t_policy_info *info)
 		printf("%sstrict ", prefix);
 }
 
-static void print(const void *ip,
-                  const struct xt_entry_match *match,
-		  int numeric)
+static void policy_print(const void *ip, const struct xt_entry_match *match,
+                         int numeric)
 {
 	const struct ip6t_policy_info *info = (void *)match->data;
 	unsigned int i;
@@ -439,7 +437,7 @@ static void print(const void *ip,
 	printf("\n");
 }
 
-static void save(const void *ip, const struct xt_entry_match *match)
+static void policy_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_policy_info *info = (void *)match->data;
 	unsigned int i;
@@ -452,20 +450,20 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-static struct ip6tables_match policy = {
+static struct ip6tables_match policy_match6 = {
 	.name		= "policy",
 	.version	= IPTABLES_VERSION,
 	.size		= IP6T_ALIGN(sizeof(struct ip6t_policy_info)),
 	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_policy_info)),
-	.help		= help,
-	.parse		= parse,
-	.final_check	= final_check,
-	.print		= print,
-	.save		= save,
-	.extra_opts	= opts
+	.help		= policy_help,
+	.parse		= policy_parse,
+	.final_check	= policy_check,
+	.print		= policy_print,
+	.save		= policy_save,
+	.extra_opts	= policy_opts,
 };
 
 void _init(void)
 {
-	register_match6(&policy);
+	register_match6(&policy_match6);
 }

@@ -12,8 +12,7 @@
 #include <ip6tables.h>
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void eui64_help(void)
 {
 	printf(
 "eui64 v%s options:\n"
@@ -24,24 +23,22 @@ help(void)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+static int eui64_parse(int c, char **argv, int invert, unsigned int *flags,
+                       const void *entry, struct xt_entry_match **match)
 {
 	return 0;
 }
 
-static struct ip6tables_match eui64 = {
+static struct ip6tables_match eui64_target6 = {
 	.name 		= "eui64",
 	.version	= IPTABLES_VERSION,
 	.size		= IP6T_ALIGN(sizeof(int)),
 	.userspacesize	= IP6T_ALIGN(sizeof(int)),
-	.help		= &help,
-	.parse		= &parse,
+	.help		= eui64_help,
+	.parse		= eui64_parse,
 };
 
 void _init(void)
 {
-	register_match6(&eui64);
+	register_match6(&eui64_target6);
 }

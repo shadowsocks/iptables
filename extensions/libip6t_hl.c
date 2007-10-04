@@ -15,7 +15,7 @@
 #include <linux/netfilter_ipv6/ip6_tables.h>
 #include <linux/netfilter_ipv6/ip6t_hl.h>
 
-static void help(void) 
+static void hl_help(void)
 {
 	printf(
 "HL match v%s options:\n"
@@ -25,9 +25,8 @@ static void help(void)
 , IPTABLES_VERSION);
 }
 
-static int parse(int c, char **argv, int invert, unsigned int *flags,
-		const void *entry,
-		struct xt_entry_match **match)
+static int hl_parse(int c, char **argv, int invert, unsigned int *flags,
+                    const void *entry, struct xt_entry_match **match)
 {
 	struct ip6t_hl_info *info = (struct ip6t_hl_info *) (*match)->data;
 	u_int8_t value;
@@ -81,7 +80,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void final_check(unsigned int flags)
+static void hl_check(unsigned int flags)
 {
 	if (!flags) 
 		exit_error(PARAMETER_PROBLEM,
@@ -89,9 +88,8 @@ static void final_check(unsigned int flags)
 			"`--hl-eq', `--hl-lt', `--hl-gt'");
 }
 
-static void print(const void *ip,
-		const struct xt_entry_match *match,
-		int numeric)
+static void hl_print(const void *ip, const struct xt_entry_match *match,
+                     int numeric)
 {
 	static const char *op[] = {
 		[IP6T_HL_EQ] = "==",
@@ -105,8 +103,7 @@ static void print(const void *ip,
 	printf("HL match HL %s %u ", op[info->mode], info->hop_limit);
 }
 
-static void save(const void *ip,
-		const struct xt_entry_match *match)
+static void hl_save(const void *ip, const struct xt_entry_match *match)
 {
 	static const char *op[] = {
 		[IP6T_HL_EQ] = "eq",
@@ -120,7 +117,7 @@ static void save(const void *ip,
 	printf("--hl-%s %u ", op[info->mode], info->hop_limit);
 }
 
-static const struct option opts[] = {
+static const struct option hl_opts[] = {
 	{ .name = "hl",    .has_arg = 1, .val = '2' },
 	{ .name = "hl-eq", .has_arg = 1, .val = '2' },
 	{ .name = "hl-lt", .has_arg = 1, .val = '3' },
@@ -128,22 +125,21 @@ static const struct option opts[] = {
 	{ }
 };
 
-static
-struct ip6tables_match hl = {
+static struct ip6tables_match hl_match6 = {
 	.name          = "hl",
 	.version       = IPTABLES_VERSION,
 	.size          = IP6T_ALIGN(sizeof(struct ip6t_hl_info)),
 	.userspacesize = IP6T_ALIGN(sizeof(struct ip6t_hl_info)),
-	.help          = &help,
-	.parse         = &parse,
-	.final_check   = &final_check,
-	.print         = &print,
-	.save          = &save,
-	.extra_opts    = opts
+	.help          = hl_help,
+	.parse         = hl_parse,
+	.final_check   = hl_check,
+	.print         = hl_print,
+	.save          = hl_save,
+	.extra_opts    = hl_opts,
 };
 
 
 void _init(void) 
 {
-	register_match6(&hl);
+	register_match6(&hl_match6);
 }

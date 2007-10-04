@@ -11,8 +11,7 @@
 #include <linux/netfilter_ipv6/ip6t_owner.h>
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void owner_help(void)
 {
 #ifdef IP6T_OWNER_COMM
 	printf(
@@ -36,7 +35,7 @@ IPTABLES_VERSION);
 #endif /* IP6T_OWNER_COMM */
 }
 
-static const struct option opts[] = {
+static const struct option owner_opts[] = {
 	{ "uid-owner", 1, NULL, '1' },
 	{ "gid-owner", 1, NULL, '2' },
 	{ "pid-owner", 1, NULL, '3' },
@@ -49,10 +48,8 @@ static const struct option opts[] = {
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+static int owner_parse(int c, char **argv, int invert, unsigned int *flags,
+                       const void *entry, struct xt_entry_match **match)
 {
 	struct ip6t_owner_info *ownerinfo = (struct ip6t_owner_info *)(*match)->data;
 
@@ -188,8 +185,7 @@ print_item(struct ip6t_owner_info *info, u_int8_t flag, int numeric, char *label
 }
 
 /* Final check; must have specified --own. */
-static void
-final_check(unsigned int flags)
+static void owner_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -197,10 +193,8 @@ final_check(unsigned int flags)
 }
 
 /* Prints out the matchinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+static void owner_print(const void *ip, const struct xt_entry_match *match,
+                        int numeric)
 {
 	struct ip6t_owner_info *info = (struct ip6t_owner_info *)match->data;
 
@@ -214,8 +208,7 @@ print(const void *ip,
 }
 
 /* Saves the union ip6t_matchinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_match *match)
+static void owner_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct ip6t_owner_info *info = (struct ip6t_owner_info *)match->data;
 
@@ -228,20 +221,20 @@ save(const void *ip, const struct xt_entry_match *match)
 #endif
 }
 
-static struct ip6tables_match owner = {
+static struct ip6tables_match owner_match6 = {
 	.name 		= "owner",
 	.version	= IPTABLES_VERSION,
 	.size		= IP6T_ALIGN(sizeof(struct ip6t_owner_info)),
 	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_owner_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= owner_help,
+	.parse		= owner_parse,
+	.final_check	= owner_check,
+	.print		= owner_print,
+	.save		= owner_save,
+	.extra_opts	= owner_opts,
 };
 
 void _init(void)
 {
-	register_match6(&owner);
+	register_match6(&owner_match6);
 }

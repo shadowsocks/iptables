@@ -15,8 +15,7 @@
 /*#define DEBUG	1*/
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void rt_help(void)
 {
 	printf(
 "RT v%s options:\n"
@@ -29,7 +28,7 @@ help(void)
 IPTABLES_VERSION, IP6T_RT_HOPS);
 }
 
-static const struct option opts[] = {
+static const struct option rt_opts[] = {
 	{ "rt-type", 1, NULL, '1' },
 	{ "rt-segsleft", 1, NULL, '2' },
 	{ "rt-len", 1, NULL, '3' },
@@ -138,8 +137,7 @@ parse_addresses(const char *addrstr, struct in6_addr *addrp)
 }
 
 /* Initialize the match. */
-static void
-init(struct xt_entry_match *m)
+static void rt_init(struct xt_entry_match *m)
 {
 	struct ip6t_rt *rtinfo = (struct ip6t_rt *)m->data;
 
@@ -154,10 +152,8 @@ init(struct xt_entry_match *m)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+static int rt_parse(int c, char **argv, int invert, unsigned int *flags,
+                    const void *entry, struct xt_entry_match **match)
 {
 	struct ip6t_rt *rtinfo = (struct ip6t_rt *)(*match)->data;
 
@@ -269,9 +265,8 @@ print_addresses(int addrnr, struct in6_addr *addrp)
 }
 
 /* Prints out the union ip6t_matchinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_match *match, int numeric)
+static void rt_print(const void *ip, const struct xt_entry_match *match,
+                     int numeric)
 {
 	const struct ip6t_rt *rtinfo = (struct ip6t_rt *)match->data;
 
@@ -297,7 +292,7 @@ print(const void *ip,
 }
 
 /* Saves the union ip6t_matchinfo in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void rt_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_rt *rtinfo = (struct ip6t_rt *)match->data;
 
@@ -334,21 +329,21 @@ static void save(const void *ip, const struct xt_entry_match *match)
 
 }
 
-static struct ip6tables_match rt = {
+static struct ip6tables_match rt_match6 = {
 	.name		= "rt",
 	.version	= IPTABLES_VERSION,
 	.size		= IP6T_ALIGN(sizeof(struct ip6t_rt)),
 	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_rt)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= rt_help,
+	.init		= rt_init,
+	.parse		= rt_parse,
+	.print		= rt_print,
+	.save		= rt_save,
+	.extra_opts	= rt_opts,
 };
 
 void
 _init(void)
 {
-	register_match6(&rt);
+	register_match6(&rt_match6);
 }

@@ -18,8 +18,7 @@
 #define LNAME		(HOPBYHOP ? "hbh" : "dst")
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void hbh_help(void)
 {
 	printf(
 "%s v%s options:\n"
@@ -30,14 +29,14 @@ UNAME , IPTABLES_VERSION, LNAME, LNAME, IP6T_OPTS_OPTSNR);
 }
 
 #if HOPBYHOP
-static const struct option opts[] = {
+static const struct option hbh_opts[] = {
 	{ "hbh-len", 1, NULL, '1' },
 	{ "hbh-opts", 1, NULL, '2' },
 	{ "hbh-not-strict", 1, NULL, '3' },
 	{ }
 };
 #else
-static const struct option opts[] = {
+static const struct option hbh_opts[] = {
 	{ "dst-len", 1, NULL, '1' },
 	{ "dst-opts", 1, NULL, '2' },
 	{ "dst-not-strict", 1, NULL, '3' },
@@ -116,8 +115,7 @@ parse_options(const char *optsstr, u_int16_t *opts)
 }
 
 /* Initialize the match. */
-static void
-init(struct xt_entry_match *m)
+static void hbh_init(struct xt_entry_match *m)
 {
 	struct ip6t_opts *optinfo = (struct ip6t_opts *)m->data;
 
@@ -129,10 +127,8 @@ init(struct xt_entry_match *m)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+static int hbh_parse(int c, char **argv, int invert, unsigned int *flags,
+                     const void *entry, struct xt_entry_match **match)
 {
 	struct ip6t_opts *optinfo = (struct ip6t_opts *)(*match)->data;
 
@@ -192,9 +188,8 @@ print_options(int optsnr, u_int16_t *optsp)
 }
 
 /* Prints out the union ip6t_matchinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_match *match, int numeric)
+static void hbh_print(const void *ip, const struct xt_entry_match *match,
+                      int numeric)
 {
 	const struct ip6t_opts *optinfo = (struct ip6t_opts *)match->data;
 
@@ -214,7 +209,7 @@ print(const void *ip,
 }
 
 /* Saves the union ip6t_matchinfo in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void hbh_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_opts *optinfo = (struct ip6t_opts *)match->data;
 
@@ -230,7 +225,7 @@ static void save(const void *ip, const struct xt_entry_match *match)
 
 }
 
-static struct ip6tables_match optstruct = {
+static struct ip6tables_match hbh_match6 = {
 #if HOPBYHOP
 	.name 		= "hbh",
 #else
@@ -239,16 +234,16 @@ static struct ip6tables_match optstruct = {
 	.version	= IPTABLES_VERSION,
 	.size		= IP6T_ALIGN(sizeof(struct ip6t_opts)),
 	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_opts)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= hbh_help,
+	.init		= hbh_init,
+	.parse		= hbh_parse,
+	.print		= hbh_print,
+	.save		= hbh_save,
+	.extra_opts	= hbh_opts,
 };
 
 void
 _init(void)
 {
-	register_match6(&optstruct);
+	register_match6(&hbh_match6);
 }

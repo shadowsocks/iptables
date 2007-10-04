@@ -58,7 +58,7 @@ static void print_types_all(void)
 	printf("\n");
 }
 
-static void help(void)
+static void mh_help(void)
 {
 	printf(
 "MH v%s options:\n"
@@ -67,7 +67,7 @@ IPTABLES_VERSION);
 	print_types_all();
 }
 
-static void init(struct xt_entry_match *m)
+static void mh_init(struct xt_entry_match *m)
 {
 	struct ip6t_mh *mhinfo = (struct ip6t_mh *)m->data;
 
@@ -125,9 +125,8 @@ static void parse_mh_types(const char *mhtype, u_int8_t *types)
 
 #define MH_TYPES 0x01
 
-static int parse(int c, char **argv, int invert, unsigned int *flags,
-		 const void *entry,
-		 struct xt_entry_match **match)
+static int mh_parse(int c, char **argv, int invert, unsigned int *flags,
+                    const void *entry, struct xt_entry_match **match)
 {
 	struct ip6t_mh *mhinfo = (struct ip6t_mh *)(*match)->data;
 
@@ -189,9 +188,8 @@ static void print_types(u_int8_t min, u_int8_t max, int invert, int numeric)
 	}
 }
 
-static void print(const void *ip,
-		  const struct xt_entry_match *match,
-		  int numeric)
+static void mh_print(const void *ip, const struct xt_entry_match *match,
+                     int numeric)
 {
 	const struct ip6t_mh *mhinfo = (struct ip6t_mh *)match->data;
 
@@ -204,7 +202,7 @@ static void print(const void *ip,
 		       mhinfo->invflags & ~IP6T_MH_INV_MASK);
 }
 
-static void save(const void *ip, const struct xt_entry_match *match)
+static void mh_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_mh *mhinfo = (struct ip6t_mh *)match->data;
 
@@ -220,25 +218,25 @@ static void save(const void *ip, const struct xt_entry_match *match)
 		printf("--mh-type %u ", mhinfo->types[0]);
 }
 
-static const struct option opts[] = {
+static const struct option mh_opts[] = {
 	{ "mh-type", 1, NULL, '1' },
 	{ }
 };
 
-static struct ip6tables_match mh = {
+static struct ip6tables_match mh_match6 = {
 	.name		= "mh",
 	.version	= IPTABLES_VERSION,
 	.size		= IP6T_ALIGN(sizeof(struct ip6t_mh)),
 	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_mh)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= mh_help,
+	.init		= mh_init,
+	.parse		= mh_parse,
+	.print		= mh_print,
+	.save		= mh_save,
+	.extra_opts	= mh_opts,
 };
 
 void _init(void)
 {
-	register_match6(&mh);
+	register_match6(&mh_match6);
 }

@@ -20,8 +20,7 @@
 #endif
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void dst_help(void)
 {
 	printf(
 UNAME " v%s options:\n"
@@ -31,7 +30,7 @@ UNAME " v%s options:\n"
 IPTABLES_VERSION, IP6T_OPTS_OPTSNR);
 }
 
-static const struct option opts[] = {
+static const struct option dst_opts[] = {
 	{ .name = LNAME "-len",        .has_arg = 1, .val = '1' },
 	{ .name = LNAME "-opts",       .has_arg = 1, .val = '2' },
 	{ .name = LNAME "-not-strict", .has_arg = 1, .val = '3' },
@@ -117,8 +116,7 @@ parse_options(const char *optsstr, u_int16_t *opts)
 }
 
 /* Initialize the match. */
-static void
-init(struct xt_entry_match *m)
+static void dst_init(struct xt_entry_match *m)
 {
 	struct ip6t_opts *optinfo = (struct ip6t_opts *)m->data;
 
@@ -130,10 +128,8 @@ init(struct xt_entry_match *m)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+static int dst_parse(int c, char **argv, int invert, unsigned int *flags,
+                     const void *entry, struct xt_entry_match **match)
 {
 	struct ip6t_opts *optinfo = (struct ip6t_opts *)(*match)->data;
 
@@ -195,9 +191,8 @@ print_options(int optsnr, u_int16_t *optsp)
 }
 
 /* Prints out the union ip6t_matchinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_match *match, int numeric)
+static void dst_print(const void *ip, const struct xt_entry_match *match,
+                      int numeric)
 {
 	const struct ip6t_opts *optinfo = (struct ip6t_opts *)match->data;
 
@@ -221,7 +216,7 @@ print(const void *ip,
 }
 
 /* Saves the union ip6t_matchinfo in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void dst_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_opts *optinfo = (struct ip6t_opts *)match->data;
 
@@ -240,22 +235,21 @@ static void save(const void *ip, const struct xt_entry_match *match)
 		printf("--" LNAME "-not-strict ");
 }
 
-static
-struct ip6tables_match optstruct = {
+static struct ip6tables_match dst_match6 = {
 	.name          = LNAME,
 	.version       = IPTABLES_VERSION,
 	.size          = IP6T_ALIGN(sizeof(struct ip6t_opts)),
 	.userspacesize = IP6T_ALIGN(sizeof(struct ip6t_opts)),
-	.help          = &help,
-	.init          = &init,
-	.parse         = &parse,
-	.print         = &print,
-	.save          = &save,
-	.extra_opts    = opts
+	.help          = dst_help,
+	.init          = dst_init,
+	.parse         = dst_parse,
+	.print         = dst_print,
+	.save          = dst_save,
+	.extra_opts    = dst_opts,
 };
 
 void
 _init(void)
 {
-	register_match6(&optstruct);
+	register_match6(&dst_match6);
 }

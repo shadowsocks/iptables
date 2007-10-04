@@ -13,8 +13,7 @@
 #endif
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void state_help(void)
 {
 	printf(
 "state v%s options:\n"
@@ -23,7 +22,7 @@ help(void)
 "\n", IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option state_opts[] = {
 	{ "state", 1, 0, '1' },
 	{0}
 };
@@ -63,10 +62,8 @@ parse_states(const char *arg, struct ipt_state_info *sinfo)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+static int state_parse(int c, char **argv, int invert, unsigned int *flags,
+                       const void *entry, struct xt_entry_match **match)
 {
 	struct ipt_state_info *sinfo = (struct ipt_state_info *)(*match)->data;
 
@@ -88,7 +85,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Final check; must have specified --state. */
-static void final_check(unsigned int flags)
+static void state_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM, "You must specify `--state'");
@@ -122,10 +119,8 @@ static void print_state(unsigned int statemask)
 }
 
 /* Prints out the matchinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+static void state_print(const void *ip, const struct xt_entry_match *match,
+                        int numeric)
 {
 	struct ipt_state_info *sinfo = (struct ipt_state_info *)match->data;
 
@@ -134,7 +129,7 @@ print(const void *ip,
 }
 
 /* Saves the matchinfo in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void state_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct ipt_state_info *sinfo = (struct ipt_state_info *)match->data;
 
@@ -142,20 +137,20 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	print_state(sinfo->statemask);
 }
 
-static struct ip6tables_match state = { 
+static struct ip6tables_match state_match6 = {
 	.name		= "state",
 	.version	= IPTABLES_VERSION,
 	.size		= IP6T_ALIGN(sizeof(struct ipt_state_info)),
 	.userspacesize	= IP6T_ALIGN(sizeof(struct ipt_state_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= state_help,
+	.parse		= state_parse,
+	.final_check	= state_check,
+	.print		= state_print,
+	.save		= state_save,
+	.extra_opts	= state_opts,
 };
 
 void _init(void)
 {
-	register_match6(&state);
+	register_match6(&state_match6);
 }
