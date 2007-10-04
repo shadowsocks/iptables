@@ -9,8 +9,7 @@
 #include <linux/netfilter_ipv4/ipt_iprange.h>
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void iprange_help(void)
 {
 	printf(
 "iprange match v%s options:\n"
@@ -20,7 +19,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option iprange_opts[] = {
 	{ "src-range", 1, NULL, '1' },
 	{ "dst-range", 1, NULL, '2' },
 	{ }
@@ -54,10 +53,8 @@ parse_iprange(char *arg, struct ipt_iprange *range)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+static int iprange_parse(int c, char **argv, int invert, unsigned int *flags,
+                         const void *entry, struct xt_entry_match **match)
 {
 	struct ipt_iprange_info *info = (struct ipt_iprange_info *)(*match)->data;
 
@@ -99,8 +96,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Final check; must have specified --src-range or --dst-range. */
-static void
-final_check(unsigned int flags)
+static void iprange_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -120,10 +116,8 @@ print_iprange(const struct ipt_iprange *range)
 }
 
 /* Prints out the info. */
-static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+static void iprange_print(const void *ip, const struct xt_entry_match *match,
+                          int numeric)
 {
 	struct ipt_iprange_info *info = (struct ipt_iprange_info *)match->data;
 
@@ -142,8 +136,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_info in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_match *match)
+static void iprange_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct ipt_iprange_info *info = (struct ipt_iprange_info *)match->data;
 
@@ -163,20 +156,20 @@ save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-static struct iptables_match iprange = { 
+static struct iptables_match iprange_match = {
 	.name		= "iprange",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_iprange_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_iprange_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= iprange_help,
+	.parse		= iprange_parse,
+	.final_check	= iprange_check,
+	.print		= iprange_print,
+	.save		= iprange_save,
+	.extra_opts	= iprange_opts,
 };
 
 void _init(void)
 {
-	register_match(&iprange);
+	register_match(&iprange_match);
 }

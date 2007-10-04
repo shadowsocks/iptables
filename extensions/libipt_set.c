@@ -22,7 +22,7 @@
 #include "libipt_set.h"
 
 /* Function which prints out usage message. */
-static void help(void)
+static void set_help(void)
 {
 	printf("set v%s options:\n"
 	       " [!] --set     name flags\n"
@@ -32,13 +32,13 @@ static void help(void)
 	       "\n", IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option set_opts[] = {
 	{"set", 1, 0, '1'},
 	{0}
 };
 
 /* Initialize the match. */
-static void init(struct xt_entry_match *match)
+static void set_init(struct xt_entry_match *match)
 {
 	struct ipt_set_info_match *info = 
 		(struct ipt_set_info_match *) match->data;
@@ -49,10 +49,8 @@ static void init(struct xt_entry_match *match)
 }
 
 /* Function which parses command options; returns true if it ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+static int set_parse(int c, char **argv, int invert, unsigned int *flags,
+                     const void *entry, struct xt_entry_match **match)
 {
 	struct ipt_set_info_match *myinfo = 
 		(struct ipt_set_info_match *) (*match)->data;
@@ -95,7 +93,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Final check; must have specified --set. */
-static void final_check(unsigned int flags)
+static void set_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -125,9 +123,8 @@ print_match(const char *prefix, const struct ipt_set_info *info)
 }
 
 /* Prints out the matchinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_match *match, int numeric)
+static void set_print(const void *ip, const struct xt_entry_match *match,
+                      int numeric)
 {
 	struct ipt_set_info_match *info = 
 		(struct ipt_set_info_match *) match->data;
@@ -136,8 +133,7 @@ print(const void *ip,
 }
 
 /* Saves the matchinfo in parsable form to stdout. */
-static void save(const void *ip,
-		 const struct xt_entry_match *match)
+static void set_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct ipt_set_info_match *info = 
 		(struct ipt_set_info_match *) match->data;
@@ -145,22 +141,21 @@ static void save(const void *ip,
 	print_match("--set", &info->match_set);
 }
 
-static
-struct iptables_match set = {
+static struct iptables_match set_match = {
 	.name		= "set",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_set_info_match)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_set_info_match)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= set_help,
+	.init		= set_init,
+	.parse		= set_parse,
+	.final_check	= set_check,
+	.print		= set_print,
+	.save		= set_save,
+	.extra_opts	= set_opts,
 };
 
 void _init(void)
 {
-	register_match(&set);
+	register_match(&set_match);
 }

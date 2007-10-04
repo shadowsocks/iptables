@@ -18,8 +18,7 @@
 #endif
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void conntrack_help(void)
 {
 	printf(
 "conntrack match v%s options:\n"
@@ -41,9 +40,7 @@ help(void)
 "\n", IPTABLES_VERSION);
 }
 
-
-
-static const struct option opts[] = {
+static const struct option conntrack_opts[] = {
 	{ "ctstate", 1, NULL, '1' },
 	{ "ctproto", 1, NULL, '2' },
 	{ "ctorigsrc", 1, NULL, '3' },
@@ -165,10 +162,8 @@ parse_expires(const char *s, struct ipt_conntrack_info *sinfo)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
+                           const void *entry, struct xt_entry_match **match)
 {
 	struct ipt_conntrack_info *sinfo = (struct ipt_conntrack_info *)(*match)->data;
 	char *protocol = NULL;
@@ -316,8 +311,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void
-final_check(unsigned int flags)
+static void conntrack_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM, "You must specify one or more options");
@@ -489,34 +483,32 @@ matchinfo_print(const void *ip, const struct xt_entry_match *match, int numeric,
 }
 
 /* Prints out the matchinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+static void conntrack_print(const void *ip, const struct xt_entry_match *match,
+                            int numeric)
 {
 	matchinfo_print(ip, match, numeric, "");
 }
 
 /* Saves the matchinfo in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void conntrack_save(const void *ip, const struct xt_entry_match *match)
 {
 	matchinfo_print(ip, match, 1, "--");
 }
 
-static struct iptables_match conntrack = { 
+static struct iptables_match conntrack_match = {
 	.name		= "conntrack",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_conntrack_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_conntrack_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= conntrack_help,
+	.parse		= conntrack_parse,
+	.final_check	= conntrack_check,
+	.print		= conntrack_print,
+	.save		= conntrack_save,
+	.extra_opts	= conntrack_opts,
 };
 
 void _init(void)
 {
-	register_match(&conntrack);
+	register_match(&conntrack_match);
 }

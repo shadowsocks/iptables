@@ -98,8 +98,7 @@ print_icmptypes(void)
 }
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void icmp_help(void)
 {
 	printf(
 "ICMP v%s options:\n"
@@ -109,7 +108,7 @@ help(void)
 	print_icmptypes();
 }
 
-static const struct option opts[] = {
+static const struct option icmp_opts[] = {
 	{ "icmp-type", 1, NULL, '1' },
 	{ }
 };
@@ -168,8 +167,7 @@ parse_icmp(const char *icmptype, u_int8_t *type, u_int8_t code[])
 }
 
 /* Initialize the match. */
-static void
-init(struct xt_entry_match *m)
+static void icmp_init(struct xt_entry_match *m)
 {
 	struct ipt_icmp *icmpinfo = (struct ipt_icmp *)m->data;
 
@@ -179,10 +177,8 @@ init(struct xt_entry_match *m)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+static int icmp_parse(int c, char **argv, int invert, unsigned int *flags,
+                      const void *entry, struct xt_entry_match **match)
 {
 	struct ipt_icmp *icmpinfo = (struct ipt_icmp *)(*match)->data;
 
@@ -244,10 +240,8 @@ static void print_icmptype(u_int8_t type,
 }
 
 /* Prints out the union ipt_matchinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+static void icmp_print(const void *ip, const struct xt_entry_match *match,
+                       int numeric)
 {
 	const struct ipt_icmp *icmp = (struct ipt_icmp *)match->data;
 
@@ -262,7 +256,7 @@ print(const void *ip,
 }
 
 /* Saves the match in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void icmp_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ipt_icmp *icmp = (struct ipt_icmp *)match->data;
 
@@ -280,20 +274,20 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-static struct iptables_match icmp = { 
+static struct iptables_match icmp_match = {
 	.name		= "icmp",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_icmp)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_icmp)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= icmp_help,
+	.init		= icmp_init,
+	.parse		= icmp_parse,
+	.print		= icmp_print,
+	.save		= icmp_save,
+	.extra_opts	= icmp_opts,
 };
 
 void _init(void)
 {
-	register_match(&icmp);
+	register_match(&icmp_match);
 }

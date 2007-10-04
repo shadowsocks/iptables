@@ -16,7 +16,7 @@
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_ecn.h>
 
-static void help(void) 
+static void ecn_help(void)
 {
 	printf(
 "ECN match v%s options\n"
@@ -26,17 +26,15 @@ static void help(void)
 	IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option ecn_opts[] = {
 	{ .name = "ecn-tcp-cwr", .has_arg = 0, .val = 'F' },
 	{ .name = "ecn-tcp-ece", .has_arg = 0, .val = 'G' },
 	{ .name = "ecn-ip-ect",  .has_arg = 1, .val = 'H' },
 	{ }
 };
 
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+static int ecn_parse(int c, char **argv, int invert, unsigned int *flags,
+                     const void *entry, struct xt_entry_match **match)
 {
 	unsigned int result;
 	struct ipt_ecn_info *einfo
@@ -86,8 +84,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void
-final_check(unsigned int flags)
+static void ecn_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -95,10 +92,8 @@ final_check(unsigned int flags)
 }
 
 /* Prints out the matchinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+static void ecn_print(const void *ip, const struct xt_entry_match *match,
+                      int numeric)
 {
 	const struct ipt_ecn_info *einfo =
 		(const struct ipt_ecn_info *)match->data;
@@ -125,8 +120,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_match *match)
+static void ecn_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ipt_ecn_info *einfo =
 		(const struct ipt_ecn_info *)match->data;
@@ -150,21 +144,20 @@ save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-static
-struct iptables_match ecn
-= { .name          = "ecn",
+static struct iptables_match ecn_match = {
+    .name          = "ecn",
     .version       = IPTABLES_VERSION,
     .size          = IPT_ALIGN(sizeof(struct ipt_ecn_info)),
     .userspacesize = IPT_ALIGN(sizeof(struct ipt_ecn_info)),
-    .help          = &help,
-    .parse         = &parse,
-    .final_check   = &final_check,
-    .print         = &print,
-    .save          = &save,
-    .extra_opts    = opts
+    .help          = ecn_help,
+    .parse         = ecn_parse,
+    .final_check   = ecn_check,
+    .print         = ecn_print,
+    .save          = ecn_save,
+    .extra_opts    = ecn_opts,
 };
 
 void _init(void)
 {
-	register_match(&ecn);
+	register_match(&ecn_match);
 }

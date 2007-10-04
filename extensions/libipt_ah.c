@@ -9,8 +9,7 @@
 #include <linux/netfilter_ipv4/ipt_ah.h>
                                         
 /* Function which prints out usage message. */
-static void
-help(void)
+static void ah_help(void)
 {
 	printf(
 "AH v%s options:\n"
@@ -19,7 +18,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option ah_opts[] = {
 	{ "ahspi", 1, NULL, '1' },
 	{ }
 };
@@ -67,8 +66,7 @@ parse_ah_spis(const char *spistring, u_int32_t *spis)
 }
 
 /* Initialize the match. */
-static void
-init(struct xt_entry_match *m)
+static void ah_init(struct xt_entry_match *m)
 {
 	struct ipt_ah *ahinfo = (struct ipt_ah *)m->data;
 
@@ -79,10 +77,8 @@ init(struct xt_entry_match *m)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+static int ah_parse(int c, char **argv, int invert, unsigned int *flags,
+                    const void *entry, struct xt_entry_match **match)
 {
 	struct ipt_ah *ahinfo = (struct ipt_ah *)(*match)->data;
 
@@ -126,9 +122,8 @@ print_spis(const char *name, u_int32_t min, u_int32_t max,
 }
 
 /* Prints out the union ipt_matchinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_match *match, int numeric)
+static void ah_print(const void *ip, const struct xt_entry_match *match,
+                     int numeric)
 {
 	const struct ipt_ah *ah = (struct ipt_ah *)match->data;
 
@@ -141,7 +136,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void ah_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ipt_ah *ahinfo = (struct ipt_ah *)match->data;
 
@@ -161,21 +156,21 @@ static void save(const void *ip, const struct xt_entry_match *match)
 
 }
 
-static struct iptables_match ah = { 
+static struct iptables_match ah_match = {
 	.name 		= "ah",
 	.version 	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_ah)),
 	.userspacesize 	= IPT_ALIGN(sizeof(struct ipt_ah)),
-	.help 		= &help,
-	.init 		= &init,
-	.parse 		= &parse,
-	.print 		= &print,
-	.save 		= &save,
-	.extra_opts 	= opts
+	.help 		= ah_help,
+	.init 		= ah_init,
+	.parse 		= ah_parse,
+	.print 		= ah_print,
+	.save 		= ah_save,
+	.extra_opts 	= ah_opts,
 };
 
 void
 _init(void)
 {
-	register_match(&ah);
+	register_match(&ah_match);
 }

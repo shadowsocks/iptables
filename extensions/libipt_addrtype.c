@@ -36,7 +36,7 @@ static void addrtype_help_types(void)
 		printf("                                %s\n", rtn_names[i]);
 }
 
-static void addrtype_help(void) 
+static void addrtype_help(void)
 {
 	printf(
 "Address type match v%s options:\n"
@@ -49,7 +49,7 @@ static void addrtype_help(void)
 }
 
 static int
-addrtype_parse_type(const char *name, size_t strlen, u_int16_t *mask)
+parse_type(const char *name, size_t strlen, u_int16_t *mask)
 {
 	int i;
 
@@ -63,27 +63,27 @@ addrtype_parse_type(const char *name, size_t strlen, u_int16_t *mask)
 	return 0;
 }
 
-static void addrtype_parse_types(const char *arg, u_int16_t *mask)
+static void parse_types(const char *arg, u_int16_t *mask)
 {
 	const char *comma;
 
 	while ((comma = strchr(arg, ',')) != NULL) {
-		if (comma == arg || !addrtype_parse_type(arg, comma-arg, mask))
+		if (comma == arg || !parse_type(arg, comma-arg, mask))
 			exit_error(PARAMETER_PROBLEM,
 			           "addrtype: bad type `%s'", arg);
 		arg = comma + 1;
 	}
 
-	if (strlen(arg) == 0 || !addrtype_parse_type(arg, strlen(arg), mask))
+	if (strlen(arg) == 0 || !parse_type(arg, strlen(arg), mask))
 		exit_error(PARAMETER_PROBLEM, "addrtype: bad type `%s'", arg);
 }
 	
 #define IPT_ADDRTYPE_OPT_SRCTYPE	0x1
 #define IPT_ADDRTYPE_OPT_DSTTYPE	0x2
 
-static int addrtype_parse(int c, char **argv, int invert, unsigned int *flags,
-		const void *entry,
-		struct xt_entry_match **match)
+static int
+addrtype_parse(int c, char **argv, int invert, unsigned int *flags,
+               const void *entry, struct xt_entry_match **match)
 {
 	struct ipt_addrtype_info *info =
 		(struct ipt_addrtype_info *) (*match)->data;
@@ -94,7 +94,7 @@ static int addrtype_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 			           "addrtype: can't specify src-type twice");
 		check_inverse(optarg, &invert, &optind, 0);
-		addrtype_parse_types(argv[optind-1], &info->source);
+		parse_types(argv[optind-1], &info->source);
 		if (invert)
 			info->invert_source = 1;
 		*flags |= IPT_ADDRTYPE_OPT_SRCTYPE;
@@ -104,7 +104,7 @@ static int addrtype_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 			           "addrtype: can't specify dst-type twice");
 		check_inverse(optarg, &invert, &optind, 0);
-		addrtype_parse_types(argv[optind-1], &info->dest);
+		parse_types(argv[optind-1], &info->dest);
 		if (invert)
 			info->invert_dest = 1;
 		*flags |= IPT_ADDRTYPE_OPT_DSTTYPE;
@@ -116,14 +116,14 @@ static int addrtype_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void addrtype_final_check(unsigned int flags)
+static void addrtype_check(unsigned int flags)
 {
 	if (!(flags & (IPT_ADDRTYPE_OPT_SRCTYPE|IPT_ADDRTYPE_OPT_DSTTYPE)))
 		exit_error(PARAMETER_PROBLEM,
 			   "addrtype: you must specify --src-type or --dst-type");
 }
 
-static void addrtype_print_types(u_int16_t mask)
+static void print_types(u_int16_t mask)
 {
 	const char *sep = "";
 	int i;
@@ -137,9 +137,8 @@ static void addrtype_print_types(u_int16_t mask)
 	printf(" ");
 }
 
-static void addrtype_print(const void *ip,
-		const struct xt_entry_match *match,
-		int numeric)
+static void addrtype_print(const void *ip, const struct xt_entry_match *match,
+                           int numeric)
 {
 	const struct ipt_addrtype_info *info = 
 		(struct ipt_addrtype_info *) match->data;
@@ -149,18 +148,17 @@ static void addrtype_print(const void *ip,
 		printf("src-type ");
 		if (info->invert_source)
 			printf("!");
-		addrtype_print_types(info->source);
+		print_types(info->source);
 	}
 	if (info->dest) {
 		printf("dst-type ");
 		if (info->invert_dest)
 			printf("!");
-		addrtype_print_types(info->dest);
+		print_types(info->dest);
 	}
 }
 
-static void addrtype_save(const void *ip,
-		const struct xt_entry_match *match)
+static void addrtype_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ipt_addrtype_info *info =
 		(struct ipt_addrtype_info *) match->data;
@@ -169,38 +167,37 @@ static void addrtype_save(const void *ip,
 		printf("--src-type ");
 		if (info->invert_source)
 			printf("! ");
-		addrtype_print_types(info->source);
+		print_types(info->source);
 	}
 	if (info->dest) {
 		printf("--dst-type ");
 		if (info->invert_dest)
 			printf("! ");
-		addrtype_print_types(info->dest);
+		print_types(info->dest);
 	}
 }
 
-static const struct option opts[] = {
+static const struct option addrtype_opts[] = {
 	{ "src-type", 1, NULL, '1' },
 	{ "dst-type", 1, NULL, '2' },
 	{ }
 };
 
-static
-struct iptables_match addrtype = {
+static struct iptables_match addrtype_match = {
 	.name 		= "addrtype",
 	.version 	= IPTABLES_VERSION,
 	.size 		= IPT_ALIGN(sizeof(struct ipt_addrtype_info)),
 	.userspacesize 	= IPT_ALIGN(sizeof(struct ipt_addrtype_info)),
-	.help 		= &addrtype_help,
-	.parse 		= &addrtype_parse,
-	.final_check 	= &addrtype_final_check,
-	.print 		= &addrtype_print,
-	.save 		= &addrtype_save,
-	.extra_opts 	= opts
+	.help 		= addrtype_help,
+	.parse 		= addrtype_parse,
+	.final_check 	= addrtype_check,
+	.print 		= addrtype_print,
+	.save 		= addrtype_save,
+	.extra_opts 	= addrtype_opts,
 };
 
 
 void _init(void) 
 {
-	register_match(&addrtype);
+	register_match(&addrtype_match);
 }
