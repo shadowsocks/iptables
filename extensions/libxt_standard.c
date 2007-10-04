@@ -16,12 +16,6 @@ help(void)
 "(If target is DROP, ACCEPT, RETURN or nothing)\n", IPTABLES_VERSION);
 }
 
-/* Initialize the target. */
-static void
-init(struct xt_entry_target *t)
-{
-}
-
 /* Function which parses command options; returns true if it
    ate an option */
 static int
@@ -51,7 +45,6 @@ struct xtables_target standard = {
 	.size		= XT_ALIGN(sizeof(int)),
 	.userspacesize	= XT_ALIGN(sizeof(int)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= NULL,
@@ -66,7 +59,6 @@ struct xtables_target standard6 = {
 	.size		= XT_ALIGN(sizeof(int)),
 	.userspacesize	= XT_ALIGN(sizeof(int)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= NULL,

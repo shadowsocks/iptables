@@ -16,12 +16,6 @@ help(void)
 IPTABLES_VERSION);
 }
 
-/* Initialize the target. */
-static void
-init(struct xt_entry_target *t)
-{
-}
-
 /* Function which parses command options; returns true if it
    ate an option */
 static int
@@ -43,7 +37,6 @@ static struct iptables_target mirror = {
 	.size		= IPT_ALIGN(0),
 	.userspacesize	= IPT_ALIGN(0),
  	.help		= &help,
-	.init		= &init,
  	.parse		= &parse,
 	.final_check 	= &final_check,
 	.print		= NULL,

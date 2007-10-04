@@ -17,10 +17,6 @@
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_ECN.h>
 
-static void init(struct xt_entry_target *t)
-{
-}
-
 static void help(void) 
 {
 	printf(
@@ -170,7 +166,6 @@ struct iptables_target ecn = {
 	.size		= IPT_ALIGN(sizeof(struct ipt_ECN_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_ECN_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

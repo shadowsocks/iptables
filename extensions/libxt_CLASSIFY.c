@@ -26,12 +26,6 @@ static const struct option opts[] = {
 	{ }
 };
 
-/* Initialize the target. */
-static void
-init(struct xt_entry_target *t)
-{
-}
-
 int string_to_priority(const char *s, unsigned int *p)
 {
 	unsigned int i, j;
@@ -115,7 +109,6 @@ static struct xtables_target classify = {
 	.size		= XT_ALIGN(sizeof(struct xt_classify_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_classify_target_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,
@@ -130,7 +123,6 @@ static struct xtables_target classify6 = {
 	.size		= XT_ALIGN(sizeof(struct xt_classify_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_classify_target_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

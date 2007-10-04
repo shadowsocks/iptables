@@ -16,10 +16,6 @@
 
 #define IPT_TTL_USED	1
 
-static void init(struct xt_entry_target *t)
-{
-}
-
 static void help(void) 
 {
 	printf(
@@ -152,7 +148,6 @@ static struct iptables_target TTL = {
 	.size		= IPT_ALIGN(sizeof(struct ipt_TTL_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_TTL_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

@@ -55,11 +55,6 @@ static const struct option opts[] = {
 };
 
 static void
-init(struct xt_entry_target *t)
-{
-}
-
-static void
 parse_mac(const char *mac, char *macbuf)
 {
 	unsigned int i = 0;
@@ -253,7 +248,6 @@ static struct iptables_target clusterip = {
 	.size		= IPT_ALIGN(sizeof(struct ipt_clusterip_tgt_info)),
 	.userspacesize	= offsetof(struct ipt_clusterip_tgt_info, config),
  	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

@@ -93,10 +93,6 @@ static const struct option opts[] =
 	{ }
 };
 
-static void init(struct xt_entry_match *m)
-{
-}
-
 static int parse_direction(char *s)
 {
 	if (strcmp(s, "in") == 0)
@@ -420,7 +416,6 @@ struct iptables_match policy = {
 	.size		= IPT_ALIGN(sizeof(struct ipt_policy_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_policy_info)),
 	.help		= help,
-	.init		= init,
 	.parse		= parse,
 	.final_check	= final_check,
 	.print		= print,

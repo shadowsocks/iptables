@@ -133,10 +133,6 @@ extern void parse_hostnetworkmask(const char *name, struct in6_addr **addrpp,
 
 /* End duplicated code from ip6tables.c */
 
-static void init(struct xt_entry_match *m)
-{
-}
-
 static int parse_direction(char *s)
 {
 	if (strcmp(s, "in") == 0)
@@ -462,7 +458,6 @@ struct ip6tables_match policy = {
 	.size		= IP6T_ALIGN(sizeof(struct ip6t_policy_info)),
 	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_policy_info)),
 	.help		= help,
-	.init		= init,
 	.parse		= parse,
 	.final_check	= final_check,
 	.print		= print,

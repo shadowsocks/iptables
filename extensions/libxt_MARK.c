@@ -28,12 +28,6 @@ static const struct option opts[] = {
 	{ }
 };
 
-/* Initialize the target. */
-static void
-init(struct xt_entry_target *t)
-{
-}
-
 /* Function which parses command options; returns true if it
    ate an option */
 static int
@@ -192,7 +186,6 @@ static struct xtables_target mark_v0 = {
 	.size		= XT_ALIGN(sizeof(struct xt_mark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_target_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse_v0,
 	.final_check	= &final_check,
 	.print		= &print_v0,
@@ -208,7 +201,6 @@ static struct xtables_target mark_v1 = {
 	.size		= XT_ALIGN(sizeof(struct xt_mark_target_info_v1)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_target_info_v1)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse_v1,
 	.final_check	= &final_check,
 	.print		= &print_v1,
@@ -224,7 +216,6 @@ static struct xtables_target mark6_v0 = {
 	.size		= XT_ALIGN(sizeof(struct xt_mark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_target_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse_v0,
 	.final_check	= &final_check,
 	.print		= &print_v0,

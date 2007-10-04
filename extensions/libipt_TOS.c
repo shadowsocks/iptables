@@ -52,12 +52,6 @@ static const struct option opts[] = {
 	{ }
 };
 
-/* Initialize the target. */
-static void
-init(struct xt_entry_target *t)
-{
-}
-
 static void
 parse_tos(const char *s, struct ipt_tos_target_info *info)
 {
@@ -159,7 +153,6 @@ static struct iptables_target tos = {
 	.size		= IPT_ALIGN(sizeof(struct ipt_tos_target_info)),
 	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_tos_target_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

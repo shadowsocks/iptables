@@ -133,12 +133,6 @@ parse_multi_ports_v1(const char *portstring,
  	free(buffer);
 }
 
-/* Initialize the match. */
-static void
-init(struct xt_entry_match *m)
-{
-}
-
 static const char *
 check_proto(u_int16_t pnum, u_int8_t invflags)
 {
@@ -523,7 +517,6 @@ static struct xtables_match multiport = {
 	.size		= XT_ALIGN(sizeof(struct xt_multiport)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,
@@ -539,7 +532,6 @@ static struct xtables_match multiport6 = {
 	.size		= XT_ALIGN(sizeof(struct xt_multiport)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse6,
 	.final_check	= &final_check,
 	.print		= &print6,
@@ -555,7 +547,6 @@ static struct xtables_match multiport_v1 = {
 	.size		= XT_ALIGN(sizeof(struct xt_multiport_v1)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport_v1)),
 	.help		= &help_v1,
-	.init		= &init,
 	.parse		= &parse_v1,
 	.final_check	= &final_check,
 	.print		= &print_v1,
@@ -571,7 +562,6 @@ static struct xtables_match multiport6_v1 = {
 	.size		= XT_ALIGN(sizeof(struct xt_multiport_v1)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport_v1)),
 	.help		= &help_v1,
-	.init		= &init,
 	.parse		= &parse6_v1,
 	.final_check	= &final_check,
 	.print		= &print6_v1,

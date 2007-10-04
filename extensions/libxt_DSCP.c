@@ -21,11 +21,6 @@
 /* This is evil, but it's my code - HW*/
 #include "libipt_dscp_helper.c"
 
-
-static void init(struct xt_entry_target *t)
-{
-}
-
 static void help(void) 
 {
 	printf(
@@ -150,7 +145,6 @@ static struct xtables_target dscp = {
 	.size		= XT_ALIGN(sizeof(struct xt_DSCP_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_DSCP_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,
@@ -165,7 +159,6 @@ static struct xtables_target dscp6 = {
 	.size		= XT_ALIGN(sizeof(struct xt_DSCP_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_DSCP_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

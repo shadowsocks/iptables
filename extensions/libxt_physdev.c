@@ -34,11 +34,6 @@ static const struct option opts[] = {
 	{ }
 };
 
-static void
-init(struct xt_entry_match *m)
-{
-}
-
 static int
 parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
@@ -178,7 +173,6 @@ static struct xtables_match physdev = {
 	.size		= XT_ALIGN(sizeof(struct xt_physdev_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_physdev_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,
@@ -193,7 +187,6 @@ static struct xtables_match physdev6 = {
 	.size		= XT_ALIGN(sizeof(struct xt_physdev_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_physdev_info)),
 	.help		= &help,
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,

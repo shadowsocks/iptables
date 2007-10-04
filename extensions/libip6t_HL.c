@@ -16,10 +16,6 @@
 
 #define IP6T_HL_USED	1
 
-static void init(struct xt_entry_target *t)
-{
-}
-
 static void help(void) 
 {
 	printf(
@@ -152,7 +148,6 @@ struct ip6tables_target HL = {
 	.size		= IP6T_ALIGN(sizeof(struct ip6t_HL_info)),
 	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_HL_info)),
 	.help		= &help, 
-	.init		= &init,
 	.parse		= &parse,
 	.final_check	= &final_check,
 	.print		= &print,
