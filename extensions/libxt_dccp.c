@@ -81,7 +81,7 @@ parse_dccp_ports(const char *portstring,
 	free(buffer);
 }
 
-static char *dccp_pkt_types[] = {
+static const char *const dccp_pkt_types[] = {
 	[DCCP_PKT_REQUEST] 	= "REQUEST",
 	[DCCP_PKT_RESPONSE]	= "RESPONSE",
 	[DCCP_PKT_DATA]		= "DATA",

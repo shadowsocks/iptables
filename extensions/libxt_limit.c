@@ -126,7 +126,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static struct rates
+static const struct rates
 {
 	const char *name;
 	u_int32_t mult;

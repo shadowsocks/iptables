@@ -26,7 +26,7 @@ static const struct option opts[] = {
 	{ }
 };
 
-int string_to_priority(const char *s, unsigned int *p)
+static int string_to_priority(const char *s, unsigned int *p)
 {
 	unsigned int i, j;
 

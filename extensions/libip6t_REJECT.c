@@ -145,7 +145,7 @@ static void save(const void *ip,
 	printf("--reject-with %s ", reject_table[i].name);
 }
 
-struct ip6tables_target reject = {
+static struct ip6tables_target reject = {
 	.name = "REJECT",
 	.version	= IPTABLES_VERSION,
 	.size 		= IP6T_ALIGN(sizeof(struct ip6t_reject_info)),

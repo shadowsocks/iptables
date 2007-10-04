@@ -66,7 +66,7 @@ struct tcp_flag_names {
 	unsigned int flag;
 };
 
-static struct tcp_flag_names tcp_flag_names[]
+static const struct tcp_flag_names tcp_flag_names[]
 = { { "FIN", 0x01 },
     { "SYN", 0x02 },
     { "RST", 0x04 },

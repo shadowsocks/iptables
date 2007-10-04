@@ -57,7 +57,7 @@ struct ip6t_log_names {
 	unsigned int level;
 };
 
-static struct ip6t_log_names ip6t_log_names[]
+static const struct ip6t_log_names ip6t_log_names[]
 = { { .name = "alert",   .level = LOG_ALERT },
     { .name = "crit",    .level = LOG_CRIT },
     { .name = "debug",   .level = LOG_DEBUG },

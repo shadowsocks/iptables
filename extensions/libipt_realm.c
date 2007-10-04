@@ -116,7 +116,7 @@ static void load_realms(void)
 }
 
 /* get realm id for name, -1 if error/not found */
-int realm_name2id(const char* name)
+static int realm_name2id(const char* name)
 {
 	struct realmname* cur;
 
@@ -134,7 +134,7 @@ int realm_name2id(const char* name)
 }
 
 /* get realm name for id, NULL if error/not found */
-const char* realm_id2name(int id)
+static const char *realm_id2name(int id)
 {
 	struct realmname* cur;
 

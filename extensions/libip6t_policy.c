@@ -452,7 +452,7 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-struct ip6tables_match policy = {
+static struct ip6tables_match policy = {
 	.name		= "policy",
 	.version	= IPTABLES_VERSION,
 	.size		= IP6T_ALIGN(sizeof(struct ip6t_policy_info)),

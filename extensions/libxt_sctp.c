@@ -110,7 +110,7 @@ struct sctp_chunk_names {
 };
 
 /*'ALL' and 'NONE' will be treated specially. */
-static struct sctp_chunk_names sctp_chunk_names[]
+static const struct sctp_chunk_names sctp_chunk_names[]
 = { { .name = "DATA", 		.chunk_type = 0,   .valid_flags = "-----UBE"},
     { .name = "INIT", 		.chunk_type = 1,   .valid_flags = "--------"},
     { .name = "INIT_ACK", 	.chunk_type = 2,   .valid_flags = "--------"},

@@ -249,7 +249,7 @@ static void final_check(unsigned int flags)
 				"You have to specify --hashlimit-name");
 }
 
-static struct rates
+static const struct rates
 {
 	const char *name;
 	u_int32_t mult;
