@@ -32,21 +32,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
-/* Prints out the matchinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
-{
-	printf("eui64 ");
-}
-
-/* Saves the union ip6t_matchinfo in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_match *match)
-{
-
-}
-
 static struct ip6tables_match eui64 = {
 	.name 		= "eui64",
 	.version	= IPTABLES_VERSION,
@@ -54,8 +39,6 @@ static struct ip6tables_match eui64 = {
 	.userspacesize	= IP6T_ALIGN(sizeof(int)),
 	.help		= &help,
 	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
 };
 
 void _init(void)

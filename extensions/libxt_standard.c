@@ -26,12 +26,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
-/* Saves the targinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_target *target)
-{
-}
-
 static
 struct xtables_target standard = { 
 	.family		= AF_INET,
@@ -41,8 +35,6 @@ struct xtables_target standard = {
 	.userspacesize	= XT_ALIGN(sizeof(int)),
 	.help		= &help,
 	.parse		= &parse,
-	.print		= NULL,
-	.save		= &save,
 };
 
 static
@@ -54,8 +46,6 @@ struct xtables_target standard6 = {
 	.userspacesize	= XT_ALIGN(sizeof(int)),
 	.help		= &help,
 	.parse		= &parse,
-	.print		= NULL,
-	.save		= &save,
 };
 
 void _init(void)

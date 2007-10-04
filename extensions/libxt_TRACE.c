@@ -34,8 +34,6 @@ static struct xtables_target trace = {
 	.userspacesize	= XT_ALIGN(0),
 	.help		= &help,
 	.parse		= &parse,
-	.print		= NULL, /* print */
-	.save		= NULL, /* save */
 };
 
 static struct xtables_target trace6 = {
@@ -46,8 +44,6 @@ static struct xtables_target trace6 = {
 	.userspacesize	= XT_ALIGN(0),
 	.help		= &help,
 	.parse		= &parse,
-	.print		= NULL, /* print */
-	.save		= NULL, /* save */
 };
 
 void _init(void)

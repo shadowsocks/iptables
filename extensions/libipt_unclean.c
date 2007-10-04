@@ -31,8 +31,6 @@ struct iptables_match unclean = {
 	.userspacesize	= IPT_ALIGN(0),
 	.help		= &help,
 	.parse		= &parse,
-	.print		= NULL,
-	.save		= NULL,
 };
 
 void _init(void)
