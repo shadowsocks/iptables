@@ -8,8 +8,7 @@
 #include <linux/netfilter/xt_tcpudp.h>
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void tcp_help(void)
 {
 	printf(
 "TCP v%s options:\n"
@@ -27,7 +26,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option tcp_opts[] = {
 	{ "source-port", 1, NULL, '1' },
 	{ "sport", 1, NULL, '1' }, /* synonym */
 	{ "destination-port", 1, NULL, '2' },
@@ -130,8 +129,7 @@ parse_tcp_option(const char *option, u_int8_t *result)
 }
 
 /* Initialize the match. */
-static void
-init(struct xt_entry_match *m)
+static void tcp_init(struct xt_entry_match *m)
 {
 	struct xt_tcp *tcpinfo = (struct xt_tcp *)m->data;
 
@@ -146,9 +144,8 @@ init(struct xt_entry_match *m)
 /* Function which parses command options; returns true if it
    ate an option. */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+tcp_parse(int c, char **argv, int invert, unsigned int *flags,
+          const void *entry, struct xt_entry_match **match)
 {
 	struct xt_tcp *tcpinfo = (struct xt_tcp *)(*match)->data;
 
@@ -310,8 +307,7 @@ print_flags(u_int8_t mask, u_int8_t cmp, int invert, int numeric)
 
 /* Prints out the union ipt_matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match, int numeric)
+tcp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_tcp *tcp = (struct xt_tcp *)match->data;
 
@@ -334,7 +330,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void tcp_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_tcp *tcpinfo = (struct xt_tcp *)match->data;
 
@@ -387,37 +383,37 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-static struct xtables_match tcp = { 
+static struct xtables_match tcp_match = {
 	.family		= AF_INET,
 	.name		= "tcp",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcp)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= tcp_help,
+	.init		= tcp_init,
+	.parse		= tcp_parse,
+	.print		= tcp_print,
+	.save		= tcp_save,
+	.extra_opts	= tcp_opts,
 };
 
-static struct xtables_match tcp6 = { 
+static struct xtables_match tcp_match6 = {
 	.family		= AF_INET6,
 	.name		= "tcp",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcp)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= tcp_help,
+	.init		= tcp_init,
+	.parse		= tcp_parse,
+	.print		= tcp_print,
+	.save		= tcp_save,
+	.extra_opts	= tcp_opts,
 };
 
 void
 _init(void)
 {
-	xtables_register_match(&tcp);
-	xtables_register_match(&tcp6);
+	xtables_register_match(&tcp_match);
+	xtables_register_match(&tcp_match6);
 }

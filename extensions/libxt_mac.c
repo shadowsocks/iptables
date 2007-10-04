@@ -13,8 +13,7 @@
 #include <linux/netfilter/xt_mac.h>
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void mac_help(void)
 {
 	printf(
 "MAC v%s options:\n"
@@ -23,7 +22,7 @@ help(void)
 "\n", IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option mac_opts[] = {
 	{ "mac-source", 1, NULL, '1' },
 	{ }
 };
@@ -55,9 +54,8 @@ parse_mac(const char *mac, struct xt_mac_info *info)
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+mac_parse(int c, char **argv, int invert, unsigned int *flags,
+          const void *entry, struct xt_entry_match **match)
 {
 	struct xt_mac_info *macinfo = (struct xt_mac_info *)(*match)->data;
 
@@ -88,7 +86,7 @@ static void print_mac(unsigned char macaddress[ETH_ALEN])
 }
 
 /* Final check; must have specified --mac. */
-static void final_check(unsigned int flags)
+static void mac_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -97,9 +95,7 @@ static void final_check(unsigned int flags)
 
 /* Prints out the matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+mac_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	printf("MAC ");
 
@@ -110,7 +106,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void mac_save(const void *ip, const struct xt_entry_match *match)
 {
 	if (((struct xt_mac_info *)match->data)->invert)
 		printf("! ");
@@ -119,36 +115,36 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	print_mac(((struct xt_mac_info *)match->data)->srcaddr);
 }
 
-static struct xtables_match mac = { 
+static struct xtables_match mac_match = {
 	.family		= AF_INET,
  	.name		= "mac",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_mac_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_mac_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= mac_help,
+	.parse		= mac_parse,
+	.final_check	= mac_check,
+	.print		= mac_print,
+	.save		= mac_save,
+	.extra_opts	= mac_opts,
 };
 
-static struct xtables_match mac6 = { 
+static struct xtables_match mac_match6 = {
 	.family		= AF_INET6,
  	.name		= "mac",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_mac_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_mac_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= mac_help,
+	.parse		= mac_parse,
+	.final_check	= mac_check,
+	.print		= mac_print,
+	.save		= mac_save,
+	.extra_opts	= mac_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&mac);
-	xtables_register_match(&mac6);
+	xtables_register_match(&mac_match);
+	xtables_register_match(&mac_match6);
 }

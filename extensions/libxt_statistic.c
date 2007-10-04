@@ -8,8 +8,7 @@
 #include <xtables.h>
 #include <linux/netfilter/xt_statistic.h>
 
-static void
-help(void)
+static void statistic_help(void)
 {
 	printf(
 "statistic match v%s options:\n"
@@ -23,7 +22,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option statistic_opts[] = {
 	{ "mode", 1, NULL, '1' },
 	{ "probability", 1, NULL, '2' },
 	{ "every", 1, NULL, '3' },
@@ -34,9 +33,8 @@ static const struct option opts[] = {
 static struct xt_statistic_info *info;
 
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+statistic_parse(int c, char **argv, int invert, unsigned int *flags,
+                const void *entry, struct xt_entry_match **match)
 {
 	double prob;
 
@@ -95,8 +93,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Final check; must have specified --mark. */
-static void
-final_check(unsigned int flags)
+static void statistic_check(unsigned int flags)
 {
 	if (!(flags & 0x1))
 		exit_error(PARAMETER_PROBLEM, "no mode specified");
@@ -145,9 +142,7 @@ static void print_match(const struct xt_statistic_info *info, char *prefix)
 }
 
 static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+statistic_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	struct xt_statistic_info *info = (struct xt_statistic_info *)match->data;
 
@@ -156,44 +151,43 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_match *match)
+static void statistic_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_statistic_info *info = (struct xt_statistic_info *)match->data;
 
 	print_match(info, "--");
 }
 
-static struct xtables_match statistic = { 
+static struct xtables_match statistic_match = {
 	.family		= AF_INET,
 	.name		= "statistic",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_statistic_info)),
 	.userspacesize	= offsetof(struct xt_statistic_info, u.nth.count),
-	.help		= help,
-	.parse		= parse,
-	.final_check	= final_check,
-	.print		= print,
-	.save		= save,
-	.extra_opts	= opts
+	.help		= statistic_help,
+	.parse		= statistic_parse,
+	.final_check	= statistic_check,
+	.print		= statistic_print,
+	.save		= statistic_save,
+	.extra_opts	= statistic_opts,
 };
 
-static struct xtables_match statistic6 = { 
+static struct xtables_match statistic_match6 = {
 	.family		= AF_INET6,
 	.name		= "statistic",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_statistic_info)),
 	.userspacesize	= offsetof(struct xt_statistic_info, u.nth.count),
-	.help		= help,
-	.parse		= parse,
-	.final_check	= final_check,
-	.print		= print,
-	.save		= save,
-	.extra_opts	= opts
+	.help		= statistic_help,
+	.parse		= statistic_parse,
+	.final_check	= statistic_check,
+	.print		= statistic_print,
+	.save		= statistic_save,
+	.extra_opts	= statistic_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&statistic);
-	xtables_register_match(&statistic6);
+	xtables_register_match(&statistic_match);
+	xtables_register_match(&statistic_match6);
 }

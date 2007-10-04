@@ -29,8 +29,7 @@
 #include <linux/netfilter/xt_connmark.h>
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void connmark_help(void)
 {
 	printf(
 "CONNMARK match v%s options:\n"
@@ -39,7 +38,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option connmark_opts[] = {
 	{ "mark", 1, NULL, '1' },
 	{ }
 };
@@ -47,9 +46,8 @@ static const struct option opts[] = {
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+connmark_parse(int c, char **argv, int invert, unsigned int *flags,
+               const void *entry, struct xt_entry_match **match)
 {
 	struct xt_connmark_info *markinfo = (struct xt_connmark_info *)(*match)->data;
 
@@ -87,8 +85,7 @@ print_mark(unsigned long mark, unsigned long mask, int numeric)
 }
 
 /* Final check; must have specified --mark. */
-static void
-final_check(unsigned int flags)
+static void connmark_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -97,9 +94,7 @@ final_check(unsigned int flags)
 
 /* Prints out the matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+connmark_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	struct xt_connmark_info *info = (struct xt_connmark_info *)match->data;
 
@@ -110,8 +105,7 @@ print(const void *ip,
 }
 
 /* Saves the matchinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_match *match)
+static void connmark_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_connmark_info *info = (struct xt_connmark_info *)match->data;
 
@@ -128,12 +122,12 @@ static struct xtables_match connmark_match = {
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_connmark_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connmark_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= connmark_help,
+	.parse		= connmark_parse,
+	.final_check	= connmark_check,
+	.print		= connmark_print,
+	.save		= connmark_save,
+	.extra_opts	= connmark_opts,
 };
 
 static struct xtables_match connmark_match6 = {
@@ -142,12 +136,12 @@ static struct xtables_match connmark_match6 = {
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_connmark_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connmark_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= connmark_help,
+	.parse		= connmark_parse,
+	.final_check	= connmark_check,
+	.print		= connmark_print,
+	.save		= connmark_save,
+	.extra_opts	= connmark_opts,
 };
 
 void _init(void)

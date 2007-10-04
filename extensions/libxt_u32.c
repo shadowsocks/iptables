@@ -268,7 +268,7 @@ static void u32_save(const void *ip, const struct xt_entry_match *match)
 	return;
 }
 
-static struct xtables_match u32_reg = {
+static struct xtables_match u32_match = {
 	.name          = "u32",
 	.family        = AF_INET,
 	.version       = IPTABLES_VERSION,
@@ -281,7 +281,7 @@ static struct xtables_match u32_reg = {
 	.extra_opts    = u32_opts,
 };
 
-static struct xtables_match u32_reg6 = {
+static struct xtables_match u32_match6 = {
 	.name          = "u32",
 	.family        = AF_INET6,
 	.version       = IPTABLES_VERSION,
@@ -296,7 +296,7 @@ static struct xtables_match u32_reg6 = {
 
 void _init(void)
 {
-	xtables_register_match(&u32_reg);
-	xtables_register_match(&u32_reg6);
+	xtables_register_match(&u32_match);
+	xtables_register_match(&u32_match6);
 	return;
 }

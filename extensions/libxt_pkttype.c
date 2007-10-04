@@ -55,16 +55,16 @@ static void print_types(void)
 }
 
 /* Function which prints out usage message. */
-static void help(void)
+static void pkttype_help(void)
 {
 	printf(
-"pkt_type v%s options:\n"
+"pkttype v%s options:\n"
 "  --pkt-type [!] packettype\tmatch packet type\n"
 "\n", PKTTYPE_VERSION);
 	print_types();
 }
 
-static const struct option opts[] = {
+static const struct option pkttype_opts[] = {
 	{"pkt-type", 1, NULL, '1'},
 	{ }
 };
@@ -85,9 +85,8 @@ static void parse_pkttype(const char *pkttype, struct xt_pkttype_info *info)
 	exit_error(PARAMETER_PROBLEM, "Bad packet type '%s'", pkttype);
 }
 
-static int parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+static int pkttype_parse(int c, char **argv, int invert, unsigned int *flags,
+                         const void *entry, struct xt_entry_match **match)
 {
 	struct xt_pkttype_info *info = (struct xt_pkttype_info *)(*match)->data;
 	
@@ -108,7 +107,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void final_check(unsigned int flags)
+static void pkttype_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM, "You must specify `--pkt-type'");
@@ -130,7 +129,8 @@ static void print_pkttype(struct xt_pkttype_info *info)
 	printf("%d ", info->pkttype);	/* in case we didn't find an entry in named-packtes */
 }
 
-static void print(const void *ip, const struct xt_entry_match *match, int numeric)
+static void pkttype_print(const void *ip, const struct xt_entry_match *match,
+                          int numeric)
 {
 	struct xt_pkttype_info *info = (struct xt_pkttype_info *)match->data;
 	
@@ -138,7 +138,7 @@ static void print(const void *ip, const struct xt_entry_match *match, int numeri
 	print_pkttype(info);
 }
 
-static void save(const void *ip, const struct xt_entry_match *match)
+static void pkttype_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_pkttype_info *info = (struct xt_pkttype_info *)match->data;
 	
@@ -146,36 +146,36 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	print_pkttype(info);
 }
 
-static struct xtables_match pkttype = {
+static struct xtables_match pkttype_match = {
 	.family		= AF_INET,
 	.name		= "pkttype",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_pkttype_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_pkttype_info)),
-	.help		= &help,
-	.parse		= &parse, 
-	.final_check	= &final_check, 
-	.print		= &print,
-	.save		= &save, 
-	.extra_opts	= opts
+	.help		= pkttype_help,
+	.parse		= pkttype_parse,
+	.final_check	= pkttype_check,
+	.print		= pkttype_print,
+	.save		= pkttype_save,
+	.extra_opts	= pkttype_opts,
 };
 
-static struct xtables_match pkttype6 = {
+static struct xtables_match pkttype_match6 = {
 	.family		= AF_INET6,
 	.name		= "pkttype",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_pkttype_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_pkttype_info)),
-	.help		= &help,
-	.parse		= &parse, 
-	.final_check	= &final_check, 
-	.print		= &print,
-	.save		= &save, 
-	.extra_opts	= opts
+	.help		= pkttype_help,
+	.parse		= pkttype_parse,
+	.final_check	= pkttype_check,
+	.print		= pkttype_print,
+	.save		= pkttype_save,
+	.extra_opts	= pkttype_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&pkttype);
-	xtables_register_match(&pkttype6);
+	xtables_register_match(&pkttype_match);
+	xtables_register_match(&pkttype_match6);
 }

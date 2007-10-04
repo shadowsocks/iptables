@@ -31,8 +31,7 @@
 #include <linux/netfilter/xt_string.h>
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void string_help(void)
 {
 	printf(
 "STRING match v%s options:\n"
@@ -44,7 +43,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option string_opts[] = {
 	{ "from", 1, NULL, '1' },
 	{ "to", 1, NULL, '2' },
 	{ "algo", 1, NULL, '3' },
@@ -53,8 +52,7 @@ static const struct option opts[] = {
 	{ }
 };
 
-static void
-init(struct xt_entry_match *m)
+static void string_init(struct xt_entry_match *m)
 {
 	struct xt_string_info *i = (struct xt_string_info *) m->data;
 
@@ -169,9 +167,8 @@ parse_hex_string(const char *s, struct xt_string_info *info)
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+string_parse(int c, char **argv, int invert, unsigned int *flags,
+             const void *entry, struct xt_entry_match **match)
 {
 	struct xt_string_info *stringinfo = (struct xt_string_info *)(*match)->data;
 
@@ -229,8 +226,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 
 /* Final check; must have specified --string. */
-static void
-final_check(unsigned int flags)
+static void string_check(unsigned int flags)
 {
 	if (!(flags & STRING))
 		exit_error(PARAMETER_PROBLEM,
@@ -288,9 +284,7 @@ print_string(const char *str, const unsigned short int len)
 
 /* Prints out the matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+string_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_string_info *info =
 	    (const struct xt_string_info*) match->data;
@@ -311,8 +305,7 @@ print(const void *ip,
 
 
 /* Saves the union ipt_matchinfo in parseable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_match *match)
+static void string_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_string_info *info =
 	    (const struct xt_string_info*) match->data;
@@ -332,39 +325,39 @@ save(const void *ip, const struct xt_entry_match *match)
 }
 
 
-static struct xtables_match string = {
+static struct xtables_match string_match = {
     .name		= "string",
-    .family			= AF_INET,
+    .family		= AF_INET,
     .version		= IPTABLES_VERSION,
     .size		= XT_ALIGN(sizeof(struct xt_string_info)),
     .userspacesize	= offsetof(struct xt_string_info, config),
-    .help		= help,
-    .init		= init,
-    .parse		= parse,
-    .final_check	= final_check,
-    .print		= print,
-    .save		= save,
-    .extra_opts		= opts
+    .help		= string_help,
+    .init		= string_init,
+    .parse		= string_parse,
+    .final_check	= string_check,
+    .print		= string_print,
+    .save		= string_save,
+    .extra_opts		= string_opts,
 };
 
 
-static struct xtables_match string6 = {
+static struct xtables_match string_match6 = {
     .name		= "string",
-    .family			= AF_INET6,
+    .family		= AF_INET6,
     .version		= IPTABLES_VERSION,
     .size		= XT_ALIGN(sizeof(struct xt_string_info)),
     .userspacesize	= offsetof(struct xt_string_info, config),
-    .help		= help,
-    .init		= init,
-    .parse		= parse,
-    .final_check	= final_check,
-    .print		= print,
-    .save		= save,
-    .extra_opts		= opts
+    .help		= string_help,
+    .init		= string_init,
+    .parse		= string_parse,
+    .final_check	= string_check,
+    .print		= string_print,
+    .save		= string_save,
+    .extra_opts		= string_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&string);
-	xtables_register_match(&string6);
+	xtables_register_match(&string_match);
+	xtables_register_match(&string_match6);
 }

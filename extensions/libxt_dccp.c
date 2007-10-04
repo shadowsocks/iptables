@@ -25,15 +25,14 @@
 #endif
 
 /* Initialize the match. */
-static void
-init(struct xt_entry_match *m)
+static void dccp_init(struct xt_entry_match *m)
 {
 	struct xt_dccp_info *einfo = (struct xt_dccp_info *)m->data;
 
 	memset(einfo, 0, sizeof(struct xt_dccp_info));
 }
 
-static void help(void)
+static void dccp_help(void)
 {
 	printf(
 "DCCP match v%s options\n"
@@ -45,7 +44,7 @@ static void help(void)
 	IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option dccp_opts[] = {
 	{ .name = "source-port", .has_arg = 1, .val = '1' },
 	{ .name = "sport", .has_arg = 1, .val = '1' },
 	{ .name = "destination-port", .has_arg = 1, .val = '2' },
@@ -132,9 +131,8 @@ static u_int8_t parse_dccp_option(char *optstring)
 }
 
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+dccp_parse(int c, char **argv, int invert, unsigned int *flags,
+           const void *entry, struct xt_entry_match **match)
 {
 	struct xt_dccp_info *einfo
 		= (struct xt_dccp_info *)(*match)->data;
@@ -272,9 +270,7 @@ print_option(u_int8_t option, int invert, int numeric)
 
 /* Prints out the matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+dccp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_dccp_info *einfo =
 		(const struct xt_dccp_info *)match->data;
@@ -306,9 +302,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void
-save(const void *ip,
-     const struct xt_entry_match *match)
+static void dccp_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_dccp_info *einfo =
 		(const struct xt_dccp_info *)match->data;
@@ -345,39 +339,37 @@ save(const void *ip,
 	}
 }
 
-static struct xtables_match dccp =
-{
+static struct xtables_match dccp_match = {
 	.name		= "dccp",
 	.family		= AF_INET,
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_dccp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_dccp_info)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= dccp_help,
+	.init		= dccp_init,
+	.parse		= dccp_parse,
+	.print		= dccp_print,
+	.save		= dccp_save,
+	.extra_opts	= dccp_opts,
 };
 
-static struct xtables_match dccp6 =
-{
+static struct xtables_match dccp_match6 = {
 	.name		= "dccp",
 	.family		= AF_INET6,
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_dccp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_dccp_info)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= dccp_help,
+	.init		= dccp_init,
+	.parse		= dccp_parse,
+	.print		= dccp_print,
+	.save		= dccp_save,
+	.extra_opts	= dccp_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&dccp);
-	xtables_register_match(&dccp6);
+	xtables_register_match(&dccp_match);
+	xtables_register_match(&dccp_match6);
 }
 

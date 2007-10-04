@@ -10,8 +10,7 @@
 #include "../include/linux/netfilter/xt_mark.h"
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void mark_help(void)
 {
 	printf(
 "MARK match v%s options:\n"
@@ -20,7 +19,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option mark_opts[] = {
 	{ "mark", 1, NULL, '1' },
 	{ }
 };
@@ -28,9 +27,8 @@ static const struct option opts[] = {
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+mark_parse(int c, char **argv, int invert, unsigned int *flags,
+           const void *entry, struct xt_entry_match **match)
 {
 	struct xt_mark_info *markinfo = (struct xt_mark_info *)(*match)->data;
 
@@ -66,8 +64,7 @@ print_mark(unsigned long mark, unsigned long mask, int numeric)
 }
 
 /* Final check; must have specified --mark. */
-static void
-final_check(unsigned int flags)
+static void mark_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -76,9 +73,7 @@ final_check(unsigned int flags)
 
 /* Prints out the matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+mark_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	struct xt_mark_info *info = (struct xt_mark_info *)match->data;
 
@@ -92,7 +87,7 @@ print(const void *ip,
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void
-save(const void *ip, const struct xt_entry_match *match)
+mark_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_mark_info *info = (struct xt_mark_info *)match->data;
 
@@ -103,36 +98,36 @@ save(const void *ip, const struct xt_entry_match *match)
 	print_mark(info->mark, info->mask, 0);
 }
 
-static struct xtables_match mark = { 
+static struct xtables_match mark_match = {
 	.family		= AF_INET,
 	.name		= "mark",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_mark_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= mark_help,
+	.parse		= mark_parse,
+	.final_check	= mark_check,
+	.print		= mark_print,
+	.save		= mark_save,
+	.extra_opts	= mark_opts,
 };
 
-static struct xtables_match mark6 = { 
+static struct xtables_match mark_match6 = {
 	.family		= AF_INET6,
 	.name		= "mark",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_mark_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= mark_help,
+	.parse		= mark_parse,
+	.final_check	= mark_check,
+	.print		= mark_print,
+	.save		= mark_save,
+	.extra_opts	= mark_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&mark);
-	xtables_register_match(&mark6);
+	xtables_register_match(&mark_match);
+	xtables_register_match(&mark_match6);
 }

@@ -18,8 +18,7 @@
 #define XT_LIMIT_BURST	5
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void limit_help(void)
 {
 	printf(
 "limit v%s options:\n"
@@ -30,7 +29,7 @@ help(void)
 "\n", IPTABLES_VERSION, XT_LIMIT_BURST);
 }
 
-static const struct option opts[] = {
+static const struct option limit_opts[] = {
 	{ "limit", 1, NULL, '%' },
 	{ "limit-burst", 1, NULL, '$' },
 	{ }
@@ -73,8 +72,7 @@ int parse_rate(const char *rate, u_int32_t *val)
 }
 
 /* Initialize the match. */
-static void
-init(struct xt_entry_match *m)
+static void limit_init(struct xt_entry_match *m)
 {
 	struct xt_rateinfo *r = (struct xt_rateinfo *)m->data;
 
@@ -92,9 +90,8 @@ init(struct xt_entry_match *m)
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+limit_parse(int c, char **argv, int invert, unsigned int *flags,
+            const void *entry, struct xt_entry_match **match)
 {
 	struct xt_rateinfo *r = (struct xt_rateinfo *)(*match)->data;
 	unsigned int num;
@@ -150,9 +147,7 @@ static void print_rate(u_int32_t period)
 
 /* Prints out the matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+limit_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	struct xt_rateinfo *r = (struct xt_rateinfo *)match->data;
 	printf("limit: avg "); print_rate(r->avg);
@@ -160,7 +155,7 @@ print(const void *ip,
 }
 
 /* FIXME: Make minimalist: only print rate if not default --RR */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void limit_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_rateinfo *r = (struct xt_rateinfo *)match->data;
 
@@ -169,36 +164,36 @@ static void save(const void *ip, const struct xt_entry_match *match)
 		printf("--limit-burst %u ", r->burst);
 }
 
-static struct xtables_match limit = { 
+static struct xtables_match limit_match = {
 	.family		= AF_INET,
 	.name		= "limit",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_rateinfo)),
 	.userspacesize	= offsetof(struct xt_rateinfo, prev),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= limit_help,
+	.init		= limit_init,
+	.parse		= limit_parse,
+	.print		= limit_print,
+	.save		= limit_save,
+	.extra_opts	= limit_opts,
 };
 
-static struct xtables_match limit6 = { 
+static struct xtables_match limit_match6 = {
 	.family		= AF_INET6,
 	.name		= "limit",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_rateinfo)),
 	.userspacesize	= offsetof(struct xt_rateinfo, prev),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= limit_help,
+	.init		= limit_init,
+	.parse		= limit_parse,
+	.print		= limit_print,
+	.save		= limit_save,
+	.extra_opts	= limit_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&limit);
-	xtables_register_match(&limit6);
+	xtables_register_match(&limit_match);
+	xtables_register_match(&limit_match6);
 }

@@ -15,8 +15,7 @@
 #include <linux/netfilter/xt_comment.h>
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void comment_help(void)
 {
 	printf(
 		"COMMENT match options:\n"
@@ -24,7 +23,7 @@ help(void)
 		);
 }
 
-static const struct option opts[] = {
+static const struct option comment_opts[] = {
 	{ "comment", 1, NULL, '1' },
 	{ }
 };
@@ -44,9 +43,8 @@ parse_comment(const char *s, struct xt_comment_info *info)
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+comment_parse(int c, char **argv, int invert, unsigned int *flags,
+              const void *entry, struct xt_entry_match **match)
 {
 	struct xt_comment_info *commentinfo = (struct xt_comment_info *)(*match)->data;
 
@@ -68,8 +66,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Final check; must have specified --comment. */
-static void
-final_check(unsigned int flags)
+static void comment_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -78,9 +75,7 @@ final_check(unsigned int flags)
 
 /* Prints out the matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+comment_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	struct xt_comment_info *commentinfo = (struct xt_comment_info *)match->data;
 
@@ -90,7 +85,7 @@ print(const void *ip,
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void
-save(const void *ip, const struct xt_entry_match *match)
+comment_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_comment_info *commentinfo = (struct xt_comment_info *)match->data;
 
@@ -98,36 +93,36 @@ save(const void *ip, const struct xt_entry_match *match)
 	printf("--comment \"%s\" ", commentinfo->comment);
 }
 
-static struct xtables_match comment = {
+static struct xtables_match comment_match = {
 	.family		= AF_INET,
 	.name		= "comment",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_comment_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_comment_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print 		= &print,
-	.save 		= &save,
-	.extra_opts	= opts
+	.help		= comment_help,
+	.parse		= comment_parse,
+	.final_check	= comment_check,
+	.print 		= comment_print,
+	.save 		= comment_save,
+	.extra_opts	= comment_opts,
 };
 
-static struct xtables_match comment6 = {
+static struct xtables_match comment_match6 = {
 	.family		= AF_INET6,
 	.name		= "comment",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_comment_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_comment_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print 		= &print,
-	.save 		= &save,
-	.extra_opts	= opts
+	.help		= comment_help,
+	.parse		= comment_parse,
+	.final_check	= comment_check,
+	.print 		= comment_print,
+	.save 		= comment_save,
+	.extra_opts	= comment_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&comment);
-	xtables_register_match(&comment6);
+	xtables_register_match(&comment_match);
+	xtables_register_match(&comment_match6);
 }

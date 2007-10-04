@@ -9,8 +9,7 @@
 #include <linux/netfilter/xt_connbytes.h>
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void connbytes_help(void)
 {
 	printf(
 "connbytes v%s options:\n"
@@ -20,7 +19,7 @@ help(void)
 "\n", IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option connbytes_opts[] = {
 	{ "connbytes", 1, NULL, '1' },
 	{ "connbytes-dir", 1, NULL, '2' },
 	{ "connbytes-mode", 1, NULL, '3' },
@@ -49,9 +48,8 @@ parse_range(const char *arg, struct xt_connbytes_info *si)
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+connbytes_parse(int c, char **argv, int invert, unsigned int *flags,
+                const void *entry, struct xt_entry_match **match)
 {
 	struct xt_connbytes_info *sinfo = (struct xt_connbytes_info *)(*match)->data;
 	unsigned long i;
@@ -101,7 +99,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void final_check(unsigned int flags)
+static void connbytes_check(unsigned int flags)
 {
 	if (flags != 7)
 		exit_error(PARAMETER_PROBLEM, "You must specify `--connbytes'"
@@ -146,9 +144,7 @@ static void print_direction(struct xt_connbytes_info *sinfo)
 
 /* Prints out the matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+connbytes_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	struct xt_connbytes_info *sinfo = (struct xt_connbytes_info *)match->data;
 
@@ -169,7 +165,7 @@ print(const void *ip,
 }
 
 /* Saves the matchinfo in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void connbytes_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_connbytes_info *sinfo = (struct xt_connbytes_info *)match->data;
 
@@ -189,36 +185,36 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	print_direction(sinfo);
 }
 
-static struct xtables_match state = {
+static struct xtables_match connbytes_match = {
 	.family		= AF_INET,
 	.name 		= "connbytes",
 	.version 	= IPTABLES_VERSION,
 	.size 		= XT_ALIGN(sizeof(struct xt_connbytes_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connbytes_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save 		= &save,
-	.extra_opts	= opts
+	.help		= connbytes_help,
+	.parse		= connbytes_parse,
+	.final_check	= connbytes_check,
+	.print		= connbytes_print,
+	.save 		= connbytes_save,
+	.extra_opts	= connbytes_opts,
 };
 
-static struct xtables_match state6 = {
+static struct xtables_match connbytes_match6 = {
 	.family		= AF_INET6,
 	.name 		= "connbytes",
 	.version 	= IPTABLES_VERSION,
 	.size 		= XT_ALIGN(sizeof(struct xt_connbytes_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connbytes_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save 		= &save,
-	.extra_opts	= opts
+	.help		= connbytes_help,
+	.parse		= connbytes_parse,
+	.final_check	= connbytes_check,
+	.print		= connbytes_print,
+	.save 		= connbytes_save,
+	.extra_opts	= connbytes_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&state);
-	xtables_register_match(&state6);
+	xtables_register_match(&connbytes_match);
+	xtables_register_match(&connbytes_match6);
 }

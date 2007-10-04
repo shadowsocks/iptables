@@ -9,8 +9,7 @@
 #include <linux/netfilter/xt_esp.h>
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void esp_help(void)
 {
 	printf(
 "ESP v%s options:\n"
@@ -19,7 +18,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option esp_opts[] = {
 	{ "espspi", 1, NULL, '1' },
 	{ }
 };
@@ -70,8 +69,7 @@ parse_esp_spis(const char *spistring, u_int32_t *spis)
 }
 
 /* Initialize the match. */
-static void
-init(struct xt_entry_match *m)
+static void esp_init(struct xt_entry_match *m)
 {
 	struct xt_esp *espinfo = (struct xt_esp *)m->data;
 
@@ -83,9 +81,8 @@ init(struct xt_entry_match *m)
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+esp_parse(int c, char **argv, int invert, unsigned int *flags,
+          const void *entry, struct xt_entry_match **match)
 {
 	struct xt_esp *espinfo = (struct xt_esp *)(*match)->data;
 
@@ -123,8 +120,7 @@ print_spis(const char *name, u_int32_t min, u_int32_t max,
 
 /* Prints out the union ipt_matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match, int numeric)
+esp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_esp *esp = (struct xt_esp *)match->data;
 
@@ -137,7 +133,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void esp_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_esp *espinfo = (struct xt_esp *)match->data;
 
@@ -157,37 +153,37 @@ static void save(const void *ip, const struct xt_entry_match *match)
 
 }
 
-static struct xtables_match esp = { 
+static struct xtables_match esp_match = {
 	.family		= AF_INET,
 	.name 		= "esp",
 	.version 	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_esp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_esp)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= esp_help,
+	.init		= esp_init,
+	.parse		= esp_parse,
+	.print		= esp_print,
+	.save		= esp_save,
+	.extra_opts	= esp_opts,
 };
 
-static struct xtables_match esp6 = { 
+static struct xtables_match esp_match6 = {
 	.family		= AF_INET6,
 	.name 		= "esp",
 	.version 	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_esp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_esp)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= esp_help,
+	.init		= esp_init,
+	.parse		= esp_parse,
+	.print		= esp_print,
+	.save		= esp_save,
+	.extra_opts	= esp_opts,
 };
 
 void
 _init(void)
 {
-	xtables_register_match(&esp);
-	xtables_register_match(&esp6);
+	xtables_register_match(&esp_match);
+	xtables_register_match(&esp_match6);
 }

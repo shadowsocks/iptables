@@ -12,8 +12,7 @@
 #include <linux/if_ether.h>
 #endif
 
-static void
-help(void)
+static void physdev_help(void)
 {
 	printf(
 "physdev v%s options:\n"
@@ -25,7 +24,7 @@ help(void)
 "\n", IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option physdev_opts[] = {
 	{ "physdev-in", 1, NULL, '1' },
 	{ "physdev-out", 1, NULL, '2' },
 	{ "physdev-is-in", 0, NULL, '3' },
@@ -35,9 +34,8 @@ static const struct option opts[] = {
 };
 
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+physdev_parse(int c, char **argv, int invert, unsigned int *flags,
+              const void *entry, struct xt_entry_match **match)
 {
 	struct xt_physdev_info *info =
 		(struct xt_physdev_info*)(*match)->data;
@@ -108,16 +106,14 @@ multiple_use:
 
 }
 
-static void final_check(unsigned int flags)
+static void physdev_check(unsigned int flags)
 {
 	if (flags == 0)
 		exit_error(PARAMETER_PROBLEM, "PHYSDEV: no physdev option specified");
 }
 
 static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+physdev_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	struct xt_physdev_info *info =
 		(struct xt_physdev_info*)match->data;
@@ -142,7 +138,7 @@ print(const void *ip,
 	printf(" ");
 }
 
-static void save(const void *ip, const struct xt_entry_match *match)
+static void physdev_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_physdev_info *info =
 		(struct xt_physdev_info*)match->data;
@@ -166,36 +162,36 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	printf(" ");
 }
 
-static struct xtables_match physdev = { 
+static struct xtables_match physdev_match = {
 	.family		= AF_INET,
 	.name		= "physdev",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_physdev_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_physdev_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= physdev_help,
+	.parse		= physdev_parse,
+	.final_check	= physdev_check,
+	.print		= physdev_print,
+	.save		= physdev_save,
+	.extra_opts	= physdev_opts,
 };
 
-static struct xtables_match physdev6 = { 
+static struct xtables_match physdev_match6 = {
 	.family		= AF_INET6,
 	.name		= "physdev",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_physdev_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_physdev_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= physdev_help,
+	.parse		= physdev_parse,
+	.final_check	= physdev_check,
+	.print		= physdev_print,
+	.save		= physdev_save,
+	.extra_opts	= physdev_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&physdev);
-	xtables_register_match(&physdev6);
+	xtables_register_match(&physdev_match);
+	xtables_register_match(&physdev_match6);
 }

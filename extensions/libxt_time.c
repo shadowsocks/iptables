@@ -463,7 +463,7 @@ static void time_save(const void *ip, const struct xt_entry_match *match)
 		printf("--utc ");
 }
 
-static struct xtables_match time_reg = {
+static struct xtables_match time_match = {
 	.name          = "time",
 	.family        = AF_INET,
 	.version       = IPTABLES_VERSION,
@@ -477,7 +477,7 @@ static struct xtables_match time_reg = {
 	.extra_opts    = time_opts,
 };
 
-static struct xtables_match time6_reg = {
+static struct xtables_match time_match6 = {
 	.name          = "time",
 	.family        = AF_INET6,
 	.version       = IPTABLES_VERSION,
@@ -493,6 +493,6 @@ static struct xtables_match time6_reg = {
 
 void _init(void)
 {
-	xtables_register_match(&time_reg);
-	xtables_register_match(&time6_reg);
+	xtables_register_match(&time_match);
+	xtables_register_match(&time_match6);
 }

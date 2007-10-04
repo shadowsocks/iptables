@@ -12,8 +12,7 @@
 #include "../include/linux/netfilter/xt_multiport.h"
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void multiport_help(void)
 {
 	printf(
 "multiport v%s options:\n"
@@ -29,8 +28,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static void
-help_v1(void)
+static void multiport_help_v1(void)
 {
 	printf(
 "multiport v%s options:\n"
@@ -45,7 +43,7 @@ help_v1(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option multiport_opts[] = {
 	{ "source-ports", 1, NULL, '1' },
 	{ "sports", 1, NULL, '1' }, /* synonym */
 	{ "destination-ports", 1, NULL, '2' },
@@ -156,9 +154,9 @@ check_proto(u_int16_t pnum, u_int8_t invflags)
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-__parse(int c, char **argv, int invert, unsigned int *flags,
-	struct xt_entry_match **match,
-	u_int16_t pnum, u_int8_t invflags)
+__multiport_parse(int c, char **argv, int invert, unsigned int *flags,
+                  struct xt_entry_match **match, u_int16_t pnum,
+                  u_int8_t invflags)
 {
 	const char *proto;
 	struct xt_multiport *multiinfo
@@ -205,29 +203,27 @@ __parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-	 const void *e,
-	 struct xt_entry_match **match)
+multiport_parse(int c, char **argv, int invert, unsigned int *flags,
+                const void *e, struct xt_entry_match **match)
 {
 	const struct ipt_entry *entry = e;
-	return __parse(c, argv, invert, flags, match, entry->ip.proto,
-		       entry->ip.invflags);
+	return __multiport_parse(c, argv, invert, flags, match,
+	       entry->ip.proto, entry->ip.invflags);
 }
 
 static int
-parse6(int c, char **argv, int invert, unsigned int *flags,
-	 const void *e,
-	 struct xt_entry_match **match)
+multiport_parse6(int c, char **argv, int invert, unsigned int *flags,
+                 const void *e, struct xt_entry_match **match)
 {
 	const struct ip6t_entry *entry = (const struct ip6t_entry *)e;
-	return __parse(c, argv, invert, flags, match, entry->ipv6.proto,
-		       entry->ipv6.invflags);
+	return __multiport_parse(c, argv, invert, flags, match,
+	       entry->ipv6.proto, entry->ipv6.invflags);
 }
 
 static int
-__parse_v1(int c, char **argv, int invert, unsigned int *flags,
-	   struct xt_entry_match **match,
-	   u_int16_t pnum, u_int8_t invflags)
+__multiport_parse_v1(int c, char **argv, int invert, unsigned int *flags,
+                     struct xt_entry_match **match, u_int16_t pnum,
+                     u_int8_t invflags)
 {
 	const char *proto;
 	struct xt_multiport_v1 *multiinfo
@@ -270,28 +266,25 @@ __parse_v1(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static int
-parse_v1(int c, char **argv, int invert, unsigned int *flags,
-	 const void *e,
-	 struct xt_entry_match **match)
+multiport_parse_v1(int c, char **argv, int invert, unsigned int *flags,
+                   const void *e, struct xt_entry_match **match)
 {
 	const struct ipt_entry *entry = e;
-	return __parse_v1(c, argv, invert, flags, match, entry->ip.proto,
-			  entry->ip.invflags);
+	return __multiport_parse_v1(c, argv, invert, flags, match,
+	       entry->ip.proto, entry->ip.invflags);
 }
 
 static int
-parse6_v1(int c, char **argv, int invert, unsigned int *flags,
-	  const void *e,
-	  struct xt_entry_match **match)
+multiport_parse6_v1(int c, char **argv, int invert, unsigned int *flags,
+                    const void *e, struct xt_entry_match **match)
 {
 	const struct ip6t_entry *entry = (const struct ip6t_entry *)e;
-	return __parse_v1(c, argv, invert, flags, match, entry->ipv6.proto,
-			  entry->ipv6.invflags);
+	return __multiport_parse_v1(c, argv, invert, flags, match,
+	       entry->ipv6.proto, entry->ipv6.invflags);
 }
 
 /* Final check; must specify something. */
-static void
-final_check(unsigned int flags)
+static void multiport_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM, "multiport expection an option");
@@ -321,7 +314,8 @@ print_port(u_int16_t port, u_int8_t protocol, int numeric)
 
 /* Prints out the matchinfo. */
 static void
-__print(const struct xt_entry_match *match, int numeric, u_int16_t proto)
+__multiport_print(const struct xt_entry_match *match, int numeric,
+                  u_int16_t proto)
 {
 	const struct xt_multiport *multiinfo
 		= (const struct xt_multiport *)match->data;
@@ -354,22 +348,22 @@ __print(const struct xt_entry_match *match, int numeric, u_int16_t proto)
 	printf(" ");
 }
 
-static void
-print(const void *ip_void, const struct xt_entry_match *match, int numeric)
+static void multiport_print(const void *ip_void,
+                            const struct xt_entry_match *match, int numeric)
 {
 	const struct ipt_ip *ip = ip_void;
-	__print(match, numeric, ip->proto);
+	__multiport_print(match, numeric, ip->proto);
 }
 
-static void
-print6(const void *ip_void, const struct xt_entry_match *match, int numeric)
+static void multiport_print6(const void *ip_void,
+                             const struct xt_entry_match *match, int numeric)
 {
 	const struct ip6t_ip6 *ip = (const struct ip6t_ip6 *)ip_void;
-	__print(match, numeric, ip->proto);
+	__multiport_print(match, numeric, ip->proto);
 }
 
-static void
-__print_v1(const struct xt_entry_match *match, int numeric, u_int16_t proto)
+static void __multiport_print_v1(const struct xt_entry_match *match,
+                                 int numeric, u_int16_t proto)
 {
 	const struct xt_multiport_v1 *multiinfo
 		= (const struct xt_multiport_v1 *)match->data;
@@ -409,22 +403,23 @@ __print_v1(const struct xt_entry_match *match, int numeric, u_int16_t proto)
 	printf(" ");
 }
 
-static void
-print_v1(const void *ip_void, const struct xt_entry_match *match, int numeric)
+static void multiport_print_v1(const void *ip_void,
+                               const struct xt_entry_match *match, int numeric)
 {
 	const struct ipt_ip *ip = ip_void;
-	__print_v1(match, numeric, ip->proto);
+	__multiport_print_v1(match, numeric, ip->proto);
 }
 
-static void
-print6_v1(const void *ip_void, const struct xt_entry_match *match, int numeric)
+static void multiport_print6_v1(const void *ip_void,
+                                const struct xt_entry_match *match, int numeric)
 {
 	const struct ip6t_ip6 *ip = (const struct ip6t_ip6 *)ip_void;
-	__print_v1(match, numeric, ip->proto);
+	__multiport_print_v1(match, numeric, ip->proto);
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void __save(const struct xt_entry_match *match, u_int16_t proto)
+static void __multiport_save(const struct xt_entry_match *match,
+                             u_int16_t proto)
 {
 	const struct xt_multiport *multiinfo
 		= (const struct xt_multiport *)match->data;
@@ -451,19 +446,22 @@ static void __save(const struct xt_entry_match *match, u_int16_t proto)
 	printf(" ");
 }
 
-static void save(const void *ip_void, const struct xt_entry_match *match)
+static void multiport_save(const void *ip_void,
+                           const struct xt_entry_match *match)
 {
 	const struct ipt_ip *ip = ip_void;
-	__save(match, ip->proto);
+	__multiport_save(match, ip->proto);
 }
 
-static void save6(const void *ip_void, const struct xt_entry_match *match)
+static void multiport_save6(const void *ip_void,
+                            const struct xt_entry_match *match)
 {
 	const struct ip6t_ip6 *ip = (const struct ip6t_ip6 *)ip_void;
-	__save(match, ip->proto);
+	__multiport_save(match, ip->proto);
 }
 
-static void __save_v1(const struct xt_entry_match *match, u_int16_t proto)
+static void __multiport_save_v1(const struct xt_entry_match *match,
+                                u_int16_t proto)
 {
 	const struct xt_multiport_v1 *multiinfo
 		= (const struct xt_multiport_v1 *)match->data;
@@ -497,83 +495,85 @@ static void __save_v1(const struct xt_entry_match *match, u_int16_t proto)
 	printf(" ");
 }
 
-static void save_v1(const void *ip_void, const struct xt_entry_match *match)
+static void multiport_save_v1(const void *ip_void,
+                              const struct xt_entry_match *match)
 {
 	const struct ipt_ip *ip = ip_void;
-	__save_v1(match, ip->proto);
+	__multiport_save_v1(match, ip->proto);
 }
 
-static void save6_v1(const void *ip_void, const struct xt_entry_match *match)
+static void multiport_save6_v1(const void *ip_void,
+                               const struct xt_entry_match *match)
 {
 	const struct ip6t_ip6 *ip = (const struct ip6t_ip6 *)ip_void;
-	__save_v1(match, ip->proto);
+	__multiport_save_v1(match, ip->proto);
 }
 
-static struct xtables_match multiport = { 
+static struct xtables_match multiport_match = {
 	.family		= AF_INET,
 	.name		= "multiport",
 	.revision	= 0,
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_multiport)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= multiport_help,
+	.parse		= multiport_parse,
+	.final_check	= multiport_check,
+	.print		= multiport_print,
+	.save		= multiport_save,
+	.extra_opts	= multiport_opts,
 };
 
-static struct xtables_match multiport6 = { 
+static struct xtables_match multiport_match6 = {
 	.family		= AF_INET6,
 	.name		= "multiport",
 	.revision	= 0,
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_multiport)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport)),
-	.help		= &help,
-	.parse		= &parse6,
-	.final_check	= &final_check,
-	.print		= &print6,
-	.save		= &save6,
-	.extra_opts	= opts
+	.help		= multiport_help,
+	.parse		= multiport_parse6,
+	.final_check	= multiport_check,
+	.print		= multiport_print6,
+	.save		= multiport_save6,
+	.extra_opts	= multiport_opts,
 };
 
-static struct xtables_match multiport_v1 = { 
+static struct xtables_match multiport_match_v1 = {
 	.family		= AF_INET,
 	.name		= "multiport",
 	.version	= IPTABLES_VERSION,
 	.revision	= 1,
 	.size		= XT_ALIGN(sizeof(struct xt_multiport_v1)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport_v1)),
-	.help		= &help_v1,
-	.parse		= &parse_v1,
-	.final_check	= &final_check,
-	.print		= &print_v1,
-	.save		= &save_v1,
-	.extra_opts	= opts
+	.help		= multiport_help_v1,
+	.parse		= multiport_parse_v1,
+	.final_check	= multiport_check,
+	.print		= multiport_print_v1,
+	.save		= multiport_save_v1,
+	.extra_opts	= multiport_opts,
 };
 
-static struct xtables_match multiport6_v1 = { 
+static struct xtables_match multiport_match6_v1 = {
 	.family		= AF_INET6,
 	.name		= "multiport",
 	.version	= IPTABLES_VERSION,
 	.revision	= 1,
 	.size		= XT_ALIGN(sizeof(struct xt_multiport_v1)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport_v1)),
-	.help		= &help_v1,
-	.parse		= &parse6_v1,
-	.final_check	= &final_check,
-	.print		= &print6_v1,
-	.save		= &save6_v1,
-	.extra_opts	= opts
+	.help		= multiport_help_v1,
+	.parse		= multiport_parse6_v1,
+	.final_check	= multiport_check,
+	.print		= multiport_print6_v1,
+	.save		= multiport_save6_v1,
+	.extra_opts	= multiport_opts,
 };
 
 void
 _init(void)
 {
-	xtables_register_match(&multiport);
-	xtables_register_match(&multiport6);
-	xtables_register_match(&multiport_v1);
-	xtables_register_match(&multiport6_v1);
+	xtables_register_match(&multiport_match);
+	xtables_register_match(&multiport_match6);
+	xtables_register_match(&multiport_match_v1);
+	xtables_register_match(&multiport_match6_v1);
 }

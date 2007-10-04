@@ -41,8 +41,7 @@ static void
 print_chunk(u_int32_t chunknum, int numeric);
 
 /* Initialize the match. */
-static void
-init(struct xt_entry_match *m)
+static void sctp_init(struct xt_entry_match *m)
 {
 	int i;
 	struct xt_sctp_info *einfo = (struct xt_sctp_info *)m->data;
@@ -54,7 +53,7 @@ init(struct xt_entry_match *m)
 	}
 }
 
-static void help(void)
+static void sctp_help(void)
 {
 	printf(
 "SCTP match v%s options\n"
@@ -68,7 +67,7 @@ static void help(void)
 	IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option sctp_opts[] = {
 	{ .name = "source-port", .has_arg = 1, .val = '1' },
 	{ .name = "sport", .has_arg = 1, .val = '1' },
 	{ .name = "destination-port", .has_arg = 1, .val = '2' },
@@ -260,9 +259,8 @@ parse_sctp_chunks(struct xt_sctp_info *einfo,
 }
 
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+sctp_parse(int c, char **argv, int invert, unsigned int *flags,
+           const void *entry, struct xt_entry_match **match)
 {
 	struct xt_sctp_info *einfo
 		= (struct xt_sctp_info *)(*match)->data;
@@ -450,9 +448,7 @@ out:
 
 /* Prints out the matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+sctp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_sctp_info *einfo =
 		(const struct xt_sctp_info *)match->data;
@@ -483,9 +479,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void
-save(const void *ip,
-     const struct xt_entry_match *match)
+static void sctp_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_sctp_info *einfo =
 		(const struct xt_sctp_info *)match->data;
@@ -520,37 +514,37 @@ save(const void *ip,
 	}
 }
 
-static struct xtables_match sctp = {
+static struct xtables_match sctp_match = {
 	.name		= "sctp",
 	.family		= AF_INET,
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_sctp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_sctp_info)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= sctp_help,
+	.init		= sctp_init,
+	.parse		= sctp_parse,
+	.print		= sctp_print,
+	.save		= sctp_save,
+	.extra_opts	= sctp_opts,
 };
 
-static struct xtables_match sctp6 = {
+static struct xtables_match sctp_match6 = {
 	.name		= "sctp",
 	.family		= AF_INET6,
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_sctp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_sctp_info)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= sctp_help,
+	.init		= sctp_init,
+	.parse		= sctp_parse,
+	.print		= sctp_print,
+	.save		= sctp_save,
+	.extra_opts	= sctp_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&sctp);
-	xtables_register_match(&sctp6);
+	xtables_register_match(&sctp_match);
+	xtables_register_match(&sctp_match6);
 }
 

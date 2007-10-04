@@ -178,7 +178,7 @@ static void connlimit_save6(const void *ip, const struct xt_entry_match *match)
 	       count_bits6(info->v6_mask));
 }
 
-static struct xtables_match connlimit_reg4 = {
+static struct xtables_match connlimit_match = {
 	.name          = "connlimit",
 	.family        = AF_INET,
 	.version       = IPTABLES_VERSION,
@@ -193,7 +193,7 @@ static struct xtables_match connlimit_reg4 = {
 	.extra_opts    = connlimit_opts,
 };
 
-static struct xtables_match connlimit_reg6 = {
+static struct xtables_match connlimit_match6 = {
 	.name          = "connlimit",
 	.family        = AF_INET6,
 	.version       = IPTABLES_VERSION,
@@ -210,6 +210,6 @@ static struct xtables_match connlimit_reg6 = {
 
 void _init(void)
 {
-	xtables_register_match(&connlimit_reg4);
-	xtables_register_match(&connlimit_reg6);
+	xtables_register_match(&connlimit_match);
+	xtables_register_match(&connlimit_match6);
 }

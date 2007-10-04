@@ -8,8 +8,7 @@
 #include <linux/netfilter/xt_tcpudp.h>
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void udp_help(void)
 {
 	printf(
 "UDP v%s options:\n"
@@ -22,7 +21,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option udp_opts[] = {
 	{ "source-port", 1, NULL, '1' },
 	{ "sport", 1, NULL, '1' }, /* synonym */
 	{ "destination-port", 1, NULL, '2' },
@@ -54,8 +53,7 @@ parse_udp_ports(const char *portstring, u_int16_t *ports)
 }
 
 /* Initialize the match. */
-static void
-init(struct xt_entry_match *m)
+static void udp_init(struct xt_entry_match *m)
 {
 	struct xt_udp *udpinfo = (struct xt_udp *)m->data;
 
@@ -68,9 +66,8 @@ init(struct xt_entry_match *m)
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+udp_parse(int c, char **argv, int invert, unsigned int *flags,
+          const void *entry, struct xt_entry_match **match)
 {
 	struct xt_udp *udpinfo = (struct xt_udp *)(*match)->data;
 
@@ -149,8 +146,7 @@ print_ports(const char *name, u_int16_t min, u_int16_t max,
 
 /* Prints out the union ipt_matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match, int numeric)
+udp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_udp *udp = (struct xt_udp *)match->data;
 
@@ -167,7 +163,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void udp_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_udp *udpinfo = (struct xt_udp *)match->data;
 
@@ -200,39 +196,37 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-static
-struct xtables_match udp = { 
+static struct xtables_match udp_match = {
 	.family		= AF_INET,
 	.name		= "udp",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_udp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_udp)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= udp_help,
+	.init		= udp_init,
+	.parse		= udp_parse,
+	.print		= udp_print,
+	.save		= udp_save,
+	.extra_opts	= udp_opts,
 };
 
-static
-struct xtables_match udp6 = { 
+static struct xtables_match udp_match6 = {
 	.family		= AF_INET6,
 	.name		= "udp",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_udp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_udp)),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= udp_help,
+	.init		= udp_init,
+	.parse		= udp_parse,
+	.print		= udp_print,
+	.save		= udp_save,
+	.extra_opts	= udp_opts,
 };
 
 void
 _init(void)
 {
-	xtables_register_match(&udp);
-	xtables_register_match(&udp6);
+	xtables_register_match(&udp_match);
+	xtables_register_match(&udp_match6);
 }

@@ -9,8 +9,7 @@
 #include <linux/netfilter/xt_length.h>
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void length_help(void)
 {
 	printf(
 "length v%s options:\n"
@@ -20,7 +19,7 @@ IPTABLES_VERSION);
 
 }
   
-static const struct option opts[] = {
+static const struct option length_opts[] = {
 	{ "length", 1, NULL, '1' },
 	{ }
 };
@@ -65,9 +64,8 @@ parse_lengths(const char *s, struct xt_length_info *info)
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+length_parse(int c, char **argv, int invert, unsigned int *flags,
+             const void *entry, struct xt_entry_match **match)
 {
 	struct xt_length_info *info = (struct xt_length_info *)(*match)->data;
 
@@ -91,8 +89,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Final check; must have specified --length. */
-static void
-final_check(unsigned int flags)
+static void length_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -114,52 +111,49 @@ print_length(struct xt_length_info *info)
 
 /* Prints out the matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+length_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	printf("length ");
 	print_length((struct xt_length_info *)match->data);
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_match *match)
+static void length_save(const void *ip, const struct xt_entry_match *match)
 {
 	printf("--length ");
 	print_length((struct xt_length_info *)match->data);
 }
 
-static struct xtables_match length = { 
+static struct xtables_match length_match = {
 	.family		= AF_INET,
 	.name		= "length",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_length_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_length_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= length_help,
+	.parse		= length_parse,
+	.final_check	= length_check,
+	.print		= length_print,
+	.save		= length_save,
+	.extra_opts	= length_opts,
 };
 
-static struct xtables_match length6 = { 
+static struct xtables_match length_match6 = {
 	.family		= AF_INET6,
 	.name		= "length",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_length_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_length_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= length_help,
+	.parse		= length_parse,
+	.final_check	= length_check,
+	.print		= length_print,
+	.save		= length_save,
+	.extra_opts	= length_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&length);
-	xtables_register_match(&length6);
+	xtables_register_match(&length_match);
+	xtables_register_match(&length_match6);
 }

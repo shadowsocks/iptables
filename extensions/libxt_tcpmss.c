@@ -9,8 +9,7 @@
 #include <linux/netfilter/xt_tcpmss.h>
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void tcpmss_help(void)
 {
 	printf(
 "tcpmss match v%s options:\n"
@@ -19,7 +18,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option tcpmss_opts[] = {
 	{ "mss", 1, NULL, '1' },
 	{ }
 };
@@ -59,9 +58,8 @@ parse_tcp_mssvalues(const char *mssvaluestring,
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+tcpmss_parse(int c, char **argv, int invert, unsigned int *flags,
+             const void *entry, struct xt_entry_match **match)
 {
 	struct xt_tcpmss_match_info *mssinfo =
 		(struct xt_tcpmss_match_info *)(*match)->data;
@@ -97,8 +95,7 @@ print_tcpmss(u_int16_t mss_min, u_int16_t mss_max, int invert, int numeric)
 }
 
 /* Final check; must have specified --mss. */
-static void
-final_check(unsigned int flags)
+static void tcpmss_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -107,9 +104,7 @@ final_check(unsigned int flags)
 
 /* Prints out the matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+tcpmss_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_tcpmss_match_info *mssinfo =
 		(const struct xt_tcpmss_match_info *)match->data;
@@ -120,8 +115,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_match *match)
+static void tcpmss_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_tcpmss_match_info *mssinfo =
 		(const struct xt_tcpmss_match_info *)match->data;
@@ -131,36 +125,36 @@ save(const void *ip, const struct xt_entry_match *match)
 		     mssinfo->invert, 0);
 }
 
-static struct xtables_match tcpmss = {
+static struct xtables_match tcpmss_match = {
 	.family		= AF_INET,
 	.name		= "tcpmss",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_match_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcpmss_match_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= tcpmss_help,
+	.parse		= tcpmss_parse,
+	.final_check	= tcpmss_check,
+	.print		= tcpmss_print,
+	.save		= tcpmss_save,
+	.extra_opts	= tcpmss_opts,
 };
 
-static struct xtables_match tcpmss6 = {
+static struct xtables_match tcpmss_match6 = {
 	.family		= AF_INET6,
 	.name		= "tcpmss",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_match_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcpmss_match_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= tcpmss_help,
+	.parse		= tcpmss_parse,
+	.final_check	= tcpmss_check,
+	.print		= tcpmss_print,
+	.save		= tcpmss_save,
+	.extra_opts	= tcpmss_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&tcpmss);
-	xtables_register_match(&tcpmss6);
+	xtables_register_match(&tcpmss_match);
+	xtables_register_match(&tcpmss_match6);
 }

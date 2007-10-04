@@ -24,7 +24,7 @@
 /* This is evil, but it's my code - HW*/
 #include "libipt_dscp_helper.c"
 
-static void help(void) 
+static void dscp_help(void)
 {
 	printf(
 "DSCP match v%s options\n"
@@ -39,7 +39,7 @@ static void help(void)
 );
 }
 
-static const struct option opts[] = {
+static const struct option dscp_opts[] = {
 	{ "dscp", 1, NULL, 'F' },
 	{ "dscp-class", 1, NULL, 'G' },
 	{ }
@@ -74,9 +74,8 @@ parse_class(const char *s, struct xt_dscp_info *dinfo)
 
 
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+dscp_parse(int c, char **argv, int invert, unsigned int *flags,
+           const void *entry, struct xt_entry_match **match)
 {
 	struct xt_dscp_info *dinfo
 		= (struct xt_dscp_info *)(*match)->data;
@@ -111,8 +110,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void
-final_check(unsigned int flags)
+static void dscp_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -130,9 +128,7 @@ print_dscp(u_int8_t dscp, int invert, int numeric)
 
 /* Prints out the matchinfo. */
 static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+dscp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_dscp_info *dinfo =
 		(const struct xt_dscp_info *)match->data;
@@ -141,8 +137,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_match *match)
+static void dscp_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_dscp_info *dinfo =
 		(const struct xt_dscp_info *)match->data;
@@ -151,36 +146,36 @@ save(const void *ip, const struct xt_entry_match *match)
 	print_dscp(dinfo->dscp, dinfo->invert, 1);
 }
 
-static struct xtables_match dscp = { 
+static struct xtables_match dscp_match = {
 	.family		= AF_INET,
 	.name 		= "dscp",
 	.version 	= IPTABLES_VERSION,
 	.size 		= XT_ALIGN(sizeof(struct xt_dscp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_dscp_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= dscp_help,
+	.parse		= dscp_parse,
+	.final_check	= dscp_check,
+	.print		= dscp_print,
+	.save		= dscp_save,
+	.extra_opts	= dscp_opts,
 };
 
-static struct xtables_match dscp6 = { 
+static struct xtables_match dscp_match6 = {
 	.family		= AF_INET6,
 	.name 		= "dscp",
 	.version 	= IPTABLES_VERSION,
 	.size 		= XT_ALIGN(sizeof(struct xt_dscp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_dscp_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= dscp_help,
+	.parse		= dscp_parse,
+	.final_check	= dscp_check,
+	.print		= dscp_print,
+	.save		= dscp_save,
+	.extra_opts	= dscp_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&dscp);
-	xtables_register_match(&dscp6);
+	xtables_register_match(&dscp_match);
+	xtables_register_match(&dscp_match6);
 }

@@ -27,8 +27,7 @@
 #define XT_HASHLIMIT_EXPIRE	10000
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void hashlimit_help(void)
 {
 	printf(
 "hashlimit v%s options:\n"
@@ -46,7 +45,7 @@ help(void)
 "\n", IPTABLES_VERSION, XT_HASHLIMIT_BURST);
 }
 
-static const struct option opts[] = {
+static const struct option hashlimit_opts[] = {
 	{ "hashlimit", 1, NULL, '%' },
 	{ "hashlimit-burst", 1, NULL, '$' },
 	{ "hashlimit-htable-size", 1, NULL, '&' },
@@ -95,8 +94,7 @@ int parse_rate(const char *rate, u_int32_t *val)
 }
 
 /* Initialize the match. */
-static void
-init(struct xt_entry_match *m)
+static void hashlimit_init(struct xt_entry_match *m)
 {
 	struct xt_hashlimit_info *r = (struct xt_hashlimit_info *)m->data;
 
@@ -150,9 +148,8 @@ static int parse_mode(struct xt_hashlimit_info *r, char *optarg)
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_match **match)
+hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
+                const void *entry, struct xt_entry_match **match)
 {
 	struct xt_hashlimit_info *r = 
 			(struct xt_hashlimit_info *)(*match)->data;
@@ -236,7 +233,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Final check; nothing. */
-static void final_check(unsigned int flags)
+static void hashlimit_check(unsigned int flags)
 {
 	if (!(flags & PARAM_LIMIT))
 		exit_error(PARAMETER_PROBLEM,
@@ -302,10 +299,8 @@ static void print_mode(const struct xt_hashlimit_info *r, char separator)
 }
 
 /* Prints out the matchinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_match *match,
-      int numeric)
+static void hashlimit_print(const void *ip,
+                            const struct xt_entry_match *match, int numeric)
 {
 	struct xt_hashlimit_info *r = 
 		(struct xt_hashlimit_info *)match->data;
@@ -324,7 +319,7 @@ print(const void *ip,
 }
 
 /* FIXME: Make minimalist: only print rate if not default --RR */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void hashlimit_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_hashlimit_info *r = 
 		(struct xt_hashlimit_info *)match->data;
@@ -348,38 +343,38 @@ static void save(const void *ip, const struct xt_entry_match *match)
 		printf("--hashlimit-htable-expire %u ", r->cfg.expire);
 }
 
-static struct xtables_match hashlimit = {
+static struct xtables_match hashlimit_match = {
 	.family		= AF_INET,
 	.name		= "hashlimit",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_hashlimit_info)),
 	.userspacesize	= offsetof(struct xt_hashlimit_info, hinfo),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= hashlimit_help,
+	.init		= hashlimit_init,
+	.parse		= hashlimit_parse,
+	.final_check	= hashlimit_check,
+	.print		= hashlimit_print,
+	.save		= hashlimit_save,
+	.extra_opts	= hashlimit_opts,
 };
 
-static struct xtables_match hashlimit6 = {
+static struct xtables_match hashlimit_match6 = {
 	.family		= AF_INET6,
 	.name		= "hashlimit",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_hashlimit_info)),
 	.userspacesize	= offsetof(struct xt_hashlimit_info, hinfo),
-	.help		= &help,
-	.init		= &init,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= hashlimit_help,
+	.init		= hashlimit_init,
+	.parse		= hashlimit_parse,
+	.final_check	= hashlimit_check,
+	.print		= hashlimit_print,
+	.save		= hashlimit_save,
+	.extra_opts	= hashlimit_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&hashlimit);
-	xtables_register_match(&hashlimit6);
+	xtables_register_match(&hashlimit_match);
+	xtables_register_match(&hashlimit_match6);
 }
