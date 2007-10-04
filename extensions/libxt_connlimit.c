@@ -24,7 +24,7 @@ static const struct option connlimit_opts[] = {
 	{NULL},
 };
 
-static void connlimit_init(struct ipt_entry_match *match)
+static void connlimit_init(struct xt_entry_match *match)
 {
 	struct xt_connlimit_info *info = (void *)match->data;
 	info->v4_mask = 0xFFFFFFFFUL;
