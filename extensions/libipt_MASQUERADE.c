@@ -161,7 +161,7 @@ save(const void *ip, const struct xt_entry_target *target)
 		printf("--random ");
 }
 
-static struct iptables_target masq = { NULL,
+static struct iptables_target masq = {
 	.name		= "MASQUERADE",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),

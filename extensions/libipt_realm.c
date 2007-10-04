@@ -250,7 +250,7 @@ final_check(unsigned int flags)
 			   "realm match: You must specify `--realm'");
 }
 
-static struct iptables_match realm = { NULL,
+static struct iptables_match realm = {
 	.name		= "realm",
 	.version	= IPTABLES_VERSION,
 	.size		= IPT_ALIGN(sizeof(struct ipt_realm_info)),

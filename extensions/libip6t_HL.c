@@ -146,7 +146,7 @@ static const struct option opts[] = {
 };
 
 static
-struct ip6tables_target HL = { NULL, 
+struct ip6tables_target HL = {
 	.name 		= "HL",
 	.version	= IPTABLES_VERSION,
 	.size		= IP6T_ALIGN(sizeof(struct ip6t_HL_info)),
