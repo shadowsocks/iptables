@@ -18,8 +18,7 @@
 #define LOG_DEFAULT_LEVEL LOG_WARNING
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void LOG_help(void)
 {
 	printf(
 "LOG v%s options:\n"
@@ -32,7 +31,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option LOG_opts[] = {
 	{ .name = "log-level",        .has_arg = 1, .val = '!' },
 	{ .name = "log-prefix",       .has_arg = 1, .val = '#' },
 	{ .name = "log-tcp-sequence", .has_arg = 0, .val = '1' },
@@ -43,8 +42,7 @@ static const struct option opts[] = {
 };
 
 /* Initialize the target. */
-static void
-init(struct xt_entry_target *t)
+static void LOG_init(struct xt_entry_target *t)
 {
 	struct ip6t_log_info *loginfo = (struct ip6t_log_info *)t->data;
 
@@ -108,10 +106,8 @@ parse_level(const char *level)
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_target **target)
+static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
+                     const void *entry, struct xt_entry_target **target)
 {
 	struct ip6t_log_info *loginfo = (struct ip6t_log_info *)(*target)->data;
 
@@ -200,10 +196,8 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Prints out the targinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_target *target,
-      int numeric)
+static void LOG_print(const void *ip, const struct xt_entry_target *target,
+                      int numeric)
 {
 	const struct ip6t_log_info *loginfo
 		= (const struct ip6t_log_info *)target->data;
@@ -241,8 +235,7 @@ print(const void *ip,
 }
 
 /* Saves the union ip6t_targinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_target *target)
+static void LOG_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ip6t_log_info *loginfo
 		= (const struct ip6t_log_info *)target->data;
@@ -263,22 +256,20 @@ save(const void *ip, const struct xt_entry_target *target)
 		printf("--log-uid ");
 }
 
-static
-struct ip6tables_target log
-= {
+static struct ip6tables_target log_target6 = {
     .name          = "LOG",
     .version       = IPTABLES_VERSION,
     .size          = IP6T_ALIGN(sizeof(struct ip6t_log_info)),
     .userspacesize = IP6T_ALIGN(sizeof(struct ip6t_log_info)),
-    .help          = &help,
-    .init          = &init,
-    .parse         = &parse,
-    .print         = &print,
-    .save          = &save,
-    .extra_opts    = opts
+    .help          = LOG_help,
+    .init          = LOG_init,
+    .parse         = LOG_parse,
+    .print         = LOG_print,
+    .save          = LOG_save,
+    .extra_opts    = LOG_opts,
 };
 
 void _init(void)
 {
-	register_target6(&log);
+	register_target6(&log_target6);
 }
