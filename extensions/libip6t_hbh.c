@@ -13,36 +13,24 @@
 #include <arpa/inet.h>
                                         
 #define DEBUG		0
-#define HOPBYHOP	1
-#define UNAME		(HOPBYHOP ? "HBH" : "DST")
-#define LNAME		(HOPBYHOP ? "hbh" : "dst")
 
 /* Function which prints out usage message. */
 static void hbh_help(void)
 {
 	printf(
-"%s v%s options:\n"
-" --%s-len [!] length           total length of this header\n"
-" --%s-opts TYPE[:LEN][,TYPE[:LEN]...] \n"
-"                               Options and its length (list, max: %d)\n", 
-UNAME , IPTABLES_VERSION, LNAME, LNAME, IP6T_OPTS_OPTSNR);
+"hbh v%s options:\n"
+"  --hbh-len [!] length          total length of this header\n"
+"  --hbh-opts TYPE[:LEN][,TYPE[:LEN]...] \n"
+"                                Options and its length (list, max: %d)\n",
+IPTABLES_VERSION, IP6T_OPTS_OPTSNR);
 }
 
-#if HOPBYHOP
 static const struct option hbh_opts[] = {
 	{ "hbh-len", 1, NULL, '1' },
 	{ "hbh-opts", 1, NULL, '2' },
 	{ "hbh-not-strict", 1, NULL, '3' },
 	{ }
 };
-#else
-static const struct option hbh_opts[] = {
-	{ "dst-len", 1, NULL, '1' },
-	{ "dst-opts", 1, NULL, '2' },
-	{ "dst-not-strict", 1, NULL, '3' },
-	{ }
-};
-#endif
 
 static u_int32_t
 parse_opts_num(const char *idstr, const char *typestr)
@@ -54,7 +42,7 @@ parse_opts_num(const char *idstr, const char *typestr)
 
 	if ( idstr == ep ) {
 		exit_error(PARAMETER_PROBLEM,
-			   "%s no valid digits in %s `%s'", UNAME, typestr, idstr);
+			   "hbh: no valid digits in %s `%s'", typestr, idstr);
 	}
 	if ( id == ULONG_MAX  && errno == ERANGE ) {
 		exit_error(PARAMETER_PROBLEM,
@@ -63,7 +51,7 @@ parse_opts_num(const char *idstr, const char *typestr)
 	}	
 	if ( *idstr != '\0'  && *ep != '\0' ) {
 		exit_error(PARAMETER_PROBLEM,
-			   "%s error parsing %s `%s'", UNAME, typestr, idstr);
+			   "hbh: error parsing %s `%s'", typestr, idstr);
 	}
 	return (u_int32_t) id;
 }
@@ -136,7 +124,7 @@ static int hbh_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 		if (*flags & IP6T_OPTS_LEN)
 			exit_error(PARAMETER_PROBLEM,
-				   "Only one `--%s-len' allowed", LNAME);
+				   "Only one `--hbh-len' allowed");
 		check_inverse(optarg, &invert, &optind, 0);
 		optinfo->hdrlen = parse_opts_num(argv[optind-1], "length");
 		if (invert)
@@ -147,11 +135,11 @@ static int hbh_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '2':
 		if (*flags & IP6T_OPTS_OPTS)
 			exit_error(PARAMETER_PROBLEM,
-				   "Only one `--%s-opts' allowed", LNAME);
+				   "Only one `--hbh-opts' allowed");
                 check_inverse(optarg, &invert, &optind, 0);
                 if (invert)
                         exit_error(PARAMETER_PROBLEM,
-				" '!' not allowed with `--%s-opts'", LNAME);
+				" '!' not allowed with `--hbh-opts'");
 		optinfo->optsnr = parse_options(argv[optind-1], optinfo->opts);
 		optinfo->flags |= IP6T_OPTS_OPTS;
 		*flags |= IP6T_OPTS_OPTS;
@@ -159,10 +147,10 @@ static int hbh_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '3':
 		if (*flags & IP6T_OPTS_NSTRICT)
 			exit_error(PARAMETER_PROBLEM,
-				   "Only one `--%s-not-strict' allowed", LNAME);
+				   "Only one `--hbh-not-strict' allowed");
 		if ( !(*flags & IP6T_OPTS_OPTS) )
 			exit_error(PARAMETER_PROBLEM,
-				   "`--%s-opts ...' required before `--%s-not-strict'", LNAME, LNAME);
+				   "`--hbh-opts ...' required before `--hbh-not-strict'");
 		optinfo->flags |= IP6T_OPTS_NSTRICT;
 		*flags |= IP6T_OPTS_NSTRICT;
 		break;
@@ -193,7 +181,7 @@ static void hbh_print(const void *ip, const struct xt_entry_match *match,
 {
 	const struct ip6t_opts *optinfo = (struct ip6t_opts *)match->data;
 
-	printf("%s ", LNAME);
+	printf("hbh ");
 	if (optinfo->flags & IP6T_OPTS_LEN) {
 		printf("length");
 		printf(":%s", optinfo->invflags & IP6T_OPTS_INV_LEN ? "!" : "");
@@ -214,23 +202,20 @@ static void hbh_save(const void *ip, const struct xt_entry_match *match)
 	const struct ip6t_opts *optinfo = (struct ip6t_opts *)match->data;
 
 	if (optinfo->flags & IP6T_OPTS_LEN) {
-		printf("--%s-len %s%u ", LNAME, 
+		printf("--hbh-len %s%u ",
 			(optinfo->invflags & IP6T_OPTS_INV_LEN) ? "! " : "", 
 			optinfo->hdrlen);
 	}
 
-	if (optinfo->flags & IP6T_OPTS_OPTS) printf("--%s-opts ", LNAME);
+	if (optinfo->flags & IP6T_OPTS_OPTS)
+		printf("--hbh-opts ");
 	print_options(optinfo->optsnr, (u_int16_t *)optinfo->opts);
-	if (optinfo->flags & IP6T_OPTS_NSTRICT) printf("--%s-not-strict ", LNAME);
-
+	if (optinfo->flags & IP6T_OPTS_NSTRICT)
+		printf("--hbh-not-strict ");
 }
 
 static struct ip6tables_match hbh_match6 = {
-#if HOPBYHOP
 	.name 		= "hbh",
-#else
-	.name		= "dst",
-#endif
 	.version	= IPTABLES_VERSION,
 	.size		= IP6T_ALIGN(sizeof(struct ip6t_opts)),
 	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_opts)),
