@@ -14,7 +14,7 @@ enum {
 	NFLOG_THRESHOLD	= 0x8,
 };
 
-static const struct option opts[] = {
+static const struct option NFLOG_opts[] = {
 	{ "nflog-group",     1, NULL, NFLOG_GROUP },
 	{ "nflog-prefix",    1, NULL, NFLOG_PREFIX },
 	{ "nflog-range",     1, NULL, NFLOG_RANGE },
@@ -22,7 +22,7 @@ static const struct option opts[] = {
 	{NULL},
 };
 
-static void help(void)
+static void NFLOG_help(void)
 {
 	printf("NFLOG v%s options:\n"
 	       " --nflog-group NUM		NETLINK group used for logging\n"
@@ -32,7 +32,7 @@ static void help(void)
 	       IPTABLES_VERSION);
 }
 
-static void init(struct xt_entry_target *t)
+static void NFLOG_init(struct xt_entry_target *t)
 {
 	struct xt_nflog_info *info = (struct xt_nflog_info *)t->data;
 
@@ -40,9 +40,8 @@ static void init(struct xt_entry_target *t)
 	info->threshold	= XT_NFLOG_DEFAULT_THRESHOLD;
 }
 
-static int parse(int c, char **argv, int invert, unsigned int *flags,
-		 const void *entry,
-		 struct xt_entry_target **target)
+static int NFLOG_parse(int c, char **argv, int invert, unsigned int *flags,
+                       const void *entry, struct xt_entry_target **target)
 {
 	struct xt_nflog_info *info = (struct xt_nflog_info *)(*target)->data;
 	int n;
@@ -122,51 +121,51 @@ static void nflog_print(const struct xt_nflog_info *info, char *prefix)
 		printf("%snflog-threshold %u ", prefix, info->threshold);
 }
 
-static void print(const void *ip, const struct xt_entry_target *target,
-		  int numeric)
+static void NFLOG_print(const void *ip, const struct xt_entry_target *target,
+                        int numeric)
 {
 	const struct xt_nflog_info *info = (struct xt_nflog_info *)target->data;
 
 	nflog_print(info, "");
 }
 
-static void save(const void *ip, const struct xt_entry_target *target)
+static void NFLOG_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_nflog_info *info = (struct xt_nflog_info *)target->data;
 
 	nflog_print(info, "--");
 }
 
-static struct xtables_target nflog = {
+static struct xtables_target nflog_target = {
 	.family		= AF_INET,
 	.name		= "NFLOG",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_nflog_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_nflog_info)),
-	.help		= help,
-	.init		= init,
-	.parse		= parse,
-	.print		= print,
-	.save		= save,
-	.extra_opts	= opts,
+	.help		= NFLOG_help,
+	.init		= NFLOG_init,
+	.parse		= NFLOG_parse,
+	.print		= NFLOG_print,
+	.save		= NFLOG_save,
+	.extra_opts	= NFLOG_opts,
 };
 
-static struct xtables_target nflog6 = {
+static struct xtables_target nflog_target6 = {
 	.family		= AF_INET6,
 	.name		= "NFLOG",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_nflog_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_nflog_info)),
-	.help		= help,
-	.init		= init,
-	.parse		= parse,
-	.print		= print,
-	.save		= save,
-	.extra_opts	= opts,
+	.help		= NFLOG_help,
+	.init		= NFLOG_init,
+	.parse		= NFLOG_parse,
+	.print		= NFLOG_print,
+	.save		= NFLOG_save,
+	.extra_opts	= NFLOG_opts,
 };
 
 void _init(void)
 {
-	xtables_register_target(&nflog);
-	xtables_register_target(&nflog6);
+	xtables_register_target(&nflog_target);
+	xtables_register_target(&nflog_target6);
 }

@@ -14,7 +14,7 @@
 
 #define PFX "SECMARK target: "
 
-static void help(void)
+static void SECMARK_help(void)
 {
 	printf(
 "SECMARK target v%s options:\n"
@@ -23,7 +23,7 @@ static void help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option SECMARK_opts[] = {
 	{ "selctx", 1, 0, '1' },
 	{ 0 }
 };
@@ -32,8 +32,8 @@ static const struct option opts[] = {
  * Function which parses command options; returns true if it
  * ate an option.
  */
-static int parse(int c, char **argv, int invert, unsigned int *flags,
-                 const void *entry, struct xt_entry_target **target)
+static int SECMARK_parse(int c, char **argv, int invert, unsigned int *flags,
+                         const void *entry, struct xt_entry_target **target)
 {
 	struct xt_secmark_target_info *info =
 		(struct xt_secmark_target_info*)(*target)->data;
@@ -61,7 +61,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void final_check(unsigned int flags)
+static void SECMARK_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM, PFX "parameter required");
@@ -79,8 +79,8 @@ static void print_secmark(struct xt_secmark_target_info *info)
 	}
 }
 
-static void print(const void *ip,
-		  const struct xt_entry_target *target, int numeric)
+static void SECMARK_print(const void *ip, const struct xt_entry_target *target,
+                          int numeric)
 {
 	struct xt_secmark_target_info *info =
 		(struct xt_secmark_target_info*)(target)->data;
@@ -90,7 +90,7 @@ static void print(const void *ip,
 }
 
 /* Saves the target info in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_target *target)
+static void SECMARK_save(const void *ip, const struct xt_entry_target *target)
 {
 	struct xt_secmark_target_info *info =
 		(struct xt_secmark_target_info*)target->data;
@@ -99,38 +99,38 @@ static void save(const void *ip, const struct xt_entry_target *target)
 	print_secmark(info);
 }
 
-static struct xtables_target secmark = {
+static struct xtables_target secmark_target = {
 	.family		= AF_INET,
 	.name		= "SECMARK",
 	.version	= IPTABLES_VERSION,
 	.revision	= 0,
 	.size		= XT_ALIGN(sizeof(struct xt_secmark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_secmark_target_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= SECMARK_help,
+	.parse		= SECMARK_parse,
+	.final_check	= SECMARK_check,
+	.print		= SECMARK_print,
+	.save		= SECMARK_save,
+	.extra_opts	= SECMARK_opts,
 };
 
-static struct xtables_target secmark6 = {
+static struct xtables_target secmark_target6 = {
 	.family		= AF_INET6,
 	.name		= "SECMARK",
 	.version	= IPTABLES_VERSION,
 	.revision	= 0,
 	.size		= XT_ALIGN(sizeof(struct xt_secmark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_secmark_target_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= SECMARK_help,
+	.parse		= SECMARK_parse,
+	.final_check	= SECMARK_check,
+	.print		= SECMARK_print,
+	.save		= SECMARK_save,
+	.extra_opts	= SECMARK_opts,
 };
 
 void _init(void)
 {
-	xtables_register_target(&secmark);
-	xtables_register_target(&secmark6);
+	xtables_register_target(&secmark_target);
+	xtables_register_target(&secmark_target6);
 }

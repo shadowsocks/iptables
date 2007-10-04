@@ -21,7 +21,7 @@
 /* This is evil, but it's my code - HW*/
 #include "libipt_dscp_helper.c"
 
-static void help(void) 
+static void DSCP_help(void)
 {
 	printf(
 "DSCP target options\n"
@@ -37,7 +37,7 @@ static void help(void)
 );
 }
 
-static const struct option opts[] = {
+static const struct option DSCP_opts[] = {
 	{ "set-dscp", 1, NULL, 'F' },
 	{ "set-dscp-class", 1, NULL, 'G' },
 	{ }
@@ -71,10 +71,8 @@ parse_class(const char *s, struct xt_DSCP_info *dinfo)
 }
 
 
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_target **target)
+static int DSCP_parse(int c, char **argv, int invert, unsigned int *flags,
+                      const void *entry, struct xt_entry_target **target)
 {
 	struct xt_DSCP_info *dinfo
 		= (struct xt_DSCP_info *)(*target)->data;
@@ -102,8 +100,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void
-final_check(unsigned int flags)
+static void DSCP_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -117,10 +114,8 @@ print_dscp(u_int8_t dscp, int numeric)
 }
 
 /* Prints out the targinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_target *target,
-      int numeric)
+static void DSCP_print(const void *ip, const struct xt_entry_target *target,
+                       int numeric)
 {
 	const struct xt_DSCP_info *dinfo =
 		(const struct xt_DSCP_info *)target->data;
@@ -129,8 +124,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_target *target)
+static void DSCP_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_DSCP_info *dinfo =
 		(const struct xt_DSCP_info *)target->data;
@@ -138,36 +132,36 @@ save(const void *ip, const struct xt_entry_target *target)
 	printf("--set-dscp 0x%02x ", dinfo->dscp);
 }
 
-static struct xtables_target dscp = { 
+static struct xtables_target dscp_target = {
 	.family		= AF_INET,
 	.name		= "DSCP",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_DSCP_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_DSCP_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= DSCP_help,
+	.parse		= DSCP_parse,
+	.final_check	= DSCP_check,
+	.print		= DSCP_print,
+	.save		= DSCP_save,
+	.extra_opts	= DSCP_opts,
 };
 
-static struct xtables_target dscp6 = { 
+static struct xtables_target dscp_target6 = {
 	.family		= AF_INET6,
 	.name		= "DSCP",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_DSCP_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_DSCP_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= DSCP_help,
+	.parse		= DSCP_parse,
+	.final_check	= DSCP_check,
+	.print		= DSCP_print,
+	.save		= DSCP_save,
+	.extra_opts	= DSCP_opts,
 };
 
 void _init(void)
 {
-	xtables_register_target(&dscp);
-	xtables_register_target(&dscp6);
+	xtables_register_target(&dscp_target);
+	xtables_register_target(&dscp_target6);
 }

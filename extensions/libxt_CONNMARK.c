@@ -36,8 +36,7 @@ struct markinfo {
 #endif
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void CONNMARK_help(void)
 {
 	printf(
 "CONNMARK target v%s options:\n"
@@ -48,7 +47,7 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option CONNMARK_opts[] = {
 	{ "set-mark", 1, NULL, '1' },
 	{ "save-mark", 0, NULL, '2' },
 	{ "restore-mark", 0, NULL, '3' },
@@ -59,9 +58,8 @@ static const struct option opts[] = {
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_target **target)
+CONNMARK_parse(int c, char **argv, int invert, unsigned int *flags,
+               const void *entry, struct xt_entry_target **target)
 {
 	struct xt_connmark_target_info *markinfo
 		= (struct xt_connmark_target_info *)(*target)->data;
@@ -114,8 +112,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void
-final_check(unsigned int flags)
+static void CONNMARK_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -137,10 +134,8 @@ print_mask(const char *text, unsigned long mask)
 
 
 /* Prints out the target info. */
-static void
-print(const void *ip,
-      const struct xt_entry_target *target,
-      int numeric)
+static void CONNMARK_print(const void *ip,
+                           const struct xt_entry_target *target, int numeric)
 {
 	const struct xt_connmark_target_info *markinfo =
 		(const struct xt_connmark_target_info *)target->data;
@@ -167,8 +162,7 @@ print(const void *ip,
 }
 
 /* Saves the target into in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_target *target)
+static void CONNMARK_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_connmark_target_info *markinfo =
 		(const struct xt_connmark_target_info *)target->data;
@@ -200,12 +194,12 @@ static struct xtables_target connmark_target = {
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= CONNMARK_help,
+	.parse		= CONNMARK_parse,
+	.final_check	= CONNMARK_check,
+	.print		= CONNMARK_print,
+	.save		= CONNMARK_save,
+	.extra_opts	= CONNMARK_opts,
 };
 
 static struct xtables_target connmark_target6 = {
@@ -214,12 +208,12 @@ static struct xtables_target connmark_target6 = {
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= CONNMARK_help,
+	.parse		= CONNMARK_parse,
+	.final_check	= CONNMARK_check,
+	.print		= CONNMARK_print,
+	.save		= CONNMARK_save,
+	.extra_opts	= CONNMARK_opts,
 };
 
 void _init(void)

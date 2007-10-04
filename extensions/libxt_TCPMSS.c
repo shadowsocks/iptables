@@ -17,7 +17,7 @@ struct mssinfo {
 };
 
 /* Function which prints out usage message. */
-static void __help(int hdrsize)
+static void __TCPMSS_help(int hdrsize)
 {
 	printf(
 "TCPMSS target v%s mutually-exclusive options:\n"
@@ -26,17 +26,17 @@ static void __help(int hdrsize)
 IPTABLES_VERSION, hdrsize);
 }
 
-static void help(void)
+static void TCPMSS_help(void)
 {
-	__help(40);
+	__TCPMSS_help(40);
 }
 
-static void help6(void)
+static void TCPMSS_help6(void)
 {
-	__help(60);
+	__TCPMSS_help(60);
 }
 
-static const struct option opts[] = {
+static const struct option TCPMSS_opts[] = {
 	{ "set-mss", 1, NULL, '1' },
 	{ "clamp-mss-to-pmtu", 0, NULL, '2' },
 	{ }
@@ -44,11 +44,9 @@ static const struct option opts[] = {
 
 /* Function which parses command options; returns true if it
    ate an option */
-static int
-__parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_target **target,
-      int hdrsize)
+static int __TCPMSS_parse(int c, char **argv, int invert, unsigned int *flags,
+                          const void *entry, struct xt_entry_target **target,
+                          int hdrsize)
 {
 	struct xt_tcpmss_info *mssinfo
 		= (struct xt_tcpmss_info *)(*target)->data;
@@ -82,24 +80,19 @@ __parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_target **target)
+static int TCPMSS_parse(int c, char **argv, int invert, unsigned int *flags,
+                        const void *entry, struct xt_entry_target **target)
 {
-	return __parse(c, argv, invert, flags, entry, target, 40);
+	return __TCPMSS_parse(c, argv, invert, flags, entry, target, 40);
 }
 
-static int
-parse6(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_target **target)
+static int TCPMSS_parse6(int c, char **argv, int invert, unsigned int *flags,
+                         const void *entry, struct xt_entry_target **target)
 {
-	return __parse(c, argv, invert, flags, entry, target, 60);
+	return __TCPMSS_parse(c, argv, invert, flags, entry, target, 60);
 }
 
-static void
-final_check(unsigned int flags)
+static void TCPMSS_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -107,10 +100,8 @@ final_check(unsigned int flags)
 }
 
 /* Prints out the targinfo. */
-static void
-print(const void *ip,
-      const struct xt_entry_target *target,
-      int numeric)
+static void TCPMSS_print(const void *ip, const struct xt_entry_target *target,
+                         int numeric)
 {
 	const struct xt_tcpmss_info *mssinfo =
 		(const struct xt_tcpmss_info *)target->data;
@@ -121,8 +112,7 @@ print(const void *ip,
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
-static void
-save(const void *ip, const struct xt_entry_target *target)
+static void TCPMSS_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_tcpmss_info *mssinfo =
 		(const struct xt_tcpmss_info *)target->data;
@@ -133,36 +123,36 @@ save(const void *ip, const struct xt_entry_target *target)
 		printf("--set-mss %u ", mssinfo->mss);
 }
 
-static struct xtables_target mss = {
+static struct xtables_target tcpmss_target = {
 	.family		= AF_INET,
 	.name		= "TCPMSS",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= TCPMSS_help,
+	.parse		= TCPMSS_parse,
+	.final_check	= TCPMSS_check,
+	.print		= TCPMSS_print,
+	.save		= TCPMSS_save,
+	.extra_opts	= TCPMSS_opts,
 };
 
-static struct xtables_target mss6 = {
+static struct xtables_target tcpmss_target6 = {
 	.family		= AF_INET6,
 	.name		= "TCPMSS",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
-	.help		= &help6,
-	.parse		= &parse6,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts
+	.help		= TCPMSS_help6,
+	.parse		= TCPMSS_parse6,
+	.final_check	= TCPMSS_check,
+	.print		= TCPMSS_print,
+	.save		= TCPMSS_save,
+	.extra_opts	= TCPMSS_opts,
 };
 
 void _init(void)
 {
-	xtables_register_target(&mss);
-	xtables_register_target(&mss6);
+	xtables_register_target(&tcpmss_target);
+	xtables_register_target(&tcpmss_target6);
 }

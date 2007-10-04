@@ -14,7 +14,7 @@
 
 #define PFX "CONNSECMARK target: "
 
-static void help(void)
+static void CONNSECMARK_help(void)
 {
 	printf(
 "CONNSECMARK target v%s options:\n"
@@ -24,14 +24,15 @@ static void help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option CONNSECMARK_opts[] = {
 	{ "save", 0, 0, '1' },
 	{ "restore", 0, 0, '2' },
 	{ 0 }
 };
 
-static int parse(int c, char **argv, int invert, unsigned int *flags,
-                 const void *entry, struct xt_entry_target **target)
+static int
+CONNSECMARK_parse(int c, char **argv, int invert, unsigned int *flags,
+                  const void *entry, struct xt_entry_target **target)
 {
 	struct xt_connsecmark_target_info *info =
 		(struct xt_connsecmark_target_info*)(*target)->data;
@@ -60,7 +61,7 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void final_check(unsigned int flags)
+static void CONNSECMARK_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM, PFX "parameter required");
@@ -86,8 +87,9 @@ static void print_connsecmark(struct xt_connsecmark_target_info *info)
 	}
 }
 
-static void print(const void *ip,
-		  const struct xt_entry_target *target, int numeric)
+static void
+CONNSECMARK_print(const void *ip, const struct xt_entry_target *target,
+                  int numeric)
 {
 	struct xt_connsecmark_target_info *info =
 		(struct xt_connsecmark_target_info*)(target)->data;
@@ -96,7 +98,8 @@ static void print(const void *ip,
 	print_connsecmark(info);
 }
 
-static void save(const void *ip, const struct xt_entry_target *target)
+static void
+CONNSECMARK_save(const void *ip, const struct xt_entry_target *target)
 {
 	struct xt_connsecmark_target_info *info =
 		(struct xt_connsecmark_target_info*)target->data;
@@ -105,38 +108,38 @@ static void save(const void *ip, const struct xt_entry_target *target)
 	print_connsecmark(info);
 }
 
-static struct xtables_target connsecmark = {
+static struct xtables_target connsecmark_target = {
 	.family		= AF_INET,
 	.name		= "CONNSECMARK",
 	.version	= IPTABLES_VERSION,
 	.revision	= 0,
 	.size		= XT_ALIGN(sizeof(struct xt_connsecmark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connsecmark_target_info)),
-	.parse		= &parse,
-	.help		= &help,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.parse		= CONNSECMARK_parse,
+	.help		= CONNSECMARK_help,
+	.final_check	= CONNSECMARK_check,
+	.print		= CONNSECMARK_print,
+	.save		= CONNSECMARK_save,
+	.extra_opts	= CONNSECMARK_opts,
 };
 
-static struct xtables_target connsecmark6 = {
+static struct xtables_target connsecmark_target6 = {
 	.family		= AF_INET6,
 	.name		= "CONNSECMARK",
 	.version	= IPTABLES_VERSION,
 	.revision	= 0,
 	.size		= XT_ALIGN(sizeof(struct xt_connsecmark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connsecmark_target_info)),
-	.parse		= &parse,
-	.help		= &help,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.parse		= CONNSECMARK_parse,
+	.help		= CONNSECMARK_help,
+	.final_check	= CONNSECMARK_check,
+	.print		= CONNSECMARK_print,
+	.save		= CONNSECMARK_save,
+	.extra_opts	= CONNSECMARK_opts,
 };
 
 void _init(void)
 {
-	xtables_register_target(&connsecmark);
-	xtables_register_target(&connsecmark6);
+	xtables_register_target(&connsecmark_target);
+	xtables_register_target(&connsecmark_target6);
 }

@@ -8,8 +8,7 @@
 #include <linux/netfilter/x_tables.h>
 
 /* Function which prints out usage message. */
-static void
-help(void)
+static void NOTRACK_help(void)
 {
 	printf(
 "NOTRACK target v%s takes no options\n",
@@ -19,39 +18,34 @@ IPTABLES_VERSION);
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
-      const void *entry,
-      struct xt_entry_target **target)
+NOTRACK_parse(int c, char **argv, int invert, unsigned int *flags,
+              const void *entry, struct xt_entry_target **target)
 {
 	return 0;
 }
 
-static
-struct xtables_target notrack =
-{
+static struct xtables_target notrack_target = {
 	.family		= AF_INET,
 	.name		= "NOTRACK",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(0),
 	.userspacesize	= XT_ALIGN(0),
-	.help		= &help,
-	.parse		= &parse,
+	.help		= NOTRACK_help,
+	.parse		= NOTRACK_parse,
 };
 
-static
-struct xtables_target notrack6 =
-{
+static struct xtables_target notrack_target6 = {
 	.family		= AF_INET6,
 	.name		= "NOTRACK",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(0),
 	.userspacesize	= XT_ALIGN(0),
-	.help		= &help,
-	.parse		= &parse,
+	.help		= NOTRACK_help,
+	.parse		= NOTRACK_parse,
 };
 
 void _init(void)
 {
-	xtables_register_target(&notrack);
-	xtables_register_target(&notrack6);
+	xtables_register_target(&notrack_target);
+	xtables_register_target(&notrack_target6);
 }
