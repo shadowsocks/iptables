@@ -124,11 +124,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	}
 }
 
-/* Final check; don't care. */
-static void final_check(unsigned int flags)
-{
-}
-
 /* Prints out the targinfo. */
 static void
 print(const void *ip,
@@ -177,7 +172,6 @@ static struct iptables_target redir = {
 	.help		= &help,
 	.init		= &init,
  	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
 	.extra_opts	= opts

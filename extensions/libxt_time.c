@@ -326,10 +326,6 @@ static int time_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
-static void time_check(unsigned int flags)
-{
-}
-
 static void time_print_date(time_t date, const char *command)
 {
 	struct tm *t;
@@ -476,7 +472,6 @@ static struct xtables_match time_reg = {
 	.help          = time_help,
 	.init          = time_init,
 	.parse         = time_parse,
-	.final_check   = time_check,
 	.print         = time_print,
 	.save          = time_save,
 	.extra_opts    = time_opts,
@@ -491,7 +486,6 @@ static struct xtables_match time6_reg = {
 	.help          = time_help,
 	.init          = time_init,
 	.parse         = time_parse,
-	.final_check   = time_check,
 	.print         = time_print,
 	.save          = time_save,
 	.extra_opts    = time_opts,

@@ -32,11 +32,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
-/* Final check */
-static void final_check(unsigned int flags)
-{
-}
-
 /* Prints out the matchinfo. */
 static void
 print(const void *ip,
@@ -59,7 +54,6 @@ static struct ip6tables_match eui64 = {
 	.userspacesize	= IP6T_ALIGN(sizeof(int)),
 	.help		= &help,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
 };

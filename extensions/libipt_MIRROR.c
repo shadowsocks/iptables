@@ -26,11 +26,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
-static void
-final_check(unsigned int flags)
-{
-}
-
 static struct iptables_target mirror = {
 	.name		= "MIRROR",
 	.version	= IPTABLES_VERSION,
@@ -38,7 +33,6 @@ static struct iptables_target mirror = {
 	.userspacesize	= IPT_ALIGN(0),
  	.help		= &help,
  	.parse		= &parse,
-	.final_check 	= &final_check,
 	.print		= NULL,
 	.save		= NULL,
 };

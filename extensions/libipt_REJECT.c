@@ -132,11 +132,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
-/* Final check; nothing. */
-static void final_check(unsigned int flags)
-{
-}
-
 /* Prints out ipt_reject_info. */
 static void
 print(const void *ip,
@@ -176,7 +171,6 @@ static struct iptables_target reject = {
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
 	.extra_opts	= opts

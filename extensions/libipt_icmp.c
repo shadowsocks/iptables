@@ -280,11 +280,6 @@ static void save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-/* Final check; we don't care. We can pass 0xFF to match any type */
-static void final_check(unsigned int flags)
-{
-}
-
 static struct iptables_match icmp = { 
 	.name		= "icmp",
 	.version	= IPTABLES_VERSION,
@@ -293,7 +288,6 @@ static struct iptables_match icmp = {
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
 	.extra_opts	= opts

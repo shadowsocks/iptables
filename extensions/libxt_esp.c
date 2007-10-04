@@ -107,12 +107,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; we don't care. */
-static void
-final_check(unsigned int flags)
-{
-}
-
 static void
 print_spis(const char *name, u_int32_t min, u_int32_t max,
 	    int invert)
@@ -172,7 +166,6 @@ static struct xtables_match esp = {
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
 	.extra_opts	= opts
@@ -187,7 +180,6 @@ static struct xtables_match esp6 = {
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
 	.extra_opts	= opts

@@ -23,11 +23,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
-/* Final check; must have specified --mac. */
-static void final_check(unsigned int flags)
-{
-}
-
 static
 struct iptables_match unclean = { 
 	.name		= "unclean",
@@ -36,7 +31,6 @@ struct iptables_match unclean = {
 	.userspacesize	= IPT_ALIGN(0),
 	.help		= &help,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= NULL,
 	.save		= NULL,
 };

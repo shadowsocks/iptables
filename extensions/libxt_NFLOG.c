@@ -110,11 +110,6 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void final_check(unsigned int flags)
-{
-	return;
-}
-
 static void nflog_print(const struct xt_nflog_info *info, char *prefix)
 {
 	if (info->prefix[0] != '\0')
@@ -151,7 +146,6 @@ static struct xtables_target nflog = {
 	.help		= help,
 	.init		= init,
 	.parse		= parse,
-	.final_check	= final_check,
 	.print		= print,
 	.save		= save,
 	.extra_opts	= opts,
@@ -166,7 +160,6 @@ static struct xtables_target nflog6 = {
 	.help		= help,
 	.init		= init,
 	.parse		= parse,
-	.final_check	= final_check,
 	.print		= print,
 	.save		= save,
 	.extra_opts	= opts,

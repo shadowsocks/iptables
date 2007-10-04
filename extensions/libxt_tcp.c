@@ -220,12 +220,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; we don't care. */
-static void
-final_check(unsigned int flags)
-{
-}
-
 static char *
 port_to_service(int port)
 {
@@ -402,7 +396,6 @@ static struct xtables_match tcp = {
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
 	.extra_opts	= opts,
@@ -417,7 +410,6 @@ static struct xtables_match tcp6 = {
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
 	.extra_opts	= opts,

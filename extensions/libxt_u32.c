@@ -247,10 +247,6 @@ static int u32_parse(int c, char **argv, int invert, unsigned int *flags,
 	}
 }
 
-static void u32_check(unsigned int flags)
-{
-}
-
 static void u32_print(const void *ip, const struct xt_entry_match *match,
                       int numeric)
 {
@@ -280,7 +276,6 @@ static struct xtables_match u32_reg = {
 	.userspacesize = XT_ALIGN(sizeof(struct xt_u32)),
 	.help          = u32_help,
 	.parse         = u32_parse,
-	.final_check   = u32_check,
 	.print         = u32_print,
 	.save          = u32_save,
 	.extra_opts    = u32_opts,
@@ -294,7 +289,6 @@ static struct xtables_match u32_reg6 = {
 	.userspacesize = XT_ALIGN(sizeof(struct xt_u32)),
 	.help          = u32_help,
 	.parse         = u32_parse,
-	.final_check   = u32_check,
 	.print         = u32_print,
 	.save          = u32_save,
 	.extra_opts    = u32_opts,

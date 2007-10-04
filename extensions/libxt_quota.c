@@ -79,12 +79,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
         return 1;
 }
 
-/* no final check */
-static void
-final_check(unsigned int flags)
-{
-}
-
 struct xtables_match quota = { 
 	.family		= AF_INET,
 	.name		= "quota",
@@ -93,7 +87,6 @@ struct xtables_match quota = {
 	.userspacesize	= offsetof(struct xt_quota_info, quota),
 	.help		= &help,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
 	.extra_opts	= opts
@@ -107,7 +100,6 @@ struct xtables_match quota6 = {
 	.userspacesize	= offsetof(struct xt_quota_info, quota),
 	.help		= &help,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
 	.extra_opts	= opts

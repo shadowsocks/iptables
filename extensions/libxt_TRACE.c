@@ -26,11 +26,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
-static void
-final_check(unsigned int flags)
-{
-}
-
 static struct xtables_target trace = {
 	.family		= AF_INET,
 	.name		= "TRACE",
@@ -39,7 +34,6 @@ static struct xtables_target trace = {
 	.userspacesize	= XT_ALIGN(0),
 	.help		= &help,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= NULL, /* print */
 	.save		= NULL, /* save */
 };
@@ -52,7 +46,6 @@ static struct xtables_target trace6 = {
 	.userspacesize	= XT_ALIGN(0),
 	.help		= &help,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= NULL, /* print */
 	.save		= NULL, /* save */
 };

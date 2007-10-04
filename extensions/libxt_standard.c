@@ -26,11 +26,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
-/* Final check; don't care. */
-static void final_check(unsigned int flags)
-{
-}
-
 /* Saves the targinfo in parsable form to stdout. */
 static void
 save(const void *ip, const struct xt_entry_target *target)
@@ -46,7 +41,6 @@ struct xtables_target standard = {
 	.userspacesize	= XT_ALIGN(sizeof(int)),
 	.help		= &help,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= NULL,
 	.save		= &save,
 };
@@ -60,7 +54,6 @@ struct xtables_target standard6 = {
 	.userspacesize	= XT_ALIGN(sizeof(int)),
 	.help		= &help,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= NULL,
 	.save		= &save,
 };

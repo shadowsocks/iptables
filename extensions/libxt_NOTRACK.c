@@ -26,11 +26,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
-static void
-final_check(unsigned int flags)
-{
-}
-
 static
 struct xtables_target notrack =
 {
@@ -41,7 +36,6 @@ struct xtables_target notrack =
 	.userspacesize	= XT_ALIGN(0),
 	.help		= &help,
 	.parse		= &parse,
-	.final_check	= &final_check,
 };
 
 static
@@ -54,7 +48,6 @@ struct xtables_target notrack6 =
 	.userspacesize	= XT_ALIGN(0),
 	.help		= &help,
 	.parse		= &parse,
-	.final_check	= &final_check,
 };
 
 void _init(void)

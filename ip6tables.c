@@ -1840,9 +1840,10 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	}
 
 	for (matchp = matches; matchp; matchp = matchp->next)
-		matchp->match->final_check(matchp->match->mflags);
+		if (matchp->match->final_check != NULL)
+			matchp->match->final_check(matchp->match->mflags);
 
-	if (target)
+	if (target != NULL && target->final_check != NULL)
 		target->final_check(target->tflags);
 
 	/* Fix me: must put inverse options checking here --MN */

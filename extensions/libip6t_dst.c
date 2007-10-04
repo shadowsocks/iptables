@@ -179,12 +179,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; we don't care. */
-static void
-final_check(unsigned int flags)
-{
-}
-
 static void
 print_options(int optsnr, u_int16_t *optsp)
 {
@@ -255,7 +249,6 @@ struct ip6tables_match optstruct = {
 	.help          = &help,
 	.init          = &init,
 	.parse         = &parse,
-	.final_check   = &final_check,
 	.print         = &print,
 	.save          = &save,
 	.extra_opts    = opts

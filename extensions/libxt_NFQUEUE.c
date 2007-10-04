@@ -63,11 +63,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void
-final_check(unsigned int flags)
-{
-}
-
 /* Prints out the targinfo. */
 static void
 print(const void *ip,
@@ -97,7 +92,6 @@ static struct xtables_target nfqueue = {
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_NFQ_info)),
 	.help		= &help,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
 	.extra_opts	= opts
@@ -111,7 +105,6 @@ static struct xtables_target nfqueue6 = {
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_NFQ_info)),
 	.help		= &help,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
 	.extra_opts	= opts

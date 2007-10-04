@@ -150,11 +150,6 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; we don't care. */
-static void final_check(unsigned int flags)
-{
-}
-
 static const char *type_to_name(u_int8_t type)
 {
 	unsigned int i;
@@ -238,7 +233,6 @@ static struct ip6tables_match mh = {
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
 	.extra_opts	= opts,

@@ -150,11 +150,6 @@ static int parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; nothing. */
-static void final_check(unsigned int flags)
-{
-}
-
 /* Saves the union ipt_targinfo in parsable form to stdout. */
 static void save(const void *ip,
 		 const struct xt_entry_target *target)
@@ -200,7 +195,6 @@ static struct iptables_target ulog = {
 	.help		= &help,
 	.init		= &init,
 	.parse		= &parse,
-	.final_check	= &final_check,
 	.print		= &print,
 	.save		= &save,
 	.extra_opts	= opts
