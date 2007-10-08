@@ -12,7 +12,7 @@
 
 /* Function which prints out usage message. */
 static void
-help(void)
+CLASSIFY_help(void)
 {
 	printf(
 "CLASSIFY target v%s options:\n"
@@ -21,12 +21,12 @@ help(void)
 IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option CLASSIFY_opts[] = {
 	{ "set-class", 1, NULL, '1' },
 	{ }
 };
 
-static int string_to_priority(const char *s, unsigned int *p)
+static int CLASSIFY_string_to_priority(const char *s, unsigned int *p)
 {
 	unsigned int i, j;
 
@@ -40,7 +40,7 @@ static int string_to_priority(const char *s, unsigned int *p)
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
+CLASSIFY_parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
       struct xt_entry_target **target)
 {
@@ -49,7 +49,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (string_to_priority(optarg, &clinfo->priority))
+		if (CLASSIFY_string_to_priority(optarg, &clinfo->priority))
 			exit_error(PARAMETER_PROBLEM,
 				   "Bad class value `%s'", optarg);
 		if (*flags)
@@ -66,7 +66,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static void
-final_check(unsigned int flags)
+CLASSIFY_final_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM,
@@ -74,26 +74,26 @@ final_check(unsigned int flags)
 }
 
 static void
-print_class(unsigned int priority, int numeric)
+CLASSIFY_print_class(unsigned int priority, int numeric)
 {
 	printf("%x:%x ", TC_H_MAJ(priority)>>16, TC_H_MIN(priority));
 }
 
 /* Prints out the targinfo. */
 static void
-print(const void *ip,
+CLASSIFY_print(const void *ip,
       const struct xt_entry_target *target,
       int numeric)
 {
 	const struct xt_classify_target_info *clinfo =
 		(const struct xt_classify_target_info *)target->data;
 	printf("CLASSIFY set ");
-	print_class(clinfo->priority, numeric);
+	CLASSIFY_print_class(clinfo->priority, numeric);
 }
 
 /* Saves the union ipt_targinfo in parsable form to stdout. */
 static void
-save(const void *ip, const struct xt_entry_target *target)
+CLASSIFY_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_classify_target_info *clinfo =
 		(const struct xt_classify_target_info *)target->data;
@@ -102,36 +102,36 @@ save(const void *ip, const struct xt_entry_target *target)
 	       TC_H_MAJ(clinfo->priority)>>16, TC_H_MIN(clinfo->priority));
 }
 
-static struct xtables_target classify = { 
+static struct xtables_target classify_target = { 
 	.family		= AF_INET,
 	.name		= "CLASSIFY",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_classify_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_classify_target_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= CLASSIFY_help,
+	.parse		= CLASSIFY_parse,
+	.final_check	= CLASSIFY_final_check,
+	.print		= CLASSIFY_print,
+	.save		= CLASSIFY_save,
+	.extra_opts	= CLASSIFY_opts,
 };
 
-static struct xtables_target classify6 = { 
+static struct xtables_target classify_target6 = { 
 	.family		= AF_INET6,
 	.name		= "CLASSIFY",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_classify_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_classify_target_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= CLASSIFY_help,
+	.parse		= CLASSIFY_parse,
+	.final_check	= CLASSIFY_final_check,
+	.print		= CLASSIFY_print,
+	.save		= CLASSIFY_save,
+	.extra_opts	= CLASSIFY_opts,
 };
 
 void _init(void)
 {
-	xtables_register_target(&classify);
-	xtables_register_target(&classify6);
+	xtables_register_target(&classify_target);
+	xtables_register_target(&classify_target6);
 }

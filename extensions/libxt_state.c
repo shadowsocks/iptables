@@ -14,7 +14,7 @@
 
 /* Function which prints out usage message. */
 static void
-help(void)
+state_help(void)
 {
 	printf(
 "state v%s options:\n"
@@ -23,13 +23,13 @@ help(void)
 "\n", IPTABLES_VERSION);
 }
 
-static const struct option opts[] = {
+static const struct option state_opts[] = {
 	{ "state", 1, NULL, '1' },
 	{ }
 };
 
 static int
-parse_state(const char *state, size_t strlen, struct xt_state_info *sinfo)
+state_parse_state(const char *state, size_t strlen, struct xt_state_info *sinfo)
 {
 	if (strncasecmp(state, "INVALID", strlen) == 0)
 		sinfo->statemask |= XT_STATE_INVALID;
@@ -47,24 +47,24 @@ parse_state(const char *state, size_t strlen, struct xt_state_info *sinfo)
 }
 
 static void
-parse_states(const char *arg, struct xt_state_info *sinfo)
+state_parse_states(const char *arg, struct xt_state_info *sinfo)
 {
 	const char *comma;
 
 	while ((comma = strchr(arg, ',')) != NULL) {
-		if (comma == arg || !parse_state(arg, comma-arg, sinfo))
+		if (comma == arg || !state_parse_state(arg, comma-arg, sinfo))
 			exit_error(PARAMETER_PROBLEM, "Bad state `%s'", arg);
 		arg = comma+1;
 	}
 
-	if (strlen(arg) == 0 || !parse_state(arg, strlen(arg), sinfo))
+	if (strlen(arg) == 0 || !state_parse_state(arg, strlen(arg), sinfo))
 		exit_error(PARAMETER_PROBLEM, "Bad state `%s'", arg);
 }
 
 /* Function which parses command options; returns true if it
    ate an option */
 static int
-parse(int c, char **argv, int invert, unsigned int *flags,
+state_parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
       struct xt_entry_match **match)
 {
@@ -74,7 +74,7 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 		check_inverse(optarg, &invert, &optind, 0);
 
-		parse_states(argv[optind-1], sinfo);
+		state_parse_states(argv[optind-1], sinfo);
 		if (invert)
 			sinfo->statemask = ~sinfo->statemask;
 		*flags = 1;
@@ -88,13 +88,13 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 /* Final check; must have specified --state. */
-static void final_check(unsigned int flags)
+static void state_final_check(unsigned int flags)
 {
 	if (!flags)
 		exit_error(PARAMETER_PROBLEM, "You must specify `--state'");
 }
 
-static void print_state(unsigned int statemask)
+static void state_print_state(unsigned int statemask)
 {
 	const char *sep = "";
 
@@ -123,55 +123,55 @@ static void print_state(unsigned int statemask)
 
 /* Prints out the matchinfo. */
 static void
-print(const void *ip,
+state_print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
 	struct xt_state_info *sinfo = (struct xt_state_info *)match->data;
 
 	printf("state ");
-	print_state(sinfo->statemask);
+	state_print_state(sinfo->statemask);
 }
 
 /* Saves the matchinfo in parsable form to stdout. */
-static void save(const void *ip, const struct xt_entry_match *match)
+static void state_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_state_info *sinfo = (struct xt_state_info *)match->data;
 
 	printf("--state ");
-	print_state(sinfo->statemask);
+	state_print_state(sinfo->statemask);
 }
 
-static struct xtables_match state = { 
+static struct xtables_match state_match = { 
 	.family		= AF_INET,
 	.name		= "state",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_state_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_state_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= state_help,
+	.parse		= state_parse,
+	.final_check	= state_final_check,
+	.print		= state_print,
+	.save		= state_save,
+	.extra_opts	= state_opts,
 };
 
-static struct xtables_match state6 = { 
+static struct xtables_match state_match6 = { 
 	.family		= AF_INET6,
 	.name		= "state",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_state_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_state_info)),
-	.help		= &help,
-	.parse		= &parse,
-	.final_check	= &final_check,
-	.print		= &print,
-	.save		= &save,
-	.extra_opts	= opts,
+	.help		= state_help,
+	.parse		= state_parse,
+	.final_check	= state_final_check,
+	.print		= state_print,
+	.save		= state_save,
+	.extra_opts	= state_opts,
 };
 
 void _init(void)
 {
-	xtables_register_match(&state);
-	xtables_register_match(&state6);
+	xtables_register_match(&state_match);
+	xtables_register_match(&state_match6);
 }
