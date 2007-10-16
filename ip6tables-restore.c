@@ -77,7 +77,11 @@ ip6tc_handle_t create_handle(const char *tablename, const char* modprobe)
 
 static int parse_counters(char *string, struct ip6t_counters *ctr)
 {
-	return (sscanf(string, "[%llu:%llu]", (unsigned long long *)&ctr->pcnt, (unsigned long long *)&ctr->bcnt) == 2);
+	u_int64_t *pcnt, *bcnt;
+
+	pcnt = &ctr->pcnt;
+	bcnt = &ctr->bcnt;
+	return (sscanf(string, "[%llu:%llu]", (unsigned long long *)pcnt, (unsigned long long *)bcnt) == 2);
 }
 
 /* global new argv and argc */
