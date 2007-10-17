@@ -74,11 +74,15 @@ iptc_handle_t create_handle(const char *tablename, const char* modprobe )
 
 static int parse_counters(char *string, struct ipt_counters *ctr)
 {
-	u_int64_t *pcnt, *bcnt;
+	unsigned long long pcnt, bcnt;
+	int ret;
 
-	pcnt = &ctr->pcnt;
-	bcnt = &ctr->bcnt;
-	return (sscanf(string, "[%llu:%llu]", (unsigned long long *)pcnt, (unsigned long long *)bcnt) == 2);
+	ret = sscanf(string, "[%llu:%llu]",
+		     (unsigned long long *)&pcnt,
+		     (unsigned long long *)&bcnt);
+	ctr->pcnt = pcnt;
+	ctr->bcnt = bcnt;
+	return ret == 2;
 }
 
 /* global new argv and argc */
