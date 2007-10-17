@@ -1818,7 +1818,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				optarg[0] = '\0';
 				continue;
 			}
-			printf("Bad argument `%s'\n", optarg);
+			fprintf(stderr, "Bad argument `%s'\n", optarg);
 			exit_tryhelp(2);
 
 		default:
@@ -1990,8 +1990,9 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		}
 
 		if (target && iptc_is_chain(jumpto, *handle)) {
-			printf("Warning: using chain %s, not extension\n",
-			       jumpto);
+			fprintf(stderr,
+				"Warning: using chain %s, not extension\n",
+				jumpto);
 
 			if (target->t)
 				free(target->t);

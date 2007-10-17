@@ -246,9 +246,10 @@ void parse_interface(const char *arg, char *vianame, unsigned char *mask)
 			if (vianame[i] == ':' ||
 			    vianame[i] == '!' ||
 			    vianame[i] == '*') {
-				printf("Warning: weird character in interface"
-				       " `%s' (No aliases, :, ! or *).\n",
-				       vianame);
+				fprintf(stderr,
+					"Warning: weird character in interface"
+					" `%s' (No aliases, :, ! or *).\n",
+					vianame);
 				break;
 			}
 		}

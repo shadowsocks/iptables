@@ -1592,9 +1592,10 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			
 			if (is_exthdr(fw.ipv6.proto)
 			    && (fw.ipv6.invflags & IP6T_INV_PROTO) == 0)
-				printf("Warning: never matched protocol: %s. "
-				       "use extension match instead.\n",
-				       protocol);
+				fprintf(stderr,
+					"Warning: never matched protocol: %s. "
+					"use extension match instead.\n",
+					protocol);
 			break;
 
 		case 's':
@@ -1753,7 +1754,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 				optarg[0] = '\0';
 				continue;
 			}
-			printf("Bad argument `%s'\n", optarg);
+			fprintf(stderr, "Bad argument `%s'\n", optarg);
 			exit_tryhelp(2);
 
 		default:
@@ -1926,8 +1927,9 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 		}
 
 		if (target && ip6tc_is_chain(jumpto, *handle)) {
-			printf("Warning: using chain %s, not extension\n",
-			       jumpto);
+			fprintf(stderr,
+				"Warning: using chain %s, not extension\n",
+				jumpto);
 
 			if (target->t)
 				free(target->t);
