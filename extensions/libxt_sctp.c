@@ -398,12 +398,11 @@ print_chunk(u_int32_t chunknum, int numeric)
 }
 
 static void
-print_chunks(u_int32_t chunk_match_type, 
-	     const u_int32_t *chunkmap, 
-	     const struct xt_sctp_flag_info *flag_info,
-	     int flag_count,
-	     int numeric)
+print_chunks(const struct xt_sctp_info *einfo, int numeric)
 {
+	u_int32_t chunk_match_type = einfo->chunk_match_type;
+	const struct xt_sctp_flag_info *flag_info = einfo->flag_info;
+	int flag_count = einfo->flag_count;
 	int i, j;
 	int flag;
 
@@ -414,19 +413,19 @@ print_chunks(u_int32_t chunk_match_type,
 		default:	printf("Never reach herer\n"); break;
 	}
 
-	if (SCTP_CHUNKMAP_IS_CLEAR(chunkmap)) {
+	if (SCTP_CHUNKMAP_IS_CLEAR(einfo->chunkmap)) {
 		printf("NONE ");
 		goto out;
 	}
 	
-	if (SCTP_CHUNKMAP_IS_ALL_SET(chunkmap)) {
+	if (SCTP_CHUNKMAP_IS_ALL_SET(einfo->chunkmap)) {
 		printf("ALL ");
 		goto out;
 	}
 	
 	flag = 0;
 	for (i = 0; i < 256; i++) {
-		if (SCTP_CHUNKMAP_IS_SET(chunkmap, i)) {
+		if (SCTP_CHUNKMAP_IS_SET(einfo->chunkmap, i)) {
 			if (flag)
 				printf(",");
 			flag = 1;
@@ -473,8 +472,7 @@ sctp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 		if (einfo->invflags & XT_SCTP_CHUNK_TYPES) {
 			printf("! ");
 		}
-		print_chunks(einfo->chunk_match_type, einfo->chunkmap,
-			einfo->flag_info, einfo->flag_count, numeric);
+		print_chunks(einfo, numeric);
 	}
 }
 
@@ -509,8 +507,7 @@ static void sctp_save(const void *ip, const struct xt_entry_match *match)
 			printf("! ");
 		printf("--chunk-types ");
 
-		print_chunks(einfo->chunk_match_type, einfo->chunkmap, 
-			einfo->flag_info, einfo->flag_count, 0);
+		print_chunks(einfo, 0);
 	}
 }
 
