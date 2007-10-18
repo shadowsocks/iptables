@@ -75,7 +75,7 @@ static void time_init(struct xt_entry_match *m)
 
 	/* ...and have no date-begin or date-end boundary */
 	info->date_start = 0;
-	info->date_stop  = UINT_MAX;
+	info->date_stop  = INT_MAX;
 
 	/* local time is default */
 	info->flags |= XT_TIME_LOCAL_TZ;
@@ -428,7 +428,7 @@ static void time_print(const void *ip, const struct xt_entry_match *match,
 		printf("starting from ");
 		time_print_date(info->date_start, NULL);
 	}
-	if (info->date_stop != UINT_MAX) {
+	if (info->date_stop != INT_MAX) {
 		printf("until date ");
 		time_print_date(info->date_stop, NULL);
 	}
