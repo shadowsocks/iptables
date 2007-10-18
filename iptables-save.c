@@ -242,7 +242,9 @@ static int for_each_table(int (*func)(const char *tablename))
 
 	procfile = fopen("/proc/net/ip_tables_names", "r");
 	if (!procfile)
-		return 0;
+		exit_error(OTHER_PROBLEM,
+			   "Unable to open /proc/net/ip_tables_names: %s\n",
+			   strerror(errno));
 
 	while (fgets(tablename, sizeof(tablename), procfile)) {
 		if (tablename[strlen(tablename) - 1] != '\n')
