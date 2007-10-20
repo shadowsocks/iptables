@@ -1,6 +1,7 @@
 /*
  *	libxt_time - iptables part for xt_time
- *	Copyright © Jan Engelhardt <jengelh@computergmbh.de>, 2007
+ *	Copyright Â© CC Computer Consultants GmbH, 2007
+ *	Contact: <jengelh@computergmbh.de>
  *
  *	libxt_time.c is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by

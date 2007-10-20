@@ -5,8 +5,10 @@
  * net/netfilter/xt_u32.c
  *
  * (C) 2002 by Don Cohen <don-netf@isis.cs3-inc.com>
- * Copyright © Jan Engelhardt <jengelh@gmx.de>, 2007
  * Released under the terms of GNU GPL v2
+ *
+ * Copyright Â© CC Computer Consultants GmbH, 2007
+ * Contact: <jengelh@computergmbh.de>
  */
 #include <sys/types.h>
 #include <ctype.h>
