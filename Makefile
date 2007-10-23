@@ -61,7 +61,10 @@ EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/iptables-save $(DESTDIR)$(BINDIR)/iptables-r
 ifeq ($(DO_IPV6), 1)
 EXTRAS+=ip6tables ip6tables.o ip6tables.8
 EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/ip6tables $(DESTDIR)$(MANDIR)/man8/ip6tables.8
+
+ifneq ($(DO_MULTI), 1)
 EXTRAS+=ip6tables-save ip6tables-restore
+endif
 EXTRA_INSTALLS+=$(DESTDIR)$(BINDIR)/ip6tables-save $(DESTDIR)$(BINDIR)/ip6tables-restore $(DESTDIR)$(MANDIR)/man8/ip6tables-save.8 $(DESTDIR)$(MANDIR)/man8/ip6tables-restore.8
 endif
 
@@ -156,8 +159,13 @@ endif
 ip6tables.o: ip6tables.c
 	$(CC) $(CFLAGS) -DIP6T_LIB_DIR=\"$(IPT_LIBDIR)\" -c -o $@ $<
 
+ifeq ($(DO_MULTI), 1)
+ip6tables: ip6tables-multi.c ip6tables-save.c ip6tables-restore.c ip6tables-standalone.c ip6tables.o xtables.o $(STATIC6_LIBS) libiptc/libiptc.a
+	$(CC) $(CFLAGS) -DIPTABLES_MULTI -DIP6T_LIB_DIR=\"$(IPT_LIBDIR)\" $(LDFLAGS) -o $@ $^ $(LDLIBS)
+else
 ip6tables: ip6tables-standalone.c ip6tables.o xtables.o $(STATIC6_LIBS) libiptc/libiptc.a
 	$(CC) $(CFLAGS) -DIP6T_LIB_DIR=\"$(IPT_LIBDIR)\" $(LDFLAGS) -o $@ $^ $(LDLIBS)
+endif
 
 $(DESTDIR)$(BINDIR)/ip6tables: ip6tables
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
@@ -166,16 +174,28 @@ $(DESTDIR)$(BINDIR)/ip6tables: ip6tables
 ip6tables-save: ip6tables-save.c ip6tables.o xtables.o $(STATIC6_LIBS) libiptc/libiptc.a
 	$(CC) $(CFLAGS) -DIP6T_LIB_DIR=\"$(IPT_LIBDIR)\" $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
+ifeq ($(DO_MULTI), 1)
+$(DESTDIR)$(BINDIR)/ip6tables-save: ip6tables
+	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
+	ln -sf $< $@
+else
 $(DESTDIR)$(BINDIR)/ip6tables-save: ip6tables-save
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
 	cp $< $@
+endif
 
 ip6tables-restore: ip6tables-restore.c ip6tables.o xtables.o $(STATIC6_LIBS) libiptc/libiptc.a
 	$(CC) $(CFLAGS) -DIP6T_LIB_DIR=\"$(IPT_LIBDIR)\" $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
+ifeq ($(DO_MULTI), 1)
+$(DESTDIR)$(BINDIR)/ip6tables-restore: ip6tables
+	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
+	ln -sf $< $@
+else
 $(DESTDIR)$(BINDIR)/ip6tables-restore: ip6tables-restore
 	@[ -d $(DESTDIR)$(BINDIR) ] || mkdir -p $(DESTDIR)$(BINDIR)
 	cp $< $@
+endif
 
 $(DESTDIR)$(MANDIR)/man8/%.8: %.8
 	@[ -d $(DESTDIR)$(MANDIR)/man8 ] || mkdir -p $(DESTDIR)$(MANDIR)/man8
