@@ -33,6 +33,7 @@ static struct option options[] = {
 	{ "help", 0, 0, 'h' },
 	{ "noflush", 0, 0, 'n'},
 	{ "modprobe", 1, 0, 'M'},
+	{ "table", 1, 0, 'T'},
 	{ 0 }
 };
 
@@ -47,6 +48,7 @@ static void print_usage(const char *name, const char *version)
 			"	   [ --test ]\n"
 			"	   [ --help ]\n"
 			"	   [ --noflush ]\n"
+			"	   [ --table=<TABLE> ]\n"
 		        "          [ --modprobe=<command>]\n", name);
 		
 	exit(1);
@@ -123,6 +125,7 @@ main(int argc, char *argv[])
 	FILE *in;
 	const char *modprobe = 0;
 	int in_table = 0, testing = 0;
+	const char *tablename = 0;
 
 	program_name = "iptables-restore";
 	program_version = IPTABLES_VERSION;
@@ -136,7 +139,7 @@ main(int argc, char *argv[])
 	init_extensions();
 #endif
 
-	while ((c = getopt_long(argc, argv, "bcvthnM:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "bcvthnM:T:", options, NULL)) != -1) {
 		switch (c) {
 			case 'b':
 				binary = 1;
@@ -159,6 +162,9 @@ main(int argc, char *argv[])
 				break;
 			case 'M':
 				modprobe = optarg;
+				break;
+			case 'T':
+				tablename = optarg;
 				break;
 		}
 	}
@@ -212,6 +218,8 @@ main(int argc, char *argv[])
 			strncpy(curtable, table, IPT_TABLE_MAXNAMELEN);
 			curtable[IPT_TABLE_MAXNAMELEN] = '\0';
 
+			if (tablename && (strcmp(tablename, table) != 0))
+				continue;
 			if (handle)
 				iptc_free(&handle);
 
@@ -438,6 +446,8 @@ main(int argc, char *argv[])
 
 			free_argv();
 		}
+		if (tablename && (strcmp(tablename, curtable) != 0))
+			continue;
 		if (!ret) {
 			fprintf(stderr, "%s: line %u failed\n",
 					program_name, line);
