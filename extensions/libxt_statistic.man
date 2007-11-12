@@ -1,0 +1,30 @@
+This module matches packets based on some statistic condition.
+It supports two distinct modes settable with the 
+.B --mode
+option.
+.TP
+Supported options:
+.TP
+.BI "--mode " "mode"
+Set the matching mode of the matching rule, supported modes are
+.B random
+and
+.B nth. 
+.TP
+.BI "--probability " "p"
+Set the probability from 0 to 1 for a packet to be randomly
+matched. It works only with the
+.B random
+mode.
+.TP
+.BI "--every " "n"
+Match one packet every nth packet. It works only with the
+.B nth
+mode (see also the 
+.B --packet
+option).
+.TP
+.BI "--packet " "p"
+Set the initial counter value (0 <= p <= n-1, default 0) for the
+.B nth 
+mode.
