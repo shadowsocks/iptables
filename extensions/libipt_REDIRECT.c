@@ -23,7 +23,7 @@ IPTABLES_VERSION);
 
 static const struct option REDIRECT_opts[] = {
 	{ "to-ports", 1, NULL, '1' },
-	{ "random", 1, NULL, '2' },
+	{ "random", 0, NULL, '2' },
 	{ }
 };
 

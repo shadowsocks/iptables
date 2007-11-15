@@ -178,6 +178,7 @@ static int DNAT_parse(int c, char **argv, int invert, unsigned int *flags,
 			*flags |= IPT_DNAT_OPT_RANDOM;
 		} else
 			*flags |= IPT_DNAT_OPT_RANDOM;
+		return 1;
 	default:
 		return 0;
 	}
