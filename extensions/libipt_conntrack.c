@@ -204,7 +204,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '3':
-		check_inverse(optarg, &invert, &optind, 9);
+		check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
 			sinfo->invflags |= IPT_CONNTRACK_ORIGSRC;
