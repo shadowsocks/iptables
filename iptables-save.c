@@ -141,6 +141,9 @@ static int print_match(const struct ipt_entry_match *e,
 /* print a given ip including mask if neccessary */
 static void print_ip(char *prefix, u_int32_t ip, u_int32_t mask, int invert)
 {
+	u_int32_t bits, hmask = ntohl(mask);
+	int i;
+
 	if (!mask && !ip && !invert)
 		return;
 
@@ -149,10 +152,19 @@ static void print_ip(char *prefix, u_int32_t ip, u_int32_t mask, int invert)
 		invert ? "! " : "",
 		IP_PARTS(ip));
 
-	if (mask != 0xffffffff) 
-		printf("/%u.%u.%u.%u ", IP_PARTS(mask));
+	if (mask == 0xFFFFFFFFU) {
+		printf("/32 ");
+		return;
+	}
+
+	i    = 32;
+	bits = 0xFFFFFFFEU;
+	while (--i >= 0 && hmask != bits)
+		bits <<= 1;
+	if (i >= 0)
+		printf("/%u ", i);
 	else
-		printf(" ");
+		printf("/%u.%u.%u.%u ", IP_PARTS(mask));
 }
 
 /* We want this to be readable, so only print out neccessary fields.
