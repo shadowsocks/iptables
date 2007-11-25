@@ -1,8 +1,6 @@
 #ifndef _X_TABLES_H
 #define _X_TABLES_H
 
-#include <sys/types.h>
-
 #define XT_FUNCTION_MAXNAMELEN 30
 #define XT_TABLE_MAXNAMELEN 32
 
@@ -55,6 +53,14 @@ struct xt_entry_target
 
 	unsigned char data[0];
 };
+
+#define XT_TARGET_INIT(__name, __size)					       \
+{									       \
+	.target.u.user = {						       \
+		.target_size	= XT_ALIGN(__size),			       \
+		.name		= __name,				       \
+	},								       \
+}
 
 struct xt_standard_target
 {
@@ -119,5 +125,6 @@ struct xt_counters_info
 };
 
 #define XT_INV_PROTO		0x40	/* Invert the sense of PROTO. */
+
 
 #endif /* _X_TABLES_H */
