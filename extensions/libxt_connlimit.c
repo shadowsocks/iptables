@@ -149,7 +149,7 @@ static void connlimit_print4(const void *ip,
 	const struct xt_connlimit_info *info = (const void *)match->data;
 
 	printf("#conn/%u %s %u ", count_bits4(info->v4_mask),
-	       info->inverse ? "<" : ">", info->limit);
+	       info->inverse ? "<=" : ">", info->limit);
 }
 
 static void connlimit_print6(const void *ip,
@@ -157,7 +157,7 @@ static void connlimit_print6(const void *ip,
 {
 	const struct xt_connlimit_info *info = (const void *)match->data;
 	printf("#conn/%u %s %u ", count_bits6(info->v6_mask),
-	       info->inverse ? "<" : ">", info->limit);
+	       info->inverse ? "<=" : ">", info->limit);
 }
 
 static void connlimit_save4(const void *ip, const struct xt_entry_match *match)
