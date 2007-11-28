@@ -420,8 +420,8 @@ static void __iptcc_p_add_chain(TC_HANDLE_T h, struct chain_head *c,
 	c->head_offset = offset;
 	c->index = *num;
 
-	iptc_insert_chain(h, c);
-	
+	list_add_tail(&c->list, &h->chains); /* Its already sorted */
+
 	h->chain_iterator_cur = c;
 }
 
@@ -1791,7 +1791,7 @@ TC_CREATE_CHAIN(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 	}
 
 	DEBUGP("Creating chain `%s'\n", chain);
-	list_add_tail(&c->list, &(*handle)->chains);
+	iptc_insert_chain(*handle, c); /* Insert sorted */
 
 	set_changed(*handle);
 
