@@ -411,6 +411,15 @@ static int compatible_revision(const char *name, u_int8_t revision, int opt)
 
 	sockfd = socket(afinfo.family, SOCK_RAW, IPPROTO_RAW);
 	if (sockfd < 0) {
+		if (errno == EPERM) {
+			/* revision 0 is always supported. */
+			if (revision != 0)
+				fprintf(stderr, "Could not determine whether "
+						"revision %u is supported, "
+						"assuming it is.\n",
+					revision);
+			return 1;
+		}
 		fprintf(stderr, "Could not open socket to kernel: %s\n",
 			strerror(errno));
 		exit(1);
