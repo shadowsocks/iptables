@@ -866,10 +866,6 @@ TC_INIT(const char *tablename)
 	CHECK(h);
 	return h;
 error:
-	if (--sockfd_use == 0) {
-		close(sockfd);
-		sockfd = -1;
-	}
 	TC_FREE(&h);
 	return NULL;
 }
