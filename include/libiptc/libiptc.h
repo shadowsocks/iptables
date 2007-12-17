@@ -2,6 +2,7 @@
 #define _LIBIPTC_H
 /* Library which manipulates filtering rules. */
 
+#include <linux/types.h>
 #include <libiptc/ipt_kernel_headers.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
 

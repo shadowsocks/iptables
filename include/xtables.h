@@ -2,6 +2,7 @@
 #define _XTABLES_H
 
 #include <sys/types.h>
+#include <linux/types.h>
 #include <linux/netfilter/x_tables.h>
 #include <libiptc/libxtc.h>
 
@@ -233,10 +234,5 @@ extern const char *program_name, *program_version;
 # endif
   extern void init_extensions(void);
 #endif
-
-#define __be32	u_int32_t
-#define __le32	u_int32_t
-#define __be16	u_int16_t
-#define __le16	u_int16_t
 
 #endif /* _XTABLES_H */

@@ -2,6 +2,7 @@
 #define _LIBIP6TC_H
 /* Library which manipulates firewall rules. Version 0.2. */
 
+#include <linux/types.h>
 #include <libiptc/ipt_kernel_headers.h>
 #include <linux/netfilter_ipv6/ip6_tables.h>
 
