@@ -16,7 +16,6 @@
  *	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <netdb.h>
@@ -30,6 +29,10 @@
 #include <sys/wait.h>
 
 #include <xtables.h>
+
+#ifndef NO_SHARED_LIBS
+#include <dlfcn.h>
+#endif
 
 #define NPROTO	255
 

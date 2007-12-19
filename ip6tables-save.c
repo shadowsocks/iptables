@@ -11,12 +11,15 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
-#include <dlfcn.h>
 #include <time.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include "libiptc/libip6tc.h"
 #include "ip6tables.h"
+
+#ifndef NO_SHARED_LIBS
+#include <dlfcn.h>
+#endif
 
 static int binary = 0, counters = 0;
 

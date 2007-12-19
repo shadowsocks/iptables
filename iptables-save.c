@@ -11,11 +11,14 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
-#include <dlfcn.h>
 #include <time.h>
 #include <netdb.h>
 #include "libiptc/libiptc.h"
 #include "iptables.h"
+
+#ifndef NO_SHARED_LIBS
+#include <dlfcn.h>
+#endif
 
 static int binary = 0, counters = 0;
 
