@@ -20,8 +20,8 @@ endif
 ifndef KBUILD_OUTPUT
 KBUILD_OUTPUT="/lib/modules/$(shell uname -r)/build"
 endif
-IPTABLES_VERSION:=1.4.0rc1
-OLD_IPTABLES_VERSION:=1.3.8
+IPTABLES_VERSION:=1.4.0
+OLD_IPTABLES_VERSION:=1.4.0rc1
 
 PREFIX:=/usr/local
 LIBDIR:=$(PREFIX)/lib
