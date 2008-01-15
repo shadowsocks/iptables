@@ -132,6 +132,8 @@ STRUCT_TC_HANDLE
 	struct chain_head *chain_iterator_cur;
 	struct rule_head *rule_iterator_cur;
 
+	unsigned int num_chains;         /* number of user defined chains */
+
 	STRUCT_GETINFO info;
 	STRUCT_GET_ENTRIES *entries;
 };
@@ -475,6 +477,7 @@ static int cache_add_entry(STRUCT_ENTRY *e,
 			errno = -ENOMEM;
 			return -1;
 		}
+		h->num_chains++; /* New user defined chain */
 
 		__iptcc_p_add_chain(h, c, offset, num);
 
@@ -1801,6 +1804,7 @@ TC_CREATE_CHAIN(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 		return 0;
 
 	}
+	(*handle)->num_chains++; /* New user defined chain */
 
 	DEBUGP("Creating chain `%s'\n", chain);
 	iptc_insert_chain(*handle, c); /* Insert sorted */
@@ -1867,12 +1871,14 @@ TC_DELETE_CHAIN(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 	}
 
 	/* If we are about to delete the chain that is the current
-	 * iterator, move chain iterator firward. */
+	 * iterator, move chain iterator forward. */
 	if (c == (*handle)->chain_iterator_cur)
 		iptcc_chain_iterator_advance(*handle);
 
 	list_del(&c->list);
 	free(c);
+
+	(*handle)->num_chains--; /* One user defined chain deleted */
 
 	DEBUGP("chain `%s' deleted\n", chain);
 
