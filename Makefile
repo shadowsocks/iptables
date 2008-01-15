@@ -80,7 +80,7 @@ SH_CFLAGS:=$(CFLAGS) -fPIC
 STATIC_LIBS  =
 STATIC6_LIBS =
 LDFLAGS      = -rdynamic
-LDLIBS       = -ldl
+LDLIBS       = -ldl -lm
 ifeq ($(DO_SELINUX), 1)
 LDLIBS       += -lselinux
 endif
@@ -89,7 +89,7 @@ DEPFILES = $(EXT_OBJS:%.o=%.d)
 STATIC_LIBS  = extensions/libext.a
 STATIC6_LIBS = extensions/libext6.a
 LDFLAGS      = -static
-LDLIBS	     =
+LDLIBS	     = -lm
 ifeq ($(DO_SELINUX), 1)
 LDLIBS       += -lselinux
 endif
