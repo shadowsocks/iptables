@@ -64,8 +64,6 @@ CONNMARK_parse(int c, char **argv, int invert, unsigned int *flags,
 	struct xt_connmark_target_info *markinfo
 		= (struct xt_connmark_target_info *)(*target)->data;
 
-	markinfo->mask = 0xffffffffUL;
-
 	switch (c) {
 		char *end;
 	case '1':
@@ -188,6 +186,14 @@ static void CONNMARK_save(const void *ip, const struct xt_entry_target *target)
 	}
 }
 
+static void CONNMARK_init(struct xt_entry_target *t)
+{
+	struct xt_connmark_target_info *markinfo
+		= (struct xt_connmark_target_info *)t->data;
+
+	markinfo->mask = 0xffffffffUL;
+}
+
 static struct xtables_target connmark_target = {
 	.family		= AF_INET,
 	.name		= "CONNMARK",
@@ -195,6 +201,7 @@ static struct xtables_target connmark_target = {
 	.size		= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
 	.help		= CONNMARK_help,
+	.init           = CONNMARK_init,
 	.parse		= CONNMARK_parse,
 	.final_check	= CONNMARK_check,
 	.print		= CONNMARK_print,
@@ -209,6 +216,7 @@ static struct xtables_target connmark_target6 = {
 	.size		= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
 	.help		= CONNMARK_help,
+	.init           = CONNMARK_init,
 	.parse		= CONNMARK_parse,
 	.final_check	= CONNMARK_check,
 	.print		= CONNMARK_print,
