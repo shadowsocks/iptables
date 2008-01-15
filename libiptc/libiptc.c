@@ -166,7 +166,7 @@ static struct rule_head *iptcc_alloc_rule(struct chain_head *c, unsigned int siz
 }
 
 /* notify us that the ruleset has been modified by the user */
-static void
+static inline void
 set_changed(TC_HANDLE_T h)
 {
 	h->changed = 1;
@@ -268,7 +268,7 @@ iptcb_ent_is_hook_entry(STRUCT_ENTRY *e, TC_HANDLE_T h)
  **********************************************************************/
 
 /* Is the given chain builtin (1) or user-defined (0) */
-static unsigned int iptcc_is_builtin(struct chain_head *c)
+static inline unsigned int iptcc_is_builtin(struct chain_head *c)
 {
 	return (c->hooknum ? 1 : 0);
 }
