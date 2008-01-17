@@ -863,6 +863,8 @@ merge_options(struct option *oldopts, const struct option *newopts,
 	*option_offset = global_option_offset;
 
 	merge = malloc(sizeof(struct option) * (num_new + num_old + 1));
+	if (merge == NULL)
+		return NULL;
 	memcpy(merge, oldopts, num_old * sizeof(struct option));
 	free_opts(0); /* Release previous options merged if any */
 	for (i = 0; i < num_new; i++) {
@@ -1689,7 +1691,12 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 					     target->revision);
 				if (target->init != NULL)
 					target->init(target->t);
-				opts = merge_options(opts, target->extra_opts, &target->option_offset);
+				opts = merge_options(opts, 
+						     target->extra_opts, 
+						     &target->option_offset);
+				if (opts == NULL)
+					exit_error(OTHER_PROBLEM,
+						   "can't alloc memory!");
 			}
 			break;
 
@@ -1741,9 +1748,15 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			set_revision(m->m->u.user.name, m->revision);
 			if (m->init != NULL)
 				m->init(m->m);
-			if (m != m->next)
+			if (m != m->next) {
 				/* Merge options for non-cloned matches */
-				opts = merge_options(opts, m->extra_opts, &m->option_offset);
+				opts = merge_options(opts, 
+						     m->extra_opts, 
+						     &m->option_offset);
+				if (opts == NULL)
+					exit_error(OTHER_PROBLEM,
+						   "can't alloc memory!");
+			}
 		}
 		break;
 
@@ -1889,7 +1902,11 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 						m->init(m->m);
 
 					opts = merge_options(opts,
-					    m->extra_opts, &m->option_offset);
+							     m->extra_opts, 
+							     &m->option_offset);
+					if (opts == NULL)
+						exit_error(OTHER_PROBLEM,
+							"can't alloc memory!");
 
 					optind--;
 					continue;
