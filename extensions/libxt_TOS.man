@@ -1,0 +1,27 @@
+This module sets the Type of Service field in the IPv4 header (including the
+'precedence' bits) or the Priority field in the IPv6 header. Note that TOS
+shares the same bits as DSCP and ECN. The TOS target is only valid in the
+\fBmangle\fR table.
+.TP
+\fB--set-tos\fR \fIvalue\fR[\fB/\fR\fImask\fR]
+Zeroes out the bits given by \fImask\fR and XORs \fIvalue\fR into the
+TOS/Priority field. If \fImask\fR is omitted, 0xFF is assumed.
+.TP
+\fB--set-tos\fR \fIsymbol\fR
+You can specify a symbolic name when using the TOS target for IPv4. It implies
+a mask of 0xFF. The list of recognized TOS names can be obtained by calling
+iptables with \fB-j TOS -h\fR.
+.PP
+The following mnemonics are available:
+.TP
+\fB--and-tos\fR \fIbits\fR
+Binary AND the TOS value with \fIbits\fR. (Mnemonic for \fB--set-tos
+0/\fR\fIinvbits\fR, where \fIinvbits\fR is the binary negation of \fIbits\fR.)
+.TP
+\fB--or-tos\fR \fIbits\fR
+Binary OR the TOS value with \fIbits\fR. (Mnemonic for \fB--set-tos\fR
+\fIbits\fR\fB/\fR\fIbits\fR.)
+.TP
+\fB--xor-tos\fR \fIbits\fR
+Binary XOR the TOS value with \fIbits\fR. (Mnemonic for \fB--set-tos\fR
+\fIbits\fR\fB/0\fR.)
