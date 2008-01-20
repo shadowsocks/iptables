@@ -220,7 +220,11 @@ enum exittype {
 	OTHER_PROBLEM = 1,
 	PARAMETER_PROBLEM,
 	VERSION_PROBLEM,
-	RESOURCE_PROBLEM
+	RESOURCE_PROBLEM,
+	P_ONLY_ONCE,
+	P_NO_INVERT,
+	P_BAD_VALUE,
+	P_ONE_ACTION,
 };
 
 /* this is a special 64bit data type that is 8-byte aligned */
@@ -229,6 +233,7 @@ enum exittype {
 int check_inverse(const char option[], int *invert, int *optind, int argc);
 void exit_error(enum exittype, const char *, ...)__attribute__((noreturn,
 							  format(printf,2,3)));
+extern void param_act(unsigned int, const char *, ...);
 extern const char *program_name, *program_version;
 
 #ifdef NO_SHARED_LIBS

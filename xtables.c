@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <netdb.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -638,4 +639,52 @@ void xtables_register_target(struct xtables_target *me)
 	xtables_targets = me;
 	me->t = NULL;
 	me->tflags = 0;
+}
+
+void param_act(unsigned int status, const char *p1, ...)
+{
+	const char *p2, *p3;
+	va_list args;
+	bool b;
+
+	va_start(args, p1);
+
+	switch (status) {
+	case P_ONLY_ONCE:
+		p2 = va_arg(args, const char *);
+		b  = va_arg(args, unsigned int);
+		if (!b)
+			return;
+		exit_error(PARAMETER_PROBLEM,
+		           "%s: \"%s\" option may only be specified once",
+		           p1, p2);
+		break;
+	case P_NO_INVERT:
+		p2 = va_arg(args, const char *);
+		b  = va_arg(args, unsigned int);
+		if (!b)
+			return;
+		exit_error(PARAMETER_PROBLEM,
+		           "%s: \"%s\" option cannot be inverted", p1, p2);
+		break;
+	case P_BAD_VALUE:
+		p2 = va_arg(args, const char *);
+		p3 = va_arg(args, const char *);
+		exit_error(PARAMETER_PROBLEM,
+		           "%s: Bad value for \"%s\" option: \"%s\"",
+		           p1, p2, p3);
+		break;
+	case P_ONE_ACTION:
+		b = va_arg(args, unsigned int);
+		if (!b)
+			return;
+		exit_error(PARAMETER_PROBLEM,
+		           "%s: At most one action is possible", p1);
+		break;
+	default:
+		exit_error(status, p1, args);
+		break;
+	}
+
+	va_end(args);
 }
