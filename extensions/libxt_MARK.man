@@ -1,0 +1,25 @@
+This target is used to set the Netfilter mark value associated with the packet.
+The target can only be used in the \fBmangle\fR table. It can, for example, be
+used in conjunction with routing based on fwmark (needs iproute2).
+.TP
+\fB--set-xmark\fR \fIvalue\fR[\fB/\fR\fImask\fR]
+Zeroes out the bits given by \fImask\fR and XORs \fIvalue\fR into the packet
+mark ("nfmark"). If \fImask\fR is omitted, 0xFFFFFFFF is assumed.
+.TP
+\fB--set-mark\fR \fIvalue\fR[\fB/\fR\fImask\fR]
+Zeroes out the bits given by \fImask\fR and ORs \fIvalue\fR into the packet
+mark. If \fImask\fR is omitted, 0xFFFFFFFF is assumed.
+.PP
+The following mnemonics are available:
+.TP
+\fB--and-mark\fR \fIbits\fR
+Binary AND the nfmark with \fIbits\fR. (Mnemonic for \fB--set-xmark
+0/\fR\fIinvbits\fR, where \fIinvbits\fR is the binary negation of \fIbits\fR.)
+.TP
+\fB--or-mark\fR \fIbits\fR
+Binary OR the nfmark with \fIbits\fR. (Mnemonic for \fB--set-xmark\fR
+\fIbits\fR\fB/\fR\fIbits\fR.)
+.TP
+\fB--xor-mark\fR \fIbits\fR
+Binary XOR the nfmark with \fIbits\fR. (Mnemonic for \fB--set-xmark\fR
+\fIbits\fR\fB/0\fR.)
