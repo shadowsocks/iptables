@@ -5,15 +5,21 @@ FOLLOW THESE STEPS:
    in a seperate package, called patch-o-matic.  It is available from
    ftp://ftp.netfilter.org/pub/patch-o-matic/
 
-1) Next, make the package.
-	% make KERNEL_DIR=<<where-you-built-your-kernel>>
+1) Next, make the package. If you use a standard distribution kernel,
+   just run ./configure.
 
-2) Finally, you need to to install the shared libraries, and the binary:
-	# make install KERNEL_DIR=<<where-you-built-your-kernel>>
+   If you want to build against an own kernel tree:
 
-If you are a developer, you can install the headers, development libraries
-and associated development man pages, with:
-	# make install-devel
+	$ ./configure --with-kernel=/home/jengelh/mykernel
+
+   or whereever you put it. If you are using a dedicated kernel build
+   directory, you use:
+
+	$ ./configure --with-kbuild=<<where-built>> --with-ksource=<<source>>
+
+2) Finally, you need to install the binaries and shared libraries:
+
+	# make install
 
 That's it!
 ================================================================
@@ -21,27 +27,26 @@ PROBLEMS YOU MAY ENCOUNTER:
 
 1) This package requires a 2.4.4 kernel, or above.
 
-2) If you get the kernel directory wrong, you may see a message like:
-	Please try `make KERNEL_DIR=path-to-correct-kernel'
+2) If you get the kernel directory wrong, you may get compile failures.
 
 3) If you want to specify alternate directories for installation
 (instead of /usr/local/ bin lib man), do this:
 
-	% make BINDIR=/usr/bin LIBDIR=/usr/lib MANDIR=/usr/man
-	# make BINDIR=/usr/bin LIBDIR=/usr/lib MANDIR=/usr/man install
+	$ ./configure --prefix=/usr
+	$ make
+	# make install
 
-4) If you want to build a statically linked version of the iptables binary,
+4) The make process will automatically build a multipurpose binary under the
+   names iptables-multi and ip6tables-multi.
+
+5) If you want to build a statically linked version of the iptables binary,
    without the need for loading the plugins at runtime (e.g. for an embedded
    device or router-on-a-disk), please use
 
-	% make NO_SHARED_LIBS=1
+	$ ./configure --enable-static
 
-5) If you want to build a single BusyBox style multipurpose binary instead of
-   the individual iptables, iptables-save and iptables-restore binaries, then
-   please use
+   which will build both a semi-static multi binary (iptables-mtss, uses
+   libc but not plugins) and a fully static multi binary (iptables-static).
 
-	% make DO_MULTI=1
-
-NOTE: make sure you build with at least the correct LIBDIR=
-specification, otherwise iptables(8) won't know where to find the
-dynamic objects.
+6) If you want to install libipq (old interface), add --enable-devel to
+   ./configure.

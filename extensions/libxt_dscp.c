@@ -22,7 +22,7 @@
 #include <linux/netfilter/xt_dscp.h>
 
 /* This is evil, but it's my code - HW*/
-#include "libipt_dscp_helper.c"
+#include "dscp_helper.c"
 
 static void dscp_help(void)
 {

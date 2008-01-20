@@ -19,7 +19,7 @@
 #include <linux/netfilter/xt_DSCP.h>
 
 /* This is evil, but it's my code - HW*/
-#include "libipt_dscp_helper.c"
+#include "dscp_helper.c"
 
 static void DSCP_help(void)
 {

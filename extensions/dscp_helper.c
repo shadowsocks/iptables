@@ -5,7 +5,7 @@
  * <http://www.iana.org/assignments/dscp-registry>
  *
  * This code is released under the GNU GPL v2, 1991
- * 
+ *
  * Author: Iain Barnes
  */
 
@@ -18,7 +18,7 @@ static const struct ds_class
 {
 	const char *name;
 	unsigned int dscp;
-} ds_classes[] = 
+} ds_classes[] =
 {
 	{ "CS0", 0x00 },
 	{ "CS1", 0x08 },
@@ -46,18 +46,18 @@ static const struct ds_class
 
 
 
-static unsigned int 
+static unsigned int
 class_to_dscp(const char *name)
 {
 	int i;
 
 	for (i = 0; i < sizeof(ds_classes) / sizeof(struct ds_class); i++) {
 		if (!strncasecmp(name, ds_classes[i].name,
-					strlen(ds_classes[i].name))) 
+					strlen(ds_classes[i].name)))
 			return ds_classes[i].dscp;
 	}
 
-	exit_error(PARAMETER_PROBLEM, 
+	exit_error(PARAMETER_PROBLEM,
 			"Invalid DSCP value `%s'\n", name);
 }
 
@@ -73,7 +73,7 @@ dscp_to_name(unsigned int dscp)
 			return ds_classes[i].name;
 	}
 
-	
+
 	exit_error(PARAMETER_PROBLEM,
 			"Invalid DSCP value `%d'\n", dscp);
 }

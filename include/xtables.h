@@ -226,13 +226,14 @@ void exit_error(enum exittype, const char *, ...)__attribute__((noreturn,
 							  format(printf,2,3)));
 extern const char *program_name, *program_version;
 
-#define _init __attribute__((constructor)) my_init
 #ifdef NO_SHARED_LIBS
-# ifdef _INIT
-#  undef _init
-#  define _init _INIT
-# endif
-  extern void init_extensions(void);
+#	ifdef _INIT
+#		undef _init
+#		define _init _INIT
+#	endif
+	extern void init_extensions(void);
+#else
+#	define _init __attribute__((constructor)) _INIT
 #endif
 
 #endif /* _XTABLES_H */
