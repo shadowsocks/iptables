@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <arpa/inet.h>
 
 #include <xtables.h>
 
@@ -701,4 +702,151 @@ void param_act(unsigned int status, const char *p1, ...)
 	}
 
 	va_end(args);
+}
+
+const char *ipaddr_to_numeric(const struct in_addr *addrp)
+{
+	static char buf[20];
+	const unsigned char *bytep = (const void *)&addrp->s_addr;
+
+	sprintf(buf, "%u.%u.%u.%u", bytep[0], bytep[1], bytep[2], bytep[3]);
+	return buf;
+}
+
+static const char *ipaddr_to_host(const struct in_addr *addr)
+{
+	struct hostent *host;
+
+	host = gethostbyaddr(addr, sizeof(struct in_addr), AF_INET);
+	if (host == NULL)
+		return NULL;
+
+	return host->h_name;
+}
+
+static const char *ipaddr_to_network(const struct in_addr *addr)
+{
+	struct netent *net;
+
+	if ((net = getnetbyaddr(ntohl(addr->s_addr), AF_INET)) != NULL)
+		return net->n_name;
+
+	return NULL;
+}
+
+const char *ipaddr_to_anyname(const struct in_addr *addr)
+{
+	const char *name;
+
+	if ((name = ipaddr_to_host(addr)) != NULL ||
+	    (name = ipaddr_to_network(addr)) != NULL)
+		return name;
+
+	return ipaddr_to_numeric(addr);
+}
+
+const char *ipmask_to_numeric(const struct in_addr *mask)
+{
+	static char buf[20];
+	uint32_t maskaddr, bits;
+	int i;
+
+	maskaddr = ntohl(mask->s_addr);
+
+	if (maskaddr == 0xFFFFFFFFL)
+		/* we don't want to see "/32" */
+		return "";
+
+	i = 32;
+	bits = 0xFFFFFFFEL;
+	while (--i >= 0 && maskaddr != bits)
+		bits <<= 1;
+	if (i >= 0)
+		sprintf(buf, "/%d", i);
+	else
+		/* mask was not a decent combination of 1's and 0's */
+		sprintf(buf, "/%s", ipaddr_to_numeric(mask));
+
+	return buf;
+}
+
+const char *ip6addr_to_numeric(const struct in6_addr *addrp)
+{
+	/* 0000:0000:0000:0000:0000:000.000.000.000
+	 * 0000:0000:0000:0000:0000:0000:0000:0000 */
+	static char buf[50+1];
+	return inet_ntop(AF_INET6, addrp, buf, sizeof(buf));
+}
+
+static const char *ip6addr_to_host(const struct in6_addr *addr)
+{
+	static char hostname[NI_MAXHOST];
+	struct sockaddr_in6 saddr;
+	int err;
+
+	memset(&saddr, 0, sizeof(struct sockaddr_in6));
+	memcpy(&saddr.sin6_addr, addr, sizeof(*addr));
+	saddr.sin6_family = AF_INET6;
+
+	err = getnameinfo((const void *)&saddr, sizeof(struct sockaddr_in6),
+	      hostname, sizeof(hostname) - 1, NULL, 0, 0);
+	if (err != 0) {
+#ifdef DEBUG
+		fprintf(stderr,"IP2Name: %s\n",gai_strerror(err));
+#endif
+		return NULL;
+	}
+
+#ifdef DEBUG
+	fprintf (stderr, "\naddr2host: %s\n", hostname);
+#endif
+	return hostname;
+}
+
+const char *ip6addr_to_anyname(const struct in6_addr *addr)
+{
+	const char *name;
+
+	if ((name = ip6addr_to_host(addr)) != NULL)
+		return name;
+
+	return ip6addr_to_numeric(addr);
+}
+
+static int ip6addr_prefix_length(const struct in6_addr *k)
+{
+	unsigned int bits = 0;
+	uint32_t a, b, c, d;
+
+	a = k->s6_addr32[0];
+	b = k->s6_addr32[1];
+	c = k->s6_addr32[2];
+	d = k->s6_addr32[3];
+	while (a & 0x80000000U) {
+		++bits;
+		a <<= 1;
+		a  |= (b >> 31) & 1;
+		b <<= 1;
+		b  |= (c >> 31) & 1;
+		c <<= 1;
+		c  |= (d >> 31) & 1;
+		d <<= 1;
+	}
+	if (a != 0 || b != 0 || c != 0 || d != 0)
+		return -1;
+	return bits;
+}
+
+const char *ip6mask_to_numeric(const struct in6_addr *addrp)
+{
+	static char buf[50+2];
+	int l = ip6addr_prefix_length(addrp);
+
+	if (l == -1) {
+		strcpy(buf, "/");
+		strcat(buf, ip6addr_to_numeric(addrp));
+		return buf;
+	}
+	sprintf(buf, "/%d", l);
+	return buf;
 }

@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <iptables.h>
+#include <xtables.h>
 #include <linux/netfilter.h>
 #include <linux/netfilter/xt_conntrack.h>
 #include <linux/netfilter/nf_conntrack_common.h>
@@ -388,10 +389,10 @@ print_addr(struct in_addr *addr, struct in_addr *mask, int inv, int numeric)
 		printf("%s ", "anywhere");
 	else {
 		if (numeric)
-			sprintf(buf, "%s", addr_to_dotted(addr));
+			sprintf(buf, "%s", ipaddr_to_numeric(addr));
 		else
-			sprintf(buf, "%s", addr_to_anyname(addr));
-		strcat(buf, mask_to_dotted(mask));
+			sprintf(buf, "%s", ipaddr_to_anyname(addr));
+		strcat(buf, ipmask_to_numeric(mask));
 		printf("%s ", buf);
 	}
 }

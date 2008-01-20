@@ -250,13 +250,6 @@ proto_to_name(u_int8_t proto, int nolookup)
 	return NULL;
 }
 
-static void
-in6addrcpy(struct in6_addr *dst, struct in6_addr *src)
-{
-	memcpy(dst, src, sizeof(struct in6_addr));
-	/* dst->s6_addr = src->s6_addr; */
-}
-
 static void free_opts(int reset_offset)
 {
 	if (opts != original_opts) {
@@ -466,15 +459,6 @@ check_inverse(const char option[], int *invert, int *optind, int argc)
 	return FALSE;
 }
 
-static char *
-addr_to_numeric(const struct in6_addr *addrp)
-{
-	/* 0000:0000:0000:0000:0000:000.000.000.000
-	 * 0000:0000:0000:0000:0000:0000:0000:0000 */
-	static char buf[50+1];
-	return (char *)inet_ntop(AF_INET6, addrp, buf, sizeof(buf));
-}
-
 static struct in6_addr *
 numeric_to_addr(const char *num)
 {
@@ -521,58 +505,14 @@ host_to_addr(const char *name, unsigned int *naddr)
 #endif
 		/* Get the first element of the address-chain */
 		addr = fw_calloc(1, sizeof(struct in6_addr));
-		in6addrcpy(addr, (struct in6_addr *)
-			&((struct sockaddr_in6 *)res->ai_addr)->sin6_addr);
+		memcpy(addr, &((const struct sockaddr_in6 *)res->ai_addr)->sin6_addr,
+		       sizeof(struct in6_addr));
 		freeaddrinfo(res);
 		*naddr = 1;
 		return addr;
 	}
 
 	return (struct in6_addr *) NULL;
-}
-
-static char *
-addr_to_host(const struct in6_addr *addr)
-{
-	struct sockaddr_in6 saddr;
-	int err;
-	static char hostname[NI_MAXHOST];
-
-	memset(&saddr, 0, sizeof(struct sockaddr_in6));
-	in6addrcpy(&(saddr.sin6_addr),(struct in6_addr *)addr);
-	saddr.sin6_family = AF_INET6;
-
-        if ( (err=getnameinfo((struct sockaddr *)&saddr,
-			       sizeof(struct sockaddr_in6),
-			       hostname, sizeof(hostname)-1,
-			       NULL, 0, 0)) != 0 ){
-#ifdef DEBUG
-                fprintf(stderr,"IP2Name: %s\n",gai_strerror(err)); 
-#endif
-                return (char *) NULL;
-        } else {
-#ifdef DEBUG
-		fprintf (stderr, "\naddr2host: %s\n", hostname);
-#endif
-
-		return hostname;
-	}
-
-	return (char *) NULL;
-}
-
-static char *
-mask_to_numeric(const struct in6_addr *addrp)
-{
-	static char buf[50+2];
-	int l = ipv6_prefix_length(addrp);
-	if (l == -1) {
-		strcpy(buf, "/");
-		strcat(buf, addr_to_numeric(addrp));
-		return buf;
-	}
-	sprintf(buf, "/%d", l);
-	return buf;
 }
 
 static struct in6_addr *
@@ -582,17 +522,6 @@ network_to_addr(const char *name)
 	/* TODO: not implemented yet, but the exception breaks the
 	 *       name resolvation */
 	return (struct in6_addr *)NULL;
-}
-
-static char *
-addr_to_anyname(const struct in6_addr *addr)
-{
-	char *name;
-
-	if ((name = addr_to_host(addr)) != NULL)
-		return name;
-
-	return addr_to_numeric(addr);
 }
 
 /*
@@ -612,7 +541,7 @@ parse_hostnetwork(const char *name, unsigned int *naddrs)
 	if ((addrptmp = numeric_to_addr(name)) != NULL ||
 	    (addrptmp = network_to_addr(name)) != NULL) {
 		addrp = fw_malloc(sizeof(struct in6_addr));
-		in6addrcpy(addrp, addrptmp);
+		memcpy(addrp, addrptmp, sizeof(*addrp));
 		*naddrs = 1;
 		return addrp;
 	}
@@ -667,7 +596,7 @@ parse_hostnetworkmask(const char *name, struct in6_addr **addrpp,
 		addrp = parse_mask(p + 1);
 	} else
 		addrp = parse_mask(NULL);
-	in6addrcpy(maskp, addrp);
+	memcpy(maskp, addrp, sizeof(*maskp));
 
 	/* if a null mask is given, the name is ignored, like in "any/0" */
 	if (!memcmp(maskp, &in6addr_any, sizeof(in6addr_any)))
@@ -1029,10 +958,10 @@ print_firewall(const struct ip6t_entry *fw,
 		printf(FMT("%-19s ","%s "), "anywhere");
 	else {
 		if (format & FMT_NUMERIC)
-			sprintf(buf, "%s", addr_to_numeric(&(fw->ipv6.src)));
+			sprintf(buf, "%s", ip6addr_to_numeric(&fw->ipv6.src));
 		else
-			sprintf(buf, "%s", addr_to_anyname(&(fw->ipv6.src)));
-		strcat(buf, mask_to_numeric(&(fw->ipv6.smsk)));
+			sprintf(buf, "%s", ip6addr_to_anyname(&fw->ipv6.src));
+		strcat(buf, ip6mask_to_numeric(&fw->ipv6.smsk));
 		printf(FMT("%-19s ","%s "), buf);
 	}
 
@@ -1042,10 +971,10 @@ print_firewall(const struct ip6t_entry *fw,
 		printf(FMT("%-19s","-> %s"), "anywhere");
 	else {
 		if (format & FMT_NUMERIC)
-			sprintf(buf, "%s", addr_to_numeric(&(fw->ipv6.dst)));
+			sprintf(buf, "%s", ip6addr_to_numeric(&fw->ipv6.dst));
 		else
-			sprintf(buf, "%s", addr_to_anyname(&(fw->ipv6.dst)));
-		strcat(buf, mask_to_numeric(&(fw->ipv6.dmsk)));
+			sprintf(buf, "%s", ip6addr_to_anyname(&fw->ipv6.dst));
+		strcat(buf, ip6mask_to_numeric(&fw->ipv6.dmsk));
 		printf(FMT("%-19s","-> %s"), buf);
 	}
 

@@ -575,18 +575,6 @@ host_to_addr(const char *name, unsigned int *naddr)
 	return (struct in_addr *) NULL;
 }
 
-static char *
-addr_to_host(const struct in_addr *addr)
-{
-	struct hostent *host;
-
-	if ((host = gethostbyaddr((char *) addr,
-				  sizeof(struct in_addr), AF_INET)) != NULL)
-		return (char *) host->h_name;
-
-	return (char *) NULL;
-}
-
 /*
  *	All functions starting with "parse" should succeed, otherwise
  *	the program fails.
@@ -763,66 +751,6 @@ parse_target(const char *targetname)
 			exit_error(PARAMETER_PROBLEM,
 				   "Invalid target name `%s'", targetname);
 	return targetname;
-}
-
-static char *
-addr_to_network(const struct in_addr *addr)
-{
-	struct netent *net;
-
-	if ((net = getnetbyaddr((long) ntohl(addr->s_addr), AF_INET)) != NULL)
-		return (char *) net->n_name;
-
-	return (char *) NULL;
-}
-
-char *
-addr_to_dotted(const struct in_addr *addrp)
-{
-	static char buf[20];
-	const unsigned char *bytep;
-
-	bytep = (const unsigned char *) &(addrp->s_addr);
-	sprintf(buf, "%d.%d.%d.%d", bytep[0], bytep[1], bytep[2], bytep[3]);
-	return buf;
-}
-
-char *
-addr_to_anyname(const struct in_addr *addr)
-{
-	char *name;
-
-	if ((name = addr_to_host(addr)) != NULL ||
-	    (name = addr_to_network(addr)) != NULL)
-		return name;
-
-	return addr_to_dotted(addr);
-}
-
-char *
-mask_to_dotted(const struct in_addr *mask)
-{
-	int i;
-	static char buf[20];
-	u_int32_t maskaddr, bits;
-
-	maskaddr = ntohl(mask->s_addr);
-
-	if (maskaddr == 0xFFFFFFFFL)
-		/* we don't want to see "/32" */
-		return "";
-
-	i = 32;
-	bits = 0xFFFFFFFEL;
-	while (--i >= 0 && maskaddr != bits)
-		bits <<= 1;
-	if (i >= 0)
-		sprintf(buf, "/%d", i);
-	else
-		/* mask was not a decent combination of 1's and 0's */
-		sprintf(buf, "/%s", addr_to_dotted(mask));
-
-	return buf;
 }
 
 static void
@@ -1068,10 +996,10 @@ print_firewall(const struct ipt_entry *fw,
 		printf(FMT("%-19s ","%s "), "anywhere");
 	else {
 		if (format & FMT_NUMERIC)
-			sprintf(buf, "%s", addr_to_dotted(&(fw->ip.src)));
+			sprintf(buf, "%s", ipaddr_to_numeric(&fw->ip.src));
 		else
-			sprintf(buf, "%s", addr_to_anyname(&(fw->ip.src)));
-		strcat(buf, mask_to_dotted(&(fw->ip.smsk)));
+			sprintf(buf, "%s", ipaddr_to_anyname(&fw->ip.src));
+		strcat(buf, ipmask_to_numeric(&fw->ip.smsk));
 		printf(FMT("%-19s ","%s "), buf);
 	}
 
@@ -1080,10 +1008,10 @@ print_firewall(const struct ipt_entry *fw,
 		printf(FMT("%-19s ","-> %s"), "anywhere");
 	else {
 		if (format & FMT_NUMERIC)
-			sprintf(buf, "%s", addr_to_dotted(&(fw->ip.dst)));
+			sprintf(buf, "%s", ipaddr_to_numeric(&fw->ip.dst));
 		else
-			sprintf(buf, "%s", addr_to_anyname(&(fw->ip.dst)));
-		strcat(buf, mask_to_dotted(&(fw->ip.dmsk)));
+			sprintf(buf, "%s", ipaddr_to_anyname(&fw->ip.dst));
+		strcat(buf, ipmask_to_numeric(&fw->ip.dmsk));
 		printf(FMT("%-19s ","-> %s"), buf);
 	}
 

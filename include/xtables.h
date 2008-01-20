@@ -236,6 +236,14 @@ void exit_error(enum exittype, const char *, ...)__attribute__((noreturn,
 extern void param_act(unsigned int, const char *, ...);
 extern const char *program_name, *program_version;
 
+extern const char *ipaddr_to_numeric(const struct in_addr *);
+extern const char *ipaddr_to_anyname(const struct in_addr *);
+extern const char *ipmask_to_numeric(const struct in_addr *);
+
+extern const char *ip6addr_to_numeric(const struct in6_addr *);
+extern const char *ip6addr_to_anyname(const struct in6_addr *);
+extern const char *ip6mask_to_numeric(const struct in6_addr *);
+
 #ifdef NO_SHARED_LIBS
 #	ifdef _INIT
 #		undef _init

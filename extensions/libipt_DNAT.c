@@ -198,10 +198,10 @@ static void print_range(const struct ip_nat_range *r)
 		struct in_addr a;
 
 		a.s_addr = r->min_ip;
-		printf("%s", addr_to_dotted(&a));
+		printf("%s", ipaddr_to_numeric(&a));
 		if (r->max_ip != r->min_ip) {
 			a.s_addr = r->max_ip;
-			printf("-%s", addr_to_dotted(&a));
+			printf("-%s", ipaddr_to_numeric(&a));
 		}
 	}
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
