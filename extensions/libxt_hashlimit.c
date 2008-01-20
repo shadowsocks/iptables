@@ -157,6 +157,8 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch(c) {
 	case '%':
+		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit",
+		          *flags & PARAM_LIMIT);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!parse_rate(optarg, &r->cfg.avg))
 			exit_error(PARAMETER_PROBLEM,
@@ -165,6 +167,8 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '$':
+		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-burst",
+		          *flags & PARAM_BURST);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (string_to_number(optarg, 0, 10000, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
@@ -173,6 +177,8 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_BURST;
 		break;
 	case '&':
+		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-htable-size",
+		          *flags & PARAM_SIZE);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
@@ -181,6 +187,8 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_SIZE;
 		break;
 	case '*':
+		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-htable-max",
+		          *flags & PARAM_MAX);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
@@ -189,6 +197,9 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_MAX;
 		break;
 	case '(':
+		param_act(P_ONLY_ONCE, "hashlimit",
+		          "--hashlimit-htable-gcinterval",
+		          *flags & PARAM_GCINTERVAL);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
@@ -199,6 +210,8 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_GCINTERVAL;
 		break;
 	case ')':
+		param_act(P_ONLY_ONCE, "hashlimit",
+		          "--hashlimit-htable-expire", *flags & PARAM_EXPIRE);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
@@ -208,6 +221,8 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_EXPIRE;
 		break;
 	case '_':
+		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-mode",
+		          *flags & PARAM_MODE);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (parse_mode(r, optarg) < 0)
 			exit_error(PARAMETER_PROBLEM, 
@@ -215,6 +230,8 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_MODE;
 		break;
 	case '"':
+		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-name",
+		          *flags & PARAM_NAME);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (strlen(optarg) == 0)
 			exit_error(PARAMETER_PROBLEM, "Zero-length name?");
