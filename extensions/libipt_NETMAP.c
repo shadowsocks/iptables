@@ -68,7 +68,7 @@ static void
 parse_to(char *arg, struct ip_nat_range *range)
 {
 	char *slash;
-	struct in_addr *ip;
+	const struct in_addr *ip;
 	u_int32_t netmask;
 	unsigned int bits;
 
@@ -77,14 +77,14 @@ parse_to(char *arg, struct ip_nat_range *range)
 	if (slash)
 		*slash = '\0';
 
-	ip = dotted_to_addr(arg);
+	ip = numeric_to_ipaddr(arg);
 	if (!ip)
 		exit_error(PARAMETER_PROBLEM, "Bad IP address `%s'\n",
 			   arg);
 	range->min_ip = ip->s_addr;
 	if (slash) {
 		if (strchr(slash+1, '.')) {
-			ip = dotted_to_mask(slash+1);
+			ip = numeric_to_ipmask(slash+1);
 			if (!ip)
 				exit_error(PARAMETER_PROBLEM, "Bad netmask `%s'\n",
 					   slash+1);

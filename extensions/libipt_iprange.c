@@ -29,20 +29,20 @@ static void
 parse_iprange(char *arg, struct ipt_iprange *range)
 {
 	char *dash;
-	struct in_addr *ip;
+	const struct in_addr *ip;
 
 	dash = strchr(arg, '-');
 	if (dash)
 		*dash = '\0';
 		
-	ip = dotted_to_addr(arg);
+	ip = numeric_to_ipaddr(arg);
 	if (!ip)
 		exit_error(PARAMETER_PROBLEM, "iprange match: Bad IP address `%s'\n", 
 			   arg);
 	range->min_ip = ip->s_addr;
 
 	if (dash) {
-		ip = dotted_to_addr(dash+1);
+		ip = numeric_to_ipaddr(dash+1);
 		if (!ip)
 			exit_error(PARAMETER_PROBLEM, "iprange match: Bad IP address `%s'\n",
 				   dash+1);

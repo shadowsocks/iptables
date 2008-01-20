@@ -239,10 +239,17 @@ extern const char *program_name, *program_version;
 extern const char *ipaddr_to_numeric(const struct in_addr *);
 extern const char *ipaddr_to_anyname(const struct in_addr *);
 extern const char *ipmask_to_numeric(const struct in_addr *);
+extern struct in_addr *numeric_to_ipaddr(const char *);
+extern struct in_addr *numeric_to_ipmask(const char *);
+extern void ipparse_hostnetworkmask(const char *, struct in_addr **,
+	struct in_addr *, unsigned int *);
 
+extern struct in6_addr *numeric_to_ip6addr(const char *);
 extern const char *ip6addr_to_numeric(const struct in6_addr *);
 extern const char *ip6addr_to_anyname(const struct in6_addr *);
 extern const char *ip6mask_to_numeric(const struct in6_addr *);
+extern void ip6parse_hostnetworkmask(const char *, struct in6_addr **,
+	struct in6_addr *, unsigned int *);
 
 #ifdef NO_SHARED_LIBS
 #	ifdef _INIT

@@ -62,7 +62,7 @@ parse_to(char *arg, int portok, struct ipt_natinfo *info)
 {
 	struct ip_nat_range range;
 	char *colon, *dash, *error;
-	struct in_addr *ip;
+	const struct in_addr *ip;
 
 	memset(&range, 0, sizeof(range));
 	colon = strchr(arg, ':');
@@ -119,13 +119,13 @@ parse_to(char *arg, int portok, struct ipt_natinfo *info)
 	if (dash)
 		*dash = '\0';
 
-	ip = dotted_to_addr(arg);
+	ip = numeric_to_ipaddr(arg);
 	if (!ip)
 		exit_error(PARAMETER_PROBLEM, "Bad IP address `%s'\n",
 			   arg);
 	range.min_ip = ip->s_addr;
 	if (dash) {
-		ip = dotted_to_addr(dash+1);
+		ip = numeric_to_ipaddr(dash+1);
 		if (!ip)
 			exit_error(PARAMETER_PROBLEM, "Bad IP address `%s'\n",
 				   dash+1);

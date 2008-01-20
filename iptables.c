@@ -253,90 +253,6 @@ enum {
 	IPT_DOTTED_MASK
 };
 
-static struct in_addr *
-__dotted_to_addr(const char *dotted, int type)
-{
-	static struct in_addr addr;
-	unsigned char *addrp;
-	char *p, *q;
-	unsigned int onebyte;
-	int i;
-	char buf[20];
-
-	/* copy dotted string, because we need to modify it */
-	strncpy(buf, dotted, sizeof(buf) - 1);
-	buf[sizeof(buf) - 1] = '\0';
-	addrp = (unsigned char *) &(addr.s_addr);
-
-	p = buf;
-	for (i = 0; i < 3; i++) {
-		if ((q = strchr(p, '.')) == NULL) {
-			if (type == IPT_DOTTED_ADDR) {
-				/* autocomplete, this is a network address */
-				if (string_to_number(p, 0, 255, &onebyte) == -1)
-					return (struct in_addr *) NULL;
-
-				addrp[i] = (unsigned char) onebyte;
-				while (i < 3)
-					addrp[++i] = 0;
-
-				return &addr;
-			} else
-				return (struct in_addr *) NULL;
-		}
-
-		*q = '\0';
-		if (string_to_number(p, 0, 255, &onebyte) == -1)
-			return (struct in_addr *) NULL;
-
-		addrp[i] = (unsigned char) onebyte;
-		p = q + 1;
-	}
-
-	/* we've checked 3 bytes, now we check the last one */
-	if (string_to_number(p, 0, 255, &onebyte) == -1)
-		return (struct in_addr *) NULL;
-
-	addrp[3] = (unsigned char) onebyte;
-
-	return &addr;
-}
-
-struct in_addr *
-dotted_to_addr(const char *dotted)
-{
-	return __dotted_to_addr(dotted, IPT_DOTTED_ADDR);
-}
-
-struct in_addr *
-dotted_to_mask(const char *dotted)
-{
-	return __dotted_to_addr(dotted, IPT_DOTTED_MASK);
-}
-
-static struct in_addr *
-network_to_addr(const char *name)
-{
-	struct netent *net;
-	static struct in_addr addr;
-
-	if ((net = getnetbyname(name)) != NULL) {
-		if (net->n_addrtype != AF_INET)
-			return (struct in_addr *) NULL;
-		addr.s_addr = htonl((unsigned long) net->n_net);
-		return &addr;
-	}
-
-	return (struct in_addr *) NULL;
-}
-
-static void
-inaddrcpy(struct in_addr *dst, struct in_addr *src)
-{
-	/* memcpy(dst, src, sizeof(struct in_addr)); */
-	dst->s_addr = src->s_addr;
-}
-
 static void free_opts(int reset_offset)
 {
 	if (opts != original_opts) {
@@ -550,31 +466,6 @@ check_inverse(const char option[], int *invert, int *optind, int argc)
 	return FALSE;
 }
 
-static struct in_addr *
-host_to_addr(const char *name, unsigned int *naddr)
-{
-	struct hostent *host;
-	struct in_addr *addr;
-	unsigned int i;
-
-	*naddr = 0;
-	if ((host = gethostbyname(name)) != NULL) {
-		if (host->h_addrtype != AF_INET ||
-		    host->h_length != sizeof(struct in_addr))
-			return (struct in_addr *) NULL;
-
-		while (host->h_addr_list[*naddr] != (char *) NULL)
-			(*naddr)++;
-		addr = fw_calloc(*naddr, sizeof(struct in_addr) * *naddr);
-		for (i = 0; i < *naddr; i++)
-			inaddrcpy(&(addr[i]),
-				  (struct in_addr *) host->h_addr_list[i]);
-		return addr;
-	}
-
-	return (struct in_addr *) NULL;
-}
-
 /*
  *	All functions starting with "parse" should succeed, otherwise
  *	the program fails.
@@ -583,87 +474,6 @@ host_to_addr(const char *name, unsigned int *naddr)
  *	"host_to_addr", "parse_hostnetwork", and "parse_hostnetworkmask"
  *	return global static data.
 */
-
-static struct in_addr *
-parse_hostnetwork(const char *name, unsigned int *naddrs)
-{
-	struct in_addr *addrp, *addrptmp;
-
-	if ((addrptmp = dotted_to_addr(name)) != NULL ||
-	    (addrptmp = network_to_addr(name)) != NULL) {
-		addrp = fw_malloc(sizeof(struct in_addr));
-		inaddrcpy(addrp, addrptmp);
-		*naddrs = 1;
-		return addrp;
-	}
-	if ((addrp = host_to_addr(name, naddrs)) != NULL)
-		return addrp;
-
-	exit_error(PARAMETER_PROBLEM, "host/network `%s' not found", name);
-}
-
-static struct in_addr *
-parse_mask(char *mask)
-{
-	static struct in_addr maskaddr;
-	struct in_addr *addrp;
-	unsigned int bits;
-
-	if (mask == NULL) {
-		/* no mask at all defaults to 32 bits */
-		maskaddr.s_addr = 0xFFFFFFFF;
-		return &maskaddr;
-	}
-	if ((addrp = dotted_to_mask(mask)) != NULL)
-		/* dotted_to_addr already returns a network byte order addr */
-		return addrp;
-	if (string_to_number(mask, 0, 32, &bits) == -1)
-		exit_error(PARAMETER_PROBLEM,
-			   "invalid mask `%s' specified", mask);
-	if (bits != 0) {
-		maskaddr.s_addr = htonl(0xFFFFFFFF << (32 - bits));
-		return &maskaddr;
-	}
-
-	maskaddr.s_addr = 0L;
-	return &maskaddr;
-}
-
-void
-parse_hostnetworkmask(const char *name, struct in_addr **addrpp,
-		      struct in_addr *maskp, unsigned int *naddrs)
-{
-	struct in_addr *addrp;
-	char buf[256];
-	char *p;
-	int i, j, k, n;
-
-	strncpy(buf, name, sizeof(buf) - 1);
-	buf[sizeof(buf) - 1] = '\0';
-	if ((p = strrchr(buf, '/')) != NULL) {
-		*p = '\0';
-		addrp = parse_mask(p + 1);
-	} else
-		addrp = parse_mask(NULL);
-	inaddrcpy(maskp, addrp);
-
-	/* if a null mask is given, the name is ignored, like in "any/0" */
-	if (maskp->s_addr == 0L)
-		strcpy(buf, "0.0.0.0");
-
-	addrp = *addrpp = parse_hostnetwork(buf, naddrs);
-	n = *naddrs;
-	for (i = 0, j = 0; i < n; i++) {
-		addrp[j++].s_addr &= maskp->s_addr;
-		for (k = 0; k < j - 1; k++) {
-			if (addrp[k].s_addr == addrp[j - 1].s_addr) {
-				(*naddrs)--;
-				j--;
-				break;
-			}
-		}
-	}
-}
 
 /* Christophe Burki wants `-p 6' to imply `-m tcp'.  */
 static struct iptables_match *
@@ -1874,12 +1684,12 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	}
 
 	if (shostnetworkmask)
-		parse_hostnetworkmask(shostnetworkmask, &saddrs,
-				      &(fw.ip.smsk), &nsaddrs);
+		ipparse_hostnetworkmask(shostnetworkmask, &saddrs,
+		                        &fw.ip.smsk, &nsaddrs);
 
 	if (dhostnetworkmask)
-		parse_hostnetworkmask(dhostnetworkmask, &daddrs,
-				      &(fw.ip.dmsk), &ndaddrs);
+		ipparse_hostnetworkmask(dhostnetworkmask, &daddrs,
+		                        &fw.ip.dmsk, &ndaddrs);
 
 	if ((nsaddrs > 1 || ndaddrs > 1) &&
 	    (fw.ip.invflags & (IPT_INV_SRCIP | IPT_INV_DSTIP)))

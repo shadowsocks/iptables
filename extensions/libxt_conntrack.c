@@ -203,7 +203,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_ORIGSRC;
 
-		parse_hostnetworkmask(argv[optind-1], &addrs,
+		ipparse_hostnetworkmask(argv[optind-1], &addrs,
 					&sinfo->sipmsk[IP_CT_DIR_ORIGINAL],
 					&naddrs);
 		if(naddrs > 1)
@@ -223,7 +223,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_ORIGDST;
 
-		parse_hostnetworkmask(argv[optind-1], &addrs,
+		ipparse_hostnetworkmask(argv[optind-1], &addrs,
 					&sinfo->dipmsk[IP_CT_DIR_ORIGINAL],
 					&naddrs);
 		if(naddrs > 1)
@@ -243,7 +243,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_REPLSRC;
 
-		parse_hostnetworkmask(argv[optind-1], &addrs,
+		ipparse_hostnetworkmask(argv[optind-1], &addrs,
 					&sinfo->sipmsk[IP_CT_DIR_REPLY],
 					&naddrs);
 		if(naddrs > 1)
@@ -263,7 +263,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_REPLDST;
 
-		parse_hostnetworkmask(argv[optind-1], &addrs,
+		ipparse_hostnetworkmask(argv[optind-1], &addrs,
 					&sinfo->dipmsk[IP_CT_DIR_REPLY],
 					&naddrs);
 		if(naddrs > 1)

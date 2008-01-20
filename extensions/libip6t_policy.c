@@ -128,8 +128,6 @@ mask_to_numeric(const struct in6_addr *addrp)
 
 /* These should be in include/ip6tables.h... */
 extern u_int16_t parse_protocol(const char *s);
-extern void parse_hostnetworkmask(const char *name, struct in6_addr **addrpp,
-		struct in6_addr *maskp, unsigned int *naddrs);
 
 /* End duplicated code from ip6tables.c */
 
@@ -223,7 +221,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: double --tunnel-src option");
 
-		parse_hostnetworkmask(argv[optind-1], &addr, &mask, &naddr);
+		ip6parse_hostnetworkmask(argv[optind-1], &addr, &mask, &naddr);
 		if (naddr > 1)
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: name resolves to multiple IPs");
@@ -238,7 +236,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: double --tunnel-dst option");
 
-		parse_hostnetworkmask(argv[optind-1], &addr, &mask, &naddr);
+		ip6parse_hostnetworkmask(argv[optind-1], &addr, &mask, &naddr);
 		if (naddr > 1)
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: name resolves to multiple IPs");

@@ -770,6 +770,179 @@ const char *ipmask_to_numeric(const struct in_addr *mask)
 	return buf;
 }
 
+static struct in_addr *__numeric_to_ipaddr(const char *dotted, bool is_mask)
+{
+	static struct in_addr addr;
+	unsigned char *addrp;
+	unsigned int onebyte;
+	char buf[20], *p, *q;
+	int i;
+
+	/* copy dotted string, because we need to modify it */
+	strncpy(buf, dotted, sizeof(buf) - 1);
+	buf[sizeof(buf) - 1] = '\0';
+	addrp = (void *)&addr.s_addr;
+
+	p = buf;
+	for (i = 0; i < 3; ++i) {
+		if ((q = strchr(p, '.')) == NULL) {
+			if (is_mask)
+				return NULL;
+
+			/* autocomplete, this is a network address */
+			if (!strtonum(p, NULL, &onebyte, 0, 255))
+				return NULL;
+
+			addrp[i] = onebyte;
+			while (i < 3)
+				addrp[++i] = 0;
+
+			return &addr;
+		}
+
+		*q = '\0';
+		if (!strtonum(p, NULL, &onebyte, 0, 255))
+			return NULL;
+
+		addrp[i] = onebyte;
+		p = q + 1;
+	}
+
+	/* we have checked 3 bytes, now we check the last one */
+	if (!strtonum(p, NULL, &onebyte, 0, 255))
+		return NULL;
+
+	addrp[3] = onebyte;
+	return &addr;
+}
+
+struct in_addr *numeric_to_ipaddr(const char *dotted)
+{
+	return __numeric_to_ipaddr(dotted, false);
+}
+
+struct in_addr *numeric_to_ipmask(const char *dotted)
+{
+	return __numeric_to_ipaddr(dotted, true);
+}
+
+static struct in_addr *network_to_ipaddr(const char *name)
+{
+	static struct in_addr addr;
+	struct netent *net;
+
+	if ((net = getnetbyname(name)) != NULL) {
+		if (net->n_addrtype != AF_INET)
+			return NULL;
+		addr.s_addr = htonl(net->n_net);
+		return &addr;
+	}
+
+	return NULL;
+}
+
+static struct in_addr *host_to_ipaddr(const char *name, unsigned int *naddr)
+{
+	struct hostent *host;
+	struct in_addr *addr;
+	unsigned int i;
+
+	*naddr = 0;
+	if ((host = gethostbyname(name)) != NULL) {
+		if (host->h_addrtype != AF_INET ||
+		    host->h_length != sizeof(struct in_addr))
+			return NULL;
+
+		while (host->h_addr_list[*naddr] != NULL)
+			++*naddr;
+		addr = fw_calloc(*naddr, sizeof(struct in_addr) * *naddr);
+		for (i = 0; i < *naddr; i++)
+			memcpy(&addr[i], host->h_addr_list[i],
+			       sizeof(struct in_addr));
+		return addr;
+	}
+
+	return NULL;
+}
+
+static struct in_addr *
+ipparse_hostnetwork(const char *name, unsigned int *naddrs)
+{
+	struct in_addr *addrptmp, *addrp;
+
+	if ((addrptmp = numeric_to_ipaddr(name)) != NULL ||
+	    (addrptmp = network_to_ipaddr(name)) != NULL) {
+		addrp = fw_malloc(sizeof(struct in_addr));
+		memcpy(addrp, addrptmp, sizeof(*addrp));
+		*naddrs = 1;
+		return addrp;
+	}
+	if ((addrptmp = host_to_ipaddr(name, naddrs)) != NULL)
+		return addrptmp;
+
+	exit_error(PARAMETER_PROBLEM, "host/network `%s' not found", name);
+}
+
+static struct in_addr *parse_ipmask(const char *mask)
+{
+	static struct in_addr maskaddr;
+	struct in_addr *addrp;
+	unsigned int bits;
+
+	if (mask == NULL) {
+		/* no mask at all defaults to 32 bits */
+		maskaddr.s_addr = 0xFFFFFFFF;
+		return &maskaddr;
+	}
+	if ((addrp = numeric_to_ipmask(mask)) != NULL)
+		/* dotted_to_addr already returns a network byte order addr */
+		return addrp;
+	if (string_to_number(mask, 0, 32, &bits) == -1)
+		exit_error(PARAMETER_PROBLEM,
+			   "invalid mask `%s' specified", mask);
+	if (bits != 0) {
+		maskaddr.s_addr = htonl(0xFFFFFFFF << (32 - bits));
+		return &maskaddr;
+	}
+
+	maskaddr.s_addr = 0U;
+	return &maskaddr;
+}
+
+void ipparse_hostnetworkmask(const char *name, struct in_addr **addrpp,
+                             struct in_addr *maskp, unsigned int *naddrs)
+{
+	unsigned int i, j, k, n;
+	struct in_addr *addrp;
+	char buf[256], *p;
+
+	strncpy(buf, name, sizeof(buf) - 1);
+	buf[sizeof(buf) - 1] = '\0';
+	if ((p = strrchr(buf, '/')) != NULL) {
+		*p = '\0';
+		addrp = parse_ipmask(p + 1);
+	} else {
+		addrp = parse_ipmask(NULL);
+	}
+	memcpy(maskp, addrp, sizeof(*maskp));
+
+	/* if a null mask is given, the name is ignored, like in "any/0" */
+	if (maskp->s_addr == 0U)
+		strcpy(buf, "0.0.0.0");
+
+	addrp = *addrpp = ipparse_hostnetwork(buf, naddrs);
+	n = *naddrs;
+	for (i = 0, j = 0; i < n; ++i) {
+		addrp[j++].s_addr &= maskp->s_addr;
+		for (k = 0; k < j - 1; ++k)
+			if (addrp[k].s_addr == addrp[j-1].s_addr) {
+				--*naddrs;
+				--j;
+				break;
+			}
+	}
+}
+
 const char *ip6addr_to_numeric(const struct in6_addr *addrp)
 {
 	/* 0000:0000:0000:0000:0000:000.000.000.000
@@ -849,4 +1022,149 @@ const char *ip6mask_to_numeric(const struct in6_addr *addrp)
 	}
 	sprintf(buf, "/%d", l);
 	return buf;
+}
+
+struct in6_addr *numeric_to_ip6addr(const char *num)
+{
+	static struct in6_addr ap;
+	int err;
+
+	if ((err = inet_pton(AF_INET6, num, &ap)) == 1)
+		return &ap;
+#ifdef DEBUG
+	fprintf(stderr, "\nnumeric2addr: %d\n", err);
+#endif
+	return NULL;
+}
+
+static struct in6_addr *
+host_to_ip6addr(const char *name, unsigned int *naddr)
+{
+	static struct in6_addr *addr;
+	struct addrinfo hints;
+	struct addrinfo *res;
+	int err;
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_flags    = AI_CANONNAME;
+	hints.ai_family   = AF_INET6;
+	hints.ai_socktype = SOCK_RAW;
+	hints.ai_protocol = IPPROTO_IPV6;
+	hints.ai_next     = NULL;
+
+	*naddr = 0;
+	if ((err = getaddrinfo(name, NULL, &hints, &res)) != 0) {
+#ifdef DEBUG
+		fprintf(stderr,"Name2IP: %s\n",gai_strerror(err));
+#endif
+		return NULL;
+	} else {
+		if (res->ai_family != AF_INET6 ||
+		    res->ai_addrlen != sizeof(struct sockaddr_in6))
+			return NULL;
+
+#ifdef DEBUG
+		fprintf(stderr, "resolved: len=%d  %s ", res->ai_addrlen,
+		        ip6addr_to_numeric(&((struct sockaddr_in6 *)res->ai_addr)->sin6_addr));
+#endif
+		/* Get the first element of the address-chain */
+		addr = fw_malloc(sizeof(struct in6_addr));
+		memcpy(addr, &((const struct sockaddr_in6 *)res->ai_addr)->sin6_addr,
+		       sizeof(struct in6_addr));
+		freeaddrinfo(res);
+		*naddr = 1;
+		return addr;
+	}
+
+	return NULL;
+}
+
+static struct in6_addr *network_to_ip6addr(const char *name)
+{
+	/*	abort();*/
+	/* TODO: not implemented yet, but the exception breaks the
+	 *       name resolvation */
+	return NULL;
+}
+
+static struct in6_addr *
+ip6parse_hostnetwork(const char *name, unsigned int *naddrs)
+{
+	struct in6_addr *addrp, *addrptmp;
+
+	if ((addrptmp = numeric_to_ip6addr(name)) != NULL ||
+	    (addrptmp = network_to_ip6addr(name)) != NULL) {
+		addrp = fw_malloc(sizeof(struct in6_addr));
+		memcpy(addrp, addrptmp, sizeof(*addrp));
+		*naddrs = 1;
+		return addrp;
+	}
+	if ((addrp = host_to_ip6addr(name, naddrs)) != NULL)
+		return addrp;
+
+	exit_error(PARAMETER_PROBLEM, "host/network `%s' not found", name);
+}
+
+static struct in6_addr *parse_ip6mask(char *mask)
+{
+	static struct in6_addr maskaddr;
+	struct in6_addr *addrp;
+	unsigned int bits;
+
+	if (mask == NULL) {
+		/* no mask at all defaults to 128 bits */
+		memset(&maskaddr, 0xff, sizeof maskaddr);
+		return &maskaddr;
+	}
+	if ((addrp = numeric_to_ip6addr(mask)) != NULL)
+		return addrp;
+	if (string_to_number(mask, 0, 128, &bits) == -1)
+		exit_error(PARAMETER_PROBLEM,
+			   "invalid mask `%s' specified", mask);
+	if (bits != 0) {
+		char *p = (void *)&maskaddr;
+		memset(p, 0xff, bits / 8);
+		memset(p + (bits / 8) + 1, 0, (128 - bits) / 8);
+		p[bits/8] = 0xff << (8 - (bits & 7));
+		return &maskaddr;
+	}
+
+	memset(&maskaddr, 0, sizeof(maskaddr));
+	return &maskaddr;
+}
+
+void ip6parse_hostnetworkmask(const char *name, struct in6_addr **addrpp,
+                              struct in6_addr *maskp, unsigned int *naddrs)
+{
+	struct in6_addr *addrp;
+	unsigned int i, j, k, n;
+	char buf[256], *p;
+
+	strncpy(buf, name, sizeof(buf) - 1);
+	buf[sizeof(buf)-1] = '\0';
+	if ((p = strrchr(buf, '/')) != NULL) {
+		*p = '\0';
+		addrp = parse_ip6mask(p + 1);
+	} else {
+		addrp = parse_ip6mask(NULL);
+	}
+	memcpy(maskp, addrp, sizeof(*maskp));
+
+	/* if a null mask is given, the name is ignored, like in "any/0" */
+	if (memcmp(maskp, &in6addr_any, sizeof(in6addr_any)) == 0)
+		strcpy(buf, "::");
+
+	addrp = *addrpp = ip6parse_hostnetwork(buf, naddrs);
+	n = *naddrs;
+	for (i = 0, j = 0; i < n; ++i) {
+		for (k = 0; k < 4; ++k)
+			addrp[j].in6_u.u6_addr32[k] &= maskp->in6_u.u6_addr32[k];
+		++j;
+		for (k = 0; k < j - 1; ++k)
+			if (IN6_ARE_ADDR_EQUAL(&addrp[k], &addrp[j - 1])) {
+				--*naddrs;
+				--j;
+				break;
+			}
+	}
 }

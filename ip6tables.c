@@ -459,71 +459,6 @@ check_inverse(const char option[], int *invert, int *optind, int argc)
 	return FALSE;
 }
 
-static struct in6_addr *
-numeric_to_addr(const char *num)
-{
-	static struct in6_addr ap;
-	int err;
-	if ((err=inet_pton(AF_INET6, num, &ap)) == 1)
-		return &ap;
-#ifdef DEBUG
-	fprintf(stderr, "\nnumeric2addr: %d\n", err);
-#endif
-	return (struct in6_addr *)NULL;
-}
-
-
-static struct in6_addr *
-host_to_addr(const char *name, unsigned int *naddr)
-{
-	struct addrinfo hints;
-        struct addrinfo *res;
-        static struct in6_addr *addr;
-	int err;
-
-	memset(&hints, 0, sizeof(hints));
-        hints.ai_flags=AI_CANONNAME;
-        hints.ai_family=AF_INET6;
-        hints.ai_socktype=SOCK_RAW;
-        hints.ai_protocol=41;
-        hints.ai_next=NULL;
-
-	*naddr = 0;
-        if ( (err=getaddrinfo(name, NULL, &hints, &res)) != 0 ){
-#ifdef DEBUG
-                fprintf(stderr,"Name2IP: %s\n",gai_strerror(err)); 
-#endif
-                return (struct in6_addr *) NULL;
-        } else {
-		if (res->ai_family != AF_INET6 ||
-		    res->ai_addrlen != sizeof(struct sockaddr_in6))
-			return (struct in6_addr *) NULL;
-
-#ifdef DEBUG
-                fprintf(stderr, "resolved: len=%d  %s ", res->ai_addrlen, 
-                    addr_to_numeric(&(((struct sockaddr_in6 *)res->ai_addr)->sin6_addr)));
-#endif
-		/* Get the first element of the address-chain */
-		addr = fw_calloc(1, sizeof(struct in6_addr));
-		memcpy(addr, &((const struct sockaddr_in6 *)res->ai_addr)->sin6_addr,
-		       sizeof(struct in6_addr));
-		freeaddrinfo(res);
-		*naddr = 1;
-		return addr;
-	}
-
-	return (struct in6_addr *) NULL;
-}
-
-static struct in6_addr *
-network_to_addr(const char *name)
-{
-	/*	abort();*/
-	/* TODO: not implemented yet, but the exception breaks the
-	 *       name resolvation */
-	return (struct in6_addr *)NULL;
-}
-
 /*
  *	All functions starting with "parse" should succeed, otherwise
  *	the program fails.
@@ -532,92 +467,6 @@ network_to_addr(const char *name)
  *	"host_to_addr", "parse_hostnetwork", and "parse_hostnetworkmask"
  *	return global static data.
 */
-
-static struct in6_addr *
-parse_hostnetwork(const char *name, unsigned int *naddrs)
-{
-	struct in6_addr *addrp, *addrptmp;
-
-	if ((addrptmp = numeric_to_addr(name)) != NULL ||
-	    (addrptmp = network_to_addr(name)) != NULL) {
-		addrp = fw_malloc(sizeof(struct in6_addr));
-		memcpy(addrp, addrptmp, sizeof(*addrp));
-		*naddrs = 1;
-		return addrp;
-	}
-	if ((addrp = host_to_addr(name, naddrs)) != NULL)
-		return addrp;
-
-	exit_error(PARAMETER_PROBLEM, "host/network `%s' not found", name);
-}
-
-static struct in6_addr *
-parse_mask(char *mask)
-{
-	static struct in6_addr maskaddr;
-	struct in6_addr *addrp;
-	unsigned int bits;
-
-	if (mask == NULL) {
-		/* no mask at all defaults to 128 bits */
-		memset(&maskaddr, 0xff, sizeof maskaddr);
-		return &maskaddr;
-	}
-	if ((addrp = numeric_to_addr(mask)) != NULL)
-		return addrp;
-	if (string_to_number(mask, 0, 128, &bits) == -1)
-		exit_error(PARAMETER_PROBLEM,
-			   "invalid mask `%s' specified", mask);
-	if (bits != 0) {
-		char *p = (char *)&maskaddr;
-		memset(p, 0xff, bits / 8);
-		memset(p + (bits / 8) + 1, 0, (128 - bits) / 8);
-		p[bits / 8] = 0xff << (8 - (bits & 7));
-		return &maskaddr;
-	}
-
-	memset(&maskaddr, 0, sizeof maskaddr);
-	return &maskaddr;
-}
-
-void
-parse_hostnetworkmask(const char *name, struct in6_addr **addrpp,
-		      struct in6_addr *maskp, unsigned int *naddrs)
-{
-	struct in6_addr *addrp;
-	char buf[256];
-	char *p;
-	int i, j, n;
-
-	strncpy(buf, name, sizeof(buf) - 1);
-	buf[sizeof(buf) - 1] = '\0';
-	if ((p = strrchr(buf, '/')) != NULL) {
-		*p = '\0';
-		addrp = parse_mask(p + 1);
-	} else
-		addrp = parse_mask(NULL);
-	memcpy(maskp, addrp, sizeof(*maskp));
-
-	/* if a null mask is given, the name is ignored, like in "any/0" */
-	if (!memcmp(maskp, &in6addr_any, sizeof(in6addr_any)))
-		strcpy(buf, "::");
-
-	addrp = *addrpp = parse_hostnetwork(buf, naddrs);
-	n = *naddrs;
-	for (i = 0, j = 0; i < n; i++) {
-		int k;
-		for (k = 0; k < 4; k++)
-			addrp[j].in6_u.u6_addr32[k] &= maskp->in6_u.u6_addr32[k];
-		j++;
-		for (k = 0; k < j - 1; k++) {
-			if (IN6_ARE_ADDR_EQUAL(&addrp[k], &addrp[j - 1])) {
-				(*naddrs)--;
-				j--;
-				break;
-			}
-		}
-	}
-}
 
 /* Christophe Burki wants `-p 6' to imply `-m tcp'.  */
 static struct ip6tables_match *
@@ -1795,12 +1644,12 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	}
 
 	if (shostnetworkmask)
-		parse_hostnetworkmask(shostnetworkmask, &saddrs,
-				      &(fw.ipv6.smsk), &nsaddrs);
+		ip6parse_hostnetworkmask(shostnetworkmask, &saddrs,
+		                         &fw.ipv6.smsk, &nsaddrs);
 
 	if (dhostnetworkmask)
-		parse_hostnetworkmask(dhostnetworkmask, &daddrs,
-				      &(fw.ipv6.dmsk), &ndaddrs);
+		ip6parse_hostnetworkmask(dhostnetworkmask, &daddrs,
+		                         &fw.ipv6.dmsk, &ndaddrs);
 
 	if ((nsaddrs > 1 || ndaddrs > 1) &&
 	    (fw.ipv6.invflags & (IP6T_INV_SRCIP | IP6T_INV_DSTIP)))
