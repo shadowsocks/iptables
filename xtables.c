@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <netdb.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -197,6 +198,49 @@ int string_to_number(const char *s, unsigned int min, unsigned int max,
 	*ret = (unsigned int)number;
 
 	return result;
+}
+
+/*
+ * strtonum{,l} - string to number conversion
+ *
+ * If @end is NULL, we assume the caller does not want
+ * a case like "15a", so reject it.
+ */
+bool strtonuml(const char *s, char **end, unsigned long *value,
+               unsigned long min, unsigned long max)
+{
+	unsigned long v;
+	char *my_end;
+
+	errno = 0;
+	v = strtoul(s, &my_end, 0);
+
+	if (my_end == s)
+		return false;
+	if (end != NULL)
+		*end = my_end;
+
+	if (errno != ERANGE && min <= v && (max == 0 || v <= max)) {
+		if (value != NULL)
+			*value = v;
+		if (end == NULL)
+			return *my_end == '\0';
+		return true;
+	}
+
+	return false;
+}
+
+bool strtonum(const char *s, char **end, unsigned int *value,
+                  unsigned int min, unsigned int max)
+{
+	unsigned long v;
+	bool ret;
+
+	ret = strtonuml(s, end, &v, min, max);
+	if (value != NULL)
+		*value = v;
+	return ret;
 }
 
 int service_to_port(const char *name, const char *proto)

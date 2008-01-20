@@ -5,6 +5,7 @@
 #include <linux/types.h>
 #include <linux/netfilter/x_tables.h>
 #include <libiptc/libxtc.h>
+#include <stdbool.h>
 
 #ifndef XT_LIB_DIR
 #define XT_LIB_DIR "/usr/local/lib/iptables"
@@ -206,6 +207,10 @@ extern int string_to_number(const char *s,
 			    unsigned int min,
 			    unsigned int max,
 			    unsigned int *ret);
+extern bool strtonuml(const char *, char **, unsigned long *,
+	unsigned long, unsigned long);
+extern bool strtonum(const char *, char **, unsigned int *,
+	unsigned int, unsigned int);
 extern int service_to_port(const char *name, const char *proto);
 extern u_int16_t parse_port(const char *port, const char *proto);
 extern void
