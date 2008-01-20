@@ -2,80 +2,73 @@
  * GPL (C) 2001  Marc Boucher (marc@mbsi.ca).
  */
 
-#include <stdio.h>
-#include <netdb.h>
-#include <string.h>
-#include <stdlib.h>
-#include <getopt.h>
 #include <ctype.h>
+#include <getopt.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <iptables.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter/xt_conntrack.h>
 #include <linux/netfilter/nf_conntrack_common.h>
-/* For 64bit kernel / 32bit userspace */
-#include "../include/linux/netfilter_ipv4/ipt_conntrack.h"
-
-#ifndef IPT_CONNTRACK_STATE_UNTRACKED
-#define IPT_CONNTRACK_STATE_UNTRACKED (1 << (IP_CT_NUMBER + 3))
-#endif
 
 /* Function which prints out usage message. */
-static void conntrack_help(void)
+static void conntrack_mt_help(void)
 {
 	printf(
-"conntrack match v%s options:\n"
-" [!] --ctstate [INVALID|ESTABLISHED|NEW|RELATED|UNTRACKED|SNAT|DNAT][,...]\n"
-"				State(s) to match\n"
-" [!] --ctproto	proto		Protocol to match; by number or name, eg. `tcp'\n"
-"     --ctorigsrc  [!] address[/mask]\n"
-"				Original source specification\n"
-"     --ctorigdst  [!] address[/mask]\n"
-"				Original destination specification\n"
-"     --ctreplsrc  [!] address[/mask]\n"
-"				Reply source specification\n"
-"     --ctrepldst  [!] address[/mask]\n"
-"				Reply destination specification\n"
-" [!] --ctstatus [NONE|EXPECTED|SEEN_REPLY|ASSURED|CONFIRMED][,...]\n"
-"				Status(es) to match\n"
-" [!] --ctexpire time[:time]	Match remaining lifetime in seconds against\n"
-"				value or range of values (inclusive)\n"
-"\n", IPTABLES_VERSION);
+"conntrack match options:\n"
+"[!] --ctstate {INVALID|ESTABLISHED|NEW|RELATED|UNTRACKED|SNAT|DNAT}[,...]\n"
+"                               State(s) to match\n"
+"[!] --ctproto proto            Protocol to match; by number or name, e.g. \"tcp\"\n"
+"[!] --ctorigsrc address[/mask]\n"
+"[!] --ctorigdst address[/mask]\n"
+"[!] --ctreplsrc address[/mask]\n"
+"[!] --ctrepldst address[/mask]\n"
+"                               Original/Reply source/destination address\n"
+"[!] --ctstatus {NONE|EXPECTED|SEEN_REPLY|ASSURED|CONFIRMED}[,...]\n"
+"                               Status(es) to match\n"
+"[!] --ctexpire time[:time]     Match remaining lifetime in seconds against\n"
+"                               value or range of values (inclusive)\n"
+"\n");
 }
 
-static const struct option conntrack_opts[] = {
-	{ "ctstate", 1, NULL, '1' },
-	{ "ctproto", 1, NULL, '2' },
-	{ "ctorigsrc", 1, NULL, '3' },
-	{ "ctorigdst", 1, NULL, '4' },
-	{ "ctreplsrc", 1, NULL, '5' },
-	{ "ctrepldst", 1, NULL, '6' },
-	{ "ctstatus", 1, NULL, '7' },
-	{ "ctexpire", 1, NULL, '8' },
-	{ }
+static const struct option conntrack_mt_opts[] = {
+	{.name = "ctstate",   .has_arg = true, .val = '1'},
+	{.name = "ctproto",   .has_arg = true, .val = '2'},
+	{.name = "ctorigsrc", .has_arg = true, .val = '3'},
+	{.name = "ctorigdst", .has_arg = true, .val = '4'},
+	{.name = "ctreplsrc", .has_arg = true, .val = '5'},
+	{.name = "ctrepldst", .has_arg = true, .val = '6'},
+	{.name = "ctstatus",  .has_arg = true, .val = '7'},
+	{.name = "ctexpire",  .has_arg = true, .val = '8'},
+	{},
 };
 
 static int
-parse_state(const char *state, size_t strlen, struct ipt_conntrack_info *sinfo)
+parse_state(const char *state, size_t strlen, struct xt_conntrack_info *sinfo)
 {
 	if (strncasecmp(state, "INVALID", strlen) == 0)
-		sinfo->statemask |= IPT_CONNTRACK_STATE_INVALID;
+		sinfo->statemask |= XT_CONNTRACK_STATE_INVALID;
 	else if (strncasecmp(state, "NEW", strlen) == 0)
-		sinfo->statemask |= IPT_CONNTRACK_STATE_BIT(IP_CT_NEW);
+		sinfo->statemask |= XT_CONNTRACK_STATE_BIT(IP_CT_NEW);
 	else if (strncasecmp(state, "ESTABLISHED", strlen) == 0)
-		sinfo->statemask |= IPT_CONNTRACK_STATE_BIT(IP_CT_ESTABLISHED);
+		sinfo->statemask |= XT_CONNTRACK_STATE_BIT(IP_CT_ESTABLISHED);
 	else if (strncasecmp(state, "RELATED", strlen) == 0)
-		sinfo->statemask |= IPT_CONNTRACK_STATE_BIT(IP_CT_RELATED);
+		sinfo->statemask |= XT_CONNTRACK_STATE_BIT(IP_CT_RELATED);
 	else if (strncasecmp(state, "UNTRACKED", strlen) == 0)
-		sinfo->statemask |= IPT_CONNTRACK_STATE_UNTRACKED;
+		sinfo->statemask |= XT_CONNTRACK_STATE_UNTRACKED;
 	else if (strncasecmp(state, "SNAT", strlen) == 0)
-		sinfo->statemask |= IPT_CONNTRACK_STATE_SNAT;
+		sinfo->statemask |= XT_CONNTRACK_STATE_SNAT;
 	else if (strncasecmp(state, "DNAT", strlen) == 0)
-		sinfo->statemask |= IPT_CONNTRACK_STATE_DNAT;
+		sinfo->statemask |= XT_CONNTRACK_STATE_DNAT;
 	else
 		return 0;
 	return 1;
 }
 
 static void
-parse_states(const char *arg, struct ipt_conntrack_info *sinfo)
+parse_states(const char *arg, struct xt_conntrack_info *sinfo)
 {
 	const char *comma;
 
@@ -90,7 +83,7 @@ parse_states(const char *arg, struct ipt_conntrack_info *sinfo)
 }
 
 static int
-parse_status(const char *status, size_t strlen, struct ipt_conntrack_info *sinfo)
+parse_status(const char *status, size_t strlen, struct xt_conntrack_info *sinfo)
 {
 	if (strncasecmp(status, "NONE", strlen) == 0)
 		sinfo->statusmask |= 0;
@@ -110,7 +103,7 @@ parse_status(const char *status, size_t strlen, struct ipt_conntrack_info *sinfo
 }
 
 static void
-parse_statuses(const char *arg, struct ipt_conntrack_info *sinfo)
+parse_statuses(const char *arg, struct xt_conntrack_info *sinfo)
 {
 	const char *comma;
 
@@ -128,7 +121,7 @@ static unsigned long
 parse_expire(const char *s)
 {
 	unsigned int len;
-	
+
 	if (string_to_number(s, 0, 0, &len) == -1)
 		exit_error(PARAMETER_PROBLEM, "expire value invalid: `%s'\n", s);
 	else
@@ -137,7 +130,7 @@ parse_expire(const char *s)
 
 /* If a single value is provided, min and max are both set to the value */
 static void
-parse_expires(const char *s, struct ipt_conntrack_info *sinfo)
+parse_expires(const char *s, struct xt_conntrack_info *sinfo)
 {
 	char *buffer;
 	char *cp;
@@ -153,7 +146,7 @@ parse_expires(const char *s, struct ipt_conntrack_info *sinfo)
 		sinfo->expires_max = cp[0] ? parse_expire(cp) : -1;
 	}
 	free(buffer);
-	
+
 	if (sinfo->expires_min > sinfo->expires_max)
 		exit_error(PARAMETER_PROBLEM,
 		           "expire min. range value `%lu' greater than max. "
@@ -165,7 +158,7 @@ parse_expires(const char *s, struct ipt_conntrack_info *sinfo)
 static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
                            const void *entry, struct xt_entry_match **match)
 {
-	struct ipt_conntrack_info *sinfo = (struct ipt_conntrack_info *)(*match)->data;
+	struct xt_conntrack_info *sinfo = (void *)(*match)->data;
 	char *protocol = NULL;
 	unsigned int naddrs = 0;
 	struct in_addr *addrs = NULL;
@@ -177,16 +170,16 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		parse_states(argv[optind-1], sinfo);
 		if (invert) {
-			sinfo->invflags |= IPT_CONNTRACK_STATE;
+			sinfo->invflags |= XT_CONNTRACK_STATE;
 		}
-		sinfo->flags |= IPT_CONNTRACK_STATE;
+		sinfo->flags |= XT_CONNTRACK_STATE;
 		break;
 
 	case '2':
 		check_inverse(optarg, &invert, &optind, 0);
 
 		if(invert)
-			sinfo->invflags |= IPT_CONNTRACK_PROTO;
+			sinfo->invflags |= XT_CONNTRACK_PROTO;
 
 		/* Canonicalize into lower case */
 		for (protocol = argv[optind-1]; *protocol; protocol++)
@@ -196,18 +189,18 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum = parse_protocol(protocol);
 
 		if (sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum == 0
-		    && (sinfo->invflags & IPT_INV_PROTO))
+		    && (sinfo->invflags & XT_INV_PROTO))
 			exit_error(PARAMETER_PROBLEM,
 				   "rule would never match protocol");
 
-		sinfo->flags |= IPT_CONNTRACK_PROTO;
+		sinfo->flags |= XT_CONNTRACK_PROTO;
 		break;
 
 	case '3':
 		check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
-			sinfo->invflags |= IPT_CONNTRACK_ORIGSRC;
+			sinfo->invflags |= XT_CONNTRACK_ORIGSRC;
 
 		parse_hostnetworkmask(argv[optind-1], &addrs,
 					&sinfo->sipmsk[IP_CT_DIR_ORIGINAL],
@@ -220,14 +213,14 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 			sinfo->tuple[IP_CT_DIR_ORIGINAL].src.ip = addrs[0].s_addr;
 		}
 
-		sinfo->flags |= IPT_CONNTRACK_ORIGSRC;
+		sinfo->flags |= XT_CONNTRACK_ORIGSRC;
 		break;
 
 	case '4':
 		check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
-			sinfo->invflags |= IPT_CONNTRACK_ORIGDST;
+			sinfo->invflags |= XT_CONNTRACK_ORIGDST;
 
 		parse_hostnetworkmask(argv[optind-1], &addrs,
 					&sinfo->dipmsk[IP_CT_DIR_ORIGINAL],
@@ -240,14 +233,14 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 			sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.ip = addrs[0].s_addr;
 		}
 
-		sinfo->flags |= IPT_CONNTRACK_ORIGDST;
+		sinfo->flags |= XT_CONNTRACK_ORIGDST;
 		break;
 
 	case '5':
 		check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
-			sinfo->invflags |= IPT_CONNTRACK_REPLSRC;
+			sinfo->invflags |= XT_CONNTRACK_REPLSRC;
 
 		parse_hostnetworkmask(argv[optind-1], &addrs,
 					&sinfo->sipmsk[IP_CT_DIR_REPLY],
@@ -260,14 +253,14 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 			sinfo->tuple[IP_CT_DIR_REPLY].src.ip = addrs[0].s_addr;
 		}
 
-		sinfo->flags |= IPT_CONNTRACK_REPLSRC;
+		sinfo->flags |= XT_CONNTRACK_REPLSRC;
 		break;
 
 	case '6':
 		check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
-			sinfo->invflags |= IPT_CONNTRACK_REPLDST;
+			sinfo->invflags |= XT_CONNTRACK_REPLDST;
 
 		parse_hostnetworkmask(argv[optind-1], &addrs,
 					&sinfo->dipmsk[IP_CT_DIR_REPLY],
@@ -280,7 +273,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 			sinfo->tuple[IP_CT_DIR_REPLY].dst.ip = addrs[0].s_addr;
 		}
 
-		sinfo->flags |= IPT_CONNTRACK_REPLDST;
+		sinfo->flags |= XT_CONNTRACK_REPLDST;
 		break;
 
 	case '7':
@@ -288,9 +281,9 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		parse_statuses(argv[optind-1], sinfo);
 		if (invert) {
-			sinfo->invflags |= IPT_CONNTRACK_STATUS;
+			sinfo->invflags |= XT_CONNTRACK_STATUS;
 		}
-		sinfo->flags |= IPT_CONNTRACK_STATUS;
+		sinfo->flags |= XT_CONNTRACK_STATUS;
 		break;
 
 	case '8':
@@ -298,9 +291,9 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		parse_expires(argv[optind-1], sinfo);
 		if (invert) {
-			sinfo->invflags |= IPT_CONNTRACK_EXPIRES;
+			sinfo->invflags |= XT_CONNTRACK_EXPIRES;
 		}
-		sinfo->flags |= IPT_CONNTRACK_EXPIRES;
+		sinfo->flags |= XT_CONNTRACK_EXPIRES;
 		break;
 
 	default:
@@ -311,9 +304,9 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void conntrack_check(unsigned int flags)
+static void conntrack_mt_check(unsigned int flags)
 {
-	if (!flags)
+	if (flags == 0)
 		exit_error(PARAMETER_PROBLEM, "You must specify one or more options");
 }
 
@@ -322,31 +315,31 @@ print_state(unsigned int statemask)
 {
 	const char *sep = "";
 
-	if (statemask & IPT_CONNTRACK_STATE_INVALID) {
+	if (statemask & XT_CONNTRACK_STATE_INVALID) {
 		printf("%sINVALID", sep);
 		sep = ",";
 	}
-	if (statemask & IPT_CONNTRACK_STATE_BIT(IP_CT_NEW)) {
+	if (statemask & XT_CONNTRACK_STATE_BIT(IP_CT_NEW)) {
 		printf("%sNEW", sep);
 		sep = ",";
 	}
-	if (statemask & IPT_CONNTRACK_STATE_BIT(IP_CT_RELATED)) {
+	if (statemask & XT_CONNTRACK_STATE_BIT(IP_CT_RELATED)) {
 		printf("%sRELATED", sep);
 		sep = ",";
 	}
-	if (statemask & IPT_CONNTRACK_STATE_BIT(IP_CT_ESTABLISHED)) {
+	if (statemask & XT_CONNTRACK_STATE_BIT(IP_CT_ESTABLISHED)) {
 		printf("%sESTABLISHED", sep);
 		sep = ",";
 	}
-	if (statemask & IPT_CONNTRACK_STATE_UNTRACKED) {
+	if (statemask & XT_CONNTRACK_STATE_UNTRACKED) {
 		printf("%sUNTRACKED", sep);
 		sep = ",";
 	}
-	if (statemask & IPT_CONNTRACK_STATE_SNAT) {
+	if (statemask & XT_CONNTRACK_STATE_SNAT) {
 		printf("%sSNAT", sep);
 		sep = ",";
 	}
-	if (statemask & IPT_CONNTRACK_STATE_DNAT) {
+	if (statemask & XT_CONNTRACK_STATE_DNAT) {
 		printf("%sDNAT", sep);
 		sep = ",";
 	}
@@ -388,8 +381,8 @@ print_addr(struct in_addr *addr, struct in_addr *mask, int inv, int numeric)
 {
 	char buf[BUFSIZ];
 
-        if (inv) 
-               	printf("! ");
+	if (inv)
+	       	printf("! ");
 
 	if (mask->s_addr == 0L && !numeric)
 		printf("%s ", "anywhere");
@@ -407,73 +400,81 @@ print_addr(struct in_addr *addr, struct in_addr *mask, int inv, int numeric)
 static void
 matchinfo_print(const void *ip, const struct xt_entry_match *match, int numeric, const char *optpfx)
 {
-	struct ipt_conntrack_info *sinfo = (struct ipt_conntrack_info *)match->data;
+	struct xt_conntrack_info *sinfo = (void *)match->data;
 
-	if(sinfo->flags & IPT_CONNTRACK_STATE) {
-		printf("%sctstate ", optpfx);
-        	if (sinfo->invflags & IPT_CONNTRACK_STATE)
+	if(sinfo->flags & XT_CONNTRACK_STATE) {
+        	if (sinfo->invflags & XT_CONNTRACK_STATE)
                 	printf("! ");
+		printf("%sctstate ", optpfx);
 		print_state(sinfo->statemask);
 	}
 
-	if(sinfo->flags & IPT_CONNTRACK_PROTO) {
-		printf("%sctproto ", optpfx);
-        	if (sinfo->invflags & IPT_CONNTRACK_PROTO)
+	if(sinfo->flags & XT_CONNTRACK_PROTO) {
+        	if (sinfo->invflags & XT_CONNTRACK_PROTO)
                 	printf("! ");
+		printf("%sctproto ", optpfx);
 		printf("%u ", sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum);
 	}
 
-	if(sinfo->flags & IPT_CONNTRACK_ORIGSRC) {
+	if(sinfo->flags & XT_CONNTRACK_ORIGSRC) {
+		if (sinfo->invflags & XT_CONNTRACK_ORIGSRC)
+			printf("! ");
 		printf("%sctorigsrc ", optpfx);
 
 		print_addr(
 		    (struct in_addr *)&sinfo->tuple[IP_CT_DIR_ORIGINAL].src.ip,
 		    &sinfo->sipmsk[IP_CT_DIR_ORIGINAL],
-		    sinfo->invflags & IPT_CONNTRACK_ORIGSRC,
+		    false,
 		    numeric);
 	}
 
-	if(sinfo->flags & IPT_CONNTRACK_ORIGDST) {
+	if(sinfo->flags & XT_CONNTRACK_ORIGDST) {
+		if (sinfo->invflags & XT_CONNTRACK_ORIGDST)
+			printf("! ");
 		printf("%sctorigdst ", optpfx);
 
 		print_addr(
 		    (struct in_addr *)&sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.ip,
 		    &sinfo->dipmsk[IP_CT_DIR_ORIGINAL],
-		    sinfo->invflags & IPT_CONNTRACK_ORIGDST,
+		    false,
 		    numeric);
 	}
 
-	if(sinfo->flags & IPT_CONNTRACK_REPLSRC) {
+	if(sinfo->flags & XT_CONNTRACK_REPLSRC) {
+		if (sinfo->invflags & XT_CONNTRACK_REPLSRC)
+			printf("! ");
 		printf("%sctreplsrc ", optpfx);
 
 		print_addr(
 		    (struct in_addr *)&sinfo->tuple[IP_CT_DIR_REPLY].src.ip,
 		    &sinfo->sipmsk[IP_CT_DIR_REPLY],
-		    sinfo->invflags & IPT_CONNTRACK_REPLSRC,
+		    false,
 		    numeric);
 	}
 
-	if(sinfo->flags & IPT_CONNTRACK_REPLDST) {
+	if(sinfo->flags & XT_CONNTRACK_REPLDST) {
+		if (sinfo->invflags & XT_CONNTRACK_REPLDST)
+			printf("! ");
 		printf("%sctrepldst ", optpfx);
 
 		print_addr(
 		    (struct in_addr *)&sinfo->tuple[IP_CT_DIR_REPLY].dst.ip,
 		    &sinfo->dipmsk[IP_CT_DIR_REPLY],
-		    sinfo->invflags & IPT_CONNTRACK_REPLDST,
+		    false,
 		    numeric);
 	}
 
-	if(sinfo->flags & IPT_CONNTRACK_STATUS) {
-		printf("%sctstatus ", optpfx);
-        	if (sinfo->invflags & IPT_CONNTRACK_STATUS)
+	if(sinfo->flags & XT_CONNTRACK_STATUS) {
+        	if (sinfo->invflags & XT_CONNTRACK_STATUS)
                 	printf("! ");
+		printf("%sctstatus ", optpfx);
 		print_status(sinfo->statusmask);
 	}
 
-	if(sinfo->flags & IPT_CONNTRACK_EXPIRES) {
-		printf("%sctexpire ", optpfx);
-        	if (sinfo->invflags & IPT_CONNTRACK_EXPIRES)
+	if(sinfo->flags & XT_CONNTRACK_EXPIRES) {
+        	if (sinfo->invflags & XT_CONNTRACK_EXPIRES)
                 	printf("! ");
+		printf("%sctexpire ", optpfx);
 
         	if (sinfo->expires_max == sinfo->expires_min)
                 	printf("%lu ", sinfo->expires_min);
@@ -495,20 +496,22 @@ static void conntrack_save(const void *ip, const struct xt_entry_match *match)
 	matchinfo_print(ip, match, 1, "--");
 }
 
-static struct iptables_match conntrack_match = {
-	.name		= "conntrack",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_conntrack_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_conntrack_info)),
-	.help		= conntrack_help,
-	.parse		= conntrack_parse,
-	.final_check	= conntrack_check,
-	.print		= conntrack_print,
-	.save		= conntrack_save,
-	.extra_opts	= conntrack_opts,
+static struct xtables_match conntrack_match = {
+	.version       = IPTABLES_VERSION,
+	.name          = "conntrack",
+	.revision      = 0,
+	.family        = AF_INET,
+	.size          = XT_ALIGN(sizeof(struct xt_conntrack_info)),
+	.userspacesize = XT_ALIGN(sizeof(struct xt_conntrack_info)),
+	.help          = conntrack_mt_help,
+	.parse         = conntrack_parse,
+	.final_check   = conntrack_mt_check,
+	.print         = conntrack_print,
+	.save          = conntrack_save,
+	.extra_opts    = conntrack_mt_opts,
 };
 
 void _init(void)
 {
-	register_match(&conntrack_match);
+	xtables_register_match(&conntrack_match);
 }

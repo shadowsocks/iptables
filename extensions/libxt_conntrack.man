@@ -1,0 +1,71 @@
+This module, when combined with connection tracking, allows access to the
+connection tracking state for this packet/connection.
+.TP
+[\fB!\fR] \fB--ctstate\fR \fIstatelist\fR
+\fIstatelist\fR is a comma separated list of the connection states to match.
+Possible states are listed below.
+.TP
+[\fB!\fR] \fB--ctproto\fR \fIl4proto\fR
+Layer-4 protocol to match (by number or name)
+.TP
+[\fB!\fR] \fB--ctorigsrc\fR \fIaddress\fR[\fB/\fR\fImask\fR]
+Match against original source address
+.TP
+[\fB!\fR] \fB--ctorigdst\fR \fIaddress\fR[\fB/\fR\fImask\fR]
+Match against original destination address
+.TP
+[\fB!\fR] \fB--ctreplsrc\fR \fIaddress\fR[\fB/\fR\fImask\fR]
+Match against reply source address
+.TP
+[\fB!\fR] \fB--ctrepldst\fR \fIaddress\fR[\fB/\fR\fImask\fR]
+Match against reply destination address
+.TP
+[\fB!\fR] \fB--ctstatus\fR \fIstatelist\fR
+\fIstatuslist\fR is a comma separated list of the connection statuses to match.
+Possible statuses are listed below.
+.TP
+[\fB!\fR] \fB--ctexpire\fR \fItime\fR[\fB:\fR\fItime\fR]
+Match remaining lifetime in seconds against given value or range of values
+(inclusive)
+.PP
+States for \fB--ctstate\fR:
+.TP
+\fBINVALID\fR
+meaning that the packet is associated with no known connection
+.TP
+\fBNEW\fR
+meaning that the packet has started a new connection, or otherwise associated
+with a connection which has not seen packets in both directions, and
+.TP
+\fBESTABLISHED\fR
+meaning that the packet is associated with a connection which has seen packets
+in both directions,
+.TP
+\fBRELATED\fR
+meaning that the packet is starting a new connection, but is associated with an
+existing connection, such as an FTP data transfer, or an ICMP error.
+.TP
+\fBSNAT\fR
+A virtual state, matching if the original source address differs from the reply
+destination.
+.TP
+\fBDNAT\fR
+A virtual state, matching if the original destination differs from the reply
+source.
+.PP
+Statuses for \fB--ctstatus\fR:
+.TP
+\fBNONE\fR
+None of the below.
+.TP
+\fBEXPECTED\fR
+This is an expected connection (i.e. a conntrack helper set it up)
+.TP
+\fBSEEN_REPLY\fR
+Conntrack has seen packets in both directions.
+.TP
+\fBASSURED\fR
+Conntrack entry should never be early-expired.
+.TP
+\fBCONFIRMED\fR
+Connection is confirmed: originating packet has left box.
