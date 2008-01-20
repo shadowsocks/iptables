@@ -307,6 +307,9 @@ void parse_interface(const char *arg, char *vianame, unsigned char *mask)
 struct xtables_match *find_match(const char *name, enum xt_tryload tryload,
 				 struct xtables_rule_match **matches)
 {
+#ifndef NO_SHARED_LIBS
+	struct stat sb;
+#endif
 	struct xtables_match *ptr;
 	const char *icmp6 = "icmp6";
 
@@ -347,12 +350,16 @@ struct xtables_match *find_match(const char *name, enum xt_tryload tryload,
 			/* Found library.  If it didn't register itself,
 			   maybe they specified target as match. */
 			ptr = find_match(name, DONT_LOAD, NULL);
+		else if (stat(path, &sb) == 0)
+			fprintf(stderr, "%s: %s\n", path, dlerror());
 
 		if (ptr == NULL) {
 			sprintf(path, "%s/%s%s.so", lib_dir, afinfo.libprefix,
 				name);
 			if (dlopen(path, RTLD_NOW) != NULL)
 				ptr = find_match(name, DONT_LOAD, NULL);
+			else if (stat(path, &sb) == 0)
+				fprintf(stderr, "%s: %s\n", path, dlerror());
 		}
 
 		if (ptr == NULL && tryload == LOAD_MUST_SUCCEED)
@@ -395,6 +402,9 @@ struct xtables_match *find_match(const char *name, enum xt_tryload tryload,
 
 struct xtables_target *find_target(const char *name, enum xt_tryload tryload)
 {
+#ifndef NO_SHARED_LIBS
+	struct stat sb;
+#endif
 	struct xtables_target *ptr;
 
 	/* Standard target? */
@@ -420,12 +430,16 @@ struct xtables_target *find_target(const char *name, enum xt_tryload tryload)
 			/* Found library.  If it didn't register itself,
 			   maybe they specified match as a target. */
 			ptr = find_target(name, DONT_LOAD);
+		else if (stat(path, &sb) == 0)
+			fprintf(stderr, "%s: %s\n", path, dlerror());
 
 		if (ptr == NULL) {
 			sprintf(path, "%s/%s%s.so", lib_dir, afinfo.libprefix,
 				name);
 			if (dlopen(path, RTLD_NOW) != NULL)
 				ptr = find_target(name, DONT_LOAD);
+			else if (stat(path, &sb) == 0)
+				fprintf(stderr, "%s: %s\n", path, dlerror());
 		}
 		if (ptr == NULL && tryload == LOAD_MUST_SUCCEED)
 			exit_error(PARAMETER_PROBLEM,
