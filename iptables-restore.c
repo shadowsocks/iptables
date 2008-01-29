@@ -1,4 +1,4 @@
-/* Code to restore the iptables state, from file by iptables-save. 
+/* Code to restore the iptables state, from file by iptables-save.
  * (C) 2000-2002 by Harald Welte <laforge@gnumonks.org>
  * based on previous code from Rusty Russell <rusty@linuxcare.com.au>
  *
@@ -19,7 +19,7 @@
 #ifdef DEBUG
 #define DEBUGP(x, args...) fprintf(stderr, x, ## args)
 #else
-#define DEBUGP(x, args...) 
+#define DEBUGP(x, args...)
 #endif
 
 static int binary = 0, counters = 0, verbose = 0, noflush = 0;
@@ -49,8 +49,8 @@ static void print_usage(const char *name, const char *version)
 			"	   [ --help ]\n"
 			"	   [ --noflush ]\n"
 			"	   [ --table=<TABLE> ]\n"
-		        "          [ --modprobe=<command>]\n", name);
-		
+			"          [ --modprobe=<command>]\n", name);
+
 	exit(1);
 }
 
@@ -168,7 +168,7 @@ main(int argc, char *argv[])
 				break;
 		}
 	}
-	
+
 	if (optind == argc - 1) {
 		in = fopen(argv[optind], "r");
 		if (!in) {
@@ -182,7 +182,7 @@ main(int argc, char *argv[])
 		exit(1);
 	}
 	else in = stdin;
-	
+
 	/* Grab standard input. */
 	while (fgets(buffer, sizeof(buffer), in)) {
 		int ret = 0;
@@ -210,7 +210,7 @@ main(int argc, char *argv[])
 			table = strtok(buffer+1, " \t\n");
 			DEBUGP("line %u, table '%s'\n", line, table);
 			if (!table) {
-				exit_error(PARAMETER_PROBLEM, 
+				exit_error(PARAMETER_PROBLEM,
 					"%s: line %u table name invalid\n",
 					program_name, line);
 				exit(1);
@@ -227,12 +227,12 @@ main(int argc, char *argv[])
 			if (noflush == 0) {
 				DEBUGP("Cleaning all chains of table '%s'\n",
 					table);
-				for_each_chain(flush_entries, verbose, 1, 
+				for_each_chain(flush_entries, verbose, 1,
 						&handle);
-	
+
 				DEBUGP("Deleting all user-defined chains "
 				       "of table '%s'\n", table);
-				for_each_chain(delete_chain, verbose, 0, 
+				for_each_chain(delete_chain, verbose, 0,
 						&handle) ;
 			}
 
@@ -292,7 +292,7 @@ main(int argc, char *argv[])
 							   "for chain '%s'\n", chain);
 
 				} else {
-					memset(&count, 0, 
+					memset(&count, 0,
 					       sizeof(struct ipt_counters));
 				}
 
@@ -355,7 +355,7 @@ main(int argc, char *argv[])
 			add_argv(argv[0]);
 			add_argv("-t");
 			add_argv((char *) &curtable);
-			
+
 			if (counters && pcnt && bcnt) {
 				add_argv("--set-counters");
 				add_argv((char *) pcnt);
@@ -368,7 +368,7 @@ main(int argc, char *argv[])
 
 			quote_open = 0;
 			param_len = 0;
-			
+
 			for (curchar = parsestart; *curchar; curchar++) {
 				char param_buffer[1024];
 
@@ -404,8 +404,8 @@ main(int argc, char *argv[])
 
 					/* check if table name specified */
 					if (!strncmp(param_buffer, "-t", 3)
-                                            || !strncmp(param_buffer, "--table", 8)) {
-						exit_error(PARAMETER_PROBLEM, 
+					    || !strncmp(param_buffer, "--table", 8)) {
+						exit_error(PARAMETER_PROBLEM,
 						   "Line %u seems to have a "
 						   "-t table option.\n", line);
 						exit(1);
@@ -430,7 +430,7 @@ main(int argc, char *argv[])
 					param_buffer[param_len++] = *curchar;
 
 					if (param_len >= sizeof(param_buffer))
-						exit_error(PARAMETER_PROBLEM, 
+						exit_error(PARAMETER_PROBLEM,
 						   "Parameter too long!");
 				}
 			}
@@ -441,7 +441,7 @@ main(int argc, char *argv[])
 			for (a = 0; a < newargc; a++)
 				DEBUGP("argv[%u]: %s\n", a, newargv[a]);
 
-			ret = do_command(newargc, newargv, 
+			ret = do_command(newargc, newargv,
 					 &newargv[2], &handle);
 
 			free_argv();

@@ -1,10 +1,10 @@
-/* Code to restore the iptables state, from file by ip6tables-save. 
+/* Code to restore the iptables state, from file by ip6tables-save.
  * Author:  Andras Kis-Szabo <kisza@sch.bme.hu>
  *
  * based on iptables-restore
  * Authors:
- * 	Harald Welte <laforge@gnumonks.org>
- * 	Rusty Russell <rusty@linuxcare.com.au>
+ *      Harald Welte <laforge@gnumonks.org>
+ *      Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
  *
  * $Id$
@@ -22,7 +22,7 @@
 #ifdef DEBUG
 #define DEBUGP(x, args...) fprintf(stderr, x, ## args)
 #else
-#define DEBUGP(x, args...) 
+#define DEBUGP(x, args...)
 #endif
 
 static int binary = 0, counters = 0, verbose = 0, noflush = 0;
@@ -50,8 +50,8 @@ static void print_usage(const char *name, const char *version)
 			"	   [ --test ]\n"
 			"	   [ --help ]\n"
 			"	   [ --noflush ]\n"
-		        "          [ --modprobe=<command>]\n", name);
-		
+			"          [ --modprobe=<command>]\n", name);
+
 	exit(1);
 }
 
@@ -92,7 +92,7 @@ static int parse_counters(char *string, struct ip6t_counters *ctr)
 static char *newargv[255];
 static int newargc;
 
-/* function adding one argument to newargv, updating newargc 
+/* function adding one argument to newargv, updating newargc
  * returns true if argument added, false otherwise */
 static int add_argv(char *what) {
 	DEBUGP("add_argv: %s\n", what);
@@ -100,7 +100,7 @@ static int add_argv(char *what) {
 		newargv[newargc] = strdup(what);
 		newargc++;
 		return 1;
-	} else 
+	} else
 		return 0;
 }
 
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
 				break;
 		}
 	}
-	
+
 	if (optind == argc - 1) {
 		in = fopen(argv[optind], "r");
 		if (!in) {
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	else in = stdin;
-	
+
 	/* Grab standard input. */
 	while (fgets(buffer, sizeof(buffer), in)) {
 		int ret = 0;
@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
 			table = strtok(buffer+1, " \t\n");
 			DEBUGP("line %u, table '%s'\n", line, table);
 			if (!table) {
-				exit_error(PARAMETER_PROBLEM, 
+				exit_error(PARAMETER_PROBLEM,
 					"%s: line %u table name invalid\n",
 					program_name, line);
 				exit(1);
@@ -220,12 +220,12 @@ int main(int argc, char *argv[])
 			if (noflush == 0) {
 				DEBUGP("Cleaning all chains of table '%s'\n",
 					table);
-				for_each_chain(flush_entries, verbose, 1, 
+				for_each_chain(flush_entries, verbose, 1,
 						&handle);
-	
+
 				DEBUGP("Deleting all user-defined chains "
 				       "of table '%s'\n", table);
-				for_each_chain(delete_chain, verbose, 0, 
+				for_each_chain(delete_chain, verbose, 0,
 						&handle) ;
 			}
 
@@ -285,7 +285,7 @@ int main(int argc, char *argv[])
 							  "for chain '%s'\n", chain);
 
 				} else {
-					memset(&count, 0, 
+					memset(&count, 0,
 					       sizeof(struct ip6t_counters));
 				}
 
@@ -347,7 +347,7 @@ int main(int argc, char *argv[])
 			add_argv(argv[0]);
 			add_argv("-t");
 			add_argv((char *) &curtable);
-			
+
 			if (counters && pcnt && bcnt) {
 				add_argv("--set-counters");
 				add_argv((char *) pcnt);
@@ -360,7 +360,7 @@ int main(int argc, char *argv[])
 
 			quote_open = 0;
 			param_start = parsestart;
-			
+
 			for (curchar = parsestart; *curchar; curchar++) {
 				if (*curchar == '"') {
 					/* quote_open cannot be true if there
@@ -398,7 +398,7 @@ int main(int argc, char *argv[])
 					/* check if table name specified */
 					if (!strncmp(param_buffer, "-t", 3)
                                             || !strncmp(param_buffer, "--table", 8)) {
-						exit_error(PARAMETER_PROBLEM, 
+						exit_error(PARAMETER_PROBLEM,
 						   "Line %u seems to have a "
 						   "-t table option.\n", line);
 						exit(1);
@@ -417,7 +417,7 @@ int main(int argc, char *argv[])
 			for (a = 0; a < newargc; a++)
 				DEBUGP("argv[%u]: %s\n", a, newargv[a]);
 
-			ret = do_command6(newargc, newargv, 
+			ret = do_command6(newargc, newargv,
 					 &newargv[2], &handle);
 
 			free_argv();

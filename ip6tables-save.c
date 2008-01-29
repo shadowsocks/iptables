@@ -2,7 +2,7 @@
 /* Author:  Andras Kis-Szabo <kisza@sch.bme.hu>
  * Original code: iptables-save
  * Authors: Paul 'Rusty' Russel <rusty@linuxcare.com.au> and
- * 	    Harald Welte <laforge@gnumonks.org>
+ *          Harald Welte <laforge@gnumonks.org>
  * This code is distributed under the terms of GNU GPL v2
  */
 #include <getopt.h>
@@ -49,7 +49,7 @@ print_iface(char letter, const char *iface, const unsigned char *mask,
 			if (iface[i] != '\0')
 				printf("%c", iface[i]);
 		} else {
-			/* we can access iface[i-1] here, because 
+			/* we can access iface[i-1] here, because
 			 * a few lines above we make sure that mask[0] != 0 */
 			if (iface[i-1] != '\0')
 				printf("+");
@@ -81,11 +81,11 @@ static void print_proto(u_int16_t proto, int invert)
 		unsigned int i;
 		const char *invertstr = invert ? "! " : "";
 
-                struct protoent *pent = getprotobynumber(proto);
-                if (pent) {
+		struct protoent *pent = getprotobynumber(proto);
+		if (pent) {
 			printf("-p %s%s ",
 			       invertstr, pent->p_name);
-	                return;
+			return;
 		}
 
 		for (i = 0; i < sizeof(chain_protos)/sizeof(struct pprot); i++)
@@ -144,8 +144,8 @@ static void print_ip(char *prefix, const struct in6_addr *ip, const struct in6_a
 
 /* We want this to be readable, so only print out neccessary fields.
  * Because that's the kind of world I want to live in.  */
-static void print_rule(const struct ip6t_entry *e, 
-		ip6tc_handle_t *h, const char *chain, int counters)
+static void print_rule(const struct ip6t_entry *e,
+		       ip6tc_handle_t *h, const char *chain, int counters)
 {
 	struct ip6t_entry_target *t;
 	const char *target_name;
@@ -159,7 +159,7 @@ static void print_rule(const struct ip6t_entry *e,
 
 	/* Print IP part. */
 	print_ip("-s", &(e->ipv6.src), &(e->ipv6.smsk),
-			e->ipv6.invflags & IP6T_INV_SRCIP);	
+			e->ipv6.invflags & IP6T_INV_SRCIP);
 
 	print_ip("-d", &(e->ipv6.dst), &(e->ipv6.dmsk),
 			e->ipv6.invflags & IP6T_INV_DSTIP);
@@ -182,7 +182,7 @@ static void print_rule(const struct ip6t_entry *e,
 
 	if (e->ipv6.flags & IP6T_F_TOS)
 		printf("%s-? %d ",
-		       e->ipv6.invflags & IP6T_INV_TOS ? "! " : "", 
+		       e->ipv6.invflags & IP6T_INV_TOS ? "! " : "",
 		       e->ipv6.tos);
 
 	/* Print matchinfo part */
@@ -190,7 +190,7 @@ static void print_rule(const struct ip6t_entry *e,
 		IP6T_MATCH_ITERATE(e, print_match, &e->ipv6);
 	}
 
-	/* Print target name */	
+	/* Print target name */
 	target_name = ip6tc_get_target(e, h);
 	if (target_name && (*target_name != '\0'))
 		printf("-j %s ", target_name);
@@ -213,7 +213,7 @@ static void print_rule(const struct ip6t_entry *e,
 			/* If the target size is greater than ip6t_entry_target
 			 * there is something to be saved, we just don't know
 			 * how to print it */
-			if (t->u.target_size != 
+			if (t->u.target_size !=
 			    sizeof(struct ip6t_entry_target)) {
 				fprintf(stderr, "Target `%s' is missing "
 						"save function\n",
@@ -228,7 +228,7 @@ static void print_rule(const struct ip6t_entry *e,
 /* Debugging prototype. */
 static int for_each_table(int (*func)(const char *tablename))
 {
-        int ret = 1;
+	int ret = 1;
 	FILE *procfile = NULL;
 	char tablename[IP6T_TABLE_MAXNAMELEN+1];
 
@@ -249,7 +249,7 @@ static int for_each_table(int (*func)(const char *tablename))
 
 	return ret;
 }
-	
+
 
 static int do_output(const char *tablename)
 {
@@ -261,7 +261,7 @@ static int do_output(const char *tablename)
 
 	h = ip6tc_init(tablename);
 	if (!h)
- 		exit_error(OTHER_PROBLEM, "Can't initialize: %s\n",
+		exit_error(OTHER_PROBLEM, "Can't initialize: %s\n",
 			   ip6tc_strerror(errno));
 
 	if (!binary) {
@@ -271,7 +271,7 @@ static int do_output(const char *tablename)
 		       IPTABLES_VERSION, ctime(&now));
 		printf("*%s\n", tablename);
 
-		/* Dump out chain names first, 
+		/* Dump out chain names first,
 		 * thereby preventing dependency conflicts */
 		for (chain = ip6tc_first_chain(&h);
 		     chain;

@@ -1058,7 +1058,7 @@ delete_chain(const ipt_chainlabel chain, int verbose,
 		return for_each_chain(delete_chain, verbose, 0, handle);
 
 	if (verbose)
-	        fprintf(stdout, "Deleting chain `%s'\n", chain);
+		fprintf(stdout, "Deleting chain `%s'\n", chain);
 	return iptc_delete_chain(chain, handle);
 }
 
@@ -1180,7 +1180,7 @@ get_kernel_version(void) {
 	if (uname(&uts) == -1) {
 		fprintf(stderr, "Unable to retrieve kernel version.\n");
 		free_opts(1);
-		exit(1); 
+		exit(1);
 	}
 
 	sscanf(uts.release, "%d.%d.%d", &x, &y, &z);
@@ -1337,7 +1337,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				newname = argv[optind++];
 			else
 				exit_error(PARAMETER_PROBLEM,
-				           "-%c requires old-chain-name and "
+					   "-%c requires old-chain-name and "
 					   "new-chain-name",
 					    cmd2char(CMD_RENAME_CHAIN));
 			break;
@@ -1429,8 +1429,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 					     target->revision);
 				if (target->init != NULL)
 					target->init(target->t);
-				opts = merge_options(opts, 
-						     target->extra_opts, 
+				opts = merge_options(opts,
+						     target->extra_opts,
 						     &target->option_offset);
 				if (opts == NULL)
 					exit_error(OTHER_PROBLEM,
@@ -1488,8 +1488,8 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				m->init(m->m);
 			if (m != m->next) {
 				/* Merge options for non-cloned matches */
-				opts = merge_options(opts, 
-						     m->extra_opts, 
+				opts = merge_options(opts,
+						     m->extra_opts,
 						     &m->option_offset);
 				if (opts == NULL)
 					exit_error(OTHER_PROBLEM,
@@ -1579,7 +1579,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 					       &target->tflags,
 					       &fw, &target->t))) {
 				for (matchp = matches; matchp; matchp = matchp->next) {
-					if (matchp->completed) 
+					if (matchp->completed)
 						continue;
 					if (matchp->match->parse(c - matchp->match->option_offset,
 						     argv, invert,
@@ -1616,7 +1616,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				if (m == NULL
 				    && protocol
 				    && (!find_proto(protocol, DONT_LOAD,
-						   options&OPT_NUMERIC, NULL) 
+						   options&OPT_NUMERIC, NULL)
 					|| (find_proto(protocol, DONT_LOAD,
 							options&OPT_NUMERIC, NULL)
 					    && (proto_used == 0))
@@ -1625,7 +1625,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 						       options&OPT_NUMERIC, &matches))) {
 					/* Try loading protocol */
 					size_t size;
-					
+
 					proto_used = 1;
 
 					size = IPT_ALIGN(sizeof(struct ipt_entry_match))
@@ -1640,7 +1640,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 						m->init(m->m);
 
 					opts = merge_options(opts,
-							     m->extra_opts, 
+							     m->extra_opts,
 							     &m->option_offset);
 					if (opts == NULL)
 						exit_error(OTHER_PROBLEM,
@@ -1685,11 +1685,11 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 
 	if (shostnetworkmask)
 		ipparse_hostnetworkmask(shostnetworkmask, &saddrs,
-		                        &fw.ip.smsk, &nsaddrs);
+					&fw.ip.smsk, &nsaddrs);
 
 	if (dhostnetworkmask)
 		ipparse_hostnetworkmask(dhostnetworkmask, &daddrs,
-		                        &fw.ip.dmsk, &ndaddrs);
+					&fw.ip.dmsk, &ndaddrs);
 
 	if ((nsaddrs > 1 || ndaddrs > 1) &&
 	    (fw.ip.invflags & (IPT_INV_SRCIP | IPT_INV_DSTIP)))

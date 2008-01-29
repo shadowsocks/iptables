@@ -55,7 +55,7 @@ print_iface(char letter, const char *iface, const unsigned char *mask,
 			if (iface[i] != '\0')
 				printf("%c", iface[i]);
 		} else {
-			/* we can access iface[i-1] here, because 
+			/* we can access iface[i-1] here, because
 			 * a few lines above we make sure that mask[0] != 0 */
 			if (iface[i-1] != '\0')
 				printf("+");
@@ -172,7 +172,7 @@ static void print_ip(char *prefix, u_int32_t ip, u_int32_t mask, int invert)
 
 /* We want this to be readable, so only print out neccessary fields.
  * Because that's the kind of world I want to live in.  */
-static void print_rule(const struct ipt_entry *e, 
+static void print_rule(const struct ipt_entry *e,
 		iptc_handle_t *h, const char *chain, int counters)
 {
 	struct ipt_entry_target *t;
@@ -187,7 +187,7 @@ static void print_rule(const struct ipt_entry *e,
 
 	/* Print IP part. */
 	print_ip("-s", e->ip.src.s_addr,e->ip.smsk.s_addr,
-			e->ip.invflags & IPT_INV_SRCIP);	
+			e->ip.invflags & IPT_INV_SRCIP);
 
 	print_ip("-d", e->ip.dst.s_addr, e->ip.dmsk.s_addr,
 			e->ip.invflags & IPT_INV_DSTIP);
@@ -209,7 +209,7 @@ static void print_rule(const struct ipt_entry *e,
 		IPT_MATCH_ITERATE(e, print_match, &e->ip);
 	}
 
-	/* Print target name */	
+	/* Print target name */
 	target_name = iptc_get_target(e, h);
 	if (target_name && (*target_name != '\0'))
 #ifdef IPT_F_GOTO
@@ -236,7 +236,7 @@ static void print_rule(const struct ipt_entry *e,
 			/* If the target size is greater than ipt_entry_target
 			 * there is something to be saved, we just don't know
 			 * how to print it */
-			if (t->u.target_size != 
+			if (t->u.target_size !=
 			    sizeof(struct ipt_entry_target)) {
 				fprintf(stderr, "Target `%s' is missing "
 						"save function\n",
@@ -251,7 +251,7 @@ static void print_rule(const struct ipt_entry *e,
 /* Debugging prototype. */
 static int for_each_table(int (*func)(const char *tablename))
 {
-        int ret = 1;
+	int ret = 1;
 	FILE *procfile = NULL;
 	char tablename[IPT_TABLE_MAXNAMELEN+1];
 
@@ -272,7 +272,7 @@ static int for_each_table(int (*func)(const char *tablename))
 
 	return ret;
 }
-	
+
 
 static int do_output(const char *tablename)
 {
@@ -284,7 +284,7 @@ static int do_output(const char *tablename)
 
 	h = iptc_init(tablename);
 	if (!h)
- 		exit_error(OTHER_PROBLEM, "Can't initialize: %s\n",
+		exit_error(OTHER_PROBLEM, "Can't initialize: %s\n",
 			   iptc_strerror(errno));
 
 	if (!binary) {
@@ -294,12 +294,12 @@ static int do_output(const char *tablename)
 		       IPTABLES_VERSION, ctime(&now));
 		printf("*%s\n", tablename);
 
-		/* Dump out chain names first, 
+		/* Dump out chain names first,
 		 * thereby preventing dependency conflicts */
 		for (chain = iptc_first_chain(&h);
 		     chain;
 		     chain = iptc_next_chain(&h)) {
-			
+
 			printf(":%s ", chain);
 			if (iptc_builtin(chain, h)) {
 				struct ipt_counters count;
@@ -310,7 +310,7 @@ static int do_output(const char *tablename)
 				printf("- [0:0]\n");
 			}
 		}
-				
+
 
 		for (chain = iptc_first_chain(&h);
 		     chain;

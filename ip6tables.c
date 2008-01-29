@@ -337,8 +337,8 @@ exit_printhelp(struct ip6tables_rule_match *matches)
 "  --set-counters PKTS BYTES	set the counter during insert/append\n"
 "[!] --version	-V		print package version.\n");
 
-	/* Print out any special helps. A user might like to be able to add a --help 
-	   to the commandline, and see expected results. So we call help for all 
+	/* Print out any special helps. A user might like to be able to add a --help
+	   to the commandline, and see expected results. So we call help for all
 	   specified matches & targets */
 	for (t = xtables_targets; t; t = t->next) {
 		if (t->used) {
@@ -495,7 +495,7 @@ parse_protocol(const char *s)
 
 		/* first deal with the special case of 'all' to prevent
 		 * people from being able to redefine 'all' in nsswitch
-		 * and/or provoke expensive [not working] ldap/nis/... 
+		 * and/or provoke expensive [not working] ldap/nis/...
 		 * lookups */
 		if (!strcmp(s, "all"))
 			return 0;
@@ -802,7 +802,7 @@ print_firewall(const struct ip6t_entry *fw,
 	}
 
 	fputc(fw->ipv6.invflags & IP6T_INV_SRCIP ? '!' : ' ', stdout);
-	if (!memcmp(&fw->ipv6.smsk, &in6addr_any, sizeof in6addr_any) 
+	if (!memcmp(&fw->ipv6.smsk, &in6addr_any, sizeof in6addr_any)
 	    && !(format & FMT_NUMERIC))
 		printf(FMT("%-19s ","%s "), "anywhere");
 	else {
@@ -950,7 +950,7 @@ make_delete_mask(struct ip6t_entry *fw, struct ip6tables_rule_match *matches)
 		mptr += IP6T_ALIGN(sizeof(struct ip6t_entry_match)) + matchp->match->size;
 	}
 
-	memset(mptr, 0xFF, 
+	memset(mptr, 0xFF,
 	       IP6T_ALIGN(sizeof(struct ip6t_entry_target))
 	       + xtables_targets->userspacesize);
 
@@ -991,7 +991,7 @@ int
 for_each_chain(int (*fn)(const ip6t_chainlabel, int, ip6tc_handle_t *),
 	       int verbose, int builtinstoo, ip6tc_handle_t *handle)
 {
-        int ret = 1;
+	int ret = 1;
 	const char *chain;
 	char *chains;
 	unsigned int i, chaincount = 0;
@@ -1000,7 +1000,7 @@ for_each_chain(int (*fn)(const ip6t_chainlabel, int, ip6tc_handle_t *),
 	while (chain) {
 		chaincount++;
 		chain = ip6tc_next_chain(handle);
-        }
+	}
 
 	chains = fw_malloc(sizeof(ip6t_chainlabel) * chaincount);
 	i = 0;
@@ -1009,18 +1009,18 @@ for_each_chain(int (*fn)(const ip6t_chainlabel, int, ip6tc_handle_t *),
 		strcpy(chains + i*sizeof(ip6t_chainlabel), chain);
 		i++;
 		chain = ip6tc_next_chain(handle);
-        }
+	}
 
 	for (i = 0; i < chaincount; i++) {
 		if (!builtinstoo
 		    && ip6tc_builtin(chains + i*sizeof(ip6t_chainlabel),
 				    *handle) == 1)
 			continue;
-	        ret &= fn(chains + i*sizeof(ip6t_chainlabel), verbose, handle);
+		ret &= fn(chains + i*sizeof(ip6t_chainlabel), verbose, handle);
 	}
 
 	free(chains);
-        return ret;
+	return ret;
 }
 
 int
@@ -1055,7 +1055,7 @@ delete_chain(const ip6t_chainlabel chain, int verbose,
 		return for_each_chain(delete_chain, verbose, 0, handle);
 
 	if (verbose)
-	        fprintf(stdout, "Deleting chain `%s'\n", chain);
+		fprintf(stdout, "Deleting chain `%s'\n", chain);
 	return ip6tc_delete_chain(chain, handle);
 }
 
@@ -1367,7 +1367,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			    && (fw.ipv6.invflags & IP6T_INV_PROTO))
 				exit_error(PARAMETER_PROBLEM,
 					   "rule would never match protocol");
-			
+
 			if (is_exthdr(fw.ipv6.proto)
 			    && (fw.ipv6.invflags & IP6T_INV_PROTO) == 0)
 				fprintf(stderr,
@@ -1542,7 +1542,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 					       &target->tflags,
 					       &fw, &target->t))) {
 				for (matchp = matches; matchp; matchp = matchp->next) {
-					if (matchp->completed) 
+					if (matchp->completed)
 						continue;
 					if (matchp->match->parse(c - matchp->match->option_offset,
 						     argv, invert,
@@ -1579,7 +1579,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 				if (m == NULL
 				    && protocol
 				    && (!find_proto(protocol, DONT_LOAD,
-						   options&OPT_NUMERIC, NULL) 
+						   options&OPT_NUMERIC, NULL)
 					|| (find_proto(protocol, DONT_LOAD,
 							options&OPT_NUMERIC, NULL)
 					    && (proto_used == 0))
@@ -1588,7 +1588,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 						       options&OPT_NUMERIC, &matches))) {
 					/* Try loading protocol */
 					size_t size;
-					
+
 					proto_used = 1;
 
 					size = IP6T_ALIGN(sizeof(struct ip6t_entry_match))
