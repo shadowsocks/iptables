@@ -373,14 +373,12 @@ main(int argc, char *argv[])
 			for (curchar = parsestart; *curchar; curchar++) {
 				char param_buffer[1024];
 
-				if (escaped) {
-					param_buffer[param_len++] = *curchar;
-					escaped = 0;
-					continue;
-				}
-
 				if (quote_open) {
-					if (*curchar == '\\') {
+					if (escaped) {
+						param_buffer[param_len++] = *curchar;
+						escaped = 0;
+						continue;
+					} else if (*curchar == '\\') {
 						escaped = 1;
 						continue;
 					} else if (*curchar == '"') {
