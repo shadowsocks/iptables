@@ -192,14 +192,14 @@ man_run    = \
 		fi; \
 	done >$@;
 
-matches4.man: .initext4.dd $(wildcard lib*.man)
+matches4.man: .initext4.dd $(wildcard ${srcdir}/lib*.man)
 	$(call man_run,$(call ex_matches,${pfx_build_mod} ${pf4_build_mod}))
 
-matches6.man: .initext6.dd $(wildcard lib*.man)
+matches6.man: .initext6.dd $(wildcard ${srcdir}/lib*.man)
 	$(call man_run,$(call ex_matches,${pfx_build_mod} ${pf6_build_mod}))
 
-targets4.man: .initext4.dd $(wildcard lib*.man)
+targets4.man: .initext4.dd $(wildcard ${srcdir}/lib*.man)
 	$(call man_run,$(call ex_targets,${pfx_build_mod} ${pf4_build_mod}))
 
-targets6.man: .initext6.dd $(wildcard lib*.man)
+targets6.man: .initext6.dd $(wildcard ${srcdir}/lib*.man)
 	$(call man_run,$(call ex_targets,${pfx_build_mod} ${pf6_build_mod}))
