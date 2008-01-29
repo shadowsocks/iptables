@@ -320,7 +320,7 @@ main(int argc, char *argv[])
 			/* the parser */
 			char *curchar;
 			int quote_open;
-			int param_len;
+			size_t param_len;
 
 			/* reset the newargv */
 			newargc = 0;

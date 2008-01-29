@@ -45,6 +45,7 @@ static int NFLOG_parse(int c, char **argv, int invert, unsigned int *flags,
 {
 	struct xt_nflog_info *info = (struct xt_nflog_info *)(*target)->data;
 	int n;
+	size_t length;
 
 	switch (c) {
 	case NFLOG_GROUP:
@@ -69,15 +70,15 @@ static int NFLOG_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --nflog-prefix");
 
-		n = strlen(optarg);
-		if (n == 0)
+		length = strlen(optarg);
+		if (length == 0)
 			exit_error(PARAMETER_PROBLEM,
 				   "No prefix specified for --nflog-prefix");
-		if (n >= sizeof(info->prefix))
+		if (length >= sizeof(info->prefix))
 			exit_error(PARAMETER_PROBLEM,
 				   "--nflog-prefix too long, max %Zu characters",
 				   sizeof(info->prefix) - 1);
-		if (n != strlen(strtok(optarg, "\n")))
+		if (length != strlen(strtok(optarg, "\n")))
 			exit_error(PARAMETER_PROBLEM,
 				   "Newlines are not allowed in --nflog-prefix");
 		strcpy(info->prefix, optarg);
