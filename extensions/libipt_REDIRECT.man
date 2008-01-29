@@ -7,8 +7,7 @@ and
 chains, and user-defined chains which are only called from those
 chains.  It redirects the packet to the machine itself by changing the
 destination IP to the primary address of the incoming interface
-(locally-generated packets are mapped to the 127.0.0.1 address).  It
-takes one option:
+(locally-generated packets are mapped to the 127.0.0.1 address).
 .TP
 .BR "--to-ports " "\fIport\fP[-\fIport\fP]"
 This specifies a destination port or range of ports to use: without
