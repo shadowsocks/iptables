@@ -14,8 +14,9 @@ CCLD           := ${CC}
 CFLAGS         := @CFLAGS@
 LDFLAGS        := @LDFLAGS@
 regular_CFLAGS := @regular_CFLAGS@
+kinclude_CFLAGS := @kinclude_CFLAGS@
 
-AM_CFLAGS      := ${regular_CFLAGS} -I${top_srcdir}/include
+AM_CFLAGS      := ${regular_CFLAGS} -I${top_srcdir}/include ${kinclude_CFLAGS}
 AM_DEPFLAGS     = -Wp,-MMD,$(@D)/.$(@F).d,-MT,$@
 
 ifeq (${V},)
@@ -88,7 +89,7 @@ clean:
 	rm -f *.o *.oo *.so *.a {matches,targets}[46].man initext4.c initext6.c;
 
 distclean: clean
-	rm -f .*.d *.dd;
+	rm -f .*.d .*.dd;
 
 %.o: %.c
 	${AM_VERBOSE_CC} ${CC} ${AM_DEPFLAGS} ${AM_CFLAGS} -D_INIT=$*_init ${CFLAGS} -o $@ -c $<;
