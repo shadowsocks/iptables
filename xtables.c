@@ -1168,3 +1168,40 @@ void ip6parse_hostnetworkmask(const char *name, struct in6_addr **addrpp,
 			}
 	}
 }
+
+void save_string(const char *value)
+{
+	static const char no_quote_chars[] = "_-0123456789"
+		"abcdefghijklmnopqrstuvwxyz"
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	static const char escape_chars[] = "\"\\'";
+	size_t length;
+	const char *p;
+
+	length = strcspn(value, no_quote_chars);
+	if (length > 0 && value[length] == 0) {
+		/* no quoting required */
+		fputs(value, stdout);
+		putchar(' ');
+	} else {
+		/* there is at least one dangerous character in the
+		   value, which we have to quote.  Write double quotes
+		   around the value and escape special characters with
+		   a backslash */
+		putchar('"');
+
+		for (p = strpbrk(value, escape_chars); p != NULL;
+		     p = strpbrk(value, escape_chars)) {
+			if (p > value)
+				fwrite(value, 1, p - value, stdout);
+			putchar('\\');
+			putchar(*p);
+			value = p + 1;
+		}
+
+		/* print the rest and finish the double quoted
+		   string */
+		fputs(value, stdout);
+		printf("\" ");
+	}
+}

@@ -112,8 +112,10 @@ static int NFLOG_parse(int c, char **argv, int invert, unsigned int *flags,
 
 static void nflog_print(const struct xt_nflog_info *info, char *prefix)
 {
-	if (info->prefix[0] != '\0')
-		printf("%snflog-prefix \"%s\" ", prefix, info->prefix);
+	if (info->prefix[0] != '\0') {
+		printf("%snflog-prefix ", prefix);
+		save_string(info->prefix);
+	}
 	if (info->group)
 		printf("%snflog-group %u ", prefix, info->group);
 	if (info->len)

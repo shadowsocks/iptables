@@ -251,6 +251,12 @@ extern const char *ip6mask_to_numeric(const struct in6_addr *);
 extern void ip6parse_hostnetworkmask(const char *, struct in6_addr **,
 	struct in6_addr *, unsigned int *);
 
+/**
+ * Print the specified value to standard output, quoting dangerous
+ * characters if required.
+ */
+extern void save_string(const char *value);
+
 #ifdef NO_SHARED_LIBS
 #	ifdef _INIT
 #		undef _init

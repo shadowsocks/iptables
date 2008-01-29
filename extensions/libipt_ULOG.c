@@ -155,8 +155,10 @@ static void ULOG_save(const void *ip, const struct xt_entry_target *target)
 	const struct ipt_ulog_info *loginfo
 	    = (const struct ipt_ulog_info *) target->data;
 
-	if (strcmp(loginfo->prefix, "") != 0)
-		printf("--ulog-prefix \"%s\" ", loginfo->prefix);
+	if (strcmp(loginfo->prefix, "") != 0) {
+		fputs("--ulog-prefix ", stdout);
+		save_string(loginfo->prefix);
+	}
 
 	if (loginfo->nl_group != ULOG_DEFAULT_NLGROUP) {
 		printf("--ulog-nlgroup ");

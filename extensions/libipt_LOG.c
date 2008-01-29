@@ -240,8 +240,10 @@ static void LOG_save(const void *ip, const struct xt_entry_target *target)
 	const struct ipt_log_info *loginfo
 		= (const struct ipt_log_info *)target->data;
 
-	if (strcmp(loginfo->prefix, "") != 0)
-		printf("--log-prefix \"%s\" ", loginfo->prefix);
+	if (strcmp(loginfo->prefix, "") != 0) {
+		printf("--log-prefix ");
+		save_string(loginfo->prefix);
+	}
 
 	if (loginfo->level != LOG_DEFAULT_LEVEL)
 		printf("--log-level %d ", loginfo->level);
