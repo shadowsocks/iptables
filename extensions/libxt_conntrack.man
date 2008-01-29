@@ -9,16 +9,22 @@ Possible states are listed below.
 Layer-4 protocol to match (by number or name)
 .TP
 [\fB!\fR] \fB--ctorigsrc\fR \fIaddress\fR[\fB/\fR\fImask\fR]
-Match against original source address
 .TP
 [\fB!\fR] \fB--ctorigdst\fR \fIaddress\fR[\fB/\fR\fImask\fR]
-Match against original destination address
 .TP
 [\fB!\fR] \fB--ctreplsrc\fR \fIaddress\fR[\fB/\fR\fImask\fR]
-Match against reply source address
 .TP
 [\fB!\fR] \fB--ctrepldst\fR \fIaddress\fR[\fB/\fR\fImask\fR]
-Match against reply destination address
+Match against original/reply source/destination address
+.TP
+[\fB!\fR] \fB--ctorigsrcport\fR \fIport\fR
+.TP
+[\fB!\fR] \fB--ctorigdstport\fR \fIport\fR
+.TP
+[\fB!\fR] \fB--ctreplsrcport\fR \fIport\fR
+.TP
+[\fB!\fR] \fB--ctrepldstport\fR \fIport\fR
+Match against original/reply source/destination port (TCP/UDP/etc.) or GRE key.
 .TP
 [\fB!\fR] \fB--ctstatus\fR \fIstatelist\fR
 \fIstatuslist\fR is a comma separated list of the connection statuses to match.
@@ -27,6 +33,10 @@ Possible statuses are listed below.
 [\fB!\fR] \fB--ctexpire\fR \fItime\fR[\fB:\fR\fItime\fR]
 Match remaining lifetime in seconds against given value or range of values
 (inclusive)
+.TP
+\fB--ctdir\fR {\fBORIGINAL\fR|\fBREPLY\fR}
+Match packets that are flowing in the specified direction. If this flag is not
+specified at all, matches packets in both directions.
 .PP
 States for \fB--ctstate\fR:
 .TP
