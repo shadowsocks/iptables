@@ -49,7 +49,7 @@ static const struct option ULOG_opts[] = {
 	{"ulog-prefix", 1, NULL, '#'},
 	{"ulog-cprange", 1, NULL, 'A'},
 	{"ulog-qthreshold", 1, NULL, 'B'},
-	{ }
+	{ .name = NULL }
 };
 
 /* Initialize the target. */

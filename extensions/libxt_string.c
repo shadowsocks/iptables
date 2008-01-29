@@ -49,7 +49,7 @@ static const struct option string_opts[] = {
 	{ "algo", 1, NULL, '3' },
 	{ "string", 1, NULL, '4' },
 	{ "hex-string", 1, NULL, '5' },
-	{ }
+	{ .name = NULL }
 };
 
 static void string_init(struct xt_entry_match *m)

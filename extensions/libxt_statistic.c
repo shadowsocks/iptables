@@ -27,7 +27,7 @@ static const struct option statistic_opts[] = {
 	{ "probability", 1, NULL, '2' },
 	{ "every", 1, NULL, '3' },
 	{ "packet", 1, NULL, '4' },
-	{ }
+	{ .name = NULL }
 };
 
 static struct xt_statistic_info *info;
@@ -113,7 +113,7 @@ static void statistic_check(unsigned int flags)
 		exit_error(PARAMETER_PROBLEM,
 			   "--packet can only be used with --every");
 	/* at this point, info->u.nth.every have been decreased. */
-	if (!(info->u.nth.packet >= 0 && info->u.nth.packet <= info->u.nth.every))
+	if (info->u.nth.packet > info->u.nth.every)
 		exit_error(PARAMETER_PROBLEM,
 			  "the --packet p must be 0 <= p <= n-1");
 

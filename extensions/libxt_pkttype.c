@@ -66,7 +66,7 @@ static void pkttype_help(void)
 
 static const struct option pkttype_opts[] = {
 	{"pkt-type", 1, NULL, '1'},
-	{ }
+	{ .name = NULL }
 };
 
 static void parse_pkttype(const char *pkttype, struct xt_pkttype_info *info)

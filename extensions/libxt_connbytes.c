@@ -23,7 +23,7 @@ static const struct option connbytes_opts[] = {
 	{ "connbytes", 1, NULL, '1' },
 	{ "connbytes-dir", 1, NULL, '2' },
 	{ "connbytes-mode", 1, NULL, '3' },
-	{ }
+	{ .name = NULL }
 };
 
 static void

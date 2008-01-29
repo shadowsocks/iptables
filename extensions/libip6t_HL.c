@@ -136,7 +136,7 @@ static const struct option HL_opts[] = {
 	{ "hl-set", 1, NULL, '1' },
 	{ "hl-dec", 1, NULL, '2' },
 	{ "hl-inc", 1, NULL, '3' },
-	{ }
+	{ .name = NULL }
 };
 
 static struct ip6tables_target hl_target6 = {

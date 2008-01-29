@@ -122,7 +122,7 @@ static const struct option hl_opts[] = {
 	{ .name = "hl-eq", .has_arg = 1, .val = '2' },
 	{ .name = "hl-lt", .has_arg = 1, .val = '3' },
 	{ .name = "hl-gt", .has_arg = 1, .val = '4' },
-	{ }
+	{ .name = NULL }
 };
 
 static struct ip6tables_match hl_match6 = {

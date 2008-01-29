@@ -145,7 +145,7 @@ static const struct option ttl_opts[] = {
 	{ "ttl-eq", 1, NULL, '2'},
 	{ "ttl-lt", 1, NULL, '3'},
 	{ "ttl-gt", 1, NULL, '4'},
-	{ }
+	{ .name = NULL }
 };
 
 static struct iptables_match ttl_match = {

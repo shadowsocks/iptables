@@ -86,7 +86,7 @@ static void icmp6_help(void)
 
 static const struct option icmp6_opts[] = {
 	{ "icmpv6-type", 1, NULL, '1' },
-	{ }
+	{ .name = NULL }
 };
 
 static void

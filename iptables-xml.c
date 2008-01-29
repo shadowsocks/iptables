@@ -54,7 +54,7 @@ static struct option options[] = {
 	{"verbose", 0, 0, 'v'},
 	{"combine", 0, 0, 'c'},
 	{"help", 0, 0, 'h'},
-	{0}
+	{ .name = NULL }
 };
 
 static void
@@ -85,10 +85,10 @@ parse_counters(char *string, struct ipt_counters *ctr)
 
 /* global new argv and argc */
 static char *newargv[255];
-static int newargc = 0;
+static unsigned newargc = 0;
 
 static char *oldargv[255];
-static int oldargc = 0;
+static unsigned oldargc = 0;
 
 /* arg meta data, were they quoted, frinstance */
 static int newargvattr[255];
@@ -129,7 +129,7 @@ add_argv(char *what, int quoted)
 static void
 free_argv(void)
 {
-	int i;
+	unsigned i;
 
 	for (i = 0; i < newargc; i++) {
 		free(newargv[i]);
@@ -149,7 +149,7 @@ free_argv(void)
 static void
 save_argv(void)
 {
-	int i;
+	unsigned i;
 
 	for (i = 0; i < oldargc; i++)
 		free(oldargv[i]);
@@ -228,7 +228,7 @@ xmlAttrI(char *name, long long int num)
 }
 
 static void
-closeChain()
+closeChain(void)
 {
 	if (curChain[0] == 0)
 		return;
@@ -316,7 +316,7 @@ saveChain(char *chain, char *policy, struct ipt_counters *ctr)
 }
 
 static void
-finishChains()
+finishChains(void)
 {
 	int c;
 
@@ -331,7 +331,7 @@ finishChains()
 }
 
 static void
-closeTable()
+closeTable(void)
 {
 	closeChain();
 	finishChains();
@@ -536,7 +536,7 @@ do_rule_part(char *leveltag1, char *leveltag2, int part, int argc,
 }
 
 static int
-compareRules()
+compareRules(void)
 {
 	/* compare arguments up to -j or -g for match.
 	   NOTE: We don't want to combine actions if there were no criteria 
@@ -545,8 +545,8 @@ compareRules()
 	   is the case when processing the ACTUAL output of actual iptables-save 
 	   rather than a file merely in a compatable format */
 
-	int old = 0;
-	int new = 0;
+	unsigned old = 0;
+	unsigned new = 0;
 
 	int compare = 0;
 
@@ -748,7 +748,7 @@ main(int argc, char *argv[])
 
 			ret = 1;
 		} else if (curTable[0]) {
-			int a;
+			unsigned a;
 			char *ptr = buffer;
 			char *pcnt = NULL;
 			char *bcnt = NULL;

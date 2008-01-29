@@ -57,7 +57,7 @@ static const struct option conntrack_mt_opts_v0[] = {
 	{.name = "ctrepldst", .has_arg = true, .val = '6'},
 	{.name = "ctstatus",  .has_arg = true, .val = '7'},
 	{.name = "ctexpire",  .has_arg = true, .val = '8'},
-	{},
+	{ .name = NULL }
 };
 
 static const struct option conntrack_mt_opts[] = {
@@ -74,7 +74,7 @@ static const struct option conntrack_mt_opts[] = {
 	{.name = "ctreplsrcport", .has_arg = true, .val = 'c'},
 	{.name = "ctrepldstport", .has_arg = true, .val = 'd'},
 	{.name = "ctdir",         .has_arg = true, .val = 'e'},
-	{},
+	{.name = NULL},
 };
 
 static int
@@ -250,7 +250,9 @@ parse_expires(const char *s, struct xt_conntrack_info *sinfo)
 		cp++;
 
 		sinfo->expires_min = buffer[0] ? parse_expire(buffer) : 0;
-		sinfo->expires_max = cp[0] ? parse_expire(cp) : -1;
+		sinfo->expires_max = cp[0]
+			? parse_expire(cp)
+			: (unsigned long)-1;
 	}
 	free(buffer);
 

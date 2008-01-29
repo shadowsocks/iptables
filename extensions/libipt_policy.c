@@ -90,7 +90,7 @@ static const struct option policy_opts[] =
 		.name		= "next",
 		.val		= 'a'
 	},
-	{ }
+	{ .name = NULL }
 };
 
 static int parse_direction(char *s)

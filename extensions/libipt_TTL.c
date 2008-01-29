@@ -136,7 +136,7 @@ static const struct option TTL_opts[] = {
 	{ "ttl-set", 1, NULL, '1' },
 	{ "ttl-dec", 1, NULL, '2' },
 	{ "ttl-inc", 1, NULL, '3' },
-	{ }
+	{ .name = NULL }
 };
 
 static struct iptables_target ttl_target = {

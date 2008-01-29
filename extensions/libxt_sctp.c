@@ -73,7 +73,7 @@ static const struct option sctp_opts[] = {
 	{ .name = "destination-port", .has_arg = 1, .val = '2' },
 	{ .name = "dport", .has_arg = 1, .val = '2' },
 	{ .name = "chunk-types", .has_arg = 1, .val = '3' },
-	{ }
+	{ .name = NULL }
 };
 
 static void

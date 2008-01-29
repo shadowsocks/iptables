@@ -15,7 +15,7 @@
 
 static const struct option NETMAP_opts[] = {
 	{ "to", 1, NULL, '1' },
-	{ }
+	{ .name = NULL }
 };
 
 /* Function which prints out usage message. */

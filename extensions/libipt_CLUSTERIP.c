@@ -50,7 +50,7 @@ static const struct option CLUSTERIP_opts[] = {
 	{ "total-nodes", 1, NULL, '4' },
 	{ "local-node", 1, NULL, '5' },
 	{ "hash-init", 1, NULL, '6' },
-	{ }
+	{ .name = NULL }
 };
 
 static void

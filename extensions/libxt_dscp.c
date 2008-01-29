@@ -42,7 +42,7 @@ static void dscp_help(void)
 static const struct option dscp_opts[] = {
 	{ "dscp", 1, NULL, 'F' },
 	{ "dscp-class", 1, NULL, 'G' },
-	{ }
+	{ .name = NULL }
 };
 
 static void

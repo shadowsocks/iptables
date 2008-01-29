@@ -220,7 +220,7 @@ static void mh_save(const void *ip, const struct xt_entry_match *match)
 
 static const struct option mh_opts[] = {
 	{ "mh-type", 1, NULL, '1' },
-	{ }
+	{ .name = NULL }
 };
 
 static struct ip6tables_match mh_match6 = {

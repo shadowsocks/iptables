@@ -26,7 +26,7 @@ static void realm_help(void)
 
 static const struct option realm_opts[] = {
 	{ "realm", 1, NULL, '1' },
-	{ }
+	{ .name = NULL }
 };
 
 struct realmname { 

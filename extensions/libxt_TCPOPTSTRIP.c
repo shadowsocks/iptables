@@ -22,12 +22,12 @@ enum {
 
 struct tcp_optionmap {
 	const char *name, *desc;
-	const int option;
+	const unsigned option;
 };
 
 static const struct option tcpoptstrip_tg_opts[] = {
 	{.name = "strip-options", .has_arg = true, .val = 's'},
-	{},
+	{ .name = NULL }
 };
 
 static const struct tcp_optionmap tcp_optionmap[] = {
@@ -37,7 +37,7 @@ static const struct tcp_optionmap tcp_optionmap[] = {
 	{"sack",           "Selective ACK",        TCPOPT_SACK},
 	{"timestamp",      "Timestamp",            TCPOPT_TIMESTAMP},
 	{"md5",            "MD5 signature",        TCPOPT_MD5SIG},
-	{NULL},
+	{ .name = NULL }
 };
 
 static void tcpoptstrip_tg_help(void)

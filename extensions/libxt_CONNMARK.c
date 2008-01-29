@@ -50,7 +50,7 @@ static const struct option CONNMARK_opts[] = {
 	{ "save-mark", 0, NULL, '2' },
 	{ "restore-mark", 0, NULL, '3' },
 	{ "mask", 1, NULL, '4' },
-	{ }
+	{ .name = NULL }
 };
 
 static const struct option connmark_tg_opts[] = {
@@ -64,7 +64,7 @@ static const struct option connmark_tg_opts[] = {
 	{.name = "ctmask",        .has_arg = true,  .val = 'c'},
 	{.name = "nfmask",        .has_arg = true,  .val = 'n'},
 	{.name = "mask",          .has_arg = true,  .val = 'm'},
-	{},
+	{.name = NULL},
 };
 
 static void connmark_tg_help(void)

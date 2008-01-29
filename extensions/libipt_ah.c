@@ -20,7 +20,7 @@ IPTABLES_VERSION);
 
 static const struct option ah_opts[] = {
 	{ "ahspi", 1, NULL, '1' },
-	{ }
+	{ .name = NULL }
 };
 
 static u_int32_t

@@ -33,7 +33,7 @@ static const struct option recent_opts[] = {
 	{ .name = "name",     .has_arg = 1, .val = 208 },
 	{ .name = "rsource",  .has_arg = 0, .val = 209 },
 	{ .name = "rdest",    .has_arg = 0, .val = 210 },
-	{ }
+	{ .name = NULL }
 };
 
 /* Function which prints out usage message. */

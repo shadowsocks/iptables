@@ -22,7 +22,7 @@ enum {
 
 static const struct option tos_mt_opts[] = {
 	{.name = "tos", .has_arg = true, .val = 't'},
-	{},
+	{ .name = NULL }
 };
 
 static void tos_mt_help(void)

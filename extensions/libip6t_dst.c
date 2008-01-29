@@ -26,7 +26,7 @@ static const struct option dst_opts[] = {
 	{ .name = "dst-len",        .has_arg = 1, .val = '1' },
 	{ .name = "dst-opts",       .has_arg = 1, .val = '2' },
 	{ .name = "dst-not-strict", .has_arg = 1, .val = '3' },
-	{ }
+	{ .name = NULL }
 };
 
 static u_int32_t
@@ -168,7 +168,7 @@ static int dst_parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static void
-print_options(int optsnr, u_int16_t *optsp)
+print_options(unsigned optsnr, u_int16_t *optsp)
 {
 	unsigned int i;
 

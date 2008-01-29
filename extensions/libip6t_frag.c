@@ -29,7 +29,7 @@ static const struct option frag_opts[] = {
 	{ .name = "fragfirst", .has_arg = 0, .val = '4' },
 	{ .name = "fragmore",  .has_arg = 0, .val = '5' },
 	{ .name = "fraglast",  .has_arg = 0, .val = '6' },
-	{ }
+	{ .name = NULL }
 };
 
 static u_int32_t

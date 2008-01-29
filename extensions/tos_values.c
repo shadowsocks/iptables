@@ -15,7 +15,7 @@ static const struct tos_symbol_info {
 	{IPTOS_RELIABILITY, "Maximize-Reliability"},
 	{IPTOS_MINCOST,     "Minimize-Cost"},
 	{IPTOS_NORMALSVC,   "Normal-Service"},
-	{},
+	{ .name = NULL }
 };
 
 /*

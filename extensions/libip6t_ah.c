@@ -23,7 +23,7 @@ static const struct option ah_opts[] = {
 	{ .name = "ahspi", .has_arg = 1, .val = '1' },
 	{ .name = "ahlen", .has_arg = 1, .val = '2' },
 	{ .name = "ahres", .has_arg = 0, .val = '3' },
-	{ }
+	{ .name = NULL }
 };
 
 static u_int32_t

@@ -38,7 +38,7 @@ static const struct option ECN_opts[] = {
 	{ "ecn-tcp-cwr", 1, NULL, 'G' },
 	{ "ecn-tcp-ece", 1, NULL, 'H' },
 	{ "ecn-ip-ect", 1, NULL, '9' },
-	{ }
+	{ .name = NULL }
 };
 
 static int ECN_parse(int c, char **argv, int invert, unsigned int *flags,

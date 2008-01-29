@@ -51,7 +51,7 @@ static const struct option dccp_opts[] = {
 	{ .name = "dport", .has_arg = 1, .val = '2' },
 	{ .name = "dccp-types", .has_arg = 1, .val = '3' },
 	{ .name = "dccp-option", .has_arg = 1, .val = '4' },
-	{ }
+	{ .name = NULL }
 };
 
 static void

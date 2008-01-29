@@ -27,7 +27,7 @@ IPTABLES_VERSION);
 static const struct option CONNSECMARK_opts[] = {
 	{ "save", 0, 0, '1' },
 	{ "restore", 0, 0, '2' },
-	{ 0 }
+	{ .name = NULL }
 };
 
 static int

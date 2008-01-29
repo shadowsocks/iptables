@@ -110,7 +110,7 @@ static void icmp_help(void)
 
 static const struct option icmp_opts[] = {
 	{ "icmp-type", 1, NULL, '1' },
-	{ }
+	{ .name = NULL }
 };
 
 static void 

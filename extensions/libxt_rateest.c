@@ -55,7 +55,7 @@ static const struct option rateest_opts[] = {
 	{ "rateest-lt",		0, NULL, OPT_RATEEST_LT },
 	{ "rateest-gt",		0, NULL, OPT_RATEEST_GT },
 	{ "rateest-eq",		0, NULL, OPT_RATEEST_EQ },
-	{ },
+	{ .name = NULL }
 };
 
 /* Copied from iproute. See http://physics.nist.gov/cuu/Units/binary.html */
@@ -81,7 +81,7 @@ static const struct rate_suffix {
 	{ "GBps",	8000000000. },
 	{ "TiBps",	8.*1024.*1024.*1024.*1024. },
 	{ "TBps",	8000000000000. },
-	{ }
+	{ .name = NULL }
 };
 
 static int

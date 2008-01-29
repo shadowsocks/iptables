@@ -32,7 +32,7 @@ static const struct option SAME_opts[] = {
 	{ "to", 1, NULL, '1' },
 	{ "nodst", 0, NULL, '2'},
 	{ "random", 0, NULL, '3' },
-	{ }
+	{ .name = NULL }
 };
 
 /* Initialize the target. */
@@ -90,7 +90,7 @@ static int SAME_parse(int c, char **argv, int invert, unsigned int *flags,
 {
 	struct ipt_same_info *mr
 		= (struct ipt_same_info *)(*target)->data;
-	int count;
+	unsigned count;
 
 	switch (c) {
 	case '1':
@@ -146,7 +146,7 @@ static void SAME_check(unsigned int flags)
 static void SAME_print(const void *ip, const struct xt_entry_target *target,
                        int numeric)
 {
-	int count;
+	unsigned count;
 	struct ipt_same_info *mr
 		= (struct ipt_same_info *)target->data;
 	int random = 0;
@@ -180,7 +180,7 @@ static void SAME_print(const void *ip, const struct xt_entry_target *target,
 /* Saves the union ipt_targinfo in parsable form to stdout. */
 static void SAME_save(const void *ip, const struct xt_entry_target *target)
 {
-	int count;
+	unsigned count;
 	struct ipt_same_info *mr
 		= (struct ipt_same_info *)target->data;
 	int random = 0;

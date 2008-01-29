@@ -20,7 +20,7 @@ IPTABLES_VERSION);
 
 static const struct option tcpmss_opts[] = {
 	{ "mss", 1, NULL, '1' },
-	{ }
+	{ .name = NULL }
 };
 
 static u_int16_t

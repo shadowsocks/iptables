@@ -39,7 +39,7 @@ static void TCPMSS_help6(void)
 static const struct option TCPMSS_opts[] = {
 	{ "set-mss", 1, NULL, '1' },
 	{ "clamp-mss-to-pmtu", 0, NULL, '2' },
-	{ }
+	{ .name = NULL }
 };
 
 /* Function which parses command options; returns true if it

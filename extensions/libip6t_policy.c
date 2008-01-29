@@ -91,7 +91,7 @@ static const struct option policy_opts[] =
 		.name		= "next",
 		.val		= 'a'
 	},
-	{ }
+	{ .name = NULL }
 };
 
 /* FIXME - Duplicated code from ip6tables.c */

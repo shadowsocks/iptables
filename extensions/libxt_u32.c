@@ -24,7 +24,7 @@
 
 static const struct option u32_opts[] = {
 	{"u32", 1, NULL, 'u'},
-	{NULL},
+	{ .name = NULL }
 };
 
 static void u32_help(void)

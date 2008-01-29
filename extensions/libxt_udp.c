@@ -26,7 +26,7 @@ static const struct option udp_opts[] = {
 	{ "sport", 1, NULL, '1' }, /* synonym */
 	{ "destination-port", 1, NULL, '2' },
 	{ "dport", 1, NULL, '2' }, /* synonym */
-	{ }
+	{ .name = NULL }
 };
 
 static void

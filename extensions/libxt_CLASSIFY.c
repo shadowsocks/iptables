@@ -23,7 +23,7 @@ IPTABLES_VERSION);
 
 static const struct option CLASSIFY_opts[] = {
 	{ "set-class", 1, NULL, '1' },
-	{ }
+	{ .name = NULL }
 };
 
 static int CLASSIFY_string_to_priority(const char *s, unsigned int *p)

@@ -25,7 +25,7 @@ IPTABLES_VERSION);
 
 static const struct option SECMARK_opts[] = {
 	{ "selctx", 1, 0, '1' },
-	{ 0 }
+	{ .name = NULL }
 };
 
 /*

@@ -257,10 +257,10 @@ int service_to_port(const char *name, const char *proto)
 
 u_int16_t parse_port(const char *port, const char *proto)
 {
-	unsigned int portnum;
+	unsigned portnum;
 
 	if ((string_to_number(port, 0, 65535, &portnum)) != -1 ||
-	    (portnum = service_to_port(port, proto)) != -1)
+	    (portnum = service_to_port(port, proto)) != (unsigned)-1)
 		return (u_int16_t)portnum;
 
 	exit_error(PARAMETER_PROBLEM,

@@ -66,7 +66,7 @@ static void REJECT_help(void)
 
 static const struct option REJECT_opts[] = {
 	{ "reject-with", 1, NULL, '1' },
-	{ }
+	{ .name = NULL }
 };
 
 /* Allocate and initialize the target. */

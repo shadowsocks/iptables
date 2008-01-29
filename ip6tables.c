@@ -1177,6 +1177,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 	struct in6_addr *saddrs = NULL, *daddrs = NULL;
 
 	int c, verbose = 0;
+	unsigned i;
 	const char *chain = NULL;
 	const char *shostnetworkmask = NULL, *dhostnetworkmask = NULL;
 	const char *policy = NULL, *newname = NULL;
@@ -1825,11 +1826,11 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 		e = NULL;
 	}
 
-	for (c = 0; c < nsaddrs; c++)
-		free(&saddrs[c]);
+	for (i = 0; i < nsaddrs; i++)
+		free(&saddrs[i]);
 
-	for (c = 0; c < ndaddrs; c++)
-		free(&daddrs[c]);
+	for (i = 0; i < ndaddrs; i++)
+		free(&daddrs[i]);
 
 	free_opts(1);
 

@@ -32,7 +32,7 @@ static void limit_help(void)
 static const struct option limit_opts[] = {
 	{ "limit", 1, NULL, '%' },
 	{ "limit-burst", 1, NULL, '$' },
-	{ }
+	{ .name = NULL }
 };
 
 static

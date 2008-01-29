@@ -25,7 +25,7 @@ static void comment_help(void)
 
 static const struct option comment_opts[] = {
 	{ "comment", 1, NULL, '1' },
-	{ }
+	{ .name = NULL }
 };
 
 static void

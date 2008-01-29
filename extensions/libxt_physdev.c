@@ -30,7 +30,7 @@ static const struct option physdev_opts[] = {
 	{ "physdev-is-in", 0, NULL, '3' },
 	{ "physdev-is-out", 0, NULL, '4' },
 	{ "physdev-is-bridged", 0, NULL, '5' },
-	{ }
+	{ .name = NULL }
 };
 
 static int

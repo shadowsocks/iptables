@@ -38,7 +38,7 @@ static const struct option LOG_opts[] = {
 	{ .name = "log-tcp-options",  .has_arg = 0, .val = '2' },
 	{ .name = "log-ip-options",   .has_arg = 0, .val = '3' },
 	{ .name = "log-uid",          .has_arg = 0, .val = '4' },
-	{ }
+	{ .name = NULL }
 };
 
 /* Initialize the target. */

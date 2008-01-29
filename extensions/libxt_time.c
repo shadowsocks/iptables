@@ -44,7 +44,7 @@ static const struct option time_opts[] = {
 	{"monthdays", true,  NULL, 'm'},
 	{"localtz",   false, NULL, 'l'},
 	{"utc",       false, NULL, 'u'},
-	{NULL},
+	{ .name = NULL }
 };
 
 static void time_help(void)

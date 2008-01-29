@@ -13,7 +13,7 @@
 
 static const struct option quota_opts[] = {
 	{"quota", 1, NULL, '1'},
-	{ }
+	{ .name = NULL }
 };
 
 /* print usage */
@@ -49,7 +49,7 @@ parse_quota(const char *s, u_int64_t * quota)
 	printf("Quota: %llu\n", *quota);
 #endif
 
-	if (*quota == -1)
+	if (*quota == (u_int64_t)-1)
 		exit_error(PARAMETER_PROBLEM, "quota invalid: '%s'\n", s);
 	else
 		return 1;

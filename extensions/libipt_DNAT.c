@@ -34,7 +34,7 @@ IPTABLES_VERSION);
 static const struct option DNAT_opts[] = {
 	{ "to-destination", 1, NULL, '1' },
 	{ "random", 0, NULL, '2' },
-	{ }
+	{ .name = NULL }
 };
 
 static struct ipt_natinfo *

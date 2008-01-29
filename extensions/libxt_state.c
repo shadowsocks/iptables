@@ -25,7 +25,7 @@ state_help(void)
 
 static const struct option state_opts[] = {
 	{ "state", 1, NULL, '1' },
-	{ }
+	{ .name = NULL }
 };
 
 static int

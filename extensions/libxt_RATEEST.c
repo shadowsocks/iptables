@@ -36,7 +36,7 @@ static const struct option RATEEST_opts[] = {
 	{ "rateest-name",	1, NULL, RATEEST_OPT_NAME },
 	{ "rateest-interval",	1, NULL, RATEEST_OPT_INTERVAL },
 	{ "rateest-ewmalog",	1, NULL, RATEEST_OPT_EWMALOG },
-	{ },
+	{ .name = NULL },
 };
 
 /* Copied from iproute */

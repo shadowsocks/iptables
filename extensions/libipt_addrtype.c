@@ -180,7 +180,7 @@ static void addrtype_save(const void *ip, const struct xt_entry_match *match)
 static const struct option addrtype_opts[] = {
 	{ "src-type", 1, NULL, '1' },
 	{ "dst-type", 1, NULL, '2' },
-	{ }
+	{ .name = NULL }
 };
 
 static struct iptables_match addrtype_match = {

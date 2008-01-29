@@ -54,7 +54,7 @@ static const struct option hashlimit_opts[] = {
 	{ "hashlimit-htable-expire", 1, NULL, ')' },
 	{ "hashlimit-mode", 1, NULL, '_' },
 	{ "hashlimit-name", 1, NULL, '"' },
-	{ }
+	{ .name = NULL }
 };
 
 static

@@ -21,7 +21,7 @@ static void connlimit_help(void)
 static const struct option connlimit_opts[] = {
 	{"connlimit-above", 1, NULL, 'A'},
 	{"connlimit-mask",  1, NULL, 'M'},
-	{NULL},
+	{ .name = NULL }
 };
 
 static void connlimit_init(struct xt_entry_match *match)

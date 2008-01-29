@@ -27,7 +27,7 @@ static void iprange_mt_help(void)
 static const struct option iprange_mt_opts[] = {
 	{.name = "src-range", .has_arg = true, .val = '1'},
 	{.name = "dst-range", .has_arg = true, .val = '2'},
-	{},
+	{ .name = NULL }
 };
 
 static void

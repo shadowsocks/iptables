@@ -25,7 +25,7 @@ static void NFQUEUE_help(void)
 
 static const struct option NFQUEUE_opts[] = {
 	{ "queue-num", 1, NULL, 'F' },
-	{ }
+	{ .name = NULL }
 };
 
 static void

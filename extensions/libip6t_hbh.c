@@ -29,7 +29,7 @@ static const struct option hbh_opts[] = {
 	{ "hbh-len", 1, NULL, '1' },
 	{ "hbh-opts", 1, NULL, '2' },
 	{ "hbh-not-strict", 1, NULL, '3' },
-	{ }
+	{ .name = NULL }
 };
 
 static u_int32_t
@@ -162,7 +162,7 @@ static int hbh_parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static void
-print_options(int optsnr, u_int16_t *optsp)
+print_options(unsigned optsnr, u_int16_t *optsp)
 {
 	unsigned int i;
 

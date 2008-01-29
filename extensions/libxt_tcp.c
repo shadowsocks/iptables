@@ -34,7 +34,7 @@ static const struct option tcp_opts[] = {
 	{ "syn", 0, NULL, '3' },
 	{ "tcp-flags", 1, NULL, '4' },
 	{ "tcp-option", 1, NULL, '5' },
-	{ }
+	{ .name = NULL }
 };
 
 static void

@@ -35,7 +35,7 @@ static const struct option rt_opts[] = {
 	{ "rt-0-res", 0, NULL, '4' },
 	{ "rt-0-addrs", 1, NULL, '5' },
 	{ "rt-0-not-strict", 0, NULL, '6' },
-	{ }
+	{ .name = NULL }
 };
 
 static u_int32_t
@@ -255,7 +255,7 @@ print_nums(const char *name, u_int32_t min, u_int32_t max,
 }
 
 static void
-print_addresses(int addrnr, struct in6_addr *addrp)
+print_addresses(unsigned addrnr, struct in6_addr *addrp)
 {
 	unsigned int i;
 

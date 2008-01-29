@@ -49,7 +49,7 @@ static const struct option multiport_opts[] = {
 	{ "destination-ports", 1, NULL, '2' },
 	{ "dports", 1, NULL, '2' }, /* synonym */
 	{ "ports", 1, NULL, '3' },
-	{ }
+	{ .name = NULL }
 };
 
 static char *

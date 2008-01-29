@@ -19,7 +19,7 @@ static const struct option NFLOG_opts[] = {
 	{ "nflog-prefix",    1, NULL, NFLOG_PREFIX },
 	{ "nflog-range",     1, NULL, NFLOG_RANGE },
 	{ "nflog-threshold", 1, NULL, NFLOG_THRESHOLD },
-	{NULL},
+	{ .name = NULL }
 };
 
 static void NFLOG_help(void)

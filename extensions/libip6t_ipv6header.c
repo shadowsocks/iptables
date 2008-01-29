@@ -150,7 +150,7 @@ static void ipv6header_help(void)
 static const struct option ipv6header_opts[] = {
 	{ "header", 1, NULL, '1' },
 	{ "soft", 0, NULL, '2' },
-	{ }
+	{ .name = NULL }
 };
 
 static void ipv6header_init(struct xt_entry_match *m)

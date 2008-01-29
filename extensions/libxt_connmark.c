@@ -42,7 +42,7 @@ static void connmark_mt_help(void)
 
 static const struct option connmark_mt_opts[] = {
 	{.name = "mark", .has_arg = true, .val = '1'},
-	{},
+	{ .name = NULL }
 };
 
 static int
