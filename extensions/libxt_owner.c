@@ -67,9 +67,9 @@ static void owner_mt_help(void)
 {
 	printf(
 "owner match options:\n"
-"[!] --uid-owner userid     Match local UID\n"
-"[!] --gid-owner groupid    Match local GID\n"
-"[!] --socket-exists        Match if socket exists\n"
+"[!] --uid-owner userid[-userid]      Match local UID\n"
+"[!] --gid-owner groupid[-groupid]    Match local GID\n"
+"[!] --socket-exists                  Match if socket exists\n"
 "\n");
 }
 
@@ -243,40 +243,58 @@ owner_mt6_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 	return false;
 }
 
+static void owner_parse_range(const char *s, unsigned int *from,
+                              unsigned int *to, const char *opt)
+{
+	char *end;
+
+	/* 4294967295 is reserved, so subtract one from ~0 */
+	if (!strtonum(s, &end, from, 0, (~(uid_t)0) - 1))
+		param_act(P_BAD_VALUE, "owner", opt, s);
+	*to = *from;
+	if (*end == '-' || *end == ':')
+		if (!strtonum(end + 1, &end, to, 0, (~(uid_t)0) - 1))
+			param_act(P_BAD_VALUE, "owner", opt, s);
+	if (*end != '\0')
+		param_act(P_BAD_VALUE, "owner", opt, s);
+}
+
 static int owner_mt_parse(int c, char **argv, int invert, unsigned int *flags,
                           const void *entry, struct xt_entry_match **match)
 {
 	struct xt_owner_match_info *info = (void *)(*match)->data;
 	struct passwd *pwd;
 	struct group *grp;
-	unsigned int id;
+	unsigned int from, to;
 
 	switch (c) {
 	case 'u':
 		param_act(P_ONLY_ONCE, "owner", "--uid-owner",
 		          *flags & FLAG_UID_OWNER);
 		if ((pwd = getpwnam(optarg)) != NULL)
-			id = pwd->pw_uid;
-		else if (!strtonum(optarg, NULL, &id, 0, ~(uid_t)0))
-			param_act(P_BAD_VALUE, "owner", "--uid-owner", optarg);
+			from = to = pwd->pw_uid;
+		else
+			owner_parse_range(optarg, &from, &to, "--uid-owner");
 		if (invert)
 			info->invert |= XT_OWNER_UID;
-		info->match |= XT_OWNER_UID;
-		info->uid    = id;
-		*flags      |= FLAG_UID_OWNER;
+		info->match  |= XT_OWNER_UID;
+		info->uid_min = from;
+		info->uid_max = to;
+		*flags       |= FLAG_UID_OWNER;
 		return true;
 
 	case 'g':
 		param_act(P_ONLY_ONCE, "owner", "--gid-owner",
 		          *flags & FLAG_GID_OWNER);
 		if ((grp = getgrnam(optarg)) != NULL)
-			id = grp->gr_gid;
-		else if (!strtonum(optarg, NULL, &id, 0, ~(gid_t)0))
-			param_act(P_BAD_VALUE, "owner", "--gid-owner", optarg);
+			from = to = grp->gr_gid;
+		else
+			owner_parse_range(optarg, &from, &to, "--gid-owner");
 		if (invert)
 			info->invert |= XT_OWNER_GID;
-		info->match |= XT_OWNER_GID;
-		info->gid    = id;
+		info->match  |= XT_OWNER_GID;
+		info->gid_min = from;
+		info->gid_max = to;
 		*flags      |= FLAG_GID_OWNER;
 		return true;
 
@@ -409,27 +427,35 @@ owner_mt_print_item(const struct xt_owner_match_info *info, const char *label,
 
 	switch (info->match & flag) {
 	case XT_OWNER_UID:
-		if (!numeric) {
-			const struct passwd *pwd = getpwuid(info->uid);
+		if (info->uid_min != info->uid_max) {
+			printf("%u-%u ", (unsigned int)info->uid_min,
+			       (unsigned int)info->uid_max);
+			break;
+		} else if (!numeric) {
+			const struct passwd *pwd = getpwuid(info->uid_min);
 
 			if (pwd != NULL && pwd->pw_name != NULL) {
 				printf("%s ", pwd->pw_name);
 				break;
 			}
 		}
-		printf("%u ", (unsigned int)info->uid);
+		printf("%u ", (unsigned int)info->uid_min);
 		break;
 
 	case XT_OWNER_GID:
-		if (!numeric) {
-			const struct group *grp = getgrgid(info->gid);
+		if (info->gid_min != info->gid_max) {
+			printf("%u-%u ", (unsigned int)info->gid_min,
+			       (unsigned int)info->gid_max);
+			break;
+		} else if (!numeric) {
+			const struct group *grp = getgrgid(info->gid_min);
 
 			if (grp != NULL && grp->gr_name != NULL) {
 				printf("%s ", grp->gr_name);
 				break;
 			}
 		}
-		printf("%u ", (unsigned int)info->gid);
+		printf("%u ", (unsigned int)info->gid_min);
 		break;
 	}
 }
