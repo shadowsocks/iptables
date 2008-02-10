@@ -3,14 +3,17 @@ for locally generated packets. This match is only valid in the OUTPUT and
 POSTROUTING chains. Forwarded packets do not have any socket associated with
 them. Packets from kernel threads do have a socket, but usually no owner.
 .TP
-\fB--uid-owner\fR \fIuserid\fR
-Matches if the packet socket's file structure (if it has one) is owned by the
-given user ID. A user name may be specified in place of \fIuserid\fR, in which
-case iptables will try to look it up.
+\fB--uid-owner\fR \fIusername\fR
 .TP
-\fB--gid-owner\fR \fIgroupid\fR
-Matches if the packet socket's file structure is owned by the given group ID.
-A group name may be specified in place of \fIgroupid\fR.
+\fB--uid-owner\fR \fIuserid\fR[\fB-\fR\fIuserid\fR]
+Matches if the packet socket's file structure (if it has one) is owned by the
+given user. You may also specify a numerical UID, or an UID range.
+.TP
+\fB--gid-owner\fR \fIgroupname\fR
+.TP
+\fB--gid-owner\fR \fIgroupid\fR[\fB-\fR\fIgroupid\fR]
+Matches if the packet socket's file structure is owned by the given group.
+You may also specify a numerical GID, or a GID range.
 .TP
 \fB--socket-exists\fR
 Matches if the packet is associated with a socket.
