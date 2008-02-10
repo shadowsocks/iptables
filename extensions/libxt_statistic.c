@@ -30,15 +30,19 @@ static const struct option statistic_opts[] = {
 	{ .name = NULL }
 };
 
-static struct xt_statistic_info *info;
+static struct xt_statistic_info *global_info;
+
+static void statistic_mt_init(struct xt_entry_match *match)
+{
+	global_info = (void *)match->data;
+}
 
 static int
 statistic_parse(int c, char **argv, int invert, unsigned int *flags,
                 const void *entry, struct xt_entry_match **match)
 {
+	struct xt_statistic_info *info = (void *)(*match)->data;
 	double prob;
-
-	info = (void *)(*match)->data;
 
 	if (invert)
 		info->flags |= XT_STATISTIC_INVERT;
@@ -100,25 +104,26 @@ static void statistic_check(unsigned int flags)
 	if ((flags & 0x2) && (flags & (0x4 | 0x8)))
 		exit_error(PARAMETER_PROBLEM,
 			   "both nth and random parameters given");
-	if (flags & 0x2 && info->mode != XT_STATISTIC_MODE_RANDOM)
+	if (flags & 0x2 && global_info->mode != XT_STATISTIC_MODE_RANDOM)
 		exit_error(PARAMETER_PROBLEM,
 			   "--probability can only be used in random mode");
-	if (flags & 0x4 && info->mode != XT_STATISTIC_MODE_NTH)
+	if (flags & 0x4 && global_info->mode != XT_STATISTIC_MODE_NTH)
 		exit_error(PARAMETER_PROBLEM,
 			   "--every can only be used in nth mode");
-	if (flags & 0x8 && info->mode != XT_STATISTIC_MODE_NTH)
+	if (flags & 0x8 && global_info->mode != XT_STATISTIC_MODE_NTH)
 		exit_error(PARAMETER_PROBLEM,
 			   "--packet can only be used in nth mode");
 	if ((flags & 0x8) && !(flags & 0x4))
 		exit_error(PARAMETER_PROBLEM,
 			   "--packet can only be used with --every");
 	/* at this point, info->u.nth.every have been decreased. */
-	if (info->u.nth.packet > info->u.nth.every)
+	if (global_info->u.nth.packet > global_info->u.nth.every)
 		exit_error(PARAMETER_PROBLEM,
 			  "the --packet p must be 0 <= p <= n-1");
 
 
-	info->u.nth.count = info->u.nth.every - info->u.nth.packet;
+	global_info->u.nth.count = global_info->u.nth.every -
+	                           global_info->u.nth.packet;
 }
 
 /* Prints out the matchinfo. */
@@ -164,6 +169,7 @@ static struct xtables_match statistic_match = {
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_statistic_info)),
 	.userspacesize	= offsetof(struct xt_statistic_info, u.nth.count),
+	.init		= statistic_mt_init,
 	.help		= statistic_help,
 	.parse		= statistic_parse,
 	.final_check	= statistic_check,
@@ -178,6 +184,7 @@ static struct xtables_match statistic_match6 = {
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_statistic_info)),
 	.userspacesize	= offsetof(struct xt_statistic_info, u.nth.count),
+	.init		= statistic_mt_init,
 	.help		= statistic_help,
 	.parse		= statistic_parse,
 	.final_check	= statistic_check,

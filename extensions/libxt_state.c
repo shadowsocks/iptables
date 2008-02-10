@@ -29,17 +29,17 @@ static const struct option state_opts[] = {
 };
 
 static int
-state_parse_state(const char *state, size_t strlen, struct xt_state_info *sinfo)
+state_parse_state(const char *state, size_t len, struct xt_state_info *sinfo)
 {
-	if (strncasecmp(state, "INVALID", strlen) == 0)
+	if (strncasecmp(state, "INVALID", len) == 0)
 		sinfo->statemask |= XT_STATE_INVALID;
-	else if (strncasecmp(state, "NEW", strlen) == 0)
+	else if (strncasecmp(state, "NEW", len) == 0)
 		sinfo->statemask |= XT_STATE_BIT(IP_CT_NEW);
-	else if (strncasecmp(state, "ESTABLISHED", strlen) == 0)
+	else if (strncasecmp(state, "ESTABLISHED", len) == 0)
 		sinfo->statemask |= XT_STATE_BIT(IP_CT_ESTABLISHED);
-	else if (strncasecmp(state, "RELATED", strlen) == 0)
+	else if (strncasecmp(state, "RELATED", len) == 0)
 		sinfo->statemask |= XT_STATE_BIT(IP_CT_RELATED);
-	else if (strncasecmp(state, "UNTRACKED", strlen) == 0)
+	else if (strncasecmp(state, "UNTRACKED", len) == 0)
 		sinfo->statemask |= XT_STATE_UNTRACKED;
 	else
 		return 0;

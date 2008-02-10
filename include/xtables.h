@@ -176,7 +176,7 @@ extern char *lib_dir;
 extern void *fw_calloc(size_t count, size_t size);
 extern void *fw_malloc(size_t size);
 
-extern const char *modprobe;
+extern const char *modprobe_program;
 extern int xtables_insmod(const char *modname, const char *modprobe, int quiet);
 extern int load_xtables_ko(const char *modprobe, int quiet);
 
@@ -230,7 +230,7 @@ enum exittype {
 /* this is a special 64bit data type that is 8-byte aligned */
 #define aligned_u64 u_int64_t __attribute__((aligned(8)))
 
-int check_inverse(const char option[], int *invert, int *optind, int argc);
+int check_inverse(const char option[], int *invert, int *my_optind, int argc);
 void exit_error(enum exittype, const char *, ...)__attribute__((noreturn,
 							  format(printf,2,3)));
 extern void param_act(unsigned int, const char *, ...);

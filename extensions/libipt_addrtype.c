@@ -49,12 +49,12 @@ static void addrtype_help(void)
 }
 
 static int
-parse_type(const char *name, size_t strlen, u_int16_t *mask)
+parse_type(const char *name, size_t len, u_int16_t *mask)
 {
 	int i;
 
 	for (i = 0; rtn_names[i]; i++)
-		if (strncasecmp(name, rtn_names[i], strlen) == 0) {
+		if (strncasecmp(name, rtn_names[i], len) == 0) {
 			/* build up bitmask for kernel module */
 			*mask |= (1 << i);
 			return 1;

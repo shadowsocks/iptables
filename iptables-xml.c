@@ -99,16 +99,15 @@ char closeRuleTag[IPT_TABLE_MAXNAMELEN + 1];
 char curTable[IPT_TABLE_MAXNAMELEN + 1];
 char curChain[IPT_CHAIN_MAXNAMELEN + 1];
 
-typedef struct chain
-{
+struct chain {
 	char *chain;
 	char *policy;
 	struct ipt_counters count;
 	int created;
-} chain;
+};
 
 #define maxChains 10240		/* max chains per table */
-static chain chains[maxChains];
+static struct chain chains[maxChains];
 static int nextChain = 0;
 
 /* funCtion adding one argument to newargv, updating newargc 

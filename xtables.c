@@ -46,7 +46,7 @@
 char *lib_dir;
 
 /* the path to command to load kernel module */
-const char *modprobe = NULL;
+const char *modprobe_program = NULL;
 
 /* Keeping track of external matches and targets: linked lists.  */
 struct xtables_match *xtables_matches;
@@ -488,7 +488,7 @@ static int compatible_revision(const char *name, u_int8_t revision, int opt)
 		exit(1);
 	}
 
-	load_xtables_ko(modprobe, 1);
+	load_xtables_ko(modprobe_program, 1);
 
 	strcpy(rev.name, name);
 	rev.revision = revision;

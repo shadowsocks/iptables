@@ -106,10 +106,10 @@ static void hashlimit_init(struct xt_entry_match *m)
 
 
 /* Parse a 'mode' parameter into the required bitmask */
-static int parse_mode(struct xt_hashlimit_info *r, char *optarg)
+static int parse_mode(struct xt_hashlimit_info *r, char *option_arg)
 {
 	char *tok;
-	char *arg = strdup(optarg);
+	char *arg = strdup(option_arg);
 
 	if (!arg)
 		return -1;

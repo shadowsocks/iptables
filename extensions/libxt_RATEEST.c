@@ -177,17 +177,17 @@ static void
 __RATEEST_print(const struct xt_entry_target *target, const char *prefix)
 {
 	struct xt_rateest_target_info *info = (void *)target->data;
-	unsigned int interval;
-	unsigned int ewma_log;
+	unsigned int local_interval;
+	unsigned int local_ewma_log;
 
-	interval = (TIME_UNITS_PER_SEC << (info->interval + 2)) / 4;
-	ewma_log = interval * (1 << (info->ewma_log));
+	local_interval = (TIME_UNITS_PER_SEC << (info->interval + 2)) / 4;
+	local_ewma_log = local_interval * (1 << (info->ewma_log));
 
 	printf("%sname %s ", prefix, info->name);
 	printf("%sinterval ", prefix);
-	RATEEST_print_time(interval);
+	RATEEST_print_time(local_interval);
 	printf("%sewmalog ", prefix);
-	RATEEST_print_time(ewma_log);
+	RATEEST_print_time(local_ewma_log);
 }
 
 static void

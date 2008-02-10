@@ -447,16 +447,16 @@ add_command(unsigned int *cmd, const int newcmd, const int othercmds,
 }
 
 int
-check_inverse(const char option[], int *invert, int *optind, int argc)
+check_inverse(const char option[], int *invert, int *my_optind, int argc)
 {
 	if (option && strcmp(option, "!") == 0) {
 		if (*invert)
 			exit_error(PARAMETER_PROBLEM,
 				   "Multiple `!' flags not allowed");
 		*invert = TRUE;
-		if (optind) {
-			*optind = *optind+1;
-			if (argc && *optind > argc)
+		if (my_optind != NULL) {
+			++*my_optind;
+			if (argc && *my_optind > argc)
 				exit_error(PARAMETER_PROBLEM,
 					   "no argument following `!'");
 		}
@@ -1529,7 +1529,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			break;
 
 		case 'M':
-			modprobe = optarg;
+			modprobe_program = optarg;
 			break;
 
 		case 'c':
@@ -1712,7 +1712,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		*handle = iptc_init(*table);
 
 	/* try to insmod the module if iptc_init failed */
-	if (!*handle && load_xtables_ko(modprobe, 0) != -1)
+	if (!*handle && load_xtables_ko(modprobe_program, 0) != -1)
 		*handle = iptc_init(*table);
 
 	if (!*handle)

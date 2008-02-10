@@ -149,7 +149,7 @@ static void SAME_print(const void *ip, const struct xt_entry_target *target,
 	unsigned int count;
 	struct ipt_same_info *mr
 		= (struct ipt_same_info *)target->data;
-	int random = 0;
+	int random_selection = 0;
 	
 	printf("same:");
 	
@@ -167,13 +167,13 @@ static void SAME_print(const void *ip, const struct xt_entry_target *target,
 		else
 			printf("-%s ", ipaddr_to_numeric(&a));
 		if (r->flags & IP_NAT_RANGE_PROTO_RANDOM) 
-			random = 1;
+			random_selection = 1;
 	}
 	
 	if (mr->info & IPT_SAME_NODST)
 		printf("nodst ");
 
-	if (random)
+	if (random_selection)
 		printf("random ");
 }
 
@@ -183,7 +183,7 @@ static void SAME_save(const void *ip, const struct xt_entry_target *target)
 	unsigned int count;
 	struct ipt_same_info *mr
 		= (struct ipt_same_info *)target->data;
-	int random = 0;
+	int random_selection = 0;
 
 	for (count = 0; count < mr->rangesize; count++) {
 		struct ip_nat_range *r = &mr->range[count];
@@ -198,13 +198,13 @@ static void SAME_save(const void *ip, const struct xt_entry_target *target)
 		else
 			printf("-%s ", ipaddr_to_numeric(&a));
 		if (r->flags & IP_NAT_RANGE_PROTO_RANDOM) 
-			random = 1;
+			random_selection = 1;
 	}
 	
 	if (mr->info & IPT_SAME_NODST)
 		printf("--nodst ");
 
-	if (random)
+	if (random_selection)
 		printf("--random ");
 }
 

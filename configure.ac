@@ -46,8 +46,7 @@ kinclude_CFLAGS="-I\"$kbuilddir/include\" -I\"$ksourcedir/include\"";
 # Remove workarounds soon
 regular_CFLAGS="$regular_CFLAGS -Wno-aggregate-return \
 	-Wno-missing-declarations -Wno-missing-prototypes \
-        -Wno-unused-parameter \
-	-Wno-shadow -Wno-inline"
+        -Wno-unused-parameter"
 
 AC_SUBST([regular_CFLAGS kinclude_CFLAGS])
 AC_SUBST([kbuilddir])

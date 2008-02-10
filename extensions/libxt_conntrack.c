@@ -78,21 +78,21 @@ static const struct option conntrack_mt_opts[] = {
 };
 
 static int
-parse_state(const char *state, size_t strlen, struct xt_conntrack_info *sinfo)
+parse_state(const char *state, size_t len, struct xt_conntrack_info *sinfo)
 {
-	if (strncasecmp(state, "INVALID", strlen) == 0)
+	if (strncasecmp(state, "INVALID", len) == 0)
 		sinfo->statemask |= XT_CONNTRACK_STATE_INVALID;
-	else if (strncasecmp(state, "NEW", strlen) == 0)
+	else if (strncasecmp(state, "NEW", len) == 0)
 		sinfo->statemask |= XT_CONNTRACK_STATE_BIT(IP_CT_NEW);
-	else if (strncasecmp(state, "ESTABLISHED", strlen) == 0)
+	else if (strncasecmp(state, "ESTABLISHED", len) == 0)
 		sinfo->statemask |= XT_CONNTRACK_STATE_BIT(IP_CT_ESTABLISHED);
-	else if (strncasecmp(state, "RELATED", strlen) == 0)
+	else if (strncasecmp(state, "RELATED", len) == 0)
 		sinfo->statemask |= XT_CONNTRACK_STATE_BIT(IP_CT_RELATED);
-	else if (strncasecmp(state, "UNTRACKED", strlen) == 0)
+	else if (strncasecmp(state, "UNTRACKED", len) == 0)
 		sinfo->statemask |= XT_CONNTRACK_STATE_UNTRACKED;
-	else if (strncasecmp(state, "SNAT", strlen) == 0)
+	else if (strncasecmp(state, "SNAT", len) == 0)
 		sinfo->statemask |= XT_CONNTRACK_STATE_SNAT;
-	else if (strncasecmp(state, "DNAT", strlen) == 0)
+	else if (strncasecmp(state, "DNAT", len) == 0)
 		sinfo->statemask |= XT_CONNTRACK_STATE_DNAT;
 	else
 		return 0;
@@ -154,18 +154,18 @@ conntrack_ps_states(struct xt_conntrack_mtinfo1 *info, const char *arg)
 }
 
 static int
-parse_status(const char *status, size_t strlen, struct xt_conntrack_info *sinfo)
+parse_status(const char *status, size_t len, struct xt_conntrack_info *sinfo)
 {
-	if (strncasecmp(status, "NONE", strlen) == 0)
+	if (strncasecmp(status, "NONE", len) == 0)
 		sinfo->statusmask |= 0;
-	else if (strncasecmp(status, "EXPECTED", strlen) == 0)
+	else if (strncasecmp(status, "EXPECTED", len) == 0)
 		sinfo->statusmask |= IPS_EXPECTED;
-	else if (strncasecmp(status, "SEEN_REPLY", strlen) == 0)
+	else if (strncasecmp(status, "SEEN_REPLY", len) == 0)
 		sinfo->statusmask |= IPS_SEEN_REPLY;
-	else if (strncasecmp(status, "ASSURED", strlen) == 0)
+	else if (strncasecmp(status, "ASSURED", len) == 0)
 		sinfo->statusmask |= IPS_ASSURED;
 #ifdef IPS_CONFIRMED
-	else if (strncasecmp(status, "CONFIRMED", strlen) == 0)
+	else if (strncasecmp(status, "CONFIRMED", len) == 0)
 		sinfo->statusmask |= IPS_CONFIRMED;
 #endif
 	else
