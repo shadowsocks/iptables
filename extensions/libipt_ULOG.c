@@ -21,7 +21,7 @@
 #include "../include/linux/netfilter_ipv4/ipt_ULOG.h"
 
 
-void print_groups(unsigned int gmask)
+static void print_groups(unsigned int gmask)
 {
 	int b;
 	unsigned int test;

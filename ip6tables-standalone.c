@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <ip6tables.h>
+#include "ip6tables-multi.h"
 
 #ifdef IPTABLES_MULTI
 int

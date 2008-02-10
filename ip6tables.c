@@ -41,6 +41,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include "ip6tables-multi.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -185,9 +186,6 @@ static int inverse_for_options[NUMBER_OF_OPT] =
 
 const char *program_version;
 const char *program_name;
-
-/* Extra debugging from libiptc */
-extern void dump_entries6(const ip6tc_handle_t handle);
 
 /* A few hardcoded protocols for 'all' and in case the user has no
    /etc/protocols */
@@ -1140,7 +1138,7 @@ generate_entry(const struct ip6t_entry *fw,
 	return e;
 }
 
-void clear_rule_matches(struct ip6tables_rule_match **matches)
+static void clear_rule_matches(struct ip6tables_rule_match **matches)
 {
 	struct ip6tables_rule_match *matchp, *tmp;
 

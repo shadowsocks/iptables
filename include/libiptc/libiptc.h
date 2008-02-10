@@ -159,6 +159,8 @@ int iptc_get_raw_socket(void);
 /* Translates errno numbers into more human-readable form than strerror. */
 const char *iptc_strerror(int err);
 
+extern void dump_entries(const iptc_handle_t);
+
 #ifdef __cplusplus
 }
 #endif

@@ -24,8 +24,6 @@ extern int line;
 extern void register_match(struct iptables_match *me);
 extern void register_target(struct iptables_target *me);
 
-extern u_int16_t parse_protocol(const char *s);
-
 extern int do_command(int argc, char *argv[], char **table,
 		      iptc_handle_t *handle);
 extern int delete_chain(const ipt_chainlabel chain, int verbose,

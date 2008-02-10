@@ -18,6 +18,7 @@
 #include "ip6tables.h"
 #include "xtables.h"
 #include "libiptc/libip6tc.h"
+#include "ip6tables-multi.h"
 
 #ifdef DEBUG
 #define DEBUGP(x, args...) fprintf(stderr, x, ## args)
@@ -55,7 +56,8 @@ static void print_usage(const char *name, const char *version)
 	exit(1);
 }
 
-ip6tc_handle_t create_handle(const char *tablename, const char* modprobe)
+static ip6tc_handle_t create_handle(const char *tablename,
+                                    const char *modprobe)
 {
 	ip6tc_handle_t handle;
 

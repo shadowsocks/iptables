@@ -41,12 +41,8 @@ regular_CFLAGS="-D_LARGEFILE_SOURCE=1 -D_LARGE_FILES -D_FILE_OFFSET_BITS=64 \
 	-Wmissing-prototypes -Wredundant-decls -Wshadow -Wstrict-prototypes \
 	-Winline -pipe -DIPTABLES_VERSION=\\\"$PACKAGE_VERSION\\\" \
 	-DIPT_LIB_DIR=\\\"\${iptdir}\\\" -DIP6T_LIB_DIR=\\\"\${iptdir}\\\"";
+regular_CFLAGS="$regular_CFLAGS -DXTABLES_INTERNAL"
 kinclude_CFLAGS="-I\"$kbuilddir/include\" -I\"$ksourcedir/include\"";
-
-# Remove workarounds soon
-regular_CFLAGS="$regular_CFLAGS -Wno-aggregate-return \
-	-Wno-missing-declarations -Wno-missing-prototypes \
-        -Wno-unused-parameter"
 
 AC_SUBST([regular_CFLAGS kinclude_CFLAGS])
 AC_SUBST([kbuilddir])

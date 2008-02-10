@@ -267,4 +267,11 @@ extern void save_string(const char *value);
 #	define _init __attribute__((constructor)) _INIT
 #endif
 
+/* Present in both iptables.c and ip6tables.c */
+extern u_int16_t parse_protocol(const char *s);
+
+#ifdef XTABLES_INTERNAL
+#	include <xtables/internal.h>
+#endif
+
 #endif /* _XTABLES_H */

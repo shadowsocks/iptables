@@ -190,8 +190,6 @@ const char *program_name;
 
 int kernel_version;
 
-extern void dump_entries(const iptc_handle_t handle);
-
 /* A few hardcoded protocols for 'all' and in case the user has no
    /etc/protocols */
 struct pprot {
@@ -1143,7 +1141,7 @@ generate_entry(const struct ipt_entry *fw,
 	return e;
 }
 
-void clear_rule_matches(struct iptables_rule_match **matches)
+static void clear_rule_matches(struct iptables_rule_match **matches)
 {
 	struct iptables_rule_match *matchp, *tmp;
 

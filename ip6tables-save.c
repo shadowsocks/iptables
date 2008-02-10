@@ -16,6 +16,7 @@
 #include <arpa/inet.h>
 #include "libiptc/libip6tc.h"
 #include "ip6tables.h"
+#include "ip6tables-multi.h"
 
 #ifndef NO_SHARED_LIBS
 #include <dlfcn.h>

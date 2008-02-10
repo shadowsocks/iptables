@@ -15,6 +15,7 @@
 #include "iptables.h"
 #include "xtables.h"
 #include "libiptc/libiptc.h"
+#include "iptables-multi.h"
 
 #ifdef DEBUG
 #define DEBUGP(x, args...) fprintf(stderr, x, ## args)
@@ -54,7 +55,7 @@ static void print_usage(const char *name, const char *version)
 	exit(1);
 }
 
-iptc_handle_t create_handle(const char *tablename, const char* modprobe )
+static iptc_handle_t create_handle(const char *tablename, const char *modprobe)
 {
 	iptc_handle_t handle;
 

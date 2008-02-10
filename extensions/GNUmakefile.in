@@ -143,6 +143,7 @@ initext4.c: .initext4.dd
 	for i in ${initext_func}; do \
 		echo "extern void lib$${i}_init(void);" >>$@; \
 	done; \
+	echo -en "void init_extensions(void);\n" >>$@; \
 	echo -en "void init_extensions(void)\n""{\n" >>$@; \
 	for i in ${initext_func}; do \
 		echo -e "\t""lib$${i}_init();" >>$@; \
@@ -157,6 +158,7 @@ initext6.c: .initext6.dd
 	for i in ${initext6_func}; do \
 		echo "extern void lib$${i}_init(void);" >>$@; \
 	done; \
+	echo -en "void init_extensions(void);\n" >>$@; \
 	echo -en "void init_extensions(void)\n""{\n" >>$@; \
 	for i in ${initext6_func}; do \
 		echo -e "\t""lib$${i}_init();" >>$@; \

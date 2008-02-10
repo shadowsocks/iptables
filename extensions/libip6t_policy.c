@@ -126,11 +126,6 @@ mask_to_numeric(const struct in6_addr *addrp)
 	return buf;
 }
 
-/* These should be in include/ip6tables.h... */
-extern u_int16_t parse_protocol(const char *s);
-
-/* End duplicated code from ip6tables.c */
-
 static int parse_direction(char *s)
 {
 	if (strcmp(s, "in") == 0)

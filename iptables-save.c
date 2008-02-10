@@ -15,6 +15,7 @@
 #include <netdb.h>
 #include "libiptc/libiptc.h"
 #include "iptables.h"
+#include "iptables-multi.h"
 
 #ifndef NO_SHARED_LIBS
 #include <dlfcn.h>
