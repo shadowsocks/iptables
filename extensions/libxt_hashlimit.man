@@ -1,35 +1,59 @@
-This patch adds a new match called 'hashlimit'.
-The idea is to have something like 'limit', but either per
-destination-ip or per (destip,destport) tuple.
-
-It gives you the ability to express
-.IP
- '1000 packets per second for every host in 192.168.0.0/16'
-.IP
- '100 packets per second for every service of 192.168.1.1'
-.P
-with a single iptables rule.
+\fBhashlimit\fR uses hash buckets to express a rate limiting match (like the
+\fBlimit\fR match) for a group of connections using a \fBsingle\fR iptables
+rule. Grouping can be done per-hostgroup (source and/or destination address)
+and/or per-port. It gives you the ability to express "\fIN\fR packets per time
+quantum per group":
 .TP
-.BI "--hashlimit " "rate"
-A rate just like the limit match
+matching on source host
+"1000 packets per second for every host in 192.168.0.0/16"
 .TP
-.BI "--hashlimit-burst " "num"
-Burst value, just like limit match
+matching on source prot
+"100 packets per second for every service of 192.168.1.1"
 .TP
-.BI "--hashlimit-mode " "dstip,srcip,dstport,srcport"
-A comma-separated list of objects to take into consideration
+matching on subnet
+"10000 packets per minute for every /28 subnet in 10.0.0.0/8"
+.PP
+A hash limit option (\fB--hashlimit-upto\fR, \fB--hashlimit-above\fR) and
+\fB--hashlimit-name\fR are required.
 .TP
-.BI "--hashlimit-name " "foo"
-The name for the /proc/net/ipt_hashlimit/foo entry
+\fB--hashlimit-upto\fR \fIamount\fR[\fB/second\fR|\fB/minute\fR|\fB/hour\fR|\fB/day\fR]
+Match if the rate is below or equal to \fIamount\fR/quantum. It is specified as
+a number, with an optional time quantum suffix; the default is 3/hour.
 .TP
-.BI "--hashlimit-htable-size " "num"
+\fB--hashlimit-above\fR \fIamount\fR[\fB/second\fR|\fB/minute\fR|\fB/hour\fR|\fB/day\fR]
+Match if the rate is above \fIamount\fR/quantum.
+.TP
+\fB--hashlimit-burst\fR \fIamount\fR
+Maximum initial number of packets to match: this number gets recharged by one
+every time the limit specified above is not reached, up to this number; the
+default is 5.
+.TP
+\fB--hashlimit-mode\fR [\fBsrcip\fR|\fBsrcport\fR|\fBdstip\fR|\fBdstport\fR[\fB,\fR...]]
+A comma-separated list of objects to take into consideration. If no
+--hashlimit-mode option is given, hashlimit acts like limit, but at the
+expensive of doing the hash housekeeping.
+.TP
+\fB--hashlimit-srcmask\fR \fIprefix\fR
+When --hashlimit-mode srcip is used, all source addresses encountered will be
+grouped according to the given prefix length and the so-created subnet will be
+subject to hashlimit. \fIprefix\fR must be between (inclusive) 0 and 32. Note
+that --hashlimit-srcmask 0 is basically doing the same thing as not specifying
+srcip for --hashlimit-mode, but is technically more expensive.
+.TP
+\fB--hashlimit-dstmask\fR \fIprefix\fR
+Like --hashlimit-srcmask, but for destination addresses.
+.TP
+\fB--hashlimit-name\fR \fIfoo\fR
+The name for the /proc/net/ipt_hashlimit/foo entry.
+.TP
+\fB--hashlimit-htable-size\fR \fIbuckets\fR
 The number of buckets of the hash table
 .TP
-.BI "--hashlimit-htable-max " "num"
-Maximum entries in the hash
+\fB--hashlimit-htable-max\fR \fIentries\fR
+Maximum entries in the hash.
 .TP
-.BI "--hashlimit-htable-expire " "num"
-After how many miliseconds do hash entries expire
+\fB--hashlimit-htable-expire\fR \fImsec\fR
+After how many miliseconds do hash entries expire.
 .TP
-.BI "--hashlimit-htable-gcinterval " "num"
-How many miliseconds between garbage collection intervals
+\fB--hashlimit-htable-gcinterval\fR \fImsec\fR
+How many miliseconds between garbage collection intervals.
