@@ -1,52 +1,80 @@
-FOLLOW THESE STEPS:
+Installation instructions for iptables
+======================================
 
-0) There may be some outstanding bugfixes or tweaks which are not yet
-   in the official kernel.  Those are now (as of iptables-1.2.7) kept
-   in a seperate package, called patch-o-matic.  It is available from
-   ftp://ftp.netfilter.org/pub/patch-o-matic/
+iptables uses the well-known configure(autotools) infrastructure.
 
-1) Next, make the package. If you use a standard distribution kernel,
-   just run ./configure.
-
-   If you want to build against an own kernel tree:
-
-	$ ./configure --with-kernel=/home/jengelh/mykernel
-
-   or whereever you put it. If you are using a dedicated kernel build
-   directory, you use:
-
-	$ ./configure --with-kbuild=<<where-built>> --with-ksource=<<source>>
-
-2) Finally, you need to install the binaries and shared libraries:
-
-	# make install
-
-That's it!
-================================================================
-PROBLEMS YOU MAY ENCOUNTER:
-
-1) This package requires a 2.4.4 kernel, or above.
-
-2) If you get the kernel directory wrong, you may get compile failures.
-
-3) If you want to specify alternate directories for installation
-(instead of /usr/local/ bin lib man), do this:
-
-	$ ./configure --prefix=/usr
+	$ ./configure
 	$ make
 	# make install
 
-4) The make process will automatically build a multipurpose binary under the
-   names iptables-multi and ip6tables-multi.
 
-5) If you want to build a statically linked version of the iptables binary,
-   without the need for loading the plugins at runtime (e.g. for an embedded
-   device or router-on-a-disk), please use
+Prerequisites
+=============
 
-	$ ./configure --enable-static
+	* no kernel-source required
 
-   which will build both a semi-static multi binary (iptables-mtss, uses
-   libc but not plugins) and a fully static multi binary (iptables-static).
+	* but obviously a compiler, glibc-devel and linux-kernel-headers
+	  (/usr/include/linux)
 
-6) If you want to install libipq (old interface), add --enable-devel to
-   ./configure.
+
+Configuring and compiling
+=========================
+
+./configure [options]
+
+--prefix=
+
+	The prefix to put all installed files under. It defaults to
+	/usr/local, so the binaries will go into /usr/local/bin, sbin,
+	manpages into /usr/local/share/man, etc.
+
+--with-xtlibdir=
+
+	The path to where Xtables extensions should be installed to. It
+	defaults to ${prefix}/libexec/xtables.
+
+--enable-devel (or --disable-devel)
+
+	This option causes development files to be installed to
+	${includedir}, which is needed for building additional packages,
+	such as Xtables-addons or other 3rd-party extensions.
+
+	It is enabled by default.
+
+--enable-libipq
+
+	This option causes libipq to be installed into ${libdir} and
+	${includedir}.
+
+--enable-static
+
+	Enable building single standalone multipurpose binaries,
+	(iptables-static and ip6tables-static), which contain every
+	extension compiled-in (and does not support additional
+	extensions).
+
+--with-ksource=
+
+	Xtables does not depend on kernel headers anymore, but you can
+	optionally specify a search path to include anyway. This is
+	probably only useful for development.
+
+If you want to enable debugging, use
+
+	./configure CFLAGS="-ggdb3 -O0"
+
+(-O0 is used to turn off instruction reordering, which makes debugging
+much easier.)
+
+
+Other notes
+===========
+
+The make process will automatically build multipurpose binaries.
+These have the core (iptables), -save, -restore and -xml code
+compiled into one binary, but extensions remain as modules.
+
+If you want to build a statically linked version of the iptables binary,
+without the need for loading the plugins at runtime (e.g. for an
+embedded device or router-on-a-disk), you can use the --enable-static
+configure flag.

@@ -22,9 +22,9 @@ AC_ARG_WITH([ksource],
 	[ksourcedir="$withval"])
 AC_ARG_WITH([xtlibdir],
 	AS_HELP_STRING([--with-xtlibdir=PATH],
-	[Path to iptables modules [[LIBEXECDIR/iptables]]]),
+	[Path where to install Xtables extensions [[LIBEXECDIR/xtables]]]),
 	[xtlibdir="$withval"],
-	[xtlibdir="${libexecdir}/iptables"])
+	[xtlibdir="${libexecdir}/xtables"])
 AC_ARG_ENABLE([devel],
 	AS_HELP_STRING([--enable-devel],
 	[Install Xtables development headers]),
