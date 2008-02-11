@@ -7,7 +7,7 @@ prefix      := @prefix@
 exec_prefix := @exec_prefix@
 libdir      := @libdir@
 libexecdir  := @libexecdir@
-iptdir      := @iptdir@
+xtlibdir    := @xtlibdir@
 
 CC             := @CC@
 CCLD           := ${CC}
@@ -82,8 +82,8 @@ targets_install :=
 all: ${targets}
 
 install: ${targets_install}
-	@mkdir -p "${DESTDIR}${iptdir}";
-	install -pm0755 $^ "${DESTDIR}${iptdir}/";
+	@mkdir -p "${DESTDIR}${xtlibdir}";
+	install -pm0755 $^ "${DESTDIR}${xtlibdir}/";
 
 clean:
 	rm -f *.o *.oo *.so *.a {matches,targets}[46].man initext4.c initext6.c;

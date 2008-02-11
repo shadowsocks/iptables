@@ -22,11 +22,11 @@ AC_ARG_WITH([ksource],
 	AS_HELP_STRING([--with-ksource=PATH],
 	[Path to kernel source directory [[/lib/modules/CURRENT/source]]]),
 	[ksourcedir="$withval"])
-AC_ARG_WITH([iptdir],
-	AS_HELP_STRING([--with-iptdir=PATH],
+AC_ARG_WITH([xtlibdir],
+	AS_HELP_STRING([--with-xtlibdir=PATH],
 	[Path to iptables modules [[LIBEXECDIR/iptables]]]),
-	[iptdir="$withval"],
-	[iptdir="${libexecdir}/iptables"])
+	[xtlibdir="$withval"],
+	[xtlibdir="${libexecdir}/iptables"])
 AC_ARG_ENABLE([devel],
 	AS_HELP_STRING([--enable-devel],
 	[Build and install development files (libipq, libipq-devel, iptables-devel)]))
@@ -40,12 +40,11 @@ regular_CFLAGS="-D_LARGEFILE_SOURCE=1 -D_LARGE_FILES -D_FILE_OFFSET_BITS=64 \
 	-D_REENTRANT -Wall -Waggregate-return -Wmissing-declarations \
 	-Wmissing-prototypes -Wredundant-decls -Wshadow -Wstrict-prototypes \
 	-Winline -pipe -DIPTABLES_VERSION=\\\"$PACKAGE_VERSION\\\" \
-	-DIPT_LIB_DIR=\\\"\${iptdir}\\\" -DIP6T_LIB_DIR=\\\"\${iptdir}\\\"";
-regular_CFLAGS="$regular_CFLAGS -DXTABLES_INTERNAL"
+	-DXTABLES_LIBDIR=\\\"\${xtlibdir}\\\" -DXTABLES_INTERNAL";
 kinclude_CFLAGS="-I\"$kbuilddir/include\" -I\"$ksourcedir/include\"";
 
 AC_SUBST([regular_CFLAGS kinclude_CFLAGS])
 AC_SUBST([kbuilddir])
 AC_SUBST([ksourcedir])
-AC_SUBST([iptdir])
+AC_SUBST([xtlibdir])
 AC_OUTPUT([Makefile extensions/GNUmakefile libipq/Makefile])

@@ -4,10 +4,6 @@
 #include "xtables.h"
 #include "libiptc/libiptc.h"
 
-#ifndef IPT_LIB_DIR
-#define IPT_LIB_DIR XT_LIB_DIR
-#endif
-
 #ifndef IPT_SO_GET_REVISION_MATCH /* Old kernel source. */
 #define IPT_SO_GET_REVISION_MATCH	(IPT_BASE_CTL + 2)
 #define IPT_SO_GET_REVISION_TARGET	(IPT_BASE_CTL + 3)

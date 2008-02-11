@@ -5,10 +5,6 @@
 
 #include "libiptc/libip6tc.h"
 
-#ifndef IP6T_LIB_DIR
-#define IP6T_LIB_DIR XT_LIB_DIR
-#endif
-
 #ifndef IP6T_SO_GET_REVISION_MATCH /* Old kernel source. */
 #define IP6T_SO_GET_REVISION_MATCH	68
 #define IP6T_SO_GET_REVISION_TARGET	69
