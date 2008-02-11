@@ -75,6 +75,9 @@ man_MANS         := iptables.8 iptables-restore.8 iptables-save.8 \
 CLEANFILES       := iptables.8 ip6tables.8
 if ENABLE_DEVEL
 include_HEADERS  := include/xtables.h include/iptables.h include/ip6tables.h
+iptcdir          := ${includedir}/libiptc
+iptc_HEADERS     := include/libiptc/libxtc.h \
+                    include/libiptc/ipt_kernel_headers.h
 endif
 
 if ENABLE_STATIC
