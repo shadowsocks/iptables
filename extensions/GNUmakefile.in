@@ -32,30 +32,9 @@ endif
 #
 #	Wildcard module list
 #
-pfx_all_mod := $(patsubst ${srcdir}/libxt_%.c,%,$(wildcard ${srcdir}/libxt_*.c))
-pf4_all_mod := $(patsubst ${srcdir}/libipt_%.c,%,$(wildcard ${srcdir}/libipt_*.c))
-pf6_all_mod := $(patsubst ${srcdir}/libip6t_%.c,%,$(wildcard ${srcdir}/libip6t_*.c))
-
-#
-#	Conditional module list
-#
-pfx_cond_mod := $(foreach i,$(wildcard ${srcdir}/.*-testx),$(shell KERNEL_DIR=${ksourcedir} ${i} provides))
-pf4_cond_mod := $(foreach i,$(wildcard ${srcdir}/.*-test),$(shell KERNEL_DIR=${ksourcedir} ${i} provides))
-pf6_cond_mod := $(foreach i,$(wildcard ${srcdir}/.*-test6),$(shell KERNEL_DIR=${ksourcedir} ${i} provides))
-
-#
-#	Conditional modules to build
-#
-pfx_bc_mod := $(foreach i,$(wildcard ${srcdir}/.*-testx),$(shell KERNEL_DIR=${ksourcedir} ${i}))
-pf4_bc_mod := $(foreach i,$(wildcard ${srcdir}/.*-test),$(shell KERNEL_DIR=${ksourcedir} ${i}))
-pf6_bc_mod := $(foreach i,$(wildcard ${srcdir}/.*-test6),$(shell KERNEL_DIR=${ksourcedir} ${i}))
-
-#
-#	Total list of modules to build
-#
-pfx_build_mod := $(filter-out ${pfx_cond_mod},${pfx_all_mod}) ${pfx_bc_mod}
-pf4_build_mod := $(filter-out ${pf4_cond_mod},${pf4_all_mod}) ${pf4_bc_mod}
-pf6_build_mod := $(filter-out ${pf6_cond_mod},${pf6_all_mod}) ${pf6_bc_mod}
+pfx_build_mod := $(patsubst ${srcdir}/libxt_%.c,%,$(wildcard ${srcdir}/libxt_*.c))
+pf4_build_mod := $(patsubst ${srcdir}/libipt_%.c,%,$(wildcard ${srcdir}/libipt_*.c))
+pf6_build_mod := $(patsubst ${srcdir}/libip6t_%.c,%,$(wildcard ${srcdir}/libip6t_*.c))
 pfx_objs      := $(patsubst %,libxt_%.o,${pfx_build_mod})
 pf4_objs      := $(patsubst %,libipt_%.o,${pf4_build_mod})
 pf6_objs      := $(patsubst %,libip6t_%.o,${pf6_build_mod})
