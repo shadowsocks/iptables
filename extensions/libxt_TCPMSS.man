@@ -1,6 +1,7 @@
 This target allows to alter the MSS value of TCP SYN packets, to control
 the maximum size for that connection (usually limiting it to your
-outgoing interface's MTU minus 40).  Of course, it can only be used
+outgoing interface's MTU minus 40 for IPv4 or 60 for IPv6, respectively).
+Of course, it can only be used
 in conjunction with
 .BR "-p tcp" .
 It is only valid in the
@@ -8,7 +9,8 @@ It is only valid in the
 table.
 .br
 This target is used to overcome criminally braindead ISPs or servers
-which block ICMP Fragmentation Needed packets.  The symptoms of this
+which block "ICMP Fragmentation Needed" or "ICMPv6 Packet Too Big"
+packets.  The symptoms of this
 problem are that everything works fine from your Linux
 firewall/router, but machines behind it can never exchange large
 packets:
@@ -36,6 +38,6 @@ configuration like:
 Explicitly set MSS option to specified value.
 .TP
 .B "--clamp-mss-to-pmtu"
-Automatically clamp MSS value to (path_MTU - 40).
+Automatically clamp MSS value to (path_MTU - 40 for IPv4; -60 for IPv6).
 .TP
 These options are mutually exclusive.
