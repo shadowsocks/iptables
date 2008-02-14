@@ -147,21 +147,7 @@ static void pkttype_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match pkttype_match = {
-	.family		= AF_INET,
-	.name		= "pkttype",
-	.version	= IPTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_pkttype_info)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_pkttype_info)),
-	.help		= pkttype_help,
-	.parse		= pkttype_parse,
-	.final_check	= pkttype_check,
-	.print		= pkttype_print,
-	.save		= pkttype_save,
-	.extra_opts	= pkttype_opts,
-};
-
-static struct xtables_match pkttype_match6 = {
-	.family		= AF_INET6,
+	.family		= AF_UNSPEC,
 	.name		= "pkttype",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_pkttype_info)),
@@ -177,5 +163,4 @@ static struct xtables_match pkttype_match6 = {
 void _init(void)
 {
 	xtables_register_match(&pkttype_match);
-	xtables_register_match(&pkttype_match6);
 }

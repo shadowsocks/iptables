@@ -202,23 +202,8 @@ RATEEST_save(const void *ip, const struct xt_entry_target *target)
 	__RATEEST_print(target, "--rateest-");
 }
 
-static struct xtables_target rateest_target4 = {
-	.family		= AF_INET,
-	.name		= "RATEEST",
-	.version	= IPTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_rateest_target_info)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_rateest_target_info)),
-	.help		= RATEEST_help,
-	.init		= RATEEST_init,
-	.parse		= RATEEST_parse,
-	.final_check	= RATEEST_final_check,
-	.print		= RATEEST_print,
-	.save		= RATEEST_save,
-	.extra_opts	= RATEEST_opts,
-};
-
-static struct xtables_target rateest_target6 = {
-	.family		= AF_INET6,
+static struct xtables_target rateest_tg_reg = {
+	.family		= AF_UNSPEC,
 	.name		= "RATEEST",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_rateest_target_info)),
@@ -234,6 +219,5 @@ static struct xtables_target rateest_target6 = {
 
 void _init(void)
 {
-	xtables_register_target(&rateest_target4);
-	xtables_register_target(&rateest_target6);
+	xtables_register_target(&rateest_tg_reg);
 }

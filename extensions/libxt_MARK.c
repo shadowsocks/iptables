@@ -333,22 +333,7 @@ static struct xtables_target mark_tg_reg_v2 = {
 	.version       = IPTABLES_VERSION,
 	.name          = "MARK",
 	.revision      = 2,
-	.family        = AF_INET,
-	.size          = XT_ALIGN(sizeof(struct xt_mark_tginfo2)),
-	.userspacesize = XT_ALIGN(sizeof(struct xt_mark_tginfo2)),
-	.help          = mark_tg_help,
-	.parse         = mark_tg_parse,
-	.final_check   = mark_tg_check,
-	.print         = mark_tg_print,
-	.save          = mark_tg_save,
-	.extra_opts    = mark_tg_opts,
-};
-
-static struct xtables_target mark_tg6_reg_v2 = {
-	.version       = IPTABLES_VERSION,
-	.name          = "MARK",
-	.revision      = 2,
-	.family        = AF_INET6,
+	.family        = AF_UNSPEC,
 	.size          = XT_ALIGN(sizeof(struct xt_mark_tginfo2)),
 	.userspacesize = XT_ALIGN(sizeof(struct xt_mark_tginfo2)),
 	.help          = mark_tg_help,
@@ -365,5 +350,4 @@ void _init(void)
 	xtables_register_target(&mark_target_v1);
 	xtables_register_target(&mark_target6_v0);
 	xtables_register_target(&mark_tg_reg_v2);
-	xtables_register_target(&mark_tg6_reg_v2);
 }

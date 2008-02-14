@@ -426,22 +426,8 @@ rateest_save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-static struct xtables_match rateest_match4 = {
-	.family		= AF_INET,
-	.name		= "rateest",
-	.version	= IPTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_rateest_match_info)),
-	.userspacesize	= XT_ALIGN(offsetof(struct xt_rateest_match_info, est1)),
-	.help		= rateest_help,
-	.parse		= rateest_parse,
-	.final_check	= rateest_final_check,
-	.print		= rateest_print,
-	.save		= rateest_save,
-	.extra_opts	= rateest_opts,
-};
-
-static struct xtables_match rateest_match6 = {
-	.family		= AF_INET6,
+static struct xtables_match rateest_mt_reg = {
+	.family		= AF_UNSPEC,
 	.name		= "rateest",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_rateest_match_info)),
@@ -456,6 +442,5 @@ static struct xtables_match rateest_match6 = {
 
 void _init(void)
 {
-	xtables_register_match(&rateest_match4);
-	xtables_register_match(&rateest_match6);
+	xtables_register_match(&rateest_mt_reg);
 }

@@ -100,22 +100,7 @@ static void SECMARK_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target secmark_target = {
-	.family		= AF_INET,
-	.name		= "SECMARK",
-	.version	= IPTABLES_VERSION,
-	.revision	= 0,
-	.size		= XT_ALIGN(sizeof(struct xt_secmark_target_info)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_secmark_target_info)),
-	.help		= SECMARK_help,
-	.parse		= SECMARK_parse,
-	.final_check	= SECMARK_check,
-	.print		= SECMARK_print,
-	.save		= SECMARK_save,
-	.extra_opts	= SECMARK_opts,
-};
-
-static struct xtables_target secmark_target6 = {
-	.family		= AF_INET6,
+	.family		= AF_UNSPEC,
 	.name		= "SECMARK",
 	.version	= IPTABLES_VERSION,
 	.revision	= 0,
@@ -132,5 +117,4 @@ static struct xtables_target secmark_target6 = {
 void _init(void)
 {
 	xtables_register_target(&secmark_target);
-	xtables_register_target(&secmark_target6);
 }

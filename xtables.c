@@ -557,12 +557,13 @@ void xtables_register_match(struct xtables_match *me)
 	}
 
 	/* ignore not interested match */
-	if (me->family != afinfo.family)
+	if (me->family != afinfo.family && me->family != AF_UNSPEC)
 		return;
 
 	old = find_match(me->name, DURING_LOAD, NULL);
 	if (old) {
-		if (old->revision == me->revision) {
+		if (old->revision == me->revision &&
+		    old->family == me->family) {
 			fprintf(stderr,
 				"%s: match `%s' already registered.\n",
 				program_name, me->name);
@@ -574,8 +575,12 @@ void xtables_register_match(struct xtables_match *me)
 		    && old->revision > me->revision)
 			return;
 
-		/* Replace if compatible. */
+		/* See if new match can be used. */
 		if (!compatible_match_revision(me->name, me->revision))
+			return;
+
+		/* Prefer !AF_UNSPEC over AF_UNSPEC for same revision. */
+		if (old->revision == me->revision && me->family == AF_UNSPEC)
 			return;
 
 		/* Delete old one. */
@@ -623,14 +628,15 @@ void xtables_register_target(struct xtables_target *me)
 	}
 
 	/* ignore not interested target */
-	if (me->family != afinfo.family)
+	if (me->family != afinfo.family && me->family != AF_UNSPEC)
 		return;
 
 	old = find_target(me->name, DURING_LOAD);
 	if (old) {
 		struct xtables_target **i;
 
-		if (old->revision == me->revision) {
+		if (old->revision == me->revision &&
+		    old->family == me->family) {
 			fprintf(stderr,
 				"%s: target `%s' already registered.\n",
 				program_name, me->name);
@@ -642,8 +648,12 @@ void xtables_register_target(struct xtables_target *me)
 		    && old->revision > me->revision)
 			return;
 
-		/* Replace if compatible. */
+		/* See if new target can be used. */
 		if (!compatible_target_revision(me->name, me->revision))
+			return;
+
+		/* Prefer !AF_UNSPEC over AF_UNSPEC for same revision. */
+		if (old->revision == me->revision && me->family == AF_UNSPEC)
 			return;
 
 		/* Delete old one. */

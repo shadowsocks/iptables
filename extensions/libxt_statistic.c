@@ -164,22 +164,7 @@ static void statistic_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match statistic_match = {
-	.family		= AF_INET,
-	.name		= "statistic",
-	.version	= IPTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_statistic_info)),
-	.userspacesize	= offsetof(struct xt_statistic_info, u.nth.count),
-	.init		= statistic_mt_init,
-	.help		= statistic_help,
-	.parse		= statistic_parse,
-	.final_check	= statistic_check,
-	.print		= statistic_print,
-	.save		= statistic_save,
-	.extra_opts	= statistic_opts,
-};
-
-static struct xtables_match statistic_match6 = {
-	.family		= AF_INET6,
+	.family		= AF_UNSPEC,
 	.name		= "statistic",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_statistic_info)),
@@ -196,5 +181,4 @@ static struct xtables_match statistic_match6 = {
 void _init(void)
 {
 	xtables_register_match(&statistic_match);
-	xtables_register_match(&statistic_match6);
 }

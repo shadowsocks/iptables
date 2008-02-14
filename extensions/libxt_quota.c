@@ -78,20 +78,7 @@ quota_parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 struct xtables_match quota_match = {
-	.family		= AF_INET,
-	.name		= "quota",
-	.version	= IPTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof (struct xt_quota_info)),
-	.userspacesize	= offsetof(struct xt_quota_info, quota),
-	.help		= quota_help,
-	.parse		= quota_parse,
-	.print		= quota_print,
-	.save		= quota_save,
-	.extra_opts	= quota_opts,
-};
-
-struct xtables_match quota_match6 = {
-	.family		= AF_INET6,
+	.family		= AF_UNSPEC,
 	.name		= "quota",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof (struct xt_quota_info)),
@@ -107,5 +94,4 @@ void
 _init(void)
 {
 	xtables_register_match(&quota_match);
-	xtables_register_match(&quota_match6);
 }

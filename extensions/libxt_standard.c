@@ -24,17 +24,7 @@ static int standard_parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static struct xtables_target standard_target = {
-	.family		= AF_INET,
-	.name		= "standard",
-	.version	= IPTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(int)),
-	.userspacesize	= XT_ALIGN(sizeof(int)),
-	.help		= standard_help,
-	.parse		= standard_parse,
-};
-
-static struct xtables_target standard_target6 = {
-	.family		= AF_INET6,
+	.family		= AF_UNSPEC,
 	.name		= "standard",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(int)),
@@ -46,5 +36,4 @@ static struct xtables_target standard_target6 = {
 void _init(void)
 {
 	xtables_register_target(&standard_target);
-	xtables_register_target(&standard_target6);
 }

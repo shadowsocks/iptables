@@ -165,21 +165,7 @@ static void limit_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match limit_match = {
-	.family		= AF_INET,
-	.name		= "limit",
-	.version	= IPTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_rateinfo)),
-	.userspacesize	= offsetof(struct xt_rateinfo, prev),
-	.help		= limit_help,
-	.init		= limit_init,
-	.parse		= limit_parse,
-	.print		= limit_print,
-	.save		= limit_save,
-	.extra_opts	= limit_opts,
-};
-
-static struct xtables_match limit_match6 = {
-	.family		= AF_INET6,
+	.family		= AF_UNSPEC,
 	.name		= "limit",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_rateinfo)),
@@ -195,5 +181,4 @@ static struct xtables_match limit_match6 = {
 void _init(void)
 {
 	xtables_register_match(&limit_match);
-	xtables_register_match(&limit_match6);
 }

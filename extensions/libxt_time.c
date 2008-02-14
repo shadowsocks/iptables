@@ -466,21 +466,7 @@ static void time_save(const void *ip, const struct xt_entry_match *match)
 
 static struct xtables_match time_match = {
 	.name          = "time",
-	.family        = AF_INET,
-	.version       = IPTABLES_VERSION,
-	.size          = XT_ALIGN(sizeof(struct xt_time_info)),
-	.userspacesize = XT_ALIGN(sizeof(struct xt_time_info)),
-	.help          = time_help,
-	.init          = time_init,
-	.parse         = time_parse,
-	.print         = time_print,
-	.save          = time_save,
-	.extra_opts    = time_opts,
-};
-
-static struct xtables_match time_match6 = {
-	.name          = "time",
-	.family        = AF_INET6,
+	.family        = AF_UNSPEC,
 	.version       = IPTABLES_VERSION,
 	.size          = XT_ALIGN(sizeof(struct xt_time_info)),
 	.userspacesize = XT_ALIGN(sizeof(struct xt_time_info)),
@@ -495,5 +481,4 @@ static struct xtables_match time_match6 = {
 void _init(void)
 {
 	xtables_register_match(&time_match);
-	xtables_register_match(&time_match6);
 }

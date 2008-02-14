@@ -24,17 +24,7 @@ static int TRACE_parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static struct xtables_target trace_target = {
-	.family		= AF_INET,
-	.name		= "TRACE",
-	.version	= IPTABLES_VERSION,
-	.size		= XT_ALIGN(0),
-	.userspacesize	= XT_ALIGN(0),
-	.help		= TRACE_help,
-	.parse		= TRACE_parse,
-};
-
-static struct xtables_target trace_target6 = {
-	.family		= AF_INET6,
+	.family		= AF_UNSPEC,
 	.name		= "TRACE",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(0),
@@ -46,5 +36,4 @@ static struct xtables_target trace_target6 = {
 void _init(void)
 {
 	xtables_register_target(&trace_target);
-	xtables_register_target(&trace_target6);
 }

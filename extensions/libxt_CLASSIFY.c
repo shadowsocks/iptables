@@ -103,21 +103,7 @@ CLASSIFY_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target classify_target = { 
-	.family		= AF_INET,
-	.name		= "CLASSIFY",
-	.version	= IPTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_classify_target_info)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_classify_target_info)),
-	.help		= CLASSIFY_help,
-	.parse		= CLASSIFY_parse,
-	.final_check	= CLASSIFY_final_check,
-	.print		= CLASSIFY_print,
-	.save		= CLASSIFY_save,
-	.extra_opts	= CLASSIFY_opts,
-};
-
-static struct xtables_target classify_target6 = { 
-	.family		= AF_INET6,
+	.family		= AF_UNSPEC,
 	.name		= "CLASSIFY",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_classify_target_info)),
@@ -133,5 +119,4 @@ static struct xtables_target classify_target6 = {
 void _init(void)
 {
 	xtables_register_target(&classify_target);
-	xtables_register_target(&classify_target6);
 }

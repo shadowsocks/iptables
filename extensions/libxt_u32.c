@@ -272,20 +272,7 @@ static void u32_save(const void *ip, const struct xt_entry_match *match)
 
 static struct xtables_match u32_match = {
 	.name          = "u32",
-	.family        = AF_INET,
-	.version       = IPTABLES_VERSION,
-	.size          = XT_ALIGN(sizeof(struct xt_u32)),
-	.userspacesize = XT_ALIGN(sizeof(struct xt_u32)),
-	.help          = u32_help,
-	.parse         = u32_parse,
-	.print         = u32_print,
-	.save          = u32_save,
-	.extra_opts    = u32_opts,
-};
-
-static struct xtables_match u32_match6 = {
-	.name          = "u32",
-	.family        = AF_INET6,
+	.family        = AF_UNSPEC,
 	.version       = IPTABLES_VERSION,
 	.size          = XT_ALIGN(sizeof(struct xt_u32)),
 	.userspacesize = XT_ALIGN(sizeof(struct xt_u32)),
@@ -299,6 +286,4 @@ static struct xtables_match u32_match6 = {
 void _init(void)
 {
 	xtables_register_match(&u32_match);
-	xtables_register_match(&u32_match6);
-	return;
 }

@@ -125,21 +125,7 @@ static void length_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match length_match = {
-	.family		= AF_INET,
-	.name		= "length",
-	.version	= IPTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_length_info)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_length_info)),
-	.help		= length_help,
-	.parse		= length_parse,
-	.final_check	= length_check,
-	.print		= length_print,
-	.save		= length_save,
-	.extra_opts	= length_opts,
-};
-
-static struct xtables_match length_match6 = {
-	.family		= AF_INET6,
+	.family		= AF_UNSPEC,
 	.name		= "length",
 	.version	= IPTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_length_info)),
@@ -155,5 +141,4 @@ static struct xtables_match length_match6 = {
 void _init(void)
 {
 	xtables_register_match(&length_match);
-	xtables_register_match(&length_match6);
 }
