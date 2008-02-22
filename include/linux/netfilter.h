@@ -1,8 +1,6 @@
 #ifndef __LINUX_NETFILTER_H
 #define __LINUX_NETFILTER_H
 
-#include <linux/compiler.h>
-
 /* Responses from hook functions. */
 #define NF_DROP 0
 #define NF_ACCEPT 1
