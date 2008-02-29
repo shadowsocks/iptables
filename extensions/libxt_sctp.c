@@ -125,8 +125,8 @@ static const struct sctp_chunk_names sctp_chunk_names[]
     { .name = "ECN_ECNE",	.chunk_type = 12,  .valid_flags = "--------"},
     { .name = "ECN_CWR",	.chunk_type = 13,  .valid_flags = "--------"},
     { .name = "SHUTDOWN_COMPLETE", .chunk_type = 14,  .valid_flags = "-------T"},
-    { .name = "ASCONF",		.chunk_type = 31,  .valid_flags = "--------"},
-    { .name = "ASCONF_ACK",	.chunk_type = 30,  .valid_flags = "--------"},
+    { .name = "ASCONF",		.chunk_type = 193,  .valid_flags = "--------"},
+    { .name = "ASCONF_ACK",	.chunk_type = 128,  .valid_flags = "--------"},
 };
 
 static void
