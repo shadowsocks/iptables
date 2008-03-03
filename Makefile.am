@@ -93,3 +93,11 @@ ip6tables.8: ${srcdir}/ip6tables.8.in extensions/matches6.man extensions/targets
 
 extensions/%:
 	${MAKE} ${AM_MAKEFLAGS} -C $(@D) $(@F)
+
+.PHONY: tarball
+tarball:
+	rm -Rf /tmp/xtables-${PACKAGE_VERSION};
+	pushd ${top_srcdir} && git-archive --prefix=xtables-${PACKAGE_VERSION}/ HEAD | tar -C /tmp -x && popd;
+	pushd /tmp/xtables-${PACKAGE_VERSION} && ./autogen.sh && popd;
+	tar -C /tmp -cjf xtables-${PACKAGE_VERSION}.tar.bz2 --owner=root --group=root xtables-${PACKAGE_VERSION}/;
+	rm -Rf /tmp/xtables-${PACKAGE_VERSION};
