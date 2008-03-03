@@ -162,7 +162,7 @@ static int hbh_parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static void
-print_options(unsigned optsnr, u_int16_t *optsp)
+print_options(unsigned int optsnr, u_int16_t *optsp)
 {
 	unsigned int i;
 

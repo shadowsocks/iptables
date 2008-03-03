@@ -255,7 +255,7 @@ print_nums(const char *name, u_int32_t min, u_int32_t max,
 }
 
 static void
-print_addresses(unsigned addrnr, struct in6_addr *addrp)
+print_addresses(unsigned int addrnr, struct in6_addr *addrp)
 {
 	unsigned int i;
 

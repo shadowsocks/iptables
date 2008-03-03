@@ -90,7 +90,7 @@ static int SAME_parse(int c, char **argv, int invert, unsigned int *flags,
 {
 	struct ipt_same_info *mr
 		= (struct ipt_same_info *)(*target)->data;
-	unsigned count;
+	unsigned int count;
 
 	switch (c) {
 	case '1':
@@ -146,7 +146,7 @@ static void SAME_check(unsigned int flags)
 static void SAME_print(const void *ip, const struct xt_entry_target *target,
                        int numeric)
 {
-	unsigned count;
+	unsigned int count;
 	struct ipt_same_info *mr
 		= (struct ipt_same_info *)target->data;
 	int random = 0;
@@ -180,7 +180,7 @@ static void SAME_print(const void *ip, const struct xt_entry_target *target,
 /* Saves the union ipt_targinfo in parsable form to stdout. */
 static void SAME_save(const void *ip, const struct xt_entry_target *target)
 {
-	unsigned count;
+	unsigned int count;
 	struct ipt_same_info *mr
 		= (struct ipt_same_info *)target->data;
 	int random = 0;

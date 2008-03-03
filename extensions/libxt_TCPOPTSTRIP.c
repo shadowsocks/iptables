@@ -22,7 +22,7 @@ enum {
 
 struct tcp_optionmap {
 	const char *name, *desc;
-	const unsigned option;
+	const unsigned int option;
 };
 
 static const struct option tcpoptstrip_tg_opts[] = {

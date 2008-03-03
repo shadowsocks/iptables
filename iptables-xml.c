@@ -85,10 +85,10 @@ parse_counters(char *string, struct ipt_counters *ctr)
 
 /* global new argv and argc */
 static char *newargv[255];
-static unsigned newargc = 0;
+static unsigned int newargc = 0;
 
 static char *oldargv[255];
-static unsigned oldargc = 0;
+static unsigned int oldargc = 0;
 
 /* arg meta data, were they quoted, frinstance */
 static int newargvattr[255];
@@ -129,7 +129,7 @@ add_argv(char *what, int quoted)
 static void
 free_argv(void)
 {
-	unsigned i;
+	unsigned int i;
 
 	for (i = 0; i < newargc; i++) {
 		free(newargv[i]);
@@ -149,7 +149,7 @@ free_argv(void)
 static void
 save_argv(void)
 {
-	unsigned i;
+	unsigned int i;
 
 	for (i = 0; i < oldargc; i++)
 		free(oldargv[i]);
@@ -545,8 +545,8 @@ compareRules(void)
 	   is the case when processing the ACTUAL output of actual iptables-save 
 	   rather than a file merely in a compatable format */
 
-	unsigned old = 0;
-	unsigned new = 0;
+	unsigned int old = 0;
+	unsigned int new = 0;
 
 	int compare = 0;
 
@@ -748,7 +748,7 @@ main(int argc, char *argv[])
 
 			ret = 1;
 		} else if (curTable[0]) {
-			unsigned a;
+			unsigned int a;
 			char *ptr = buffer;
 			char *pcnt = NULL;
 			char *bcnt = NULL;

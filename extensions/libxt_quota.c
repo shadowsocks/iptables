@@ -43,7 +43,7 @@ quota_save(const void *ip, const struct xt_entry_match *match)
 static int
 parse_quota(const char *s, u_int64_t * quota)
 {
-	*quota = strtoull(s, (char **) NULL, 10);
+	*quota = strtoull(s, NULL, 10);
 
 #ifdef DEBUG_XT_QUOTA
 	printf("Quota: %llu\n", *quota);

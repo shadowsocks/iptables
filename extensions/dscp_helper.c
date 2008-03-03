@@ -49,7 +49,7 @@ static const struct ds_class
 static unsigned int
 class_to_dscp(const char *name)
 {
-	unsigned i;
+	unsigned int i;
 
 	for (i = 0; i < sizeof(ds_classes) / sizeof(struct ds_class); i++) {
 		if (!strncasecmp(name, ds_classes[i].name,
