@@ -50,21 +50,21 @@ target like SNAT and another chain.
 Some sample output is:
 
 <iptables-rules>
-  <table name="mangle" >
+  <table name="mangle">
     <chain name="PREROUTING" policy="ACCEPT" packet-count="63436"
-byte-count="7137573" >
-      <rule >
+byte-count="7137573">
+      <rule>
        <conditions>
-        <match >
-          <p >tcp</p>
+        <match>
+          <p>tcp</p>
         </match>
-        <tcp >
-          <sport >8443</sport>
+        <tcp>
+          <sport>8443</sport>
         </tcp>
        </conditions>
        <actions>
-        <call >
-          <check_ip />
+        <call>
+          <check_ip/>
         </call>
         <ACCEPT/>
        </actions>
