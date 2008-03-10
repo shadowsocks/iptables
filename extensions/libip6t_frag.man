@@ -13,8 +13,8 @@ Matches if the reserved fields are filled with zero.
 .BR "--fragfirst "
 Matches on the first fragment.
 .TP
-.BR "[--fragmore]"
+\fB--fragmore\fP
 Matches if there are more fragments.
 .TP
-.BR "[--fraglast]"
+\fB--fraglast\fP
 Matches if this is the last fragment.

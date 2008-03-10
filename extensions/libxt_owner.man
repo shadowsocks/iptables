@@ -3,17 +3,17 @@ for locally generated packets. This match is only valid in the OUTPUT and
 POSTROUTING chains. Forwarded packets do not have any socket associated with
 them. Packets from kernel threads do have a socket, but usually no owner.
 .TP
-\fB--uid-owner\fR \fIusername\fR
+[\fB!\fP] \fB--uid-owner\fP \fIusername\fP
 .TP
-\fB--uid-owner\fR \fIuserid\fR[\fB-\fR\fIuserid\fR]
+[\fB!\fP] \fB--uid-owner\fP \fIuserid\fP[\fB-\fP\fIuserid\fP]
 Matches if the packet socket's file structure (if it has one) is owned by the
 given user. You may also specify a numerical UID, or an UID range.
 .TP
-\fB--gid-owner\fR \fIgroupname\fR
+[\fB!\fP] \fB--gid-owner\fP \fIgroupname\fP
 .TP
-\fB--gid-owner\fR \fIgroupid\fR[\fB-\fR\fIgroupid\fR]
+[\fB!\fP] \fB--gid-owner\fP \fIgroupid\fP[\fB-\fR\fIgroupid\fP]
 Matches if the packet socket's file structure is owned by the given group.
 You may also specify a numerical GID, or a GID range.
 .TP
-\fB--socket-exists\fR
+[\fB!\fP] \fB--socket-exists\fP
 Matches if the packet is associated with a socket.

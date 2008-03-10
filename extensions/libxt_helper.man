@@ -1,6 +1,6 @@
 This module matches packets related to a specific conntrack-helper.
 .TP
-.BI "--helper " "string"
+[\fB!\fP] \fB--helper\fP \fIstring\fP
 Matches packets related to the specified conntrack-helper.
 .RS
 .PP

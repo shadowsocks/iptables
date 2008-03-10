@@ -10,7 +10,7 @@ should be modified (and all future packets in this connection will
 also be mangled), and rules should cease being examined.  It takes one
 type of option:
 .TP
-.BR "--to-destination " "[\fIipaddr\fP][-\fIipaddr\fP][:\fIport\fP-\fIport\fP]"
+\fB--to-destination\fP [\fIipaddr\fP][\fB-\fP\fIipaddr\fP][\fB:\fP\fIport\fP[\fB-\fP\fIport\fP]]
 which can specify a single new destination IP address, an inclusive
 range of IP addresses, and optionally, a port range (which is only
 valid if the rule also specifies
