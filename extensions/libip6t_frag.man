@@ -17,4 +17,4 @@ Matches on the first fragment.
 Matches if there are more fragments.
 .TP
 .BR "[--fraglast]"
-Matches if this is the last fragement.
+Matches if this is the last fragment.

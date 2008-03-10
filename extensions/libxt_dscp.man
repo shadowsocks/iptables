@@ -7,4 +7,4 @@ Match against a numeric (decimal or hex) value [0-63].
 .BI "--dscp-class " "\fIDiffServ Class\fP"
 Match the DiffServ class. This value may be any of the
 BE, EF, AFxx or CSx classes.  It will then be converted
-into it's according numeric value.
+into its according numeric value.

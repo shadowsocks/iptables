@@ -720,7 +720,7 @@ print_match(const struct ipt_entry_match *m,
 	return 0;
 }
 
-/* e is called `fw' here for hysterical raisins */
+/* e is called `fw' here for historical reasons */
 static void
 print_firewall(const struct ipt_entry *fw,
 	       const char *targname,

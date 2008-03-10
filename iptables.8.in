@@ -55,7 +55,7 @@ a `target', which may be a jump to a user-defined chain in the same
 table.
 
 .SH TARGETS
-A firewall rule specifies criteria for a packet, and a target.  If the
+A firewall rule specifies criteria for a packet and a target.  If the
 packet does not match, the next rule in the chain is the examined; if
 it does match, then the next rule is specified by the value of the
 target, which can be the name of a user-defined chain or one of the
@@ -155,9 +155,9 @@ The options that are recognized by
 .B iptables
 can be divided into several different groups.
 .SS COMMANDS
-These options specify the specific action to perform.  Only one of them
-can be specified on the command line unless otherwise specified
-below.  For all the long versions of the command and option names, you
+These options specify the desired action to perform. Only one of them
+can be specified on the command line unless otherwise stated
+below. For long versions of the command and option names, you
 need to use only enough letters to ensure that
 .B iptables
 can differentiate it from all other options.
@@ -188,7 +188,7 @@ fail.  Rules are numbered starting at 1.
 .TP
 .BR "-L, --list " "[\fIchain\fP]"
 List all rules in the selected chain.  If no chain is selected, all
-chains are listed.  As every other iptables command, it applies to the
+chains are listed. Like every other iptables command, it applies to the
 specified table (filter is the default), so NAT rules get listed by
 .nf
  iptables -t nat -n -L

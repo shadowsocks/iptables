@@ -1,5 +1,5 @@
 Match by how many bytes or packets a connection (or one of the two
-flows constituting the connection) have tranferred so far, or by
+flows constituting the connection) has transferred so far, or by
 average bytes per packet.
 
 The counters are 64bit and are thus not expected to overflow ;)
@@ -7,7 +7,7 @@ The counters are 64bit and are thus not expected to overflow ;)
 The primary use is to detect long-lived downloads and mark them to be
 scheduled using a lower priority band in traffic control.
 
-The transfered bytes per connection can also be viewed through
+The transferred bytes per connection can also be viewed through
 /proc/net/ip_conntrack and accessed via ctnetlink
 .TP
 [\fB!\fP] \fB--connbytes\fP \fIfrom\fP[\fB:\fR\fIto\fP]
