@@ -2,7 +2,7 @@ U32 tests whether quantities of up to 4 bytes extracted from a packet have
 specified values. The specification of what to extract is general enough to
 find data at given offsets from tcp headers or payloads.
 .TP
-[\fB!\fR]\fB --u32 \fItests\fR
+[\fB!\fP] \fB--u32\fP \fItests\fP
 The argument amounts to a program in a small language described below.
 .IP
 tests := location "=" value | tests "&&" location "=" value

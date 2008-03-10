@@ -3,7 +3,7 @@ This module matches the parameters in Authentication header of IPsec packets.
 .BR "--ahspi " "[!] \fIspi\fP[:\fIspi\fP]"
 Matches SPI.
 .TP
-.BR "--ahlen " "[!] \fIlength"
+[\fB!\fP] \fB--ahlen\fP \fIlength\fP
 Total length of this header in octets.
 .TP
 .BI "--ahres"

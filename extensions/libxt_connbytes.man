@@ -10,7 +10,7 @@ scheduled using a lower priority band in traffic control.
 The transfered bytes per connection can also be viewed through
 /proc/net/ip_conntrack and accessed via ctnetlink
 .TP
-[\fB!\fR]\fB --connbytes \fIfrom\fB:\fR[\fIto\fR]
+[\fB!\fP] \fB--connbytes\fP \fIfrom\fP[\fB:\fR\fIto\fP]
 match packets from a connection whose packets/bytes/average packet
 size is more than FROM and less than TO bytes/packets. if TO is
 omitted only FROM check is done. "!" is used to match packets not

@@ -1,7 +1,7 @@
 Allows you to restrict the number of parallel connections to a server per
 client IP address (or client address block).
 .TP
-[\fB!\fR] \fB--connlimit-above \fIn\fR
+[\fB!\fP] \fB--connlimit-above\fP \fIn\fP
 Match if the number of existing connections is (not) above \fIn\fR.
 .TP
 \fB--connlimit-mask\fR \fIprefix_length\fR

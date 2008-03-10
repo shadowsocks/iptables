@@ -1,7 +1,7 @@
 .TP
-\fB--source-port\fR,\fB--sport \fR[\fB!\fR] \fIport\fR[\fB:\fIport\fR]
+[\fB!\fP] \fB--source-port\fP,\fB--sport\fP \fIport\fP[\fB:\fP\fIport\fP]
 .TP
-\fB--destination-port\fR,\fB--dport \fR[\fB!\fR] \fIport\fR[\fB:\fIport\fR]
+[\fB!\fP] \fB--destination-port\fP,\fB--dport\fP \fIport\fP[\fB:\fP\fIport\fP]
 .TP
 \fB--dccp-types\fR [\fB!\fR] \fImask\fP
 Match when the DCCP packet type is one of 'mask'. 'mask' is a comma-separated
