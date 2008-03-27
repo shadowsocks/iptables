@@ -26,16 +26,16 @@
 static int binary = 0, counters = 0, verbose = 0, noflush = 0;
 
 /* Keeping track of external matches and targets.  */
-static struct option options[] = {
-	{ "binary", 0, 0, 'b' },
-	{ "counters", 0, 0, 'c' },
-	{ "verbose", 0, 0, 'v' },
-	{ "test", 0, 0, 't' },
-	{ "help", 0, 0, 'h' },
-	{ "noflush", 0, 0, 'n'},
-	{ "modprobe", 1, 0, 'M'},
-	{ "table", 1, 0, 'T'},
-	{ 0 }
+static const struct option options[] = {
+	{.name = "binary",   .has_arg = false, .val = 'b'},
+	{.name = "counters", .has_arg = false, .val = 'c'},
+	{.name = "verbose",  .has_arg = false, .val = 'v'},
+	{.name = "test",     .has_arg = false, .val = 't'},
+	{.name = "help",     .has_arg = false, .val = 'h'},
+	{.name = "noflush",  .has_arg = false, .val = 'n'},
+	{.name = "modprobe", .has_arg = true,  .val = 'M'},
+	{.name = "table",    .has_arg = true,  .val = 'T'},
+	{NULL},
 };
 
 static void print_usage(const char *name, const char *version) __attribute__((noreturn));

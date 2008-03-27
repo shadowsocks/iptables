@@ -24,12 +24,12 @@
 
 static int show_binary = 0, show_counters = 0;
 
-static struct option options[] = {
-	{ "binary", 0, 0, 'b' },
-	{ "counters", 0, 0, 'c' },
-	{ "dump", 0, 0, 'd' },
-	{ "table", 1, 0, 't' },
-	{ 0 }
+static const struct option options[] = {
+	{.name = "binary",   .has_arg = false, .val = 'b'},
+	{.name = "counters", .has_arg = false, .val = 'c'},
+	{.name = "dump",     .has_arg = false, .val = 'd'},
+	{.name = "table",    .has_arg = true,  .val = 't'},
+	{NULL},
 };
 
 
