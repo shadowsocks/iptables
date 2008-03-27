@@ -18,12 +18,11 @@ static void
 RATEEST_help(void)
 {
 	printf(
-"RATEST target v%s options:\n"
+"RATEEST target options:\n"
 "  --rateest-name name		Rate estimator name\n"
 "  --rateest-interval sec	Rate measurement interval in seconds\n"
 "  --rateest-ewmalog value	Rate measurement averaging time constant\n"
-"\n",
-	       IPTABLES_VERSION);
+"\n");
 }
 
 enum RATEEST_options {
