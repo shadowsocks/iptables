@@ -41,14 +41,14 @@ parse_iprange(char *arg, struct ipt_iprange *range)
 		*dash = '\0';
 
 	ip = numeric_to_ipaddr(arg);
-	if (ip != NULL)
+	if (!ip)
 		exit_error(PARAMETER_PROBLEM, "iprange match: Bad IP address `%s'\n",
 			   arg);
 	range->min_ip = ip->s_addr;
 
 	if (dash != NULL) {
 		ip = numeric_to_ipaddr(dash+1);
-		if (ip != NULL)
+		if (!ip)
 			exit_error(PARAMETER_PROBLEM, "iprange match: Bad IP address `%s'\n",
 				   dash+1);
 		range->max_ip = ip->s_addr;
