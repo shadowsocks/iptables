@@ -7,10 +7,6 @@
 #include <libiptc/libxtc.h>
 #include <stdbool.h>
 
-#ifndef XT_LIB_DIR
-#define XT_LIB_DIR "/usr/local/lib/iptables"
-#endif
-
 #ifndef IPPROTO_SCTP
 #define IPPROTO_SCTP 132
 #endif
@@ -20,43 +16,6 @@
 #ifndef IPPROTO_UDPLITE
 #define IPPROTO_UDPLITE	136
 #endif
-
-/* protocol family dependent informations */
-struct afinfo {
-	/* protocol family */
-	int family;
-
-	/* prefix of library name (ex "libipt_" */
-	char *libprefix;
-
-	/* used by setsockopt (ex IPPROTO_IP */
-	int ipproto;
-
-	/* kernel module (ex "ip_tables" */
-	char *kmod;
-
-	/* optname to check revision support of match */
-	int so_rev_match;
-
-	/* optname to check revision support of match */
-	int so_rev_target;
-};
-
-enum xt_tryload {
-	DONT_LOAD,
-	DURING_LOAD,
-	TRY_LOAD,
-	LOAD_MUST_SUCCEED
-};
-
-struct xtables_rule_match
-{
-	struct xtables_rule_match *next;
-	struct xtables_match *match;
-	/* Multiple matches of the same type: the ones before
-	   the current one are completed from parsing point of view */
-	unsigned int completed;
-};
 
 /* Include file for additions: new matches and targets. */
 struct xtables_match
@@ -171,29 +130,9 @@ struct xtables_target
 #endif
 };
 
-extern char *lib_dir;
-
-extern void *fw_calloc(size_t count, size_t size);
-extern void *fw_malloc(size_t size);
-
-extern const char *modprobe_program;
-extern int xtables_insmod(const char *modname, const char *modprobe, int quiet);
-extern int load_xtables_ko(const char *modprobe, int quiet);
-
-/* This is decleared in ip[6]tables.c */
-extern struct afinfo afinfo;
-
-/* Keeping track of external matches and targets: linked lists.  */
-extern struct xtables_match *xtables_matches;
-extern struct xtables_target *xtables_targets;
-
 /* Your shared library should call one of these. */
 extern void xtables_register_match(struct xtables_match *me);
 extern void xtables_register_target(struct xtables_target *me);
-
-extern struct xtables_match *find_match(const char *name, enum xt_tryload,
-					struct xtables_rule_match **match);
-extern struct xtables_target *find_target(const char *name, enum xt_tryload);
 
 extern int string_to_number_ll(const char *s,
 			       unsigned long long min,
