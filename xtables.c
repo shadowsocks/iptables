@@ -305,6 +305,7 @@ void parse_interface(const char *arg, char *vianame, unsigned char *mask)
 	}
 }
 
+#ifndef NO_SHARED_LIBS
 static void *load_extension(const char *search_path, const char *prefix,
     const char *name, bool is_target)
 {
@@ -353,6 +354,7 @@ static void *load_extension(const char *search_path, const char *prefix,
 
 	return NULL;
 }
+#endif
 
 struct xtables_match *find_match(const char *name, enum xt_tryload tryload,
 				 struct xtables_rule_match **matches)
