@@ -318,7 +318,7 @@ static void *load_extension(const char *search_path, const char *prefix,
 		if (next == NULL)
 			next = dir + strlen(dir);
 		snprintf(path, sizeof(path), "%.*s/libxt_%s.so",
-		         next - dir, dir, name);
+		         (unsigned int)(next - dir), dir, name);
 
 		if (dlopen(path, RTLD_NOW) != NULL) {
 			/* Found library.  If it didn't register itself,
@@ -335,7 +335,7 @@ static void *load_extension(const char *search_path, const char *prefix,
 			return ptr;
 
 		snprintf(path, sizeof(path), "%.*s/%s%s.so",
-		         next - dir, dir, prefix, name);
+		         (unsigned int)(next - dir), dir, prefix, name);
 		if (dlopen(path, RTLD_NOW) != NULL) {
 			if (is_target)
 				ptr = find_target(name, DONT_LOAD);
