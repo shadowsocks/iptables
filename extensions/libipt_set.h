@@ -12,9 +12,9 @@
 #endif
 
 static void
-parse_bindings(const char *optarg, struct ipt_set_info *info)
+parse_bindings(const char *opt_arg, struct ipt_set_info *info)
 {
-	char *saved = strdup(optarg);
+	char *saved = strdup(opt_arg);
 	char *ptr, *tmp = saved;
 	int i = 0;
 	
@@ -66,8 +66,8 @@ static void get_set_byname(const char *setname, struct ipt_set_info *info)
 	if (size != sizeof(struct ip_set_req_get_set))
 		exit_error(OTHER_PROBLEM,
 			   "Incorrect return size from kernel during ipset lookup, "
-			   "(want %ld, got %ld)\n",
-			   sizeof(struct ip_set_req_get_set), size);
+			   "(want %zu, got %zu)\n",
+			   sizeof(struct ip_set_req_get_set), (size_t)size);
 	if (req.set.index == IP_SET_INVALID_ID)
 		exit_error(PARAMETER_PROBLEM,
 			   "Set %s doesn't exist.\n", setname);
@@ -75,7 +75,7 @@ static void get_set_byname(const char *setname, struct ipt_set_info *info)
 	info->index = req.set.index;
 }
 
-static void get_set_byid(char * setname, ip_set_id_t index)
+static void get_set_byid(char * setname, ip_set_id_t idx)
 {
 	struct ip_set_req_get_set req;
 	socklen_t size = sizeof(struct ip_set_req_get_set);
@@ -83,7 +83,7 @@ static void get_set_byid(char * setname, ip_set_id_t index)
 
 	req.op = IP_SET_OP_GET_BYINDEX;
 	req.version = IP_SET_PROTOCOL_VERSION;
-	req.set.index = index;
+	req.set.index = idx;
 	res = get_set_getsockopt(&req, &size);
 	if (res != 0)
 		exit_error(OTHER_PROBLEM,
@@ -92,11 +92,11 @@ static void get_set_byid(char * setname, ip_set_id_t index)
 	if (size != sizeof(struct ip_set_req_get_set))
 		exit_error(OTHER_PROBLEM,
 			   "Incorrect return size from kernel during ipset lookup, "
-			   "(want %ld, got %ld)\n",
-			   sizeof(struct ip_set_req_get_set), size);
+			   "(want %zu, got %zu)\n",
+			   sizeof(struct ip_set_req_get_set), (size_t)size);
 	if (req.set.name[0] == '\0')
 		exit_error(PARAMETER_PROBLEM,
-			   "Set id %i in kernel doesn't exist.\n", index);
+			   "Set id %i in kernel doesn't exist.\n", idx);
 
 	strncpy(setname, req.set.name, IP_SET_MAXNAMELEN);
 }
