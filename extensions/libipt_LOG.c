@@ -21,14 +21,13 @@
 static void LOG_help(void)
 {
 	printf(
-"LOG v%s options:\n"
+"LOG target options:\n"
 " --log-level level		Level of logging (numeric or see syslog.conf)\n"
 " --log-prefix prefix		Prefix log messages with this prefix.\n\n"
 " --log-tcp-sequence		Log TCP sequence numbers.\n\n"
 " --log-tcp-options		Log TCP options.\n\n"
 " --log-ip-options		Log IP options.\n\n"
-" --log-uid			Log UID owning the local socket.\n\n",
-IPTABLES_VERSION);
+" --log-uid			Log UID owning the local socket.\n\n");
 }
 
 static const struct option LOG_opts[] = {
@@ -258,11 +257,12 @@ static void LOG_save(const void *ip, const struct xt_entry_target *target)
 		printf("--log-uid ");
 }
 
-static struct iptables_target log_target = {
+static struct xtables_target log_tg_reg = {
     .name          = "LOG",
-    .version       = IPTABLES_VERSION,
-    .size          = IPT_ALIGN(sizeof(struct ipt_log_info)),
-    .userspacesize = IPT_ALIGN(sizeof(struct ipt_log_info)),
+    .version       = XTABLES_VERSION,
+    .family        = PF_INET,
+    .size          = XT_ALIGN(sizeof(struct ipt_log_info)),
+    .userspacesize = XT_ALIGN(sizeof(struct ipt_log_info)),
     .help          = LOG_help,
     .init          = LOG_init,
     .parse         = LOG_parse,
@@ -273,5 +273,5 @@ static struct iptables_target log_target = {
 
 void _init(void)
 {
-	register_target(&log_target);
+	xtables_register_target(&log_tg_reg);
 }

@@ -30,7 +30,7 @@
 static void hashlimit_help(void)
 {
 	printf(
-"hashlimit v%s options:\n"
+"hashlimit match options:\n"
 "--hashlimit <avg>		max average match rate\n"
 "                                [Packets per second unless followed by \n"
 "                                /sec /minute /hour /day postfixes]\n"
@@ -41,8 +41,8 @@ static void hashlimit_help(void)
 "[--hashlimit-htable-size <num>]	number of hashtable buckets\n"
 "[--hashlimit-htable-max <num>]	number of hashtable entries\n"
 "[--hashlimit-htable-gcinterval]	interval between garbage collection runs\n"
-"[--hashlimit-htable-expire]	after which time are idle entries expired?\n"
-"\n", IPTABLES_VERSION, XT_HASHLIMIT_BURST);
+"[--hashlimit-htable-expire]	after which time are idle entries expired?\n",
+XT_HASHLIMIT_BURST);
 }
 
 static void hashlimit_mt_help(void)
@@ -671,7 +671,7 @@ hashlimit_mt6_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match hashlimit_match = {
 	.family		= AF_INET,
 	.name		= "hashlimit",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.revision	= 0,
 	.size		= XT_ALIGN(sizeof(struct xt_hashlimit_info)),
 	.userspacesize	= offsetof(struct xt_hashlimit_info, hinfo),
@@ -687,7 +687,7 @@ static struct xtables_match hashlimit_match = {
 static struct xtables_match hashlimit_match6 = {
 	.family		= AF_INET6,
 	.name		= "hashlimit",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.revision	= 0,
 	.size		= XT_ALIGN(sizeof(struct xt_hashlimit_info)),
 	.userspacesize	= offsetof(struct xt_hashlimit_info, hinfo),
@@ -701,7 +701,7 @@ static struct xtables_match hashlimit_match6 = {
 };
 
 static struct xtables_match hashlimit_mt_reg = {
-	.version        = IPTABLES_VERSION,
+	.version        = XTABLES_VERSION,
 	.name           = "hashlimit",
 	.revision       = 1,
 	.family         = AF_INET,
@@ -717,7 +717,7 @@ static struct xtables_match hashlimit_mt_reg = {
 };
 
 static struct xtables_match hashlimit_mt6_reg = {
-	.version        = IPTABLES_VERSION,
+	.version        = XTABLES_VERSION,
 	.name           = "hashlimit",
 	.revision       = 1,
 	.family         = AF_INET6,

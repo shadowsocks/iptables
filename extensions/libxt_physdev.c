@@ -15,13 +15,12 @@
 static void physdev_help(void)
 {
 	printf(
-"physdev v%s options:\n"
+"physdev match options:\n"
 " --physdev-in [!] input name[+]		bridge port name ([+] for wildcard)\n"
 " --physdev-out [!] output name[+]	bridge port name ([+] for wildcard)\n"
 " [!] --physdev-is-in			arrived on a bridge device\n"
 " [!] --physdev-is-out			will leave on a bridge device\n"
-" [!] --physdev-is-bridged		it's a bridged packet\n"
-"\n", IPTABLES_VERSION);
+" [!] --physdev-is-bridged		it's a bridged packet\n");
 }
 
 static const struct option physdev_opts[] = {
@@ -165,7 +164,7 @@ static void physdev_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match physdev_match = {
 	.family		= AF_INET,
 	.name		= "physdev",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_physdev_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_physdev_info)),
 	.help		= physdev_help,
@@ -179,7 +178,7 @@ static struct xtables_match physdev_match = {
 static struct xtables_match physdev_match6 = {
 	.family		= AF_INET6,
 	.name		= "physdev",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_physdev_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_physdev_info)),
 	.help		= physdev_help,

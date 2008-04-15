@@ -18,10 +18,9 @@
 static void realm_help(void)
 {
 	printf(
-"realm v%s options:\n"
+"realm match options:\n"
 " --realm [!] value[/mask]\n"
-"				Match realm\n"
-"\n", IPTABLES_VERSION);
+"				Match realm\n");
 }
 
 static const struct option realm_opts[] = {
@@ -243,11 +242,12 @@ static void realm_check(unsigned int flags)
 			   "realm match: You must specify `--realm'");
 }
 
-static struct iptables_match realm_match = {
+static struct xtables_match realm_mt_reg = {
 	.name		= "realm",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_realm_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_realm_info)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ipt_realm_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ipt_realm_info)),
 	.help		= realm_help,
 	.parse		= realm_parse,
 	.final_check	= realm_check,
@@ -258,7 +258,7 @@ static struct iptables_match realm_match = {
 
 void _init(void)
 {
-	register_match(&realm_match);
+	xtables_register_match(&realm_mt_reg);
 }
 
 

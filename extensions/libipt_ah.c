@@ -12,10 +12,9 @@
 static void ah_help(void)
 {
 	printf(
-"AH v%s options:\n"
+"ah match options:\n"
 " --ahspi [!] spi[:spi]\n"
-"				match spi (range)\n",
-IPTABLES_VERSION);
+"				match spi (range)\n");
 }
 
 static const struct option ah_opts[] = {
@@ -156,11 +155,12 @@ static void ah_save(const void *ip, const struct xt_entry_match *match)
 
 }
 
-static struct iptables_match ah_match = {
+static struct xtables_match ah_mt_reg = {
 	.name 		= "ah",
-	.version 	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_ah)),
-	.userspacesize 	= IPT_ALIGN(sizeof(struct ipt_ah)),
+	.version 	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ipt_ah)),
+	.userspacesize 	= XT_ALIGN(sizeof(struct ipt_ah)),
 	.help 		= ah_help,
 	.init 		= ah_init,
 	.parse 		= ah_parse,
@@ -172,5 +172,5 @@ static struct iptables_match ah_match = {
 void
 _init(void)
 {
-	register_match(&ah_match);
+	xtables_register_match(&ah_mt_reg);
 }

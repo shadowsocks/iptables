@@ -20,9 +20,8 @@
 static void ECN_help(void)
 {
 	printf(
-"ECN target v%s options\n"
-"  --ecn-tcp-remove		Remove all ECN bits from TCP header\n",
-		IPTABLES_VERSION);
+"ECN target options\n"
+"  --ecn-tcp-remove		Remove all ECN bits from TCP header\n");
 }
 
 #if 0
@@ -153,11 +152,12 @@ static void ECN_save(const void *ip, const struct xt_entry_target *target)
 	}
 }
 
-static struct iptables_target ecn_target = {
+static struct xtables_target ecn_tg_reg = {
 	.name		= "ECN",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_ECN_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_ECN_info)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ipt_ECN_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ipt_ECN_info)),
 	.help		= ECN_help,
 	.parse		= ECN_parse,
 	.final_check	= ECN_check,
@@ -168,5 +168,5 @@ static struct iptables_target ecn_target = {
 
 void _init(void)
 {
-	register_target(&ecn_target);
+	xtables_register_target(&ecn_tg_reg);
 }

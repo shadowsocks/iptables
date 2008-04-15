@@ -12,11 +12,10 @@
 static void connbytes_help(void)
 {
 	printf(
-"connbytes v%s options:\n"
+"connbytes match options:\n"
 " [!] --connbytes from:[to]\n"
 "     --connbytes-dir [original, reply, both]\n"
-"     --connbytes-mode [packets, bytes, avgpkt]\n"
-"\n", IPTABLES_VERSION);
+"     --connbytes-mode [packets, bytes, avgpkt]\n");
 }
 
 static const struct option connbytes_opts[] = {
@@ -188,7 +187,7 @@ static void connbytes_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match connbytes_match = {
 	.family		= AF_INET,
 	.name 		= "connbytes",
-	.version 	= IPTABLES_VERSION,
+	.version 	= XTABLES_VERSION,
 	.size 		= XT_ALIGN(sizeof(struct xt_connbytes_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connbytes_info)),
 	.help		= connbytes_help,
@@ -202,7 +201,7 @@ static struct xtables_match connbytes_match = {
 static struct xtables_match connbytes_match6 = {
 	.family		= AF_INET6,
 	.name 		= "connbytes",
-	.version 	= IPTABLES_VERSION,
+	.version 	= XTABLES_VERSION,
 	.size 		= XT_ALIGN(sizeof(struct xt_connbytes_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connbytes_info)),
 	.help		= connbytes_help,

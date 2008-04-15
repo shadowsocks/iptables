@@ -12,14 +12,11 @@
 static void MASQUERADE_help(void)
 {
 	printf(
-"MASQUERADE v%s options:\n"
+"MASQUERADE target options:\n"
 " --to-ports <port>[-<port>]\n"
 "				Port (range) to map to.\n"
 " --random\n"
-"				Randomize source port.\n"
-"\n"
-,
-IPTABLES_VERSION);
+"				Randomize source port.\n");
 }
 
 static const struct option MASQUERADE_opts[] = {
@@ -151,11 +148,12 @@ MASQUERADE_save(const void *ip, const struct xt_entry_target *target)
 		printf("--random ");
 }
 
-static struct iptables_target masquerade_target = {
+static struct xtables_target masquerade_tg_reg = {
 	.name		= "MASQUERADE",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
 	.help		= MASQUERADE_help,
 	.init		= MASQUERADE_init,
 	.parse		= MASQUERADE_parse,
@@ -166,5 +164,5 @@ static struct iptables_target masquerade_target = {
 
 void _init(void)
 {
-	register_target(&masquerade_target);
+	xtables_register_target(&masquerade_tg_reg);
 }

@@ -59,7 +59,7 @@ static void tos_tg_help(void)
 "  --set-tos symbol        Set TOS field (IPv4 only) by symbol\n"
 "                          (this zeroes the 4-bit Precedence part!)\n"
 "                          Accepted symbolic names for value are:\n",
-IPTABLES_VERSION);
+XTABLES_VERSION);
 
 	for (symbol = tos_symbol_names; symbol->name != NULL; ++symbol)
 		printf("                            (0x%02x) %2u %s\n",
@@ -205,7 +205,7 @@ static void tos_tg_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target tos_tg_reg_v0 = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "TOS",
 	.revision      = 0,
 	.family        = AF_INET,
@@ -220,7 +220,7 @@ static struct xtables_target tos_tg_reg_v0 = {
 };
 
 static struct xtables_target tos_tg_reg = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "TOS",
 	.revision      = 1,
 	.family        = AF_INET,
@@ -235,7 +235,7 @@ static struct xtables_target tos_tg_reg = {
 };
 
 static struct xtables_target tos_tg6_reg = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "TOS",
 	.family        = AF_INET6,
 	.revision      = 1,

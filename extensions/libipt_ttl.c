@@ -17,11 +17,10 @@
 static void ttl_help(void)
 {
 	printf(
-"TTL match v%s options:\n"
+"ttl match options:\n"
 "  --ttl-eq value	Match time to live value\n"
 "  --ttl-lt value	Match TTL < value\n"
-"  --ttl-gt value	Match TTL > value\n"
-, IPTABLES_VERSION);
+"  --ttl-gt value	Match TTL > value\n");
 }
 
 static int ttl_parse(int c, char **argv, int invert, unsigned int *flags,
@@ -148,11 +147,12 @@ static const struct option ttl_opts[] = {
 	{ .name = NULL }
 };
 
-static struct iptables_match ttl_match = {
+static struct xtables_match ttl_mt_reg = {
 	.name		= "ttl",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_ttl_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_ttl_info)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ipt_ttl_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ipt_ttl_info)),
 	.help		= ttl_help,
 	.parse		= ttl_parse,
 	.final_check	= ttl_check,
@@ -164,5 +164,5 @@ static struct iptables_match ttl_match = {
 
 void _init(void) 
 {
-	register_match(&ttl_match);
+	xtables_register_match(&ttl_mt_reg);
 }

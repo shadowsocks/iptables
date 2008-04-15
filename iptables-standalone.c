@@ -51,7 +51,7 @@ main(int argc, char *argv[])
 	iptc_handle_t handle = NULL;
 
 	program_name = "iptables";
-	program_version = IPTABLES_VERSION;
+	program_version = XTABLES_VERSION;
 
 	lib_dir = getenv("XTABLES_LIBDIR");
 	if (lib_dir == NULL) {

@@ -58,9 +58,8 @@ static void print_types(void)
 static void pkttype_help(void)
 {
 	printf(
-"pkttype v%s options:\n"
-"  --pkt-type [!] packettype\tmatch packet type\n"
-"\n", PKTTYPE_VERSION);
+"pkttype match options:\n"
+"  --pkt-type [!] packettype\tmatch packet type\n");
 	print_types();
 }
 
@@ -149,7 +148,7 @@ static void pkttype_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match pkttype_match = {
 	.family		= AF_UNSPEC,
 	.name		= "pkttype",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_pkttype_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_pkttype_info)),
 	.help		= pkttype_help,

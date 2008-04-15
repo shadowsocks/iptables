@@ -70,7 +70,7 @@ print_reject_types(void)
 static void REJECT_help(void)
 {
 	printf(
-"REJECT options:\n"
+"REJECT target options:\n"
 "--reject-with type              drop input packet and send back\n"
 "                                a reply packet according to type:\n");
 
@@ -157,11 +157,12 @@ static void REJECT_save(const void *ip, const struct xt_entry_target *target)
 	printf("--reject-with %s ", reject_table[i].name);
 }
 
-static struct iptables_target reject_target = {
+static struct xtables_target reject_tg_reg = {
 	.name		= "REJECT",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_reject_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_reject_info)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ipt_reject_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ipt_reject_info)),
 	.help		= REJECT_help,
 	.init		= REJECT_init,
 	.parse		= REJECT_parse,
@@ -172,5 +173,5 @@ static struct iptables_target reject_target = {
 
 void _init(void)
 {
-	register_target(&reject_target);
+	xtables_register_target(&reject_tg_reg);
 }

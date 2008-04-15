@@ -10,9 +10,7 @@
 /* Function which prints out usage message. */
 static void MIRROR_help(void)
 {
-	printf(
-"MIRROR target v%s takes no options\n",
-IPTABLES_VERSION);
+	printf("MIRROR target takes no options\n");
 }
 
 /* Function which parses command options; returns true if it
@@ -23,11 +21,12 @@ static int MIRROR_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
-static struct iptables_target mirror_target = {
+static struct xtables_target mirror_tg_reg = {
 	.name		= "MIRROR",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(0),
-	.userspacesize	= IPT_ALIGN(0),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(0),
+	.userspacesize	= XT_ALIGN(0),
  	.help		= MIRROR_help,
  	.parse		= MIRROR_parse,
 	.print		= NULL,
@@ -36,5 +35,5 @@ static struct iptables_target mirror_target = {
 
 void _init(void)
 {
-	register_target(&mirror_target);
+	xtables_register_target(&mirror_tg_reg);
 }

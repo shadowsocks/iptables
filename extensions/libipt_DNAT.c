@@ -23,12 +23,10 @@ struct ipt_natinfo
 static void DNAT_help(void)
 {
 	printf(
-"DNAT v%s options:\n"
+"DNAT target options:\n"
 " --to-destination <ipaddr>[-<ipaddr>][:port-port]\n"
 "				Address to map destination to.\n"
-"[--random]\n"
-"\n",
-IPTABLES_VERSION);
+"[--random]\n");
 }
 
 static const struct option DNAT_opts[] = {
@@ -43,7 +41,7 @@ append_range(struct ipt_natinfo *info, const struct ip_nat_range *range)
 	unsigned int size;
 
 	/* One rangesize already in struct ipt_natinfo */
-	size = IPT_ALIGN(sizeof(*info) + info->mr.rangesize * sizeof(*range));
+	size = XT_ALIGN(sizeof(*info) + info->mr.rangesize * sizeof(*range));
 
 	info = realloc(info, size);
 	if (!info)
@@ -243,11 +241,12 @@ static void DNAT_save(const void *ip, const struct xt_entry_target *target)
 	}
 }
 
-static struct iptables_target dnat_target = {
+static struct xtables_target dnat_tg_reg = {
 	.name		= "DNAT",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
 	.help		= DNAT_help,
 	.parse		= DNAT_parse,
 	.final_check	= DNAT_check,
@@ -258,5 +257,5 @@ static struct iptables_target dnat_target = {
 
 void _init(void)
 {
-	register_target(&dnat_target);
+	xtables_register_target(&dnat_tg_reg);
 }

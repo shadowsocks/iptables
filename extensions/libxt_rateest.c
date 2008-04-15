@@ -13,7 +13,7 @@ static struct xt_rateest_match_info *rateest_info;
 static void rateest_help(void)
 {
 	printf(
-"rateest match v%s options:\n"
+"rateest match options:\n"
 " --rateest1 name		Rate estimator name\n"
 " --rateest2 name		Rate estimator name\n"
 " --rateest-delta		Compare difference(s) to given rate(s)\n"
@@ -23,9 +23,7 @@ static void rateest_help(void)
 " --rateest-pps2 [pps]		Compare pps\n"
 " [!] --rateest-lt		Match if rate is less than given rate/estimator\n"
 " [!] --rateest-gt		Match if rate is greater than given rate/estimator\n"
-" [!] --rateest-eq		Match if rate is equal to given rate/estimator\n"
-"\n",
-	       IPTABLES_VERSION);
+" [!] --rateest-eq		Match if rate is equal to given rate/estimator\n");
 }
 
 enum rateest_options {
@@ -429,7 +427,7 @@ rateest_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match rateest_mt_reg = {
 	.family		= AF_UNSPEC,
 	.name		= "rateest",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_rateest_match_info)),
 	.userspacesize	= XT_ALIGN(offsetof(struct xt_rateest_match_info, est1)),
 	.help		= rateest_help,

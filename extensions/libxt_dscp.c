@@ -27,16 +27,14 @@
 static void dscp_help(void)
 {
 	printf(
-"DSCP match v%s options\n"
+"dscp match options\n"
 "[!] --dscp value		Match DSCP codepoint with numerical value\n"
 "  		                This value can be in decimal (ex: 32)\n"
 "               		or in hex (ex: 0x20)\n"
 "[!] --dscp-class name		Match the DiffServ class. This value may\n"
 "				be any of the BE,EF, AFxx or CSx classes\n"
 "\n"
-"				These two options are mutually exclusive !\n"
-				, IPTABLES_VERSION
-);
+"				These two options are mutually exclusive !\n");
 }
 
 static const struct option dscp_opts[] = {
@@ -149,7 +147,7 @@ static void dscp_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match dscp_match = {
 	.family		= AF_INET,
 	.name 		= "dscp",
-	.version 	= IPTABLES_VERSION,
+	.version 	= XTABLES_VERSION,
 	.size 		= XT_ALIGN(sizeof(struct xt_dscp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_dscp_info)),
 	.help		= dscp_help,
@@ -163,7 +161,7 @@ static struct xtables_match dscp_match = {
 static struct xtables_match dscp_match6 = {
 	.family		= AF_INET6,
 	.name 		= "dscp",
-	.version 	= IPTABLES_VERSION,
+	.version 	= XTABLES_VERSION,
 	.size 		= XT_ALIGN(sizeof(struct xt_dscp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_dscp_info)),
 	.help		= dscp_help,

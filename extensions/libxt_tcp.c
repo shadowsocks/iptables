@@ -11,7 +11,7 @@
 static void tcp_help(void)
 {
 	printf(
-"TCP v%s options:\n"
+"tcp match options:\n"
 " --tcp-flags [!] mask comp	match when TCP flags & mask == comp\n"
 "				(Flags: SYN ACK FIN RST URG PSH ALL NONE)\n"
 "[!] --syn			match when only SYN flag set\n"
@@ -22,8 +22,7 @@ static void tcp_help(void)
 " --destination-port [!] port[:port]\n"
 " --dport ...\n"
 "				match destination port(s)\n"
-" --tcp-option [!] number       match if TCP option set\n\n",
-IPTABLES_VERSION);
+" --tcp-option [!] number       match if TCP option set\n");
 }
 
 static const struct option tcp_opts[] = {
@@ -386,7 +385,7 @@ static void tcp_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match tcp_match = {
 	.family		= AF_INET,
 	.name		= "tcp",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcp)),
 	.help		= tcp_help,
@@ -400,7 +399,7 @@ static struct xtables_match tcp_match = {
 static struct xtables_match tcp_match6 = {
 	.family		= AF_INET6,
 	.name		= "tcp",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcp)),
 	.help		= tcp_help,

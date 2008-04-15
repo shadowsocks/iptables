@@ -34,13 +34,12 @@
 static void string_help(void)
 {
 	printf(
-"STRING match v%s options:\n"
+"string match options:\n"
 "--from                       Offset to start searching from\n"
 "--to                         Offset to stop searching\n"
 "--algo	                      Algorithm\n"
 "--string [!] string          Match a string in a packet\n"
-"--hex-string [!] string      Match a hex string in a packet\n",
-IPTABLES_VERSION);
+"--hex-string [!] string      Match a hex string in a packet\n");
 }
 
 static const struct option string_opts[] = {
@@ -328,7 +327,7 @@ static void string_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match string_match = {
     .name		= "string",
     .family		= AF_UNSPEC,
-    .version		= IPTABLES_VERSION,
+    .version		= XTABLES_VERSION,
     .size		= XT_ALIGN(sizeof(struct xt_string_info)),
     .userspacesize	= offsetof(struct xt_string_info, config),
     .help		= string_help,

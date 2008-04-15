@@ -19,11 +19,10 @@
 static void ecn_help(void)
 {
 	printf(
-"ECN match v%s options\n"
+"ECN match options\n"
 "[!] --ecn-tcp-cwr 		Match CWR bit of TCP header\n"
 "[!] --ecn-tcp-ece		Match ECE bit of TCP header\n"
-"[!] --ecn-ip-ect [0..3]	Match ECN codepoint in IPv4 header\n",
-	IPTABLES_VERSION);
+"[!] --ecn-ip-ect [0..3]	Match ECN codepoint in IPv4 header\n");
 }
 
 static const struct option ecn_opts[] = {
@@ -144,11 +143,12 @@ static void ecn_save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-static struct iptables_match ecn_match = {
+static struct xtables_match ecn_mt_reg = {
     .name          = "ecn",
-    .version       = IPTABLES_VERSION,
-    .size          = IPT_ALIGN(sizeof(struct ipt_ecn_info)),
-    .userspacesize = IPT_ALIGN(sizeof(struct ipt_ecn_info)),
+    .version       = XTABLES_VERSION,
+    .family        = PF_INET,
+    .size          = XT_ALIGN(sizeof(struct ipt_ecn_info)),
+    .userspacesize = XT_ALIGN(sizeof(struct ipt_ecn_info)),
     .help          = ecn_help,
     .parse         = ecn_parse,
     .final_check   = ecn_check,
@@ -159,5 +159,5 @@ static struct iptables_match ecn_match = {
 
 void _init(void)
 {
-	register_match(&ecn_match);
+	xtables_register_match(&ecn_mt_reg);
 }

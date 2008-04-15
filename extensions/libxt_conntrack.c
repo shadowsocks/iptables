@@ -44,8 +44,7 @@ static void conntrack_mt_help(void)
 "                               Status(es) to match\n"
 "[!] --ctexpire time[:time]     Match remaining lifetime in seconds against\n"
 "                               value or range of values (inclusive)\n"
-"    --ctdir {ORIGINAL|REPLY}   Flow direction of packet\n"
-"\n");
+"    --ctdir {ORIGINAL|REPLY}   Flow direction of packet\n");
 }
 
 static const struct option conntrack_mt_opts_v0[] = {
@@ -1017,7 +1016,7 @@ static void conntrack_mt6_save(const void *ip,
 }
 
 static struct xtables_match conntrack_match = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "conntrack",
 	.revision      = 0,
 	.family        = AF_INET,
@@ -1032,7 +1031,7 @@ static struct xtables_match conntrack_match = {
 };
 
 static struct xtables_match conntrack_mt_reg = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "conntrack",
 	.revision      = 1,
 	.family        = AF_INET,
@@ -1047,7 +1046,7 @@ static struct xtables_match conntrack_mt_reg = {
 };
 
 static struct xtables_match conntrack_mt6_reg = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "conntrack",
 	.revision      = 1,
 	.family        = AF_INET6,

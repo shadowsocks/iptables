@@ -10,9 +10,7 @@
 /* Function which prints out usage message. */
 static void NOTRACK_help(void)
 {
-	printf(
-"NOTRACK target v%s takes no options\n",
-IPTABLES_VERSION);
+	printf("NOTRACK target takes no options\n");
 }
 
 /* Function which parses command options; returns true if it
@@ -27,7 +25,7 @@ NOTRACK_parse(int c, char **argv, int invert, unsigned int *flags,
 static struct xtables_target notrack_target = {
 	.family		= AF_INET,
 	.name		= "NOTRACK",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(0),
 	.userspacesize	= XT_ALIGN(0),
 	.help		= NOTRACK_help,
@@ -37,7 +35,7 @@ static struct xtables_target notrack_target = {
 static struct xtables_target notrack_target6 = {
 	.family		= AF_INET6,
 	.name		= "NOTRACK",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(0),
 	.userspacesize	= XT_ALIGN(0),
 	.help		= NOTRACK_help,

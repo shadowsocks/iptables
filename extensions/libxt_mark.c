@@ -17,8 +17,7 @@ static void mark_mt_help(void)
 {
 	printf(
 "mark match options:\n"
-"[!] --mark value[/mask]    Match nfmark value with optional mask\n"
-"\n");
+"[!] --mark value[/mask]    Match nfmark value with optional mask\n");
 }
 
 static const struct option mark_mt_opts[] = {
@@ -152,7 +151,7 @@ static struct xtables_match mark_match = {
 	.family		= AF_UNSPEC,
 	.name		= "mark",
 	.revision	= 0,
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_mark_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_info)),
 	.help		= mark_mt_help,
@@ -164,7 +163,7 @@ static struct xtables_match mark_match = {
 };
 
 static struct xtables_match mark_mt_reg = {
-	.version        = IPTABLES_VERSION,
+	.version        = XTABLES_VERSION,
 	.name           = "mark",
 	.revision       = 1,
 	.family         = AF_UNSPEC,

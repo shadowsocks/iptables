@@ -101,10 +101,9 @@ print_icmptypes(void)
 static void icmp_help(void)
 {
 	printf(
-"ICMP v%s options:\n"
+"icmp match options:\n"
 " --icmp-type [!] typename	match icmp type\n"
-"				(or numeric type or type/code)\n"
-"\n", IPTABLES_VERSION);
+"				(or numeric type or type/code)\n");
 	print_icmptypes();
 }
 
@@ -274,11 +273,12 @@ static void icmp_save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-static struct iptables_match icmp_match = {
+static struct xtables_match icmp_mt_reg = {
 	.name		= "icmp",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_icmp)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_icmp)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ipt_icmp)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ipt_icmp)),
 	.help		= icmp_help,
 	.init		= icmp_init,
 	.parse		= icmp_parse,
@@ -289,5 +289,5 @@ static struct iptables_match icmp_match = {
 
 void _init(void)
 {
-	register_match(&icmp_match);
+	xtables_register_match(&icmp_mt_reg);
 }

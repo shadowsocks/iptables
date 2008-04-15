@@ -21,10 +21,10 @@ static const struct option NETMAP_opts[] = {
 /* Function which prints out usage message. */
 static void NETMAP_help(void)
 {
-	printf(MODULENAME" v%s options:\n"
+	printf(MODULENAME" target options:\n"
 	       "  --%s address[/mask]\n"
 	       "				Network address to map to.\n\n",
-	       IPTABLES_VERSION, NETMAP_opts[0].name);
+	       NETMAP_opts[0].name);
 }
 
 static u_int32_t
@@ -170,11 +170,12 @@ static void NETMAP_save(const void *ip, const struct xt_entry_target *target)
 	NETMAP_print(ip, target, 0);
 }
 
-static struct iptables_target netmap_target = {
+static struct xtables_target netmap_tg_reg = {
 	.name		= MODULENAME,
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
 	.help		= NETMAP_help,
 	.init		= NETMAP_init,
 	.parse		= NETMAP_parse,
@@ -186,6 +187,6 @@ static struct iptables_target netmap_target = {
 
 void _init(void)
 {
-	register_target(&netmap_target);
+	xtables_register_target(&netmap_tg_reg);
 }
 

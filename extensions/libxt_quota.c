@@ -19,8 +19,8 @@ static const struct option quota_opts[] = {
 /* print usage */
 static void quota_help(void)
 {
-	printf("quota options:\n"
-	       " --quota quota			quota (bytes)\n" "\n");
+	printf("quota match options:\n"
+	       " --quota quota			quota (bytes)\n");
 }
 
 /* print matchinfo */
@@ -80,7 +80,7 @@ quota_parse(int c, char **argv, int invert, unsigned int *flags,
 struct xtables_match quota_match = {
 	.family		= AF_UNSPEC,
 	.name		= "quota",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof (struct xt_quota_info)),
 	.userspacesize	= offsetof(struct xt_quota_info, quota),
 	.help		= quota_help,

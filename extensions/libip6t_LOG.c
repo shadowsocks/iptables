@@ -21,14 +21,13 @@
 static void LOG_help(void)
 {
 	printf(
-"LOG v%s options:\n"
+"LOG target options:\n"
 " --log-level level		Level of logging (numeric or see syslog.conf)\n"
-" --log-prefix prefix		Prefix log messages with this prefix.\n\n"
-" --log-tcp-sequence		Log TCP sequence numbers.\n\n"
-" --log-tcp-options		Log TCP options.\n\n"
-" --log-ip-options		Log IP options.\n\n"
-" --log-uid			Log UID owning the local socket.\n\n",
-IPTABLES_VERSION);
+" --log-prefix prefix		Prefix log messages with this prefix.\n"
+" --log-tcp-sequence		Log TCP sequence numbers.\n"
+" --log-tcp-options		Log TCP options.\n"
+" --log-ip-options		Log IP options.\n"
+" --log-uid			Log UID owning the local socket.\n");
 }
 
 static const struct option LOG_opts[] = {
@@ -256,11 +255,12 @@ static void LOG_save(const void *ip, const struct xt_entry_target *target)
 		printf("--log-uid ");
 }
 
-static struct ip6tables_target log_target6 = {
+static struct xtables_target log_tg6_reg = {
     .name          = "LOG",
-    .version       = IPTABLES_VERSION,
-    .size          = IP6T_ALIGN(sizeof(struct ip6t_log_info)),
-    .userspacesize = IP6T_ALIGN(sizeof(struct ip6t_log_info)),
+    .version       = XTABLES_VERSION,
+    .family        = PF_INET6,
+    .size          = XT_ALIGN(sizeof(struct ip6t_log_info)),
+    .userspacesize = XT_ALIGN(sizeof(struct ip6t_log_info)),
     .help          = LOG_help,
     .init          = LOG_init,
     .parse         = LOG_parse,
@@ -271,5 +271,5 @@ static struct ip6tables_target log_target6 = {
 
 void _init(void)
 {
-	register_target6(&log_target6);
+	xtables_register_target(&log_tg6_reg);
 }

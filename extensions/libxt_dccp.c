@@ -35,13 +35,11 @@ static void dccp_init(struct xt_entry_match *m)
 static void dccp_help(void)
 {
 	printf(
-"DCCP match v%s options\n"
+"dccp match options\n"
 " --source-port [!] port[:port]                          match source port(s)\n"
 " --sport ...\n"
 " --destination-port [!] port[:port]                     match destination port(s)\n"
-" --dport ...\n"
-,
-	IPTABLES_VERSION);
+" --dport ...\n");
 }
 
 static const struct option dccp_opts[] = {
@@ -342,7 +340,7 @@ static void dccp_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match dccp_match = {
 	.name		= "dccp",
 	.family		= AF_INET,
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_dccp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_dccp_info)),
 	.help		= dccp_help,
@@ -356,7 +354,7 @@ static struct xtables_match dccp_match = {
 static struct xtables_match dccp_match6 = {
 	.name		= "dccp",
 	.family		= AF_INET6,
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_dccp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_dccp_info)),
 	.help		= dccp_help,

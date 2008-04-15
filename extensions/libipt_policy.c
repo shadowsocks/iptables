@@ -24,7 +24,7 @@ static struct ipt_policy_info *policy_info;
 static void policy_help(void)
 {
 	printf(
-"policy v%s options:\n"
+"policy match options:\n"
 "  --dir in|out			match policy applied during decapsulation/\n"
 "				policy to be applied during encapsulation\n"
 "  --pol none|ipsec		match policy\n"
@@ -36,8 +36,7 @@ static void policy_help(void)
 "[!] --mode mode 		match mode (transport/tunnel)\n"
 "[!] --tunnel-src addr/mask	match tunnel source\n"
 "[!] --tunnel-dst addr/mask	match tunnel destination\n"
-"  --next 			begin next element in policy\n",
-	IPTABLES_VERSION);
+"  --next 			begin next element in policy\n");
 }
 
 static const struct option policy_opts[] =
@@ -408,11 +407,12 @@ static void policy_save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-static struct iptables_match policy_match = {
+static struct xtables_match policy_mt_reg = {
 	.name		= "policy",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_policy_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_policy_info)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ipt_policy_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ipt_policy_info)),
 	.help		= policy_help,
 	.parse		= policy_parse,
 	.final_check	= policy_check,
@@ -423,5 +423,5 @@ static struct iptables_match policy_match = {
 
 void _init(void)
 {
-	register_match(&policy_match);
+	xtables_register_match(&policy_mt_reg);
 }

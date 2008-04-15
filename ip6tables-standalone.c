@@ -50,7 +50,7 @@ main(int argc, char *argv[])
 	ip6tc_handle_t handle = NULL;
 
 	program_name = "ip6tables";
-	program_version = IPTABLES_VERSION;
+	program_version = XTABLES_VERSION;
 
 	lib_dir = getenv("XTABLES_LIBDIR");
 	if (lib_dir == NULL) {

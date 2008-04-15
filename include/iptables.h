@@ -10,16 +10,11 @@
 #endif /* IPT_SO_GET_REVISION_MATCH   Old kernel source */
 
 #define iptables_rule_match	xtables_rule_match
-#define iptables_match		xtables_match
-#define iptables_target		xtables_target
 #define ipt_tryload		xt_tryload
 
 extern int line;
 
 /* Your shared library should call one of these. */
-extern void register_match(struct iptables_match *me);
-extern void register_target(struct iptables_target *me);
-
 extern int do_command(int argc, char *argv[], char **table,
 		      iptc_handle_t *handle);
 extern int delete_chain(const ipt_chainlabel chain, int verbose,

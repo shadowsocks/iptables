@@ -25,13 +25,12 @@
 /* Function which prints out usage message. */
 static void SET_help(void)
 {
-	printf("SET v%s options:\n"
+	printf("SET target options:\n"
 	       " --add-set name flags\n"
 	       " --del-set name flags\n"
 	       "		add/del src/dst IP/port from/to named sets,\n"
 	       "		where flags are the comma separated list of\n"
-	       "		'src' and 'dst'.\n"
-	       "\n", IPTABLES_VERSION);
+	       "		'src' and 'dst'.\n");
 }
 
 static const struct option SET_opts[] = {
@@ -154,11 +153,12 @@ static void SET_save(const void *ip, const struct xt_entry_target *target)
 	print_target("--del-set", &info->del_set);
 }
 
-static struct iptables_target set_target = {
+static struct xtables_target set_tg_reg = {
 	.name		= "SET",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_set_info_target)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_set_info_target)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ipt_set_info_target)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ipt_set_info_target)),
 	.help		= SET_help,
 	.init		= SET_init,
 	.parse		= SET_parse,
@@ -170,5 +170,5 @@ static struct iptables_target set_target = {
 
 void _init(void)
 {
-	register_target(&set_target);
+	xtables_register_target(&set_tg_reg);
 }

@@ -15,11 +15,11 @@
 static void dst_help(void)
 {
 	printf(
-"dst v%s options:\n"
+"dst match options:\n"
 "  --dst-len [!] length          total length of this header\n"
 "  --dst-opts TYPE[:LEN][,TYPE[:LEN]...]\n"
 "                                Options and its length (list, max: %d)\n",
-IPTABLES_VERSION, IP6T_OPTS_OPTSNR);
+IP6T_OPTS_OPTSNR);
 }
 
 static const struct option dst_opts[] = {
@@ -227,11 +227,12 @@ static void dst_save(const void *ip, const struct xt_entry_match *match)
 		printf("--dst-not-strict ");
 }
 
-static struct ip6tables_match dst_match6 = {
+static struct xtables_match dst_mt6_reg = {
 	.name          = "dst",
-	.version       = IPTABLES_VERSION,
-	.size          = IP6T_ALIGN(sizeof(struct ip6t_opts)),
-	.userspacesize = IP6T_ALIGN(sizeof(struct ip6t_opts)),
+	.version       = XTABLES_VERSION,
+	.family        = PF_INET6,
+	.size          = XT_ALIGN(sizeof(struct ip6t_opts)),
+	.userspacesize = XT_ALIGN(sizeof(struct ip6t_opts)),
 	.help          = dst_help,
 	.init          = dst_init,
 	.parse         = dst_parse,
@@ -243,5 +244,5 @@ static struct ip6tables_match dst_match6 = {
 void
 _init(void)
 {
-	register_match6(&dst_match6);
+	xtables_register_match(&dst_mt6_reg);
 }

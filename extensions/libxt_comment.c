@@ -18,9 +18,8 @@
 static void comment_help(void)
 {
 	printf(
-		"COMMENT match options:\n"
-		"--comment COMMENT             Attach a comment to a rule\n\n"
-		);
+		"comment match options:\n"
+		"--comment COMMENT             Attach a comment to a rule\n");
 }
 
 static const struct option comment_opts[] = {
@@ -96,7 +95,7 @@ comment_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match comment_match = {
 	.family		= AF_INET,
 	.name		= "comment",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_comment_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_comment_info)),
 	.help		= comment_help,
@@ -110,7 +109,7 @@ static struct xtables_match comment_match = {
 static struct xtables_match comment_match6 = {
 	.family		= AF_INET6,
 	.name		= "comment",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_comment_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_comment_info)),
 	.help		= comment_help,

@@ -176,7 +176,7 @@ tcpoptstrip_tg_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target tcpoptstrip_tg_reg = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "TCPOPTSTRIP",
 	.family        = AF_INET,
 	.size          = XT_ALIGN(sizeof(struct xt_tcpoptstrip_target_info)),
@@ -191,7 +191,7 @@ static struct xtables_target tcpoptstrip_tg_reg = {
 };
 
 static struct xtables_target tcpoptstrip_tg6_reg = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "TCPOPTSTRIP",
 	.family        = AF_INET6,
 	.size          = XT_ALIGN(sizeof(struct xt_tcpoptstrip_target_info)),

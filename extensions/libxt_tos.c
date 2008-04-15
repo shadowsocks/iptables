@@ -138,7 +138,7 @@ static void tos_mt_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match tos_mt_reg_v0 = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "tos",
 	.family        = AF_INET,
 	.revision      = 0,
@@ -153,7 +153,7 @@ static struct xtables_match tos_mt_reg_v0 = {
 };
 
 static struct xtables_match tos_mt_reg = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "tos",
 	.family        = AF_INET,
 	.revision      = 1,
@@ -168,7 +168,7 @@ static struct xtables_match tos_mt_reg = {
 };
 
 static struct xtables_match tos_mt6_reg = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "tos",
 	.family        = AF_INET6,
 	.revision      = 1,

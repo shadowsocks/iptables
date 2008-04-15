@@ -19,11 +19,10 @@
 static void TTL_help(void)
 {
 	printf(
-"TTL target v%s options\n"
+"TTL target options\n"
 "  --ttl-set value		Set TTL to <value 0-255>\n"
 "  --ttl-dec value		Decrement TTL by <value 1-255>\n"
-"  --ttl-inc value		Increment TTL by <value 1-255>\n"
-, IPTABLES_VERSION);
+"  --ttl-inc value		Increment TTL by <value 1-255>\n");
 }
 
 static int TTL_parse(int c, char **argv, int invert, unsigned int *flags,
@@ -139,12 +138,12 @@ static const struct option TTL_opts[] = {
 	{ .name = NULL }
 };
 
-static struct iptables_target ttl_target = {
-	.next		= NULL, 
+static struct xtables_target ttl_tg_reg = {
 	.name		= "TTL",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_TTL_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_TTL_info)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ipt_TTL_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ipt_TTL_info)),
 	.help		= TTL_help,
 	.parse		= TTL_parse,
 	.final_check	= TTL_check,
@@ -155,5 +154,5 @@ static struct iptables_target ttl_target = {
 
 void _init(void)
 {
-	register_target(&ttl_target);
+	xtables_register_target(&ttl_tg_reg);
 }

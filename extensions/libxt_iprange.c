@@ -20,8 +20,7 @@ static void iprange_mt_help(void)
 	printf(
 "iprange match options:\n"
 "[!] --src-range ip-ip        Match source IP in the specified range\n"
-"[!] --dst-range ip-ip        Match destination IP in the specified range\n"
-"\n");
+"[!] --dst-range ip-ip        Match destination IP in the specified range\n");
 }
 
 static const struct option iprange_mt_opts[] = {
@@ -339,7 +338,7 @@ static void iprange_mt6_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match iprange_match = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "iprange",
 	.revision      = 0,
 	.family        = AF_INET,
@@ -354,7 +353,7 @@ static struct xtables_match iprange_match = {
 };
 
 static struct xtables_match iprange_mt_reg = {
-	.version        = IPTABLES_VERSION,
+	.version        = XTABLES_VERSION,
 	.name           = "iprange",
 	.revision       = 1,
 	.family         = AF_INET,
@@ -369,7 +368,7 @@ static struct xtables_match iprange_mt_reg = {
 };
 
 static struct xtables_match iprange_mt6_reg = {
-	.version        = IPTABLES_VERSION,
+	.version        = XTABLES_VERSION,
 	.name           = "iprange",
 	.revision       = 1,
 	.family         = AF_INET6,

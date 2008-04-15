@@ -15,10 +15,8 @@ static void
 CLASSIFY_help(void)
 {
 	printf(
-"CLASSIFY target v%s options:\n"
-"  --set-class [MAJOR:MINOR]    Set skb->priority value\n"
-"\n",
-IPTABLES_VERSION);
+"CLASSIFY target options:\n"
+"  --set-class [MAJOR:MINOR]    Set skb->priority value\n");
 }
 
 static const struct option CLASSIFY_opts[] = {
@@ -105,7 +103,7 @@ CLASSIFY_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target classify_target = { 
 	.family		= AF_UNSPEC,
 	.name		= "CLASSIFY",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_classify_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_classify_target_info)),
 	.help		= CLASSIFY_help,

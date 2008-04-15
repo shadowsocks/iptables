@@ -24,12 +24,11 @@
 /* Function which prints out usage message. */
 static void set_help(void)
 {
-	printf("set v%s options:\n"
+	printf("set match options:\n"
 	       " [!] --set     name flags\n"
 	       "		'name' is the set name from to match,\n" 
 	       "		'flags' are the comma separated list of\n"
-	       "		'src' and 'dst'.\n"
-	       "\n", IPTABLES_VERSION);
+	       "		'src' and 'dst'.\n");
 }
 
 static const struct option set_opts[] = {
@@ -141,11 +140,12 @@ static void set_save(const void *ip, const struct xt_entry_match *match)
 	print_match("--set", &info->match_set);
 }
 
-static struct iptables_match set_match = {
+static struct xtables_match set_mt_reg = {
 	.name		= "set",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_set_info_match)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_set_info_match)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ipt_set_info_match)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ipt_set_info_match)),
 	.help		= set_help,
 	.init		= set_init,
 	.parse		= set_parse,
@@ -157,5 +157,5 @@ static struct iptables_match set_match = {
 
 void _init(void)
 {
-	register_match(&set_match);
+	xtables_register_match(&set_mt_reg);
 }

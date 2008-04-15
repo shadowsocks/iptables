@@ -40,7 +40,7 @@ static const struct option recent_opts[] = {
 static void recent_help(void)
 {
 	printf(
-"recent v%s options:\n"
+"recent match options:\n"
 "[!] --set                       Add source address to list, always matches.\n"
 "[!] --rcheck                    Match if source address in list.\n"
 "[!] --update                    Match if source address in list, also update last-seen time.\n"
@@ -59,10 +59,7 @@ static void recent_help(void)
 "    --name name                 Name of the recent list to be used.  DEFAULT used if none given.\n"
 "    --rsource                   Match/Save the source address of each packet in the recent list table (default).\n"
 "    --rdest                     Match/Save the destination address of each packet in the recent list table.\n"
-RECENT_NAME " " RECENT_VER ": Stephen Frost <sfrost@snowman.net>.  http://snowman.net/projects/ipt_recent/\n"
-,
-IPTABLES_VERSION);
-
+RECENT_NAME " " RECENT_VER ": Stephen Frost <sfrost@snowman.net>.  http://snowman.net/projects/ipt_recent/\n");
 }
   
 /* Initialize the match. */
@@ -210,11 +207,12 @@ static void recent_save(const void *ip, const struct xt_entry_match *match)
 }
 
 /* Structure for iptables to use to communicate with module */
-static struct iptables_match recent_match = {
+static struct xtables_match recent_mt_reg = {
     .name          = "recent",
-    .version       = IPTABLES_VERSION,
-    .size          = IPT_ALIGN(sizeof(struct ipt_recent_info)),
-    .userspacesize = IPT_ALIGN(sizeof(struct ipt_recent_info)),
+    .version       = XTABLES_VERSION,
+    .family        = PF_INET,
+    .size          = XT_ALIGN(sizeof(struct ipt_recent_info)),
+    .userspacesize = XT_ALIGN(sizeof(struct ipt_recent_info)),
     .help          = recent_help,
     .init          = recent_init,
     .parse         = recent_parse,
@@ -226,5 +224,5 @@ static struct iptables_match recent_match = {
 
 void _init(void)
 {
-	register_match(&recent_match);
+	xtables_register_match(&recent_mt_reg);
 }

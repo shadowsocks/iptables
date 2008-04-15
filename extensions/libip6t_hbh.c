@@ -18,11 +18,11 @@
 static void hbh_help(void)
 {
 	printf(
-"hbh v%s options:\n"
+"hbh match options:\n"
 "  --hbh-len [!] length          total length of this header\n"
 "  --hbh-opts TYPE[:LEN][,TYPE[:LEN]...] \n"
 "                                Options and its length (list, max: %d)\n",
-IPTABLES_VERSION, IP6T_OPTS_OPTSNR);
+IP6T_OPTS_OPTSNR);
 }
 
 static const struct option hbh_opts[] = {
@@ -214,11 +214,12 @@ static void hbh_save(const void *ip, const struct xt_entry_match *match)
 		printf("--hbh-not-strict ");
 }
 
-static struct ip6tables_match hbh_match6 = {
+static struct xtables_match hbh_mt6_reg = {
 	.name 		= "hbh",
-	.version	= IPTABLES_VERSION,
-	.size		= IP6T_ALIGN(sizeof(struct ip6t_opts)),
-	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_opts)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET6,
+	.size		= XT_ALIGN(sizeof(struct ip6t_opts)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ip6t_opts)),
 	.help		= hbh_help,
 	.init		= hbh_init,
 	.parse		= hbh_parse,
@@ -230,5 +231,5 @@ static struct ip6tables_match hbh_match6 = {
 void
 _init(void)
 {
-	register_match6(&hbh_match6);
+	xtables_register_match(&hbh_mt6_reg);
 }

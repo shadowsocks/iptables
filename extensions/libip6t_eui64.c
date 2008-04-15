@@ -15,10 +15,9 @@
 static void eui64_help(void)
 {
 	printf(
-"eui64 v%s options:\n"
+"eui64 match options:\n"
 " This module hasn't got any option\n"
-" This module checks for EUI64 IPv6 addresses\n"
-"\n", IPTABLES_VERSION);
+" This module checks for EUI64 IPv6 addresses\n");
 }
 
 /* Function which parses command options; returns true if it
@@ -29,16 +28,17 @@ static int eui64_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
-static struct ip6tables_match eui64_target6 = {
+static struct xtables_match eui64_mt6_reg = {
 	.name 		= "eui64",
-	.version	= IPTABLES_VERSION,
-	.size		= IP6T_ALIGN(sizeof(int)),
-	.userspacesize	= IP6T_ALIGN(sizeof(int)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET6,
+	.size		= XT_ALIGN(sizeof(int)),
+	.userspacesize	= XT_ALIGN(sizeof(int)),
 	.help		= eui64_help,
 	.parse		= eui64_parse,
 };
 
 void _init(void)
 {
-	register_match6(&eui64_target6);
+	xtables_register_match(&eui64_mt6_reg);
 }

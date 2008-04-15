@@ -12,11 +12,10 @@
 static void ah_help(void)
 {
 	printf(
-"AH v%s options:\n"
+"ah match options:\n"
 " --ahspi [!] spi[:spi]         match spi (range)\n"
 " --ahlen [!] length            total length of this header\n"
-" --ahres                       check the reserved filed, too\n",
-IPTABLES_VERSION);
+" --ahres                       check the reserved filed, too\n");
 }
 
 static const struct option ah_opts[] = {
@@ -193,11 +192,12 @@ static void ah_save(const void *ip, const struct xt_entry_match *match)
 		printf("--ahres ");
 }
 
-static struct ip6tables_match ah_match6 = {
+static struct xtables_match ah_mt6_reg = {
 	.name          = "ah",
-	.version       = IPTABLES_VERSION,
-	.size          = IP6T_ALIGN(sizeof(struct ip6t_ah)),
-	.userspacesize = IP6T_ALIGN(sizeof(struct ip6t_ah)),
+	.version       = XTABLES_VERSION,
+	.family        = PF_INET6,
+	.size          = XT_ALIGN(sizeof(struct ip6t_ah)),
+	.userspacesize = XT_ALIGN(sizeof(struct ip6t_ah)),
 	.help          = ah_help,
 	.init          = ah_init,
 	.parse         = ah_parse,
@@ -209,5 +209,5 @@ static struct ip6tables_match ah_match6 = {
 void
 _init(void)
 {
-	register_match6(&ah_match6);
+	xtables_register_match(&ah_mt6_reg);
 }

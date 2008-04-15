@@ -17,11 +17,9 @@
 static void CONNSECMARK_help(void)
 {
 	printf(
-"CONNSECMARK target v%s options:\n"
+"CONNSECMARK target options:\n"
 "  --save                   Copy security mark from packet to conntrack\n"
-"  --restore                Copy security mark from connection to packet\n"
-"\n",
-IPTABLES_VERSION);
+"  --restore                Copy security mark from connection to packet\n");
 }
 
 static const struct option CONNSECMARK_opts[] = {
@@ -111,7 +109,7 @@ CONNSECMARK_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target connsecmark_target = {
 	.family		= AF_INET,
 	.name		= "CONNSECMARK",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.revision	= 0,
 	.size		= XT_ALIGN(sizeof(struct xt_connsecmark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connsecmark_target_info)),
@@ -126,7 +124,7 @@ static struct xtables_target connsecmark_target = {
 static struct xtables_target connsecmark_target6 = {
 	.family		= AF_INET6,
 	.name		= "CONNSECMARK",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.revision	= 0,
 	.size		= XT_ALIGN(sizeof(struct xt_connsecmark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connsecmark_target_info)),

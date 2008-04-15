@@ -12,14 +12,13 @@
 static void frag_help(void)
 {
 	printf(
-"FRAG v%s options:\n"
+"frag match options:\n"
 " --fragid [!] id[:id]          match the id (range)\n"
 " --fraglen [!] length          total length of this header\n"
 " --fragres                     check the reserved filed, too\n"
 " --fragfirst                   matches on the first fragment\n"
 " [--fragmore|--fraglast]       there are more fragments or this\n"
-"                               is the last one\n",
-IPTABLES_VERSION);
+"                               is the last one\n");
 }
 
 static const struct option frag_opts[] = {
@@ -238,11 +237,12 @@ static void frag_save(const void *ip, const struct xt_entry_match *match)
 		printf("--fraglast ");
 }
 
-static struct ip6tables_match frag_match6 = {
+static struct xtables_match frag_mt6_reg = {
 	.name          = "frag",
-	.version       = IPTABLES_VERSION,
-	.size          = IP6T_ALIGN(sizeof(struct ip6t_frag)),
-	.userspacesize = IP6T_ALIGN(sizeof(struct ip6t_frag)),
+	.version       = XTABLES_VERSION,
+	.family        = PF_INET6,
+	.size          = XT_ALIGN(sizeof(struct ip6t_frag)),
+	.userspacesize = XT_ALIGN(sizeof(struct ip6t_frag)),
 	.help          = frag_help,
 	.init          = frag_init,
 	.parse         = frag_parse,
@@ -254,5 +254,5 @@ static struct ip6tables_match frag_match6 = {
 void
 _init(void)
 {
-	register_match6(&frag_match6);
+	xtables_register_match(&frag_mt6_reg);
 }

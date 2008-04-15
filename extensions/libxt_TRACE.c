@@ -10,9 +10,7 @@
 /* Function which prints out usage message. */
 static void TRACE_help(void)
 {
-	printf(
-"TRACE target v%s takes no options\n",
-IPTABLES_VERSION);
+	printf("TRACE target takes no options\n");
 }
 
 /* Function which parses command options; returns true if it
@@ -26,7 +24,7 @@ static int TRACE_parse(int c, char **argv, int invert, unsigned int *flags,
 static struct xtables_target trace_target = {
 	.family		= AF_UNSPEC,
 	.name		= "TRACE",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(0),
 	.userspacesize	= XT_ALIGN(0),
 	.help		= TRACE_help,

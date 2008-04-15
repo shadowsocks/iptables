@@ -19,11 +19,10 @@
 static void HL_help(void)
 {
 	printf(
-"HL target v%s options\n"
+"HL target options\n"
 "  --hl-set value		Set HL to <value 0-255>\n"
 "  --hl-dec value		Decrement HL by <value 1-255>\n"
-"  --hl-inc value		Increment HL by <value 1-255>\n"
-, IPTABLES_VERSION);
+"  --hl-inc value		Increment HL by <value 1-255>\n");
 }
 
 static int HL_parse(int c, char **argv, int invert, unsigned int *flags,
@@ -139,11 +138,12 @@ static const struct option HL_opts[] = {
 	{ .name = NULL }
 };
 
-static struct ip6tables_target hl_target6 = {
+static struct xtables_target hl_tg6_reg = {
 	.name 		= "HL",
-	.version	= IPTABLES_VERSION,
-	.size		= IP6T_ALIGN(sizeof(struct ip6t_HL_info)),
-	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_HL_info)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET6,
+	.size		= XT_ALIGN(sizeof(struct ip6t_HL_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ip6t_HL_info)),
 	.help		= HL_help,
 	.parse		= HL_parse,
 	.final_check	= HL_check,
@@ -154,5 +154,5 @@ static struct ip6tables_target hl_target6 = {
 
 void _init(void)
 {
-	register_target6(&hl_target6);
+	xtables_register_target(&hl_tg6_reg);
 }

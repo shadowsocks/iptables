@@ -39,12 +39,11 @@ static void addrtype_help_types(void)
 static void addrtype_help(void)
 {
 	printf(
-"Address type match v%s options:\n"
+"Address type match options:\n"
 " [!] --src-type type[,...]      Match source address type\n"
 " [!] --dst-type type[,...]      Match destination address type\n"
 "\n"
-"Valid types:           \n"
-, IPTABLES_VERSION);
+"Valid types:           \n");
 	addrtype_help_types();
 }
 
@@ -183,11 +182,12 @@ static const struct option addrtype_opts[] = {
 	{ .name = NULL }
 };
 
-static struct iptables_match addrtype_match = {
+static struct xtables_match addrtype_mt_reg = {
 	.name 		= "addrtype",
-	.version 	= IPTABLES_VERSION,
-	.size 		= IPT_ALIGN(sizeof(struct ipt_addrtype_info)),
-	.userspacesize 	= IPT_ALIGN(sizeof(struct ipt_addrtype_info)),
+	.version 	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size 		= XT_ALIGN(sizeof(struct ipt_addrtype_info)),
+	.userspacesize 	= XT_ALIGN(sizeof(struct ipt_addrtype_info)),
 	.help 		= addrtype_help,
 	.parse 		= addrtype_parse,
 	.final_check 	= addrtype_check,
@@ -199,5 +199,5 @@ static struct iptables_match addrtype_match = {
 
 void _init(void) 
 {
-	register_match(&addrtype_match);
+	xtables_register_match(&addrtype_mt_reg);
 }

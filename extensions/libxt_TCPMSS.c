@@ -20,10 +20,10 @@ struct mssinfo {
 static void __TCPMSS_help(int hdrsize)
 {
 	printf(
-"TCPMSS target v%s mutually-exclusive options:\n"
+"TCPMSS target mutually-exclusive options:\n"
 "  --set-mss value               explicitly set MSS option to specified value\n"
 "  --clamp-mss-to-pmtu           automatically clamp MSS value to (path_MTU - %d)\n",
-IPTABLES_VERSION, hdrsize);
+hdrsize);
 }
 
 static void TCPMSS_help(void)
@@ -126,7 +126,7 @@ static void TCPMSS_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target tcpmss_target = {
 	.family		= AF_INET,
 	.name		= "TCPMSS",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
 	.help		= TCPMSS_help,
@@ -140,7 +140,7 @@ static struct xtables_target tcpmss_target = {
 static struct xtables_target tcpmss_target6 = {
 	.family		= AF_INET6,
 	.name		= "TCPMSS",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
 	.help		= TCPMSS_help6,

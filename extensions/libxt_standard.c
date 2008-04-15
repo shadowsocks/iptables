@@ -11,8 +11,8 @@
 static void standard_help(void)
 {
 	printf(
-"Standard v%s options:\n"
-"(If target is DROP, ACCEPT, RETURN or nothing)\n", IPTABLES_VERSION);
+"standard match options:\n"
+"(If target is DROP, ACCEPT, RETURN or nothing)\n");
 }
 
 /* Function which parses command options; returns true if it
@@ -26,7 +26,7 @@ static int standard_parse(int c, char **argv, int invert, unsigned int *flags,
 static struct xtables_target standard_target = {
 	.family		= AF_UNSPEC,
 	.name		= "standard",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(int)),
 	.userspacesize	= XT_ALIGN(sizeof(int)),
 	.help		= standard_help,

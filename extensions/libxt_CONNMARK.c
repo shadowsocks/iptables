@@ -37,12 +37,10 @@ enum {
 static void CONNMARK_help(void)
 {
 	printf(
-"CONNMARK target v%s options:\n"
+"CONNMARK target options:\n"
 "  --set-mark value[/mask]       Set conntrack mark value\n"
 "  --save-mark [--mask mask]     Save the packet nfmark in the connection\n"
-"  --restore-mark [--mask mask]  Restore saved nfmark value\n"
-"\n",
-IPTABLES_VERSION);
+"  --restore-mark [--mask mask]  Restore saved nfmark value\n");
 }
 
 static const struct option CONNMARK_opts[] = {
@@ -410,7 +408,7 @@ static struct xtables_target connmark_target = {
 	.family		= AF_INET,
 	.name		= "CONNMARK",
 	.revision	= 0,
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
 	.help		= CONNMARK_help,
@@ -426,7 +424,7 @@ static struct xtables_target connmark_target6 = {
 	.family		= AF_INET6,
 	.name		= "CONNMARK",
 	.revision	= 0,
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
 	.help		= CONNMARK_help,
@@ -439,7 +437,7 @@ static struct xtables_target connmark_target6 = {
 };
 
 static struct xtables_target connmark_tg_reg = {
-	.version        = IPTABLES_VERSION,
+	.version        = XTABLES_VERSION,
 	.name           = "CONNMARK",
 	.revision       = 1,
 	.family         = AF_INET,
@@ -455,7 +453,7 @@ static struct xtables_target connmark_tg_reg = {
 };
 
 static struct xtables_target connmark_tg6_reg = {
-	.version        = IPTABLES_VERSION,
+	.version        = XTABLES_VERSION,
 	.name           = "CONNMARK",
 	.revision       = 1,
 	.family         = AF_INET6,

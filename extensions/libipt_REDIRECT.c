@@ -15,10 +15,9 @@
 static void REDIRECT_help(void)
 {
 	printf(
-"REDIRECT v%s options:\n"
+"REDIRECT target options:\n"
 " --to-ports <port>[-<port>]\n"
-"				Port (range) to map to.\n\n",
-IPTABLES_VERSION);
+"				Port (range) to map to.\n");
 }
 
 static const struct option REDIRECT_opts[] = {
@@ -157,11 +156,12 @@ static void REDIRECT_save(const void *ip, const struct xt_entry_target *target)
 	}
 }
 
-static struct iptables_target redirect_target = {
+static struct xtables_target redirect_tg_reg = {
 	.name		= "REDIRECT",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
 	.help		= REDIRECT_help,
 	.init		= REDIRECT_init,
  	.parse		= REDIRECT_parse,
@@ -172,5 +172,5 @@ static struct iptables_target redirect_target = {
 
 void _init(void)
 {
-	register_target(&redirect_target);
+	xtables_register_target(&redirect_tg_reg);
 }

@@ -18,11 +18,10 @@
 static void hl_help(void)
 {
 	printf(
-"HL match v%s options:\n"
+"hl match options:\n"
 "  --hl-eq [!] value	Match hop limit value\n"
 "  --hl-lt value	Match HL < value\n"
-"  --hl-gt value	Match HL > value\n"
-, IPTABLES_VERSION);
+"  --hl-gt value	Match HL > value\n");
 }
 
 static int hl_parse(int c, char **argv, int invert, unsigned int *flags,
@@ -125,11 +124,12 @@ static const struct option hl_opts[] = {
 	{ .name = NULL }
 };
 
-static struct ip6tables_match hl_match6 = {
+static struct xtables_match hl_mt6_reg = {
 	.name          = "hl",
-	.version       = IPTABLES_VERSION,
-	.size          = IP6T_ALIGN(sizeof(struct ip6t_hl_info)),
-	.userspacesize = IP6T_ALIGN(sizeof(struct ip6t_hl_info)),
+	.version       = XTABLES_VERSION,
+	.family        = PF_INET6,
+	.size          = XT_ALIGN(sizeof(struct ip6t_hl_info)),
+	.userspacesize = XT_ALIGN(sizeof(struct ip6t_hl_info)),
 	.help          = hl_help,
 	.parse         = hl_parse,
 	.final_check   = hl_check,
@@ -141,5 +141,5 @@ static struct ip6tables_match hl_match6 = {
 
 void _init(void) 
 {
-	register_match6(&hl_match6);
+	xtables_register_match(&hl_mt6_reg);
 }

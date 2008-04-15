@@ -12,10 +12,9 @@
 static void esp_help(void)
 {
 	printf(
-"ESP v%s options:\n"
+"esp match options:\n"
 " --espspi [!] spi[:spi]\n"
-"				match spi (range)\n",
-IPTABLES_VERSION);
+"				match spi (range)\n");
 }
 
 static const struct option esp_opts[] = {
@@ -156,7 +155,7 @@ static void esp_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match esp_match = {
 	.family		= AF_INET,
 	.name 		= "esp",
-	.version 	= IPTABLES_VERSION,
+	.version 	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_esp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_esp)),
 	.help		= esp_help,
@@ -170,7 +169,7 @@ static struct xtables_match esp_match = {
 static struct xtables_match esp_match6 = {
 	.family		= AF_INET6,
 	.name 		= "esp",
-	.version 	= IPTABLES_VERSION,
+	.version 	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_esp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_esp)),
 	.help		= esp_help,

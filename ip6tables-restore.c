@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
 	int in_table = 0, testing = 0;
 
 	program_name = "ip6tables-restore";
-	program_version = IPTABLES_VERSION;
+	program_version = XTABLES_VERSION;
 	line = 0;
 
 	lib_dir = getenv("XTABLES_LIBDIR");
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
 				break;
 			case 'h':
 				print_usage("ip6tables-restore",
-					    IPTABLES_VERSION);
+					    XTABLES_VERSION);
 				break;
 			case 'n':
 				noflush = 1;

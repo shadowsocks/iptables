@@ -137,14 +137,13 @@ add_proto_to_mask(int proto){
 static void ipv6header_help(void)
 {
 	printf(
-"ipv6header v%s match options:\n"
+"ipv6header match options:\n"
 "--header [!] headers     Type of header to match, by name\n"
 "                         names: hop,dst,route,frag,auth,esp,none,proto\n"
 "                    long names: hop-by-hop,ipv6-opts,ipv6-route,\n"
 "                                ipv6-frag,ah,esp,ipv6-nonxt,protocol\n"
 "                       numbers: 0,60,43,44,51,50,59\n"
-"--soft                    The header CONTAINS the specified extensions\n",
-	IPTABLES_VERSION);
+"--soft                    The header CONTAINS the specified extensions\n");
 }
 
 static const struct option ipv6header_opts[] = {
@@ -286,11 +285,12 @@ static void ipv6header_save(const void *ip, const struct xt_entry_match *match)
 	return;
 }
 
-static struct ip6tables_match ipv6header_match6 = {
+static struct xtables_match ipv6header_mt6_reg = {
 	.name		= "ipv6header",
-	.version	= IPTABLES_VERSION,
-	.size		= IP6T_ALIGN(sizeof(struct ip6t_ipv6header_info)),
-	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_ipv6header_info)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET6,
+	.size		= XT_ALIGN(sizeof(struct ip6t_ipv6header_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ip6t_ipv6header_info)),
 	.help		= ipv6header_help,
 	.init		= ipv6header_init,
 	.parse		= ipv6header_parse,
@@ -302,5 +302,5 @@ static struct ip6tables_match ipv6header_match6 = {
 
 void _init(void)
 {
-	register_match6(&ipv6header_match6);
+	xtables_register_match(&ipv6header_mt6_reg);
 }

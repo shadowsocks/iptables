@@ -129,7 +129,7 @@ main(int argc, char *argv[])
 	const char *tablename = 0;
 
 	program_name = "iptables-restore";
-	program_version = IPTABLES_VERSION;
+	program_version = XTABLES_VERSION;
 	line = 0;
 
 	lib_dir = getenv("XTABLES_LIBDIR");
@@ -161,7 +161,7 @@ main(int argc, char *argv[])
 				break;
 			case 'h':
 				print_usage("iptables-restore",
-					    IPTABLES_VERSION);
+					    XTABLES_VERSION);
 				break;
 			case 'n':
 				noflush = 1;

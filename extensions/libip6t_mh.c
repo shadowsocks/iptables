@@ -61,9 +61,8 @@ static void print_types_all(void)
 static void mh_help(void)
 {
 	printf(
-"MH v%s options:\n"
-" --mh-type [!] type[:type]	match mh type\n",
-IPTABLES_VERSION);
+"mh match options:\n"
+" --mh-type [!] type[:type]	match mh type\n");
 	print_types_all();
 }
 
@@ -223,11 +222,12 @@ static const struct option mh_opts[] = {
 	{ .name = NULL }
 };
 
-static struct ip6tables_match mh_match6 = {
+static struct xtables_match mh_mt6_reg = {
 	.name		= "mh",
-	.version	= IPTABLES_VERSION,
-	.size		= IP6T_ALIGN(sizeof(struct ip6t_mh)),
-	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_mh)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET6,
+	.size		= XT_ALIGN(sizeof(struct ip6t_mh)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ip6t_mh)),
 	.help		= mh_help,
 	.init		= mh_init,
 	.parse		= mh_parse,
@@ -238,5 +238,5 @@ static struct ip6tables_match mh_match6 = {
 
 void _init(void)
 {
-	register_match6(&mh_match6);
+	xtables_register_match(&mh_mt6_reg);
 }

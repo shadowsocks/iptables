@@ -11,14 +11,13 @@
 static void udp_help(void)
 {
 	printf(
-"UDP v%s options:\n"
+"udp match options:\n"
 " --source-port [!] port[:port]\n"
 " --sport ...\n"
 "				match source port(s)\n"
 " --destination-port [!] port[:port]\n"
 " --dport ...\n"
-"				match destination port(s)\n",
-IPTABLES_VERSION);
+"				match destination port(s)\n");
 }
 
 static const struct option udp_opts[] = {
@@ -199,7 +198,7 @@ static void udp_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match udp_match = {
 	.family		= AF_INET,
 	.name		= "udp",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_udp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_udp)),
 	.help		= udp_help,
@@ -213,7 +212,7 @@ static struct xtables_match udp_match = {
 static struct xtables_match udp_match6 = {
 	.family		= AF_INET6,
 	.name		= "udp",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_udp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_udp)),
 	.help		= udp_help,

@@ -56,15 +56,14 @@ static void sctp_init(struct xt_entry_match *m)
 static void sctp_help(void)
 {
 	printf(
-"SCTP match v%s options\n"
+"sctp match options\n"
 " --source-port [!] port[:port]                          match source port(s)\n"
 " --sport ...\n"
 " --destination-port [!] port[:port]                     match destination port(s)\n"
 " --dport ...\n" 
 " --chunk-types [!] (all|any|none) (chunktype[:flags])+	match if all, any or none of\n"
 "						        chunktypes are present\n"
-"chunktypes - DATA INIT INIT_ACK SACK HEARTBEAT HEARTBEAT_ACK ABORT SHUTDOWN SHUTDOWN_ACK ERROR COOKIE_ECHO COOKIE_ACK ECN_ECNE ECN_CWR SHUTDOWN_COMPLETE ASCONF ASCONF_ACK ALL NONE\n",
-	IPTABLES_VERSION);
+"chunktypes - DATA INIT INIT_ACK SACK HEARTBEAT HEARTBEAT_ACK ABORT SHUTDOWN SHUTDOWN_ACK ERROR COOKIE_ECHO COOKIE_ACK ECN_ECNE ECN_CWR SHUTDOWN_COMPLETE ASCONF ASCONF_ACK ALL NONE\n");
 }
 
 static const struct option sctp_opts[] = {
@@ -514,7 +513,7 @@ static void sctp_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match sctp_match = {
 	.name		= "sctp",
 	.family		= AF_INET,
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_sctp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_sctp_info)),
 	.help		= sctp_help,
@@ -528,7 +527,7 @@ static struct xtables_match sctp_match = {
 static struct xtables_match sctp_match6 = {
 	.name		= "sctp",
 	.family		= AF_INET6,
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_sctp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_sctp_info)),
 	.help		= sctp_help,

@@ -17,12 +17,10 @@ enum {
 static void MARK_help(void)
 {
 	printf(
-"MARK target v%s options:\n"
+"MARK target options:\n"
 "  --set-mark value                   Set nfmark value\n"
 "  --and-mark value                   Binary AND the nfmark with value\n"
-"  --or-mark  value                   Binary OR  the nfmark with value\n"
-"\n",
-IPTABLES_VERSION);
+"  --or-mark  value                   Binary OR  the nfmark with value\n");
 }
 
 static const struct option MARK_opts[] = {
@@ -287,7 +285,7 @@ static void mark_tg_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target mark_target_v0 = {
 	.family		= AF_INET,
 	.name		= "MARK",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.revision	= 0,
 	.size		= XT_ALIGN(sizeof(struct xt_mark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_target_info)),
@@ -302,7 +300,7 @@ static struct xtables_target mark_target_v0 = {
 static struct xtables_target mark_target_v1 = {
 	.family		= AF_INET,
 	.name		= "MARK",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.revision	= 1,
 	.size		= XT_ALIGN(sizeof(struct xt_mark_target_info_v1)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_target_info_v1)),
@@ -317,7 +315,7 @@ static struct xtables_target mark_target_v1 = {
 static struct xtables_target mark_target6_v0 = {
 	.family		= AF_INET6,
 	.name		= "MARK",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.revision	= 0,
 	.size		= XT_ALIGN(sizeof(struct xt_mark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_target_info)),
@@ -330,7 +328,7 @@ static struct xtables_target mark_target6_v0 = {
 };
 
 static struct xtables_target mark_tg_reg_v2 = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "MARK",
 	.revision      = 2,
 	.family        = AF_UNSPEC,

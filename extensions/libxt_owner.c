@@ -37,8 +37,7 @@ static void owner_mt_help_v0(void)
 "[!] --pid-owner processid    Match local PID\n"
 "[!] --sid-owner sessionid    Match local SID\n"
 "[!] --cmd-owner name         Match local command name\n"
-"NOTE: PID, SID and command matching are broken on SMP\n"
-"\n");
+"NOTE: PID, SID and command matching are broken on SMP\n");
 #else
 	printf(
 "owner match options:\n"
@@ -46,8 +45,7 @@ static void owner_mt_help_v0(void)
 "[!] --gid-owner groupid      Match local GID\n"
 "[!] --pid-owner processid    Match local PID\n"
 "[!] --sid-owner sessionid    Match local SID\n"
-"NOTE: PID and SID matching are broken on SMP\n"
-"\n");
+"NOTE: PID and SID matching are broken on SMP\n");
 #endif /* IPT_OWNER_COMM */
 }
 
@@ -59,8 +57,7 @@ static void owner_mt6_help_v0(void)
 "[!] --gid-owner groupid      Match local GID\n"
 "[!] --pid-owner processid    Match local PID\n"
 "[!] --sid-owner sessionid    Match local SID\n"
-"NOTE: PID and SID matching are broken on SMP\n"
-"\n");
+"NOTE: PID and SID matching are broken on SMP\n");
 }
 
 static void owner_mt_help(void)
@@ -69,8 +66,7 @@ static void owner_mt_help(void)
 "owner match options:\n"
 "[!] --uid-owner userid[-userid]      Match local UID\n"
 "[!] --gid-owner groupid[-groupid]    Match local GID\n"
-"[!] --socket-exists                  Match if socket exists\n"
-"\n");
+"[!] --socket-exists                  Match if socket exists\n");
 }
 
 static const struct option owner_mt_opts_v0[] = {
@@ -532,7 +528,7 @@ static void owner_mt_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match owner_mt_reg_v0 = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "owner",
 	.revision      = 0,
 	.family        = AF_INET,
@@ -547,7 +543,7 @@ static struct xtables_match owner_mt_reg_v0 = {
 };
 
 static struct xtables_match owner_mt6_reg_v0 = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "owner",
 	.revision      = 0,
 	.family        = AF_INET6,
@@ -562,7 +558,7 @@ static struct xtables_match owner_mt6_reg_v0 = {
 };
 
 static struct xtables_match owner_mt_reg = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "owner",
 	.revision      = 1,
 	.family        = AF_INET,
@@ -577,7 +573,7 @@ static struct xtables_match owner_mt_reg = {
 };
 
 static struct xtables_match owner_mt6_reg = {
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.name          = "owner",
 	.revision      = 1,
 	.family        = AF_INET6,

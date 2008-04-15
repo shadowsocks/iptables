@@ -24,12 +24,11 @@ static const struct option NFLOG_opts[] = {
 
 static void NFLOG_help(void)
 {
-	printf("NFLOG v%s options:\n"
+	printf("NFLOG target options:\n"
 	       " --nflog-group NUM		NETLINK group used for logging\n"
 	       " --nflog-range NUM		Number of byte to copy\n"
 	       " --nflog-threshold NUM		Message threshold of in-kernel queue\n"
-	       " --nflog-prefix STRING		Prefix string for log messages\n\n",
-	       IPTABLES_VERSION);
+	       " --nflog-prefix STRING		Prefix string for log messages\n");
 }
 
 static void NFLOG_init(struct xt_entry_target *t)
@@ -142,7 +141,7 @@ static void NFLOG_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target nflog_target = {
 	.family		= AF_INET,
 	.name		= "NFLOG",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_nflog_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_nflog_info)),
 	.help		= NFLOG_help,
@@ -156,7 +155,7 @@ static struct xtables_target nflog_target = {
 static struct xtables_target nflog_target6 = {
 	.family		= AF_INET6,
 	.name		= "NFLOG",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_nflog_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_nflog_info)),
 	.help		= NFLOG_help,

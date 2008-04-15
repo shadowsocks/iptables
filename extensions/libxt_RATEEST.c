@@ -21,8 +21,7 @@ RATEEST_help(void)
 "RATEEST target options:\n"
 "  --rateest-name name		Rate estimator name\n"
 "  --rateest-interval sec	Rate measurement interval in seconds\n"
-"  --rateest-ewmalog value	Rate measurement averaging time constant\n"
-"\n");
+"  --rateest-ewmalog value	Rate measurement averaging time constant\n");
 }
 
 enum RATEEST_options {
@@ -205,7 +204,7 @@ RATEEST_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target rateest_tg_reg = {
 	.family		= AF_UNSPEC,
 	.name		= "RATEEST",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_rateest_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_rateest_target_info)),
 	.help		= RATEEST_help,

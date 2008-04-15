@@ -11,15 +11,13 @@
 static void statistic_help(void)
 {
 	printf(
-"statistic match v%s options:\n"
+"statistic match options:\n"
 " --mode mode                    Match mode (random, nth)\n"
 " random mode:\n"
 " --probability p		 Probability\n"
 " nth mode:\n"
 " --every n			 Match every nth packet\n"
-" --packet p			 Initial counter value (0 <= p <= n-1, default 0)\n"
-"\n",
-IPTABLES_VERSION);
+" --packet p			 Initial counter value (0 <= p <= n-1, default 0)\n");
 }
 
 static const struct option statistic_opts[] = {
@@ -166,7 +164,7 @@ static void statistic_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match statistic_match = {
 	.family		= AF_UNSPEC,
 	.name		= "statistic",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_statistic_info)),
 	.userspacesize	= offsetof(struct xt_statistic_info, u.nth.count),
 	.init		= statistic_mt_init,

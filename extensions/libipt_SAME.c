@@ -14,7 +14,7 @@
 static void SAME_help(void)
 {
 	printf(
-"SAME v%s options:\n"
+"SAME target options:\n"
 " --to <ipaddr>-<ipaddr>\n"
 "				Addresses to map source to.\n"
 "				 May be specified more than\n"
@@ -23,9 +23,7 @@ static void SAME_help(void)
 "				Don't use destination-ip in\n"
 "				           source selection\n"
 " --random\n"
-"				Randomize source port\n"
-,
-IPTABLES_VERSION);
+"				Randomize source port\n");
 }
 
 static const struct option SAME_opts[] = {
@@ -208,11 +206,12 @@ static void SAME_save(const void *ip, const struct xt_entry_target *target)
 		printf("--random ");
 }
 
-static struct iptables_target same_target = {
+static struct xtables_target same_tg_reg = {
 	.name		= "SAME",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_same_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_same_info)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ipt_same_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ipt_same_info)),
 	.help		= SAME_help,
 	.init		= SAME_init,
 	.parse		= SAME_parse,
@@ -224,5 +223,5 @@ static struct iptables_target same_target = {
 
 void _init(void)
 {
-	register_target(&same_target);
+	xtables_register_target(&same_tg_reg);
 }

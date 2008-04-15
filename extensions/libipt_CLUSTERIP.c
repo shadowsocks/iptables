@@ -22,7 +22,7 @@
 static void CLUSTERIP_help(void)
 {
 	printf(
-"CLUSTERIP target v%s options:\n"
+"CLUSTERIP target options:\n"
 "  --new			 Create a new ClusterIP\n"
 "  --hashmode <mode>		 Specify hashing mode\n"
 "					sourceip\n"
@@ -31,9 +31,7 @@ static void CLUSTERIP_help(void)
 "  --clustermac <mac>		 Set clusterIP MAC address\n"
 "  --total-nodes <num>		 Set number of total nodes in cluster\n"
 "  --local-node <num>		 Set the local node number\n"
-"  --hash-init <num>		 Set init value of the Jenkins hash\n"
-"\n",
-IPTABLES_VERSION);
+"  --hash-init <num>		 Set init value of the Jenkins hash\n");
 }
 
 #define	PARAM_NEW	0x0001
@@ -235,10 +233,11 @@ static void CLUSTERIP_save(const void *ip, const struct xt_entry_target *target)
 	       cipinfo->hash_initval);
 }
 
-static struct iptables_target clusterip_target = {
+static struct xtables_target clusterip_tg_reg = {
 	.name		= "CLUSTERIP",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_clusterip_tgt_info)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ipt_clusterip_tgt_info)),
 	.userspacesize	= offsetof(struct ipt_clusterip_tgt_info, config),
  	.help		= CLUSTERIP_help,
 	.parse		= CLUSTERIP_parse,
@@ -250,5 +249,5 @@ static struct iptables_target clusterip_target = {
 
 void _init(void)
 {
-	register_target(&clusterip_target);
+	xtables_register_target(&clusterip_tg_reg);
 }

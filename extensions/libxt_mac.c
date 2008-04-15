@@ -16,10 +16,9 @@
 static void mac_help(void)
 {
 	printf(
-"MAC v%s options:\n"
+"mac match options:\n"
 " --mac-source [!] XX:XX:XX:XX:XX:XX\n"
-"				Match source MAC address\n"
-"\n", IPTABLES_VERSION);
+"				Match source MAC address\n");
 }
 
 static const struct option mac_opts[] = {
@@ -118,7 +117,7 @@ static void mac_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match mac_match = {
 	.family		= AF_INET,
  	.name		= "mac",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_mac_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_mac_info)),
 	.help		= mac_help,
@@ -132,7 +131,7 @@ static struct xtables_match mac_match = {
 static struct xtables_match mac_match6 = {
 	.family		= AF_INET6,
  	.name		= "mac",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_mac_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_mac_info)),
 	.help		= mac_help,

@@ -36,12 +36,11 @@ static void print_groups(unsigned int gmask)
 /* Function which prints out usage message. */
 static void ULOG_help(void)
 {
-	printf("ULOG v%s options:\n"
+	printf("ULOG target options:\n"
 	       " --ulog-nlgroup nlgroup		NETLINK group used for logging\n"
 	       " --ulog-cprange size		Bytes of each packet to be passed\n"
 	       " --ulog-qthreshold		Threshold of in-kernel queue\n"
-	       " --ulog-prefix prefix		Prefix log messages with this prefix.\n\n",
-	       IPTABLES_VERSION);
+	       " --ulog-prefix prefix		Prefix log messages with this prefix.\n");
 }
 
 static const struct option ULOG_opts[] = {
@@ -186,11 +185,12 @@ static void ULOG_print(const void *ip, const struct xt_entry_target *target,
 	printf("queue_threshold %u ", (unsigned int)loginfo->qthreshold);
 }
 
-static struct iptables_target ulog_target = {
+static struct xtables_target ulog_tg_reg = {
 	.name		= "ULOG",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ipt_ulog_info)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ipt_ulog_info)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ipt_ulog_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ipt_ulog_info)),
 	.help		= ULOG_help,
 	.init		= ULOG_init,
 	.parse		= ULOG_parse,
@@ -201,5 +201,5 @@ static struct iptables_target ulog_target = {
 
 void _init(void)
 {
-	register_target(&ulog_target);
+	xtables_register_target(&ulog_tg_reg);
 }

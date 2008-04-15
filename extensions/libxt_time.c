@@ -50,7 +50,7 @@ static const struct option time_opts[] = {
 static void time_help(void)
 {
 	printf(
-"TIME v%s options:\n"
+"time match options:\n"
 "  --datestart time     Start and stop time, to be given in ISO 8601\n"
 "  --datestop time      (YYYY[-MM[-DD[Thh[:mm[:ss]]]]])\n"
 "  --timestart time     Start and stop daytime (hh:mm[:ss])\n"
@@ -60,8 +60,7 @@ static void time_help(void)
 "  --weekdays value     List of weekdays on which to match, sep. by comma\n"
 "                       (Possible days: Mon,Tue,Wed,Thu,Fri,Sat,Sun or 1 to 7\n"
 "                       Defaults to all weekdays.)\n"
-"  --localtz/--utc      Time is interpreted as UTC/local time\n",
-IPTABLES_VERSION);
+"  --localtz/--utc      Time is interpreted as UTC/local time\n");
 }
 
 static void time_init(struct xt_entry_match *m)
@@ -467,7 +466,7 @@ static void time_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match time_match = {
 	.name          = "time",
 	.family        = AF_UNSPEC,
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.size          = XT_ALIGN(sizeof(struct xt_time_info)),
 	.userspacesize = XT_ALIGN(sizeof(struct xt_time_info)),
 	.help          = time_help,

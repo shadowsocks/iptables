@@ -36,8 +36,7 @@ static void connmark_mt_help(void)
 {
 	printf(
 "connmark match options:\n"
-"[!] --mark value[/mask]    Match ctmark value with optional mask\n"
-"\n");
+"[!] --mark value[/mask]    Match ctmark value with optional mask\n");
 }
 
 static const struct option connmark_mt_opts[] = {
@@ -172,7 +171,7 @@ static struct xtables_match connmark_mt_reg_v0 = {
 	.family		= AF_INET,
 	.name		= "connmark",
 	.revision	= 0,
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_connmark_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connmark_info)),
 	.help		= connmark_mt_help,
@@ -187,7 +186,7 @@ static struct xtables_match connmark_mt6_reg_v0 = {
 	.family		= AF_INET6,
 	.name		= "connmark",
 	.revision	= 0,
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_connmark_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_connmark_info)),
 	.help		= connmark_mt_help,
@@ -199,7 +198,7 @@ static struct xtables_match connmark_mt6_reg_v0 = {
 };
 
 static struct xtables_match connmark_mt_reg = {
-	.version        = IPTABLES_VERSION,
+	.version        = XTABLES_VERSION,
 	.name           = "connmark",
 	.revision       = 1,
 	.family         = AF_INET,
@@ -214,7 +213,7 @@ static struct xtables_match connmark_mt_reg = {
 };
 
 static struct xtables_match connmark_mt6_reg = {
-	.version        = IPTABLES_VERSION,
+	.version        = XTABLES_VERSION,
 	.name           = "connmark",
 	.revision       = 1,
 	.family         = AF_INET6,

@@ -15,7 +15,7 @@
 static void multiport_help(void)
 {
 	printf(
-"multiport v%s options:\n"
+"multiport match options:\n"
 " --source-ports port[,port,port...]\n"
 " --sports ...\n"
 "				match source port(s)\n"
@@ -24,14 +24,13 @@ static void multiport_help(void)
 "				match destination port(s)\n"
 " --ports port[,port,port]\n"
 "				match both source and destination port(s)\n"
-" NOTE: this kernel does not support port ranges in multiport.\n",
-IPTABLES_VERSION);
+" NOTE: this kernel does not support port ranges in multiport.\n");
 }
 
 static void multiport_help_v1(void)
 {
 	printf(
-"multiport v%s options:\n"
+"multiport match options:\n"
 " --source-ports [!] port[,port:port,port...]\n"
 " --sports ...\n"
 "				match source port(s)\n"
@@ -39,8 +38,7 @@ static void multiport_help_v1(void)
 " --dports ...\n"
 "				match destination port(s)\n"
 " --ports [!] port[,port:port,port]\n"
-"				match both source and destination port(s)\n",
-IPTABLES_VERSION);
+"				match both source and destination port(s)\n");
 }
 
 static const struct option multiport_opts[] = {
@@ -513,7 +511,7 @@ static struct xtables_match multiport_match = {
 	.family		= AF_INET,
 	.name		= "multiport",
 	.revision	= 0,
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_multiport)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport)),
 	.help		= multiport_help,
@@ -528,7 +526,7 @@ static struct xtables_match multiport_match6 = {
 	.family		= AF_INET6,
 	.name		= "multiport",
 	.revision	= 0,
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_multiport)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport)),
 	.help		= multiport_help,
@@ -542,7 +540,7 @@ static struct xtables_match multiport_match6 = {
 static struct xtables_match multiport_match_v1 = {
 	.family		= AF_INET,
 	.name		= "multiport",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.revision	= 1,
 	.size		= XT_ALIGN(sizeof(struct xt_multiport_v1)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport_v1)),
@@ -557,7 +555,7 @@ static struct xtables_match multiport_match_v1 = {
 static struct xtables_match multiport_match6_v1 = {
 	.family		= AF_INET6,
 	.name		= "multiport",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.revision	= 1,
 	.size		= XT_ALIGN(sizeof(struct xt_multiport_v1)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport_v1)),

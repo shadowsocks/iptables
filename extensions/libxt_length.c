@@ -12,11 +12,9 @@
 static void length_help(void)
 {
 	printf(
-"length v%s options:\n"
+"length match options:\n"
 "[!] --length length[:length]    Match packet length against value or range\n"
-"                                of values (inclusive)\n",
-IPTABLES_VERSION);
-
+"                                of values (inclusive)\n");
 }
   
 static const struct option length_opts[] = {
@@ -127,7 +125,7 @@ static void length_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match length_match = {
 	.family		= AF_UNSPEC,
 	.name		= "length",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_length_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_length_info)),
 	.help		= length_help,

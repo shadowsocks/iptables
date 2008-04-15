@@ -12,10 +12,9 @@
 static void tcpmss_help(void)
 {
 	printf(
-"tcpmss match v%s options:\n"
+"tcpmss match options:\n"
 "[!] --mss value[:value]	Match TCP MSS range.\n"
-"				(only valid for TCP SYN or SYN/ACK packets)\n",
-IPTABLES_VERSION);
+"				(only valid for TCP SYN or SYN/ACK packets)\n");
 }
 
 static const struct option tcpmss_opts[] = {
@@ -128,7 +127,7 @@ static void tcpmss_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match tcpmss_match = {
 	.family		= AF_INET,
 	.name		= "tcpmss",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_match_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcpmss_match_info)),
 	.help		= tcpmss_help,
@@ -142,7 +141,7 @@ static struct xtables_match tcpmss_match = {
 static struct xtables_match tcpmss_match6 = {
 	.family		= AF_INET6,
 	.name		= "tcpmss",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_match_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcpmss_match_info)),
 	.help		= tcpmss_help,

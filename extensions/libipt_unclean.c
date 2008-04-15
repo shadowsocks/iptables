@@ -7,9 +7,7 @@
 /* Function which prints out usage message. */
 static void unclean_help(void)
 {
-	printf(
-"unclean v%s takes no options\n"
-"\n", IPTABLES_VERSION);
+	printf("unclean match takes no options\n");
 }
 
 /* Function which parses command options; returns true if it
@@ -20,16 +18,17 @@ static int unclean_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
-static struct iptables_match unclean_match = {
+static struct xtables_match unclean_mt_reg = {
 	.name		= "unclean",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(0),
-	.userspacesize	= IPT_ALIGN(0),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(0),
+	.userspacesize	= XT_ALIGN(0),
 	.help		= unclean_help,
 	.parse		= unclean_parse,
 };
 
 void _init(void)
 {
-	register_match(&unclean_match);
+	xtables_register_match(&unclean_mt_reg);
 }

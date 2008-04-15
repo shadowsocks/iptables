@@ -23,12 +23,10 @@ struct ipt_natinfo
 static void SNAT_help(void)
 {
 	printf(
-"SNAT v%s options:\n"
+"SNAT target options:\n"
 " --to-source <ipaddr>[-<ipaddr>][:port-port]\n"
 "				Address to map source to.\n"
-"[--random]\n"
-"\n",
-IPTABLES_VERSION);
+"[--random]\n");
 }
 
 static const struct option SNAT_opts[] = {
@@ -43,7 +41,7 @@ append_range(struct ipt_natinfo *info, const struct ip_nat_range *range)
 	unsigned int size;
 
 	/* One rangesize already in struct ipt_natinfo */
-	size = IPT_ALIGN(sizeof(*info) + info->mr.rangesize * sizeof(*range));
+	size = XT_ALIGN(sizeof(*info) + info->mr.rangesize * sizeof(*range));
 
 	info = realloc(info, size);
 	if (!info)
@@ -244,11 +242,12 @@ static void SNAT_save(const void *ip, const struct xt_entry_target *target)
 	}
 }
 
-static struct iptables_target snat_target = {
+static struct xtables_target snat_tg_reg = {
 	.name		= "SNAT",
-	.version	= IPTABLES_VERSION,
-	.size		= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
-	.userspacesize	= IPT_ALIGN(sizeof(struct ip_nat_multi_range)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET,
+	.size		= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
 	.help		= SNAT_help,
 	.parse		= SNAT_parse,
 	.final_check	= SNAT_check,
@@ -259,5 +258,5 @@ static struct iptables_target snat_target = {
 
 void _init(void)
 {
-	register_target(&snat_target);
+	xtables_register_target(&snat_tg_reg);
 }

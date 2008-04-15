@@ -11,11 +11,10 @@
 static void connlimit_help(void)
 {
 	printf(
-"connlimit v%s options:\n"
+"connlimit match options:\n"
 "[!] --connlimit-above n        match if the number of existing "
 "                               connections is (not) above n\n"
-"    --connlimit-mask n         group hosts using mask\n"
-"\n", IPTABLES_VERSION);
+"    --connlimit-mask n         group hosts using mask\n");
 }
 
 static const struct option connlimit_opts[] = {
@@ -181,7 +180,7 @@ static void connlimit_save6(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match connlimit_match = {
 	.name          = "connlimit",
 	.family        = AF_INET,
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.size          = XT_ALIGN(sizeof(struct xt_connlimit_info)),
 	.userspacesize = offsetof(struct xt_connlimit_info, data),
 	.help          = connlimit_help,
@@ -196,7 +195,7 @@ static struct xtables_match connlimit_match = {
 static struct xtables_match connlimit_match6 = {
 	.name          = "connlimit",
 	.family        = AF_INET6,
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.size          = XT_ALIGN(sizeof(struct xt_connlimit_info)),
 	.userspacesize = offsetof(struct xt_connlimit_info, data),
 	.help          = connlimit_help,

@@ -12,10 +12,8 @@
 static void helper_help(void)
 {
 	printf(
-"helper match v%s options:\n"
-"[!] --helper string        Match helper identified by string\n"
-"\n",
-IPTABLES_VERSION);
+"helper match options:\n"
+"[!] --helper string        Match helper identified by string\n");
 }
 
 static const struct option helper_opts[] = {
@@ -79,7 +77,7 @@ static void helper_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match helper_match = {
 	.family		= AF_INET,
 	.name		= "helper",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_helper_info)),
 	.help		= helper_help,
 	.parse		= helper_parse,
@@ -92,7 +90,7 @@ static struct xtables_match helper_match = {
 static struct xtables_match helper_match6 = {
 	.family		= AF_INET6,
 	.name		= "helper",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_helper_info)),
 	.help		= helper_help,
 	.parse		= helper_parse,

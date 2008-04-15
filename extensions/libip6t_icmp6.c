@@ -77,10 +77,9 @@ print_icmpv6types(void)
 static void icmp6_help(void)
 {
 	printf(
-"ICMPv6 v%s options:\n"
+"icmpv6 match options:\n"
 " --icmpv6-type [!] typename	match icmpv6 type\n"
-"				(or numeric type or type/code)\n"
-"\n", IPTABLES_VERSION);
+"				(or numeric type or type/code)\n");
 	print_icmpv6types();
 }
 
@@ -251,11 +250,12 @@ static void icmp6_check(unsigned int flags)
 			   "icmpv6 match: You must specify `--icmpv6-type'");
 }
 
-static struct ip6tables_match icmp6_match6 = {
+static struct xtables_match icmp6_mt6_reg = {
 	.name 		= "icmp6",
-	.version 	= IPTABLES_VERSION,
-	.size		= IP6T_ALIGN(sizeof(struct ip6t_icmp)),
-	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_icmp)),
+	.version 	= XTABLES_VERSION,
+	.family		= PF_INET6,
+	.size		= XT_ALIGN(sizeof(struct ip6t_icmp)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ip6t_icmp)),
 	.help		= icmp6_help,
 	.init		= icmp6_init,
 	.parse		= icmp6_parse,
@@ -267,5 +267,5 @@ static struct ip6tables_match icmp6_match6 = {
 
 void _init(void)
 {
-	register_match6(&icmp6_match6);
+	xtables_register_match(&icmp6_mt6_reg);
 }

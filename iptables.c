@@ -276,7 +276,7 @@ static void
 exit_printhelp(struct iptables_rule_match *matches)
 {
 	struct iptables_rule_match *matchp = NULL;
-	struct iptables_target *t = NULL;
+	struct xtables_target *t = NULL;
 
 	printf("%s v%s\n\n"
 "Usage: %s -[AD] chain rule-specification [options]\n"
@@ -474,7 +474,7 @@ check_inverse(const char option[], int *invert, int *my_optind, int argc)
 */
 
 /* Christophe Burki wants `-p 6' to imply `-m tcp'.  */
-static struct iptables_match *
+static struct xtables_match *
 find_proto(const char *pname, enum ipt_tryload tryload, int nolookup, struct iptables_rule_match **matches)
 {
 	unsigned int proto;
@@ -612,18 +612,6 @@ merge_options(struct option *oldopts, const struct option *newopts,
 	return merge;
 }
 
-void register_match(struct iptables_match *me)
-{
-	me->family = PF_INET;
-	xtables_register_match(me);
-}
-
-void register_target(struct iptables_target *me)
-{
-	me->family = PF_INET;
-	xtables_register_target(me);
-}
-
 static void
 print_num(u_int64_t number, unsigned int format)
 {
@@ -705,7 +693,7 @@ print_match(const struct ipt_entry_match *m,
 	    const struct ipt_ip *ip,
 	    int numeric)
 {
-	struct iptables_match *match = find_match(m->u.user.name, TRY_LOAD, NULL);
+	struct xtables_match *match = find_match(m->u.user.name, TRY_LOAD, NULL);
 
 	if (match) {
 		if (match->print)
@@ -728,7 +716,7 @@ print_firewall(const struct ipt_entry *fw,
 	       unsigned int format,
 	       const iptc_handle_t handle)
 {
-	struct iptables_target *target = NULL;
+	struct xtables_target *target = NULL;
 	const struct ipt_entry_target *t;
 	u_int8_t flags;
 	char buf[BUFSIZ];
@@ -1199,11 +1187,11 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 	unsigned int rulenum = 0, options = 0, command = 0;
 	const char *pcnt = NULL, *bcnt = NULL;
 	int ret = 1;
-	struct iptables_match *m;
+	struct xtables_match *m;
 	struct iptables_rule_match *matches = NULL;
 	struct iptables_rule_match *matchp;
-	struct iptables_target *target = NULL;
-	struct iptables_target *t;
+	struct xtables_target *target = NULL;
+	struct xtables_target *t;
 	const char *jumpto = "";
 	char *protocol = NULL;
 	int proto_used = 0;

@@ -17,10 +17,8 @@
 static void SECMARK_help(void)
 {
 	printf(
-"SECMARK target v%s options:\n"
-"  --selctx value                     Set the SELinux security context\n"
-"\n",
-IPTABLES_VERSION);
+"SECMARK target options:\n"
+"  --selctx value                     Set the SELinux security context\n");
 }
 
 static const struct option SECMARK_opts[] = {
@@ -102,7 +100,7 @@ static void SECMARK_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target secmark_target = {
 	.family		= AF_UNSPEC,
 	.name		= "SECMARK",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.revision	= 0,
 	.size		= XT_ALIGN(sizeof(struct xt_secmark_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_secmark_target_info)),

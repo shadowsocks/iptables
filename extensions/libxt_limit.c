@@ -21,12 +21,12 @@
 static void limit_help(void)
 {
 	printf(
-"limit v%s options:\n"
+"limit match options:\n"
 "--limit avg			max average match rate: default "XT_LIMIT_AVG"\n"
 "                                [Packets per second unless followed by \n"
 "                                /sec /minute /hour /day postfixes]\n"
-"--limit-burst number		number to match in a burst, default %u\n"
-"\n", IPTABLES_VERSION, XT_LIMIT_BURST);
+"--limit-burst number		number to match in a burst, default %u\n",
+XT_LIMIT_BURST);
 }
 
 static const struct option limit_opts[] = {
@@ -167,7 +167,7 @@ static void limit_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match limit_match = {
 	.family		= AF_UNSPEC,
 	.name		= "limit",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_rateinfo)),
 	.userspacesize	= offsetof(struct xt_rateinfo, prev),
 	.help		= limit_help,

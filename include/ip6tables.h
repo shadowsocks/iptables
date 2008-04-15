@@ -11,16 +11,11 @@
 #endif /* IP6T_SO_GET_REVISION_MATCH   Old kernel source */
 
 #define ip6tables_rule_match	xtables_rule_match
-#define ip6tables_match		xtables_match
-#define ip6tables_target	xtables_target
 #define ip6t_tryload		xt_tryload
 
 extern int line;
 
 /* Your shared library should call one of these. */
-extern void register_match6(struct ip6tables_match *me);
-extern void register_target6(struct ip6tables_target *me);
-
 extern int do_command6(int argc, char *argv[], char **table,
 		       ip6tc_handle_t *handle);
 

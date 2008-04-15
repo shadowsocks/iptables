@@ -30,15 +30,13 @@ static const struct option u32_opts[] = {
 static void u32_help(void)
 {
 	printf(
-		"u32 v%s options:\n"
+		"u32 match options:\n"
 		"[!] --u32 tests\n"
 		"\t\t""tests := location \"=\" value | tests \"&&\" location \"=\" value\n"
 		"\t\t""value := range | value \",\" range\n"
 		"\t\t""range := number | number \":\" number\n"
 		"\t\t""location := number | location operator number\n"
-		"\t\t""operator := \"&\" | \"<<\" | \">>\" | \"@\"\n",
-		IPTABLES_VERSION);
-	return;
+		"\t\t""operator := \"&\" | \"<<\" | \">>\" | \"@\"\n");
 }
 
 static void u32_dump(const struct xt_u32 *data)
@@ -273,7 +271,7 @@ static void u32_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match u32_match = {
 	.name          = "u32",
 	.family        = AF_UNSPEC,
-	.version       = IPTABLES_VERSION,
+	.version       = XTABLES_VERSION,
 	.size          = XT_ALIGN(sizeof(struct xt_u32)),
 	.userspacesize = XT_ALIGN(sizeof(struct xt_u32)),
 	.help          = u32_help,

@@ -17,10 +17,9 @@ static void
 state_help(void)
 {
 	printf(
-"state v%s options:\n"
+"state match options:\n"
 " [!] --state [INVALID|ESTABLISHED|NEW|RELATED|UNTRACKED][,...]\n"
-"				State(s) to match\n"
-"\n", IPTABLES_VERSION);
+"				State(s) to match\n");
 }
 
 static const struct option state_opts[] = {
@@ -145,7 +144,7 @@ static void state_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match state_match = { 
 	.family		= AF_INET,
 	.name		= "state",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_state_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_state_info)),
 	.help		= state_help,
@@ -159,7 +158,7 @@ static struct xtables_match state_match = {
 static struct xtables_match state_match6 = { 
 	.family		= AF_INET6,
 	.name		= "state",
-	.version	= IPTABLES_VERSION,
+	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_state_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_state_info)),
 	.help		= state_help,

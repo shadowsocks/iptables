@@ -18,14 +18,14 @@
 static void rt_help(void)
 {
 	printf(
-"RT v%s options:\n"
+"rt match options:\n"
 " --rt-type [!] type            match the type\n"
 " --rt-segsleft [!] num[:num]   match the Segments Left field (range)\n"
 " --rt-len [!] length           total length of this header\n"
 " --rt-0-res                    check the reserved filed, too (type 0)\n"
 " --rt-0-addrs ADDR[,ADDR...]   Type=0 addresses (list, max: %d)\n"
 " --rt-0-not-strict             List of Type=0 addresses not a strict list\n",
-IPTABLES_VERSION, IP6T_RT_HOPS);
+IP6T_RT_HOPS);
 }
 
 static const struct option rt_opts[] = {
@@ -329,11 +329,12 @@ static void rt_save(const void *ip, const struct xt_entry_match *match)
 
 }
 
-static struct ip6tables_match rt_match6 = {
+static struct xtables_match rt_mt6_reg = {
 	.name		= "rt",
-	.version	= IPTABLES_VERSION,
-	.size		= IP6T_ALIGN(sizeof(struct ip6t_rt)),
-	.userspacesize	= IP6T_ALIGN(sizeof(struct ip6t_rt)),
+	.version	= XTABLES_VERSION,
+	.family		= PF_INET6,
+	.size		= XT_ALIGN(sizeof(struct ip6t_rt)),
+	.userspacesize	= XT_ALIGN(sizeof(struct ip6t_rt)),
 	.help		= rt_help,
 	.init		= rt_init,
 	.parse		= rt_parse,
@@ -345,5 +346,5 @@ static struct ip6tables_match rt_match6 = {
 void
 _init(void)
 {
-	register_match6(&rt_match6);
+	xtables_register_match(&rt_mt6_reg);
 }
