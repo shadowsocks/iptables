@@ -1393,9 +1393,16 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 				target->t = fw_calloc(1, size);
 				target->t->u.target_size = size;
 				strcpy(target->t->u.user.name, jumpto);
+				set_revision(target->t->u.user.name,
+					     target->revision);
 				if (target->init != NULL)
 					target->init(target->t);
-				opts = merge_options(opts, target->extra_opts, &target->option_offset);
+				opts = merge_options(opts,
+						     target->extra_opts,
+						     &target->option_offset);
+				if (opts == NULL)
+					exit_error(OTHER_PROBLEM,
+						   "can't alloc memory!");
 			}
 			break;
 
