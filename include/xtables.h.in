@@ -17,6 +17,8 @@
 #define IPPROTO_UDPLITE	136
 #endif
 
+#define XTABLES_VERSION "@PACKAGE_VERSION@"
+
 /* Include file for additions: new matches and targets. */
 struct xtables_match
 {
