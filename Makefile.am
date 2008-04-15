@@ -2,8 +2,6 @@
 
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
-regular_CFLAGS  := @regular_CFLAGS@
-kinclude_CFLAGS := @kinclude_CFLAGS@
 AM_CFLAGS        = ${regular_CFLAGS} -I${top_builddir}/include -I${top_srcdir}/include ${kinclude_CFLAGS}
 SUBDIRS         := extensions
 if ENABLE_LIBIPQ
@@ -75,7 +73,7 @@ man_MANS         := iptables.8 iptables-restore.8 iptables-save.8 \
 CLEANFILES       := iptables.8 ip6tables.8
 if ENABLE_DEVEL
 include_HEADERS  := include/xtables.h include/iptables.h include/ip6tables.h
-iptcdir          := ${includedir}/libiptc
+iptcdir           = ${includedir}/libiptc
 iptc_HEADERS     := include/libiptc/libxtc.h \
                     include/libiptc/ipt_kernel_headers.h
 endif
