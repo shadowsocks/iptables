@@ -51,7 +51,8 @@ if [[ -n "$ksourcedir" ]]; then
 	kinclude_CFLAGS="$kinclude_CFLAGS -I $ksourcedir/include";
 fi;
 
-AC_SUBST([regular_CFLAGS kinclude_CFLAGS])
+AC_SUBST([regular_CFLAGS])
+AC_SUBST([kinclude_CFLAGS])
 AC_SUBST([kbuilddir])
 AC_SUBST([ksourcedir])
 AC_SUBST([xtlibdir])
