@@ -106,19 +106,6 @@ static void print_proto(u_int16_t proto, int invert)
 	}
 }
 
-#if 0
-static int non_zero(const void *ptr, size_t size)
-{
-	unsigned int i;
-
-	for (i = 0; i < size; i++)
-		if (((char *)ptr)[i])
-			return 0;
-
-	return 1;
-}
-#endif
-
 static int print_match(const struct ipt_entry_match *e,
 			const struct ipt_ip *ip)
 {
