@@ -1,5 +1,7 @@
 # -*- Makefile -*-
 
+top_builddir := @top_builddir@
+builddir     := @builddir@
 top_srcdir  := @top_srcdir@
 srcdir      := @srcdir@
 ksourcedir  := @ksourcedir@
@@ -16,7 +18,7 @@ LDFLAGS        := @LDFLAGS@
 regular_CFLAGS := @regular_CFLAGS@
 kinclude_CFLAGS := @kinclude_CFLAGS@
 
-AM_CFLAGS      := ${regular_CFLAGS} -I${top_srcdir}/include ${kinclude_CFLAGS}
+AM_CFLAGS      := ${regular_CFLAGS} -I${top_builddir}/include -I${top_srcdir}/include ${kinclude_CFLAGS}
 AM_DEPFLAGS     = -Wp,-MMD,$(@D)/.$(@F).d,-MT,$@
 
 ifeq (${V},)
