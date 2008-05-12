@@ -165,7 +165,7 @@ static char commands_v_options[NUMBER_OF_CMD][NUMBER_OF_OPT] =
 /*ZERO*/      {'x','x','x','x','x',' ','x','x','x','x','x'},
 /*NEW_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x','x'},
 /*DEL_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x','x'},
-/*SET_POLICY*/{'x','x','x','x','x',' ','x','x','x','x','x'},
+/*SET_POLICY*/{'x','x','x','x','x',' ','x','x','x','x',' '},
 /*RENAME*/    {'x','x','x','x','x',' ','x','x','x','x','x'}
 };
 
@@ -1802,7 +1802,7 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 		ret = ip6tc_rename_chain(chain, newname,	handle);
 		break;
 	case CMD_SET_POLICY:
-		ret = ip6tc_set_policy(chain, policy, NULL, handle);
+		ret = ip6tc_set_policy(chain, policy, options&OPT_COUNTERS ? &fw.counters : NULL, handle);
 		break;
 	default:
 		/* We should never reach this... */
