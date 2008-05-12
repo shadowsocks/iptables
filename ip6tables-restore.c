@@ -436,6 +436,7 @@ int main(int argc, char *argv[])
 					 &newargv[2], &handle);
 
 			free_argv();
+			fflush(stdout);
 		}
 		if (!ret) {
 			fprintf(stderr, "%s: line %u failed\n",

@@ -442,6 +442,7 @@ main(int argc, char *argv[])
 					 &newargv[2], &handle);
 
 			free_argv();
+			fflush(stdout);
 		}
 		if (tablename && (strcmp(tablename, curtable) != 0))
 			continue;
