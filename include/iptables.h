@@ -23,6 +23,8 @@ extern int flush_entries(const ipt_chainlabel chain, int verbose,
 			iptc_handle_t *handle);
 extern int for_each_chain(int (*fn)(const ipt_chainlabel, int, iptc_handle_t *),
 		int verbose, int builtinstoo, iptc_handle_t *handle);
+extern void print_rule(const struct ipt_entry *e,
+		iptc_handle_t *handle, const char *chain, int counters);
 
 /* kernel revision handling */
 extern int kernel_version;

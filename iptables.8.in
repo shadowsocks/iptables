@@ -205,6 +205,11 @@ arguments given. The exact rules are suppressed until you use
  iptables -L -v
 .fi
 .TP
+.BR "-S, --list-rules " "[\fIchain\fP]"
+Print all rules in the selected chain.  If no chain is selected, all
+chains are printed like iptables-save. Like every other iptables command,
+it applies to the specified table (filter is the default).
+.TP
 .BR "-F, --flush " "[\fIchain\fP]"
 Flush the selected chain (all the chains in the table if none is given).
 This is equivalent to deleting all the rules one by one.
