@@ -1754,26 +1754,28 @@ int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
 			set_option(&options, OPT_COUNTERS, &fw.ipv6.invflags,
 				   invert);
 			pcnt = optarg;
-			if (optind < argc && argv[optind][0] != '-'
+			bcnt = strchr(pcnt + 1, ',');
+			if (bcnt)
+			    bcnt++;
+			if (!bcnt && optind < argc && argv[optind][0] != '-'
 			    && argv[optind][0] != '!')
 				bcnt = argv[optind++];
-			else
+			if (!bcnt)
 				exit_error(PARAMETER_PROBLEM,
 					"-%c requires packet and byte counter",
 					opt2char(OPT_COUNTERS));
 
-			if (sscanf(pcnt, "%llu", (unsigned long long *)&cnt) != 1)
+			if (sscanf(pcnt, "%llu", &cnt) != 1)
 				exit_error(PARAMETER_PROBLEM,
 					"-%c packet counter not numeric",
 					opt2char(OPT_COUNTERS));
 			fw.counters.pcnt = cnt;
 
-			if (sscanf(bcnt, "%llu", (unsigned long long *)&cnt) != 1)
+			if (sscanf(bcnt, "%llu", &cnt) != 1)
 				exit_error(PARAMETER_PROBLEM,
 					"-%c byte counter not numeric",
 					opt2char(OPT_COUNTERS));
 			fw.counters.bcnt = cnt;
-
 			break;
 
 		case 1: /* non option */
