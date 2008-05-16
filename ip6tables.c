@@ -810,14 +810,14 @@ print_firewall(const struct ip6t_entry *fw,
 	fputc(fw->ipv6.invflags & IP6T_INV_DSTIP ? '!' : ' ', stdout);
 	if (!memcmp(&fw->ipv6.dmsk, &in6addr_any, sizeof in6addr_any)
 	    && !(format & FMT_NUMERIC))
-		printf(FMT("%-19s","-> %s"), "anywhere");
+		printf(FMT("%-19s ","-> %s"), "anywhere");
 	else {
 		if (format & FMT_NUMERIC)
 			sprintf(buf, "%s", ip6addr_to_numeric(&fw->ipv6.dst));
 		else
 			sprintf(buf, "%s", ip6addr_to_anyname(&fw->ipv6.dst));
 		strcat(buf, ip6mask_to_numeric(&fw->ipv6.dmsk));
-		printf(FMT("%-19s","-> %s"), buf);
+		printf(FMT("%-19s ","-> %s"), buf);
 	}
 
 	if (format & FMT_NOTABLE)
