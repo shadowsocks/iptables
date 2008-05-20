@@ -1,5 +1,5 @@
 
-AC_INIT([iptables], [1.4.1])
+AC_INIT([iptables], [1.4.1-rc1])
 AC_CONFIG_HEADERS([config.h])
 AC_PROG_INSTALL
 AM_INIT_AUTOMAKE
