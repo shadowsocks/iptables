@@ -1,6 +1,6 @@
 This module matches the parameters in Authentication header of IPsec packets.
 .TP
-.BR "--ahspi " "[!] \fIspi\fP[:\fIspi\fP]"
+[\fB!\fP] \fB--ahspi\fP \fIspi\fP[\fB:\fP\fIspi\fP]
 Matches SPI.
 .TP
 [\fB!\fP] \fB--ahlen\fP \fIlength\fP

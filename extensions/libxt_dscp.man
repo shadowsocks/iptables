@@ -4,7 +4,7 @@ IP header.  DSCP has superseded TOS within the IETF.
 .BI "--dscp " "value"
 Match against a numeric (decimal or hex) value [0-63].
 .TP
-.BI "--dscp-class " "\fIDiffServ Class\fP"
+\fB--dscp-class\fP \fIclass\fP
 Match the DiffServ class. This value may be any of the
 BE, EF, AFxx or CSx classes.  It will then be converted
 into its according numeric value.

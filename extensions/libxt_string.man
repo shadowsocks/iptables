@@ -1,6 +1,6 @@
 This modules matches a given string by using some pattern matching strategy. It requires a linux kernel >= 2.6.14.
 .TP
-.BI "--algo  " "bm|kmp"
+\fB--algo\fP {\fBbm\fP|\fBkmp\fP}
 Select the pattern matching strategy. (bm = Boyer-Moore, kmp = Knuth-Pratt-Morris)
 .TP
 .BI "--from " "offset"

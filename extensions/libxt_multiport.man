@@ -5,16 +5,16 @@ ports.  It can only be used in conjunction with
 or
 .BR "-p udp" .
 .TP
-.BR "--source-ports " "\fI[!] port\fP[,\fIport\fP[,\fIport:port\fP...]]"
+[\fB!\fP] \fB--source-ports\fP,\fB--sport\fP \fIport\fP[\fB,\fP\fIport\fP[\fB,\fP\fIport\fP\fB:\fP\fIport\fP...]]
 Match if the source port is one of the given ports.  The flag
 .B --sports
 is a convenient alias for this option.
 .TP
-.BR "--destination-ports " "\fI[!] port\fP[,\fIport\fP[,\fIport:port\fP...]]"
+[\fB!\fP] \fB--destination-ports\fP,\fB--dport\fP \fIport\fP[\fB,\fP\fIport\fP[\fB,\fP\fIport\fP\fB:\fP\fIport\fP...]]
 Match if the destination port is one of the given ports.  The flag
 .B --dports
 is a convenient alias for this option.
 .TP
-.BR "--ports " "\fI[!] port\fP[,\fIport\fP[,\fIport:port\fP...]]"
+[\fB!\fP] \fB--ports\fP \fIport\fP[\fB,\fP\fIport\fP[\fB,\fP\fIport\fP\fB:\fP\fIport\fP...]]
 Match if either the source or destination ports are equal to one of
 the given ports.

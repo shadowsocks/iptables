@@ -1,6 +1,6 @@
 This module matches the Hop Limit field in the IPv6 header.
 .TP
-.BR "--hl-eq " "[!] \fIvalue\fP"
+[\fB!\fP] \fB--hl-eq\fP \fIvalue\fP
 Matches if Hop Limit equals \fIvalue\fP.
 .TP
 .BI "--hl-lt " "value"

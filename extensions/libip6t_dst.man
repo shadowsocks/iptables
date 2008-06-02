@@ -3,5 +3,5 @@ This module matches the parameters in Destination Options header
 [\fB!\fP] \fB--dst-len\fP \fIlength\fP
 Total length of this header in octets.
 .TP
-.BR "--dst-opts " "\fItype\fP[:\fIlength\fP][,\fItype\fP[:\fIlength\fP]...]"
+\fB--dst-opts\fP \fItype\fP[\fB:\fP\fIlength\fP][\fB,\fP\fItype\fP[\fB:\fP\fIlength\fP]...]
 numeric type of option and the length of the option data in octets.

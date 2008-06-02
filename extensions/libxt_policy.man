@@ -1,6 +1,6 @@
 This modules matches the policy used by IPsec for handling a packet.
 .TP
-.BI "--dir " "in|out"
+\fB--dir\fP {\fBin\fP|\fBout\fP}
 Used to select whether to match the policy used for decapsulation or the
 policy that will be used for encapsulation.
 .B in
@@ -12,7 +12,7 @@ is valid in the
 .B POSTROUTING, OUTPUT and FORWARD
 chains.
 .TP
-.BI "--pol " "none|ipsec"
+\fB--pol\fP {\fBnone\fP|\fBipsec\fP}
 Matches if the packet is subject to IPsec processing.
 .TP
 .BI "--strict"
@@ -29,20 +29,20 @@ as level.
 .BI "--spi " "spi"
 Matches the SPI of the SA.
 .TP
-.BI "--proto " "ah|esp|ipcomp"
+\fB--proto\fP {\fBah\fP|\fBesp\fP|\fBipcomp\fP}
 Matches the encapsulation protocol.
 .TP
-.BI "--mode " "tunnel|transport"
+\fB--mode\fP {\fBtunnel\fP|\fBtransport\fP}
 Matches the encapsulation mode.
 .TP
-.BI "--tunnel-src " "addr[/mask]"
+\fB--tunnel-src\fP \fIaddr\fP[\fB/\fP\fImask\fP]
 Matches the source end-point address of a tunnel mode SA.
-Only valid with --mode tunnel.
+Only valid with \fB--mode tunnel\fP.
 .TP
-.BI "--tunnel-dst " "addr[/mask]"
+\fB--tunnel-dst\fP \fIaddr\fP[\fB/\fP\fImask\fP]
 Matches the destination end-point address of a tunnel mode SA.
-Only valid with --mode tunnel.
+Only valid with \fB--mode tunnel\fP.
 .TP
 .BI "--next"
 Start the next element in the policy specification. Can only be used with
---strict
+\fB--strict\fP.

@@ -9,7 +9,7 @@ chains.  It redirects the packet to the machine itself by changing the
 destination IP to the primary address of the incoming interface
 (locally-generated packets are mapped to the 127.0.0.1 address).
 .TP
-.BR "--to-ports " "\fIport\fP[-\fIport\fP]"
+\fB--to-ports\fP \fIport\fP[\fB-\fP\fIport\fP]
 This specifies a destination port or range of ports to use: without
 this, the destination port is never altered.  This is only valid
 if the rule also specifies
