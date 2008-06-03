@@ -18,6 +18,9 @@
 #endif
 
 #define XTABLES_VERSION "@PACKAGE_VERSION@"
+#define XTABLES_VERSION_CODE (0x10000 * @XTABLES_VERSION_MAJOR@ + 0x100 * @XTABLES_VERSION_MINOR@ + @XTABLES_VERSION_PATCH@)
+
+#define XTABLES_API_VERSION(x,y,z)    (0x10000*(x) + 0x100*(y) + z)
 
 /* Include file for additions: new matches and targets. */
 struct xtables_match
