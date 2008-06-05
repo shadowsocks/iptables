@@ -39,6 +39,14 @@ AC_ARG_ENABLE([libipq],
 	AS_HELP_STRING([--enable-libipq], [Build and install libipq]))
 
 AC_CHECK_HEADER([netinet/ip6.h], [], [AC_MSG_ERROR(but we need that for IPv6)])
+AC_CHECK_HEADER([linux/dccp.h])
+
+blacklist_modules="";
+if test "$ac_cv_header_linux_dccp_h" != "yes"; then
+	blacklist_modules="$blacklist_modules dccp";
+fi;
+AC_SUBST([blacklist_modules])
+
 AM_CONDITIONAL([ENABLE_STATIC], [test "$enable_static" == "yes"])
 AM_CONDITIONAL([ENABLE_SHARED], [test "$enable_shared" == "yes"])
 AM_CONDITIONAL([ENABLE_DEVEL], [test "$enable_devel" == "yes"])
