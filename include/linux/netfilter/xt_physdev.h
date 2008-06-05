@@ -1,9 +1,6 @@
 #ifndef _XT_PHYSDEV_H
 #define _XT_PHYSDEV_H
 
-#ifdef __KERNEL__
-#include <linux/if.h>
-#endif
 
 #define XT_PHYSDEV_OP_IN		0x01
 #define XT_PHYSDEV_OP_OUT		0x02

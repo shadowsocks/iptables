@@ -74,8 +74,8 @@ struct xt_conntrack_mtinfo1 {
 	union nf_inet_addr repldst_addr, repldst_mask;
 	u_int32_t expires_min, expires_max;
 	u_int16_t l4proto;
-	u_int16_t origsrc_port, origdst_port;
-	u_int16_t replsrc_port, repldst_port;
+	__be16 origsrc_port, origdst_port;
+	__be16 replsrc_port, repldst_port;
 	u_int16_t match_flags, invert_flags;
 	u_int8_t state_mask, status_mask;
 };

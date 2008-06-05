@@ -3,8 +3,10 @@
 
 struct xt_rateest_target_info {
 	char			name[IFNAMSIZ];
-	signed char		interval;
-	unsigned char		ewma_log;
+	int8_t			interval;
+	u_int8_t		ewma_log;
+
+	/* Used internally by the kernel */
 	struct xt_rateest	*est __attribute__((aligned(8)));
 };
 

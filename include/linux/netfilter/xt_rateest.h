@@ -2,12 +2,12 @@
 #define _XT_RATEEST_MATCH_H
 
 enum xt_rateest_match_flags {
-	XT_RATEEST_MATCH_INVERT	= 0x01,
-	XT_RATEEST_MATCH_ABS	= 0x02,
-	XT_RATEEST_MATCH_REL	= 0x04,
-	XT_RATEEST_MATCH_DELTA	= 0x08,
-	XT_RATEEST_MATCH_BPS	= 0x10,
-	XT_RATEEST_MATCH_PPS	= 0x20,
+	XT_RATEEST_MATCH_INVERT	= 1<<0,
+	XT_RATEEST_MATCH_ABS	= 1<<1,
+	XT_RATEEST_MATCH_REL	= 1<<2,
+	XT_RATEEST_MATCH_DELTA	= 1<<3,
+	XT_RATEEST_MATCH_BPS	= 1<<4,
+	XT_RATEEST_MATCH_PPS	= 1<<5,
 };
 
 enum xt_rateest_match_mode {
@@ -26,6 +26,8 @@ struct xt_rateest_match_info {
 	u_int32_t		pps1;
 	u_int32_t		bps2;
 	u_int32_t		pps2;
+
+	/* Used internally by the kernel */
 	struct xt_rateest	*est1 __attribute__((aligned(8)));
 	struct xt_rateest	*est2 __attribute__((aligned(8)));
 };

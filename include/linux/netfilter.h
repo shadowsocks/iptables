@@ -38,8 +38,8 @@ enum nf_inet_hooks {
 
 union nf_inet_addr {
 	__u32		all[4];
-	__u32		ip;
-	__u32		ip6[4];
+	__be32		ip;
+	__be32		ip6[4];
 	struct in_addr	in;
 	struct in6_addr	in6;
 };

@@ -12,10 +12,10 @@ struct xt_rateinfo {
 
 	/* Used internally by the kernel */
 	unsigned long prev;
-	/* Ugly, ugly fucker. */
-	struct xt_rateinfo *master;
-
 	u_int32_t credit;
 	u_int32_t credit_cap, cost;
+
+	/* Ugly, ugly fucker. */
+	struct xt_rateinfo *master;
 };
 #endif /*_XT_RATE_H*/

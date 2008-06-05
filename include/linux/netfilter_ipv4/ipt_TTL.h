@@ -1,5 +1,5 @@
 /* TTL modification module for IP tables
- * (C) 2000 by Harald Welte <laforge@gnumonks.org> */
+ * (C) 2000 by Harald Welte <laforge@netfilter.org> */
 
 #ifndef _IPT_TTL_H
 #define _IPT_TTL_H
@@ -16,4 +16,6 @@ struct ipt_TTL_info {
 	u_int8_t	mode;
 	u_int8_t	ttl;
 };
+
+
 #endif
