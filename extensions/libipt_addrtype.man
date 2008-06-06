@@ -7,31 +7,63 @@ The following address types are possible:
 .TP
 .BI "UNSPEC"
 an unspecified address (i.e. 0.0.0.0)
+.TP
 .BI "UNICAST"
 an unicast address
+.TP
 .BI "LOCAL"
 a local address
+.TP
 .BI "BROADCAST"
 a broadcast address
+.TP
 .BI "ANYCAST"
 an anycast packet
+.TP
 .BI "MULTICAST"
 a multicast address
+.TP
 .BI "BLACKHOLE"
 a blackhole address
+.TP
 .BI "UNREACHABLE"
 an unreachable address
+.TP
 .BI "PROHIBIT"
 a prohibited address
+.TP
 .BI "THROW"
 FIXME
+.TP
 .BI "NAT"
 FIXME
+.TP
 .BI "XRESOLVE"
-FIXME
 .TP
 .BI "--src-type " "type"
 Matches if the source address is of given type
 .TP
 .BI "--dst-type " "type"
 Matches if the destination address is of given type
+.TP
+.BI "--limit-iface-in"
+The address type checking can be limited to the interface the packet is coming
+in. This option is only valid in the
+.BR PREROUTING ,
+.B INPUT
+and
+.B FORWARD
+chains. It cannot be specified with the
+.B "--limit-iface-out"
+option.
+.TP
+.BI "--limit-iface-out"
+The address type checiking can be limited to the interface the packet is going
+out. This option is only valid in the
+.BR POSTROUTING ,
+.B OUTPUT
+and
+.B FORWARD
+chains. It cannot be specified with the
+.B --limit-iface-in
+option.
