@@ -498,12 +498,12 @@ owner_mt_save_v0(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ipt_owner_info *info = (void *)match->data;
 
-	owner_mt_print_item_v0(info, "owner UID match ", IPT_OWNER_UID, true);
-	owner_mt_print_item_v0(info, "owner GID match ", IPT_OWNER_GID, true);
-	owner_mt_print_item_v0(info, "owner PID match ", IPT_OWNER_PID, true);
-	owner_mt_print_item_v0(info, "owner SID match ", IPT_OWNER_SID, true);
+	owner_mt_print_item_v0(info, "--uid-owner ", IPT_OWNER_UID, true);
+	owner_mt_print_item_v0(info, "--gid-owner ", IPT_OWNER_GID, true);
+	owner_mt_print_item_v0(info, "--pid-owner ", IPT_OWNER_PID, true);
+	owner_mt_print_item_v0(info, "--sid-owner ", IPT_OWNER_SID, true);
 #ifdef IPT_OWNER_COMM
-	owner_mt_print_item_v0(info, "owner CMD match ", IPT_OWNER_COMM, true);
+	owner_mt_print_item_v0(info, "--cmd-owner ", IPT_OWNER_COMM, true);
 #endif
 }
 
@@ -512,10 +512,10 @@ owner_mt6_save_v0(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_owner_info *info = (void *)match->data;
 
-	owner_mt6_print_item_v0(info, "owner UID match ", IPT_OWNER_UID, true);
-	owner_mt6_print_item_v0(info, "owner GID match ", IPT_OWNER_GID, true);
-	owner_mt6_print_item_v0(info, "owner PID match ", IPT_OWNER_PID, true);
-	owner_mt6_print_item_v0(info, "owner SID match ", IPT_OWNER_SID, true);
+	owner_mt6_print_item_v0(info, "--uid-owner ", IPT_OWNER_UID, true);
+	owner_mt6_print_item_v0(info, "--gid-owner ", IPT_OWNER_GID, true);
+	owner_mt6_print_item_v0(info, "--pid-owner ", IPT_OWNER_PID, true);
+	owner_mt6_print_item_v0(info, "--sid-owner ", IPT_OWNER_SID, true);
 }
 
 static void owner_mt_save(const void *ip, const struct xt_entry_match *match)
