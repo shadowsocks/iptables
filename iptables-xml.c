@@ -52,9 +52,9 @@ static int verbose = 0;
 static int combine = 0;
 /* Keeping track of external matches and targets.  */
 static struct option options[] = {
-	{"verbose", 0, 0, 'v'},
-	{"combine", 0, 0, 'c'},
-	{"help", 0, 0, 'h'},
+	{"verbose", 0, NULL, 'v'},
+	{"combine", 0, NULL, 'c'},
+	{"help", 0, NULL, 'h'},
 	{ .name = NULL }
 };
 
@@ -95,10 +95,10 @@ static unsigned int oldargc = 0;
 static int newargvattr[255];
 
 #define IPT_CHAIN_MAXNAMELEN IPT_TABLE_MAXNAMELEN
-char closeActionTag[IPT_TABLE_MAXNAMELEN + 1];
-char closeRuleTag[IPT_TABLE_MAXNAMELEN + 1];
-char curTable[IPT_TABLE_MAXNAMELEN + 1];
-char curChain[IPT_CHAIN_MAXNAMELEN + 1];
+static char closeActionTag[IPT_TABLE_MAXNAMELEN + 1];
+static char closeRuleTag[IPT_TABLE_MAXNAMELEN + 1];
+static char curTable[IPT_TABLE_MAXNAMELEN + 1];
+static char curChain[IPT_CHAIN_MAXNAMELEN + 1];
 
 struct chain {
 	char *chain;
