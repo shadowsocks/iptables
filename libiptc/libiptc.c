@@ -2170,6 +2170,8 @@ int
 TC_CREATE_CHAIN(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 {
 	static struct chain_head *c;
+	int capacity;
+	int exceeded;
 
 	iptc_fn = TC_CREATE_CHAIN;
 
@@ -2209,8 +2211,8 @@ TC_CREATE_CHAIN(const IPT_CHAINLABEL chain, TC_HANDLE_T *handle)
 	 * in the buckets. Thus, only rebuild chain index when the
 	 * capacity is exceed with CHAIN_INDEX_INSERT_MAX chains.
 	 */
-	int capacity = (*handle)->chain_index_sz * CHAIN_INDEX_BUCKET_LEN;
-	int exceeded = ((((*handle)->num_chains)-capacity));
+	capacity = (*handle)->chain_index_sz * CHAIN_INDEX_BUCKET_LEN;
+	exceeded = ((((*handle)->num_chains)-capacity));
 	if (exceeded > CHAIN_INDEX_INSERT_MAX) {
 		debug("Capacity(%d) exceeded(%d) rebuild (chains:%d)\n",
 		      capacity, exceeded, (*handle)->num_chains);
