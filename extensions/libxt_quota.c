@@ -77,7 +77,7 @@ quota_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-struct xtables_match quota_match = {
+static struct xtables_match quota_match = {
 	.family		= AF_UNSPEC,
 	.name		= "quota",
 	.version	= XTABLES_VERSION,

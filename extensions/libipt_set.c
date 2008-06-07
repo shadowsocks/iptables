@@ -32,8 +32,8 @@ static void set_help(void)
 }
 
 static const struct option set_opts[] = {
-	{"set", 1, 0, '1'},
-	{0}
+	{"set", 1, NULL, '1'},
+	{ }
 };
 
 /* Initialize the match. */

@@ -23,8 +23,8 @@ static void CONNSECMARK_help(void)
 }
 
 static const struct option CONNSECMARK_opts[] = {
-	{ "save", 0, 0, '1' },
-	{ "restore", 0, 0, '2' },
+	{ "save", 0, NULL, '1' },
+	{ "restore", 0, NULL, '2' },
 	{ .name = NULL }
 };
 

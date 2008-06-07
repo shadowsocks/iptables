@@ -22,7 +22,7 @@ static void SECMARK_help(void)
 }
 
 static const struct option SECMARK_opts[] = {
-	{ "selctx", 1, 0, '1' },
+	{ "selctx", 1, NULL, '1' },
 	{ .name = NULL }
 };
 

@@ -124,9 +124,9 @@ main(int argc, char *argv[])
 	int c;
 	char curtable[IPT_TABLE_MAXNAMELEN + 1];
 	FILE *in;
-	const char *modprobe = 0;
+	const char *modprobe = NULL;
 	int in_table = 0, testing = 0;
-	const char *tablename = 0;
+	const char *tablename = NULL;
 
 	program_name = "iptables-restore";
 	program_version = XTABLES_VERSION;

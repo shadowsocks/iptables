@@ -34,9 +34,9 @@ static void SET_help(void)
 }
 
 static const struct option SET_opts[] = {
-	{"add-set",   1, 0, '1'},
-	{"del-set",   1, 0, '2'},
-	{0}
+	{"add-set",   1, NULL, '1'},
+	{"del-set",   1, NULL, '2'},
+	{ }
 };
 
 /* Initialize the target. */

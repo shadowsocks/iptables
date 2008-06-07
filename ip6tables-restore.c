@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
 	int c;
 	char curtable[IP6T_TABLE_MAXNAMELEN + 1];
 	FILE *in;
-	const char *modprobe = 0;
+	const char *modprobe = NULL;
 	int in_table = 0, testing = 0;
 
 	program_name = "ip6tables-restore";
