@@ -16,10 +16,10 @@ size is more than FROM and less than TO bytes/packets. if TO is
 omitted only FROM check is done. "!" is used to match packets not
 falling in the range.
 .TP
-\fB--connbytes-dir\fR [\fBoriginal\fR|\fBreply\fR|\fBboth\fR]
+\fB--connbytes-dir\fR {\fBoriginal\fR|\fBreply\fR|\fBboth\fR}
 which packets to consider
 .TP
-\fB--connbytes-mode\fR [\fBpackets\fR|\fBbytes\fR|\fBavgpkt\fR]
+\fB--connbytes-mode\fR {\fBpackets\fR|\fBbytes\fR|\fBavgpkt\fR}
 whether to check the amount of packets, number of bytes transferred or
 the average size (in bytes) of all packets received so far. Note that
 when "both" is used together with "avgpkt", and data is going (mainly)

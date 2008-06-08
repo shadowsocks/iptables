@@ -1,6 +1,6 @@
 This modules macthes IP sets which can be defined by ipset(8).
 .TP
-\fB--set\fP \fIsetname\fP \fIflag\fP[\fB,\fP\fIflag\fP...]
+[\fB!\fP] \fB--set\fP \fIsetname\fP \fIflag\fP[\fB,\fP\fIflag\fP]...
 where flags are
 .BR "src"
 and/or

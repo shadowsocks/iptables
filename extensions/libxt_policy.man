@@ -19,27 +19,27 @@ Matches if the packet is subject to IPsec processing.
 Selects whether to match the exact policy or match if any rule of
 the policy matches the given policy.
 .TP
-.BI "--reqid " "id"
+[\fB!\fP] \fB--reqid\fP \fIid\fP
 Matches the reqid of the policy rule. The reqid can be specified with
 .B setkey(8)
 using
 .B unique:id
 as level.
 .TP
-.BI "--spi " "spi"
+[\fB!\fP] \fB--spi\fP \fIspi\fP
 Matches the SPI of the SA.
 .TP
-\fB--proto\fP {\fBah\fP|\fBesp\fP|\fBipcomp\fP}
+[\fB!\fP] \fB--proto\fP {\fBah\fP|\fBesp\fP|\fBipcomp\fP}
 Matches the encapsulation protocol.
 .TP
-\fB--mode\fP {\fBtunnel\fP|\fBtransport\fP}
+[\fB!\fP] \fB--mode\fP {\fBtunnel\fP|\fBtransport\fP}
 Matches the encapsulation mode.
 .TP
-\fB--tunnel-src\fP \fIaddr\fP[\fB/\fP\fImask\fP]
+[\fB!\fP] \fB--tunnel-src\fP \fIaddr\fP[\fB/\fP\fImask\fP]
 Matches the source end-point address of a tunnel mode SA.
 Only valid with \fB--mode tunnel\fP.
 .TP
-\fB--tunnel-dst\fP \fIaddr\fP[\fB/\fP\fImask\fP]
+[\fB!\fP] \fB--tunnel-dst\fP \fIaddr\fP[\fB/\fP\fImask\fP]
 Matches the destination end-point address of a tunnel mode SA.
 Only valid with \fB--mode tunnel\fP.
 .TP

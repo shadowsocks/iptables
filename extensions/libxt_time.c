@@ -51,16 +51,16 @@ static void time_help(void)
 {
 	printf(
 "time match options:\n"
-"  --datestart time     Start and stop time, to be given in ISO 8601\n"
-"  --datestop time      (YYYY[-MM[-DD[Thh[:mm[:ss]]]]])\n"
-"  --timestart time     Start and stop daytime (hh:mm[:ss])\n"
-"  --timestop time      (between 00:00:00 and 23:59:59)\n"
-"  --monthdays value    List of days on which to match, separated by comma\n"
-"                       (Possible days: 1 to 31; defaults to all)\n"
-"  --weekdays value     List of weekdays on which to match, sep. by comma\n"
-"                       (Possible days: Mon,Tue,Wed,Thu,Fri,Sat,Sun or 1 to 7\n"
-"                       Defaults to all weekdays.)\n"
-"  --localtz/--utc      Time is interpreted as UTC/local time\n");
+"    --datestart time     Start and stop time, to be given in ISO 8601\n"
+"    --datestop time      (YYYY[-MM[-DD[Thh[:mm[:ss]]]]])\n"
+"    --timestart time     Start and stop daytime (hh:mm[:ss])\n"
+"    --timestop time      (between 00:00:00 and 23:59:59)\n"
+"[!] --monthdays value    List of days on which to match, separated by comma\n"
+"                         (Possible days: 1 to 31; defaults to all)\n"
+"[!] --weekdays value     List of weekdays on which to match, sep. by comma\n"
+"                         (Possible days: Mon,Tue,Wed,Thu,Fri,Sat,Sun or 1 to 7\n"
+"                         Defaults to all weekdays.)\n"
+"    --localtz/--utc      Time is interpreted as UTC/local time\n");
 }
 
 static void time_init(struct xt_entry_match *m)

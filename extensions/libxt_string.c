@@ -38,8 +38,8 @@ static void string_help(void)
 "--from                       Offset to start searching from\n"
 "--to                         Offset to stop searching\n"
 "--algo	                      Algorithm\n"
-"--string [!] string          Match a string in a packet\n"
-"--hex-string [!] string      Match a hex string in a packet\n");
+"[!] --string string          Match a string in a packet\n"
+"[!] --hex-string string      Match a hex string in a packet\n");
 }
 
 static const struct option string_opts[] = {

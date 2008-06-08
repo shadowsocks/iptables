@@ -4,7 +4,7 @@ A rule using this extension will match until this limit is reached
 .B LOG
 target to give limited logging, for example.
 .TP
-.BI "--limit " "rate"
+[\fB!\fP] \fB--limit\fP \fIrate\fP[\fB/second\fP|\fB/minute\fP|\fB/hour\fP|\fB/day\fP]
 Maximum average matching rate: specified as a number, with an optional
 `/second', `/minute', `/hour', or `/day' suffix; the default is
 3/hour.

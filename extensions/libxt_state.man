@@ -1,7 +1,7 @@
 This module, when combined with connection tracking, allows access to
 the connection tracking state for this packet.
 .TP
-.BI "--state " "state"
+[\fB!\fP] \fB--state\fP \fIstate\fP
 Where state is a comma separated list of the connection states to
 match.  Possible states are
 .B INVALID

@@ -40,10 +40,10 @@ FIXME
 .TP
 .BI "XRESOLVE"
 .TP
-.BI "--src-type " "type"
+[\fB!\fP] \fB--src-type\fP \fItype\fP
 Matches if the source address is of given type
 .TP
-.BI "--dst-type " "type"
+[\fB!\fP] \fB--dst-type\fP \fItype\fP
 Matches if the destination address is of given type
 .TP
 .BI "--limit-iface-in"

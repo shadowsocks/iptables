@@ -19,7 +19,7 @@ Only match during the given daytime. The possible time range is 00:00:00 to
 23:59:59. Leading zeroes are allowed (e.g. "06:03") and correctly interpreted
 as base-10.
 .TP
-[\fB!\fR] \fB--monthday\fR \fIday\fR[\fB,\fR\fIday\fR...]
+[\fB!\fR] \fB--monthdays\fR \fIday\fR[\fB,\fR\fIday\fR...]
 .IP
 Only match on the given days of the month. Possible values are \fB1\fR
 to \fB31\fR. Note that specifying \fB31\fR will of course not match

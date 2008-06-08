@@ -59,7 +59,7 @@ static void pkttype_help(void)
 {
 	printf(
 "pkttype match options:\n"
-"  --pkt-type [!] packettype\tmatch packet type\n");
+"[!] --pkt-type packettype    match packet type\n");
 	print_types();
 }
 

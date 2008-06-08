@@ -28,7 +28,7 @@ Maximum initial number of packets to match: this number gets recharged by one
 every time the limit specified above is not reached, up to this number; the
 default is 5.
 .TP
-\fB--hashlimit-mode\fR [\fBsrcip\fR|\fBsrcport\fR|\fBdstip\fR|\fBdstport\fR[\fB,\fR...]]
+\fB--hashlimit-mode\fR {\fBsrcip\fR|\fBsrcport\fR|\fBdstip\fR|\fBdstport\fR}\fB,\fP...
 A comma-separated list of objects to take into consideration. If no
 --hashlimit-mode option is given, hashlimit acts like limit, but at the
 expensive of doing the hash housekeeping.
