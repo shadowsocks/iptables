@@ -1011,10 +1011,10 @@ static int ip6addr_prefix_length(const struct in6_addr *k)
 	unsigned int bits = 0;
 	uint32_t a, b, c, d;
 
-	a = k->s6_addr32[0];
-	b = k->s6_addr32[1];
-	c = k->s6_addr32[2];
-	d = k->s6_addr32[3];
+	a = ntohl(k->s6_addr32[0]);
+	b = ntohl(k->s6_addr32[1]);
+	c = ntohl(k->s6_addr32[2]);
+	d = ntohl(k->s6_addr32[3]);
 	while (a & 0x80000000U) {
 		++bits;
 		a <<= 1;
