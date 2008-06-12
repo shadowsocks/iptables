@@ -67,7 +67,7 @@ all: ${targets}
 
 install: ${targets_install}
 	@mkdir -p "${DESTDIR}${xtlibdir}";
-	install -pm0755 $^ "${DESTDIR}${xtlibdir}/";
+	if test -n "${targets_install}"; then install -pm0755 $^ "${DESTDIR}${xtlibdir}/"; fi;
 
 clean:
 	rm -f *.o *.oo *.so *.a {matches,targets}[46].man initext4.c initext6.c;
