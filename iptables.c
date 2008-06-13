@@ -737,7 +737,7 @@ print_firewall(const struct ipt_entry *fw,
 	flags = fw->ip.flags;
 
 	if (format & FMT_LINENUMBERS)
-		printf(FMT("%-4u ", "%u "), num+1);
+		printf(FMT("%-4u ", "%u "), num);
 
 	if (!(format & FMT_NOCOUNTS)) {
 		print_num(fw->counters.pcnt, format);
