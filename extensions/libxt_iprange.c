@@ -119,6 +119,9 @@ iprange_mt4_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (ia == NULL)
 			param_act(P_BAD_VALUE, "iprange", "--src-ip", end + 1);
 		memcpy(&info->src_max.in, ia, sizeof(*ia));
+		info->flags |= IPRANGE_SRC;
+		if (invert)
+			info->flags |= IPRANGE_SRC_INV;
 		*flags |= F_SRCIP;
 		return true;
 
@@ -135,6 +138,9 @@ iprange_mt4_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (ia == NULL)
 			param_act(P_BAD_VALUE, "iprange", "--dst-ip", end + 1);
 		memcpy(&info->dst_max.in, ia, sizeof(*ia));
+		info->flags |= IPRANGE_DST;
+		if (invert)
+			info->flags |= IPRANGE_DST_INV;
 		*flags |= F_DSTIP;
 		return true;
 	}
