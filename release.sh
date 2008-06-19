@@ -9,7 +9,7 @@ IPTDIR="$TMPDIR/iptables-$VERSION"
 
 PATCH=patch-iptables-$PREV_VERSION-$VERSION.bz2
 TARBALL=iptables-$VERSION.tar.bz2
-CHANGELOG=changes-iptables-$PREV_VERSION-$VERSION
+CHANGELOG=changes-iptables-$PREV_VERSION-$VERSION.txt
 
 mkdir -p "$TMPDIR"
 git shortlog v$PREV_VERSION..v$VERSION > "$TMPDIR/$CHANGELOG"
