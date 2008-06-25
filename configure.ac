@@ -38,7 +38,6 @@ AC_ARG_ENABLE([devel],
 AC_ARG_ENABLE([libipq],
 	AS_HELP_STRING([--enable-libipq], [Build and install libipq]))
 
-AC_CHECK_HEADER([netinet/ip6.h], [], [AC_MSG_ERROR(but we need that for IPv6)])
 AC_CHECK_HEADER([linux/dccp.h])
 
 blacklist_modules="";
