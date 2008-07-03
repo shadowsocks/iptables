@@ -18,13 +18,14 @@ git archive --prefix="iptables-$VERSION/" "v$VERSION" | tar -xC "$TMPDIR/"
 
 cd "$IPTDIR" && {
 	sh autogen.sh
-	rm autogen.sh COMMIT_NOTES
 	cd ..
 }
 
 tar -cjf "$TARBALL" "iptables-$VERSION";
 gpg -u "Netfilter Core Team" -sb "$TARBALL";
 md5sum "$TARBALL" >"$TARBALL.md5sum";
+sha1sum "$TARBALL" >"$TARBALL.sha1sum";
 
 gpg -u "Netfilter Core Team" -sb "$PATCH";
 md5sum "$PATCH" >"$PATCH.md5sum";
+sha1sum "$PATCH" >"$PATCH.sha1sum";
