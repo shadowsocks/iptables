@@ -27,25 +27,25 @@
 .SH NAME
 ip6tables \- IPv6 packet filter administration
 .SH SYNOPSIS
-\fBip6tables\fP [\fB-t\fP \fItable\fP\fB]\fP {\fB-A\fP|\fB-D\fP} \fIchain rule-specification\fP [\fIoptions...\fP]
+\fBip6tables\fP [\fB-t\fP \fItable\fP] {\fB-A\fP|\fB-D\fP} \fIchain rule-specification\fP [\fIoptions...\fP]
 .br
-\fBip6tables\fP [\fB-t\fP \fItable\fP\fB] -I\fP [\fIrulenum\fP] \fIrule-specification\fP [\fIoptions...\fP]
+\fBip6tables\fP [\fB-t\fP \fItable\fP] \fB-I\fP [\fIrulenum\fP] \fIrule-specification\fP [\fIoptions...\fP]
 .br
-\fBip6tables\fP [\fB-t\fP \fItable\fP\fB] -R\fP \fIrulenum rule-specification\fP [\fIoptions...\fP]
+\fBip6tables\fP [\fB-t\fP \fItable\fP] \fB-R\fP \fIrulenum rule-specification\fP [\fIoptions...\fP]
 .br
-\fBip6tables\fP [\fB-t\fP \fItable\fP\fB] -D\fP \fIchain rulenum\fP [\fIoptions...\fP]
+\fBip6tables\fP [\fB-t\fP \fItable\fP] \fB-D\fP \fIchain rulenum\fP [\fIoptions...\fP]
 .br
-\fBip6tables\fP [\fB-t\fP \fItable\fP\fB] -S\fP [\fIchain\fP]
+\fBip6tables\fP [\fB-t\fP \fItable\fP] \fB-S\fP [\fIchain\fP]
 .br
-\fBip6tables\fP [\fB-t\fP \fItable\fP\fB]\fP {\fB-F\fP|\fB-L\fP|\fB-Z\fP} [\fIchain\fP] [\fIoptions...\fP]
+\fBip6tables\fP [\fB-t\fP \fItable\fP] {\fB-F\fP|\fB-L\fP|\fB-Z\fP} [\fIchain\fP] [\fIoptions...\fP]
 .br
-\fBip6tables\fP [\fB-t\fP \fItable\fP\fB] -N\fP \fIchain\fP
+\fBip6tables\fP [\fB-t\fP \fItable\fP] \fB-N\fP \fIchain\fP
 .br
-\fBip6tables\fP [\fB-t\fP \fItable\fP\fB] -X\fP [\fIchain\fP]
+\fBip6tables\fP [\fB-t\fP \fItable\fP] \fB-X\fP [\fIchain\fP]
 .br
-\fBip6tables\fP [\fB-t\fP \fItable\fP\fB] -P\fP \fIchain target\fP [\fIoptions...\fP]
+\fBip6tables\fP [\fB-t\fP \fItable\fP] \fB-P\fP \fIchain target\fP [\fIoptions...\fP]
 .br
-\fBip6tables\fP [\fB-t\fP \fItable\fP\fB] -E\fP \fIold-chain-name new-chain-name\fP
+\fBip6tables\fP [\fB-t\fP \fItable\fP] \fB-E\fP \fIold-chain-name new-chain-name\fP
 .SH DESCRIPTION
 \fBIp6tables\fP is used to set up, maintain, and inspect the
 tables of IPv6 packet
@@ -155,10 +155,10 @@ fail.  Rules are numbered starting at 1.
 .TP
 \fB-L\fP, \fB--list\fP [\fIchain\fP]
 List all rules in the selected chain.  If no chain is selected, all
-chains are listed. Like every other iptables command, it applies to the
+chains are listed. Like every other ip6tables command, it applies to the
 specified table (filter is the default), so NAT rules get listed by
 .nf
- iptables -t nat -n -L
+ ip6tables -t nat -n -L
 .fi
 Please note that it is often used with the \fB-n\fP
 option, in order to avoid long reverse DNS lookups.
@@ -167,12 +167,12 @@ It is legal to specify the \fB-Z\fP
 listed and zeroed.  The exact output is affected by the other
 arguments given. The exact rules are suppressed until you use
 .nf
- iptables -L -v
+ ip6tables -L -v
 .fi
 .TP
 \fB-S\fP, \fB--list-rules\fP [\fIchain\fP]
 Print all rules in the selected chain.  If no chain is selected, all
-chains are printed like iptables-save. Like every other iptables command,
+chains are printed like ip6tables-save. Like every other ip6tables command,
 it applies to the specified table (filter is the default).
 .TP
 \fB-F\fP, \fB--flush\fP [\fIchain\fP]

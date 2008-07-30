@@ -25,25 +25,25 @@
 .SH NAME
 iptables \- administration tool for IPv4 packet filtering and NAT
 .SH SYNOPSIS
-\fBiptables\fP [\fB-t\fP \fItable\fP\fB]\fP {\fB-A\fP|\fB-D\fP} \fIchain rule-specification\fP [\fIoptions...\fP]
+\fBiptables\fP [\fB-t\fP \fItable\fP] {\fB-A\fP|\fB-D\fP} \fIchain rule-specification\fP [\fIoptions...\fP]
 .br
-\fBiptables\fP [\fB-t\fP \fItable\fP\fB] -I\fP [\fIrulenum\fP] \fIrule-specification\fP [\fIoptions...\fP]
+\fBiptables\fP [\fB-t\fP \fItable\fP] \fB-I\fP [\fIrulenum\fP] \fIrule-specification\fP [\fIoptions...\fP]
 .br
-\fBiptables\fP [\fB-t\fP \fItable\fP\fB] -R\fP \fIrulenum rule-specification\fP [\fIoptions...\fP]
+\fBiptables\fP [\fB-t\fP \fItable\fP] \fB-R\fP \fIrulenum rule-specification\fP [\fIoptions...\fP]
 .br
-\fBiptables\fP [\fB-t\fP \fItable\fP\fB] -D\fP \fIchain rulenum\fP [\fIoptions...\fP]
+\fBiptables\fP [\fB-t\fP \fItable\fP] \fB-D\fP \fIchain rulenum\fP [\fIoptions...\fP]
 .br
-\fBiptables\fP [\fB-t\fP \fItable\fP\fB] -S\fP [\fIchain\fP]
+\fBiptables\fP [\fB-t\fP \fItable\fP] \fB-S\fP [\fIchain\fP]
 .br
-\fBiptables\fP [\fB-t\fP \fItable\fP\fB]\fP {\fB-F\fP|\fB-L\fP|\fB-Z\fP} [\fIchain\fP] [\fIoptions...\fP]
+\fBiptables\fP [\fB-t\fP \fItable\fP] {\fB-F\fP|\fB-L\fP|\fB-Z\fP} [\fIchain\fP] [\fIoptions...\fP]
 .br
-\fBiptables\fP [\fB-t\fP \fItable\fP\fB] -N\fP \fIchain\fP
+\fBiptables\fP [\fB-t\fP \fItable\fP] \fB-N\fP \fIchain\fP
 .br
-\fBiptables\fP [\fB-t\fP \fItable\fP\fB] -X\fP [\fIchain\fP]
+\fBiptables\fP [\fB-t\fP \fItable\fP] \fB-X\fP [\fIchain\fP]
 .br
-\fBiptables\fP [\fB-t\fP \fItable\fP\fB] -P\fP \fIchain target\fP [\fIoptions...\fP]
+\fBiptables\fP [\fB-t\fP \fItable\fP] \fB-P\fP \fIchain target\fP [\fIoptions...\fP]
 .br
-\fBiptables\fP [\fB-t\fP \fItable\fP\fB] -E\fP \fIold-chain-name new-chain-name\fP
+\fBiptables\fP [\fB-t\fP \fItable\fP] \fB-E\fP \fIold-chain-name new-chain-name\fP
 .SH DESCRIPTION
 \fBIptables\fP is used to set up, maintain, and inspect the
 tables of IPv4 packet
