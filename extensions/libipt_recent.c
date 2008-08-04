@@ -75,6 +75,10 @@ static void recent_init(struct xt_entry_match *match)
 	info->side = IPT_RECENT_SOURCE;
 }
 
+#define RECENT_CMDS \
+	(IPT_RECENT_SET | IPT_RECENT_CHECK | \
+	IPT_RECENT_UPDATE | IPT_RECENT_REMOVE)
+
 /* Function which parses command options; returns true if it
    ate an option */
 static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
@@ -83,43 +87,47 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 	struct ipt_recent_info *info = (struct ipt_recent_info *)(*match)->data;
 	switch (c) {
 		case 201:
-			if (*flags) exit_error(PARAMETER_PROBLEM,
+			if (*flags & RECENT_CMDS)
+				exit_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--rcheck' "
 					"`--update' or `--remove' may be set");
 			check_inverse(optarg, &invert, &optind, 0);
 			info->check_set |= IPT_RECENT_SET;
 			if (invert) info->invert = 1;
-			*flags = 1;
+			*flags |= IPT_RECENT_SET;
 			break;
 			
 		case 202:
-			if (*flags) exit_error(PARAMETER_PROBLEM,
+			if (*flags & RECENT_CMDS)
+				exit_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--rcheck' "
 					"`--update' or `--remove' may be set");
 			check_inverse(optarg, &invert, &optind, 0);
 			info->check_set |= IPT_RECENT_CHECK;
 			if(invert) info->invert = 1;
-			*flags = 1;
+			*flags |= IPT_RECENT_CHECK;
 			break;
 
 		case 203:
-			if (*flags) exit_error(PARAMETER_PROBLEM,
+			if (*flags & RECENT_CMDS)
+				exit_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--rcheck' "
 					"`--update' or `--remove' may be set");
 			check_inverse(optarg, &invert, &optind, 0);
 			info->check_set |= IPT_RECENT_UPDATE;
 			if (invert) info->invert = 1;
-			*flags = 1;
+			*flags |= IPT_RECENT_UPDATE;
 			break;
 
 		case 206:
-			if (*flags) exit_error(PARAMETER_PROBLEM,
+			if (*flags & RECENT_CMDS)
+				exit_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--rcheck' "
 					"`--update' or `--remove' may be set");
 			check_inverse(optarg, &invert, &optind, 0);
 			info->check_set |= IPT_RECENT_REMOVE;
 			if (invert) info->invert = 1;
-			*flags = 1;
+			*flags |= IPT_RECENT_REMOVE;
 			break;
 
 		case 204:
@@ -132,6 +140,7 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		case 207:
 			info->check_set |= IPT_RECENT_TTL;
+			*flags |= IPT_RECENT_TTL;
 			break;
 
 		case 208:
@@ -157,11 +166,15 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 /* Final check; must have specified a specific option. */
 static void recent_check(unsigned int flags)
 {
-
-	if (!flags)
+	if (!(flags & RECENT_CMDS))
 		exit_error(PARAMETER_PROBLEM,
 			"recent: you must specify one of `--set', `--rcheck' "
 			"`--update' or `--remove'");
+	if ((flags & IPT_RECENT_TTL) &&
+	    (flags & (IPT_RECENT_SET | IPT_RECENT_REMOVE | IPT_RECENT_UPDATE)))
+		exit_error(PARAMETER_PROBLEM,
+		           "recent: --rttl may only be used with --rcheck or "
+		           "--update");
 }
 
 /* Prints out the matchinfo. */
