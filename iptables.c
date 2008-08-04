@@ -1764,7 +1764,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 			if (invert)
 				exit_error(PARAMETER_PROBLEM,
 					   "unexpected ! flag before --table");
-			*table = argv[optind-1];
+			*table = optarg;
 			break;
 
 		case 'x':
@@ -1911,8 +1911,7 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 				}
 				if (!m)
 					exit_error(PARAMETER_PROBLEM,
-						   "Unknown arg `%s'",
-						   argv[optind-1]);
+						   "Unknown arg `%s'", optarg);
 			}
 		}
 		invert = FALSE;

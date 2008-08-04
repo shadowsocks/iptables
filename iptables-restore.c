@@ -412,7 +412,7 @@ main(int argc, char *argv[])
 					param_buffer[param_len] = '\0';
 
 					/* check if table name specified */
-					if (!strncmp(param_buffer, "-t", 3)
+					if (!strncmp(param_buffer, "-t", 2)
 					    || !strncmp(param_buffer, "--table", 8)) {
 						exit_error(PARAMETER_PROBLEM,
 						   "Line %u seems to have a "
