@@ -37,6 +37,9 @@ AC_ARG_ENABLE([devel],
 	[enable_devel="$enableval"], [enable_devel="yes"])
 AC_ARG_ENABLE([libipq],
 	AS_HELP_STRING([--enable-libipq], [Build and install libipq]))
+AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
+	[Path to the pkgconfig directory [[LIBDIR/pkgconfig]]]),
+	[pkgconfigdir="$withval"], [pkgconfigdir='${libdir}/pkgconfig'])
 
 AC_CHECK_HEADER([linux/dccp.h])
 
@@ -69,6 +72,7 @@ AC_SUBST([kinclude_CFLAGS])
 AC_SUBST([kbuilddir])
 AC_SUBST([ksourcedir])
 AC_SUBST([xtlibdir])
+AC_SUBST([pkgconfigdir])
 
 XTABLES_VERSION_MAJOR=_XTABLES_VERSION_MAJOR
 XTABLES_VERSION_MINOR=_XTABLES_VERSION_MINOR
@@ -79,4 +83,5 @@ AC_SUBST([XTABLES_VERSION_MINOR])
 AC_SUBST([XTABLES_VERSION_PATCH])
 AC_SUBST([XTABLES_VERSION_EXTRA])
 
-AC_OUTPUT([Makefile extensions/GNUmakefile libipq/Makefile include/xtables.h])
+AC_OUTPUT([Makefile extensions/GNUmakefile libipq/Makefile include/xtables.h
+	xtables.pc])

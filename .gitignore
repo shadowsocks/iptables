@@ -1,11 +1,14 @@
 .*.d
 .*.dd
 *.a
+*.la
+*.lo
 *.oo
 *.so
 *.o
 .deps
 .dirstamp
+.libs
 Makefile
 Makefile.in
 
@@ -31,6 +34,7 @@ Makefile.in
 /ltmain.sh
 /missing
 /stamp-h1
+/xtables.pc
 
 /ip6tables
 /ip6tables.8
