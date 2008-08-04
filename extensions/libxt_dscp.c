@@ -119,7 +119,7 @@ static void
 print_dscp(u_int8_t dscp, int invert, int numeric)
 {
 	if (invert)
-		fputc('!', stdout);
+		printf("! ");
 
  	printf("0x%02x ", dscp);
 }
