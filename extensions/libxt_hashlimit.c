@@ -614,7 +614,7 @@ static void hashlimit_save(const void *ip, const struct xt_entry_match *match)
 	if (r->cfg.max)
 		printf("--hashlimit-htable-max %u ", r->cfg.max);
 	if (r->cfg.gc_interval != XT_HASHLIMIT_GCINTERVAL)
-		printf("--hashlimit-htable-gcinterval %u", r->cfg.gc_interval);
+		printf("--hashlimit-htable-gcinterval %u ", r->cfg.gc_interval);
 	if (r->cfg.expire != XT_HASHLIMIT_EXPIRE)
 		printf("--hashlimit-htable-expire %u ", r->cfg.expire);
 }
