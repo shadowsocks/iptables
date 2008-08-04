@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <linux/ip.h>
 
 struct tos_value_mask {
 	uint8_t value, mask;

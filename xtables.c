@@ -32,6 +32,7 @@
 #include <arpa/inet.h>
 
 #include <xtables.h>
+#include <libiptc/libxtc.h>
 
 #ifndef NO_SHARED_LIBS
 #include <dlfcn.h>

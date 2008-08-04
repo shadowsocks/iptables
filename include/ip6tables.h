@@ -1,9 +1,9 @@
 #ifndef _IP6TABLES_USER_H
 #define _IP6TABLES_USER_H
 
+#include <netinet/ip.h>
 #include <xtables.h>
-
-#include "libiptc/libip6tc.h"
+#include <libiptc/libip6tc.h>
 
 #ifndef IP6T_SO_GET_REVISION_MATCH /* Old kernel source. */
 #define IP6T_SO_GET_REVISION_MATCH	68

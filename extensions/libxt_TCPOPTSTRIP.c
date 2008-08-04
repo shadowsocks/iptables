@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <xtables.h>
+#include <netinet/tcp.h>
 #include <linux/netfilter/x_tables.h>
 #include <linux/netfilter/xt_TCPOPTSTRIP.h>
 #ifndef TCPOPT_MD5SIG

@@ -20,8 +20,6 @@ extern "C" {
 #define XT_ALIGN(s) (((s) + ((XT_MIN_ALIGN)-1)) & ~((XT_MIN_ALIGN)-1))
 #endif
 
-typedef char xt_chainlabel[32];
-
 #define XTC_LABEL_ACCEPT  "ACCEPT"
 #define XTC_LABEL_DROP    "DROP"
 #define XTC_LABEL_QUEUE   "QUEUE"

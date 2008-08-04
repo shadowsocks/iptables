@@ -11,6 +11,7 @@
  * Error corections by nmalykh@bilim.com (22.01.2005)
  */
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
