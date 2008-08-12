@@ -2,7 +2,7 @@ This module matches packets based on some statistic condition.
 It supports two distinct modes settable with the 
 .B --mode
 option.
-.TP
+.PP
 Supported options:
 .TP
 .BI "--mode " "mode"

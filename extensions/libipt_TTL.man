@@ -1,10 +1,10 @@
 This is used to modify the IPv4 TTL header field.  The TTL field determines
 how many hops (routers) a packet can traverse until it's time to live is
 exceeded.
-.TP
+.PP
 Setting or incrementing the TTL field can potentially be very dangerous,
 so it should be avoided at any cost.  
-.TP
+.PP
 .B Don't ever set or increment the value on packets that leave your local network!
 .B mangle
 table.

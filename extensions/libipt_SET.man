@@ -11,6 +11,6 @@ where flags are
 and/or
 .BR "dst"
 and there can be no more than six of them.
-.TP
+.PP
 The bindings to follow must previously be defined in order to use 
 multilevel adding/deleting by the SET target.

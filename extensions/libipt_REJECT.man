@@ -30,5 +30,5 @@ TCP RST packet to be sent back.  This is mainly useful for blocking
 .I ident
 (113/tcp) probes which frequently occur when sending mail to broken mail
 hosts (which won't accept your mail otherwise).
-.TP
+.PP
 (*) Using icmp-admin-prohibited with kernels that do not support it will result in a plain DROP instead of REJECT

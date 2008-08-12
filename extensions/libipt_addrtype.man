@@ -2,7 +2,7 @@ This module matches packets based on their
 .B address type.
 Address types are used within the kernel networking stack and categorize
 addresses into various groups.  The exact definition of that group depends on the specific layer three protocol.
-.TP
+.PP
 The following address types are possible:
 .TP
 .BI "UNSPEC"

@@ -4,7 +4,7 @@ Hop Limit field can potentially be very dangerous, so it should be avoided at
 any cost. This target is only valid in
 .B mangle
 table.
-.TP
+.PP
 .B Don't ever set or increment the value on packets that leave your local network!
 .TP
 .BI "--hl-set " "value"
