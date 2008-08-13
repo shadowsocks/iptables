@@ -75,7 +75,7 @@ clean:
 distclean: clean
 	rm -f .*.d .*.dd;
 
-init%.o: ${srcdir}/init%.c
+init%.o: init%.c
 	${AM_VERBOSE_CC} ${CC} ${AM_DEPFLAGS} ${AM_CFLAGS} -D_INIT=$*_init ${CFLAGS} -o $@ -c $<;
 
 -include .*.d
