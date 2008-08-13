@@ -15,6 +15,13 @@ source address is already in the list, this will update the existing
 entry. This will always return success (or failure if `!' is passed
 in).
 .TP
+\fB--rsource\fP
+Match/save the source address of each packet in the recent list table. This
+is the default.
+.TP
+\fB--rdest\fP
+Match/save the destination address of each packet in the recent list table.
+.TP
 [\fB!\fR] \fB--rcheck\fR
 Check if the source address of the packet is currently in
 the list.
