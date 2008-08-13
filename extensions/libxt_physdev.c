@@ -16,8 +16,8 @@ static void physdev_help(void)
 {
 	printf(
 "physdev match options:\n"
-" --physdev-in [!] input name[+]		bridge port name ([+] for wildcard)\n"
-" --physdev-out [!] output name[+]	bridge port name ([+] for wildcard)\n"
+" [!] --physdev-in inputname[+]		bridge port name ([+] for wildcard)\n"
+" [!] --physdev-out outputname[+]	bridge port name ([+] for wildcard)\n"
 " [!] --physdev-is-in			arrived on a bridge device\n"
 " [!] --physdev-is-out			will leave on a bridge device\n"
 " [!] --physdev-is-bridged		it's a bridged packet\n");

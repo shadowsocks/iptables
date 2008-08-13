@@ -19,7 +19,7 @@ static void hbh_help(void)
 {
 	printf(
 "hbh match options:\n"
-"  --hbh-len [!] length          total length of this header\n"
+"[!] --hbh-len length            total length of this header\n"
 "  --hbh-opts TYPE[:LEN][,TYPE[:LEN]...] \n"
 "                                Options and its length (list, max: %d)\n",
 IP6T_OPTS_OPTSNR);

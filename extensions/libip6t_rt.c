@@ -19,9 +19,9 @@ static void rt_help(void)
 {
 	printf(
 "rt match options:\n"
-" --rt-type [!] type            match the type\n"
-" --rt-segsleft [!] num[:num]   match the Segments Left field (range)\n"
-" --rt-len [!] length           total length of this header\n"
+"[!] --rt-type type             match the type\n"
+"[!] --rt-segsleft num[:num]    match the Segments Left field (range)\n"
+"[!] --rt-len length            total length of this header\n"
 " --rt-0-res                    check the reserved filed, too (type 0)\n"
 " --rt-0-addrs ADDR[,ADDR...]   Type=0 addresses (list, max: %d)\n"
 " --rt-0-not-strict             List of Type=0 addresses not a strict list\n",

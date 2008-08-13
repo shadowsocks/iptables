@@ -12,10 +12,10 @@ static void udp_help(void)
 {
 	printf(
 "udp match options:\n"
-" --source-port [!] port[:port]\n"
+"[!] --source-port port[:port]\n"
 " --sport ...\n"
 "				match source port(s)\n"
-" --destination-port [!] port[:port]\n"
+"[!] --destination-port port[:port]\n"
 " --dport ...\n"
 "				match destination port(s)\n");
 }

@@ -13,7 +13,7 @@ static void esp_help(void)
 {
 	printf(
 "esp match options:\n"
-" --espspi [!] spi[:spi]\n"
+"[!] --espspi spi[:spi]\n"
 "				match spi (range)\n");
 }
 

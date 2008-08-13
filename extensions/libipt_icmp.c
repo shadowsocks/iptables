@@ -102,7 +102,7 @@ static void icmp_help(void)
 {
 	printf(
 "icmp match options:\n"
-" --icmp-type [!] typename	match icmp type\n"
+"[!] --icmp-type typename	match icmp type\n"
 "				(or numeric type or type/code)\n");
 	print_icmptypes();
 }

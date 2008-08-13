@@ -62,7 +62,7 @@ static void mh_help(void)
 {
 	printf(
 "mh match options:\n"
-" --mh-type [!] type[:type]	match mh type\n");
+"[!] --mh-type type[:type]	match mh type\n");
 	print_types_all();
 }
 

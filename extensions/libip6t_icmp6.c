@@ -78,7 +78,7 @@ static void icmp6_help(void)
 {
 	printf(
 "icmpv6 match options:\n"
-" --icmpv6-type [!] typename	match icmpv6 type\n"
+"[!] --icmpv6-type typename	match icmpv6 type\n"
 "				(or numeric type or type/code)\n");
 	print_icmpv6types();
 }

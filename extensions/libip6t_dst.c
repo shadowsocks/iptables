@@ -16,7 +16,7 @@ static void dst_help(void)
 {
 	printf(
 "dst match options:\n"
-"  --dst-len [!] length          total length of this header\n"
+"[!] --dst-len length            total length of this header\n"
 "  --dst-opts TYPE[:LEN][,TYPE[:LEN]...]\n"
 "                                Options and its length (list, max: %d)\n",
 IP6T_OPTS_OPTSNR);

@@ -19,7 +19,7 @@ static void hl_help(void)
 {
 	printf(
 "hl match options:\n"
-"  --hl-eq [!] value	Match hop limit value\n"
+"[!] --hl-eq value	Match hop limit value\n"
 "  --hl-lt value	Match HL < value\n"
 "  --hl-gt value	Match HL > value\n");
 }

@@ -13,7 +13,7 @@ static void ah_help(void)
 {
 	printf(
 "ah match options:\n"
-" --ahspi [!] spi[:spi]\n"
+"[!] --ahspi spi[:spi]\n"
 "				match spi (range)\n");
 }
 

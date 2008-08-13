@@ -13,8 +13,8 @@ static void ah_help(void)
 {
 	printf(
 "ah match options:\n"
-" --ahspi [!] spi[:spi]         match spi (range)\n"
-" --ahlen [!] length            total length of this header\n"
+"[!] --ahspi spi[:spi]          match spi (range)\n"
+"[!] --ahlen length             total length of this header\n"
 " --ahres                       check the reserved filed, too\n");
 }
 

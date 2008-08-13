@@ -36,9 +36,9 @@ static void dccp_help(void)
 {
 	printf(
 "dccp match options\n"
-" --source-port [!] port[:port]                          match source port(s)\n"
+"[!] --source-port port[:port]                          match source port(s)\n"
 " --sport ...\n"
-" --destination-port [!] port[:port]                     match destination port(s)\n"
+"[!] --destination-port port[:port]                     match destination port(s)\n"
 " --dport ...\n");
 }
 

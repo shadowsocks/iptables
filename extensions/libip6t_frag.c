@@ -13,8 +13,8 @@ static void frag_help(void)
 {
 	printf(
 "frag match options:\n"
-" --fragid [!] id[:id]          match the id (range)\n"
-" --fraglen [!] length          total length of this header\n"
+"[!] --fragid id[:id]           match the id (range)\n"
+"[!] --fraglen length           total length of this header\n"
 " --fragres                     check the reserved filed, too\n"
 " --fragfirst                   matches on the first fragment\n"
 " [--fragmore|--fraglast]       there are more fragments or this\n"

@@ -19,7 +19,7 @@ static void realm_help(void)
 {
 	printf(
 "realm match options:\n"
-" --realm [!] value[/mask]\n"
+"[!] --realm value[/mask]\n"
 "				Match realm\n");
 }
 

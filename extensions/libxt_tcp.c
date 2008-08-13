@@ -12,17 +12,17 @@ static void tcp_help(void)
 {
 	printf(
 "tcp match options:\n"
-" --tcp-flags [!] mask comp	match when TCP flags & mask == comp\n"
+"[!] --tcp-flags mask comp	match when TCP flags & mask == comp\n"
 "				(Flags: SYN ACK FIN RST URG PSH ALL NONE)\n"
 "[!] --syn			match when only SYN flag set\n"
 "				(equivalent to --tcp-flags SYN,RST,ACK,FIN SYN)\n"
-" --source-port [!] port[:port]\n"
+"[!] --source-port port[:port]\n"
 " --sport ...\n"
 "				match source port(s)\n"
-" --destination-port [!] port[:port]\n"
+"[!] --destination-port port[:port]\n"
 " --dport ...\n"
 "				match destination port(s)\n"
-" --tcp-option [!] number       match if TCP option set\n");
+"[!] --tcp-option number        match if TCP option set\n");
 }
 
 static const struct option tcp_opts[] = {

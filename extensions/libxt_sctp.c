@@ -57,11 +57,11 @@ static void sctp_help(void)
 {
 	printf(
 "sctp match options\n"
-" --source-port [!] port[:port]                          match source port(s)\n"
+"[!] --source-port port[:port]                          match source port(s)\n"
 " --sport ...\n"
-" --destination-port [!] port[:port]                     match destination port(s)\n"
+"[!] --destination-port port[:port]                     match destination port(s)\n"
 " --dport ...\n" 
-" --chunk-types [!] (all|any|none) (chunktype[:flags])+	match if all, any or none of\n"
+"[!] --chunk-types (all|any|none) (chunktype[:flags])+	match if all, any or none of\n"
 "						        chunktypes are present\n"
 "chunktypes - DATA INIT INIT_ACK SACK HEARTBEAT HEARTBEAT_ACK ABORT SHUTDOWN SHUTDOWN_ACK ERROR COOKIE_ECHO COOKIE_ACK ECN_ECNE ECN_CWR SHUTDOWN_COMPLETE ASCONF ASCONF_ACK ALL NONE\n");
 }

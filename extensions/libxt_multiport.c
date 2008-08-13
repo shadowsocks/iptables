@@ -31,13 +31,13 @@ static void multiport_help_v1(void)
 {
 	printf(
 "multiport match options:\n"
-" --source-ports [!] port[,port:port,port...]\n"
+"[!] --source-ports port[,port:port,port...]\n"
 " --sports ...\n"
 "				match source port(s)\n"
-" --destination-ports [!] port[,port:port,port...]\n"
+"[!] --destination-ports port[,port:port,port...]\n"
 " --dports ...\n"
 "				match destination port(s)\n"
-" --ports [!] port[,port:port,port]\n"
+"[!] --ports port[,port:port,port]\n"
 "				match both source and destination port(s)\n");
 }
 
