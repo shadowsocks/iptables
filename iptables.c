@@ -1917,6 +1917,14 @@ int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
 		invert = FALSE;
 	}
 
+	if (strcmp(*table, "nat") == 0 &&
+	    ((policy != NULL && strcmp(policy, "DROP") == 0) ||
+	    (jumpto != NULL && strcmp(jumpto, "DROP") == 0)))
+		fprintf(stderr, "\nThe \"nat\" table is not intended for "
+		        "filtering, hence the use of DROP is deprecated and "
+		        "will permanently be disabled in the next iptables "
+		        "release. Please adjust your scripts.\n\n");
+
 	for (matchp = matches; matchp; matchp = matchp->next)
 		if (matchp->match->final_check != NULL)
 			matchp->match->final_check(matchp->match->mflags);
