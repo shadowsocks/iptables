@@ -9,3 +9,4 @@ choosable.
 Rate measurement interval, in seconds, milliseconds or microseconds.
 .TP
 \fB--rateest-ewmalog\fP \fIvalue\fP
+Rate measurement averaging time constant.
