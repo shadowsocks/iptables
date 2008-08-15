@@ -36,7 +36,7 @@ iptables_save_LDFLAGS     = ${iptables_LDFLAGS}
 iptables_save_LDADD       = ${iptables_LDADD}
 
 # iptables-multi, semi-static
-iptables_static_SOURCES   = ${iptables_multi_SOURCES} iptables.c xtables.c
+iptables_static_SOURCES   = ${iptables_multi_SOURCES} xtables.c
 iptables_static_CFLAGS    = ${iptables_multi_CFLAGS} -DNO_SHARED_LIBS=1
 iptables_static_LDADD     = -lm libiptc/libiptc.a extensions/libext4.a
 
@@ -63,7 +63,7 @@ ip6tables_save_LDFLAGS    = ${ip6tables_LDFLAGS}
 ip6tables_save_LDADD      = ${ip6tables_LDADD}
 
 # iptables-multi, semi-static
-ip6tables_static_SOURCES    = ${ip6tables_multi_SOURCES} ip6tables.c xtables.c
+ip6tables_static_SOURCES    = ${ip6tables_multi_SOURCES} xtables.c
 ip6tables_static_CFLAGS     = ${ip6tables_multi_CFLAGS} -DNO_SHARED_LIBS=1
 ip6tables_static_LDADD      = -lm libiptc/libiptc.a extensions/libext6.a
 
