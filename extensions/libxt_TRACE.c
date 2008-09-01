@@ -7,14 +7,11 @@
 #include <xtables.h>
 #include <linux/netfilter/x_tables.h>
 
-/* Function which prints out usage message. */
 static void TRACE_help(void)
 {
 	printf("TRACE target takes no options\n");
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int TRACE_parse(int c, char **argv, int invert, unsigned int *flags,
                        const void *entry, struct xt_entry_target **target)
 {

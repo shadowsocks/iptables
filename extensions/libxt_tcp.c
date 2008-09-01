@@ -7,7 +7,6 @@
 #include <xtables.h>
 #include <linux/netfilter/xt_tcpudp.h>
 
-/* Function which prints out usage message. */
 static void tcp_help(void)
 {
 	printf(
@@ -127,7 +126,6 @@ parse_tcp_option(const char *option, u_int8_t *result)
 	*result = (u_int8_t)ret;
 }
 
-/* Initialize the match. */
 static void tcp_init(struct xt_entry_match *m)
 {
 	struct xt_tcp *tcpinfo = (struct xt_tcp *)m->data;
@@ -140,8 +138,6 @@ static void tcp_init(struct xt_entry_match *m)
 #define TCP_FLAGS 0x04
 #define TCP_OPTION	0x08
 
-/* Function which parses command options; returns true if it
-   ate an option. */
 static int
 tcp_parse(int c, char **argv, int invert, unsigned int *flags,
           const void *entry, struct xt_entry_match **match)
@@ -304,7 +300,6 @@ print_flags(u_int8_t mask, u_int8_t cmp, int invert, int numeric)
 	}
 }
 
-/* Prints out the union ipt_matchinfo. */
 static void
 tcp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -328,7 +323,6 @@ tcp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 		       tcp->invflags & ~XT_TCP_INV_MASK);
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void tcp_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_tcp *tcpinfo = (struct xt_tcp *)match->data;

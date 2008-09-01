@@ -21,7 +21,6 @@
 #define IPT_RECENT_NAME_LEN	200
 #endif /* IPT_RECENT_NAME_LEN */
 
-/* Options for this module */
 static const struct option recent_opts[] = {
 	{ .name = "set",      .has_arg = 0, .val = 201 }, 
 	{ .name = "rcheck",   .has_arg = 0, .val = 202 }, 
@@ -36,7 +35,6 @@ static const struct option recent_opts[] = {
 	{ .name = NULL }
 };
 
-/* Function which prints out usage message. */
 static void recent_help(void)
 {
 	printf(
@@ -61,8 +59,7 @@ static void recent_help(void)
 "    --rdest                     Match/Save the destination address of each packet in the recent list table.\n"
 RECENT_NAME " " RECENT_VER ": Stephen Frost <sfrost@snowman.net>.  http://snowman.net/projects/ipt_recent/\n");
 }
-  
-/* Initialize the match. */
+
 static void recent_init(struct xt_entry_match *match)
 {
 	struct ipt_recent_info *info = (struct ipt_recent_info *)(match)->data;
@@ -79,8 +76,6 @@ static void recent_init(struct xt_entry_match *match)
 	(IPT_RECENT_SET | IPT_RECENT_CHECK | \
 	IPT_RECENT_UPDATE | IPT_RECENT_REMOVE)
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
                         const void *entry, struct xt_entry_match **match)
 {
@@ -163,7 +158,6 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; must have specified a specific option. */
 static void recent_check(unsigned int flags)
 {
 	if (!(flags & RECENT_CMDS))
@@ -177,7 +171,6 @@ static void recent_check(unsigned int flags)
 		           "--update");
 }
 
-/* Prints out the matchinfo. */
 static void recent_print(const void *ip, const struct xt_entry_match *match,
                          int numeric)
 {
@@ -199,7 +192,6 @@ static void recent_print(const void *ip, const struct xt_entry_match *match,
 	if(info->side == IPT_RECENT_DEST) printf("side: dest");
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void recent_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct ipt_recent_info *info = (struct ipt_recent_info *)match->data;
@@ -219,7 +211,6 @@ static void recent_save(const void *ip, const struct xt_entry_match *match)
 	if(info->side == IPT_RECENT_DEST) printf("--rdest ");
 }
 
-/* Structure for iptables to use to communicate with module */
 static struct xtables_match recent_mt_reg = {
     .name          = "recent",
     .version       = XTABLES_VERSION,

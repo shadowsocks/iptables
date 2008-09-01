@@ -179,7 +179,6 @@ parse_header(const char *flags) {
 #define IPV6_HDR_HEADER	0x01
 #define IPV6_HDR_SOFT	0x02
 
-/* Parses command options; returns 0 if it ate an option */
 static int
 ipv6header_parse(int c, char **argv, int invert, unsigned int *flags,
                  const void *entry, struct xt_entry_match **match)
@@ -218,7 +217,6 @@ ipv6header_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Checks the flags variable */
 static void ipv6header_check(unsigned int flags)
 {
 	if (!flags) exit_error(PARAMETER_PROBLEM, "ip6t_ipv6header: no options specified");
@@ -246,7 +244,6 @@ print_header(u_int8_t flags){
                 printf("NONE");
 }
 
-/* Prints out the match */
 static void ipv6header_print(const void *ip,
                              const struct xt_entry_match *match, int numeric)
 {
@@ -269,7 +266,6 @@ static void ipv6header_print(const void *ip,
 	return;
 }
 
-/* Saves the match */
 static void ipv6header_save(const void *ip, const struct xt_entry_match *match)
 {
 

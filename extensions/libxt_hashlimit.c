@@ -27,7 +27,6 @@
 #define XT_HASHLIMIT_GCINTERVAL	1000
 #define XT_HASHLIMIT_EXPIRE	10000
 
-/* Function which prints out usage message. */
 static void hashlimit_help(void)
 {
 	printf(
@@ -131,7 +130,6 @@ int parse_rate(const char *rate, u_int32_t *val)
 	return 1;
 }
 
-/* Initialize the match. */
 static void hashlimit_init(struct xt_entry_match *m)
 {
 	struct xt_hashlimit_info *r = (struct xt_hashlimit_info *)m->data;
@@ -209,8 +207,6 @@ enum {
 	PARAM_DSTMASK    = 1 << 9,
 };
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
                 const void *entry, struct xt_entry_match **match)
@@ -453,7 +449,6 @@ hashlimit_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 	       flags, c, invert, 128);
 }
 
-/* Final check; nothing. */
 static void hashlimit_check(unsigned int flags)
 {
 	if (!(flags & PARAM_LIMIT))
@@ -527,7 +522,6 @@ static void print_mode(unsigned int mode, char separator)
 	putchar(' ');
 }
 
-/* Prints out the matchinfo. */
 static void hashlimit_print(const void *ip,
                             const struct xt_entry_match *match, int numeric)
 {
@@ -594,7 +588,6 @@ hashlimit_mt6_print(const void *ip, const struct xt_entry_match *match,
 	hashlimit_mt_print(info, 128);
 }
 
-/* FIXME: Make minimalist: only print rate if not default --RR */
 static void hashlimit_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_hashlimit_info *r = 

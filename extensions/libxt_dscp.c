@@ -124,7 +124,6 @@ print_dscp(u_int8_t dscp, int invert, int numeric)
  	printf("0x%02x ", dscp);
 }
 
-/* Prints out the matchinfo. */
 static void
 dscp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -134,7 +133,6 @@ dscp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	print_dscp(dinfo->dscp, dinfo->invert, numeric);
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void dscp_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_dscp_info *dinfo =

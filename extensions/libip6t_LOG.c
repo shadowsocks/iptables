@@ -1,4 +1,4 @@
-/* Shared library add-on to iptables to add LOG support. */
+/* Shared library add-on to ip6tables to add LOG support. */
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -17,7 +17,6 @@
 
 #define LOG_DEFAULT_LEVEL LOG_WARNING
 
-/* Function which prints out usage message. */
 static void LOG_help(void)
 {
 	printf(
@@ -40,7 +39,6 @@ static const struct option LOG_opts[] = {
 	{ .name = NULL }
 };
 
-/* Initialize the target. */
 static void LOG_init(struct xt_entry_target *t)
 {
 	struct ip6t_log_info *loginfo = (struct ip6t_log_info *)t->data;
@@ -103,8 +101,6 @@ parse_level(const char *level)
 #define IP6T_LOG_OPT_IPOPT 0x10
 #define IP6T_LOG_OPT_UID 0x20
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
                      const void *entry, struct xt_entry_target **target)
 {
@@ -194,7 +190,6 @@ static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Prints out the targinfo. */
 static void LOG_print(const void *ip, const struct xt_entry_target *target,
                       int numeric)
 {
@@ -233,7 +228,6 @@ static void LOG_print(const void *ip, const struct xt_entry_target *target,
 		printf("prefix `%s' ", loginfo->prefix);
 }
 
-/* Saves the union ip6t_targinfo in parsable form to stdout. */
 static void LOG_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ip6t_log_info *loginfo

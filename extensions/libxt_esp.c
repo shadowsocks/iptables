@@ -8,7 +8,6 @@
 #include <xtables.h>
 #include <linux/netfilter/xt_esp.h>
 
-/* Function which prints out usage message. */
 static void esp_help(void)
 {
 	printf(
@@ -67,7 +66,6 @@ parse_esp_spis(const char *spistring, u_int32_t *spis)
 	free(buffer);
 }
 
-/* Initialize the match. */
 static void esp_init(struct xt_entry_match *m)
 {
 	struct xt_esp *espinfo = (struct xt_esp *)m->data;
@@ -77,8 +75,6 @@ static void esp_init(struct xt_entry_match *m)
 
 #define ESP_SPI 0x01
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 esp_parse(int c, char **argv, int invert, unsigned int *flags,
           const void *entry, struct xt_entry_match **match)
@@ -117,7 +113,6 @@ print_spis(const char *name, u_int32_t min, u_int32_t max,
 	}
 }
 
-/* Prints out the union ipt_matchinfo. */
 static void
 esp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -131,7 +126,6 @@ esp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 		       esp->invflags & ~XT_ESP_INV_MASK);
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void esp_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_esp *espinfo = (struct xt_esp *)match->data;

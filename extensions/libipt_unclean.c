@@ -4,14 +4,11 @@
 #include <getopt.h>
 #include <iptables.h>
 
-/* Function which prints out usage message. */
 static void unclean_help(void)
 {
 	printf("unclean match takes no options\n");
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int unclean_parse(int c, char **argv, int invert, unsigned int *flags,
                          const void *entry, struct xt_entry_match **match)
 {

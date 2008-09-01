@@ -101,7 +101,6 @@ static u_int32_t parse_number(char **s, int pos)
 	return number;
 }
 
-/* Function which parses command options; returns true if it ate an option */
 static int u32_parse(int c, char **argv, int invert, unsigned int *flags,
 		     const void *entry, struct xt_entry_match **match)
 {

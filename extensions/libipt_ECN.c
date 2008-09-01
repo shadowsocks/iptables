@@ -104,7 +104,6 @@ static void ECN_check(unsigned int flags)
 		           "ECN target: Parameter --ecn-tcp-remove is required");
 }
 
-/* Prints out the targinfo. */
 static void ECN_print(const void *ip, const struct xt_entry_target *target,
                       int numeric)
 {
@@ -129,7 +128,6 @@ static void ECN_print(const void *ip, const struct xt_entry_target *target,
 	}
 }
 
-/* Saves the union ipt_targinfo in parsable form to stdout. */
 static void ECN_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_ECN_info *einfo =

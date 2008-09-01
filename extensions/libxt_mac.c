@@ -12,7 +12,6 @@
 #include <xtables.h>
 #include <linux/netfilter/xt_mac.h>
 
-/* Function which prints out usage message. */
 static void mac_help(void)
 {
 	printf(
@@ -50,8 +49,6 @@ parse_mac(const char *mac, struct xt_mac_info *info)
 	}
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 mac_parse(int c, char **argv, int invert, unsigned int *flags,
           const void *entry, struct xt_entry_match **match)
@@ -84,7 +81,6 @@ static void print_mac(const unsigned char macaddress[ETH_ALEN])
 	printf(" ");
 }
 
-/* Final check; must have specified --mac. */
 static void mac_check(unsigned int flags)
 {
 	if (!flags)
@@ -92,7 +88,6 @@ static void mac_check(unsigned int flags)
 			   "You must specify `--mac-source'");
 }
 
-/* Prints out the matchinfo. */
 static void
 mac_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -105,7 +100,6 @@ mac_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	print_mac(info->srcaddr);
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void mac_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_mac_info *info = (void *)match->data;

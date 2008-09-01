@@ -12,7 +12,6 @@
 #define XT_STATE_UNTRACKED (1 << (IP_CT_NUMBER + 1))
 #endif
 
-/* Function which prints out usage message. */
 static void
 state_help(void)
 {
@@ -60,8 +59,6 @@ state_parse_states(const char *arg, struct xt_state_info *sinfo)
 		exit_error(PARAMETER_PROBLEM, "Bad state `%s'", arg);
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 state_parse(int c, char **argv, int invert, unsigned int *flags,
       const void *entry,
@@ -86,7 +83,6 @@ state_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; must have specified --state. */
 static void state_final_check(unsigned int flags)
 {
 	if (!flags)
@@ -120,7 +116,6 @@ static void state_print_state(unsigned int statemask)
 	printf(" ");
 }
 
-/* Prints out the matchinfo. */
 static void
 state_print(const void *ip,
       const struct xt_entry_match *match,
@@ -132,7 +127,6 @@ state_print(const void *ip,
 	state_print_state(sinfo->statemask);
 }
 
-/* Saves the matchinfo in parsable form to stdout. */
 static void state_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_state_info *sinfo = (struct xt_state_info *)match->data;

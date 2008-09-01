@@ -7,8 +7,7 @@
 #include <errno.h>
 #include <ip6tables.h>
 #include <linux/netfilter_ipv6/ip6t_ah.h>
-                                        
-/* Function which prints out usage message. */
+
 static void ah_help(void)
 {
 	printf(
@@ -68,7 +67,6 @@ parse_ah_spis(const char *spistring, u_int32_t *spis)
 	free(buffer);
 }
 
-/* Initialize the match. */
 static void ah_init(struct xt_entry_match *m)
 {
 	struct ip6t_ah *ahinfo = (struct ip6t_ah *)m->data;
@@ -78,8 +76,6 @@ static void ah_init(struct xt_entry_match *m)
 	ahinfo->hdrres = 0;
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int ah_parse(int c, char **argv, int invert, unsigned int *flags,
                     const void *entry, struct xt_entry_match **match)
 {
@@ -143,7 +139,6 @@ print_len(const char *name, u_int32_t len, int invert)
 		printf("%s:%s%u ", name, inv, len);
 }
 
-/* Prints out the union ip6t_matchinfo. */
 static void ah_print(const void *ip, const struct xt_entry_match *match,
                      int numeric)
 {
@@ -163,7 +158,6 @@ static void ah_print(const void *ip, const struct xt_entry_match *match,
 		       ah->invflags & ~IP6T_AH_INV_MASK);
 }
 
-/* Saves the union ip6t_matchinfo in parsable form to stdout. */
 static void ah_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_ah *ahinfo = (struct ip6t_ah *)match->data;

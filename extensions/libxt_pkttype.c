@@ -54,7 +54,6 @@ static void print_types(void)
 	printf("\n");
 }
 
-/* Function which prints out usage message. */
 static void pkttype_help(void)
 {
 	printf(

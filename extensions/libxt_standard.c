@@ -7,7 +7,6 @@
 #include <getopt.h>
 #include <xtables.h>
 
-/* Function which prints out usage message. */
 static void standard_help(void)
 {
 	printf(
@@ -15,8 +14,6 @@ static void standard_help(void)
 "(If target is DROP, ACCEPT, RETURN or nothing)\n");
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int standard_parse(int c, char **argv, int invert, unsigned int *flags,
                           const void *entry, struct xt_entry_target **target)
 {

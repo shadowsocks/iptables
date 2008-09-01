@@ -7,8 +7,7 @@
 #include <errno.h>
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ipt_ah.h>
-                                        
-/* Function which prints out usage message. */
+
 static void ah_help(void)
 {
 	printf(
@@ -64,7 +63,6 @@ parse_ah_spis(const char *spistring, u_int32_t *spis)
 	free(buffer);
 }
 
-/* Initialize the match. */
 static void ah_init(struct xt_entry_match *m)
 {
 	struct ipt_ah *ahinfo = (struct ipt_ah *)m->data;
@@ -74,8 +72,6 @@ static void ah_init(struct xt_entry_match *m)
 
 #define AH_SPI 0x01
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int ah_parse(int c, char **argv, int invert, unsigned int *flags,
                     const void *entry, struct xt_entry_match **match)
 {
@@ -120,7 +116,6 @@ print_spis(const char *name, u_int32_t min, u_int32_t max,
 	}
 }
 
-/* Prints out the union ipt_matchinfo. */
 static void ah_print(const void *ip, const struct xt_entry_match *match,
                      int numeric)
 {
@@ -134,7 +129,6 @@ static void ah_print(const void *ip, const struct xt_entry_match *match,
 		       ah->invflags & ~IPT_AH_INV_MASK);
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void ah_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ipt_ah *ahinfo = (struct ipt_ah *)match->data;

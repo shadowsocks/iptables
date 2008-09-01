@@ -62,7 +62,6 @@ NFQUEUE_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Prints out the targinfo. */
 static void NFQUEUE_print(const void *ip,
                           const struct xt_entry_target *target, int numeric)
 {
@@ -71,7 +70,6 @@ static void NFQUEUE_print(const void *ip,
 	printf("NFQUEUE num %u", tinfo->queuenum);
 }
 
-/* Saves the union ipt_targinfo in parsable form to stdout. */
 static void NFQUEUE_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_NFQ_info *tinfo =

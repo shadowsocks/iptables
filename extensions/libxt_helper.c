@@ -8,7 +8,6 @@
 #include <xtables.h>
 #include <linux/netfilter/xt_helper.h>
 
-/* Function which prints out usage message. */
 static void helper_help(void)
 {
 	printf(
@@ -21,8 +20,6 @@ static const struct option helper_opts[] = {
 	{ .name = NULL }
 };
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 helper_parse(int c, char **argv, int invert, unsigned int *flags,
              const void *entry, struct xt_entry_match **match)
@@ -48,7 +45,6 @@ helper_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; must have specified --helper. */
 static void helper_check(unsigned int flags)
 {
 	if (!flags)
@@ -56,7 +52,6 @@ static void helper_check(unsigned int flags)
 			   "helper match: You must specify `--helper'");
 }
 
-/* Prints out the info. */
 static void
 helper_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -65,7 +60,6 @@ helper_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	printf("helper match %s\"%s\" ", info->invert ? "! " : "", info->name);
 }
 
-/* Saves the union ipt_info in parsable form to stdout. */
 static void helper_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_helper_info *info = (struct xt_helper_info *)match->data;

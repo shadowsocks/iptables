@@ -33,7 +33,6 @@ enum {
 	F_SR_MARK = 1 << 1,
 };
 
-/* Function which prints out usage message. */
 static void CONNMARK_help(void)
 {
 	printf(
@@ -95,8 +94,6 @@ static void connmark_tg_init(struct xt_entry_target *target)
 	info->nfmask = ~0U;
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 CONNMARK_parse(int c, char **argv, int invert, unsigned int *flags,
                const void *entry, struct xt_entry_target **target)
@@ -273,8 +270,6 @@ print_mask(const char *text, unsigned long mask)
 		printf("%s0x%lx", text, mask);
 }
 
-
-/* Prints out the target info. */
 static void CONNMARK_print(const void *ip,
                            const struct xt_entry_target *target, int numeric)
 {
@@ -346,7 +341,6 @@ connmark_tg_print(const void *ip, const struct xt_entry_target *target,
 	}
 }
 
-/* Saves the target into in parsable form to stdout. */
 static void CONNMARK_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_connmark_target_info *markinfo =

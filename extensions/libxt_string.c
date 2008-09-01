@@ -30,7 +30,6 @@
 #include <stddef.h>
 #include <linux/netfilter/xt_string.h>
 
-/* Function which prints out usage message. */
 static void string_help(void)
 {
 	printf(
@@ -166,8 +165,6 @@ parse_hex_string(const char *s, struct xt_string_info *info)
 #define TO     0x8
 #define ICASE  0x10
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 string_parse(int c, char **argv, int invert, unsigned int *flags,
              const void *entry, struct xt_entry_match **match)
@@ -245,8 +242,6 @@ string_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-
-/* Final check; must have specified --string. */
 static void string_check(unsigned int flags)
 {
 	if (!(flags & STRING))
@@ -303,7 +298,6 @@ print_string(const char *str, const unsigned short int len)
 	printf("\" ");  /* closing space and quote */
 }
 
-/* Prints out the matchinfo. */
 static void
 string_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -329,8 +323,6 @@ string_print(const void *ip, const struct xt_entry_match *match, int numeric)
 		printf("ICASE ");
 }
 
-
-/* Saves the union ipt_matchinfo in parseable form to stdout. */
 static void string_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_string_info *info =

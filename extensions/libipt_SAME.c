@@ -10,7 +10,6 @@
 /* For 64bit kernel / 32bit userspace */
 #include <linux/netfilter_ipv4/ipt_SAME.h>
 
-/* Function which prints out usage message. */
 static void SAME_help(void)
 {
 	printf(
@@ -33,7 +32,6 @@ static const struct option SAME_opts[] = {
 	{ .name = NULL }
 };
 
-/* Initialize the target. */
 static void SAME_init(struct xt_entry_target *t)
 {
 	struct ipt_same_info *mr = (struct ipt_same_info *)t->data;
@@ -81,8 +79,6 @@ parse_to(char *arg, struct ip_nat_range *range)
 #define IPT_SAME_OPT_NODST		0x02
 #define IPT_SAME_OPT_RANDOM		0x04
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int SAME_parse(int c, char **argv, int invert, unsigned int *flags,
                       const void *entry, struct xt_entry_target **target)
 {
@@ -132,7 +128,6 @@ static int SAME_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; need --to. */
 static void SAME_check(unsigned int flags)
 {
 	if (!(flags & IPT_SAME_OPT_TO))
@@ -140,7 +135,6 @@ static void SAME_check(unsigned int flags)
 			   "SAME needs --to");
 }
 
-/* Prints out the targinfo. */
 static void SAME_print(const void *ip, const struct xt_entry_target *target,
                        int numeric)
 {
@@ -175,7 +169,6 @@ static void SAME_print(const void *ip, const struct xt_entry_target *target,
 		printf("random ");
 }
 
-/* Saves the union ipt_targinfo in parsable form to stdout. */
 static void SAME_save(const void *ip, const struct xt_entry_target *target)
 {
 	unsigned int count;

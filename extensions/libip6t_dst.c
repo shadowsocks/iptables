@@ -1,4 +1,4 @@
-/* Shared library add-on to ip6tables to add Hop-by-Hop and Dst headers support. */
+/* Shared library add-on to ip6tables to add Dst header support. */
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -11,7 +11,6 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-/* Function which prints out usage message. */
 static void dst_help(void)
 {
 	printf(
@@ -107,7 +106,6 @@ parse_options(const char *optsstr, u_int16_t *opts)
 	return i;
 }
 
-/* Initialize the match. */
 static void dst_init(struct xt_entry_match *m)
 {
 	struct ip6t_opts *optinfo = (struct ip6t_opts *)m->data;
@@ -118,8 +116,6 @@ static void dst_init(struct xt_entry_match *m)
 	optinfo->optsnr = 0;
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int dst_parse(int c, char **argv, int invert, unsigned int *flags,
                      const void *entry, struct xt_entry_match **match)
 {
@@ -182,7 +178,6 @@ print_options(unsigned int optsnr, u_int16_t *optsp)
 	}
 }
 
-/* Prints out the union ip6t_matchinfo. */
 static void dst_print(const void *ip, const struct xt_entry_match *match,
                       int numeric)
 {
@@ -207,7 +202,6 @@ static void dst_print(const void *ip, const struct xt_entry_match *match,
 		       optinfo->invflags & ~IP6T_OPTS_INV_MASK);
 }
 
-/* Saves the union ip6t_matchinfo in parsable form to stdout. */
 static void dst_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_opts *optinfo = (struct ip6t_opts *)match->data;

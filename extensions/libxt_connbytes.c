@@ -8,7 +8,6 @@
 #include <linux/netfilter/nf_conntrack_common.h>
 #include <linux/netfilter/xt_connbytes.h>
 
-/* Function which prints out usage message. */
 static void connbytes_help(void)
 {
 	printf(
@@ -44,8 +43,6 @@ parse_range(const char *arg, struct xt_connbytes_info *si)
 			   (unsigned long long)si->count.to);
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 connbytes_parse(int c, char **argv, int invert, unsigned int *flags,
                 const void *entry, struct xt_entry_match **match)
@@ -141,7 +138,6 @@ static void print_direction(struct xt_connbytes_info *sinfo)
 	}
 }
 
-/* Prints out the matchinfo. */
 static void
 connbytes_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -163,7 +159,6 @@ connbytes_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	print_direction(sinfo);
 }
 
-/* Saves the matchinfo in parsable form to stdout. */
 static void connbytes_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_connbytes_info *sinfo = (struct xt_connbytes_info *)match->data;

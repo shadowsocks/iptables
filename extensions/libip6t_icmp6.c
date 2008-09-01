@@ -1,4 +1,4 @@
-/* Shared library add-on to iptables to add ICMP support. */
+/* Shared library add-on to ip6tables to add ICMP support. */
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -73,7 +73,6 @@ print_icmpv6types(void)
 	printf("\n");
 }
 
-/* Function which prints out usage message. */
 static void icmp6_help(void)
 {
 	printf(
@@ -141,7 +140,6 @@ parse_icmpv6(const char *icmpv6type, u_int8_t *type, u_int8_t code[])
 	}
 }
 
-/* Initialize the match. */
 static void icmp6_init(struct xt_entry_match *m)
 {
 	struct ip6t_icmp *icmpv6info = (struct ip6t_icmp *)m->data;
@@ -149,8 +147,6 @@ static void icmp6_init(struct xt_entry_match *m)
 	icmpv6info->code[1] = 0xFF;
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int icmp6_parse(int c, char **argv, int invert, unsigned int *flags,
                        const void *entry, struct xt_entry_match **match)
 {
@@ -213,7 +209,6 @@ static void print_icmpv6type(u_int8_t type,
 		printf(" codes %u-%u ", code_min, code_max);
 }
 
-/* Prints out the union ipt_matchinfo. */
 static void icmp6_print(const void *ip, const struct xt_entry_match *match,
                         int numeric)
 {
@@ -229,7 +224,6 @@ static void icmp6_print(const void *ip, const struct xt_entry_match *match,
 		       icmpv6->invflags & ~IP6T_ICMP_INV);
 }
 
-/* Saves the match in parsable form to stdout. */
 static void icmp6_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_icmp *icmpv6 = (struct ip6t_icmp *)match->data;

@@ -11,7 +11,6 @@
 #define IPT_REDIRECT_OPT_DEST	0x01
 #define IPT_REDIRECT_OPT_RANDOM	0x02
 
-/* Function which prints out usage message. */
 static void REDIRECT_help(void)
 {
 	printf(
@@ -26,7 +25,6 @@ static const struct option REDIRECT_opts[] = {
 	{ .name = NULL }
 };
 
-/* Initialize the target. */
 static void REDIRECT_init(struct xt_entry_target *t)
 {
 	struct ip_nat_multi_range *mr = (struct ip_nat_multi_range *)t->data;
@@ -76,8 +74,6 @@ parse_ports(const char *arg, struct ip_nat_multi_range *mr)
 	}
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int REDIRECT_parse(int c, char **argv, int invert, unsigned int *flags,
                           const void *e, struct xt_entry_target **target)
 {
@@ -122,7 +118,6 @@ static int REDIRECT_parse(int c, char **argv, int invert, unsigned int *flags,
 	}
 }
 
-/* Prints out the targinfo. */
 static void REDIRECT_print(const void *ip, const struct xt_entry_target *target,
                            int numeric)
 {
@@ -141,7 +136,6 @@ static void REDIRECT_print(const void *ip, const struct xt_entry_target *target,
 	}
 }
 
-/* Saves the union ipt_targinfo in parsable form to stdout. */
 static void REDIRECT_save(const void *ip, const struct xt_entry_target *target)
 {
 	struct ip_nat_multi_range *mr

@@ -22,7 +22,6 @@
 #include <linux/netfilter/nf_conntrack_common.h>
 #include <arpa/inet.h>
 
-/* Function which prints out usage message. */
 static void conntrack_mt_help(void)
 {
 	printf(
@@ -285,8 +284,6 @@ conntrack_ps_expires(struct xt_conntrack_mtinfo1 *info, const char *s)
 	info->expires_max = max;
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
                            const void *entry, struct xt_entry_match **match)
 {
@@ -792,7 +789,6 @@ print_addr(struct in_addr *addr, struct in_addr *mask, int inv, int numeric)
 	}
 }
 
-/* Saves the matchinfo in parsable form to stdout. */
 static void
 matchinfo_print(const void *ip, const struct xt_entry_match *match, int numeric, const char *optpfx)
 {
@@ -976,7 +972,6 @@ conntrack_dump(const struct xt_conntrack_mtinfo1 *info, const char *prefix,
 	}
 }
 
-/* Prints out the matchinfo. */
 static void conntrack_print(const void *ip, const struct xt_entry_match *match,
                             int numeric)
 {
@@ -997,7 +992,6 @@ conntrack_mt6_print(const void *ip, const struct xt_entry_match *match,
 	conntrack_dump((const void *)match->data, "", AF_INET6, numeric);
 }
 
-/* Saves the matchinfo in parsable form to stdout. */
 static void conntrack_save(const void *ip, const struct xt_entry_match *match)
 {
 	matchinfo_print(ip, match, 1, "--");

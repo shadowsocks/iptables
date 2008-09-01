@@ -26,10 +26,6 @@ static const struct option SECMARK_opts[] = {
 	{ .name = NULL }
 };
 
-/*
- * Function which parses command options; returns true if it
- * ate an option.
- */
 static int SECMARK_parse(int c, char **argv, int invert, unsigned int *flags,
                          const void *entry, struct xt_entry_target **target)
 {
@@ -87,7 +83,6 @@ static void SECMARK_print(const void *ip, const struct xt_entry_target *target,
 	print_secmark(info);
 }
 
-/* Saves the target info in parsable form to stdout. */
 static void SECMARK_save(const void *ip, const struct xt_entry_target *target)
 {
 	struct xt_secmark_target_info *info =

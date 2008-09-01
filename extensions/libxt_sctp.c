@@ -23,7 +23,7 @@
 #include <linux/netfilter/xt_sctp.h>
 
 /* Some ZS!#@:$%*#$! has replaced the ELEMCOUNT macro in ipt_sctp.h with
- * ARRAY_SIZE without noticing that this file is used from userserspace,
+ * ARRAY_SIZE without noticing that this file is used from userspace,
  * and userspace doesn't have ARRAY_SIZE */
 
 #ifndef ELEMCOUNT
@@ -40,7 +40,6 @@
 static void
 print_chunk(u_int32_t chunknum, int numeric);
 
-/* Initialize the match. */
 static void sctp_init(struct xt_entry_match *m)
 {
 	int i;
@@ -444,7 +443,6 @@ out:
 	return;
 }
 
-/* Prints out the matchinfo. */
 static void
 sctp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -475,7 +473,6 @@ sctp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	}
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void sctp_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_sctp_info *einfo =
@@ -543,4 +540,3 @@ void _init(void)
 	xtables_register_match(&sctp_match);
 	xtables_register_match(&sctp_match6);
 }
-

@@ -8,7 +8,6 @@
 #include <xtables.h>
 #include <linux/netfilter/xt_length.h>
 
-/* Function which prints out usage message. */
 static void length_help(void)
 {
 	printf(
@@ -59,8 +58,6 @@ parse_lengths(const char *s, struct xt_length_info *info)
 	
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 length_parse(int c, char **argv, int invert, unsigned int *flags,
              const void *entry, struct xt_entry_match **match)
@@ -86,7 +83,6 @@ length_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; must have specified --length. */
 static void length_check(unsigned int flags)
 {
 	if (!flags)
@@ -94,7 +90,6 @@ static void length_check(unsigned int flags)
 			   "length: You must specify `--length'");
 }
 
-/* Common match printing code. */
 static void
 print_length(struct xt_length_info *info)
 {
@@ -107,7 +102,6 @@ print_length(struct xt_length_info *info)
 		printf("%u:%u ", info->min, info->max);
 }
 
-/* Prints out the matchinfo. */
 static void
 length_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -115,7 +109,6 @@ length_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	print_length((struct xt_length_info *)match->data);
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void length_save(const void *ip, const struct xt_entry_match *match)
 {
 	printf("--length ");

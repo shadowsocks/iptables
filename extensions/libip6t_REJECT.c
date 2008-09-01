@@ -1,4 +1,4 @@
-/* Shared library add-on to iptables to add customized REJECT support.
+/* Shared library add-on to ip6tables to add customized REJECT support.
  *
  * (C) 2000 Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
  * 
@@ -51,9 +51,6 @@ print_reject_types(void)
 	printf("\n");
 }
 
-/* Saves the union ipt_targinfo in parsable form to stdout. */
-
-/* Function which prints out usage message. */
 static void REJECT_help(void)
 {
 	printf(
@@ -69,7 +66,6 @@ static const struct option REJECT_opts[] = {
 	{ .name = NULL }
 };
 
-/* Allocate and initialize the target. */
 static void REJECT_init(struct xt_entry_target *t)
 {
 	struct ip6t_reject_info *reject = (struct ip6t_reject_info *)t->data;
@@ -79,8 +75,6 @@ static void REJECT_init(struct xt_entry_target *t)
 
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int REJECT_parse(int c, char **argv, int invert, unsigned int *flags,
                         const void *entry, struct xt_entry_target **target)
 {
@@ -109,7 +103,6 @@ static int REJECT_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 0;
 }
 
-/* Prints out ipt_reject_info. */
 static void REJECT_print(const void *ip, const struct xt_entry_target *target,
                          int numeric)
 {
@@ -124,7 +117,6 @@ static void REJECT_print(const void *ip, const struct xt_entry_target *target,
 	printf("reject-with %s ", reject_table[i].name);
 }
 
-/* Saves ipt_reject in parsable form to stdout. */
 static void REJECT_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ip6t_reject_info *reject

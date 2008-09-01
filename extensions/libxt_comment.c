@@ -14,7 +14,6 @@
 #include <xtables.h>
 #include <linux/netfilter/xt_comment.h>
 
-/* Function which prints out usage message. */
 static void comment_help(void)
 {
 	printf(
@@ -39,8 +38,6 @@ parse_comment(const char *s, struct xt_comment_info *info)
 	strcpy((char *)info->comment, s);
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 comment_parse(int c, char **argv, int invert, unsigned int *flags,
               const void *entry, struct xt_entry_match **match)
@@ -64,7 +61,6 @@ comment_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; must have specified --comment. */
 static void comment_check(unsigned int flags)
 {
 	if (!flags)
@@ -72,7 +68,6 @@ static void comment_check(unsigned int flags)
 			   "COMMENT match: You must specify `--comment'");
 }
 
-/* Prints out the matchinfo. */
 static void
 comment_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {

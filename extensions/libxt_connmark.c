@@ -73,8 +73,6 @@ connmark_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 	return false;
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 connmark_parse(int c, char **argv, int invert, unsigned int *flags,
                const void *entry, struct xt_entry_match **match)
@@ -120,7 +118,6 @@ static void connmark_mt_check(unsigned int flags)
 		           "connmark: The --mark option is required");
 }
 
-/* Prints out the matchinfo. */
 static void
 connmark_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -143,7 +140,6 @@ connmark_mt_print(const void *ip, const struct xt_entry_match *match, int numeri
 	print_mark(info->mark, info->mask);
 }
 
-/* Saves the matchinfo in parsable form to stdout. */
 static void connmark_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_connmark_info *info = (struct xt_connmark_info *)match->data;

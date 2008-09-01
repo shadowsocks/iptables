@@ -22,7 +22,6 @@
 #include <linux/netfilter_ipv4/ipt_set.h>
 #include "libipt_set.h"
 
-/* Function which prints out usage message. */
 static void SET_help(void)
 {
 	printf("SET target options:\n"
@@ -39,7 +38,6 @@ static const struct option SET_opts[] = {
 	{ }
 };
 
-/* Initialize the target. */
 static void SET_init(struct xt_entry_target *target)
 {
 	struct ipt_set_info_target *info =
@@ -80,8 +78,6 @@ parse_target(char **argv, int invert, unsigned int *flags,
 	*flags = 1;
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int SET_parse(int c, char **argv, int invert, unsigned int *flags,
                      const void *entry, struct xt_entry_target **target)
 {
@@ -104,7 +100,6 @@ static int SET_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; must specify at least one. */
 static void SET_check(unsigned int flags)
 {
 	if (!flags)
@@ -132,7 +127,6 @@ print_target(const char *prefix, const struct ipt_set_info *info)
 	printf(" ");
 }
 
-/* Prints out the targinfo. */
 static void SET_print(const void *ip, const struct xt_entry_target *target,
                       int numeric)
 {
@@ -143,7 +137,6 @@ static void SET_print(const void *ip, const struct xt_entry_target *target,
 	print_target("del-set", &info->del_set);
 }
 
-/* Saves the union ipt_targinfo in parsable form to stdout. */
 static void SET_save(const void *ip, const struct xt_entry_target *target)
 {
 	struct ipt_set_info_target *info =

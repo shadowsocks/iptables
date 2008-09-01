@@ -17,7 +17,6 @@
 #define XT_LIMIT_AVG	"3/hour"
 #define XT_LIMIT_BURST	5
 
-/* Function which prints out usage message. */
 static void limit_help(void)
 {
 	printf(
@@ -71,7 +70,6 @@ int parse_rate(const char *rate, u_int32_t *val)
 	return 1;
 }
 
-/* Initialize the match. */
 static void limit_init(struct xt_entry_match *m)
 {
 	struct xt_rateinfo *r = (struct xt_rateinfo *)m->data;
@@ -87,8 +85,6 @@ static void limit_init(struct xt_entry_match *m)
 			   "Sorry: burst too large for that avg rate.\n");
 */
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 limit_parse(int c, char **argv, int invert, unsigned int *flags,
             const void *entry, struct xt_entry_match **match)
@@ -145,7 +141,6 @@ static void print_rate(u_int32_t period)
 	printf("%u/%s ", rates[i-1].mult / period, rates[i-1].name);
 }
 
-/* Prints out the matchinfo. */
 static void
 limit_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -154,7 +149,6 @@ limit_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	printf("burst %u ", r->burst);
 }
 
-/* FIXME: Make minimalist: only print rate if not default --RR */
 static void limit_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_rateinfo *r = (struct xt_rateinfo *)match->data;

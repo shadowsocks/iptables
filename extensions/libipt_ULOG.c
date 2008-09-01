@@ -33,7 +33,6 @@ static void print_groups(unsigned int gmask)
 	}
 }
 
-/* Function which prints out usage message. */
 static void ULOG_help(void)
 {
 	printf("ULOG target options:\n"
@@ -51,7 +50,6 @@ static const struct option ULOG_opts[] = {
 	{ .name = NULL }
 };
 
-/* Initialize the target. */
 static void ULOG_init(struct xt_entry_target *t)
 {
 	struct ipt_ulog_info *loginfo = (struct ipt_ulog_info *) t->data;
@@ -66,8 +64,6 @@ static void ULOG_init(struct xt_entry_target *t)
 #define IPT_LOG_OPT_CPRANGE 0x04
 #define IPT_LOG_OPT_QTHRESHOLD 0x08
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int ULOG_parse(int c, char **argv, int invert, unsigned int *flags,
                       const void *entry, struct xt_entry_target **target)
 {
@@ -148,7 +144,6 @@ static int ULOG_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Saves the union ipt_targinfo in parsable form to stdout. */
 static void ULOG_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_ulog_info *loginfo
@@ -170,7 +165,6 @@ static void ULOG_save(const void *ip, const struct xt_entry_target *target)
 		printf("--ulog-qthreshold %u ", (unsigned int)loginfo->qthreshold);
 }
 
-/* Prints out the targinfo. */
 static void ULOG_print(const void *ip, const struct xt_entry_target *target,
                        int numeric)
 {

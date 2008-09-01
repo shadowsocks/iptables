@@ -16,7 +16,6 @@ struct mssinfo {
 	struct xt_tcpmss_info mss;
 };
 
-/* Function which prints out usage message. */
 static void __TCPMSS_help(int hdrsize)
 {
 	printf(
@@ -42,8 +41,6 @@ static const struct option TCPMSS_opts[] = {
 	{ .name = NULL }
 };
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int __TCPMSS_parse(int c, char **argv, int invert, unsigned int *flags,
                           const void *entry, struct xt_entry_target **target,
                           int hdrsize)
@@ -99,7 +96,6 @@ static void TCPMSS_check(unsigned int flags)
 		           "TCPMSS target: At least one parameter is required");
 }
 
-/* Prints out the targinfo. */
 static void TCPMSS_print(const void *ip, const struct xt_entry_target *target,
                          int numeric)
 {
@@ -111,7 +107,6 @@ static void TCPMSS_print(const void *ip, const struct xt_entry_target *target,
 		printf("TCPMSS set %u ", mssinfo->mss);
 }
 
-/* Saves the union ipt_targinfo in parsable form to stdout. */
 static void TCPMSS_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_tcpmss_info *mssinfo =

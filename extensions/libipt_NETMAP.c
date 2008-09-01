@@ -18,7 +18,6 @@ static const struct option NETMAP_opts[] = {
 	{ .name = NULL }
 };
 
-/* Function which prints out usage message. */
 static void NETMAP_help(void)
 {
 	printf(MODULENAME" target options:\n"
@@ -53,7 +52,6 @@ netmask2bits(u_int32_t netmask)
 	return bits;
 }
 
-/* Initialize the target. */
 static void NETMAP_init(struct xt_entry_target *t)
 {
 	struct ip_nat_multi_range *mr = (struct ip_nat_multi_range *)t->data;
@@ -112,8 +110,6 @@ parse_to(char *arg, struct ip_nat_range *range)
 	range->max_ip = range->min_ip | ~netmask;
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int NETMAP_parse(int c, char **argv, int invert, unsigned int *flags,
                         const void *entry, struct xt_entry_target **target)
 {
@@ -135,7 +131,6 @@ static int NETMAP_parse(int c, char **argv, int invert, unsigned int *flags,
 	}
 }
 
-/* Final check; need --to */
 static void NETMAP_check(unsigned int flags)
 {
 	if (!flags)
@@ -143,7 +138,6 @@ static void NETMAP_check(unsigned int flags)
 			   MODULENAME" needs --%s", NETMAP_opts[0].name);
 }
 
-/* Prints out the targinfo. */
 static void NETMAP_print(const void *ip, const struct xt_entry_target *target,
                          int numeric)
 {
@@ -163,7 +157,6 @@ static void NETMAP_print(const void *ip, const struct xt_entry_target *target,
 		printf("/%d", bits);
 }
 
-/* Saves the targinfo in parsable form to stdout. */
 static void NETMAP_save(const void *ip, const struct xt_entry_target *target)
 {
 	printf("--%s ", NETMAP_opts[0].name);
@@ -189,4 +182,3 @@ void _init(void)
 {
 	xtables_register_target(&netmap_tg_reg);
 }
-

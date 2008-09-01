@@ -97,7 +97,6 @@ print_icmptypes(void)
 	printf("\n");
 }
 
-/* Function which prints out usage message. */
 static void icmp_help(void)
 {
 	printf(
@@ -165,7 +164,6 @@ parse_icmp(const char *icmptype, u_int8_t *type, u_int8_t code[])
 	}
 }
 
-/* Initialize the match. */
 static void icmp_init(struct xt_entry_match *m)
 {
 	struct ipt_icmp *icmpinfo = (struct ipt_icmp *)m->data;
@@ -174,8 +172,6 @@ static void icmp_init(struct xt_entry_match *m)
 	icmpinfo->code[1] = 0xFF;
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int icmp_parse(int c, char **argv, int invert, unsigned int *flags,
                       const void *entry, struct xt_entry_match **match)
 {
@@ -238,7 +234,6 @@ static void print_icmptype(u_int8_t type,
 		printf(" codes %u-%u ", code_min, code_max);
 }
 
-/* Prints out the union ipt_matchinfo. */
 static void icmp_print(const void *ip, const struct xt_entry_match *match,
                        int numeric)
 {
@@ -254,7 +249,6 @@ static void icmp_print(const void *ip, const struct xt_entry_match *match,
 		       icmp->invflags & ~IPT_ICMP_INV);
 }
 
-/* Saves the match in parsable form to stdout. */
 static void icmp_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ipt_icmp *icmp = (struct ipt_icmp *)match->data;

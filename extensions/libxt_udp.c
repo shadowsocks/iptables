@@ -7,7 +7,6 @@
 #include <xtables.h>
 #include <linux/netfilter/xt_tcpudp.h>
 
-/* Function which prints out usage message. */
 static void udp_help(void)
 {
 	printf(
@@ -51,7 +50,6 @@ parse_udp_ports(const char *portstring, u_int16_t *ports)
 	free(buffer);
 }
 
-/* Initialize the match. */
 static void udp_init(struct xt_entry_match *m)
 {
 	struct xt_udp *udpinfo = (struct xt_udp *)m->data;
@@ -62,8 +60,6 @@ static void udp_init(struct xt_entry_match *m)
 #define UDP_SRC_PORTS 0x01
 #define UDP_DST_PORTS 0x02
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 udp_parse(int c, char **argv, int invert, unsigned int *flags,
           const void *entry, struct xt_entry_match **match)
@@ -143,7 +139,6 @@ print_ports(const char *name, u_int16_t min, u_int16_t max,
 	}
 }
 
-/* Prints out the union ipt_matchinfo. */
 static void
 udp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -161,7 +156,6 @@ udp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 		       udp->invflags & ~XT_UDP_INV_MASK);
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void udp_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_udp *udpinfo = (struct xt_udp *)match->data;

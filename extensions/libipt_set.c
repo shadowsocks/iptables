@@ -21,7 +21,6 @@
 #include <linux/netfilter_ipv4/ipt_set.h>
 #include "libipt_set.h"
 
-/* Function which prints out usage message. */
 static void set_help(void)
 {
 	printf("set match options:\n"
@@ -36,7 +35,6 @@ static const struct option set_opts[] = {
 	{ }
 };
 
-/* Initialize the match. */
 static void set_init(struct xt_entry_match *match)
 {
 	struct ipt_set_info_match *info = 
@@ -47,7 +45,6 @@ static void set_init(struct xt_entry_match *match)
 
 }
 
-/* Function which parses command options; returns true if it ate an option */
 static int set_parse(int c, char **argv, int invert, unsigned int *flags,
                      const void *entry, struct xt_entry_match **match)
 {
@@ -91,7 +88,6 @@ static int set_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; must have specified --set. */
 static void set_check(unsigned int flags)
 {
 	if (!flags)
@@ -131,7 +127,6 @@ static void set_print(const void *ip, const struct xt_entry_match *match,
 	print_match("set", &info->match_set);
 }
 
-/* Saves the matchinfo in parsable form to stdout. */
 static void set_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct ipt_set_info_match *info = 

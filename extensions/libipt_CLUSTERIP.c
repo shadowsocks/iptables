@@ -192,9 +192,7 @@ static char *mac2str(const u_int8_t mac[ETH_ALEN])
 		mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 	return buf;
 }
-			
 
-/* Prints out the targinfo. */
 static void CLUSTERIP_print(const void *ip,
                             const struct xt_entry_target *target, int numeric)
 {
@@ -214,7 +212,6 @@ static void CLUSTERIP_print(const void *ip,
 		cipinfo->hash_initval);
 }
 
-/* Saves the union ipt_targinfo in parsable form to stdout. */
 static void CLUSTERIP_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_clusterip_tgt_info *cipinfo =

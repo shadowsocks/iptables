@@ -8,7 +8,6 @@
 #include <xtables.h>
 #include <linux/netfilter/xt_tcpmss.h>
 
-/* Function which prints out usage message. */
 static void tcpmss_help(void)
 {
 	printf(
@@ -54,8 +53,6 @@ parse_tcp_mssvalues(const char *mssvaluestring,
 	free(buffer);
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 tcpmss_parse(int c, char **argv, int invert, unsigned int *flags,
              const void *entry, struct xt_entry_match **match)
@@ -93,7 +90,6 @@ print_tcpmss(u_int16_t mss_min, u_int16_t mss_max, int invert, int numeric)
 		printf("%u:%u ", mss_min, mss_max);
 }
 
-/* Final check; must have specified --mss. */
 static void tcpmss_check(unsigned int flags)
 {
 	if (!flags)
@@ -101,7 +97,6 @@ static void tcpmss_check(unsigned int flags)
 			   "tcpmss match: You must specify `--mss'");
 }
 
-/* Prints out the matchinfo. */
 static void
 tcpmss_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -113,7 +108,6 @@ tcpmss_print(const void *ip, const struct xt_entry_match *match, int numeric)
 		     mssinfo->invert, numeric);
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void tcpmss_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_tcpmss_match_info *mssinfo =

@@ -13,7 +13,6 @@ enum {
 	F_MARK = 1 << 0,
 };
 
-/* Function which prints out usage message. */
 static void MARK_help(void)
 {
 	printf(
@@ -91,8 +90,6 @@ static void MARK_check(unsigned int flags)
 			   " is required");
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 MARK_parse_v1(int c, char **argv, int invert, unsigned int *flags,
               const void *entry, struct xt_entry_target **target)
@@ -199,7 +196,6 @@ print_mark(unsigned long mark)
 	printf("0x%lx ", mark);
 }
 
-/* Prints out the targinfo. */
 static void MARK_print_v0(const void *ip,
                           const struct xt_entry_target *target, int numeric)
 {
@@ -209,7 +205,6 @@ static void MARK_print_v0(const void *ip,
 	print_mark(markinfo->mark);
 }
 
-/* Saves the union ipt_targinfo in parsable form to stdout. */
 static void MARK_save_v0(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_mark_target_info *markinfo =
@@ -219,7 +214,6 @@ static void MARK_save_v0(const void *ip, const struct xt_entry_target *target)
 	print_mark(markinfo->mark);
 }
 
-/* Prints out the targinfo. */
 static void MARK_print_v1(const void *ip, const struct xt_entry_target *target,
                           int numeric)
 {
@@ -255,7 +249,6 @@ static void mark_tg_print(const void *ip, const struct xt_entry_target *target,
 		printf("MARK xset 0x%x/0x%x ", info->mark, info->mask);
 }
 
-/* Saves the union ipt_targinfo in parsable form to stdout. */
 static void MARK_save_v1(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_mark_target_info_v1 *markinfo =

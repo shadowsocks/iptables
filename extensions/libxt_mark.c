@@ -53,8 +53,6 @@ static int mark_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 	return false;
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int
 mark_parse(int c, char **argv, int invert, unsigned int *flags,
            const void *entry, struct xt_entry_match **match)
@@ -109,7 +107,6 @@ mark_mt_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	print_mark(info->mark, info->mask);
 }
 
-/* Prints out the matchinfo. */
 static void
 mark_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -134,7 +131,6 @@ static void mark_mt_save(const void *ip, const struct xt_entry_match *match)
 	print_mark(info->mark, info->mask);
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void
 mark_save(const void *ip, const struct xt_entry_match *match)
 {

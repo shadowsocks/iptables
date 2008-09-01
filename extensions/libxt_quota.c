@@ -16,14 +16,12 @@ static const struct option quota_opts[] = {
 	{ .name = NULL }
 };
 
-/* print usage */
 static void quota_help(void)
 {
 	printf("quota match options:\n"
 	       " --quota quota			quota (bytes)\n");
 }
 
-/* print matchinfo */
 static void
 quota_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -31,7 +29,6 @@ quota_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	printf("quota: %llu bytes", (unsigned long long) q->quota);
 }
 
-/* save matchinfo */
 static void
 quota_save(const void *ip, const struct xt_entry_match *match)
 {
@@ -55,7 +52,6 @@ parse_quota(const char *s, u_int64_t * quota)
 		return 1;
 }
 
-/* parse all options, returning true if we found any for us */
 static int
 quota_parse(int c, char **argv, int invert, unsigned int *flags,
 	    const void *entry, struct xt_entry_match **match)

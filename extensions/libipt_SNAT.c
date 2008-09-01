@@ -19,7 +19,6 @@ struct ipt_natinfo
 	struct ip_nat_multi_range mr;
 };
 
-/* Function which prints out usage message. */
 static void SNAT_help(void)
 {
 	printf(
@@ -134,8 +133,6 @@ parse_to(char *arg, int portok, struct ipt_natinfo *info)
 	return &(append_range(info, &range)->t);
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int SNAT_parse(int c, char **argv, int invert, unsigned int *flags,
                       const void *e, struct xt_entry_target **target)
 {
@@ -183,7 +180,6 @@ static int SNAT_parse(int c, char **argv, int invert, unsigned int *flags,
 	}
 }
 
-/* Final check; must have specfied --to-source. */
 static void SNAT_check(unsigned int flags)
 {
 	if (!(flags & IPT_SNAT_OPT_SOURCE))
@@ -211,7 +207,6 @@ static void print_range(const struct ip_nat_range *r)
 	}
 }
 
-/* Prints out the targinfo. */
 static void SNAT_print(const void *ip, const struct xt_entry_target *target,
                        int numeric)
 {
@@ -227,7 +222,6 @@ static void SNAT_print(const void *ip, const struct xt_entry_target *target,
 	}
 }
 
-/* Saves the union ipt_targinfo in parsable form to stdout. */
 static void SNAT_save(const void *ip, const struct xt_entry_target *target)
 {
 	struct ipt_natinfo *info = (void *)target;

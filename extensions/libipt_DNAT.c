@@ -19,7 +19,6 @@ struct ipt_natinfo
 	struct ip_nat_multi_range mr;
 };
 
-/* Function which prints out usage message. */
 static void DNAT_help(void)
 {
 	printf(
@@ -134,8 +133,6 @@ parse_to(char *arg, int portok, struct ipt_natinfo *info)
 	return &(append_range(info, &range)->t);
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int DNAT_parse(int c, char **argv, int invert, unsigned int *flags,
                       const void *e, struct xt_entry_target **target)
 {
@@ -182,7 +179,6 @@ static int DNAT_parse(int c, char **argv, int invert, unsigned int *flags,
 	}
 }
 
-/* Final check; must have specfied --to-source. */
 static void DNAT_check(unsigned int flags)
 {
 	if (!flags)
@@ -210,7 +206,6 @@ static void print_range(const struct ip_nat_range *r)
 	}
 }
 
-/* Prints out the targinfo. */
 static void DNAT_print(const void *ip, const struct xt_entry_target *target,
                        int numeric)
 {
@@ -226,7 +221,6 @@ static void DNAT_print(const void *ip, const struct xt_entry_target *target,
 	}
 }
 
-/* Saves the union ipt_targinfo in parsable form to stdout. */
 static void DNAT_save(const void *ip, const struct xt_entry_target *target)
 {
 	struct ipt_natinfo *info = (void *)target;

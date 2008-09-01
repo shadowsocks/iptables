@@ -7,14 +7,11 @@
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
 
-/* Function which prints out usage message. */
 static void MIRROR_help(void)
 {
 	printf("MIRROR target takes no options\n");
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int MIRROR_parse(int c, char **argv, int invert, unsigned int *flags,
                         const void *entry, struct xt_entry_target **target)
 {

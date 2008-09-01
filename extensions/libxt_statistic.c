@@ -94,7 +94,6 @@ statistic_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-/* Final check; must have specified --mark. */
 static void statistic_check(unsigned int flags)
 {
 	if (!(flags & 0x1))
@@ -124,7 +123,6 @@ static void statistic_check(unsigned int flags)
 	                           global_info->u.nth.packet;
 }
 
-/* Prints out the matchinfo. */
 static void print_match(const struct xt_statistic_info *info, char *prefix)
 {
 	if (info->flags & XT_STATISTIC_INVERT)
@@ -153,7 +151,6 @@ statistic_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	print_match(info, "");
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void statistic_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_statistic_info *info = (struct xt_statistic_info *)match->data;

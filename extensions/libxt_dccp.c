@@ -24,7 +24,6 @@
 #define DEBUGP(format, fist...) 
 #endif
 
-/* Initialize the match. */
 static void dccp_init(struct xt_entry_match *m)
 {
 	struct xt_dccp_info *einfo = (struct xt_dccp_info *)m->data;
@@ -266,7 +265,6 @@ print_option(u_int8_t option, int invert, int numeric)
 		printf("option=%s%u ", invert ? "!" : "", option);
 }
 
-/* Prints out the matchinfo. */
 static void
 dccp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
@@ -299,7 +297,6 @@ dccp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	}
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void dccp_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_dccp_info *einfo =
@@ -370,4 +367,3 @@ void _init(void)
 	xtables_register_match(&dccp_match);
 	xtables_register_match(&dccp_match6);
 }
-

@@ -14,7 +14,6 @@
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ipt_realm.h>
 
-/* Function which prints out usage message. */
 static void realm_help(void)
 {
 	printf(
@@ -149,9 +148,6 @@ static const char *realm_id2name(int id)
 	return NULL;
 }
 
-
-/* Function which parses command options; returns true if it
-   ate an option */
 static int realm_parse(int c, char **argv, int invert, unsigned int *flags,
                        const void *entry, struct xt_entry_match **match)
 {
@@ -208,7 +204,6 @@ print_realm(unsigned long id, unsigned long mask, int numeric)
 	}
 }
 
-/* Prints out the matchinfo. */
 static void realm_print(const void *ip, const struct xt_entry_match *match,
                         int numeric)
 {
@@ -221,8 +216,6 @@ static void realm_print(const void *ip, const struct xt_entry_match *match,
 	print_realm(ri->id, ri->mask, numeric);
 }
 
-
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void realm_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct ipt_realm_info *ri = (struct ipt_realm_info *) match->data;
@@ -234,7 +227,6 @@ static void realm_save(const void *ip, const struct xt_entry_match *match)
 	print_realm(ri->id, ri->mask, 0);
 }
 
-/* Final check; must have specified --mark. */
 static void realm_check(unsigned int flags)
 {
 	if (!flags)
@@ -260,5 +252,3 @@ void _init(void)
 {
 	xtables_register_match(&realm_mt_reg);
 }
-
-

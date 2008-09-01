@@ -113,7 +113,6 @@ print_dscp(u_int8_t dscp, int numeric)
  	printf("0x%02x ", dscp);
 }
 
-/* Prints out the targinfo. */
 static void DSCP_print(const void *ip, const struct xt_entry_target *target,
                        int numeric)
 {
@@ -123,7 +122,6 @@ static void DSCP_print(const void *ip, const struct xt_entry_target *target,
 	print_dscp(dinfo->dscp, numeric);
 }
 
-/* Saves the union ipt_targinfo in parsable form to stdout. */
 static void DSCP_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_DSCP_info *dinfo =

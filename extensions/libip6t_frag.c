@@ -7,8 +7,7 @@
 #include <errno.h>
 #include <ip6tables.h>
 #include <linux/netfilter_ipv6/ip6t_frag.h>
-                                        
-/* Function which prints out usage message. */
+
 static void frag_help(void)
 {
 	printf(
@@ -74,7 +73,6 @@ parse_frag_ids(const char *idstring, u_int32_t *ids)
 	free(buffer);
 }
 
-/* Initialize the match. */
 static void frag_init(struct xt_entry_match *m)
 {
 	struct ip6t_frag *fraginfo = (struct ip6t_frag *)m->data;
@@ -86,8 +84,6 @@ static void frag_init(struct xt_entry_match *m)
 	fraginfo->invflags = 0;
 }
 
-/* Function which parses command options; returns true if it
-   ate an option */
 static int frag_parse(int c, char **argv, int invert, unsigned int *flags,
                       const void *entry, struct xt_entry_match **match)
 {
@@ -166,7 +162,6 @@ print_ids(const char *name, u_int32_t min, u_int32_t max,
 	}
 }
 
-/* Prints out the union ip6t_matchinfo. */
 static void frag_print(const void *ip, const struct xt_entry_match *match,
                        int numeric)
 {
@@ -199,7 +194,6 @@ static void frag_print(const void *ip, const struct xt_entry_match *match,
 		       frag->invflags & ~IP6T_FRAG_INV_MASK);
 }
 
-/* Saves the union ip6t_matchinfo in parsable form to stdout. */
 static void frag_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ip6t_frag *fraginfo = (struct ip6t_frag *)match->data;

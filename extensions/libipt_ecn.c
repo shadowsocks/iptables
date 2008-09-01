@@ -90,7 +90,6 @@ static void ecn_check(unsigned int flags)
 		           "ECN match: some option required");
 }
 
-/* Prints out the matchinfo. */
 static void ecn_print(const void *ip, const struct xt_entry_match *match,
                       int numeric)
 {
@@ -118,7 +117,6 @@ static void ecn_print(const void *ip, const struct xt_entry_match *match,
 	}
 }
 
-/* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void ecn_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct ipt_ecn_info *einfo =
