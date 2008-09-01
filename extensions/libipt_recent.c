@@ -165,7 +165,7 @@ static void recent_check(unsigned int flags)
 			"recent: you must specify one of `--set', `--rcheck' "
 			"`--update' or `--remove'");
 	if ((flags & IPT_RECENT_TTL) &&
-	    (flags & (IPT_RECENT_SET | IPT_RECENT_REMOVE | IPT_RECENT_UPDATE)))
+	    (flags & (IPT_RECENT_SET | IPT_RECENT_REMOVE)))
 		exit_error(PARAMETER_PROBLEM,
 		           "recent: --rttl may only be used with --rcheck or "
 		           "--update");

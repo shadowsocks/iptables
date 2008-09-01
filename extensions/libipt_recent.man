@@ -50,7 +50,7 @@ than or equal to the given value. This option may be used along with
 number of hits within a specific time frame.
 .TP
 \fB--rttl\fR
-This option must be used in conjunction with one of \fB--rcheck\fR or
+This option may only be used in conjunction with one of \fB--rcheck\fR or
 \fB--update\fR. When used, this will narrow the match to only happen
 when the address is in the list and the TTL of the current packet
 matches that of the packet which hit the \fB--set\fR rule. This may be
