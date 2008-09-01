@@ -8,8 +8,7 @@
 #include <xtables.h>
 #include <libiptc/libiptc.h>
 #include <libiptc/libip6tc.h>
-/* To ensure that iptables compiles with an old kernel */
-#include "../include/linux/netfilter/xt_multiport.h"
+#include <linux/netfilter/xt_multiport.h>
 
 /* Function which prints out usage message. */
 static void multiport_help(void)

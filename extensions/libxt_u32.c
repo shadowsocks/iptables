@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include <xtables.h>
-#include "../include/linux/netfilter/xt_u32.h"
+#include <linux/netfilter/xt_u32.h>
 
 static const struct option u32_opts[] = {
 	{"u32", 1, NULL, 'u'},

@@ -18,7 +18,7 @@
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
 /* For 64bit kernel / 32bit userspace */
-#include "../include/linux/netfilter_ipv4/ipt_ULOG.h"
+#include <linux/netfilter_ipv4/ipt_ULOG.h>
 
 
 static void print_groups(unsigned int gmask)

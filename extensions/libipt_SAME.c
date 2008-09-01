@@ -8,7 +8,7 @@
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter/nf_nat.h>
 /* For 64bit kernel / 32bit userspace */
-#include "../include/linux/netfilter_ipv4/ipt_SAME.h"
+#include <linux/netfilter_ipv4/ipt_SAME.h>
 
 /* Function which prints out usage message. */
 static void SAME_help(void)

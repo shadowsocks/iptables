@@ -12,7 +12,7 @@
 #include <stddef.h>
 #include <linux/netfilter/x_tables.h>
 /* For 64bit kernel / 32bit userspace */
-#include "../include/linux/netfilter/xt_limit.h"
+#include <linux/netfilter/xt_limit.h>
 
 #define XT_LIMIT_AVG	"3/hour"
 #define XT_LIMIT_BURST	5
