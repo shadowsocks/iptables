@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <time.h>
+#include <limits.h>
+
 #include <linux/netfilter/xt_time.h>
 #include <xtables.h>
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(*x))

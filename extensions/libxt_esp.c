@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <errno.h>
+#include <limits.h>
+
 #include <xtables.h>
 #include <linux/netfilter/xt_esp.h>
 
