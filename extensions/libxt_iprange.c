@@ -106,18 +106,18 @@ iprange_mt4_parse(int c, char **argv, int invert, unsigned int *flags,
 	char *end;
 
 	switch (c) {
-	case '1': /* --src-ip */
+	case '1': /* --src-range */
 		end = strchr(optarg, '-');
 		if (end == NULL)
-			param_act(P_BAD_VALUE, "iprange", "--src-ip", optarg);
+			param_act(P_BAD_VALUE, "iprange", "--src-range", optarg);
 		*end = '\0';
 		ia = numeric_to_ipaddr(optarg);
 		if (ia == NULL)
-			param_act(P_BAD_VALUE, "iprange", "--src-ip", optarg);
+			param_act(P_BAD_VALUE, "iprange", "--src-range", optarg);
 		memcpy(&info->src_min.in, ia, sizeof(*ia));
 		ia = numeric_to_ipaddr(end+1);
 		if (ia == NULL)
-			param_act(P_BAD_VALUE, "iprange", "--src-ip", end + 1);
+			param_act(P_BAD_VALUE, "iprange", "--src-range", end + 1);
 		memcpy(&info->src_max.in, ia, sizeof(*ia));
 		info->flags |= IPRANGE_SRC;
 		if (invert)
@@ -125,18 +125,18 @@ iprange_mt4_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= F_SRCIP;
 		return true;
 
-	case '2': /* --dst-ip */
+	case '2': /* --dst-range */
 		end = strchr(optarg, '-');
 		if (end == NULL)
-			param_act(P_BAD_VALUE, "iprange", "--dst-ip", optarg);
+			param_act(P_BAD_VALUE, "iprange", "--dst-range", optarg);
 		*end = '\0';
 		ia = numeric_to_ipaddr(optarg);
 		if (ia == NULL)
-			param_act(P_BAD_VALUE, "iprange", "--dst-ip", optarg);
+			param_act(P_BAD_VALUE, "iprange", "--dst-range", optarg);
 		memcpy(&info->dst_min.in, ia, sizeof(*ia));
 		ia = numeric_to_ipaddr(end + 1);
 		if (ia == NULL)
-			param_act(P_BAD_VALUE, "iprange", "--dst-ip", end + 1);
+			param_act(P_BAD_VALUE, "iprange", "--dst-range", end + 1);
 		memcpy(&info->dst_max.in, ia, sizeof(*ia));
 		info->flags |= IPRANGE_DST;
 		if (invert)
@@ -156,18 +156,18 @@ iprange_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 	char *end;
 
 	switch (c) {
-	case '1': /* --src-ip */
+	case '1': /* --src-range */
 		end = strchr(optarg, '-');
 		if (end == NULL)
-			param_act(P_BAD_VALUE, "iprange", "--src-ip", optarg);
+			param_act(P_BAD_VALUE, "iprange", "--src-range", optarg);
 		*end = '\0';
 		ia = numeric_to_ip6addr(optarg);
 		if (ia == NULL)
-			param_act(P_BAD_VALUE, "iprange", "--src-ip", optarg);
+			param_act(P_BAD_VALUE, "iprange", "--src-range", optarg);
 		memcpy(&info->src_min.in, ia, sizeof(*ia));
 		ia = numeric_to_ip6addr(end+1);
 		if (ia == NULL)
-			param_act(P_BAD_VALUE, "iprange", "--src-ip", end + 1);
+			param_act(P_BAD_VALUE, "iprange", "--src-range", end + 1);
 		memcpy(&info->src_max.in, ia, sizeof(*ia));
 		info->flags |= IPRANGE_SRC;
 		if (invert)
@@ -175,18 +175,18 @@ iprange_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= F_SRCIP;
 		return true;
 
-	case '2': /* --dst-ip */
+	case '2': /* --dst-range */
 		end = strchr(optarg, '-');
 		if (end == NULL)
-			param_act(P_BAD_VALUE, "iprange", "--dst-ip", optarg);
+			param_act(P_BAD_VALUE, "iprange", "--dst-range", optarg);
 		*end = '\0';
 		ia = numeric_to_ip6addr(optarg);
 		if (ia == NULL)
-			param_act(P_BAD_VALUE, "iprange", "--dst-ip", optarg);
+			param_act(P_BAD_VALUE, "iprange", "--dst-range", optarg);
 		memcpy(&info->dst_min.in, ia, sizeof(*ia));
 		ia = numeric_to_ip6addr(end + 1);
 		if (ia == NULL)
-			param_act(P_BAD_VALUE, "iprange", "--dst-ip", end + 1);
+			param_act(P_BAD_VALUE, "iprange", "--dst-range", end + 1);
 		memcpy(&info->dst_max.in, ia, sizeof(*ia));
 		info->flags |= IPRANGE_DST;
 		if (invert)
