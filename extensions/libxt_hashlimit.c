@@ -5,8 +5,8 @@
  * Development of this code was funded by Astaro AG, http://www.astaro.com/
  *
  * Based on ipt_limit.c by
- * Jérôme de Vivie   <devivie@info.enserb.u-bordeaux.fr>
- * Hervé Eychenne    <rv@wallfire.org>
+ * JÃ©rÃ´me de Vivie   <devivie@info.enserb.u-bordeaux.fr>
+ * HervÃ© Eychenne    <rv@wallfire.org>
  * 
  * Error corections by nmalykh@bilim.com (22.01.2005)
  */

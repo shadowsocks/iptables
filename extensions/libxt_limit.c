@@ -1,7 +1,7 @@
 /* Shared library add-on to iptables to add limit support.
  *
- * Jérôme de Vivie   <devivie@info.enserb.u-bordeaux.fr>
- * Hervé Eychenne    <rv@wallfire.org>
+ * JÃ©rÃ´me de Vivie   <devivie@info.enserb.u-bordeaux.fr>
+ * HervÃ© Eychenne    <rv@wallfire.org>
  */
 
 #include <stdio.h>
