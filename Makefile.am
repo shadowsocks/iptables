@@ -107,3 +107,8 @@ tarball:
 	rm -Rf /tmp/${PACKAGE_TARNAME}-${PACKAGE_VERSION};
 
 config.status: include/xtables.h.in
+
+# ldconfig may fail when we are not root (as is the case in build systems)
+# so add appropriate protection that it does not let `make` fail.
+install-exec-hook:
+	-/sbin/ldconfig || :;
