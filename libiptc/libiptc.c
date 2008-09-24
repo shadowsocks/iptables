@@ -1076,8 +1076,6 @@ static int parse_table(TC_HANDLE_T h)
 		}
 	}
 
-	/* FIXME: sort chains */
-
 	return 1;
 }
 
