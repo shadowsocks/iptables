@@ -125,7 +125,7 @@ static void mark_mt_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_mark_mtinfo1 *info = (const void *)match->data;
 
 	if (info->invert)
-		printf("!");
+		printf("! ");
 
 	printf("--mark ");
 	print_mark(info->mark, info->mask);
