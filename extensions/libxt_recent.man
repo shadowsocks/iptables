@@ -67,7 +67,7 @@ Examples:
 Official website (http://snowman.net/projects/ipt_recent/) also has
 some examples of usage.
 
-/proc/net/ipt_recent/* are the current lists of addresses and information 
+/proc/net/ipt_recent/* are the current lists of addresses and information
 about each entry of each list.
 
 Each file in /proc/net/ipt_recent/ can be read from to see the current list
