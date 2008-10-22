@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <netinet/in.h>
 
 #include <xtables.h>
 #include <linux/netfilter/xt_DSCP.h>
