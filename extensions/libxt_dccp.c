@@ -12,6 +12,7 @@
 #include <netdb.h>
 #include <ctype.h>
 
+#include <netinet/in.h>
 #include <xtables.h>
 #include <linux/dccp.h>
 #include <linux/netfilter/x_tables.h>

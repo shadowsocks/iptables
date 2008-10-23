@@ -14,6 +14,7 @@
 #include <netdb.h>
 #include <ctype.h>
 
+#include <netinet/in.h>
 #include <xtables.h>
 
 #ifndef ARRAY_SIZE
