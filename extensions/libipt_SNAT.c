@@ -69,7 +69,7 @@ parse_to(char *arg, int portok, struct ipt_natinfo *info)
 
 		if (!portok)
 			exit_error(PARAMETER_PROBLEM,
-				   "Need TCP or UDP with port specification");
+				   "Need TCP, UDP, SCTP or DCCP with port specification");
 
 		range.flags |= IP_NAT_RANGE_PROTO_SPECIFIED;
 
@@ -142,6 +142,8 @@ static int SNAT_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	if (entry->ip.proto == IPPROTO_TCP
 	    || entry->ip.proto == IPPROTO_UDP
+	    || entry->ip.proto == IPPROTO_SCTP
+	    || entry->ip.proto == IPPROTO_DCCP
 	    || entry->ip.proto == IPPROTO_ICMP)
 		portok = 1;
 	else

@@ -84,6 +84,8 @@ static int REDIRECT_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	if (entry->ip.proto == IPPROTO_TCP
 	    || entry->ip.proto == IPPROTO_UDP
+	    || entry->ip.proto == IPPROTO_SCTP
+	    || entry->ip.proto == IPPROTO_DCCP
 	    || entry->ip.proto == IPPROTO_ICMP)
 		portok = 1;
 	else
@@ -93,7 +95,7 @@ static int REDIRECT_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 		if (!portok)
 			exit_error(PARAMETER_PROBLEM,
-				   "Need TCP or UDP with port specification");
+				   "Need TCP, UDP, SCTP or DCCP with port specification");
 
 		if (check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
