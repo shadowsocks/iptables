@@ -61,7 +61,7 @@ static int for_each_table(int (*func)(const char *tablename))
 
 static int do_output(const char *tablename)
 {
-	ip6tc_handle_t h;
+	struct ip6tc_handle *h;
 	const char *chain = NULL;
 
 	if (!tablename)

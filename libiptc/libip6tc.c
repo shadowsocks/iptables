@@ -46,7 +46,7 @@ typedef unsigned int socklen_t;
 #define STRUCT_REPLACE		struct ip6t_replace
 
 #define STRUCT_TC_HANDLE	struct ip6tc_handle
-#define TC_HANDLE_T		ip6tc_handle_t
+#define xtc_handle		ip6tc_handle
 
 #define ENTRY_ITERATE		IP6T_ENTRY_ITERATE
 #define TABLE_MAXNAMELEN	IP6T_TABLE_MAXNAMELEN
@@ -131,7 +131,7 @@ ipv6_prefix_length(const struct in6_addr *a)
 }
 
 static int
-dump_entry(struct ip6t_entry *e, const ip6tc_handle_t handle)
+dump_entry(struct ip6t_entry *e, struct ip6tc_handle *const handle)
 {
 	size_t i;
 	char buf[40];
@@ -261,7 +261,7 @@ unconditional(const struct ip6t_ip6 *ipv6)
 #ifdef IPTC_DEBUG
 /* Do every conceivable sanity check on the handle */
 static void
-do_check(TC_HANDLE_T h, unsigned int line)
+do_check(struct xtc_handle *h, unsigned int line)
 {
 	unsigned int i, n;
 	unsigned int user_offset; /* Offset of first user chain */

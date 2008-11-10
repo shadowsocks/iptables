@@ -17,15 +17,15 @@ extern int line;
 
 /* Your shared library should call one of these. */
 extern int do_command(int argc, char *argv[], char **table,
-		      iptc_handle_t *handle);
+		      struct iptc_handle **handle);
 extern int delete_chain(const ipt_chainlabel chain, int verbose,
-			iptc_handle_t *handle);
+			struct iptc_handle **handle);
 extern int flush_entries(const ipt_chainlabel chain, int verbose, 
-			iptc_handle_t *handle);
-extern int for_each_chain(int (*fn)(const ipt_chainlabel, int, iptc_handle_t *),
-		int verbose, int builtinstoo, iptc_handle_t *handle);
+			struct iptc_handle **handle);
+extern int for_each_chain(int (*fn)(const ipt_chainlabel, int, struct iptc_handle **),
+		int verbose, int builtinstoo, struct iptc_handle **handle);
 extern void print_rule(const struct ipt_entry *e,
-		iptc_handle_t *handle, const char *chain, int counters);
+		struct iptc_handle **handle, const char *chain, int counters);
 
 /* kernel revision handling */
 extern int kernel_version;

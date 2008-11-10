@@ -651,7 +651,7 @@ print_num(u_int64_t number, unsigned int format)
 
 
 static void
-print_header(unsigned int format, const char *chain, ip6tc_handle_t *handle)
+print_header(unsigned int format, const char *chain, struct ip6tc_handle **handle)
 {
 	struct ip6t_counters counters;
 	const char *pol = ip6tc_get_policy(chain, &counters, handle);
@@ -726,7 +726,7 @@ print_firewall(const struct ip6t_entry *fw,
 	       const char *targname,
 	       unsigned int num,
 	       unsigned int format,
-	       const ip6tc_handle_t handle)
+	       struct ip6tc_handle *const handle)
 {
 	struct xtables_target *target = NULL;
 	const struct ip6t_entry_target *t;
@@ -849,7 +849,7 @@ print_firewall(const struct ip6t_entry *fw,
 
 static void
 print_firewall_line(const struct ip6t_entry *fw,
-		    const ip6tc_handle_t h)
+		    struct ip6tc_handle *const h)
 {
 	struct ip6t_entry_target *t;
 
@@ -865,7 +865,7 @@ append_entry(const ip6t_chainlabel chain,
 	     unsigned int ndaddrs,
 	     const struct in6_addr daddrs[],
 	     int verbose,
-	     ip6tc_handle_t *handle)
+	     struct ip6tc_handle **handle)
 {
 	unsigned int i, j;
 	int ret = 1;
@@ -890,7 +890,7 @@ replace_entry(const ip6t_chainlabel chain,
 	      const struct in6_addr *saddr,
 	      const struct in6_addr *daddr,
 	      int verbose,
-	      ip6tc_handle_t *handle)
+	      struct ip6tc_handle **handle)
 {
 	fw->ipv6.src = *saddr;
 	fw->ipv6.dst = *daddr;
@@ -909,7 +909,7 @@ insert_entry(const ip6t_chainlabel chain,
 	     unsigned int ndaddrs,
 	     const struct in6_addr daddrs[],
 	     int verbose,
-	     ip6tc_handle_t *handle)
+	     struct ip6tc_handle **handle)
 {
 	unsigned int i, j;
 	int ret = 1;
@@ -968,7 +968,7 @@ delete_entry(const ip6t_chainlabel chain,
 	     unsigned int ndaddrs,
 	     const struct in6_addr daddrs[],
 	     int verbose,
-	     ip6tc_handle_t *handle,
+	     struct ip6tc_handle **handle,
 	     struct ip6tables_rule_match *matches)
 {
 	unsigned int i, j;
@@ -991,8 +991,8 @@ delete_entry(const ip6t_chainlabel chain,
 }
 
 int
-for_each_chain(int (*fn)(const ip6t_chainlabel, int, ip6tc_handle_t *),
-	       int verbose, int builtinstoo, ip6tc_handle_t *handle)
+for_each_chain(int (*fn)(const ip6t_chainlabel, int, struct ip6tc_handle **),
+	       int verbose, int builtinstoo, struct ip6tc_handle **handle)
 {
 	int ret = 1;
 	const char *chain;
@@ -1028,7 +1028,7 @@ for_each_chain(int (*fn)(const ip6t_chainlabel, int, ip6tc_handle_t *),
 
 int
 flush_entries(const ip6t_chainlabel chain, int verbose,
-	      ip6tc_handle_t *handle)
+	      struct ip6tc_handle **handle)
 {
 	if (!chain)
 		return for_each_chain(flush_entries, verbose, 1, handle);
@@ -1040,7 +1040,7 @@ flush_entries(const ip6t_chainlabel chain, int verbose,
 
 static int
 zero_entries(const ip6t_chainlabel chain, int verbose,
-	     ip6tc_handle_t *handle)
+	     struct ip6tc_handle **handle)
 {
 	if (!chain)
 		return for_each_chain(zero_entries, verbose, 1, handle);
@@ -1052,7 +1052,7 @@ zero_entries(const ip6t_chainlabel chain, int verbose,
 
 int
 delete_chain(const ip6t_chainlabel chain, int verbose,
-	     ip6tc_handle_t *handle)
+	     struct ip6tc_handle **handle)
 {
 	if (!chain)
 		return for_each_chain(delete_chain, verbose, 0, handle);
@@ -1064,7 +1064,7 @@ delete_chain(const ip6t_chainlabel chain, int verbose,
 
 static int
 list_entries(const ip6t_chainlabel chain, int rulenum, int verbose, int numeric,
-	     int expanded, int linenumbers, ip6tc_handle_t *handle)
+	     int expanded, int linenumbers, struct ip6tc_handle **handle)
 {
 	int found = 0;
 	unsigned int format;
@@ -1217,7 +1217,7 @@ static void print_ip(char *prefix, const struct in6_addr *ip, const struct in6_a
 /* We want this to be readable, so only print out neccessary fields.
  * Because that's the kind of world I want to live in.  */
 void print_rule(const struct ip6t_entry *e,
-		       ip6tc_handle_t *h, const char *chain, int counters)
+		       struct ip6tc_handle **h, const char *chain, int counters)
 {
 	struct ip6t_entry_target *t;
 	const char *target_name;
@@ -1307,7 +1307,7 @@ void print_rule(const struct ip6t_entry *e,
 
 static int
 list_rules(const ip6t_chainlabel chain, int rulenum, int counters,
-	     ip6tc_handle_t *handle)
+	     struct ip6tc_handle **handle)
 {
 	const char *this = NULL;
 	int found = 0;
@@ -1415,7 +1415,7 @@ static void set_revision(char *name, u_int8_t revision)
 	name[IP6T_FUNCTION_MAXNAMELEN - 1] = revision;
 }
 
-int do_command6(int argc, char *argv[], char **table, ip6tc_handle_t *handle)
+int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **handle)
 {
 	struct ip6t_entry fw, *e = NULL;
 	int invert = 0;

@@ -55,9 +55,9 @@ static void print_usage(const char *name, const char *version)
 	exit(1);
 }
 
-static iptc_handle_t create_handle(const char *tablename, const char *modprobe)
+static struct iptc_handle *create_handle(const char *tablename, const char *modprobe)
 {
-	iptc_handle_t handle;
+	struct iptc_handle *handle;
 
 	handle = iptc_init(tablename);
 
@@ -119,7 +119,7 @@ int
 main(int argc, char *argv[])
 #endif
 {
-	iptc_handle_t handle = NULL;
+	struct iptc_handle *handle = NULL;
 	char buffer[10240];
 	int c;
 	char curtable[IPT_TABLE_MAXNAMELEN + 1];

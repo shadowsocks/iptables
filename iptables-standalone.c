@@ -48,7 +48,7 @@ main(int argc, char *argv[])
 {
 	int ret;
 	char *table = "filter";
-	iptc_handle_t handle = NULL;
+	struct iptc_handle *handle = NULL;
 
 	program_name = "iptables";
 	program_version = XTABLES_VERSION;

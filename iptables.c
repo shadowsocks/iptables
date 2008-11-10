@@ -646,7 +646,7 @@ print_num(u_int64_t number, unsigned int format)
 
 
 static void
-print_header(unsigned int format, const char *chain, iptc_handle_t *handle)
+print_header(unsigned int format, const char *chain, struct iptc_handle **handle)
 {
 	struct ipt_counters counters;
 	const char *pol = iptc_get_policy(chain, &counters, handle);
@@ -721,7 +721,7 @@ print_firewall(const struct ipt_entry *fw,
 	       const char *targname,
 	       unsigned int num,
 	       unsigned int format,
-	       const iptc_handle_t handle)
+	       struct iptc_handle *const handle)
 {
 	struct xtables_target *target = NULL;
 	const struct ipt_entry_target *t;
@@ -842,7 +842,7 @@ print_firewall(const struct ipt_entry *fw,
 
 static void
 print_firewall_line(const struct ipt_entry *fw,
-		    const iptc_handle_t h)
+		    struct iptc_handle *const h)
 {
 	struct ipt_entry_target *t;
 
@@ -858,7 +858,7 @@ append_entry(const ipt_chainlabel chain,
 	     unsigned int ndaddrs,
 	     const struct in_addr daddrs[],
 	     int verbose,
-	     iptc_handle_t *handle)
+	     struct iptc_handle **handle)
 {
 	unsigned int i, j;
 	int ret = 1;
@@ -883,7 +883,7 @@ replace_entry(const ipt_chainlabel chain,
 	      const struct in_addr *saddr,
 	      const struct in_addr *daddr,
 	      int verbose,
-	      iptc_handle_t *handle)
+	      struct iptc_handle **handle)
 {
 	fw->ip.src.s_addr = saddr->s_addr;
 	fw->ip.dst.s_addr = daddr->s_addr;
@@ -902,7 +902,7 @@ insert_entry(const ipt_chainlabel chain,
 	     unsigned int ndaddrs,
 	     const struct in_addr daddrs[],
 	     int verbose,
-	     iptc_handle_t *handle)
+	     struct iptc_handle **handle)
 {
 	unsigned int i, j;
 	int ret = 1;
@@ -961,7 +961,7 @@ delete_entry(const ipt_chainlabel chain,
 	     unsigned int ndaddrs,
 	     const struct in_addr daddrs[],
 	     int verbose,
-	     iptc_handle_t *handle,
+	     struct iptc_handle **handle,
 	     struct iptables_rule_match *matches)
 {
 	unsigned int i, j;
@@ -984,8 +984,8 @@ delete_entry(const ipt_chainlabel chain,
 }
 
 int
-for_each_chain(int (*fn)(const ipt_chainlabel, int, iptc_handle_t *),
-	       int verbose, int builtinstoo, iptc_handle_t *handle)
+for_each_chain(int (*fn)(const ipt_chainlabel, int, struct iptc_handle **),
+	       int verbose, int builtinstoo, struct iptc_handle **handle)
 {
         int ret = 1;
 	const char *chain;
@@ -1021,7 +1021,7 @@ for_each_chain(int (*fn)(const ipt_chainlabel, int, iptc_handle_t *),
 
 int
 flush_entries(const ipt_chainlabel chain, int verbose,
-	      iptc_handle_t *handle)
+	      struct iptc_handle **handle)
 {
 	if (!chain)
 		return for_each_chain(flush_entries, verbose, 1, handle);
@@ -1033,7 +1033,7 @@ flush_entries(const ipt_chainlabel chain, int verbose,
 
 static int
 zero_entries(const ipt_chainlabel chain, int verbose,
-	     iptc_handle_t *handle)
+	     struct iptc_handle **handle)
 {
 	if (!chain)
 		return for_each_chain(zero_entries, verbose, 1, handle);
@@ -1045,7 +1045,7 @@ zero_entries(const ipt_chainlabel chain, int verbose,
 
 int
 delete_chain(const ipt_chainlabel chain, int verbose,
-	     iptc_handle_t *handle)
+	     struct iptc_handle **handle)
 {
 	if (!chain)
 		return for_each_chain(delete_chain, verbose, 0, handle);
@@ -1057,7 +1057,7 @@ delete_chain(const ipt_chainlabel chain, int verbose,
 
 static int
 list_entries(const ipt_chainlabel chain, int rulenum, int verbose, int numeric,
-	     int expanded, int linenumbers, iptc_handle_t *handle)
+	     int expanded, int linenumbers, struct iptc_handle **handle)
 {
 	int found = 0;
 	unsigned int format;
@@ -1225,7 +1225,7 @@ static void print_ip(char *prefix, u_int32_t ip, u_int32_t mask, int invert)
 /* We want this to be readable, so only print out neccessary fields.
  * Because that's the kind of world I want to live in.  */
 void print_rule(const struct ipt_entry *e,
-		iptc_handle_t *h, const char *chain, int counters)
+		struct iptc_handle **h, const char *chain, int counters)
 {
 	struct ipt_entry_target *t;
 	const char *target_name;
@@ -1306,7 +1306,7 @@ void print_rule(const struct ipt_entry *e,
 
 static int
 list_rules(const ipt_chainlabel chain, int rulenum, int counters,
-	     iptc_handle_t *handle)
+	     struct iptc_handle **handle)
 {
 	const char *this = NULL;
 	int found = 0;
@@ -1429,7 +1429,7 @@ get_kernel_version(void) {
 	kernel_version = LINUX_VERSION(x, y, z);
 }
 
-int do_command(int argc, char *argv[], char **table, iptc_handle_t *handle)
+int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle)
 {
 	struct ipt_entry fw, *e = NULL;
 	int invert = 0;
