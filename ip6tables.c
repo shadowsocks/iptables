@@ -651,7 +651,7 @@ print_num(u_int64_t number, unsigned int format)
 
 
 static void
-print_header(unsigned int format, const char *chain, struct ip6tc_handle **handle)
+print_header(unsigned int format, const char *chain, struct ip6tc_handle *handle)
 {
 	struct ip6t_counters counters;
 	const char *pol = ip6tc_get_policy(chain, &counters, handle);
@@ -865,7 +865,7 @@ append_entry(const ip6t_chainlabel chain,
 	     unsigned int ndaddrs,
 	     const struct in6_addr daddrs[],
 	     int verbose,
-	     struct ip6tc_handle **handle)
+	     struct ip6tc_handle *handle)
 {
 	unsigned int i, j;
 	int ret = 1;
@@ -875,7 +875,7 @@ append_entry(const ip6t_chainlabel chain,
 		for (j = 0; j < ndaddrs; j++) {
 			fw->ipv6.dst = daddrs[j];
 			if (verbose)
-				print_firewall_line(fw, *handle);
+				print_firewall_line(fw, handle);
 			ret &= ip6tc_append_entry(chain, fw, handle);
 		}
 	}
@@ -890,13 +890,13 @@ replace_entry(const ip6t_chainlabel chain,
 	      const struct in6_addr *saddr,
 	      const struct in6_addr *daddr,
 	      int verbose,
-	      struct ip6tc_handle **handle)
+	      struct ip6tc_handle *handle)
 {
 	fw->ipv6.src = *saddr;
 	fw->ipv6.dst = *daddr;
 
 	if (verbose)
-		print_firewall_line(fw, *handle);
+		print_firewall_line(fw, handle);
 	return ip6tc_replace_entry(chain, fw, rulenum, handle);
 }
 
@@ -909,7 +909,7 @@ insert_entry(const ip6t_chainlabel chain,
 	     unsigned int ndaddrs,
 	     const struct in6_addr daddrs[],
 	     int verbose,
-	     struct ip6tc_handle **handle)
+	     struct ip6tc_handle *handle)
 {
 	unsigned int i, j;
 	int ret = 1;
@@ -919,7 +919,7 @@ insert_entry(const ip6t_chainlabel chain,
 		for (j = 0; j < ndaddrs; j++) {
 			fw->ipv6.dst = daddrs[j];
 			if (verbose)
-				print_firewall_line(fw, *handle);
+				print_firewall_line(fw, handle);
 			ret &= ip6tc_insert_entry(chain, fw, rulenum, handle);
 		}
 	}
@@ -968,7 +968,7 @@ delete_entry(const ip6t_chainlabel chain,
 	     unsigned int ndaddrs,
 	     const struct in6_addr daddrs[],
 	     int verbose,
-	     struct ip6tc_handle **handle,
+	     struct ip6tc_handle *handle,
 	     struct ip6tables_rule_match *matches)
 {
 	unsigned int i, j;
@@ -981,7 +981,7 @@ delete_entry(const ip6t_chainlabel chain,
 		for (j = 0; j < ndaddrs; j++) {
 			fw->ipv6.dst = daddrs[j];
 			if (verbose)
-				print_firewall_line(fw, *handle);
+				print_firewall_line(fw, handle);
 			ret &= ip6tc_delete_entry(chain, fw, mask, handle);
 		}
 	}
@@ -991,8 +991,8 @@ delete_entry(const ip6t_chainlabel chain,
 }
 
 int
-for_each_chain(int (*fn)(const ip6t_chainlabel, int, struct ip6tc_handle **),
-	       int verbose, int builtinstoo, struct ip6tc_handle **handle)
+for_each_chain(int (*fn)(const ip6t_chainlabel, int, struct ip6tc_handle *),
+	       int verbose, int builtinstoo, struct ip6tc_handle *handle)
 {
 	int ret = 1;
 	const char *chain;
@@ -1017,7 +1017,7 @@ for_each_chain(int (*fn)(const ip6t_chainlabel, int, struct ip6tc_handle **),
 	for (i = 0; i < chaincount; i++) {
 		if (!builtinstoo
 		    && ip6tc_builtin(chains + i*sizeof(ip6t_chainlabel),
-				    *handle) == 1)
+				    handle) == 1)
 			continue;
 		ret &= fn(chains + i*sizeof(ip6t_chainlabel), verbose, handle);
 	}
@@ -1028,7 +1028,7 @@ for_each_chain(int (*fn)(const ip6t_chainlabel, int, struct ip6tc_handle **),
 
 int
 flush_entries(const ip6t_chainlabel chain, int verbose,
-	      struct ip6tc_handle **handle)
+	      struct ip6tc_handle *handle)
 {
 	if (!chain)
 		return for_each_chain(flush_entries, verbose, 1, handle);
@@ -1040,7 +1040,7 @@ flush_entries(const ip6t_chainlabel chain, int verbose,
 
 static int
 zero_entries(const ip6t_chainlabel chain, int verbose,
-	     struct ip6tc_handle **handle)
+	     struct ip6tc_handle *handle)
 {
 	if (!chain)
 		return for_each_chain(zero_entries, verbose, 1, handle);
@@ -1052,7 +1052,7 @@ zero_entries(const ip6t_chainlabel chain, int verbose,
 
 int
 delete_chain(const ip6t_chainlabel chain, int verbose,
-	     struct ip6tc_handle **handle)
+	     struct ip6tc_handle *handle)
 {
 	if (!chain)
 		return for_each_chain(delete_chain, verbose, 0, handle);
@@ -1064,7 +1064,7 @@ delete_chain(const ip6t_chainlabel chain, int verbose,
 
 static int
 list_entries(const ip6t_chainlabel chain, int rulenum, int verbose, int numeric,
-	     int expanded, int linenumbers, struct ip6tc_handle **handle)
+	     int expanded, int linenumbers, struct ip6tc_handle *handle)
 {
 	int found = 0;
 	unsigned int format;
@@ -1108,7 +1108,7 @@ list_entries(const ip6t_chainlabel chain, int rulenum, int verbose, int numeric,
 					       ip6tc_get_target(i, handle),
 					       num,
 					       format,
-					       *handle);
+					       handle);
 			i = ip6tc_next_rule(i, handle);
 		}
 		found = 1;
@@ -1217,7 +1217,7 @@ static void print_ip(char *prefix, const struct in6_addr *ip, const struct in6_a
 /* We want this to be readable, so only print out neccessary fields.
  * Because that's the kind of world I want to live in.  */
 void print_rule(const struct ip6t_entry *e,
-		       struct ip6tc_handle **h, const char *chain, int counters)
+		       struct ip6tc_handle *h, const char *chain, int counters)
 {
 	struct ip6t_entry_target *t;
 	const char *target_name;
@@ -1307,7 +1307,7 @@ void print_rule(const struct ip6t_entry *e,
 
 static int
 list_rules(const ip6t_chainlabel chain, int rulenum, int counters,
-	     struct ip6tc_handle **handle)
+	     struct ip6tc_handle *handle)
 {
 	const char *this = NULL;
 	int found = 0;
@@ -1323,7 +1323,7 @@ list_rules(const ip6t_chainlabel chain, int rulenum, int counters,
 		if (chain && strcmp(this, chain) != 0)
 			continue;
 
-		if (ip6tc_builtin(this, *handle)) {
+		if (ip6tc_builtin(this, handle)) {
 			struct ip6t_counters count;
 			printf("-P %s %s", this, ip6tc_get_policy(this, &count, handle));
 			if (counters)
@@ -2034,33 +2034,33 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		ret = append_entry(chain, e,
 				   nsaddrs, saddrs, ndaddrs, daddrs,
 				   options&OPT_VERBOSE,
-				   handle);
+				   *handle);
 		break;
 	case CMD_DELETE:
 		ret = delete_entry(chain, e,
 				   nsaddrs, saddrs, ndaddrs, daddrs,
 				   options&OPT_VERBOSE,
-				   handle, matches);
+				   *handle, matches);
 		break;
 	case CMD_DELETE_NUM:
-		ret = ip6tc_delete_num_entry(chain, rulenum - 1, handle);
+		ret = ip6tc_delete_num_entry(chain, rulenum - 1, *handle);
 		break;
 	case CMD_REPLACE:
 		ret = replace_entry(chain, e, rulenum - 1,
 				    saddrs, daddrs, options&OPT_VERBOSE,
-				    handle);
+				    *handle);
 		break;
 	case CMD_INSERT:
 		ret = insert_entry(chain, e, rulenum - 1,
 				   nsaddrs, saddrs, ndaddrs, daddrs,
 				   options&OPT_VERBOSE,
-				   handle);
+				   *handle);
 		break;
 	case CMD_FLUSH:
-		ret = flush_entries(chain, options&OPT_VERBOSE, handle);
+		ret = flush_entries(chain, options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_ZERO:
-		ret = zero_entries(chain, options&OPT_VERBOSE, handle);
+		ret = zero_entries(chain, options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_LIST:
 	case CMD_LIST|CMD_ZERO:
@@ -2070,32 +2070,32 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				   options&OPT_NUMERIC,
 				   options&OPT_EXPANDED,
 				   options&OPT_LINENUMBERS,
-				   handle);
+				   *handle);
 		if (ret && (command & CMD_ZERO))
 			ret = zero_entries(chain,
-					   options&OPT_VERBOSE, handle);
+					   options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_LIST_RULES:
 	case CMD_LIST_RULES|CMD_ZERO:
 		ret = list_rules(chain,
 				   rulenum,
 				   options&OPT_VERBOSE,
-				   handle);
+				   *handle);
 		if (ret && (command & CMD_ZERO))
 			ret = zero_entries(chain,
-					   options&OPT_VERBOSE, handle);
+					   options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_NEW_CHAIN:
-		ret = ip6tc_create_chain(chain, handle);
+		ret = ip6tc_create_chain(chain, *handle);
 		break;
 	case CMD_DELETE_CHAIN:
-		ret = delete_chain(chain, options&OPT_VERBOSE, handle);
+		ret = delete_chain(chain, options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_RENAME_CHAIN:
-		ret = ip6tc_rename_chain(chain, newname,	handle);
+		ret = ip6tc_rename_chain(chain, newname,	*handle);
 		break;
 	case CMD_SET_POLICY:
-		ret = ip6tc_set_policy(chain, policy, options&OPT_COUNTERS ? &fw.counters : NULL, handle);
+		ret = ip6tc_set_policy(chain, policy, options&OPT_COUNTERS ? &fw.counters : NULL, *handle);
 		break;
 	default:
 		/* We should never reach this... */

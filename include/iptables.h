@@ -19,13 +19,13 @@ extern int line;
 extern int do_command(int argc, char *argv[], char **table,
 		      struct iptc_handle **handle);
 extern int delete_chain(const ipt_chainlabel chain, int verbose,
-			struct iptc_handle **handle);
+			struct iptc_handle *handle);
 extern int flush_entries(const ipt_chainlabel chain, int verbose, 
-			struct iptc_handle **handle);
-extern int for_each_chain(int (*fn)(const ipt_chainlabel, int, struct iptc_handle **),
-		int verbose, int builtinstoo, struct iptc_handle **handle);
+			struct iptc_handle *handle);
+extern int for_each_chain(int (*fn)(const ipt_chainlabel, int, struct iptc_handle *),
+		int verbose, int builtinstoo, struct iptc_handle *handle);
 extern void print_rule(const struct ipt_entry *e,
-		struct iptc_handle **handle, const char *chain, int counters);
+		struct iptc_handle *handle, const char *chain, int counters);
 
 /* kernel revision handling */
 extern int kernel_version;

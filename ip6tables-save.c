@@ -81,15 +81,15 @@ static int do_output(const char *tablename)
 
 		/* Dump out chain names first,
 		 * thereby preventing dependency conflicts */
-		for (chain = ip6tc_first_chain(&h);
+		for (chain = ip6tc_first_chain(h);
 		     chain;
-		     chain = ip6tc_next_chain(&h)) {
+		     chain = ip6tc_next_chain(h)) {
 
 			printf(":%s ", chain);
 			if (ip6tc_builtin(chain, h)) {
 				struct ip6t_counters count;
 				printf("%s ",
-				       ip6tc_get_policy(chain, &count, &h));
+				       ip6tc_get_policy(chain, &count, h));
 				printf("[%llu:%llu]\n", (unsigned long long)count.pcnt, (unsigned long long)count.bcnt);
 			} else {
 				printf("- [0:0]\n");
@@ -97,16 +97,16 @@ static int do_output(const char *tablename)
 		}
 
 
-		for (chain = ip6tc_first_chain(&h);
+		for (chain = ip6tc_first_chain(h);
 		     chain;
-		     chain = ip6tc_next_chain(&h)) {
+		     chain = ip6tc_next_chain(h)) {
 			const struct ip6t_entry *e;
 
 			/* Dump out rules */
-			e = ip6tc_first_rule(chain, &h);
+			e = ip6tc_first_rule(chain, h);
 			while(e) {
-				print_rule(e, &h, chain, show_counters);
-				e = ip6tc_next_rule(e, &h);
+				print_rule(e, h, chain, show_counters);
+				e = ip6tc_next_rule(e, h);
 			}
 		}
 
@@ -118,7 +118,7 @@ static int do_output(const char *tablename)
 		exit_error(OTHER_PROBLEM, "Binary NYI\n");
 	}
 
-	ip6tc_free(&h);
+	ip6tc_free(h);
 
 	return 1;
 }

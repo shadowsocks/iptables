@@ -199,7 +199,9 @@ int main(int argc, char *argv[])
 		} else if ((strcmp(buffer, "COMMIT\n") == 0) && (in_table)) {
 			if (!testing) {
 				DEBUGP("Calling commit\n");
-				ret = ip6tc_commit(&handle);
+				ret = ip6tc_commit(handle);
+				ip6tc_free(handle);
+				handle = NULL;
 			} else {
 				DEBUGP("Not calling commit, testing\n");
 				ret = 1;
@@ -221,19 +223,19 @@ int main(int argc, char *argv[])
 			curtable[IP6T_TABLE_MAXNAMELEN] = '\0';
 
 			if (handle)
-				ip6tc_free(&handle);
+				ip6tc_free(handle);
 
 			handle = create_handle(table, modprobe);
 			if (noflush == 0) {
 				DEBUGP("Cleaning all chains of table '%s'\n",
 					table);
 				for_each_chain(flush_entries, verbose, 1,
-						&handle);
+						handle);
 
 				DEBUGP("Deleting all user-defined chains "
 				       "of table '%s'\n", table);
 				for_each_chain(delete_chain, verbose, 0,
-						&handle) ;
+						handle);
 			}
 
 			ret = 1;
@@ -255,14 +257,14 @@ int main(int argc, char *argv[])
 			if (ip6tc_builtin(chain, handle) <= 0) {
 				if (noflush && ip6tc_is_chain(chain, handle)) {
 					DEBUGP("Flushing existing user defined chain '%s'\n", chain);
-					if (!ip6tc_flush_entries(chain, &handle))
+					if (!ip6tc_flush_entries(chain, handle))
 						exit_error(PARAMETER_PROBLEM,
 							   "error flushing chain "
 							   "'%s':%s\n", chain,
 							   strerror(errno));
 				} else {
 					DEBUGP("Creating new chain '%s'\n", chain);
-					if (!ip6tc_create_chain(chain, &handle))
+					if (!ip6tc_create_chain(chain, handle))
 						exit_error(PARAMETER_PROBLEM,
 							   "error creating chain "
 							   "'%s':%s\n", chain,
@@ -300,7 +302,7 @@ int main(int argc, char *argv[])
 					chain, policy);
 
 				if (!ip6tc_set_policy(chain, policy, &count,
-						     &handle))
+						     handle))
 					exit_error(OTHER_PROBLEM,
 						"Can't set policy `%s'"
 						" on `%s' line %u: %s\n",

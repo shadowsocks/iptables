@@ -646,7 +646,7 @@ print_num(u_int64_t number, unsigned int format)
 
 
 static void
-print_header(unsigned int format, const char *chain, struct iptc_handle **handle)
+print_header(unsigned int format, const char *chain, struct iptc_handle *handle)
 {
 	struct ipt_counters counters;
 	const char *pol = iptc_get_policy(chain, &counters, handle);
@@ -858,7 +858,7 @@ append_entry(const ipt_chainlabel chain,
 	     unsigned int ndaddrs,
 	     const struct in_addr daddrs[],
 	     int verbose,
-	     struct iptc_handle **handle)
+	     struct iptc_handle *handle)
 {
 	unsigned int i, j;
 	int ret = 1;
@@ -868,7 +868,7 @@ append_entry(const ipt_chainlabel chain,
 		for (j = 0; j < ndaddrs; j++) {
 			fw->ip.dst.s_addr = daddrs[j].s_addr;
 			if (verbose)
-				print_firewall_line(fw, *handle);
+				print_firewall_line(fw, handle);
 			ret &= iptc_append_entry(chain, fw, handle);
 		}
 	}
@@ -883,13 +883,13 @@ replace_entry(const ipt_chainlabel chain,
 	      const struct in_addr *saddr,
 	      const struct in_addr *daddr,
 	      int verbose,
-	      struct iptc_handle **handle)
+	      struct iptc_handle *handle)
 {
 	fw->ip.src.s_addr = saddr->s_addr;
 	fw->ip.dst.s_addr = daddr->s_addr;
 
 	if (verbose)
-		print_firewall_line(fw, *handle);
+		print_firewall_line(fw, handle);
 	return iptc_replace_entry(chain, fw, rulenum, handle);
 }
 
@@ -902,7 +902,7 @@ insert_entry(const ipt_chainlabel chain,
 	     unsigned int ndaddrs,
 	     const struct in_addr daddrs[],
 	     int verbose,
-	     struct iptc_handle **handle)
+	     struct iptc_handle *handle)
 {
 	unsigned int i, j;
 	int ret = 1;
@@ -912,7 +912,7 @@ insert_entry(const ipt_chainlabel chain,
 		for (j = 0; j < ndaddrs; j++) {
 			fw->ip.dst.s_addr = daddrs[j].s_addr;
 			if (verbose)
-				print_firewall_line(fw, *handle);
+				print_firewall_line(fw, handle);
 			ret &= iptc_insert_entry(chain, fw, rulenum, handle);
 		}
 	}
@@ -961,7 +961,7 @@ delete_entry(const ipt_chainlabel chain,
 	     unsigned int ndaddrs,
 	     const struct in_addr daddrs[],
 	     int verbose,
-	     struct iptc_handle **handle,
+	     struct iptc_handle *handle,
 	     struct iptables_rule_match *matches)
 {
 	unsigned int i, j;
@@ -974,7 +974,7 @@ delete_entry(const ipt_chainlabel chain,
 		for (j = 0; j < ndaddrs; j++) {
 			fw->ip.dst.s_addr = daddrs[j].s_addr;
 			if (verbose)
-				print_firewall_line(fw, *handle);
+				print_firewall_line(fw, handle);
 			ret &= iptc_delete_entry(chain, fw, mask, handle);
 		}
 	}
@@ -984,8 +984,8 @@ delete_entry(const ipt_chainlabel chain,
 }
 
 int
-for_each_chain(int (*fn)(const ipt_chainlabel, int, struct iptc_handle **),
-	       int verbose, int builtinstoo, struct iptc_handle **handle)
+for_each_chain(int (*fn)(const ipt_chainlabel, int, struct iptc_handle *),
+	       int verbose, int builtinstoo, struct iptc_handle *handle)
 {
         int ret = 1;
 	const char *chain;
@@ -1010,7 +1010,7 @@ for_each_chain(int (*fn)(const ipt_chainlabel, int, struct iptc_handle **),
 	for (i = 0; i < chaincount; i++) {
 		if (!builtinstoo
 		    && iptc_builtin(chains + i*sizeof(ipt_chainlabel),
-				    *handle) == 1)
+				    handle) == 1)
 			continue;
 	        ret &= fn(chains + i*sizeof(ipt_chainlabel), verbose, handle);
 	}
@@ -1021,7 +1021,7 @@ for_each_chain(int (*fn)(const ipt_chainlabel, int, struct iptc_handle **),
 
 int
 flush_entries(const ipt_chainlabel chain, int verbose,
-	      struct iptc_handle **handle)
+	      struct iptc_handle *handle)
 {
 	if (!chain)
 		return for_each_chain(flush_entries, verbose, 1, handle);
@@ -1033,7 +1033,7 @@ flush_entries(const ipt_chainlabel chain, int verbose,
 
 static int
 zero_entries(const ipt_chainlabel chain, int verbose,
-	     struct iptc_handle **handle)
+	     struct iptc_handle *handle)
 {
 	if (!chain)
 		return for_each_chain(zero_entries, verbose, 1, handle);
@@ -1045,7 +1045,7 @@ zero_entries(const ipt_chainlabel chain, int verbose,
 
 int
 delete_chain(const ipt_chainlabel chain, int verbose,
-	     struct iptc_handle **handle)
+	     struct iptc_handle *handle)
 {
 	if (!chain)
 		return for_each_chain(delete_chain, verbose, 0, handle);
@@ -1057,7 +1057,7 @@ delete_chain(const ipt_chainlabel chain, int verbose,
 
 static int
 list_entries(const ipt_chainlabel chain, int rulenum, int verbose, int numeric,
-	     int expanded, int linenumbers, struct iptc_handle **handle)
+	     int expanded, int linenumbers, struct iptc_handle *handle)
 {
 	int found = 0;
 	unsigned int format;
@@ -1101,7 +1101,7 @@ list_entries(const ipt_chainlabel chain, int rulenum, int verbose, int numeric,
 					       iptc_get_target(i, handle),
 					       num,
 					       format,
-					       *handle);
+					       handle);
 			i = iptc_next_rule(i, handle);
 		}
 		found = 1;
@@ -1225,7 +1225,7 @@ static void print_ip(char *prefix, u_int32_t ip, u_int32_t mask, int invert)
 /* We want this to be readable, so only print out neccessary fields.
  * Because that's the kind of world I want to live in.  */
 void print_rule(const struct ipt_entry *e,
-		struct iptc_handle **h, const char *chain, int counters)
+		struct iptc_handle *h, const char *chain, int counters)
 {
 	struct ipt_entry_target *t;
 	const char *target_name;
@@ -1306,7 +1306,7 @@ void print_rule(const struct ipt_entry *e,
 
 static int
 list_rules(const ipt_chainlabel chain, int rulenum, int counters,
-	     struct iptc_handle **handle)
+	     struct iptc_handle *handle)
 {
 	const char *this = NULL;
 	int found = 0;
@@ -1322,7 +1322,7 @@ list_rules(const ipt_chainlabel chain, int rulenum, int counters,
 		if (chain && strcmp(this, chain) != 0)
 			continue;
 
-		if (iptc_builtin(this, *handle)) {
+		if (iptc_builtin(this, handle)) {
 			struct ipt_counters count;
 			printf("-P %s %s", this, iptc_get_policy(this, &count, handle));
 			if (counters)
@@ -2066,33 +2066,33 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 		ret = append_entry(chain, e,
 				   nsaddrs, saddrs, ndaddrs, daddrs,
 				   options&OPT_VERBOSE,
-				   handle);
+				   *handle);
 		break;
 	case CMD_DELETE:
 		ret = delete_entry(chain, e,
 				   nsaddrs, saddrs, ndaddrs, daddrs,
 				   options&OPT_VERBOSE,
-				   handle, matches);
+				   *handle, matches);
 		break;
 	case CMD_DELETE_NUM:
-		ret = iptc_delete_num_entry(chain, rulenum - 1, handle);
+		ret = iptc_delete_num_entry(chain, rulenum - 1, *handle);
 		break;
 	case CMD_REPLACE:
 		ret = replace_entry(chain, e, rulenum - 1,
 				    saddrs, daddrs, options&OPT_VERBOSE,
-				    handle);
+				    *handle);
 		break;
 	case CMD_INSERT:
 		ret = insert_entry(chain, e, rulenum - 1,
 				   nsaddrs, saddrs, ndaddrs, daddrs,
 				   options&OPT_VERBOSE,
-				   handle);
+				   *handle);
 		break;
 	case CMD_FLUSH:
-		ret = flush_entries(chain, options&OPT_VERBOSE, handle);
+		ret = flush_entries(chain, options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_ZERO:
-		ret = zero_entries(chain, options&OPT_VERBOSE, handle);
+		ret = zero_entries(chain, options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_LIST:
 	case CMD_LIST|CMD_ZERO:
@@ -2102,32 +2102,32 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 				   options&OPT_NUMERIC,
 				   options&OPT_EXPANDED,
 				   options&OPT_LINENUMBERS,
-				   handle);
+				   *handle);
 		if (ret && (command & CMD_ZERO))
 			ret = zero_entries(chain,
-					   options&OPT_VERBOSE, handle);
+					   options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_LIST_RULES:
 	case CMD_LIST_RULES|CMD_ZERO:
 		ret = list_rules(chain,
 				   rulenum,
 				   options&OPT_VERBOSE,
-				   handle);
+				   *handle);
 		if (ret && (command & CMD_ZERO))
 			ret = zero_entries(chain,
-					   options&OPT_VERBOSE, handle);
+					   options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_NEW_CHAIN:
-		ret = iptc_create_chain(chain, handle);
+		ret = iptc_create_chain(chain, *handle);
 		break;
 	case CMD_DELETE_CHAIN:
-		ret = delete_chain(chain, options&OPT_VERBOSE, handle);
+		ret = delete_chain(chain, options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_RENAME_CHAIN:
-		ret = iptc_rename_chain(chain, newname,	handle);
+		ret = iptc_rename_chain(chain, newname,	*handle);
 		break;
 	case CMD_SET_POLICY:
-		ret = iptc_set_policy(chain, policy, options&OPT_COUNTERS ? &fw.counters : NULL, handle);
+		ret = iptc_set_policy(chain, policy, options&OPT_COUNTERS ? &fw.counters : NULL, *handle);
 		break;
 	default:
 		/* We should never reach this... */

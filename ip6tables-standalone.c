@@ -66,8 +66,10 @@ main(int argc, char *argv[])
 #endif
 
 	ret = do_command6(argc, argv, &table, &handle);
-	if (ret)
-		ret = ip6tc_commit(&handle);
+	if (ret) {
+		ret = ip6tc_commit(handle);
+		ip6tc_free(handle);
+	}
 
 	if (!ret)
 		fprintf(stderr, "ip6tables: %s\n",

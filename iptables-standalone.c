@@ -67,8 +67,10 @@ main(int argc, char *argv[])
 #endif
 
 	ret = do_command(argc, argv, &table, &handle);
-	if (ret)
-		ret = iptc_commit(&handle);
+	if (ret) {
+		ret = iptc_commit(handle);
+		iptc_free(handle);
+	}
 
 	if (!ret) {
 		fprintf(stderr, "iptables: %s\n",

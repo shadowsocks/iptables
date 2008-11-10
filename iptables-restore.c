@@ -203,7 +203,9 @@ main(int argc, char *argv[])
 		} else if ((strcmp(buffer, "COMMIT\n") == 0) && (in_table)) {
 			if (!testing) {
 				DEBUGP("Calling commit\n");
-				ret = iptc_commit(&handle);
+				ret = iptc_commit(handle);
+				iptc_free(handle);
+				handle = NULL;
 			} else {
 				DEBUGP("Not calling commit, testing\n");
 				ret = 1;
@@ -227,19 +229,19 @@ main(int argc, char *argv[])
 			if (tablename && (strcmp(tablename, table) != 0))
 				continue;
 			if (handle)
-				iptc_free(&handle);
+				iptc_free(handle);
 
 			handle = create_handle(table, modprobe);
 			if (noflush == 0) {
 				DEBUGP("Cleaning all chains of table '%s'\n",
 					table);
 				for_each_chain(flush_entries, verbose, 1,
-						&handle);
+						handle);
 
 				DEBUGP("Deleting all user-defined chains "
 				       "of table '%s'\n", table);
 				for_each_chain(delete_chain, verbose, 0,
-						&handle) ;
+						handle);
 			}
 
 			ret = 1;
@@ -261,14 +263,14 @@ main(int argc, char *argv[])
 			if (iptc_builtin(chain, handle) <= 0) {
 				if (noflush && iptc_is_chain(chain, handle)) {
 					DEBUGP("Flushing existing user defined chain '%s'\n", chain);
-					if (!iptc_flush_entries(chain, &handle))
+					if (!iptc_flush_entries(chain, handle))
 						exit_error(PARAMETER_PROBLEM,
 							   "error flushing chain "
 							   "'%s':%s\n", chain,
 							   strerror(errno));
 				} else {
 					DEBUGP("Creating new chain '%s'\n", chain);
-					if (!iptc_create_chain(chain, &handle))
+					if (!iptc_create_chain(chain, handle))
 						exit_error(PARAMETER_PROBLEM,
 							   "error creating chain "
 							   "'%s':%s\n", chain,
@@ -306,7 +308,7 @@ main(int argc, char *argv[])
 					chain, policy);
 
 				if (!iptc_set_policy(chain, policy, &count,
-						     &handle))
+						     handle))
 					exit_error(OTHER_PROBLEM,
 						"Can't set policy `%s'"
 						" on `%s' line %u: %s\n",

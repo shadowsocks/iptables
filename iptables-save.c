@@ -79,15 +79,15 @@ static int do_output(const char *tablename)
 
 		/* Dump out chain names first,
 		 * thereby preventing dependency conflicts */
-		for (chain = iptc_first_chain(&h);
+		for (chain = iptc_first_chain(h);
 		     chain;
-		     chain = iptc_next_chain(&h)) {
+		     chain = iptc_next_chain(h)) {
 
 			printf(":%s ", chain);
 			if (iptc_builtin(chain, h)) {
 				struct ipt_counters count;
 				printf("%s ",
-				       iptc_get_policy(chain, &count, &h));
+				       iptc_get_policy(chain, &count, h));
 				printf("[%llu:%llu]\n", (unsigned long long)count.pcnt, (unsigned long long)count.bcnt);
 			} else {
 				printf("- [0:0]\n");
@@ -95,16 +95,16 @@ static int do_output(const char *tablename)
 		}
 
 
-		for (chain = iptc_first_chain(&h);
+		for (chain = iptc_first_chain(h);
 		     chain;
-		     chain = iptc_next_chain(&h)) {
+		     chain = iptc_next_chain(h)) {
 			const struct ipt_entry *e;
 
 			/* Dump out rules */
-			e = iptc_first_rule(chain, &h);
+			e = iptc_first_rule(chain, h);
 			while(e) {
-				print_rule(e, &h, chain, show_counters);
-				e = iptc_next_rule(e, &h);
+				print_rule(e, h, chain, show_counters);
+				e = iptc_next_rule(e, h);
 			}
 		}
 
@@ -116,7 +116,7 @@ static int do_output(const char *tablename)
 		exit_error(OTHER_PROBLEM, "Binary NYI\n");
 	}
 
-	iptc_free(&h);
+	iptc_free(h);
 
 	return 1;
 }
