@@ -47,8 +47,6 @@
 #define debug(x, args...)
 #endif
 
-static int sockfd = -1;
-static int sockfd_use = 0;
 static void *iptc_fn = NULL;
 
 static const char *hooknames[] = {
@@ -128,6 +126,7 @@ struct chain_head
 
 STRUCT_TC_HANDLE
 {
+	int sockfd;
 	int changed;			 /* Have changes been made? */
 
 	struct list_head chains;
@@ -1309,6 +1308,7 @@ TC_INIT(const char *tablename)
 	STRUCT_GETINFO info;
 	unsigned int tmp;
 	socklen_t s;
+	int sockfd;
 
 	iptc_fn = TC_INIT;
 
@@ -1316,22 +1316,17 @@ TC_INIT(const char *tablename)
 		errno = EINVAL;
 		return NULL;
 	}
-	
-	if (sockfd_use == 0) {
-		sockfd = socket(TC_AF, SOCK_RAW, IPPROTO_RAW);
-		if (sockfd < 0)
-			return NULL;
-	}
-	sockfd_use++;
+
+	sockfd = socket(TC_AF, SOCK_RAW, IPPROTO_RAW);
+	if (sockfd < 0)
+		return NULL;
+
 retry:
 	s = sizeof(info);
 
 	strcpy(info.name, tablename);
 	if (getsockopt(sockfd, TC_IPPROTO, SO_GET_INFO, &info, &s) < 0) {
-		if (--sockfd_use == 0) {
-			close(sockfd);
-			sockfd = -1;
-		}
+		close(sockfd);
 		return NULL;
 	}
 
@@ -1340,21 +1335,19 @@ retry:
 
 	if ((h = alloc_handle(info.name, info.size, info.num_entries))
 	    == NULL) {
-		if (--sockfd_use == 0) {
-			close(sockfd);
-			sockfd = -1;
-		}
+		close(sockfd);
 		return NULL;
 	}
 
 	/* Initialize current state */
+	h->sockfd = sockfd;
 	h->info = info;
 
 	h->entries->size = h->info.size;
 
 	tmp = sizeof(STRUCT_GET_ENTRIES) + h->info.size;
 
-	if (getsockopt(sockfd, TC_IPPROTO, SO_GET_ENTRIES, h->entries,
+	if (getsockopt(h->sockfd, TC_IPPROTO, SO_GET_ENTRIES, h->entries,
 		       &tmp) < 0)
 		goto error;
 
@@ -1388,10 +1381,7 @@ TC_FREE(struct xtc_handle *h)
 	struct chain_head *c, *tmp;
 
 	iptc_fn = TC_FREE;
-	if (--sockfd_use == 0) {
-		close(sockfd);
-		sockfd = -1;
-	}
+	close(h->sockfd);
 
 	list_for_each_entry_safe(c, tmp, &h->chains, list) {
 		struct rule_head *r, *rtmp;
@@ -2614,7 +2604,7 @@ TC_COMMIT(struct xtc_handle *handle)
 	}
 #endif
 
-	ret = setsockopt(sockfd, TC_IPPROTO, SO_SET_REPLACE, repl,
+	ret = setsockopt(handle->sockfd, TC_IPPROTO, SO_SET_REPLACE, repl,
 			 sizeof(*repl) + repl->size);
 	if (ret < 0)
 		goto out_free_newcounters;
@@ -2690,7 +2680,7 @@ TC_COMMIT(struct xtc_handle *handle)
 	}
 #endif
 
-	ret = setsockopt(sockfd, TC_IPPROTO, SO_SET_ADD_COUNTERS,
+	ret = setsockopt(handle->sockfd, TC_IPPROTO, SO_SET_ADD_COUNTERS,
 			 newcounters, counterlen);
 	if (ret < 0)
 		goto out_free_newcounters;
