@@ -758,14 +758,20 @@ conntrack_dump_addr(const union nf_inet_addr *addr,
 			printf("anywhere ");
 			return;
 		}
-		printf("%s ", ipaddr_to_anyname(&addr->in));
+		if (numeric)
+			printf("%s ", ipaddr_to_numeric(&addr->in));
+		else
+			printf("%s ", ipaddr_to_anyname(&addr->in));
 	} else if (family == AF_INET6) {
 		if (!numeric && addr->ip6[0] == 0 && addr->ip6[1] == 0 &&
 		    addr->ip6[2] == 0 && addr->ip6[3] == 0) {
 			printf("anywhere ");
 			return;
 		}
-		printf("%s ", ip6addr_to_anyname(&addr->in6));
+		if (numeric)
+			printf("%s ", ip6addr_to_numeric(&addr->in6));
+		else
+			printf("%s ", ip6addr_to_anyname(&addr->in6));
 	}
 }
 
