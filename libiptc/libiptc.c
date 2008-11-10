@@ -2113,18 +2113,6 @@ TC_DELETE_NUM_ENTRY(const IPT_CHAINLABEL chain,
 	return 1;
 }
 
-/* Check the packet `fw' on chain `chain'.  Returns the verdict, or
-   NULL and sets errno. */
-const char *
-TC_CHECK_PACKET(const IPT_CHAINLABEL chain,
-		STRUCT_ENTRY *entry,
-		struct xtc_handle *handle)
-{
-	iptc_fn = TC_CHECK_PACKET;
-	errno = ENOSYS;
-	return NULL;
-}
-
 /* Flushes the entries in the given chain (ie. empties chain). */
 int
 TC_FLUSH_ENTRIES(const IPT_CHAINLABEL chain, struct xtc_handle *handle)
@@ -2724,13 +2712,6 @@ out_zero:
 	return 0;
 }
 
-/* Get raw socket. */
-int
-TC_GET_RAW_SOCKET(void)
-{
-	return sockfd;
-}
-
 /* Translates errno numbers into more human-readable form than strerror. */
 const char *
 TC_STRERROR(int err)
@@ -2757,11 +2738,6 @@ TC_STRERROR(int err)
 	    { TC_ZERO_COUNTER, E2BIG, "Index of counter too big" },
 	    { TC_INSERT_ENTRY, ELOOP, "Loop found in table" },
 	    { TC_INSERT_ENTRY, EINVAL, "Target problem" },
-	    /* EINVAL for CHECK probably means bad interface. */
-	    { TC_CHECK_PACKET, EINVAL,
-	      "Bad arguments (does that interface exist?)" },
-	    { TC_CHECK_PACKET, ENOSYS,
-	      "Checking will most likely never get implemented" },
 	    /* ENOENT for DELETE probably means no matching rule */
 	    { TC_DELETE_ENTRY, ENOENT,
 	      "Bad rule (does a matching rule exist in that chain?)" },

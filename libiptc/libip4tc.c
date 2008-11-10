@@ -78,7 +78,6 @@ typedef unsigned int socklen_t;
 #define TC_APPEND_ENTRY		iptc_append_entry
 #define TC_DELETE_ENTRY		iptc_delete_entry
 #define TC_DELETE_NUM_ENTRY	iptc_delete_num_entry
-#define TC_CHECK_PACKET		iptc_check_packet
 #define TC_FLUSH_ENTRIES	iptc_flush_entries
 #define TC_ZERO_ENTRIES		iptc_zero_entries
 #define TC_READ_COUNTER		iptc_read_counter
