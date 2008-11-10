@@ -1427,13 +1427,13 @@ TC_DUMP_ENTRIES(struct xtc_handle *const handle)
 	printf("libiptc v%s. %u bytes.\n",
 	       XTABLES_VERSION, handle->entries->size);
 	printf("Table `%s'\n", handle->info.name);
-	printf("Hooks: pre/in/fwd/out/post = %u/%u/%u/%u/%u\n",
+	printf("Hooks: pre/in/fwd/out/post = %x/%x/%x/%x/%x\n",
 	       handle->info.hook_entry[HOOK_PRE_ROUTING],
 	       handle->info.hook_entry[HOOK_LOCAL_IN],
 	       handle->info.hook_entry[HOOK_FORWARD],
 	       handle->info.hook_entry[HOOK_LOCAL_OUT],
 	       handle->info.hook_entry[HOOK_POST_ROUTING]);
-	printf("Underflows: pre/in/fwd/out/post = %u/%u/%u/%u/%u\n",
+	printf("Underflows: pre/in/fwd/out/post = %x/%x/%x/%x/%x\n",
 	       handle->info.underflow[HOOK_PRE_ROUTING],
 	       handle->info.underflow[HOOK_LOCAL_IN],
 	       handle->info.underflow[HOOK_FORWARD],
