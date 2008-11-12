@@ -879,6 +879,14 @@ matchinfo_print(const void *ip, const struct xt_entry_match *match, int numeric,
         	else
                 	printf("%lu:%lu ", sinfo->expires_min, sinfo->expires_max);
 	}
+
+	if (sinfo->flags & XT_CONNTRACK_DIRECTION) {
+		if (sinfo->invflags & XT_CONNTRACK_DIRECTION)
+			printf("%sctdir REPLY", optpfx);
+		else
+			printf("%sctdir ORIGINAL", optpfx);
+	}
+
 }
 
 static void
@@ -975,6 +983,13 @@ conntrack_dump(const struct xt_conntrack_mtinfo1 *info, const char *prefix,
 		else
 			printf("%u:%u ", (unsigned int)info->expires_min,
 			       (unsigned int)info->expires_max);
+	}
+
+	if (info->match_flags & XT_CONNTRACK_DIRECTION) {
+		if (info->invert_flags & XT_CONNTRACK_DIRECTION)
+			printf("%sctdir REPLY", prefix);
+		else
+			printf("%sctdir ORIGINAL", prefix);
 	}
 }
 
