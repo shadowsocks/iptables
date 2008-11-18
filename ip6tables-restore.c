@@ -56,8 +56,7 @@ static void print_usage(const char *name, const char *version)
 	exit(1);
 }
 
-static struct ip6tc_handle *create_handle(const char *tablename,
-                                    const char *modprobe)
+static struct ip6tc_handle *create_handle(const char *tablename)
 {
 	struct ip6tc_handle *handle;
 
@@ -65,7 +64,7 @@ static struct ip6tc_handle *create_handle(const char *tablename,
 
 	if (!handle) {
 		/* try to insmod the module if iptc_init failed */
-		load_xtables_ko(modprobe, 0);
+		load_xtables_ko(modprobe_program, 0);
 		handle = ip6tc_init(tablename);
 	}
 
@@ -124,7 +123,6 @@ int main(int argc, char *argv[])
 	int c;
 	char curtable[IP6T_TABLE_MAXNAMELEN + 1];
 	FILE *in;
-	const char *modprobe = NULL;
 	int in_table = 0, testing = 0;
 
 	program_name = "ip6tables-restore";
@@ -166,7 +164,7 @@ int main(int argc, char *argv[])
 				noflush = 1;
 				break;
 			case 'M':
-				modprobe = optarg;
+				modprobe_program = optarg;
 				break;
 		}
 	}
@@ -225,7 +223,7 @@ int main(int argc, char *argv[])
 			if (handle)
 				ip6tc_free(handle);
 
-			handle = create_handle(table, modprobe);
+			handle = create_handle(table);
 			if (noflush == 0) {
 				DEBUGP("Cleaning all chains of table '%s'\n",
 					table);

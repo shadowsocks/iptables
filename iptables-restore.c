@@ -55,7 +55,7 @@ static void print_usage(const char *name, const char *version)
 	exit(1);
 }
 
-static struct iptc_handle *create_handle(const char *tablename, const char *modprobe)
+static struct iptc_handle *create_handle(const char *tablename)
 {
 	struct iptc_handle *handle;
 
@@ -63,7 +63,7 @@ static struct iptc_handle *create_handle(const char *tablename, const char *modp
 
 	if (!handle) {
 		/* try to insmod the module if iptc_init failed */
-		load_xtables_ko(modprobe, 0);
+		load_xtables_ko(modprobe_program, 0);
 		handle = iptc_init(tablename);
 	}
 
@@ -124,7 +124,6 @@ main(int argc, char *argv[])
 	int c;
 	char curtable[IPT_TABLE_MAXNAMELEN + 1];
 	FILE *in;
-	const char *modprobe = NULL;
 	int in_table = 0, testing = 0;
 	const char *tablename = NULL;
 
@@ -167,7 +166,7 @@ main(int argc, char *argv[])
 				noflush = 1;
 				break;
 			case 'M':
-				modprobe = optarg;
+				modprobe_program = optarg;
 				break;
 			case 'T':
 				tablename = optarg;
@@ -231,7 +230,7 @@ main(int argc, char *argv[])
 			if (handle)
 				iptc_free(handle);
 
-			handle = create_handle(table, modprobe);
+			handle = create_handle(table);
 			if (noflush == 0) {
 				DEBUGP("Cleaning all chains of table '%s'\n",
 					table);
