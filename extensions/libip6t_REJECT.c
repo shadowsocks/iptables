@@ -133,7 +133,7 @@ static void REJECT_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target reject_tg6_reg = {
 	.name = "REJECT",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET6,
+	.family		= NFPROTO_IPV6,
 	.size 		= XT_ALIGN(sizeof(struct ip6t_reject_info)),
 	.userspacesize 	= XT_ALIGN(sizeof(struct ip6t_reject_info)),
 	.help		= REJECT_help,

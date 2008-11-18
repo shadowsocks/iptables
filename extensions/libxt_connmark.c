@@ -164,7 +164,7 @@ connmark_mt_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match connmark_mt_reg_v0 = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "connmark",
 	.revision	= 0,
 	.version	= XTABLES_VERSION,
@@ -179,7 +179,7 @@ static struct xtables_match connmark_mt_reg_v0 = {
 };
 
 static struct xtables_match connmark_mt6_reg_v0 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "connmark",
 	.revision	= 0,
 	.version	= XTABLES_VERSION,
@@ -197,7 +197,7 @@ static struct xtables_match connmark_mt_reg = {
 	.version        = XTABLES_VERSION,
 	.name           = "connmark",
 	.revision       = 1,
-	.family         = AF_INET,
+	.family         = NFPROTO_IPV4,
 	.size           = XT_ALIGN(sizeof(struct xt_connmark_mtinfo1)),
 	.userspacesize  = XT_ALIGN(sizeof(struct xt_connmark_mtinfo1)),
 	.help           = connmark_mt_help,
@@ -212,7 +212,7 @@ static struct xtables_match connmark_mt6_reg = {
 	.version        = XTABLES_VERSION,
 	.name           = "connmark",
 	.revision       = 1,
-	.family         = AF_INET6,
+	.family         = NFPROTO_IPV6,
 	.size           = XT_ALIGN(sizeof(struct xt_connmark_mtinfo1)),
 	.userspacesize  = XT_ALIGN(sizeof(struct xt_connmark_mtinfo1)),
 	.help           = connmark_mt_help,

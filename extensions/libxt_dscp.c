@@ -143,7 +143,7 @@ static void dscp_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match dscp_match = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name 		= "dscp",
 	.version 	= XTABLES_VERSION,
 	.size 		= XT_ALIGN(sizeof(struct xt_dscp_info)),
@@ -157,7 +157,7 @@ static struct xtables_match dscp_match = {
 };
 
 static struct xtables_match dscp_match6 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name 		= "dscp",
 	.version 	= XTABLES_VERSION,
 	.size 		= XT_ALIGN(sizeof(struct xt_dscp_info)),

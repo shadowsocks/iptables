@@ -410,7 +410,7 @@ static void policy_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match policy_mt_reg = {
 	.name		= "policy",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET,
+	.family		= NFPROTO_IPV4,
 	.size		= XT_ALIGN(sizeof(struct ipt_policy_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ipt_policy_info)),
 	.help		= policy_help,

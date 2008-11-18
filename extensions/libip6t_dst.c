@@ -224,7 +224,7 @@ static void dst_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match dst_mt6_reg = {
 	.name          = "dst",
 	.version       = XTABLES_VERSION,
-	.family        = PF_INET6,
+	.family        = NFPROTO_IPV6,
 	.size          = XT_ALIGN(sizeof(struct ip6t_opts)),
 	.userspacesize = XT_ALIGN(sizeof(struct ip6t_opts)),
 	.help          = dst_help,

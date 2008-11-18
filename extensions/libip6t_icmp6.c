@@ -247,7 +247,7 @@ static void icmp6_check(unsigned int flags)
 static struct xtables_match icmp6_mt6_reg = {
 	.name 		= "icmp6",
 	.version 	= XTABLES_VERSION,
-	.family		= PF_INET6,
+	.family		= NFPROTO_IPV6,
 	.size		= XT_ALIGN(sizeof(struct ip6t_icmp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ip6t_icmp)),
 	.help		= icmp6_help,

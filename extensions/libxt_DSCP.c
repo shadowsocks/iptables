@@ -131,7 +131,7 @@ static void DSCP_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target dscp_target = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "DSCP",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_DSCP_info)),
@@ -145,7 +145,7 @@ static struct xtables_target dscp_target = {
 };
 
 static struct xtables_target dscp_target6 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "DSCP",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_DSCP_info)),

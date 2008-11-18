@@ -133,7 +133,7 @@ static void tproxy_tg_save(const void *ip, const struct xt_entry_target *target)
 
 static struct xtables_target tproxy_tg_reg = {
 	.name	       = "TPROXY",
-	.family	       = AF_INET,
+	.family	       = NFPROTO_IPV4,
 	.version       = XTABLES_VERSION,
 	.size	       = XT_ALIGN(sizeof(struct xt_tproxy_target_info)),
 	.userspacesize = XT_ALIGN(sizeof(struct xt_tproxy_target_info)),

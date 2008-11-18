@@ -663,7 +663,7 @@ hashlimit_mt6_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match hashlimit_match = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "hashlimit",
 	.version	= XTABLES_VERSION,
 	.revision	= 0,
@@ -679,7 +679,7 @@ static struct xtables_match hashlimit_match = {
 };
 
 static struct xtables_match hashlimit_match6 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "hashlimit",
 	.version	= XTABLES_VERSION,
 	.revision	= 0,
@@ -698,7 +698,7 @@ static struct xtables_match hashlimit_mt_reg = {
 	.version        = XTABLES_VERSION,
 	.name           = "hashlimit",
 	.revision       = 1,
-	.family         = AF_INET,
+	.family         = NFPROTO_IPV4,
 	.size           = XT_ALIGN(sizeof(struct xt_hashlimit_mtinfo1)),
 	.userspacesize  = offsetof(struct xt_hashlimit_mtinfo1, hinfo),
 	.help           = hashlimit_mt_help,
@@ -714,7 +714,7 @@ static struct xtables_match hashlimit_mt6_reg = {
 	.version        = XTABLES_VERSION,
 	.name           = "hashlimit",
 	.revision       = 1,
-	.family         = AF_INET6,
+	.family         = NFPROTO_IPV6,
 	.size           = XT_ALIGN(sizeof(struct xt_hashlimit_mtinfo1)),
 	.userspacesize  = offsetof(struct xt_hashlimit_mtinfo1, hinfo),
 	.help           = hashlimit_mt_help,

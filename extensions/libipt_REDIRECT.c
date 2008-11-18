@@ -158,7 +158,7 @@ static void REDIRECT_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target redirect_tg_reg = {
 	.name		= "REDIRECT",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET,
+	.family		= NFPROTO_IPV4,
 	.size		= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
 	.help		= REDIRECT_help,

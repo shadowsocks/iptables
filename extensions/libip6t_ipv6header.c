@@ -284,7 +284,7 @@ static void ipv6header_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match ipv6header_mt6_reg = {
 	.name		= "ipv6header",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET6,
+	.family		= NFPROTO_IPV6,
 	.size		= XT_ALIGN(sizeof(struct ip6t_ipv6header_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ip6t_ipv6header_info)),
 	.help		= ipv6header_help,

@@ -149,7 +149,7 @@ static void SET_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target set_tg_reg = {
 	.name		= "SET",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET,
+	.family		= NFPROTO_IPV4,
 	.size		= XT_ALIGN(sizeof(struct ipt_set_info_target)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ipt_set_info_target)),
 	.help		= SET_help,

@@ -138,7 +138,7 @@ static void set_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match set_mt_reg = {
 	.name		= "set",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET,
+	.family		= NFPROTO_IPV4,
 	.size		= XT_ALIGN(sizeof(struct ipt_set_info_match)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ipt_set_info_match)),
 	.help		= set_help,

@@ -119,7 +119,7 @@ static void TCPMSS_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target tcpmss_target = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "TCPMSS",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
@@ -133,7 +133,7 @@ static struct xtables_target tcpmss_target = {
 };
 
 static struct xtables_target tcpmss_target6 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "TCPMSS",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_info)),

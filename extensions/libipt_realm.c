@@ -237,7 +237,7 @@ static void realm_check(unsigned int flags)
 static struct xtables_match realm_mt_reg = {
 	.name		= "realm",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET,
+	.family		= NFPROTO_IPV4,
 	.size		= XT_ALIGN(sizeof(struct ipt_realm_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ipt_realm_info)),
 	.help		= realm_help,

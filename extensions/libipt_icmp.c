@@ -270,7 +270,7 @@ static void icmp_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match icmp_mt_reg = {
 	.name		= "icmp",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET,
+	.family		= NFPROTO_IPV4,
 	.size		= XT_ALIGN(sizeof(struct ipt_icmp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ipt_icmp)),
 	.help		= icmp_help,

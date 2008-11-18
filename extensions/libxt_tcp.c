@@ -378,7 +378,7 @@ static void tcp_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match tcp_match = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "tcp",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcp)),
@@ -392,7 +392,7 @@ static struct xtables_match tcp_match = {
 };
 
 static struct xtables_match tcp_match6 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "tcp",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_tcp)),

@@ -215,7 +215,7 @@ static void recent_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match recent_mt_reg = {
     .name          = "recent",
     .version       = XTABLES_VERSION,
-    .family        = PF_INET,
+    .family        = NFPROTO_IPV4,
     .size          = XT_ALIGN(sizeof(struct xt_recent_mtinfo)),
     .userspacesize = XT_ALIGN(sizeof(struct xt_recent_mtinfo)),
     .help          = recent_help,
@@ -231,7 +231,7 @@ static struct xtables_match recent_mt6_reg = {
 	.version       = XTABLES_VERSION,
 	.name          = "recent",
 	.revision      = 0,
-	.family        = PF_INET6,
+	.family        = NFPROTO_IPV6,
 	.size          = XT_ALIGN(sizeof(struct xt_recent_mtinfo)),
 	.userspacesize = XT_ALIGN(sizeof(struct xt_recent_mtinfo)),
 	.help          = recent_help,

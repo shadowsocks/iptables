@@ -163,7 +163,7 @@ static void physdev_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match physdev_match = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "physdev",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_physdev_info)),
@@ -177,7 +177,7 @@ static struct xtables_match physdev_match = {
 };
 
 static struct xtables_match physdev_match6 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "physdev",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_physdev_info)),

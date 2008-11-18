@@ -74,7 +74,7 @@ static int connlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		*flags |= 0x2;
 		i = strtoul(argv[optind-1], &err, 0);
-		if (family == AF_INET6) {
+		if (family == NFPROTO_IPV6) {
 			if (i > 128 || *err != '\0')
 				exit_error(PARAMETER_PROBLEM,
 					"--connlimit-mask must be between "
@@ -103,7 +103,7 @@ static int connlimit_parse4(int c, char **argv, int invert,
                             struct xt_entry_match **match)
 {
 	return connlimit_parse(c, argv, invert, flags,
-	       (void *)(*match)->data, AF_INET);
+	       (void *)(*match)->data, NFPROTO_IPV4);
 }
 
 static int connlimit_parse6(int c, char **argv, int invert,
@@ -111,7 +111,7 @@ static int connlimit_parse6(int c, char **argv, int invert,
                             struct xt_entry_match **match)
 {
 	return connlimit_parse(c, argv, invert, flags,
-	       (void *)(*match)->data, AF_INET6);
+	       (void *)(*match)->data, NFPROTO_IPV6);
 }
 
 static void connlimit_check(unsigned int flags)
@@ -179,7 +179,7 @@ static void connlimit_save6(const void *ip, const struct xt_entry_match *match)
 
 static struct xtables_match connlimit_match = {
 	.name          = "connlimit",
-	.family        = AF_INET,
+	.family        = NFPROTO_IPV4,
 	.version       = XTABLES_VERSION,
 	.size          = XT_ALIGN(sizeof(struct xt_connlimit_info)),
 	.userspacesize = offsetof(struct xt_connlimit_info, data),
@@ -194,7 +194,7 @@ static struct xtables_match connlimit_match = {
 
 static struct xtables_match connlimit_match6 = {
 	.name          = "connlimit",
-	.family        = AF_INET6,
+	.family        = NFPROTO_IPV6,
 	.version       = XTABLES_VERSION,
 	.size          = XT_ALIGN(sizeof(struct xt_connlimit_info)),
 	.userspacesize = offsetof(struct xt_connlimit_info, data),

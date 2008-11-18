@@ -139,7 +139,7 @@ static void NFLOG_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target nflog_target = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "NFLOG",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_nflog_info)),
@@ -153,7 +153,7 @@ static struct xtables_target nflog_target = {
 };
 
 static struct xtables_target nflog_target6 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "NFLOG",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_nflog_info)),

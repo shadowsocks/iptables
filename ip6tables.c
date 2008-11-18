@@ -199,7 +199,7 @@ struct pprot {
 };
 
 struct afinfo afinfo = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.libprefix	= "libip6t_",
 	.ipproto	= IPPROTO_IPV6,
 	.kmod		= "ip6_tables",

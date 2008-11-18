@@ -79,7 +79,7 @@ static void NFQUEUE_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target nfqueue_target = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "NFQUEUE",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_NFQ_info)),
@@ -92,7 +92,7 @@ static struct xtables_target nfqueue_target = {
 };
 
 static struct xtables_target nfqueue_target6 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "NFQUEUE",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_NFQ_info)),

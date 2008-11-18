@@ -191,7 +191,7 @@ static void udp_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match udp_match = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "udp",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_udp)),
@@ -205,7 +205,7 @@ static struct xtables_match udp_match = {
 };
 
 static struct xtables_match udp_match6 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "udp",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_udp)),

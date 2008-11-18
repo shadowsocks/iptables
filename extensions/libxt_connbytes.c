@@ -180,7 +180,7 @@ static void connbytes_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match connbytes_match = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name 		= "connbytes",
 	.version 	= XTABLES_VERSION,
 	.size 		= XT_ALIGN(sizeof(struct xt_connbytes_info)),
@@ -194,7 +194,7 @@ static struct xtables_match connbytes_match = {
 };
 
 static struct xtables_match connbytes_match6 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name 		= "connbytes",
 	.version 	= XTABLES_VERSION,
 	.size 		= XT_ALIGN(sizeof(struct xt_connbytes_info)),

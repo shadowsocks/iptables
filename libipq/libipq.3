@@ -187,7 +187,7 @@ int main(int argc, char **argv)
 	unsigned char buf[BUFSIZE];
 	struct ipq_handle *h;
 	
-	h = ipq_create_handle(0, PF_INET);
+	h = ipq_create_handle(0, NFPROTO_IPV4);
 	if (!h)
 		die(h);
 		

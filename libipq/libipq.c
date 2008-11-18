@@ -217,9 +217,9 @@ struct ipq_handle *ipq_create_handle(u_int32_t flags, u_int32_t protocol)
 	
 	memset(h, 0, sizeof(struct ipq_handle));
 	
-        if (protocol == PF_INET)
+        if (protocol == NFPROTO_IPV4)
                 h->fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_FIREWALL);
-        else if (protocol == PF_INET6)
+        else if (protocol == NFPROTO_IPV6)
                 h->fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_IP6_FW);
         else {
 		ipq_errno = IPQ_ERR_PROTOCOL;

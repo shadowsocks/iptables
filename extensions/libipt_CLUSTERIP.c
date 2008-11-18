@@ -233,7 +233,7 @@ static void CLUSTERIP_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target clusterip_tg_reg = {
 	.name		= "CLUSTERIP",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET,
+	.family		= NFPROTO_IPV4,
 	.size		= XT_ALIGN(sizeof(struct ipt_clusterip_tgt_info)),
 	.userspacesize	= offsetof(struct ipt_clusterip_tgt_info, config),
  	.help		= CLUSTERIP_help,

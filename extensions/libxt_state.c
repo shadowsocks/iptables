@@ -136,7 +136,7 @@ static void state_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match state_match = { 
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "state",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_state_info)),
@@ -150,7 +150,7 @@ static struct xtables_match state_match = {
 };
 
 static struct xtables_match state_match6 = { 
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "state",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_state_info)),

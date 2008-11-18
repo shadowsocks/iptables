@@ -202,7 +202,7 @@ static void SAME_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target same_tg_reg = {
 	.name		= "SAME",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET,
+	.family		= NFPROTO_IPV4,
 	.size		= XT_ALIGN(sizeof(struct ipt_same_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ipt_same_info)),
 	.help		= SAME_help,

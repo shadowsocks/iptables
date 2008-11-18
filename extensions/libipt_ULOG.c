@@ -182,7 +182,7 @@ static void ULOG_print(const void *ip, const struct xt_entry_target *target,
 static struct xtables_target ulog_tg_reg = {
 	.name		= "ULOG",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET,
+	.family		= NFPROTO_IPV4,
 	.size		= XT_ALIGN(sizeof(struct ipt_ulog_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ipt_ulog_info)),
 	.help		= ULOG_help,

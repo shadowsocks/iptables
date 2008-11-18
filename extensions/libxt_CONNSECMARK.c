@@ -107,7 +107,7 @@ CONNSECMARK_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target connsecmark_target = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "CONNSECMARK",
 	.version	= XTABLES_VERSION,
 	.revision	= 0,
@@ -122,7 +122,7 @@ static struct xtables_target connsecmark_target = {
 };
 
 static struct xtables_target connsecmark_target6 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "CONNSECMARK",
 	.version	= XTABLES_VERSION,
 	.revision	= 0,

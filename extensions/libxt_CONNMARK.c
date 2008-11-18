@@ -399,7 +399,7 @@ connmark_tg_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target connmark_target = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "CONNMARK",
 	.revision	= 0,
 	.version	= XTABLES_VERSION,
@@ -415,7 +415,7 @@ static struct xtables_target connmark_target = {
 };
 
 static struct xtables_target connmark_target6 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "CONNMARK",
 	.revision	= 0,
 	.version	= XTABLES_VERSION,
@@ -434,7 +434,7 @@ static struct xtables_target connmark_tg_reg = {
 	.version        = XTABLES_VERSION,
 	.name           = "CONNMARK",
 	.revision       = 1,
-	.family         = AF_INET,
+	.family         = NFPROTO_IPV4,
 	.size           = XT_ALIGN(sizeof(struct xt_connmark_tginfo1)),
 	.userspacesize  = XT_ALIGN(sizeof(struct xt_connmark_tginfo1)),
 	.help           = connmark_tg_help,
@@ -450,7 +450,7 @@ static struct xtables_target connmark_tg6_reg = {
 	.version        = XTABLES_VERSION,
 	.name           = "CONNMARK",
 	.revision       = 1,
-	.family         = AF_INET6,
+	.family         = NFPROTO_IPV6,
 	.size           = XT_ALIGN(sizeof(struct xt_connmark_tginfo1)),
 	.userspacesize  = XT_ALIGN(sizeof(struct xt_connmark_tginfo1)),
 	.help           = connmark_tg_help,

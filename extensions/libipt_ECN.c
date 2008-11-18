@@ -153,7 +153,7 @@ static void ECN_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target ecn_tg_reg = {
 	.name		= "ECN",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET,
+	.family		= NFPROTO_IPV4,
 	.size		= XT_ALIGN(sizeof(struct ipt_ECN_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ipt_ECN_info)),
 	.help		= ECN_help,

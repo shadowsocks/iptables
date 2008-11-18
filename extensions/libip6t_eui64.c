@@ -28,7 +28,7 @@ static int eui64_parse(int c, char **argv, int invert, unsigned int *flags,
 static struct xtables_match eui64_mt6_reg = {
 	.name 		= "eui64",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET6,
+	.family		= NFPROTO_IPV6,
 	.size		= XT_ALIGN(sizeof(int)),
 	.userspacesize	= XT_ALIGN(sizeof(int)),
 	.help		= eui64_help,

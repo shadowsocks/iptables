@@ -276,7 +276,7 @@ static void mark_tg_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target mark_target_v0 = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "MARK",
 	.version	= XTABLES_VERSION,
 	.revision	= 0,
@@ -291,7 +291,7 @@ static struct xtables_target mark_target_v0 = {
 };
 
 static struct xtables_target mark_target_v1 = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "MARK",
 	.version	= XTABLES_VERSION,
 	.revision	= 1,
@@ -306,7 +306,7 @@ static struct xtables_target mark_target_v1 = {
 };
 
 static struct xtables_target mark_target6_v0 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "MARK",
 	.version	= XTABLES_VERSION,
 	.revision	= 0,

@@ -507,7 +507,7 @@ static void multiport_save6_v1(const void *ip_void,
 }
 
 static struct xtables_match multiport_match = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "multiport",
 	.revision	= 0,
 	.version	= XTABLES_VERSION,
@@ -522,7 +522,7 @@ static struct xtables_match multiport_match = {
 };
 
 static struct xtables_match multiport_match6 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "multiport",
 	.revision	= 0,
 	.version	= XTABLES_VERSION,
@@ -537,7 +537,7 @@ static struct xtables_match multiport_match6 = {
 };
 
 static struct xtables_match multiport_match_v1 = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.name		= "multiport",
 	.version	= XTABLES_VERSION,
 	.revision	= 1,
@@ -552,7 +552,7 @@ static struct xtables_match multiport_match_v1 = {
 };
 
 static struct xtables_match multiport_match6_v1 = {
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.name		= "multiport",
 	.version	= XTABLES_VERSION,
 	.revision	= 1,

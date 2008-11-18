@@ -18,7 +18,7 @@ static int unclean_parse(int c, char **argv, int invert, unsigned int *flags,
 static struct xtables_match unclean_mt_reg = {
 	.name		= "unclean",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET,
+	.family		= NFPROTO_IPV4,
 	.size		= XT_ALIGN(0),
 	.userspacesize	= XT_ALIGN(0),
 	.help		= unclean_help,

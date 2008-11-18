@@ -241,7 +241,7 @@ static void SNAT_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target snat_tg_reg = {
 	.name		= "SNAT",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET,
+	.family		= NFPROTO_IPV4,
 	.size		= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
 	.help		= SNAT_help,

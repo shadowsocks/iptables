@@ -337,7 +337,7 @@ static void dccp_save(const void *ip, const struct xt_entry_match *match)
 
 static struct xtables_match dccp_match = {
 	.name		= "dccp",
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_dccp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_dccp_info)),
@@ -351,7 +351,7 @@ static struct xtables_match dccp_match = {
 
 static struct xtables_match dccp_match6 = {
 	.name		= "dccp",
-	.family		= AF_INET6,
+	.family		= NFPROTO_IPV6,
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_dccp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_dccp_info)),

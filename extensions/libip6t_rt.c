@@ -326,7 +326,7 @@ static void rt_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match rt_mt6_reg = {
 	.name		= "rt",
 	.version	= XTABLES_VERSION,
-	.family		= PF_INET6,
+	.family		= NFPROTO_IPV6,
 	.size		= XT_ALIGN(sizeof(struct ip6t_rt)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ip6t_rt)),
 	.help		= rt_help,

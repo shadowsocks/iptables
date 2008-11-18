@@ -152,7 +152,7 @@ static void ah_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match ah_mt_reg = {
 	.name 		= "ah",
 	.version 	= XTABLES_VERSION,
-	.family		= PF_INET,
+	.family		= NFPROTO_IPV4,
 	.size		= XT_ALIGN(sizeof(struct ipt_ah)),
 	.userspacesize 	= XT_ALIGN(sizeof(struct ipt_ah)),
 	.help 		= ah_help,

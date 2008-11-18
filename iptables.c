@@ -201,7 +201,7 @@ struct pprot {
 };
 
 struct afinfo afinfo = {
-	.family		= AF_INET,
+	.family		= NFPROTO_IPV4,
 	.libprefix	= "libipt_",
 	.ipproto	= IPPROTO_IP,
 	.kmod		= "ip_tables",

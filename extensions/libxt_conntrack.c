@@ -753,7 +753,7 @@ conntrack_dump_addr(const union nf_inet_addr *addr,
                     const union nf_inet_addr *mask,
                     unsigned int family, bool numeric)
 {
-	if (family == AF_INET) {
+	if (family == NFPROTO_IPV4) {
 		if (!numeric && addr->ip == 0) {
 			printf("anywhere ");
 			return;
@@ -762,7 +762,7 @@ conntrack_dump_addr(const union nf_inet_addr *addr,
 			printf("%s ", ipaddr_to_numeric(&addr->in));
 		else
 			printf("%s ", ipaddr_to_anyname(&addr->in));
-	} else if (family == AF_INET6) {
+	} else if (family == NFPROTO_IPV6) {
 		if (!numeric && addr->ip6[0] == 0 && addr->ip6[1] == 0 &&
 		    addr->ip6[2] == 0 && addr->ip6[3] == 0) {
 			printf("anywhere ");
@@ -1003,14 +1003,14 @@ static void
 conntrack_mt_print(const void *ip, const struct xt_entry_match *match,
                    int numeric)
 {
-	conntrack_dump((const void *)match->data, "", AF_INET, numeric);
+	conntrack_dump((const void *)match->data, "", NFPROTO_IPV4, numeric);
 }
 
 static void
 conntrack_mt6_print(const void *ip, const struct xt_entry_match *match,
                     int numeric)
 {
-	conntrack_dump((const void *)match->data, "", AF_INET6, numeric);
+	conntrack_dump((const void *)match->data, "", NFPROTO_IPV6, numeric);
 }
 
 static void conntrack_save(const void *ip, const struct xt_entry_match *match)
@@ -1021,20 +1021,20 @@ static void conntrack_save(const void *ip, const struct xt_entry_match *match)
 static void conntrack_mt_save(const void *ip,
                               const struct xt_entry_match *match)
 {
-	conntrack_dump((const void *)match->data, "--", AF_INET, true);
+	conntrack_dump((const void *)match->data, "--", NFPROTO_IPV4, true);
 }
 
 static void conntrack_mt6_save(const void *ip,
                                const struct xt_entry_match *match)
 {
-	conntrack_dump((const void *)match->data, "--", AF_INET6, true);
+	conntrack_dump((const void *)match->data, "--", NFPROTO_IPV6, true);
 }
 
 static struct xtables_match conntrack_match = {
 	.version       = XTABLES_VERSION,
 	.name          = "conntrack",
 	.revision      = 0,
-	.family        = AF_INET,
+	.family        = NFPROTO_IPV4,
 	.size          = XT_ALIGN(sizeof(struct xt_conntrack_info)),
 	.userspacesize = XT_ALIGN(sizeof(struct xt_conntrack_info)),
 	.help          = conntrack_mt_help,
@@ -1049,7 +1049,7 @@ static struct xtables_match conntrack_mt_reg = {
 	.version       = XTABLES_VERSION,
 	.name          = "conntrack",
 	.revision      = 1,
-	.family        = AF_INET,
+	.family        = NFPROTO_IPV4,
 	.size          = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo1)),
 	.userspacesize = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo1)),
 	.help          = conntrack_mt_help,
@@ -1064,7 +1064,7 @@ static struct xtables_match conntrack_mt6_reg = {
 	.version       = XTABLES_VERSION,
 	.name          = "conntrack",
 	.revision      = 1,
-	.family        = AF_INET6,
+	.family        = NFPROTO_IPV6,
 	.size          = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo1)),
 	.userspacesize = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo1)),
 	.help          = conntrack_mt_help,

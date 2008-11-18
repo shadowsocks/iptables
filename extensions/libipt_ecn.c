@@ -144,7 +144,7 @@ static void ecn_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match ecn_mt_reg = {
     .name          = "ecn",
     .version       = XTABLES_VERSION,
-    .family        = PF_INET,
+    .family        = NFPROTO_IPV4,
     .size          = XT_ALIGN(sizeof(struct ipt_ecn_info)),
     .userspacesize = XT_ALIGN(sizeof(struct ipt_ecn_info)),
     .help          = ecn_help,
