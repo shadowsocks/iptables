@@ -1888,9 +1888,26 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 					continue;
 				}
 
-				if (!m)
+				if (!m) {
+					if (c == '?') {
+						if (optopt) {
+							exit_error(
+							   PARAMETER_PROBLEM,
+							   "option `%s' "
+							   "requires an "
+							   "argument",
+							   argv[optind-1]);
+						} else {
+							exit_error(
+							   PARAMETER_PROBLEM,
+							   "unknown option "
+							   "`%s'",
+							   argv[optind-1]);
+						}
+					}
 					exit_error(PARAMETER_PROBLEM,
 						   "Unknown arg `%s'", optarg);
+				}
 			}
 		}
 		invert = FALSE;
