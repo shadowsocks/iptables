@@ -107,7 +107,10 @@ parse_states(const char *arg, struct xt_conntrack_info *sinfo)
 			exit_error(PARAMETER_PROBLEM, "Bad ctstate `%s'", arg);
 		arg = comma+1;
 	}
-
+	if (!*arg)
+		exit_error(PARAMETER_PROBLEM, "`--ctstate' requires a list of "
+					      "states with no spaces, e.g. "
+					      "ESTABLISHED,RELATED");
 	if (strlen(arg) == 0 || !parse_state(arg, strlen(arg), sinfo))
 		exit_error(PARAMETER_PROBLEM, "Bad ctstate `%s'", arg);
 }
