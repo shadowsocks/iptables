@@ -72,7 +72,8 @@ main(int argc, char *argv[])
 	}
 
 	if (!ret)
-		fprintf(stderr, "ip6tables: %s\n",
+		fprintf(stderr, "ip6tables: %s. "
+				"Run `dmesg' for more information.\n",
 			ip6tc_strerror(errno));
 
 	exit(!ret);

@@ -73,7 +73,8 @@ main(int argc, char *argv[])
 	}
 
 	if (!ret) {
-		fprintf(stderr, "iptables: %s\n",
+		fprintf(stderr, "iptables: %s. "
+				"Run `dmesg' for more information.\n",
 			iptc_strerror(errno));
 		if (errno == EAGAIN) {
 			exit(RESOURCE_PROBLEM);
