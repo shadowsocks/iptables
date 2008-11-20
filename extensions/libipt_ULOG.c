@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <syslog.h>
 #include <getopt.h>
-#include <iptables.h>
+#include <xtables.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
 /* For 64bit kernel / 32bit userspace */
 #include <linux/netfilter_ipv4/ipt_ULOG.h>

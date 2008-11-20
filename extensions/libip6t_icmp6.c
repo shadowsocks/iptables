@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <ip6tables.h>
+#include <xtables.h>
 #include <linux/netfilter_ipv6/ip6_tables.h>
 
 struct icmpv6_names {

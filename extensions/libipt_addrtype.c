@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
-#include <iptables.h>
+#include <xtables.h>
 
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_addrtype.h>

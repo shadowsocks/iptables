@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <iptables.h>
+#include <xtables.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
 
 /* special hack for icmp-type 'any': 

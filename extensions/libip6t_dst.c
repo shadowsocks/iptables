@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <errno.h>
-#include <ip6tables.h>
+#include <xtables.h>
 #include <linux/netfilter_ipv6/ip6t_opts.h>
 #include <sys/types.h>
 #include <sys/socket.h>

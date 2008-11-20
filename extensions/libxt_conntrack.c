@@ -15,7 +15,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <iptables.h>
 #include <xtables.h>
 #include <linux/netfilter.h>
 #include <linux/netfilter/xt_conntrack.h>

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <getopt.h>
-#include <iptables.h>
+#include <xtables.h>
 #include <linux/netfilter/xt_connlimit.h>
 
 static void connlimit_help(void)

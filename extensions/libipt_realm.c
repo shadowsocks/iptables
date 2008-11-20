@@ -11,7 +11,7 @@
 #else
 #include <linux/if_ether.h>
 #endif
-#include <iptables.h>
+#include <xtables.h>
 #include <linux/netfilter_ipv4/ipt_realm.h>
 
 static void realm_help(void)

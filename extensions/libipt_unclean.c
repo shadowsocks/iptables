@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <iptables.h>
+#include <xtables.h>
 
 static void unclean_help(void)
 {

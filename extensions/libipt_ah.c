@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <errno.h>
-#include <iptables.h>
+#include <xtables.h>
 #include <linux/netfilter_ipv4/ipt_ah.h>
 
 static void ah_help(void)

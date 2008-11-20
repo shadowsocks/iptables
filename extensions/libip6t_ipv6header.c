@@ -5,7 +5,7 @@ on whether they contain certain headers */
  * Rewritten by: Andras Kis-Szabo <kisza@sch.bme.hu> */
 
 #include <getopt.h>
-#include <ip6tables.h>
+#include <xtables.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>

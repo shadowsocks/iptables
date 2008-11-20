@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
-#include <ip6tables.h>
+#include <xtables.h>
 
 #include <linux/netfilter_ipv6/ip6_tables.h>
 #include <linux/netfilter_ipv6/ip6t_hl.h>

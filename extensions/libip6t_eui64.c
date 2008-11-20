@@ -9,7 +9,7 @@
 #else
 #include <linux/if_ether.h>
 #endif
-#include <ip6tables.h>
+#include <xtables.h>
 
 static void eui64_help(void)
 {

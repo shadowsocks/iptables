@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include <limits.h>
 
-#include <iptables.h>
 #include <xtables.h>
 #include <linux/netfilter/x_tables.h>
 #include <linux/netfilter/xt_TPROXY.h>
