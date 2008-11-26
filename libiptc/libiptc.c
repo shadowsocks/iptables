@@ -503,7 +503,7 @@ static int iptcc_chain_index_alloc(struct xtc_handle *h)
 	      array_elems, array_mem);
 
 	h->chain_index = malloc(array_mem);
-	if (!h->chain_index) {
+	if (h->chain_index == NULL && array_mem > 0) {
 		h->chain_index_sz = 0;
 		return -ENOMEM;
 	}
