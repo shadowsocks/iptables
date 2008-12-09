@@ -200,7 +200,7 @@ static void frag_save(const void *ip, const struct xt_entry_match *match)
 
 	if (!(fraginfo->ids[0] == 0
 	    && fraginfo->ids[1] == 0xFFFFFFFF)) {
-		printf("--fragid %s", 
+		printf("%s--fragid ", 
 			(fraginfo->invflags & IP6T_FRAG_INV_IDS) ? "! " : "");
 		if (fraginfo->ids[0]
 		    != fraginfo->ids[1])
@@ -213,7 +213,7 @@ static void frag_save(const void *ip, const struct xt_entry_match *match)
 	}
 
 	if (fraginfo->flags & IP6T_FRAG_LEN) {
-		printf("--fraglen %s%u ", 
+		printf("%s--fraglen %u ", 
 			(fraginfo->invflags & IP6T_FRAG_INV_LEN) ? "! " : "", 
 			fraginfo->hdrlen);
 	}

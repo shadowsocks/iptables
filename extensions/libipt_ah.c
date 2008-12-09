@@ -135,7 +135,7 @@ static void ah_save(const void *ip, const struct xt_entry_match *match)
 
 	if (!(ahinfo->spis[0] == 0
 	    && ahinfo->spis[1] == 0xFFFFFFFF)) {
-		printf("--ahspi %s", 
+		printf("%s--ahspi ",
 			(ahinfo->invflags & IPT_AH_INV_SPI) ? "! " : "");
 		if (ahinfo->spis[0]
 		    != ahinfo->spis[1])

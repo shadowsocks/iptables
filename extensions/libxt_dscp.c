@@ -116,21 +116,11 @@ static void dscp_check(unsigned int flags)
 }
 
 static void
-print_dscp(u_int8_t dscp, int invert, int numeric)
-{
-	if (invert)
-		printf("! ");
-
- 	printf("0x%02x ", dscp);
-}
-
-static void
 dscp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_dscp_info *dinfo =
 		(const struct xt_dscp_info *)match->data;
-	printf("DSCP match ");
-	print_dscp(dinfo->dscp, dinfo->invert, numeric);
+	printf("DSCP match %s0x%02x", dinfo->invert ? "!" : "", dinfo->dscp);
 }
 
 static void dscp_save(const void *ip, const struct xt_entry_match *match)
@@ -138,8 +128,7 @@ static void dscp_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_dscp_info *dinfo =
 		(const struct xt_dscp_info *)match->data;
 
-	printf("--dscp ");
-	print_dscp(dinfo->dscp, dinfo->invert, 1);
+	printf("%s--dscp 0x%02x ", dinfo->invert ? "! " : "", dinfo->dscp);
 }
 
 static struct xtables_match dscp_match = {

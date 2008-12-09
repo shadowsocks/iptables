@@ -134,7 +134,7 @@ static void esp_save(const void *ip, const struct xt_entry_match *match)
 
 	if (!(espinfo->spis[0] == 0
 	    && espinfo->spis[1] == 0xFFFFFFFF)) {
-		printf("--espspi %s", 
+		printf("%s--espspi ",
 			(espinfo->invflags & XT_ESP_INV_SPI) ? "! " : "");
 		if (espinfo->spis[0]
 		    != espinfo->spis[1])

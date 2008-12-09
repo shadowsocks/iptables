@@ -291,14 +291,14 @@ static void rt_save(const void *ip, const struct xt_entry_match *match)
 	const struct ip6t_rt *rtinfo = (struct ip6t_rt *)match->data;
 
 	if (rtinfo->flags & IP6T_RT_TYP) {
-		printf("--rt-type %s%u ", 
+		printf("%s--rt-type %u ", 
 			(rtinfo->invflags & IP6T_RT_INV_TYP) ? "! " : "", 
 			rtinfo->rt_type);
 	}
 
 	if (!(rtinfo->segsleft[0] == 0
 	    && rtinfo->segsleft[1] == 0xFFFFFFFF)) {
-		printf("--rt-segsleft %s", 
+		printf("%s--rt-segsleft ",
 			(rtinfo->invflags & IP6T_RT_INV_SGS) ? "! " : "");
 		if (rtinfo->segsleft[0]
 		    != rtinfo->segsleft[1])
@@ -311,7 +311,7 @@ static void rt_save(const void *ip, const struct xt_entry_match *match)
 	}
 
 	if (rtinfo->flags & IP6T_RT_LEN) {
-		printf("--rt-len %s%u ", 
+		printf("%s--rt-len %u ",
 			(rtinfo->invflags & IP6T_RT_INV_LEN) ? "! " : "", 
 			rtinfo->hdrlen);
 	}

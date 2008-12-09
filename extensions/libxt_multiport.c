@@ -464,6 +464,9 @@ static void __multiport_save_v1(const struct xt_entry_match *match,
 		= (const struct xt_multiport_v1 *)match->data;
 	unsigned int i;
 
+	if (multiinfo->invert)
+		printf("! ");
+
 	switch (multiinfo->flags) {
 	case XT_MULTIPORT_SOURCE:
 		printf("--sports ");
@@ -477,9 +480,6 @@ static void __multiport_save_v1(const struct xt_entry_match *match,
 		printf("--ports ");
 		break;
 	}
-
-	if (multiinfo->invert)
-		printf("! ");
 
 	for (i=0; i < multiinfo->count; i++) {
 		printf("%s", i ? "," : "");

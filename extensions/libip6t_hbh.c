@@ -196,7 +196,7 @@ static void hbh_save(const void *ip, const struct xt_entry_match *match)
 	const struct ip6t_opts *optinfo = (struct ip6t_opts *)match->data;
 
 	if (optinfo->flags & IP6T_OPTS_LEN) {
-		printf("--hbh-len %s%u ",
+		printf("%s--hbh-len %u ",
 			(optinfo->invflags & IP6T_OPTS_INV_LEN) ? "! " : "", 
 			optinfo->hdrlen);
 	}

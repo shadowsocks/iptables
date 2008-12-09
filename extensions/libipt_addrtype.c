@@ -266,15 +266,15 @@ static void addrtype_save_v0(const void *ip, const struct xt_entry_match *match)
 		(struct ipt_addrtype_info *) match->data;
 
 	if (info->source) {
-		printf("--src-type ");
 		if (info->invert_source)
 			printf("! ");
+		printf("--src-type ");
 		print_types(info->source);
 	}
 	if (info->dest) {
-		printf("--dst-type ");
 		if (info->invert_dest)
 			printf("! ");
+		printf("--dst-type ");
 		print_types(info->dest);
 	}
 }
@@ -285,15 +285,15 @@ static void addrtype_save_v1(const void *ip, const struct xt_entry_match *match)
 		(struct ipt_addrtype_info_v1 *) match->data;
 
 	if (info->source) {
-		printf("--src-type ");
 		if (info->flags & IPT_ADDRTYPE_INVERT_SOURCE)
 			printf("! ");
+		printf("--src-type ");
 		print_types(info->source);
 	}
 	if (info->dest) {
-		printf("--dst-type ");
 		if (info->flags & IPT_ADDRTYPE_INVERT_DEST)
 			printf("! ");
+		printf("--dst-type ");
 		print_types(info->dest);
 	}
 	if (info->flags & IPT_ADDRTYPE_LIMIT_IFACE_IN) {

@@ -271,8 +271,7 @@ static void ipv6header_save(const void *ip, const struct xt_entry_match *match)
 
 	const struct ip6t_ipv6header_info *info = (const struct ip6t_ipv6header_info *)match->data;
 
-	printf("--header ");
-	printf("%s", info->invflags ? "!" : "");
+	printf("%s--header ", info->invflags ? "! " : "");
 	print_header(info->matchflags);
 	printf(" ");
 	if (info->modeflag)

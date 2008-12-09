@@ -78,18 +78,6 @@ tcpmss_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void
-print_tcpmss(u_int16_t mss_min, u_int16_t mss_max, int invert, int numeric)
-{
-	if (invert)
-		printf("! ");
-
-	if (mss_min == mss_max)
-		printf("%u ", mss_min);
-	else
-		printf("%u:%u ", mss_min, mss_max);
-}
-
 static void tcpmss_check(unsigned int flags)
 {
 	if (!flags)
@@ -100,22 +88,24 @@ static void tcpmss_check(unsigned int flags)
 static void
 tcpmss_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
-	const struct xt_tcpmss_match_info *mssinfo =
-		(const struct xt_tcpmss_match_info *)match->data;
+	const struct xt_tcpmss_match_info *info = (void *)match->data;
 
-	printf("tcpmss match ");
-	print_tcpmss(mssinfo->mss_min, mssinfo->mss_max,
-		     mssinfo->invert, numeric);
+	printf("tcpmss match %s", info->invert ? "!" : "");
+	if (info->mss_min == info->mss_max)
+		printf("%u ", info->mss_min);
+	else
+		printf("%u:%u ", info->mss_min, info->mss_max);
 }
 
 static void tcpmss_save(const void *ip, const struct xt_entry_match *match)
 {
-	const struct xt_tcpmss_match_info *mssinfo =
-		(const struct xt_tcpmss_match_info *)match->data;
+	const struct xt_tcpmss_match_info *info = (void *)match->data;
 
-	printf("--mss ");
-	print_tcpmss(mssinfo->mss_min, mssinfo->mss_max,
-		     mssinfo->invert, 0);
+	printf("%s--mss ", info->invert ? "! " : "");
+	if (info->mss_min == info->mss_max)
+		printf("%u ", info->mss_min);
+	else
+		printf("%u:%u ", info->mss_min, info->mss_max);
 }
 
 static struct xtables_match tcpmss_match = {

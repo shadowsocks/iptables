@@ -104,16 +104,16 @@ static void hl_print(const void *ip, const struct xt_entry_match *match,
 
 static void hl_save(const void *ip, const struct xt_entry_match *match)
 {
-	static const char *op[] = {
-		[IP6T_HL_EQ] = "eq",
-		[IP6T_HL_NE] = "eq !",
-		[IP6T_HL_LT] = "lt",
-		[IP6T_HL_GT] = "gt" };
+	static const char *const op[] = {
+		[IP6T_HL_EQ] = "--hl-eq",
+		[IP6T_HL_NE] = "! --hl-eq",
+		[IP6T_HL_LT] = "--hl-lt",
+		[IP6T_HL_GT] = "--hl-gt" };
 
 	const struct ip6t_hl_info *info =
 		(struct ip6t_hl_info *) match->data;
 
-	printf("--hl-%s %u ", op[info->mode], info->hop_limit);
+	printf("%s %u ", op[info->mode], info->hop_limit);
 }
 
 static const struct option hl_opts[] = {

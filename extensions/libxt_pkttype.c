@@ -140,7 +140,7 @@ static void pkttype_save(const void *ip, const struct xt_entry_match *match)
 {
 	struct xt_pkttype_info *info = (struct xt_pkttype_info *)match->data;
 	
-	printf("--pkt-type %s", info->invert?"! ":"");
+	printf("%s--pkt-type ", info->invert ? "! " : "");
 	print_pkttype(info);
 }
 

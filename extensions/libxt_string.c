@@ -332,10 +332,10 @@ static void string_save(const void *ip, const struct xt_entry_match *match)
 				    info->u.v1.flags & XT_STRING_FLAG_INVERT);
 
 	if (is_hex_string(info->pattern, info->patlen)) {
-		printf("--hex-string %s", (invert) ? "! ": "");
+		printf("%s--hex-string ", (invert) ? "! ": "");
 		print_hex_string(info->pattern, info->patlen);
 	} else {
-		printf("--string %s", (invert) ? "! ": "");
+		printf("%s--string ", (invert) ? "! ": "");
 		print_string(info->pattern, info->patlen);
 	}
 	printf("--algo %s ", info->algo);

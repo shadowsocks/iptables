@@ -91,28 +91,26 @@ static void length_check(unsigned int flags)
 }
 
 static void
-print_length(struct xt_length_info *info)
+length_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
-	if (info->invert)
-		printf("! ");
-	
-	if (info->max == info->min)
+	const struct xt_length_info *info = (void *)match->data;
+
+	printf("length %s", info->invert ? "!" : "");
+	if (info->min == info->max)
 		printf("%u ", info->min);
 	else
 		printf("%u:%u ", info->min, info->max);
 }
 
-static void
-length_print(const void *ip, const struct xt_entry_match *match, int numeric)
-{
-	printf("length ");
-	print_length((struct xt_length_info *)match->data);
-}
-
 static void length_save(const void *ip, const struct xt_entry_match *match)
 {
-	printf("--length ");
-	print_length((struct xt_length_info *)match->data);
+	const struct xt_length_info *info = (void *)match->data;
+
+	printf("%s--length ", info->invert ? "! " : "");
+	if (info->min == info->max)
+		printf("%u ", info->min);
+	else
+		printf("%u:%u ", info->min, info->max);
 }
 
 static struct xtables_match length_match = {
