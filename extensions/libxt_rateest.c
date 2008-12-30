@@ -306,6 +306,9 @@ rateest_final_check(unsigned int flags)
 {
 	struct xt_rateest_match_info *info = rateest_info;
 
+	if (info == NULL)
+		exit_error(PARAMETER_PROBLEM, "rateest match: "
+		           "you need to specify some flags");
 	if (!(info->flags & XT_RATEEST_MATCH_REL))
 		info->flags |= XT_RATEEST_MATCH_ABS;
 }
