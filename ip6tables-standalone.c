@@ -56,7 +56,8 @@ main(int argc, char *argv[])
 	if (lib_dir == NULL) {
 		lib_dir = getenv("IP6TABLES_LIB_DIR");
 		if (lib_dir != NULL)
-			fprintf(stderr, "IP6TABLES_LIB_DIR is deprecated\n");
+			fprintf(stderr, "IP6TABLES_LIB_DIR is deprecated, "
+			        "use XTABLES_LIBDIR.\n");
 	}
 	if (lib_dir == NULL)
 		lib_dir = XTABLES_LIBDIR;
