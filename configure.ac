@@ -7,12 +7,13 @@ define([_XTABLES_VERSION],_XTABLES_VERSION_MAJOR._XTABLES_VERSION_MINOR._XTABLES
 
 AC_INIT([iptables], _XTABLES_VERSION)
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_INSTALL
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([-Wall])
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_DISABLE_STATIC
-AC_PROG_LIBTOOL
+AM_PROG_LIBTOOL
 
 AC_ARG_WITH([kernel],
 	AS_HELP_STRING([--with-kernel=PATH],
@@ -83,5 +84,6 @@ AC_SUBST([XTABLES_VERSION_MINOR])
 AC_SUBST([XTABLES_VERSION_PATCH])
 AC_SUBST([XTABLES_VERSION_EXTRA])
 
-AC_OUTPUT([Makefile extensions/GNUmakefile libipq/Makefile include/xtables.h
-	xtables.pc])
+AC_CONFIG_FILES([Makefile extensions/GNUmakefile libipq/Makefile
+	include/xtables.h xtables.pc])
+AC_OUTPUT
