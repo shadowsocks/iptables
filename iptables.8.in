@@ -56,12 +56,11 @@ tables of IPv4 packet
 filter rules in the Linux kernel.  Several different tables
 may be defined.  Each table contains a number of built-in
 chains and may also contain user-defined chains.
-
+.PP
 Each chain is a list of rules which can match a set of packets.  Each
 rule specifies what to do with a packet that matches.  This is called
 a `target', which may be a jump to a user-defined chain in the same
 table.
-
 .SH TARGETS
 A firewall rule specifies criteria for a packet and a target.  If the
 packet does not match, the next rule in the chain is the examined; if
@@ -342,7 +341,7 @@ module.  You can specify multiple extended match modules in one line,
 and you can use the \fB-h\fP or \fB--help\fP
 options after the module has been specified to receive help specific
 to that module.
-
+.PP
 The following are included in the base package, and most of these can
 be preceded by a "\fB!\fP" to invert the sense of the match.
 .\" @MATCH@
