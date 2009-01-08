@@ -1,4 +1,4 @@
-.TH IPTABLES 8 "Jul 03, 2008" "" ""
+.TH IPTABLES 8 "" "@PACKAGE_AND_VERSION@" "@PACKAGE_AND_VERSION@"
 .\"
 .\" Man page written by Herve Eychenne <rv@wallfire.org> (May 1999)
 .\" It is based on ipchains page.

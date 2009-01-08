@@ -1,4 +1,4 @@
-.TH IP6TABLES 8 "Jul 03, 2008" "" ""
+.TH IP6TABLES 8 "" "@PACKAGE_AND_VERSION@" "@PACKAGE_AND_VERSION@"
 .\"
 .\" Man page written by Andras Kis-Szabo <kisza@sch.bme.hu>
 .\" It is based on iptables man page.
