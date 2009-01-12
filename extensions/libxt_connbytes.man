@@ -10,16 +10,16 @@ scheduled using a lower priority band in traffic control.
 The transferred bytes per connection can also be viewed through
 /proc/net/ip_conntrack and accessed via ctnetlink
 .TP
-[\fB!\fP] \fB--connbytes\fP \fIfrom\fP[\fB:\fR\fIto\fP]
+[\fB!\fP] \fB\-\-connbytes\fP \fIfrom\fP[\fB:\fP\fIto\fP]
 match packets from a connection whose packets/bytes/average packet
 size is more than FROM and less than TO bytes/packets. if TO is
 omitted only FROM check is done. "!" is used to match packets not
 falling in the range.
 .TP
-\fB--connbytes-dir\fR {\fBoriginal\fR|\fBreply\fR|\fBboth\fR}
+\fB\-\-connbytes\-dir\fP {\fBoriginal\fP|\fBreply\fP|\fBboth\fP}
 which packets to consider
 .TP
-\fB--connbytes-mode\fR {\fBpackets\fR|\fBbytes\fR|\fBavgpkt\fR}
+\fB\-\-connbytes\-mode\fP {\fBpackets\fP|\fBbytes\fP|\fBavgpkt\fP}
 whether to check the amount of packets, number of bytes transferred or
 the average size (in bytes) of all packets received so far. Note that
 when "both" is used together with "avgpkt", and data is going (mainly)
@@ -27,4 +27,4 @@ only in one direction (for example HTTP), the average packet size will
 be about half of the actual data packets.
 .TP
 Example:
-iptables .. -m connbytes --connbytes 10000:100000 --connbytes-dir both --connbytes-mode bytes ...
+iptables .. \-m connbytes \-\-connbytes 10000:100000 \-\-connbytes\-dir both \-\-connbytes\-mode bytes ...

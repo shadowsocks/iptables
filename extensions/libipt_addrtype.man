@@ -40,13 +40,13 @@ FIXME
 .TP
 .BI "XRESOLVE"
 .TP
-[\fB!\fP] \fB--src-type\fP \fItype\fP
+[\fB!\fP] \fB\-\-src\-type\fP \fItype\fP
 Matches if the source address is of given type
 .TP
-[\fB!\fP] \fB--dst-type\fP \fItype\fP
+[\fB!\fP] \fB\-\-dst\-type\fP \fItype\fP
 Matches if the destination address is of given type
 .TP
-.BI "--limit-iface-in"
+.BI "\-\-limit\-iface\-in"
 The address type checking can be limited to the interface the packet is coming
 in. This option is only valid in the
 .BR PREROUTING ,
@@ -54,10 +54,10 @@ in. This option is only valid in the
 and
 .B FORWARD
 chains. It cannot be specified with the
-.B "--limit-iface-out"
+\fB\-\-limit\-iface\-out\fP
 option.
 .TP
-.BI "--limit-iface-out"
+\fB\-\-limit\-iface\-out\fP
 The address type checiking can be limited to the interface the packet is going
 out. This option is only valid in the
 .BR POSTROUTING ,
@@ -65,5 +65,5 @@ out. This option is only valid in the
 and
 .B FORWARD
 chains. It cannot be specified with the
-.B --limit-iface-in
+\fB\-\-limit\-iface\-in\fP
 option.

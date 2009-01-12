@@ -13,47 +13,47 @@ matching on source prot
 matching on subnet
 "10000 packets per minute for every /28 subnet in 10.0.0.0/8"
 .PP
-A hash limit option (\fB--hashlimit-upto\fR, \fB--hashlimit-above\fR) and
-\fB--hashlimit-name\fR are required.
+A hash limit option (\fB\-\-hashlimit\-upto\fP, \fB\-\-hashlimit\-above\fP) and
+\fB\-\-hashlimit\-name\fP are required.
 .TP
-\fB--hashlimit-upto\fR \fIamount\fR[\fB/second\fR|\fB/minute\fR|\fB/hour\fR|\fB/day\fR]
+\fB\-\-hashlimit\-upto\fP \fIamount\fP[\fB/second\fP|\fB/minute\fP|\fB/hour\fP|\fB/day\fP]
 Match if the rate is below or equal to \fIamount\fR/quantum. It is specified as
 a number, with an optional time quantum suffix; the default is 3/hour.
 .TP
-\fB--hashlimit-above\fR \fIamount\fR[\fB/second\fR|\fB/minute\fR|\fB/hour\fR|\fB/day\fR]
+\fB\-\-hashlimit\-above\fP \fIamount\fP[\fB/second\fP|\fB/minute\fP|\fB/hour\fP|\fB/day\fP]
 Match if the rate is above \fIamount\fR/quantum.
 .TP
-\fB--hashlimit-burst\fR \fIamount\fR
+\fB\-\-hashlimit\-burst\fP \fIamount\fP
 Maximum initial number of packets to match: this number gets recharged by one
 every time the limit specified above is not reached, up to this number; the
 default is 5.
 .TP
-\fB--hashlimit-mode\fR {\fBsrcip\fR|\fBsrcport\fR|\fBdstip\fR|\fBdstport\fR}\fB,\fP...
+\fB\-\-hashlimit\-mode\fP {\fBsrcip\fP|\fBsrcport\fP|\fBdstip\fP|\fBdstport\fP}\fB,\fP...
 A comma-separated list of objects to take into consideration. If no
---hashlimit-mode option is given, hashlimit acts like limit, but at the
+\-\-hashlimit\-mode option is given, hashlimit acts like limit, but at the
 expensive of doing the hash housekeeping.
 .TP
-\fB--hashlimit-srcmask\fR \fIprefix\fR
-When --hashlimit-mode srcip is used, all source addresses encountered will be
+\fB\-\-hashlimit\-srcmask\fP \fIprefix\fP
+When \-\-hashlimit\-mode srcip is used, all source addresses encountered will be
 grouped according to the given prefix length and the so-created subnet will be
 subject to hashlimit. \fIprefix\fR must be between (inclusive) 0 and 32. Note
-that --hashlimit-srcmask 0 is basically doing the same thing as not specifying
-srcip for --hashlimit-mode, but is technically more expensive.
+that \-\-hashlimit\-srcmask 0 is basically doing the same thing as not specifying
+srcip for \-\-hashlimit\-mode, but is technically more expensive.
 .TP
-\fB--hashlimit-dstmask\fR \fIprefix\fR
-Like --hashlimit-srcmask, but for destination addresses.
+\fB\-\-hashlimit\-dstmask\fP \fIprefix\fP
+Like \-\-hashlimit\-srcmask, but for destination addresses.
 .TP
-\fB--hashlimit-name\fR \fIfoo\fR
+\fB\-\-hashlimit\-name\fP \fIfoo\fP
 The name for the /proc/net/ipt_hashlimit/foo entry.
 .TP
-\fB--hashlimit-htable-size\fR \fIbuckets\fR
+\fB\-\-hashlimit\-htable\-size\fP \fIbuckets\fP
 The number of buckets of the hash table
 .TP
-\fB--hashlimit-htable-max\fR \fIentries\fR
+\fB\-\-hashlimit\-htable\-max\fP \fIentries\fP
 Maximum entries in the hash.
 .TP
-\fB--hashlimit-htable-expire\fR \fImsec\fR
+\fB\-\-hashlimit\-htable\-expire\fP \fImsec\fP
 After how many milliseconds do hash entries expire.
 .TP
-\fB--hashlimit-htable-gcinterval\fR \fImsec\fR
+\fB\-\-hashlimit\-htable\-gcinterval\fP \fImsec\fP
 How many milliseconds between garbage collection intervals.

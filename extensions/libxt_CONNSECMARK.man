@@ -5,11 +5,11 @@ only valid in the
 .B mangle
 table.
 .TP
-.B --save
+\fB\-\-save\fP
 If the packet has a security marking, copy it to the connection
 if the connection is not marked.
 .TP
-.B --restore
+\fB\-\-restore\fP
 If the packet does not have a security marking, and the connection
 does, copy the security marking from the connection to the packet.
 

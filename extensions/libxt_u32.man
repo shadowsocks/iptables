@@ -2,7 +2,7 @@ U32 tests whether quantities of up to 4 bytes extracted from a packet have
 specified values. The specification of what to extract is general enough to
 find data at given offsets from tcp headers or payloads.
 .TP
-[\fB!\fP] \fB--u32\fP \fItests\fP
+[\fB!\fP] \fB\-\-u32\fP \fItests\fP
 The argument amounts to a program in a small language described below.
 .IP
 tests := location "=" value | tests "&&" location "=" value
@@ -53,7 +53,7 @@ C = (*(A+B)<<24) + (*(A+B+1)<<16) + (*(A+B+2)<<8) + *(A+B+3)
 .IP
 @number A = A + C; then do the instruction number
 .PP
-Any access of memory outside [skb->data,skb->end] causes the match to fail.
+Any access of memory outside [skb\->data,skb\->end] causes the match to fail.
 Otherwise the result of the computation is the final value of C.
 .PP
 Whitespace is allowed but not required in the tests. However, the characters
@@ -66,7 +66,7 @@ match IP packets with total length >= 256
 .IP
 The IP header contains a total length field in bytes 2-3.
 .IP
---u32 "\fB0 & 0xFFFF = 0x100:0xFFFF\fR"
+\-\-u32 "\fB0 & 0xFFFF = 0x100:0xFFFF\fP"
 .IP
 read bytes 0-3
 .IP
@@ -79,7 +79,7 @@ match ICMP packets with icmp type 0
 .IP
 First test that it is an ICMP packet, true iff byte 9 (protocol) = 1
 .IP
---u32 "\fB6 & 0xFF = 1 &&\fR ...
+\-\-u32 "\fB6 & 0xFF = 1 &&\fP ...
 .IP
 read bytes 6-9, use \fB&\fR to throw away bytes 6-8 and compare the result to
 1. Next test that it is not a fragment. (If so, it might be part of such a
@@ -114,7 +114,7 @@ TCP payload bytes 8-12 is any of 1, 2, 5 or 8
 .IP
 First we test that the packet is a tcp packet (similar to ICMP).
 .IP
---u32 "\fB6 & 0xFF = 6 &&\fR ...
+\-\-u32 "\fB6 & 0xFF = 6 &&\fP ...
 .IP
 Next, test that it is not a fragment (same as above).
 .IP

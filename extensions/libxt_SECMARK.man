@@ -4,4 +4,4 @@ valid in the
 .B mangle
 table.
 .TP
-.BI "--selctx " "security_context"
+\fB\-\-selctx\fP \fIsecurity_context\fP

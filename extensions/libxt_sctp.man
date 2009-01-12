@@ -1,9 +1,9 @@
 .TP
-[\fB!\fP] \fB--source-port\fP,\fB--sport\fP \fIport\fP[\fB:\fP\fIport\fP]
+[\fB!\fP] \fB\-\-source\-port\fP,\fB\-\-sport\fP \fIport\fP[\fB:\fP\fIport\fP]
 .TP
-[\fB!\fP] \fB--destination-port\fP,\fB--dport\fP \fIport\fP[\fB:\fP\fIport\fP]
+[\fB!\fP] \fB\-\-destination\-port\fP,\fB\-\-dport\fP \fIport\fP[\fB:\fP\fIport\fP]
 .TP
-[\fB!\fP] \fB--chunk-types\fP {\fBall\fP|\fBany\fP|\fBonly\fP} \fIchunktype\fP[\fB:\fP\fIflags\fP] [...]
+[\fB!\fP] \fB\-\-chunk\-types\fP {\fBall\fP|\fBany\fP|\fBonly\fP} \fIchunktype\fP[\fB:\fP\fIflags\fP] [...]
 The flag letter in upper case indicates that the flag is to match if set,
 in the lower case indicates to match if unset.
 
@@ -21,8 +21,8 @@ SHUTDOWN_COMPLETE     T t
 .P
 Examples:
 
-iptables -A INPUT -p sctp --dport 80 -j DROP
+iptables \-A INPUT \-p sctp \-\-dport 80 \-j DROP
 
-iptables -A INPUT -p sctp --chunk-types any DATA,INIT -j DROP
+iptables \-A INPUT \-p sctp \-\-chunk\-types any DATA,INIT \-j DROP
 
-iptables -A INPUT -p sctp --chunk-types any DATA:Be -j ACCEPT
+iptables \-A INPUT \-p sctp \-\-chunk\-types any DATA:Be \-j ACCEPT

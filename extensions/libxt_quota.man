@@ -1,6 +1,6 @@
 Implements network quotas by decrementing a byte counter with each
 packet.
 .TP
-.BI "--quota " "bytes"
+\fB\-\-quota\fP \fIbytes\fP
 The quota in bytes.
 .P
