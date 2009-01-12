@@ -4,7 +4,7 @@ ACLOCAL_AMFLAGS  = -I m4
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
 AM_CFLAGS        = ${regular_CFLAGS} -I${top_builddir}/include -I${top_srcdir}/include ${kinclude_CFLAGS}
-SUBDIRS         := extensions
+SUBDIRS          = extensions
 if ENABLE_LIBIPQ
 SUBDIRS         += libipq
 endif
@@ -68,16 +68,16 @@ ip6tables_static_SOURCES    = ${ip6tables_multi_SOURCES} xtables.c
 ip6tables_static_CFLAGS     = ${ip6tables_multi_CFLAGS} -DNO_SHARED_LIBS=1
 ip6tables_static_LDADD      = -lm libiptc/libiptc.a extensions/libext6.a
 
-noinst_LIBRARIES := libiptc/libiptc.a
-bin_PROGRAMS     := iptables-xml
-sbin_PROGRAMS    :=
-noinst_PROGRAMS  :=
-man_MANS         := iptables.8 iptables-restore.8 iptables-save.8 \
-                    iptables-xml.8 ip6tables.8 ip6tables-restore.8 \
-                    ip6tables-save.8
-CLEANFILES       := iptables.8 ip6tables.8
+noinst_LIBRARIES = libiptc/libiptc.a
+bin_PROGRAMS     = iptables-xml
+sbin_PROGRAMS    =
+noinst_PROGRAMS  =
+man_MANS         = iptables.8 iptables-restore.8 iptables-save.8 \
+                   iptables-xml.8 ip6tables.8 ip6tables-restore.8 \
+                   ip6tables-save.8
+CLEANFILES       = iptables.8 ip6tables.8
 if ENABLE_DEVEL
-include_HEADERS  := include/xtables.h
+include_HEADERS  = include/xtables.h
 endif
 
 if ENABLE_STATIC
