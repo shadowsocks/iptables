@@ -324,7 +324,7 @@ owner_mt_print_item_v0(const struct ipt_owner_info *info, const char *label,
 		return;
 	if (info->invert & flag)
 		printf("! ");
-	printf(label);
+	printf("%s ", label);
 
 	switch (info->match & flag) {
 	case IPT_OWNER_UID:
@@ -375,7 +375,7 @@ owner_mt6_print_item_v0(const struct ip6t_owner_info *info, const char *label,
 		return;
 	if (info->invert & flag)
 		printf("! ");
-	printf(label);
+	printf("%s ", label);
 
 	switch (info->match & flag) {
 	case IP6T_OWNER_UID:
