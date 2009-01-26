@@ -27,9 +27,9 @@ interface which begins with this name will match. Note that in the
 .B OUTPUT
 chains one cannot match on the bridge output port, however one can in the
 .B "filter OUTPUT"
-chain. If the packet won't leave by a bridge device or it is yet unknown what
-the output device will be, then the packet won't match this option, unless
-'!' is used.
+chain. If the packet won't leave by a bridge device or if it is yet unknown what
+the output device will be, then the packet won't match this option,
+unless '!' is used.
 .TP
 [\fB!\fP] \fB\-\-physdev\-is\-in\fP
 Matches if the packet has entered through a bridge interface.
