@@ -676,7 +676,31 @@ void xtables_register_target(struct xtables_target *me)
 	me->tflags = 0;
 }
 
-void param_act(unsigned int status, const char *p1, ...)
+/**
+ * xtables_param_act - act on condition
+ * @status:	a constant from enum xtables_exittype
+ *
+ * %XTF_ONLY_ONCE: print error message that option may only be used once.
+ * @p1:		module name (e.g. "mark")
+ * @p2(...):	option in conflict (e.g. "--mark")
+ * @p3(...):	condition to match on (see extensions/ for examples)
+ *
+ * %XTF_NO_INVERT: option does not support inversion
+ * @p1:		module name
+ * @p2:		option in conflict
+ * @p3:		condition to match on
+ *
+ * %XTF_BAD_VALUE: bad value for option
+ * @p1:		module name
+ * @p2:		option with which the problem occured (e.g. "--mark")
+ * @p3:		string the user passed in (e.g. "99999999999999")
+ *
+ * %XTF_ONE_ACTION: two mutually exclusive actions have been specified
+ * @p1:		module name
+ *
+ * Displays an error message and exits the program.
+ */
+void xtables_param_act(unsigned int status, const char *p1, ...)
 {
 	const char *p2, *p3;
 	va_list args;
@@ -685,7 +709,7 @@ void param_act(unsigned int status, const char *p1, ...)
 	va_start(args, p1);
 
 	switch (status) {
-	case P_ONLY_ONCE:
+	case XTF_ONLY_ONCE:
 		p2 = va_arg(args, const char *);
 		b  = va_arg(args, unsigned int);
 		if (!b)
@@ -694,7 +718,7 @@ void param_act(unsigned int status, const char *p1, ...)
 		           "%s: \"%s\" option may only be specified once",
 		           p1, p2);
 		break;
-	case P_NO_INVERT:
+	case XTF_NO_INVERT:
 		p2 = va_arg(args, const char *);
 		b  = va_arg(args, unsigned int);
 		if (!b)
@@ -702,14 +726,14 @@ void param_act(unsigned int status, const char *p1, ...)
 		exit_error(PARAMETER_PROBLEM,
 		           "%s: \"%s\" option cannot be inverted", p1, p2);
 		break;
-	case P_BAD_VALUE:
+	case XTF_BAD_VALUE:
 		p2 = va_arg(args, const char *);
 		p3 = va_arg(args, const char *);
 		exit_error(PARAMETER_PROBLEM,
 		           "%s: Bad value for \"%s\" option: \"%s\"",
 		           p1, p2, p3);
 		break;
-	case P_ONE_ACTION:
+	case XTF_ONE_ACTION:
 		b = va_arg(args, unsigned int);
 		if (!b)
 			return;

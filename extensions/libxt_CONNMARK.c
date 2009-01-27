@@ -158,14 +158,14 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 	switch (c) {
 	case '=': /* --set-xmark */
 	case '-': /* --set-mark */
-		param_act(P_ONE_ACTION, "CONNMARK", *flags & F_MARK);
+		xtables_param_act(XTF_ONE_ACTION, "CONNMARK", *flags & F_MARK);
 		if (!xtables_strtoui(optarg, &end, &value, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "CONNMARK", "--set-xmark/--set-mark", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "CONNMARK", "--set-xmark/--set-mark", optarg);
 		if (*end == '/')
 			if (!xtables_strtoui(end + 1, &end, &mask, 0, UINT32_MAX))
-				param_act(P_BAD_VALUE, "CONNMARK", "--set-xmark/--set-mark", optarg);
+				xtables_param_act(XTF_BAD_VALUE, "CONNMARK", "--set-xmark/--set-mark", optarg);
 		if (*end != '\0')
-			param_act(P_BAD_VALUE, "CONNMARK", "--set-xmark/--set-mark", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "CONNMARK", "--set-xmark/--set-mark", optarg);
 		info->mode   = XT_CONNMARK_SET;
 		info->ctmark = value;
 		info->ctmask = mask;
@@ -175,9 +175,9 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 		return true;
 
 	case '&': /* --and-mark */
-		param_act(P_ONE_ACTION, "CONNMARK", *flags & F_MARK);
+		xtables_param_act(XTF_ONE_ACTION, "CONNMARK", *flags & F_MARK);
 		if (!xtables_strtoui(optarg, NULL, &mask, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "CONNMARK", "--and-mark", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "CONNMARK", "--and-mark", optarg);
 		info->mode   = XT_CONNMARK_SET;
 		info->ctmark = 0;
 		info->ctmask = ~mask;
@@ -185,9 +185,9 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 		return true;
 
 	case '|': /* --or-mark */
-		param_act(P_ONE_ACTION, "CONNMARK", *flags & F_MARK);
+		xtables_param_act(XTF_ONE_ACTION, "CONNMARK", *flags & F_MARK);
 		if (!xtables_strtoui(optarg, NULL, &value, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "CONNMARK", "--or-mark", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "CONNMARK", "--or-mark", optarg);
 		info->mode   = XT_CONNMARK_SET;
 		info->ctmark = value;
 		info->ctmask = value;
@@ -195,9 +195,9 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 		return true;
 
 	case '^': /* --xor-mark */
-		param_act(P_ONE_ACTION, "CONNMARK", *flags & F_MARK);
+		xtables_param_act(XTF_ONE_ACTION, "CONNMARK", *flags & F_MARK);
 		if (!xtables_strtoui(optarg, NULL, &value, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "CONNMARK", "--xor-mark", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "CONNMARK", "--xor-mark", optarg);
 		info->mode   = XT_CONNMARK_SET;
 		info->ctmark = value;
 		info->ctmask = 0;
@@ -205,13 +205,13 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 		return true;
 
 	case 'S': /* --save-mark */
-		param_act(P_ONE_ACTION, "CONNMARK", *flags & F_MARK);
+		xtables_param_act(XTF_ONE_ACTION, "CONNMARK", *flags & F_MARK);
 		info->mode = XT_CONNMARK_SAVE;
 		*flags |= F_MARK | F_SR_MARK;
 		return true;
 
 	case 'R': /* --restore-mark */
-		param_act(P_ONE_ACTION, "CONNMARK", *flags & F_MARK);
+		xtables_param_act(XTF_ONE_ACTION, "CONNMARK", *flags & F_MARK);
 		info->mode = XT_CONNMARK_RESTORE;
 		*flags |= F_MARK | F_SR_MARK;
 		return true;
@@ -222,7 +222,7 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 			           "or --restore-mark is required for "
 			           "--nfmask");
 		if (!xtables_strtoui(optarg, NULL, &value, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "CONNMARK", "--nfmask", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "CONNMARK", "--nfmask", optarg);
 		info->nfmask = value;
 		return true;
 
@@ -232,7 +232,7 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 			           "or --restore-mark is required for "
 			           "--ctmask");
 		if (!xtables_strtoui(optarg, NULL, &value, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "CONNMARK", "--ctmask", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "CONNMARK", "--ctmask", optarg);
 		info->ctmask = value;
 		return true;
 
@@ -242,7 +242,7 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 			           "or --restore-mark is required for "
 			           "--mask");
 		if (!xtables_strtoui(optarg, NULL, &value, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "CONNMARK", "--mask", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "CONNMARK", "--mask", optarg);
 		info->nfmask = info->ctmask = value;
 		return true;
 	}

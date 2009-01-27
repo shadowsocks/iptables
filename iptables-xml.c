@@ -30,7 +30,7 @@ const char *program_version;
 
 #ifndef IPTABLES_MULTI
 int line = 0;
-void exit_error(enum exittype status, const char *msg, ...)
+void exit_error(enum xtables_exittype status, const char *msg, ...)
 {
 	va_list args;
 

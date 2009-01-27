@@ -217,7 +217,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch(c) {
 	case '%':
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit",
 		          *flags & PARAM_LIMIT);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!parse_rate(optarg, &r->cfg.avg))
@@ -227,7 +227,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '$':
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-burst",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-burst",
 		          *flags & PARAM_BURST);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, 10000))
@@ -237,7 +237,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_BURST;
 		break;
 	case '&':
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-htable-size",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-htable-size",
 		          *flags & PARAM_SIZE);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
@@ -247,7 +247,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_SIZE;
 		break;
 	case '*':
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-htable-max",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-htable-max",
 		          *flags & PARAM_MAX);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
@@ -257,7 +257,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_MAX;
 		break;
 	case '(':
-		param_act(P_ONLY_ONCE, "hashlimit",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit",
 		          "--hashlimit-htable-gcinterval",
 		          *flags & PARAM_GCINTERVAL);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
@@ -270,7 +270,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_GCINTERVAL;
 		break;
 	case ')':
-		param_act(P_ONLY_ONCE, "hashlimit",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit",
 		          "--hashlimit-htable-expire", *flags & PARAM_EXPIRE);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
@@ -281,7 +281,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_EXPIRE;
 		break;
 	case '_':
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-mode",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-mode",
 		          *flags & PARAM_MODE);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (parse_mode(&r->cfg.mode, optarg) < 0)
@@ -290,7 +290,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= PARAM_MODE;
 		break;
 	case '"':
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-name",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-name",
 		          *flags & PARAM_NAME);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (strlen(optarg) == 0)
@@ -317,63 +317,63 @@ hashlimit_mt_parse(struct xt_hashlimit_mtinfo1 *info, unsigned int *flags,
 
 	switch(c) {
 	case '%': /* --hashlimit / --hashlimit-below */
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-upto",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-upto",
 		          *flags & PARAM_LIMIT);
 		if (invert)
 			info->cfg.mode |= XT_HASHLIMIT_INVERT;
 		if (!parse_rate(optarg, &info->cfg.avg))
-			param_act(P_BAD_VALUE, "hashlimit",
+			xtables_param_act(XTF_BAD_VALUE, "hashlimit",
 			          "--hashlimit-upto", optarg);
 		*flags |= PARAM_LIMIT;
 		return true;
 
 	case '^': /* --hashlimit-above == !--hashlimit-below */
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-above",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-above",
 		          *flags & PARAM_LIMIT);
 		if (!invert)
 			info->cfg.mode |= XT_HASHLIMIT_INVERT;
 		if (!parse_rate(optarg, &info->cfg.avg))
-			param_act(P_BAD_VALUE, "hashlimit",
+			xtables_param_act(XTF_BAD_VALUE, "hashlimit",
 			          "--hashlimit-above", optarg);
 		*flags |= PARAM_LIMIT;
 		return true;
 
 	case '$': /* --hashlimit-burst */
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-burst",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-burst",
 		          *flags & PARAM_BURST);
 		if (!xtables_strtoui(optarg, NULL, &num, 0, 10000))
-			param_act(P_BAD_VALUE, "hashlimit",
+			xtables_param_act(XTF_BAD_VALUE, "hashlimit",
 			          "--hashlimit-burst", optarg);
 		info->cfg.burst = num;
 		*flags |= PARAM_BURST;
 		return true;
 
 	case '&': /* --hashlimit-htable-size */
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-htable-size",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-htable-size",
 		          *flags & PARAM_SIZE);
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "hashlimit",
+			xtables_param_act(XTF_BAD_VALUE, "hashlimit",
 			          "--hashlimit-htable-size", optarg);
 		info->cfg.size = num;
 		*flags |= PARAM_SIZE;
 		return true;
 
 	case '*': /* --hashlimit-htable-max */
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-htable-max",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-htable-max",
 		          *flags & PARAM_MAX);
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "hashlimit",
+			xtables_param_act(XTF_BAD_VALUE, "hashlimit",
 			          "--hashlimit-htable-max", optarg);
 		info->cfg.max = num;
 		*flags |= PARAM_MAX;
 		return true;
 
 	case '(': /* --hashlimit-htable-gcinterval */
-		param_act(P_ONLY_ONCE, "hashlimit",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit",
 		          "--hashlimit-htable-gcinterval",
 		          *flags & PARAM_GCINTERVAL);
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "hashlimit",
+			xtables_param_act(XTF_BAD_VALUE, "hashlimit",
 			          "--hashlimit-htable-gcinterval", optarg);
 		/* FIXME: not HZ dependent!! */
 		info->cfg.gc_interval = num;
@@ -381,10 +381,10 @@ hashlimit_mt_parse(struct xt_hashlimit_mtinfo1 *info, unsigned int *flags,
 		return true;
 
 	case ')': /* --hashlimit-htable-expire */
-		param_act(P_ONLY_ONCE, "hashlimit",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit",
 		          "--hashlimit-htable-expire", *flags & PARAM_EXPIRE);
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "hashlimit",
+			xtables_param_act(XTF_BAD_VALUE, "hashlimit",
 			          "--hashlimit-htable-expire", optarg);
 		/* FIXME: not HZ dependent */
 		info->cfg.expire = num;
@@ -392,16 +392,16 @@ hashlimit_mt_parse(struct xt_hashlimit_mtinfo1 *info, unsigned int *flags,
 		return true;
 
 	case '_':
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-mode",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-mode",
 		          *flags & PARAM_MODE);
 		if (parse_mode(&info->cfg.mode, optarg) < 0)
-			param_act(P_BAD_VALUE, "hashlimit",
+			xtables_param_act(XTF_BAD_VALUE, "hashlimit",
 			          "--hashlimit-mode", optarg);
 		*flags |= PARAM_MODE;
 		return true;
 
 	case '"': /* --hashlimit-name */
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-name",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-name",
 		          *flags & PARAM_NAME);
 		if (strlen(optarg) == 0)
 			exit_error(PARAMETER_PROBLEM, "Zero-length name?");
@@ -411,20 +411,20 @@ hashlimit_mt_parse(struct xt_hashlimit_mtinfo1 *info, unsigned int *flags,
 		return true;
 
 	case '<': /* --hashlimit-srcmask */
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-srcmask",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-srcmask",
 		          *flags & PARAM_SRCMASK);
 		if (!xtables_strtoui(optarg, NULL, &num, 0, maxmask))
-			param_act(P_BAD_VALUE, "hashlimit",
+			xtables_param_act(XTF_BAD_VALUE, "hashlimit",
 			          "--hashlimit-srcmask", optarg);
 		info->cfg.srcmask = num;
 		*flags |= PARAM_SRCMASK;
 		return true;
 
 	case '>': /* --hashlimit-dstmask */
-		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-dstmask",
+		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-dstmask",
 		          *flags & PARAM_DSTMASK);
 		if (!xtables_strtoui(optarg, NULL, &num, 0, maxmask))
-			param_act(P_BAD_VALUE, "hashlimit",
+			xtables_param_act(XTF_BAD_VALUE, "hashlimit",
 			          "--hashlimit-dstmask", optarg);
 		info->cfg.dstmask = num;
 		*flags |= PARAM_DSTMASK;

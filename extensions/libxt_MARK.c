@@ -134,15 +134,15 @@ static int mark_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case 'X': /* --set-xmark */
 	case '=': /* --set-mark */
-		param_act(P_ONE_ACTION, "MARK", *flags & F_MARK);
-		param_act(P_NO_INVERT, "MARK", "--set-xmark/--set-mark", invert);
+		xtables_param_act(XTF_ONE_ACTION, "MARK", *flags & F_MARK);
+		xtables_param_act(XTF_NO_INVERT, "MARK", "--set-xmark/--set-mark", invert);
 		if (!xtables_strtoui(optarg, &end, &value, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "MARK", "--set-xmark/--set-mark", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "MARK", "--set-xmark/--set-mark", optarg);
 		if (*end == '/')
 			if (!xtables_strtoui(end + 1, &end, &mask, 0, UINT32_MAX))
-				param_act(P_BAD_VALUE, "MARK", "--set-xmark/--set-mark", optarg);
+				xtables_param_act(XTF_BAD_VALUE, "MARK", "--set-xmark/--set-mark", optarg);
 		if (*end != '\0')
-			param_act(P_BAD_VALUE, "MARK", "--set-xmark/--set-mark", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "MARK", "--set-xmark/--set-mark", optarg);
 		info->mark = value;
 		info->mask = mask;
 
@@ -151,28 +151,28 @@ static int mark_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '&': /* --and-mark */
-		param_act(P_ONE_ACTION, "MARK", *flags & F_MARK);
-		param_act(P_NO_INVERT, "MARK", "--and-mark", invert);
+		xtables_param_act(XTF_ONE_ACTION, "MARK", *flags & F_MARK);
+		xtables_param_act(XTF_NO_INVERT, "MARK", "--and-mark", invert);
 		if (!xtables_strtoui(optarg, NULL, &mask, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "MARK", "--and-mark", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "MARK", "--and-mark", optarg);
 		info->mark = 0;
 		info->mask = ~mask;
 		break;
 
 	case '|': /* --or-mark */
-		param_act(P_ONE_ACTION, "MARK", *flags & F_MARK);
-		param_act(P_NO_INVERT, "MARK", "--or-mark", invert);
+		xtables_param_act(XTF_ONE_ACTION, "MARK", *flags & F_MARK);
+		xtables_param_act(XTF_NO_INVERT, "MARK", "--or-mark", invert);
 		if (!xtables_strtoui(optarg, NULL, &value, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "MARK", "--or-mark", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "MARK", "--or-mark", optarg);
 		info->mark = value;
 		info->mask = value;
 		break;
 
 	case '^': /* --xor-mark */
-		param_act(P_ONE_ACTION, "MARK", *flags & F_MARK);
-		param_act(P_NO_INVERT, "MARK", "--xor-mark", invert);
+		xtables_param_act(XTF_ONE_ACTION, "MARK", *flags & F_MARK);
+		xtables_param_act(XTF_NO_INVERT, "MARK", "--xor-mark", invert);
 		if (!xtables_strtoui(optarg, NULL, &value, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "MARK", "--xor-mark", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "MARK", "--xor-mark", optarg);
 		info->mark = value;
 		info->mask = 0;
 		break;

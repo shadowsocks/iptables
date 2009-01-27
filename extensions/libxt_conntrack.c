@@ -269,13 +269,13 @@ conntrack_ps_expires(struct xt_conntrack_mtinfo1 *info, const char *s)
 	char *end;
 
 	if (!xtables_strtoui(s, &end, &min, 0, UINT32_MAX))
-		param_act(P_BAD_VALUE, "conntrack", "--expires", s);
+		xtables_param_act(XTF_BAD_VALUE, "conntrack", "--expires", s);
 	max = min;
 	if (*end == ':')
 		if (!xtables_strtoui(s, &end, &max, 0, UINT32_MAX))
-			param_act(P_BAD_VALUE, "conntrack", "--expires", s);
+			xtables_param_act(XTF_BAD_VALUE, "conntrack", "--expires", s);
 	if (*end != '\0')
-		param_act(P_BAD_VALUE, "conntrack", "--expires", s);
+		xtables_param_act(XTF_BAD_VALUE, "conntrack", "--expires", s);
 
 	if (min > max)
 		exit_error(PARAMETER_PROBLEM,
@@ -482,7 +482,7 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case 'a': /* --ctorigsrcport */
 		if (!xtables_strtoui(optarg, NULL, &port, 0, UINT16_MAX))
-			param_act(P_BAD_VALUE, "conntrack",
+			xtables_param_act(XTF_BAD_VALUE, "conntrack",
 			          "--ctorigsrcport", optarg);
 		info->match_flags |= XT_CONNTRACK_ORIGSRC_PORT;
 		info->origsrc_port = htons(port);
@@ -492,7 +492,7 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case 'b': /* --ctorigdstport */
 		if (!xtables_strtoui(optarg, NULL, &port, 0, UINT16_MAX))
-			param_act(P_BAD_VALUE, "conntrack",
+			xtables_param_act(XTF_BAD_VALUE, "conntrack",
 			          "--ctorigdstport", optarg);
 		info->match_flags |= XT_CONNTRACK_ORIGDST_PORT;
 		info->origdst_port = htons(port);
@@ -502,7 +502,7 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case 'c': /* --ctreplsrcport */
 		if (!xtables_strtoui(optarg, NULL, &port, 0, UINT16_MAX))
-			param_act(P_BAD_VALUE, "conntrack",
+			xtables_param_act(XTF_BAD_VALUE, "conntrack",
 			          "--ctreplsrcport", optarg);
 		info->match_flags |= XT_CONNTRACK_REPLSRC_PORT;
 		info->replsrc_port = htons(port);
@@ -512,7 +512,7 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case 'd': /* --ctrepldstport */
 		if (!xtables_strtoui(optarg, NULL, &port, 0, UINT16_MAX))
-			param_act(P_BAD_VALUE, "conntrack",
+			xtables_param_act(XTF_BAD_VALUE, "conntrack",
 			          "--ctrepldstport", optarg);
 		info->match_flags |= XT_CONNTRACK_REPLDST_PORT;
 		info->repldst_port = htons(port);
@@ -521,7 +521,7 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case 'e': /* --ctdir */
-		param_act(P_NO_INVERT, "conntrack", "--ctdir", invert);
+		xtables_param_act(XTF_NO_INVERT, "conntrack", "--ctdir", invert);
 		if (strcasecmp(optarg, "ORIGINAL") == 0) {
 			info->match_flags  |= XT_CONNTRACK_DIRECTION;
 			info->invert_flags &= ~XT_CONNTRACK_DIRECTION;
@@ -529,7 +529,7 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 			info->match_flags  |= XT_CONNTRACK_DIRECTION;
 			info->invert_flags |= XT_CONNTRACK_DIRECTION;
 		} else {
-			param_act(P_BAD_VALUE, "conntrack", "--ctdir", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "conntrack", "--ctdir", optarg);
 		}
 		break;
 

@@ -365,7 +365,7 @@ exit_printhelp(struct ip6tables_rule_match *matches)
 }
 
 void
-exit_error(enum exittype status, const char *msg, ...)
+exit_error(enum xtables_exittype status, const char *msg, ...)
 {
 	va_list args;
 

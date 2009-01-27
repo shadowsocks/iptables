@@ -112,11 +112,11 @@ owner_mt_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case 'u':
-		param_act(P_ONLY_ONCE, "owner", "--uid-owner", *flags & FLAG_UID_OWNER);
+		xtables_param_act(XTF_ONLY_ONCE, "owner", "--uid-owner", *flags & FLAG_UID_OWNER);
 		if ((pwd = getpwnam(optarg)) != NULL)
 			id = pwd->pw_uid;
 		else if (!xtables_strtoui(optarg, NULL, &id, 0, UINT32_MAX - 1))
-			param_act(P_BAD_VALUE, "owner", "--uid-owner", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "owner", "--uid-owner", optarg);
 		if (invert)
 			info->invert |= IPT_OWNER_UID;
 		info->match |= IPT_OWNER_UID;
@@ -125,11 +125,11 @@ owner_mt_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		return true;
 
 	case 'g':
-		param_act(P_ONLY_ONCE, "owner", "--gid-owner", *flags & FLAG_GID_OWNER);
+		xtables_param_act(XTF_ONLY_ONCE, "owner", "--gid-owner", *flags & FLAG_GID_OWNER);
 		if ((grp = getgrnam(optarg)) != NULL)
 			id = grp->gr_gid;
 		else if (!xtables_strtoui(optarg, NULL, &id, 0, UINT32_MAX - 1))
-			param_act(P_BAD_VALUE, "owner", "--gid-owner", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "owner", "--gid-owner", optarg);
 		if (invert)
 			info->invert |= IPT_OWNER_GID;
 		info->match |= IPT_OWNER_GID;
@@ -138,9 +138,9 @@ owner_mt_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		return true;
 
 	case 'p':
-		param_act(P_ONLY_ONCE, "owner", "--pid-owner", *flags & FLAG_PID_OWNER);
+		xtables_param_act(XTF_ONLY_ONCE, "owner", "--pid-owner", *flags & FLAG_PID_OWNER);
 		if (!xtables_strtoui(optarg, NULL, &id, 0, INT_MAX))
-			param_act(P_BAD_VALUE, "owner", "--pid-owner", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "owner", "--pid-owner", optarg);
 		if (invert)
 			info->invert |= IPT_OWNER_PID;
 		info->match |= IPT_OWNER_PID;
@@ -149,9 +149,9 @@ owner_mt_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		return true;
 
 	case 's':
-		param_act(P_ONLY_ONCE, "owner", "--sid-owner", *flags & FLAG_SID_OWNER);
+		xtables_param_act(XTF_ONLY_ONCE, "owner", "--sid-owner", *flags & FLAG_SID_OWNER);
 		if (!xtables_strtoui(optarg, NULL, &id, 0, INT_MAX))
-			param_act(P_BAD_VALUE, "owner", "--sid-value", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "owner", "--sid-value", optarg);
 		if (invert)
 			info->invert |= IPT_OWNER_SID;
 		info->match |= IPT_OWNER_SID;
@@ -161,7 +161,7 @@ owner_mt_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 
 #ifdef IPT_OWNER_COMM
 	case 'c':
-		param_act(P_ONLY_ONCE, "owner", "--cmd-owner", *flags & FLAG_COMM);
+		xtables_param_act(XTF_ONLY_ONCE, "owner", "--cmd-owner", *flags & FLAG_COMM);
 		if (strlen(optarg) > sizeof(info->comm))
 			exit_error(PARAMETER_PROBLEM, "owner match: command "
 			           "\"%s\" too long, max. %zu characters",
@@ -191,12 +191,12 @@ owner_mt6_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case 'u':
-		param_act(P_ONLY_ONCE, "owner", "--uid-owner",
+		xtables_param_act(XTF_ONLY_ONCE, "owner", "--uid-owner",
 		          *flags & FLAG_UID_OWNER);
 		if ((pwd = getpwnam(optarg)) != NULL)
 			id = pwd->pw_uid;
 		else if (!xtables_strtoui(optarg, NULL, &id, 0, UINT32_MAX - 1))
-			param_act(P_BAD_VALUE, "owner", "--uid-owner", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "owner", "--uid-owner", optarg);
 		if (invert)
 			info->invert |= IP6T_OWNER_UID;
 		info->match |= IP6T_OWNER_UID;
@@ -205,12 +205,12 @@ owner_mt6_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		return true;
 
 	case 'g':
-		param_act(P_ONLY_ONCE, "owner", "--gid-owner",
+		xtables_param_act(XTF_ONLY_ONCE, "owner", "--gid-owner",
 		          *flags & FLAG_GID_OWNER);
 		if ((grp = getgrnam(optarg)) != NULL)
 			id = grp->gr_gid;
 		else if (!xtables_strtoui(optarg, NULL, &id, 0, UINT32_MAX - 1))
-			param_act(P_BAD_VALUE, "owner", "--gid-owner", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "owner", "--gid-owner", optarg);
 		if (invert)
 			info->invert |= IP6T_OWNER_GID;
 		info->match |= IP6T_OWNER_GID;
@@ -219,10 +219,10 @@ owner_mt6_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		return true;
 
 	case 'p':
-		param_act(P_ONLY_ONCE, "owner", "--pid-owner",
+		xtables_param_act(XTF_ONLY_ONCE, "owner", "--pid-owner",
 		          *flags & FLAG_PID_OWNER);
 		if (!xtables_strtoui(optarg, NULL, &id, 0, INT_MAX))
-			param_act(P_BAD_VALUE, "owner", "--pid-owner", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "owner", "--pid-owner", optarg);
 		if (invert)
 			info->invert |= IP6T_OWNER_PID;
 		info->match |= IP6T_OWNER_PID;
@@ -231,10 +231,10 @@ owner_mt6_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		return true;
 
 	case 's':
-		param_act(P_ONLY_ONCE, "owner", "--sid-owner",
+		xtables_param_act(XTF_ONLY_ONCE, "owner", "--sid-owner",
 		          *flags & FLAG_SID_OWNER);
 		if (!xtables_strtoui(optarg, NULL, &id, 0, INT_MAX))
-			param_act(P_BAD_VALUE, "owner", "--sid-owner", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "owner", "--sid-owner", optarg);
 		if (invert)
 			info->invert |= IP6T_OWNER_SID;
 		info->match |= IP6T_OWNER_SID;
@@ -252,13 +252,13 @@ static void owner_parse_range(const char *s, unsigned int *from,
 
 	/* -1 is reversed, so the max is one less than that. */
 	if (!xtables_strtoui(s, &end, from, 0, UINT32_MAX - 1))
-		param_act(P_BAD_VALUE, "owner", opt, s);
+		xtables_param_act(XTF_BAD_VALUE, "owner", opt, s);
 	*to = *from;
 	if (*end == '-' || *end == ':')
 		if (!xtables_strtoui(end + 1, &end, to, 0, UINT32_MAX - 1))
-			param_act(P_BAD_VALUE, "owner", opt, s);
+			xtables_param_act(XTF_BAD_VALUE, "owner", opt, s);
 	if (*end != '\0')
-		param_act(P_BAD_VALUE, "owner", opt, s);
+		xtables_param_act(XTF_BAD_VALUE, "owner", opt, s);
 }
 
 static int owner_mt_parse(int c, char **argv, int invert, unsigned int *flags,
@@ -271,7 +271,7 @@ static int owner_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case 'u':
-		param_act(P_ONLY_ONCE, "owner", "--uid-owner",
+		xtables_param_act(XTF_ONLY_ONCE, "owner", "--uid-owner",
 		          *flags & FLAG_UID_OWNER);
 		if ((pwd = getpwnam(optarg)) != NULL)
 			from = to = pwd->pw_uid;
@@ -286,7 +286,7 @@ static int owner_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 		return true;
 
 	case 'g':
-		param_act(P_ONLY_ONCE, "owner", "--gid-owner",
+		xtables_param_act(XTF_ONLY_ONCE, "owner", "--gid-owner",
 		          *flags & FLAG_GID_OWNER);
 		if ((grp = getgrnam(optarg)) != NULL)
 			from = to = grp->gr_gid;
@@ -301,7 +301,7 @@ static int owner_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 		return true;
 
 	case 'k':
-		param_act(P_ONLY_ONCE, "owner", "--socket-exists",
+		xtables_param_act(XTF_ONLY_ONCE, "owner", "--socket-exists",
 		          *flags & FLAG_SOCKET_EXISTS);
 		if (invert)
 			info->invert |= XT_OWNER_SOCKET;
