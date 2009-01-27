@@ -51,7 +51,7 @@ parse_frag_id(const char *idstr, const char *typestr)
 		exit_error(PARAMETER_PROBLEM,
 			   "FRAG error parsing %s `%s'", typestr, idstr);
 	}
-	return (u_int32_t) id;
+	return id;
 }
 
 static void

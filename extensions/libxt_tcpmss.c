@@ -27,7 +27,7 @@ parse_tcp_mssvalue(const char *mssvalue)
 	unsigned int mssvaluenum;
 
 	if (string_to_number(mssvalue, 0, 65535, &mssvaluenum) != -1)
-		return (u_int16_t)mssvaluenum;
+		return mssvaluenum;
 
 	exit_error(PARAMETER_PROBLEM,
 		   "Invalid mss `%s' specified", mssvalue);

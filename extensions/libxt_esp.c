@@ -43,7 +43,7 @@ parse_esp_spi(const char *spistr)
 		exit_error(PARAMETER_PROBLEM,
 			   "ESP error parsing spi `%s'", spistr);
 	}
-	return (u_int32_t) spi;
+	return spi;
 }
 
 static void

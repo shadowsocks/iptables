@@ -45,7 +45,7 @@ parse_ah_spi(const char *spistr, const char *typestr)
 		exit_error(PARAMETER_PROBLEM,
 			   "AH error parsing %s `%s'", typestr, spistr);
 
-	return (u_int32_t) spi;
+	return spi;
 }
 
 static void

@@ -29,7 +29,7 @@ parse_length(const char *s)
 	if (string_to_number(s, 0, 0xFFFF, &len) == -1)
 		exit_error(PARAMETER_PROBLEM, "length invalid: `%s'\n", s);
 	else
-		return (u_int16_t )len;
+		return len;
 }
 
 /* If a single value is provided, min and max are both set to the value */

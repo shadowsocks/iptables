@@ -110,7 +110,7 @@ name_to_proto(const char *s)
         			s);
         }
 
-        return (u_int16_t)proto;
+        return proto;
 }
 
 static unsigned int 

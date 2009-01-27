@@ -91,7 +91,7 @@ parse_level(const char *level)
 				   "log-level `%s' unknown", level);
 	}
 
-	return (u_int8_t)lev;
+	return lev;
 }
 
 #define IP6T_LOG_OPT_LEVEL 0x01

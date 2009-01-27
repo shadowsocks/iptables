@@ -122,7 +122,7 @@ static int CLUSTERIP_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM, "Can only specify total node number once\n");
 		if (string_to_number(optarg, 1, CLUSTERIP_MAX_NODES, &num) < 0)
 			exit_error(PARAMETER_PROBLEM, "Unable to parse `%s'\n", optarg);
-		cipinfo->num_total_nodes = (u_int16_t)num;
+		cipinfo->num_total_nodes = num;
 		*flags |= PARAM_TOTALNODE;
 		break;
 	case '5':
@@ -133,7 +133,7 @@ static int CLUSTERIP_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (string_to_number(optarg, 1, CLUSTERIP_MAX_NODES, &num) < 0)
 			exit_error(PARAMETER_PROBLEM, "Unable to parse `%s'\n", optarg);
 		cipinfo->num_local_nodes = 1;
-		cipinfo->local_nodes[0] = (u_int16_t)num;
+		cipinfo->local_nodes[0] = num;
 		*flags |= PARAM_LOCALNODE;
 		break;
 	case '6':

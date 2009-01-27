@@ -125,7 +125,7 @@ static u_int8_t parse_dccp_option(char *optstring)
 		exit_error(PARAMETER_PROBLEM, "Bad DCCP option `%s'",
 			   optstring);
 
-	return (u_int8_t)ret;
+	return ret;
 }
 
 static int

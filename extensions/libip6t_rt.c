@@ -58,7 +58,7 @@ parse_rt_num(const char *idstr, const char *typestr)
 		exit_error(PARAMETER_PROBLEM,
 			   "RT error parsing %s `%s'", typestr, idstr);
 	}
-	return (u_int32_t) id;
+	return id;
 }
 
 static void

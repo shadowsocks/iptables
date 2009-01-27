@@ -124,7 +124,7 @@ parse_tcp_option(const char *option, u_int8_t *result)
 	if (string_to_number(option, 1, 255, &ret) == -1)
 		exit_error(PARAMETER_PROBLEM, "Bad TCP option `%s'", option);
 
-	*result = (u_int8_t)ret;
+	*result = ret;
 }
 
 static void tcp_init(struct xt_entry_match *m)

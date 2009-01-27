@@ -173,7 +173,7 @@ static int realm_parse(int c, char **argv, int invert, unsigned int *flags,
 			if (id == -1)
 				exit_error(PARAMETER_PROBLEM,
 					   "Realm `%s' not found", optarg);
-			realminfo->id = (u_int32_t)id;
+			realminfo->id = id;
 			realminfo->mask = 0xffffffff;
 		}
 		if (invert)
