@@ -90,8 +90,8 @@ static void connmark_tg_init(struct xt_entry_target *target)
 	 * Need these defaults for --save-mark/--restore-mark if no
 	 * --ctmark or --nfmask is given.
 	 */
-	info->ctmask = ~0U;
-	info->nfmask = ~0U;
+	info->ctmask = UINT32_MAX;
+	info->nfmask = UINT32_MAX;
 }
 
 static int
@@ -152,17 +152,17 @@ static int connmark_tg_parse(int c, char **argv, int invert,
                              struct xt_entry_target **target)
 {
 	struct xt_connmark_tginfo1 *info = (void *)(*target)->data;
-	unsigned int value, mask = ~0U;
+	unsigned int value, mask = UINT32_MAX;
 	char *end;
 
 	switch (c) {
 	case '=': /* --set-xmark */
 	case '-': /* --set-mark */
 		param_act(P_ONE_ACTION, "CONNMARK", *flags & F_MARK);
-		if (!strtonum(optarg, &end, &value, 0, ~0U))
+		if (!strtonum(optarg, &end, &value, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "CONNMARK", "--set-xmark/--set-mark", optarg);
 		if (*end == '/')
-			if (!strtonum(end + 1, &end, &mask, 0, ~0U))
+			if (!strtonum(end + 1, &end, &mask, 0, UINT32_MAX))
 				param_act(P_BAD_VALUE, "CONNMARK", "--set-xmark/--set-mark", optarg);
 		if (*end != '\0')
 			param_act(P_BAD_VALUE, "CONNMARK", "--set-xmark/--set-mark", optarg);
@@ -176,7 +176,7 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 
 	case '&': /* --and-mark */
 		param_act(P_ONE_ACTION, "CONNMARK", *flags & F_MARK);
-		if (!strtonum(optarg, NULL, &mask, 0, ~0U))
+		if (!strtonum(optarg, NULL, &mask, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "CONNMARK", "--and-mark", optarg);
 		info->mode   = XT_CONNMARK_SET;
 		info->ctmark = 0;
@@ -186,7 +186,7 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 
 	case '|': /* --or-mark */
 		param_act(P_ONE_ACTION, "CONNMARK", *flags & F_MARK);
-		if (!strtonum(optarg, NULL, &value, 0, ~0U))
+		if (!strtonum(optarg, NULL, &value, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "CONNMARK", "--or-mark", optarg);
 		info->mode   = XT_CONNMARK_SET;
 		info->ctmark = value;
@@ -196,7 +196,7 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 
 	case '^': /* --xor-mark */
 		param_act(P_ONE_ACTION, "CONNMARK", *flags & F_MARK);
-		if (!strtonum(optarg, NULL, &value, 0, ~0U))
+		if (!strtonum(optarg, NULL, &value, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "CONNMARK", "--xor-mark", optarg);
 		info->mode   = XT_CONNMARK_SET;
 		info->ctmark = value;
@@ -221,7 +221,7 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 			exit_error(PARAMETER_PROBLEM, "CONNMARK: --save-mark "
 			           "or --restore-mark is required for "
 			           "--nfmask");
-		if (!strtonum(optarg, NULL, &value, 0, ~0U))
+		if (!strtonum(optarg, NULL, &value, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "CONNMARK", "--nfmask", optarg);
 		info->nfmask = value;
 		return true;
@@ -231,7 +231,7 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 			exit_error(PARAMETER_PROBLEM, "CONNMARK: --save-mark "
 			           "or --restore-mark is required for "
 			           "--ctmask");
-		if (!strtonum(optarg, NULL, &value, 0, ~0U))
+		if (!strtonum(optarg, NULL, &value, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "CONNMARK", "--ctmask", optarg);
 		info->ctmask = value;
 		return true;
@@ -241,7 +241,7 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 			exit_error(PARAMETER_PROBLEM, "CONNMARK: --save-mark "
 			           "or --restore-mark is required for "
 			           "--mask");
-		if (!strtonum(optarg, NULL, &value, 0, ~0U))
+		if (!strtonum(optarg, NULL, &value, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "CONNMARK", "--mask", optarg);
 		info->nfmask = info->ctmask = value;
 		return true;
@@ -317,7 +317,7 @@ connmark_tg_print(const void *ip, const struct xt_entry_target *target,
 			       info->ctmark, info->ctmask);
 		break;
 	case XT_CONNMARK_SAVE:
-		if (info->nfmask == ~0U && info->ctmask == ~0U)
+		if (info->nfmask == UINT32_MAX && info->ctmask == UINT32_MAX)
 			printf("CONNMARK save ");
 		else if (info->nfmask == info->ctmask)
 			printf("CONNMARK save mask 0x%x ", info->nfmask);
@@ -326,7 +326,7 @@ connmark_tg_print(const void *ip, const struct xt_entry_target *target,
 			       info->nfmask, info->ctmask);
 		break;
 	case XT_CONNMARK_RESTORE:
-		if (info->ctmask == ~0U && info->nfmask == ~0U)
+		if (info->ctmask == UINT32_MAX && info->nfmask == UINT32_MAX)
 			printf("CONNMARK restore ");
 		else if (info->ctmask == info->nfmask)
 			printf("CONNMARK restore mask 0x%x ", info->ctmask);

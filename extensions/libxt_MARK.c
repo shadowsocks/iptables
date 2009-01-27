@@ -126,7 +126,7 @@ static int mark_tg_parse(int c, char **argv, int invert, unsigned int *flags,
                          const void *entry, struct xt_entry_target **target)
 {
 	struct xt_mark_tginfo2 *info = (void *)(*target)->data;
-	unsigned int value, mask = ~0U;
+	unsigned int value, mask = UINT32_MAX;
 	char *end;
 
 	switch (c) {
@@ -134,10 +134,10 @@ static int mark_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '=': /* --set-mark */
 		param_act(P_ONE_ACTION, "MARK", *flags & F_MARK);
 		param_act(P_NO_INVERT, "MARK", "--set-xmark/--set-mark", invert);
-		if (!strtonum(optarg, &end, &value, 0, ~0U))
+		if (!strtonum(optarg, &end, &value, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "MARK", "--set-xmark/--set-mark", optarg);
 		if (*end == '/')
-			if (!strtonum(end + 1, &end, &mask, 0, ~0U))
+			if (!strtonum(end + 1, &end, &mask, 0, UINT32_MAX))
 				param_act(P_BAD_VALUE, "MARK", "--set-xmark/--set-mark", optarg);
 		if (*end != '\0')
 			param_act(P_BAD_VALUE, "MARK", "--set-xmark/--set-mark", optarg);
@@ -151,7 +151,7 @@ static int mark_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '&': /* --and-mark */
 		param_act(P_ONE_ACTION, "MARK", *flags & F_MARK);
 		param_act(P_NO_INVERT, "MARK", "--and-mark", invert);
-		if (!strtonum(optarg, NULL, &mask, 0, ~0U))
+		if (!strtonum(optarg, NULL, &mask, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "MARK", "--and-mark", optarg);
 		info->mark = 0;
 		info->mask = ~mask;
@@ -160,7 +160,7 @@ static int mark_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '|': /* --or-mark */
 		param_act(P_ONE_ACTION, "MARK", *flags & F_MARK);
 		param_act(P_NO_INVERT, "MARK", "--or-mark", invert);
-		if (!strtonum(optarg, NULL, &value, 0, ~0U))
+		if (!strtonum(optarg, NULL, &value, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "MARK", "--or-mark", optarg);
 		info->mark = value;
 		info->mask = value;
@@ -169,7 +169,7 @@ static int mark_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '^': /* --xor-mark */
 		param_act(P_ONE_ACTION, "MARK", *flags & F_MARK);
 		param_act(P_NO_INVERT, "MARK", "--xor-mark", invert);
-		if (!strtonum(optarg, NULL, &value, 0, ~0U))
+		if (!strtonum(optarg, NULL, &value, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "MARK", "--xor-mark", optarg);
 		info->mark = value;
 		info->mask = 0;

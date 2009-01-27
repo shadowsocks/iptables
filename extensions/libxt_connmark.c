@@ -49,16 +49,16 @@ connmark_mt_parse(int c, char **argv, int invert, unsigned int *flags,
                   const void *entry, struct xt_entry_match **match)
 {
 	struct xt_connmark_mtinfo1 *info = (void *)(*match)->data;
-	unsigned int mark, mask = ~0U;
+	unsigned int mark, mask = UINT32_MAX;
 	char *end;
 
 	switch (c) {
 	case '1': /* --mark */
 		param_act(P_ONLY_ONCE, "connmark", "--mark", *flags & F_MARK);
-		if (!strtonum(optarg, &end, &mark, 0, ~0U))
+		if (!strtonum(optarg, &end, &mark, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "connmark", "--mark", optarg);
 		if (*end == '/')
-			if (!strtonum(end + 1, &end, &mask, 0, ~0U))
+			if (!strtonum(end + 1, &end, &mask, 0, UINT32_MAX))
 				param_act(P_BAD_VALUE, "connmark", "--mark", optarg);
 		if (*end != '\0')
 			param_act(P_BAD_VALUE, "connmark", "--mark", optarg);

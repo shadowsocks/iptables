@@ -46,7 +46,7 @@ parse_quota(const char *s, u_int64_t * quota)
 	printf("Quota: %llu\n", *quota);
 #endif
 
-	if (*quota == (u_int64_t)-1)
+	if (*quota == UINT64_MAX)
 		exit_error(PARAMETER_PROBLEM, "quota invalid: '%s'\n", s);
 	else
 		return 1;

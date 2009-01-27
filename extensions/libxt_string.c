@@ -57,7 +57,7 @@ static void string_init(struct xt_entry_match *m)
 	struct xt_string_info *i = (struct xt_string_info *) m->data;
 
 	if (i->to_offset == 0)
-		i->to_offset = (u_int16_t) ~0UL;
+		i->to_offset = UINT16_MAX;
 }
 
 static void

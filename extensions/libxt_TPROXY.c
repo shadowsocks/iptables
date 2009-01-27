@@ -58,7 +58,7 @@ static void parse_tproxy_laddr(const char *s, struct xt_tproxy_target_info *info
 
 static void parse_tproxy_mark(char *s, struct xt_tproxy_target_info *info)
 {
-	unsigned int value, mask = ~0U;
+	unsigned int value, mask = UINT32_MAX;
 	char *end;
 
 	if (!strtonum(s, &end, &value, 0, UINT_MAX))
