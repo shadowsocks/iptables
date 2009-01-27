@@ -531,8 +531,6 @@ do_rule_part(char *leveltag1, char *leveltag2, int part, int argc,
 	if (level1)
 		printf("%s", leveli1);
 	CLOSE_LEVEL(1);
-
-	return;
 }
 
 static int

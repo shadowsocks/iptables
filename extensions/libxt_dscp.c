@@ -57,7 +57,6 @@ parse_dscp(const char *s, struct xt_dscp_info *dinfo)
 			   "DSCP `%d` out of range\n", dscp);
 
     	dinfo->dscp = (u_int8_t )dscp;
-    	return;
 }
 
 

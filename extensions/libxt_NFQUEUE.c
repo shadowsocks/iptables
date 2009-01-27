@@ -38,7 +38,6 @@ parse_num(const char *s, struct xt_NFQ_info *tinfo)
 			   "Invalid queue number `%s'\n", s);
 
     	tinfo->queuenum = num & 0xffff;
-    	return;
 }
 
 static int

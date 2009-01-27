@@ -254,7 +254,6 @@ static void u32_print(const void *ip, const struct xt_entry_match *match,
 	if (data->invert)
 		printf("! ");
 	u32_dump(data);
-	return;
 }
 
 static void u32_save(const void *ip, const struct xt_entry_match *match)
@@ -264,7 +263,6 @@ static void u32_save(const void *ip, const struct xt_entry_match *match)
 		printf("! ");
 	printf("--u32 ");
 	u32_dump(data);
-	return;
 }
 
 static struct xtables_match u32_match = {

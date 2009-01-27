@@ -262,8 +262,6 @@ static void ipv6header_print(const void *ip,
 
 	if (info->modeflag)
 		printf("soft ");
-
-	return;
 }
 
 static void ipv6header_save(const void *ip, const struct xt_entry_match *match)
@@ -276,8 +274,6 @@ static void ipv6header_save(const void *ip, const struct xt_entry_match *match)
 	printf(" ");
 	if (info->modeflag)
 		printf("--soft ");
-
-	return;
 }
 
 static struct xtables_match ipv6header_mt6_reg = {
