@@ -1,6 +1,8 @@
 #ifndef _XTABLES_INTERNAL_H
 #define _XTABLES_INTERNAL_H 1
 
+#define IPTABLES_VERSION "@PACKAGE_VERSION@"
+
 #ifndef XT_LIB_DIR
 #	define XT_LIB_DIR "/usr/local/lib/iptables"
 #endif
@@ -28,6 +30,11 @@ struct afinfo {
 
 /* This is decleared in ip[6]tables.c */
 extern struct afinfo afinfo;
+
+/**
+ * Program's own name and version.
+ */
+extern const char *program_name, *program_version;
 
 extern void _init(void);
 

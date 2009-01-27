@@ -127,9 +127,10 @@ int main(int argc, char *argv[])
 	int in_table = 0, testing = 0;
 
 	program_name = "ip6tables-restore";
-	program_version = XTABLES_VERSION;
+	program_version = IPTABLES_VERSION;
 	line = 0;
 
+	xtables_program_name = program_name;
 	xtables_init();
 #ifdef NO_SHARED_LIBS
 	init_extensions();
@@ -151,7 +152,7 @@ int main(int argc, char *argv[])
 				break;
 			case 'h':
 				print_usage("ip6tables-restore",
-					    XTABLES_VERSION);
+					    IPTABLES_VERSION);
 				break;
 			case 'n':
 				noflush = 1;

@@ -51,8 +51,9 @@ main(int argc, char *argv[])
 	struct iptc_handle *handle = NULL;
 
 	program_name = "iptables";
-	program_version = XTABLES_VERSION;
+	program_version = IPTABLES_VERSION;
 
+	xtables_program_name = program_name;
 	xtables_init();
 #ifdef NO_SHARED_LIBS
 	init_extensions();

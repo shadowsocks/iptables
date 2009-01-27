@@ -643,7 +643,7 @@ main(int argc, char *argv[])
 	FILE *in;
 
 	program_name = "iptables-xml";
-	program_version = XTABLES_VERSION;
+	program_version = IPTABLES_VERSION;
 	line = 0;
 
 	while ((c = getopt_long(argc, argv, "cvh", options, NULL)) != -1) {
@@ -656,7 +656,7 @@ main(int argc, char *argv[])
 			verbose = 1;
 			break;
 		case 'h':
-			print_usage("iptables-xml", XTABLES_VERSION);
+			print_usage("iptables-xml", IPTABLES_VERSION);
 			break;
 		}
 	}

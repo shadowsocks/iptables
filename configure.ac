@@ -1,11 +1,10 @@
-define([_XTABLES_VERSION_MAJOR], 1)
-define([_XTABLES_VERSION_MINOR], 4)
-define([_XTABLES_VERSION_PATCH], 3)
-define([_XTABLES_VERSION_EXTRA], -rc1)
 
-define([_XTABLES_VERSION],_XTABLES_VERSION_MAJOR._XTABLES_VERSION_MINOR._XTABLES_VERSION_PATCH[]_XTABLES_VERSION_EXTRA)
+AC_INIT([iptables], [1.4.3-rc1])
 
-AC_INIT([iptables], _XTABLES_VERSION)
+# See libtool.info "Libtool's versioning system"
+libxtables_vcurrent=1
+libxtables_vage=0
+
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_INSTALL
@@ -74,16 +73,11 @@ AC_SUBST([kbuilddir])
 AC_SUBST([ksourcedir])
 AC_SUBST([xtlibdir])
 AC_SUBST([pkgconfigdir])
-
-XTABLES_VERSION_MAJOR=_XTABLES_VERSION_MAJOR
-XTABLES_VERSION_MINOR=_XTABLES_VERSION_MINOR
-XTABLES_VERSION_PATCH=_XTABLES_VERSION_PATCH
-XTABLES_VERSION_EXTRA=_XTABLES_VERSION_EXTRA
-AC_SUBST([XTABLES_VERSION_MAJOR])
-AC_SUBST([XTABLES_VERSION_MINOR])
-AC_SUBST([XTABLES_VERSION_PATCH])
-AC_SUBST([XTABLES_VERSION_EXTRA])
+AC_SUBST([libxtables_vcurrent])
+AC_SUBST([libxtables_vage])
+libxtables_vmajor=$(($libxtables_vcurrent - $libxtables_vage));
+AC_SUBST([libxtables_vmajor])
 
 AC_CONFIG_FILES([Makefile extensions/GNUmakefile libipq/Makefile
-	include/xtables.h xtables.pc])
+	include/xtables.h include/xtables/internal.h xtables.pc])
 AC_OUTPUT
