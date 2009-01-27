@@ -329,9 +329,10 @@ static void *load_extension(const char *search_path, const char *prefix,
 			/* Found library.  If it didn't register itself,
 			   maybe they specified target as match. */
 			if (is_target)
-				ptr = find_target(name, DONT_LOAD);
+				ptr = xtables_find_target(name, XTF_DONT_LOAD);
 			else
-				ptr = find_match(name, DONT_LOAD, NULL);
+				ptr = xtables_find_match(name,
+				      XTF_DONT_LOAD, NULL);
 		} else if (stat(path, &sb) == 0) {
 			fprintf(stderr, "%s: %s\n", path, dlerror());
 		}
@@ -343,9 +344,10 @@ static void *load_extension(const char *search_path, const char *prefix,
 		         (unsigned int)(next - dir), dir, prefix, name);
 		if (dlopen(path, RTLD_NOW) != NULL) {
 			if (is_target)
-				ptr = find_target(name, DONT_LOAD);
+				ptr = xtables_find_target(name, XTF_DONT_LOAD);
 			else
-				ptr = find_match(name, DONT_LOAD, NULL);
+				ptr = xtables_find_match(name,
+				      XTF_DONT_LOAD, NULL);
 		} else if (stat(path, &sb) == 0) {
 			fprintf(stderr, "%s: %s\n", path, dlerror());
 		}
@@ -360,8 +362,9 @@ static void *load_extension(const char *search_path, const char *prefix,
 }
 #endif
 
-struct xtables_match *find_match(const char *name, enum xt_tryload tryload,
-				 struct xtables_rule_match **matches)
+struct xtables_match *
+xtables_find_match(const char *name, enum xtables_tryload tryload,
+		   struct xtables_rule_match **matches)
 {
 	struct xtables_match *ptr;
 	const char *icmp6 = "icmp6";
@@ -394,22 +397,22 @@ struct xtables_match *find_match(const char *name, enum xt_tryload tryload,
 	}
 
 #ifndef NO_SHARED_LIBS
-	if (!ptr && tryload != DONT_LOAD && tryload != DURING_LOAD) {
+	if (!ptr && tryload != XTF_DONT_LOAD && tryload != XTF_DURING_LOAD) {
 		ptr = load_extension(lib_dir, afinfo.libprefix, name, false);
 
-		if (ptr == NULL && tryload == LOAD_MUST_SUCCEED)
+		if (ptr == NULL && tryload == XTF_LOAD_MUST_SUCCEED)
 			exit_error(PARAMETER_PROBLEM,
 				   "Couldn't load match `%s':%s\n",
 				   name, dlerror());
 	}
 #else
 	if (ptr && !ptr->loaded) {
-		if (tryload != DONT_LOAD)
+		if (tryload != XTF_DONT_LOAD)
 			ptr->loaded = 1;
 		else
 			ptr = NULL;
 	}
-	if(!ptr && (tryload == LOAD_MUST_SUCCEED)) {
+	if(!ptr && (tryload == XTF_LOAD_MUST_SUCCEED)) {
 		exit_error(PARAMETER_PROBLEM,
 			   "Couldn't find match `%s'\n", name);
 	}
@@ -423,10 +426,10 @@ struct xtables_match *find_match(const char *name, enum xt_tryload tryload,
 
 		for (i = matches; *i; i = &(*i)->next) {
 			if (strcmp(name, (*i)->match->name) == 0)
-				(*i)->completed = 1;
+				(*i)->completed = true;
 		}
 		newentry->match = ptr;
-		newentry->completed = 0;
+		newentry->completed = false;
 		newentry->next = NULL;
 		*i = newentry;
 	}
@@ -434,8 +437,8 @@ struct xtables_match *find_match(const char *name, enum xt_tryload tryload,
 	return ptr;
 }
 
-
-struct xtables_target *find_target(const char *name, enum xt_tryload tryload)
+struct xtables_target *
+xtables_find_target(const char *name, enum xtables_tryload tryload)
 {
 	struct xtables_target *ptr;
 
@@ -453,17 +456,17 @@ struct xtables_target *find_target(const char *name, enum xt_tryload tryload)
 	}
 
 #ifndef NO_SHARED_LIBS
-	if (!ptr && tryload != DONT_LOAD && tryload != DURING_LOAD) {
+	if (!ptr && tryload != XTF_DONT_LOAD && tryload != XTF_DURING_LOAD) {
 		ptr = load_extension(lib_dir, afinfo.libprefix, name, true);
 
-		if (ptr == NULL && tryload == LOAD_MUST_SUCCEED)
+		if (ptr == NULL && tryload == XTF_LOAD_MUST_SUCCEED)
 			exit_error(PARAMETER_PROBLEM,
 				   "Couldn't load target `%s':%s\n",
 				   name, dlerror());
 	}
 #else
 	if (ptr && !ptr->loaded) {
-		if (tryload != DONT_LOAD)
+		if (tryload != XTF_DONT_LOAD)
 			ptr->loaded = 1;
 		else
 			ptr = NULL;
@@ -566,7 +569,7 @@ void xtables_register_match(struct xtables_match *me)
 	if (me->family != afinfo.family && me->family != AF_UNSPEC)
 		return;
 
-	old = find_match(me->name, DURING_LOAD, NULL);
+	old = xtables_find_match(me->name, XTF_DURING_LOAD, NULL);
 	if (old) {
 		if (old->revision == me->revision &&
 		    old->family == me->family) {
@@ -637,7 +640,7 @@ void xtables_register_target(struct xtables_target *me)
 	if (me->family != afinfo.family && me->family != AF_UNSPEC)
 		return;
 
-	old = find_target(me->name, DURING_LOAD);
+	old = xtables_find_target(me->name, XTF_DURING_LOAD);
 	if (old) {
 		struct xtables_target **i;
 

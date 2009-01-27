@@ -140,13 +140,35 @@ struct xtables_target
 #endif
 };
 
+struct xtables_rule_match {
+	struct xtables_rule_match *next;
+	struct xtables_match *match;
+	/* Multiple matches of the same type: the ones before
+	   the current one are completed from parsing point of view */
+	bool completed;
+};
+
+enum xtables_tryload {
+	XTF_DONT_LOAD,
+	XTF_DURING_LOAD,
+	XTF_TRY_LOAD,
+	XTF_LOAD_MUST_SUCCEED,
+};
+
 extern const char *xtables_modprobe_program;
+extern struct xtables_match *xtables_matches;
+extern struct xtables_target *xtables_targets;
 
 extern void *xtables_calloc(size_t, size_t);
 extern void *xtables_malloc(size_t);
 
 extern int xtables_insmod(const char *, const char *, bool);
 extern int xtables_load_ko(const char *, bool);
+
+extern struct xtables_match *xtables_find_match(const char *name,
+	enum xtables_tryload, struct xtables_rule_match **match);
+extern struct xtables_target *xtables_find_target(const char *name,
+	enum xtables_tryload);
 
 /* Your shared library should call one of these. */
 extern void xtables_register_match(struct xtables_match *me);

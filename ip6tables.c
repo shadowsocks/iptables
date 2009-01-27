@@ -481,7 +481,8 @@ check_inverse(const char option[], int *invert, int *my_optind, int argc)
 
 /* Christophe Burki wants `-p 6' to imply `-m tcp'.  */
 static struct xtables_match *
-find_proto(const char *pname, enum ip6t_tryload tryload, int nolookup, struct ip6tables_rule_match **matches)
+find_proto(const char *pname, enum xtables_tryload tryload,
+	   int nolookup, struct ip6tables_rule_match **matches)
 {
 	unsigned int proto;
 
@@ -489,9 +490,9 @@ find_proto(const char *pname, enum ip6t_tryload tryload, int nolookup, struct ip
 		char *protoname = proto_to_name(proto, nolookup);
 
 		if (protoname)
-			return find_match(protoname, tryload, matches);
+			return xtables_find_match(protoname, tryload, matches);
 	} else
-		return find_match(pname, tryload, matches);
+		return xtables_find_match(pname, tryload, matches);
 
 	return NULL;
 }
@@ -706,7 +707,8 @@ print_match(const struct ip6t_entry_match *m,
 	    const struct ip6t_ip6 *ip,
 	    int numeric)
 {
-	struct xtables_match *match = find_match(m->u.user.name, TRY_LOAD, NULL);
+	struct xtables_match *match =
+		xtables_find_match(m->u.user.name, XTF_TRY_LOAD, NULL);
 
 	if (match) {
 		if (match->print)
@@ -735,9 +737,10 @@ print_firewall(const struct ip6t_entry *fw,
 	char buf[BUFSIZ];
 
 	if (!ip6tc_is_chain(targname, handle))
-		target = find_target(targname, TRY_LOAD);
+		target = xtables_find_target(targname, XTF_TRY_LOAD);
 	else
-		target = find_target(IP6T_STANDARD_TARGET, LOAD_MUST_SUCCEED);
+		target = xtables_find_target(IP6T_STANDARD_TARGET,
+		         XTF_LOAD_MUST_SUCCEED);
 
 	t = ip6t_get_target((struct ip6t_entry *)fw);
 	flags = fw->ipv6.flags;
@@ -1175,8 +1178,8 @@ static void print_proto(u_int16_t proto, int invert)
 static int print_match_save(const struct ip6t_entry_match *e,
 			const struct ip6t_ip6 *ip)
 {
-	struct xtables_match *match
-		= find_match(e->u.user.name, TRY_LOAD, NULL);
+	struct xtables_match *match =
+		xtables_find_match(e->u.user.name, XTF_TRY_LOAD, NULL);
 
 	if (match) {
 		printf("-m %s ", e->u.user.name);
@@ -1279,8 +1282,8 @@ void print_rule(const struct ip6t_entry *e,
 	/* Print targinfo part */
 	t = ip6t_get_target((struct ip6t_entry *)e);
 	if (t->u.user.name[0]) {
-		struct xtables_target *target
-			= find_target(t->u.user.name, TRY_LOAD);
+		struct xtables_target *target =
+			xtables_find_target(t->u.user.name, XTF_TRY_LOAD);
 
 		if (!target) {
 			fprintf(stderr, "Can't find library for target `%s'\n",
@@ -1555,7 +1558,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				exit_error(PARAMETER_PROBLEM,
 					   "chain name not allowed to start "
 					   "with `%c'\n", *optarg);
-			if (find_target(optarg, TRY_LOAD))
+			if (xtables_find_target(optarg, XTF_TRY_LOAD))
 				exit_error(PARAMETER_PROBLEM,
 					   "chain name may not clash "
 					   "with target name\n");
@@ -1606,7 +1609,8 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 
 			/* ip6tables -p icmp -h */
 			if (!matches && protocol)
-				find_match(protocol, TRY_LOAD, &matches);
+				xtables_find_match(protocol, XTF_TRY_LOAD,
+					&matches);
 
 			exit_printhelp(matches);
 
@@ -1667,7 +1671,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				   invert);
 			jumpto = parse_target(optarg);
 			/* TRY_LOAD (may be chain name) */
-			target = find_target(jumpto, TRY_LOAD);
+			target = xtables_find_target(jumpto, XTF_TRY_LOAD);
 
 			if (target) {
 				size_t size;
@@ -1724,7 +1728,8 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				exit_error(PARAMETER_PROBLEM,
 					   "unexpected ! flag before --match");
 
-			m = find_match(optarg, LOAD_MUST_SUCCEED, &matches);
+			m = xtables_find_match(optarg, XTF_LOAD_MUST_SUCCEED,
+			    &matches);
 			size = IP6T_ALIGN(sizeof(struct ip6t_entry_match))
 					 + m->size;
 			m->m = xtables_calloc(1, size);
@@ -1858,13 +1863,13 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				 */
 				if (m == NULL
 				    && protocol
-				    && (!find_proto(protocol, DONT_LOAD,
+				    && (!find_proto(protocol, XTF_DONT_LOAD,
 						   options&OPT_NUMERIC, NULL)
-					|| (find_proto(protocol, DONT_LOAD,
+					|| (find_proto(protocol, XTF_DONT_LOAD,
 							options&OPT_NUMERIC, NULL)
 					    && (proto_used == 0))
 				       )
-				    && (m = find_proto(protocol, TRY_LOAD,
+				    && (m = find_proto(protocol, XTF_TRY_LOAD,
 						       options&OPT_NUMERIC, &matches))) {
 					/* Try loading protocol */
 					size_t size;
@@ -2018,8 +2023,8 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			|| ip6tc_is_chain(jumpto, *handle))) {
 			size_t size;
 
-			target = find_target(IP6T_STANDARD_TARGET,
-					     LOAD_MUST_SUCCEED);
+			target = xtables_find_target(IP6T_STANDARD_TARGET,
+					XTF_LOAD_MUST_SUCCEED);
 
 			size = sizeof(struct ip6t_entry_target)
 				+ target->size;
@@ -2040,7 +2045,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				exit_error(PARAMETER_PROBLEM,
 						"goto '%s' is not a chain\n", jumpto);
 #endif
-			find_target(jumpto, LOAD_MUST_SUCCEED);
+			xtables_find_target(jumpto, XTF_LOAD_MUST_SUCCEED);
 		} else {
 			e = generate_entry(&fw, matches, target->t);
 			free(target->t);
