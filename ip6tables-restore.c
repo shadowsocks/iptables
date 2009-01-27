@@ -12,6 +12,7 @@
 
 #include <getopt.h>
 #include <sys/errno.h>
+#include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -64,7 +65,7 @@ static struct ip6tc_handle *create_handle(const char *tablename)
 
 	if (!handle) {
 		/* try to insmod the module if iptc_init failed */
-		load_xtables_ko(modprobe_program, 0);
+		xtables_load_ko(xtables_modprobe_program, false);
 		handle = ip6tc_init(tablename);
 	}
 
@@ -165,7 +166,7 @@ int main(int argc, char *argv[])
 				noflush = 1;
 				break;
 			case 'M':
-				modprobe_program = optarg;
+				xtables_modprobe_program = optarg;
 				break;
 		}
 	}
