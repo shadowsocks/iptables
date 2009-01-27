@@ -26,7 +26,7 @@ parse_length(const char *s)
 {
 	unsigned int len;
 	
-	if (string_to_number(s, 0, UINT16_MAX, &len) == -1)
+	if (!xtables_strtoui(s, NULL, &len, 0, UINT32_MAX))
 		exit_error(PARAMETER_PROBLEM, "length invalid: `%s'\n", s);
 	else
 		return len;

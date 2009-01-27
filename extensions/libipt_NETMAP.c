@@ -89,7 +89,7 @@ parse_to(char *arg, struct ip_nat_range *range)
 			netmask = ip->s_addr;
 		}
 		else {
-			if (string_to_number(slash+1, 0, 32, &bits) == -1)
+			if (!xtables_strtoui(slash+1, NULL, &bits, 0, 32))
 				exit_error(PARAMETER_PROBLEM, "Bad netmask `%s'\n",
 					   slash+1);
 			netmask = bits2netmask(bits);

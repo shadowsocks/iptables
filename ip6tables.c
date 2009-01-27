@@ -486,7 +486,7 @@ find_proto(const char *pname, enum xtables_tryload tryload,
 {
 	unsigned int proto;
 
-	if (string_to_number(pname, 0, UINT8_MAX, &proto) != -1) {
+	if (xtables_strtoui(pname, NULL, &proto, 0, UINT8_MAX)) {
 		char *protoname = proto_to_name(proto, nolookup);
 
 		if (protoname)
@@ -502,7 +502,7 @@ parse_protocol(const char *s)
 {
 	unsigned int proto;
 
-	if (string_to_number(s, 0, UINT8_MAX, &proto) == -1) {
+	if (!xtables_strtoui(s, NULL, &proto, 0, UINT8_MAX)) {
 		struct protoent *pent;
 
 		/* first deal with the special case of 'all' to prevent
@@ -549,7 +549,7 @@ parse_rulenumber(const char *rule)
 {
 	unsigned int rulenum;
 
-	if (string_to_number(rule, 1, INT_MAX, &rulenum) == -1)
+	if (!xtables_strtoui(rule, NULL, &rulenum, 1, INT_MAX))
 		exit_error(PARAMETER_PROBLEM,
 			   "Invalid rule number `%s'", rule);
 

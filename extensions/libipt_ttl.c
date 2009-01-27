@@ -33,7 +33,7 @@ static int ttl_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 		case '2':
-			if (string_to_number(optarg, 0, UINT8_MAX, &value) == -1)
+			if (!xtables_strtoui(optarg, NULL, &value, 0, UINT8_MAX))
 				exit_error(PARAMETER_PROBLEM,
 				           "ttl: Expected value between 0 and 255");
 
@@ -46,7 +46,7 @@ static int ttl_parse(int c, char **argv, int invert, unsigned int *flags,
 			info->ttl = value;
 			break;
 		case '3':
-			if (string_to_number(optarg, 0, UINT8_MAX, &value) == -1)
+			if (!xtables_strtoui(optarg, NULL, &value, 0, UINT8_MAX))
 				exit_error(PARAMETER_PROBLEM,
 				           "ttl: Expected value between 0 and 255");
 
@@ -58,7 +58,7 @@ static int ttl_parse(int c, char **argv, int invert, unsigned int *flags,
 			info->ttl = value;
 			break;
 		case '4':
-			if (string_to_number(optarg, 0, UINT8_MAX, &value) == -1)
+			if (!xtables_strtoui(optarg, NULL, &value, 0, UINT8_MAX))
 				exit_error(PARAMETER_PROBLEM,
 				           "ttl: Expected value between 0 and 255");
 

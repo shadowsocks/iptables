@@ -34,14 +34,14 @@ static bool tos_parse_numeric(const char *str, struct tos_value_mask *tvm,
 	unsigned int value;
 	char *end;
 
-	strtonum(str, &end, &value, 0, max);
+	xtables_strtoui(str, &end, &value, 0, max);
 	tvm->value = value;
 	tvm->mask  = max;
 
 	if (*end == '/') {
 		const char *p = end + 1;
 
-		if (!strtonum(p, &end, &value, 0, max))
+		if (!xtables_strtoui(p, &end, &value, 0, max))
 			exit_error(PARAMETER_PROBLEM, "Illegal value: \"%s\"",
 			           str);
 		tvm->mask = value;
@@ -59,7 +59,7 @@ static bool tos_parse_symbolic(const char *str, struct tos_value_mask *tvm,
 	const struct tos_symbol_info *symbol;
 	char *tmp;
 
-	if (strtonum(str, &tmp, NULL, 0, max))
+	if (xtables_strtoui(str, &tmp, NULL, 0, max))
 		return tos_parse_numeric(str, tvm, max);
 
 	/* Do not consider ECN bits */

@@ -102,7 +102,7 @@ limit_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '$':
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
-		if (string_to_number(optarg, 0, 10000, &num) == -1)
+		if (!xtables_strtoui(optarg, NULL, &num, 0, 10000))
 			exit_error(PARAMETER_PROBLEM,
 				   "bad --limit-burst `%s'", optarg);
 		r->burst = num;

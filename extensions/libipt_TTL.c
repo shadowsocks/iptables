@@ -44,7 +44,7 @@ static int TTL_parse(int c, char **argv, int invert, unsigned int *flags,
 		exit_error(PARAMETER_PROBLEM,
 				"TTL: unexpected `!'");
 	
-	if (string_to_number(optarg, 0, UINT8_MAX, &value) == -1)
+	if (!xtables_strtoui(optarg, NULL, &value, 0, UINT8_MAX))
 		exit_error(PARAMETER_PROBLEM,
 		           "TTL: Expected value between 0 and 255");
 

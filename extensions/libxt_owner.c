@@ -19,6 +19,11 @@
 #include <linux/netfilter_ipv4/ipt_owner.h>
 #include <linux/netfilter_ipv6/ip6t_owner.h>
 
+/*
+ *	Note: "UINT32_MAX - 1" is used in the code because -1 is a reserved
+ *	UID/GID value anyway.
+ */
+
 enum {
 	FLAG_UID_OWNER     = 1 << 0,
 	FLAG_GID_OWNER     = 1 << 1,
@@ -110,7 +115,7 @@ owner_mt_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		param_act(P_ONLY_ONCE, "owner", "--uid-owner", *flags & FLAG_UID_OWNER);
 		if ((pwd = getpwnam(optarg)) != NULL)
 			id = pwd->pw_uid;
-		else if (!strtonum(optarg, NULL, &id, 0, UINT32_MAX - 1))
+		else if (!xtables_strtoui(optarg, NULL, &id, 0, UINT32_MAX - 1))
 			param_act(P_BAD_VALUE, "owner", "--uid-owner", optarg);
 		if (invert)
 			info->invert |= IPT_OWNER_UID;
@@ -123,7 +128,7 @@ owner_mt_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		param_act(P_ONLY_ONCE, "owner", "--gid-owner", *flags & FLAG_GID_OWNER);
 		if ((grp = getgrnam(optarg)) != NULL)
 			id = grp->gr_gid;
-		else if (!strtonum(optarg, NULL, &id, 0, UINT32_MAX - 1))
+		else if (!xtables_strtoui(optarg, NULL, &id, 0, UINT32_MAX - 1))
 			param_act(P_BAD_VALUE, "owner", "--gid-owner", optarg);
 		if (invert)
 			info->invert |= IPT_OWNER_GID;
@@ -134,7 +139,7 @@ owner_mt_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 
 	case 'p':
 		param_act(P_ONLY_ONCE, "owner", "--pid-owner", *flags & FLAG_PID_OWNER);
-		if (!strtonum(optarg, NULL, &id, 0, INT_MAX))
+		if (!xtables_strtoui(optarg, NULL, &id, 0, INT_MAX))
 			param_act(P_BAD_VALUE, "owner", "--pid-owner", optarg);
 		if (invert)
 			info->invert |= IPT_OWNER_PID;
@@ -145,7 +150,7 @@ owner_mt_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 
 	case 's':
 		param_act(P_ONLY_ONCE, "owner", "--sid-owner", *flags & FLAG_SID_OWNER);
-		if (!strtonum(optarg, NULL, &id, 0, INT_MAX))
+		if (!xtables_strtoui(optarg, NULL, &id, 0, INT_MAX))
 			param_act(P_BAD_VALUE, "owner", "--sid-value", optarg);
 		if (invert)
 			info->invert |= IPT_OWNER_SID;
@@ -190,7 +195,7 @@ owner_mt6_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		          *flags & FLAG_UID_OWNER);
 		if ((pwd = getpwnam(optarg)) != NULL)
 			id = pwd->pw_uid;
-		else if (!strtonum(optarg, NULL, &id, 0, UINT32_MAX - 1))
+		else if (!xtables_strtoui(optarg, NULL, &id, 0, UINT32_MAX - 1))
 			param_act(P_BAD_VALUE, "owner", "--uid-owner", optarg);
 		if (invert)
 			info->invert |= IP6T_OWNER_UID;
@@ -204,7 +209,7 @@ owner_mt6_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		          *flags & FLAG_GID_OWNER);
 		if ((grp = getgrnam(optarg)) != NULL)
 			id = grp->gr_gid;
-		else if (!strtonum(optarg, NULL, &id, 0, UINT32_MAX - 1))
+		else if (!xtables_strtoui(optarg, NULL, &id, 0, UINT32_MAX - 1))
 			param_act(P_BAD_VALUE, "owner", "--gid-owner", optarg);
 		if (invert)
 			info->invert |= IP6T_OWNER_GID;
@@ -216,7 +221,7 @@ owner_mt6_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 	case 'p':
 		param_act(P_ONLY_ONCE, "owner", "--pid-owner",
 		          *flags & FLAG_PID_OWNER);
-		if (!strtonum(optarg, NULL, &id, 0, INT_MAX))
+		if (!xtables_strtoui(optarg, NULL, &id, 0, INT_MAX))
 			param_act(P_BAD_VALUE, "owner", "--pid-owner", optarg);
 		if (invert)
 			info->invert |= IP6T_OWNER_PID;
@@ -228,7 +233,7 @@ owner_mt6_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 	case 's':
 		param_act(P_ONLY_ONCE, "owner", "--sid-owner",
 		          *flags & FLAG_SID_OWNER);
-		if (!strtonum(optarg, NULL, &id, 0, INT_MAX))
+		if (!xtables_strtoui(optarg, NULL, &id, 0, INT_MAX))
 			param_act(P_BAD_VALUE, "owner", "--sid-owner", optarg);
 		if (invert)
 			info->invert |= IP6T_OWNER_SID;
@@ -246,11 +251,11 @@ static void owner_parse_range(const char *s, unsigned int *from,
 	char *end;
 
 	/* -1 is reversed, so the max is one less than that. */
-	if (!strtonum(s, &end, from, 0, UINT32_MAX - 1))
+	if (!xtables_strtoui(s, &end, from, 0, UINT32_MAX - 1))
 		param_act(P_BAD_VALUE, "owner", opt, s);
 	*to = *from;
 	if (*end == '-' || *end == ':')
-		if (!strtonum(end + 1, &end, to, 0, UINT32_MAX - 1))
+		if (!xtables_strtoui(end + 1, &end, to, 0, UINT32_MAX - 1))
 			param_act(P_BAD_VALUE, "owner", opt, s);
 	if (*end != '\0')
 		param_act(P_BAD_VALUE, "owner", opt, s);

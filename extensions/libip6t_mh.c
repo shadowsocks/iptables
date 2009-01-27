@@ -93,7 +93,7 @@ static unsigned int name_to_type(const char *name)
 	} else {
 		unsigned int number;
 
-		if (string_to_number(name, 0, UINT8_MAX, &number) == -1)
+		if (!xtables_strtoui(name, NULL, &number, 0, UINT8_MAX))
 			exit_error(PARAMETER_PROBLEM,
 				   "Invalid MH type `%s'\n", name);
 		return number;

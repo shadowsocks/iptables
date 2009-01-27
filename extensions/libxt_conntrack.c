@@ -228,7 +228,7 @@ parse_expire(const char *s)
 {
 	unsigned int len;
 
-	if (string_to_number(s, 0, 0, &len) == -1)
+	if (!xtables_strtoui(s, NULL, &len, 0, UINT32_MAX))
 		exit_error(PARAMETER_PROBLEM, "expire value invalid: `%s'\n", s);
 	else
 		return len;
@@ -268,11 +268,11 @@ conntrack_ps_expires(struct xt_conntrack_mtinfo1 *info, const char *s)
 	unsigned int min, max;
 	char *end;
 
-	if (!strtonum(s, &end, &min, 0, ~0))
+	if (!xtables_strtoui(s, &end, &min, 0, UINT32_MAX))
 		param_act(P_BAD_VALUE, "conntrack", "--expires", s);
 	max = min;
 	if (*end == ':')
-		if (!strtonum(s, &end, &max, 0, UINT32_MAX))
+		if (!xtables_strtoui(s, &end, &max, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "conntrack", "--expires", s);
 	if (*end != '\0')
 		param_act(P_BAD_VALUE, "conntrack", "--expires", s);
@@ -481,7 +481,7 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case 'a': /* --ctorigsrcport */
-		if (!strtonum(optarg, NULL, &port, 0, UINT16_MAX))
+		if (!xtables_strtoui(optarg, NULL, &port, 0, UINT16_MAX))
 			param_act(P_BAD_VALUE, "conntrack",
 			          "--ctorigsrcport", optarg);
 		info->match_flags |= XT_CONNTRACK_ORIGSRC_PORT;
@@ -491,7 +491,7 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case 'b': /* --ctorigdstport */
-		if (!strtonum(optarg, NULL, &port, 0, UINT16_MAX))
+		if (!xtables_strtoui(optarg, NULL, &port, 0, UINT16_MAX))
 			param_act(P_BAD_VALUE, "conntrack",
 			          "--ctorigdstport", optarg);
 		info->match_flags |= XT_CONNTRACK_ORIGDST_PORT;
@@ -501,7 +501,7 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case 'c': /* --ctreplsrcport */
-		if (!strtonum(optarg, NULL, &port, 0, UINT16_MAX))
+		if (!xtables_strtoui(optarg, NULL, &port, 0, UINT16_MAX))
 			param_act(P_BAD_VALUE, "conntrack",
 			          "--ctreplsrcport", optarg);
 		info->match_flags |= XT_CONNTRACK_REPLSRC_PORT;
@@ -511,7 +511,7 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case 'd': /* --ctrepldstport */
-		if (!strtonum(optarg, NULL, &port, 0, UINT16_MAX))
+		if (!xtables_strtoui(optarg, NULL, &port, 0, UINT16_MAX))
 			param_act(P_BAD_VALUE, "conntrack",
 			          "--ctrepldstport", optarg);
 		info->match_flags |= XT_CONNTRACK_REPLDST_PORT;

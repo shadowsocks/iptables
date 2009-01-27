@@ -178,57 +178,24 @@ int xtables_load_ko(const char *modprobe, bool quiet)
 	return ret;
 }
 
-int string_to_number_ll(const char *s, unsigned long long min,
-			unsigned long long max, unsigned long long *ret)
-{
-	unsigned long long number;
-	char *end;
-
-	/* Handle hex, octal, etc. */
-	errno = 0;
-	number = strtoull(s, &end, 0);
-	if (*end == '\0' && end != s) {
-		/* we parsed a number, let's see if we want this */
-		if (errno != ERANGE && min <= number && (!max || number <= max)) {
-			*ret = number;
-			return 0;
-		}
-	}
-	return -1;
-}
-
-int string_to_number_l(const char *s, unsigned long min, unsigned long max,
-		       unsigned long *ret)
-{
-	int result;
-	unsigned long long number;
-
-	result = string_to_number_ll(s, min, max, &number);
-	*ret = (unsigned long)number;
-
-	return result;
-}
-
-int string_to_number(const char *s, unsigned int min, unsigned int max,
-		unsigned int *ret)
-{
-	int result;
-	unsigned long number;
-
-	result = string_to_number_l(s, min, max, &number);
-	*ret = (unsigned int)number;
-
-	return result;
-}
-
-/*
- * strtonum{,l} - string to number conversion
+/**
+ * xtables_strtou{i,l} - string to number conversion
+ * @s:	input string
+ * @end:	like strtoul's "end" pointer
+ * @value:	pointer for result
+ * @min:	minimum accepted value
+ * @max:	maximum accepted value
  *
- * If @end is NULL, we assume the caller does not want
- * a case like "15a", so reject it.
+ * If @end is NULL, we assume the caller wants a "strict strtoul", and hence
+ * "15a" is rejected.
+ * In either case, the value obtained is compared for min-max compliance.
+ * Base is always 0, i.e. autodetect depending on @s.
+ *
+ * Returns true/false whether number was accepted. On failure, *value has
+ * undefined contents.
  */
-bool strtonuml(const char *s, char **end, unsigned long *value,
-               unsigned long min, unsigned long max)
+bool xtables_strtoul(const char *s, char **end, unsigned long *value,
+                     unsigned long min, unsigned long max)
 {
 	unsigned long v;
 	char *my_end;
@@ -252,13 +219,13 @@ bool strtonuml(const char *s, char **end, unsigned long *value,
 	return false;
 }
 
-bool strtonum(const char *s, char **end, unsigned int *value,
-                  unsigned int min, unsigned int max)
+bool xtables_strtoui(const char *s, char **end, unsigned int *value,
+                     unsigned int min, unsigned int max)
 {
 	unsigned long v;
 	bool ret;
 
-	ret = strtonuml(s, end, &v, min, max);
+	ret = xtables_strtoul(s, end, &v, min, max);
 	if (value != NULL)
 		*value = v;
 	return ret;
@@ -278,7 +245,7 @@ u_int16_t parse_port(const char *port, const char *proto)
 {
 	unsigned int portnum;
 
-	if (string_to_number(port, 0, UINT16_MAX, &portnum) != -1 ||
+	if (xtables_strtoui(port, NULL, &portnum, 0, UINT16_MAX) ||
 	    (portnum = service_to_port(port, proto)) != (unsigned)-1)
 		return portnum;
 
@@ -834,7 +801,7 @@ static struct in_addr *__numeric_to_ipaddr(const char *dotted, bool is_mask)
 				return NULL;
 
 			/* autocomplete, this is a network address */
-			if (!strtonum(p, NULL, &onebyte, 0, UINT8_MAX))
+			if (!xtables_strtoui(p, NULL, &onebyte, 0, UINT8_MAX))
 				return NULL;
 
 			addrp[i] = onebyte;
@@ -845,7 +812,7 @@ static struct in_addr *__numeric_to_ipaddr(const char *dotted, bool is_mask)
 		}
 
 		*q = '\0';
-		if (!strtonum(p, NULL, &onebyte, 0, UINT8_MAX))
+		if (!xtables_strtoui(p, NULL, &onebyte, 0, UINT8_MAX))
 			return NULL;
 
 		addrp[i] = onebyte;
@@ -853,7 +820,7 @@ static struct in_addr *__numeric_to_ipaddr(const char *dotted, bool is_mask)
 	}
 
 	/* we have checked 3 bytes, now we check the last one */
-	if (!strtonum(p, NULL, &onebyte, 0, UINT8_MAX))
+	if (!xtables_strtoui(p, NULL, &onebyte, 0, UINT8_MAX))
 		return NULL;
 
 	addrp[3] = onebyte;
@@ -941,7 +908,7 @@ static struct in_addr *parse_ipmask(const char *mask)
 	if ((addrp = numeric_to_ipmask(mask)) != NULL)
 		/* dotted_to_addr already returns a network byte order addr */
 		return addrp;
-	if (string_to_number(mask, 0, 32, &bits) == -1)
+	if (!xtables_strtoui(mask, NULL, &bits, 0, 32))
 		exit_error(PARAMETER_PROBLEM,
 			   "invalid mask `%s' specified", mask);
 	if (bits != 0) {
@@ -1162,7 +1129,7 @@ static struct in6_addr *parse_ip6mask(char *mask)
 	}
 	if ((addrp = numeric_to_ip6addr(mask)) != NULL)
 		return addrp;
-	if (string_to_number(mask, 0, 128, &bits) == -1)
+	if (!xtables_strtoui(mask, NULL, &bits, 0, 128))
 		exit_error(PARAMETER_PROBLEM,
 			   "invalid mask `%s' specified", mask);
 	if (bits != 0) {

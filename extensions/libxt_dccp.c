@@ -121,7 +121,7 @@ static u_int8_t parse_dccp_option(char *optstring)
 {
 	unsigned int ret;
 
-	if (string_to_number(optstring, 1, UINT8_MAX, &ret) == -1)
+	if (!xtables_strtoui(optstring, NULL, &ret, 1, UINT8_MAX))
 		exit_error(PARAMETER_PROBLEM, "Bad DCCP option `%s'",
 			   optstring);
 

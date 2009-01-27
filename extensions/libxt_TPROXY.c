@@ -40,7 +40,7 @@ static void parse_tproxy_lport(const char *s, struct xt_tproxy_target_info *info
 {
 	unsigned int lport;
 
-	if (string_to_number(s, 0, UINT16_MAX, &lport) != -1)
+	if (xtables_strtoui(s, NULL, &lport, 0, UINT16_MAX))
 		info->lport = htons(lport);
 	else
 		param_act(P_BAD_VALUE, "TPROXY", "--on-port", s);
@@ -61,10 +61,10 @@ static void parse_tproxy_mark(char *s, struct xt_tproxy_target_info *info)
 	unsigned int value, mask = UINT32_MAX;
 	char *end;
 
-	if (!strtonum(s, &end, &value, 0, UINT_MAX))
+	if (!xtables_strtoui(s, &end, &value, 0, UINT32_MAX))
 		param_act(P_BAD_VALUE, "TPROXY", "--tproxy-mark", s);
 	if (*end == '/')
-		if (!strtonum(end + 1, &end, &mask, 0, UINT_MAX))
+		if (!xtables_strtoui(end + 1, &end, &mask, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "TPROXY", "--tproxy-mark", s);
 	if (*end != '\0')
 		param_act(P_BAD_VALUE, "TPROXY", "--tproxy-mark", s);

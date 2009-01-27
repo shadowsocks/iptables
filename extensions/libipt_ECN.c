@@ -61,7 +61,7 @@ static int ECN_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_ECN_OP_SET_CWR)
 			exit_error(PARAMETER_PROBLEM,
 				"ECN target: Only use --ecn-tcp-cwr ONCE!");
-		if (string_to_number(optarg, 0, 1, &result))
+		if (!xtables_strtoui(optarg, NULL, &result, 0, 1))
 			exit_error(PARAMETER_PROBLEM,
 				   "ECN target: Value out of range");
 		einfo->operation |= IPT_ECN_OP_SET_CWR;
@@ -72,7 +72,7 @@ static int ECN_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_ECN_OP_SET_ECE)
 			exit_error(PARAMETER_PROBLEM,
 				"ECN target: Only use --ecn-tcp-ece ONCE!");
-		if (string_to_number(optarg, 0, 1, &result))
+		if (!xtables_strtoui(optarg, NULL, &result, 0, 1))
 			exit_error(PARAMETER_PROBLEM,
 				   "ECN target: Value out of range");
 		einfo->operation |= IPT_ECN_OP_SET_ECE;
@@ -83,7 +83,7 @@ static int ECN_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_ECN_OP_SET_IP)
 			exit_error(PARAMETER_PROBLEM,
 				"ECN target: Only use --ecn-ip-ect ONCE!");
-		if (string_to_number(optarg, 0, 3, &result))
+		if (!xtables_strtoui(optarg, NULL, &result, 0, 3))
 			exit_error(PARAMETER_PROBLEM,
 				   "ECN target: Value out of range");
 		einfo->operation |= IPT_ECN_OP_SET_IP;

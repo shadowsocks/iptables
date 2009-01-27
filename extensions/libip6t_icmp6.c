@@ -123,12 +123,12 @@ parse_icmpv6(const char *icmpv6type, u_int8_t *type, u_int8_t code[])
 		if (slash)
 			*slash = '\0';
 
-		if (string_to_number(buffer, 0, UINT8_MAX, &number) == -1)
+		if (!xtables_strtoui(buffer, NULL, &number, 0, UINT8_MAX))
 			exit_error(PARAMETER_PROBLEM,
 				   "Invalid ICMPv6 type `%s'\n", buffer);
 		*type = number;
 		if (slash) {
-			if (string_to_number(slash+1, 0, UINT8_MAX, &number) == -1)
+			if (!xtables_strtoui(slash+1, NULL, &number, 0, UINT8_MAX))
 				exit_error(PARAMETER_PROBLEM,
 					   "Invalid ICMPv6 code `%s'\n",
 					   slash+1);

@@ -70,7 +70,7 @@ parse_level(const char *level)
 	unsigned int lev = -1;
 	unsigned int set = 0;
 
-	if (string_to_number(level, 0, 7, &lev) == -1) {
+	if (!xtables_strtoui(level, NULL, &lev, 0, 7)) {
 		unsigned int i = 0;
 
 		for (i = 0;

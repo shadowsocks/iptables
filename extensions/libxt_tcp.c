@@ -121,7 +121,7 @@ parse_tcp_option(const char *option, u_int8_t *result)
 {
 	unsigned int ret;
 
-	if (string_to_number(option, 1, UINT8_MAX, &ret) == -1)
+	if (!xtables_strtoui(option, NULL, &ret, 1, UINT8_MAX))
 		exit_error(PARAMETER_PROBLEM, "Bad TCP option `%s'", option);
 
 	*result = ret;

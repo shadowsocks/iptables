@@ -35,10 +35,10 @@ static int mark_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1': /* --mark */
 		param_act(P_ONLY_ONCE, "mark", "--mark", *flags & F_MARK);
-		if (!strtonum(optarg, &end, &mark, 0, UINT32_MAX))
+		if (!xtables_strtoui(optarg, &end, &mark, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "mark", "--mark", optarg);
 		if (*end == '/')
-			if (!strtonum(end + 1, &end, &mask, 0, UINT32_MAX))
+			if (!xtables_strtoui(end + 1, &end, &mask, 0, UINT32_MAX))
 				param_act(P_BAD_VALUE, "mark", "--mark", optarg);
 		if (*end != '\0')
 			param_act(P_BAD_VALUE, "mark", "--mark", optarg);

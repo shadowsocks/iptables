@@ -175,21 +175,9 @@ extern struct xtables_target *xtables_find_target(const char *name,
 extern void xtables_register_match(struct xtables_match *me);
 extern void xtables_register_target(struct xtables_target *me);
 
-extern int string_to_number_ll(const char *s,
-			       unsigned long long min,
-			       unsigned long long max,
-			       unsigned long long *ret);
-extern int string_to_number_l(const char *s,
-			      unsigned long min,
-			      unsigned long max,
-			      unsigned long *ret);
-extern int string_to_number(const char *s,
-			    unsigned int min,
-			    unsigned int max,
-			    unsigned int *ret);
-extern bool strtonuml(const char *, char **, unsigned long *,
+extern bool xtables_strtoul(const char *, char **, unsigned long *,
 	unsigned long, unsigned long);
-extern bool strtonum(const char *, char **, unsigned int *,
+extern bool xtables_strtoui(const char *, char **, unsigned int *,
 	unsigned int, unsigned int);
 extern int service_to_port(const char *name, const char *proto);
 extern u_int16_t parse_port(const char *port, const char *proto);

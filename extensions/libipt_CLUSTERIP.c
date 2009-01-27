@@ -120,7 +120,7 @@ static int CLUSTERIP_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM, "Can only specify node number combined with `--new'\n");
 		if (*flags & PARAM_TOTALNODE)
 			exit_error(PARAMETER_PROBLEM, "Can only specify total node number once\n");
-		if (string_to_number(optarg, 1, CLUSTERIP_MAX_NODES, &num) < 0)
+		if (!xtables_strtoui(optarg, NULL, &num, 1, CLUSTERIP_MAX_NODES))
 			exit_error(PARAMETER_PROBLEM, "Unable to parse `%s'\n", optarg);
 		cipinfo->num_total_nodes = num;
 		*flags |= PARAM_TOTALNODE;
@@ -130,7 +130,7 @@ static int CLUSTERIP_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM, "Can only specify node number combined with `--new'\n");
 		if (*flags & PARAM_LOCALNODE)
 			exit_error(PARAMETER_PROBLEM, "Can only specify local node number once\n");
-		if (string_to_number(optarg, 1, CLUSTERIP_MAX_NODES, &num) < 0)
+		if (!xtables_strtoui(optarg, NULL, &num, 1, CLUSTERIP_MAX_NODES))
 			exit_error(PARAMETER_PROBLEM, "Unable to parse `%s'\n", optarg);
 		cipinfo->num_local_nodes = 1;
 		cipinfo->local_nodes[0] = num;
@@ -141,7 +141,7 @@ static int CLUSTERIP_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM, "Can only specify hash init value combined with `--new'\n");
 		if (*flags & PARAM_HASHINIT)
 			exit_error(PARAMETER_PROBLEM, "Can specify hash init value only once\n");
-		if (string_to_number(optarg, 0, UINT_MAX, &num) < 0)
+		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT_MAX))
 			exit_error(PARAMETER_PROBLEM, "Unable to parse `%s'\n", optarg);
 		cipinfo->hash_initval = num;
 		*flags |= PARAM_HASHINIT;
