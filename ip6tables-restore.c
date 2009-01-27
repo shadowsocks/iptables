@@ -130,16 +130,7 @@ int main(int argc, char *argv[])
 	program_version = XTABLES_VERSION;
 	line = 0;
 
-	lib_dir = getenv("XTABLES_LIBDIR");
-	if (lib_dir == NULL) {
-		lib_dir = getenv("IP6TABLES_LIB_DIR");
-		if (lib_dir != NULL)
-			fprintf(stderr, "IP6TABLES_LIB_DIR is deprecated, "
-			        "use XTABLES_LIBDIR.\n");
-	}
-	if (lib_dir == NULL)
-		lib_dir = XTABLES_LIBDIR;
-
+	xtables_init();
 #ifdef NO_SHARED_LIBS
 	init_extensions();
 #endif

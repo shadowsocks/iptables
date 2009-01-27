@@ -44,7 +44,8 @@
 #define PROC_SYS_MODPROBE "/proc/sys/kernel/modprobe"
 #endif
 
-char *lib_dir;
+/* Search path for Xtables .so files */
+static const char *xtables_libdir;
 
 /* the path to command to load kernel module */
 const char *xtables_modprobe_program;
@@ -52,6 +53,20 @@ const char *xtables_modprobe_program;
 /* Keeping track of external matches and targets: linked lists.  */
 struct xtables_match *xtables_matches;
 struct xtables_target *xtables_targets;
+
+void xtables_init(void)
+{
+	xtables_libdir = getenv("XTABLES_LIBDIR");
+	if (xtables_libdir != NULL)
+		return;
+	xtables_libdir = getenv("IPTABLES_LIB_DIR");
+	if (xtables_libdir != NULL) {
+		fprintf(stderr, "IPTABLES_LIB_DIR is deprecated, "
+		        "use XTABLES_LIBDIR.\n");
+		return;
+	}
+	xtables_libdir = XTABLES_LIBDIR;
+}
 
 /**
  * xtables_*alloc - wrappers that exit on failure
@@ -398,7 +413,8 @@ xtables_find_match(const char *name, enum xtables_tryload tryload,
 
 #ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != XTF_DONT_LOAD && tryload != XTF_DURING_LOAD) {
-		ptr = load_extension(lib_dir, afinfo.libprefix, name, false);
+		ptr = load_extension(xtables_libdir, afinfo.libprefix,
+		      name, false);
 
 		if (ptr == NULL && tryload == XTF_LOAD_MUST_SUCCEED)
 			exit_error(PARAMETER_PROBLEM,
@@ -457,7 +473,8 @@ xtables_find_target(const char *name, enum xtables_tryload tryload)
 
 #ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != XTF_DONT_LOAD && tryload != XTF_DURING_LOAD) {
-		ptr = load_extension(lib_dir, afinfo.libprefix, name, true);
+		ptr = load_extension(xtables_libdir, afinfo.libprefix,
+		      name, true);
 
 		if (ptr == NULL && tryload == XTF_LOAD_MUST_SUCCEED)
 			exit_error(PARAMETER_PROBLEM,

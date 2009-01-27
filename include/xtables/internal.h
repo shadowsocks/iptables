@@ -26,8 +26,6 @@ struct afinfo {
 	int so_rev_target;
 };
 
-extern char *lib_dir;
-
 /* This is decleared in ip[6]tables.c */
 extern struct afinfo afinfo;
 
