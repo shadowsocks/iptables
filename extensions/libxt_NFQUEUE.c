@@ -33,7 +33,7 @@ parse_num(const char *s, struct xt_NFQ_info *tinfo)
 {
 	unsigned int num;
        
-	if (string_to_number(s, 0, 65535, &num) == -1)
+	if (string_to_number(s, 0, UINT16_MAX, &num) == -1)
 		exit_error(PARAMETER_PROBLEM,
 			   "Invalid queue number `%s'\n", s);
 

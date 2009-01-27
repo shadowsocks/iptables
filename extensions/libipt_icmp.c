@@ -147,12 +147,12 @@ parse_icmp(const char *icmptype, u_int8_t *type, u_int8_t code[])
 		if (slash)
 			*slash = '\0';
 
-		if (string_to_number(buffer, 0, 255, &number) == -1)
+		if (string_to_number(buffer, 0, UINT8_MAX, &number) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				   "Invalid ICMP type `%s'\n", buffer);
 		*type = number;
 		if (slash) {
-			if (string_to_number(slash+1, 0, 255, &number) == -1)
+			if (string_to_number(slash+1, 0, UINT8_MAX, &number) == -1)
 				exit_error(PARAMETER_PROBLEM,
 					   "Invalid ICMP code `%s'\n",
 					   slash+1);

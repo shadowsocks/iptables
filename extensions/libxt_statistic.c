@@ -70,7 +70,7 @@ statistic_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '3':
 		if (*flags & 0x4)
 			exit_error(PARAMETER_PROBLEM, "double --every");
-		if (string_to_number(optarg, 0, 0xFFFFFFFF,
+		if (string_to_number(optarg, 0, UINT32_MAX,
 				     &info->u.nth.every) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				   "cannot parse --every `%s'", optarg);
@@ -82,7 +82,7 @@ statistic_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '4':
 		if (*flags & 0x8)
 			exit_error(PARAMETER_PROBLEM, "double --packet");
-		if (string_to_number(optarg, 0, 0xFFFFFFFF,
+		if (string_to_number(optarg, 0, UINT32_MAX,
 				     &info->u.nth.packet) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				   "cannot parse --packet `%s'", optarg);

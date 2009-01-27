@@ -26,7 +26,7 @@ parse_length(const char *s)
 {
 	unsigned int len;
 	
-	if (string_to_number(s, 0, 0xFFFF, &len) == -1)
+	if (string_to_number(s, 0, UINT16_MAX, &len) == -1)
 		exit_error(PARAMETER_PROBLEM, "length invalid: `%s'\n", s);
 	else
 		return len;

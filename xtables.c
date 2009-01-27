@@ -260,7 +260,7 @@ u_int16_t parse_port(const char *port, const char *proto)
 {
 	unsigned int portnum;
 
-	if ((string_to_number(port, 0, 65535, &portnum)) != -1 ||
+	if (string_to_number(port, 0, UINT16_MAX, &portnum) != -1 ||
 	    (portnum = service_to_port(port, proto)) != (unsigned)-1)
 		return portnum;
 
@@ -811,7 +811,7 @@ static struct in_addr *__numeric_to_ipaddr(const char *dotted, bool is_mask)
 				return NULL;
 
 			/* autocomplete, this is a network address */
-			if (!strtonum(p, NULL, &onebyte, 0, 255))
+			if (!strtonum(p, NULL, &onebyte, 0, UINT8_MAX))
 				return NULL;
 
 			addrp[i] = onebyte;
@@ -822,7 +822,7 @@ static struct in_addr *__numeric_to_ipaddr(const char *dotted, bool is_mask)
 		}
 
 		*q = '\0';
-		if (!strtonum(p, NULL, &onebyte, 0, 255))
+		if (!strtonum(p, NULL, &onebyte, 0, UINT8_MAX))
 			return NULL;
 
 		addrp[i] = onebyte;
@@ -830,7 +830,7 @@ static struct in_addr *__numeric_to_ipaddr(const char *dotted, bool is_mask)
 	}
 
 	/* we have checked 3 bytes, now we check the last one */
-	if (!strtonum(p, NULL, &onebyte, 0, 255))
+	if (!strtonum(p, NULL, &onebyte, 0, UINT8_MAX))
 		return NULL;
 
 	addrp[3] = onebyte;

@@ -40,7 +40,7 @@ static void parse_tproxy_lport(const char *s, struct xt_tproxy_target_info *info
 {
 	unsigned int lport;
 
-	if (string_to_number(s, 0, 65535, &lport) != -1)
+	if (string_to_number(s, 0, UINT16_MAX, &lport) != -1)
 		info->lport = htons(lport);
 	else
 		param_act(P_BAD_VALUE, "TPROXY", "--on-port", s);

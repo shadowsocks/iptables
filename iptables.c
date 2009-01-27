@@ -486,7 +486,7 @@ find_proto(const char *pname, enum ipt_tryload tryload, int nolookup, struct ipt
 {
 	unsigned int proto;
 
-	if (string_to_number(pname, 0, 255, &proto) != -1) {
+	if (string_to_number(pname, 0, UINT8_MAX, &proto) != -1) {
 		char *protoname = proto_to_name(proto, nolookup);
 
 		if (protoname)
@@ -502,7 +502,7 @@ parse_protocol(const char *s)
 {
 	unsigned int proto;
 
-	if (string_to_number(s, 0, 255, &proto) == -1) {
+	if (string_to_number(s, 0, UINT8_MAX, &proto) == -1) {
 		struct protoent *pent;
 
 		/* first deal with the special case of 'all' to prevent

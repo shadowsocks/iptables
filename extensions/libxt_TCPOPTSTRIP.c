@@ -82,7 +82,7 @@ static void parse_list(struct xt_tcpoptstrip_target_info *info, char *arg)
 				break;
 			}
 
-		if (option == 0 && string_to_number(arg, 0, 255, &option) == -1)
+		if (option == 0 && string_to_number(arg, 0, UINT8_MAX, &option) == -1)
 			exit_error(PARAMETER_PROBLEM,
 			           "Bad TCP option value \"%s\"", arg);
 

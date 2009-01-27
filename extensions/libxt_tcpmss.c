@@ -26,7 +26,7 @@ parse_tcp_mssvalue(const char *mssvalue)
 {
 	unsigned int mssvaluenum;
 
-	if (string_to_number(mssvalue, 0, 65535, &mssvaluenum) != -1)
+	if (string_to_number(mssvalue, 0, UINT16_MAX, &mssvaluenum) != -1)
 		return mssvaluenum;
 
 	exit_error(PARAMETER_PROBLEM,

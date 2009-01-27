@@ -55,7 +55,7 @@ static bool tos_parse_numeric(const char *str, struct tos_value_mask *tvm,
 static bool tos_parse_symbolic(const char *str, struct tos_value_mask *tvm,
     unsigned int def_mask)
 {
-	const unsigned int max = 255;
+	const unsigned int max = UINT8_MAX;
 	const struct tos_symbol_info *symbol;
 	char *tmp;
 

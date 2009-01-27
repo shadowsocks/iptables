@@ -240,7 +240,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-htable-size",
 		          *flags & PARAM_SIZE);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
-		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
+		if (string_to_number(optarg, 0, UINT32_MAX, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				"bad --hashlimit-htable-size: `%s'", optarg);
 		r->cfg.size = num;
@@ -250,7 +250,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-htable-max",
 		          *flags & PARAM_MAX);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
-		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
+		if (string_to_number(optarg, 0, UINT32_MAX, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				"bad --hashlimit-htable-max: `%s'", optarg);
 		r->cfg.max = num;
@@ -261,7 +261,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		          "--hashlimit-htable-gcinterval",
 		          *flags & PARAM_GCINTERVAL);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
-		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
+		if (string_to_number(optarg, 0, UINT32_MAX, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				"bad --hashlimit-htable-gcinterval: `%s'", 
 				optarg);
@@ -273,7 +273,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		param_act(P_ONLY_ONCE, "hashlimit",
 		          "--hashlimit-htable-expire", *flags & PARAM_EXPIRE);
 		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
-		if (string_to_number(optarg, 0, 0xffffffff, &num) == -1)
+		if (string_to_number(optarg, 0, UINT32_MAX, &num) == -1)
 			exit_error(PARAMETER_PROBLEM,
 				"bad --hashlimit-htable-expire: `%s'", optarg);
 		/* FIXME: not HZ dependent */
@@ -351,7 +351,7 @@ hashlimit_mt_parse(struct xt_hashlimit_mtinfo1 *info, unsigned int *flags,
 	case '&': /* --hashlimit-htable-size */
 		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-htable-size",
 		          *flags & PARAM_SIZE);
-		if (!strtonum(optarg, NULL, &num, 0, 0xffffffff))
+		if (!strtonum(optarg, NULL, &num, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "hashlimit",
 			          "--hashlimit-htable-size", optarg);
 		info->cfg.size = num;
@@ -361,7 +361,7 @@ hashlimit_mt_parse(struct xt_hashlimit_mtinfo1 *info, unsigned int *flags,
 	case '*': /* --hashlimit-htable-max */
 		param_act(P_ONLY_ONCE, "hashlimit", "--hashlimit-htable-max",
 		          *flags & PARAM_MAX);
-		if (!strtonum(optarg, NULL, &num, 0, 0xffffffff))
+		if (!strtonum(optarg, NULL, &num, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "hashlimit",
 			          "--hashlimit-htable-max", optarg);
 		info->cfg.max = num;
@@ -372,7 +372,7 @@ hashlimit_mt_parse(struct xt_hashlimit_mtinfo1 *info, unsigned int *flags,
 		param_act(P_ONLY_ONCE, "hashlimit",
 		          "--hashlimit-htable-gcinterval",
 		          *flags & PARAM_GCINTERVAL);
-		if (!strtonum(optarg, NULL, &num, 0, 0xffffffff))
+		if (!strtonum(optarg, NULL, &num, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "hashlimit",
 			          "--hashlimit-htable-gcinterval", optarg);
 		/* FIXME: not HZ dependent!! */
@@ -383,7 +383,7 @@ hashlimit_mt_parse(struct xt_hashlimit_mtinfo1 *info, unsigned int *flags,
 	case ')': /* --hashlimit-htable-expire */
 		param_act(P_ONLY_ONCE, "hashlimit",
 		          "--hashlimit-htable-expire", *flags & PARAM_EXPIRE);
-		if (!strtonum(optarg, NULL, &num, 0, 0xffffffff))
+		if (!strtonum(optarg, NULL, &num, 0, UINT32_MAX))
 			param_act(P_BAD_VALUE, "hashlimit",
 			          "--hashlimit-htable-expire", optarg);
 		/* FIXME: not HZ dependent */

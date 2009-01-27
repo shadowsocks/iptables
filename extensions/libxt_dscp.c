@@ -48,7 +48,7 @@ parse_dscp(const char *s, struct xt_dscp_info *dinfo)
 {
 	unsigned int dscp;
        
-	if (string_to_number(s, 0, 255, &dscp) == -1)
+	if (string_to_number(s, 0, UINT8_MAX, &dscp) == -1)
 		exit_error(PARAMETER_PROBLEM,
 			   "Invalid dscp `%s'\n", s);
 

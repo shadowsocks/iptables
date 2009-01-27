@@ -118,7 +118,7 @@ static int tos_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '&': /* --and-tos */
 		param_act(P_ONLY_ONCE, "TOS", "--and-tos", *flags & FLAG_TOS);
 		param_act(P_NO_INVERT, "TOS", "--and-tos", invert);
-		if (!strtonum(optarg, NULL, &bits, 0, 0xFF))
+		if (!strtonum(optarg, NULL, &bits, 0, UINT8_MAX))
 			param_act(P_BAD_VALUE, "TOS", "--and-tos", optarg);
 		info->tos_value = 0;
 		info->tos_mask  = ~bits;
@@ -127,7 +127,7 @@ static int tos_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '|': /* --or-tos */
 		param_act(P_ONLY_ONCE, "TOS", "--or-tos", *flags & FLAG_TOS);
 		param_act(P_NO_INVERT, "TOS", "--or-tos", invert);
-		if (!strtonum(optarg, NULL, &bits, 0, 0xFF))
+		if (!strtonum(optarg, NULL, &bits, 0, UINT8_MAX))
 			param_act(P_BAD_VALUE, "TOS", "--or-tos", optarg);
 		info->tos_value = bits;
 		info->tos_mask  = bits;
@@ -136,7 +136,7 @@ static int tos_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '^': /* --xor-tos */
 		param_act(P_ONLY_ONCE, "TOS", "--xor-tos", *flags & FLAG_TOS);
 		param_act(P_NO_INVERT, "TOS", "--xor-tos", invert);
-		if (!strtonum(optarg, NULL, &bits, 0, 0xFF))
+		if (!strtonum(optarg, NULL, &bits, 0, UINT8_MAX))
 			param_act(P_BAD_VALUE, "TOS", "--xor-tos", optarg);
 		info->tos_value = bits;
 		info->tos_mask  = 0;
