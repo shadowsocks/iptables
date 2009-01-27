@@ -14,7 +14,7 @@ libiptc_libiptc_a_SOURCES = libiptc/libip4tc.c libiptc/libip6tc.c
 
 lib_LTLIBRARIES       = libxtables.la
 libxtables_la_SOURCES = xtables.c
-libxtables_la_LDFLAGS = -version 0:0:0
+libxtables_la_LDFLAGS = -version-info 1:0:0
 
 # iptables, dynamic
 iptables_SOURCES          = iptables-standalone.c iptables.c

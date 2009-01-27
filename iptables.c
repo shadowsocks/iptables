@@ -932,7 +932,7 @@ make_delete_mask(struct ipt_entry *fw, struct iptables_rule_match *matches)
 	for (matchp = matches; matchp; matchp = matchp->next)
 		size += IPT_ALIGN(sizeof(struct ipt_entry_match)) + matchp->match->size;
 
-	mask = fw_calloc(1, size
+	mask = xtables_calloc(1, size
 			 + IPT_ALIGN(sizeof(struct ipt_entry_target))
 			 + xtables_targets->size);
 
@@ -998,7 +998,7 @@ for_each_chain(int (*fn)(const ipt_chainlabel, int, struct iptc_handle *),
 		chain = iptc_next_chain(handle);
         }
 
-	chains = fw_malloc(sizeof(ipt_chainlabel) * chaincount);
+	chains = xtables_malloc(sizeof(ipt_chainlabel) * chaincount);
 	i = 0;
 	chain = iptc_first_chain(handle);
 	while (chain) {
@@ -1370,7 +1370,7 @@ generate_entry(const struct ipt_entry *fw,
 	for (matchp = matches; matchp; matchp = matchp->next)
 		size += matchp->match->m->u.match_size;
 
-	e = fw_malloc(size + target->u.target_size);
+	e = xtables_malloc(size + target->u.target_size);
 	*e = *fw;
 	e->target_offset = size;
 	e->next_offset = size + target->u.target_size;
@@ -1679,7 +1679,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 				size = IPT_ALIGN(sizeof(struct ipt_entry_target))
 					+ target->size;
 
-				target->t = fw_calloc(1, size);
+				target->t = xtables_calloc(1, size);
 				target->t->u.target_size = size;
 				strcpy(target->t->u.user.name, jumpto);
 				set_revision(target->t->u.user.name,
@@ -1737,7 +1737,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 			m = find_match(optarg, LOAD_MUST_SUCCEED, &matches);
 			size = IPT_ALIGN(sizeof(struct ipt_entry_match))
 					 + m->size;
-			m->m = fw_calloc(1, size);
+			m->m = xtables_calloc(1, size);
 			m->m->u.match_size = size;
 			strcpy(m->m->u.user.name, m->name);
 			set_revision(m->m->u.user.name, m->revision);
@@ -1891,7 +1891,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 					size = IPT_ALIGN(sizeof(struct ipt_entry_match))
 							 + m->size;
 
-					m->m = fw_calloc(1, size);
+					m->m = xtables_calloc(1, size);
 					m->m->u.match_size = size;
 					strcpy(m->m->u.user.name, m->name);
 					set_revision(m->m->u.user.name,
@@ -2051,7 +2051,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 
 			size = sizeof(struct ipt_entry_target)
 				+ target->size;
-			target->t = fw_calloc(1, size);
+			target->t = xtables_calloc(1, size);
 			target->t->u.target_size = size;
 			strcpy(target->t->u.user.name, jumpto);
 			if (!iptc_is_chain(jumpto, *handle))

@@ -43,9 +43,6 @@ struct xtables_rule_match {
 
 extern char *lib_dir;
 
-extern void *fw_calloc(size_t count, size_t size);
-extern void *fw_malloc(size_t size);
-
 extern const char *modprobe_program;
 extern int xtables_insmod(const char *modname, const char *modprobe, int quiet);
 extern int load_xtables_ko(const char *modprobe, int quiet);
