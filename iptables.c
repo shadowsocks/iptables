@@ -194,13 +194,6 @@ const char *program_name;
 
 int kernel_version;
 
-/* A few hardcoded protocols for 'all' and in case the user has no
-   /etc/protocols */
-struct pprot {
-	char *name;
-	u_int8_t num;
-};
-
 struct afinfo afinfo = {
 	.family		= NFPROTO_IPV4,
 	.libprefix	= "libipt_",
@@ -221,18 +214,7 @@ struct afinfo afinfo = {
 #endif
 #endif
 
-static const struct pprot chain_protos[] = {
-	{ "tcp", IPPROTO_TCP },
-	{ "udp", IPPROTO_UDP },
-	{ "udplite", IPPROTO_UDPLITE },
-	{ "icmp", IPPROTO_ICMP },
-	{ "esp", IPPROTO_ESP },
-	{ "ah", IPPROTO_AH },
-	{ "sctp", IPPROTO_SCTP },
-	{ "all", 0 },
-};
-
-static char *
+static const char *
 proto_to_name(u_int8_t proto, int nolookup)
 {
 	unsigned int i;
@@ -243,9 +225,9 @@ proto_to_name(u_int8_t proto, int nolookup)
 			return pent->p_name;
 	}
 
-	for (i = 0; i < sizeof(chain_protos)/sizeof(struct pprot); i++)
-		if (chain_protos[i].num == proto)
-			return chain_protos[i].name;
+	for (i = 0; xtables_chain_protos[i].name != NULL; ++i)
+		if (xtables_chain_protos[i].num == proto)
+			return xtables_chain_protos[i].name;
 
 	return NULL;
 }
@@ -469,7 +451,7 @@ find_proto(const char *pname, enum xtables_tryload tryload,
 	unsigned int proto;
 
 	if (xtables_strtoui(pname, NULL, &proto, 0, UINT8_MAX)) {
-		char *protoname = proto_to_name(proto, nolookup);
+		const char *protoname = proto_to_name(proto, nolookup);
 
 		if (protoname)
 			return xtables_find_match(protoname, tryload, matches);
@@ -477,43 +459,6 @@ find_proto(const char *pname, enum xtables_tryload tryload,
 		return xtables_find_match(pname, tryload, matches);
 
 	return NULL;
-}
-
-u_int16_t
-parse_protocol(const char *s)
-{
-	unsigned int proto;
-
-	if (!xtables_strtoui(s, NULL, &proto, 0, UINT8_MAX)) {
-		struct protoent *pent;
-
-		/* first deal with the special case of 'all' to prevent
-		 * people from being able to redefine 'all' in nsswitch
-		 * and/or provoke expensive [not working] ldap/nis/... 
-		 * lookups */
-		if (!strcmp(s, "all"))
-			return 0;
-
-		if ((pent = getprotobyname(s)))
-			proto = pent->p_proto;
-		else {
-			unsigned int i;
-			for (i = 0;
-			     i < sizeof(chain_protos)/sizeof(struct pprot);
-			     i++) {
-				if (strcmp(s, chain_protos[i].name) == 0) {
-					proto = chain_protos[i].num;
-					break;
-				}
-			}
-			if (i == sizeof(chain_protos)/sizeof(struct pprot))
-				exit_error(PARAMETER_PROBLEM,
-					   "unknown protocol `%s' specified",
-					   s);
-		}
-	}
-
-	return (u_int16_t)proto;
 }
 
 /* Can't be zero. */
@@ -733,7 +678,7 @@ print_firewall(const struct ipt_entry *fw,
 
 	fputc(fw->ip.invflags & IPT_INV_PROTO ? '!' : ' ', stdout);
 	{
-		char *pname = proto_to_name(fw->ip.proto, format&FMT_NUMERIC);
+		const char *pname = proto_to_name(fw->ip.proto, format&FMT_NUMERIC);
 		if (pname)
 			printf(FMT("%-5s", "%s "), pname);
 		else
@@ -1107,10 +1052,10 @@ static void print_proto(u_int16_t proto, int invert)
 			return;
 		}
 
-		for (i = 0; i < sizeof(chain_protos)/sizeof(struct pprot); i++)
-			if (chain_protos[i].num == proto) {
+		for (i = 0; xtables_chain_protos[i].name != NULL; ++i)
+			if (xtables_chain_protos[i].num == proto) {
 				printf("-p %s%s ",
-				       invertstr, chain_protos[i].name);
+				       invertstr, xtables_chain_protos[i].name);
 				return;
 			}
 
@@ -1620,7 +1565,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 				*protocol = tolower(*protocol);
 
 			protocol = argv[optind-1];
-			fw.ip.proto = parse_protocol(protocol);
+			fw.ip.proto = xtables_parse_protocol(protocol);
 
 			if (fw.ip.proto == 0
 			    && (fw.ip.invflags & IPT_INV_PROTO))

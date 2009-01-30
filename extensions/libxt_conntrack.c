@@ -317,7 +317,8 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 			*protocol = tolower(*protocol);
 
 		protocol = argv[optind-1];
-		sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum = parse_protocol(protocol);
+		sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum =
+			xtables_parse_protocol(protocol);
 
 		if (sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum == 0
 		    && (sinfo->invflags & XT_INV_PROTO))
@@ -455,7 +456,7 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 		/* Canonicalize into lower case */
 		for (p = optarg; *p != '\0'; ++p)
 			*p = tolower(*p);
-		info->l4proto = parse_protocol(optarg);
+		info->l4proto = xtables_parse_protocol(optarg);
 
 		if (info->l4proto == 0 && (info->invert_flags & XT_INV_PROTO))
 			exit_error(PARAMETER_PROBLEM, "conntrack: rule would "

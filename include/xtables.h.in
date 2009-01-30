@@ -21,6 +21,9 @@
 #ifndef IPPROTO_DCCP
 #define IPPROTO_DCCP 33
 #endif
+#ifndef IPPROTO_MH
+#	define IPPROTO_MH 135
+#endif
 #ifndef IPPROTO_UDPLITE
 #define IPPROTO_UDPLITE	136
 #endif
@@ -151,6 +154,17 @@ struct xtables_rule_match {
 	bool completed;
 };
 
+/**
+ * struct xtables_pprot -
+ *
+ * A few hardcoded protocols for 'all' and in case the user has no
+ * /etc/protocols.
+ */
+struct xtables_pprot {
+	const char *name;
+	u_int8_t num;
+};
+
 enum xtables_tryload {
 	XTF_DONT_LOAD,
 	XTF_DURING_LOAD,
@@ -239,10 +253,13 @@ extern void xtables_save_string(const char *value);
 #	define _init __attribute__((constructor)) _INIT
 #endif
 
-/* Present in both iptables.c and ip6tables.c */
-extern u_int16_t parse_protocol(const char *s);
+extern const struct xtables_pprot xtables_chain_protos[];
+extern u_int16_t xtables_parse_protocol(const char *s);
 
 #ifdef XTABLES_INTERNAL
+#	ifndef ARRAY_SIZE
+#		define ARRAY_SIZE(x) (sizeof(x) / sizeof(*(x)))
+#	endif
 #	include <xtables/internal.h>
 #endif
 

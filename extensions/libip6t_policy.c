@@ -244,7 +244,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: double --proto option");
 
-		e->proto = parse_protocol(argv[optind-1]);
+		e->proto = xtables_parse_protocol(argv[optind-1]);
 		if (e->proto != IPPROTO_AH && e->proto != IPPROTO_ESP &&
 		    e->proto != IPPROTO_COMP)
 			exit_error(PARAMETER_PROBLEM,

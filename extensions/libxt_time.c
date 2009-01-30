@@ -22,7 +22,6 @@
 
 #include <linux/netfilter/xt_time.h>
 #include <xtables.h>
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof(*x))
 
 enum { /* getopt "seen" bits */
 	F_DATE_START = 1 << 0,

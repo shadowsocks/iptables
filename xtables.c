@@ -32,6 +32,7 @@
 #include <arpa/inet.h>
 
 #include <xtables.h>
+#include <ip6tables.h>
 #include <libiptc/libxtc.h>
 
 #ifndef NO_SHARED_LIBS
@@ -1284,4 +1285,55 @@ int xtables_check_inverse(const char option[], int *invert,
 		return true;
 	}
 	return false;
+}
+
+const struct xtables_pprot xtables_chain_protos[] = {
+	{"tcp",       IPPROTO_TCP},
+	{"sctp",      IPPROTO_SCTP},
+	{"udp",       IPPROTO_UDP},
+	{"udplite",   IPPROTO_UDPLITE},
+	{"icmp",      IPPROTO_ICMP},
+	{"icmpv6",    IPPROTO_ICMPV6},
+	{"ipv6-icmp", IPPROTO_ICMPV6},
+	{"esp",       IPPROTO_ESP},
+	{"ah",        IPPROTO_AH},
+	{"ipv6-mh",   IPPROTO_MH},
+	{"mh",        IPPROTO_MH},
+	{"all",       0},
+	{NULL},
+};
+
+u_int16_t
+xtables_parse_protocol(const char *s)
+{
+	unsigned int proto;
+
+	if (!xtables_strtoui(s, NULL, &proto, 0, UINT8_MAX)) {
+		struct protoent *pent;
+
+		/* first deal with the special case of 'all' to prevent
+		 * people from being able to redefine 'all' in nsswitch
+		 * and/or provoke expensive [not working] ldap/nis/...
+		 * lookups */
+		if (!strcmp(s, "all"))
+			return 0;
+
+		if ((pent = getprotobyname(s)))
+			proto = pent->p_proto;
+		else {
+			unsigned int i;
+			for (i = 0; i < ARRAY_SIZE(xtables_chain_protos); ++i) {
+				if (strcmp(s, xtables_chain_protos[i].name) == 0) {
+					proto = xtables_chain_protos[i].num;
+					break;
+				}
+			}
+			if (i == ARRAY_SIZE(xtables_chain_protos))
+				exit_error(PARAMETER_PROBLEM,
+					   "unknown protocol `%s' specified",
+					   s);
+		}
+	}
+
+	return proto;
 }

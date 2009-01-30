@@ -208,34 +208,7 @@ struct afinfo afinfo = {
 	.so_rev_target	= IP6T_SO_GET_REVISION_TARGET,
 };
 
-/* Primitive headers... */
-/* defined in netinet/in.h */
-#if 0
-#ifndef IPPROTO_ESP
-#define IPPROTO_ESP 50
-#endif
-#ifndef IPPROTO_AH
-#define IPPROTO_AH 51
-#endif
-#endif
-#ifndef IPPROTO_MH
-#define IPPROTO_MH 135
-#endif
-
-static const struct pprot chain_protos[] = {
-	{ "tcp", IPPROTO_TCP },
-	{ "udp", IPPROTO_UDP },
-	{ "udplite", IPPROTO_UDPLITE },
-	{ "icmpv6", IPPROTO_ICMPV6 },
-	{ "ipv6-icmp", IPPROTO_ICMPV6 },
-	{ "esp", IPPROTO_ESP },
-	{ "ah", IPPROTO_AH },
-	{ "ipv6-mh", IPPROTO_MH },
-	{ "mh", IPPROTO_MH },
-	{ "all", 0 },
-};
-
-static char *
+static const char *
 proto_to_name(u_int8_t proto, int nolookup)
 {
 	unsigned int i;
@@ -246,9 +219,9 @@ proto_to_name(u_int8_t proto, int nolookup)
 			return pent->p_name;
 	}
 
-	for (i = 0; i < sizeof(chain_protos)/sizeof(struct pprot); i++)
-		if (chain_protos[i].num == proto)
-			return chain_protos[i].name;
+	for (i = 0; xtables_chain_protos[i].name != NULL; ++i)
+		if (xtables_chain_protos[i].num == proto)
+			return xtables_chain_protos[i].name;
 
 	return NULL;
 }
@@ -467,7 +440,7 @@ find_proto(const char *pname, enum xtables_tryload tryload,
 	unsigned int proto;
 
 	if (xtables_strtoui(pname, NULL, &proto, 0, UINT8_MAX)) {
-		char *protoname = proto_to_name(proto, nolookup);
+		const char *protoname = proto_to_name(proto, nolookup);
 
 		if (protoname)
 			return xtables_find_match(protoname, tryload, matches);
@@ -475,43 +448,6 @@ find_proto(const char *pname, enum xtables_tryload tryload,
 		return xtables_find_match(pname, tryload, matches);
 
 	return NULL;
-}
-
-u_int16_t
-parse_protocol(const char *s)
-{
-	unsigned int proto;
-
-	if (!xtables_strtoui(s, NULL, &proto, 0, UINT8_MAX)) {
-		struct protoent *pent;
-
-		/* first deal with the special case of 'all' to prevent
-		 * people from being able to redefine 'all' in nsswitch
-		 * and/or provoke expensive [not working] ldap/nis/...
-		 * lookups */
-		if (!strcmp(s, "all"))
-			return 0;
-
-		if ((pent = getprotobyname(s)))
-			proto = pent->p_proto;
-		else {
-			unsigned int i;
-			for (i = 0;
-			     i < sizeof(chain_protos)/sizeof(struct pprot);
-			     i++) {
-				if (strcmp(s, chain_protos[i].name) == 0) {
-					proto = chain_protos[i].num;
-					break;
-				}
-			}
-			if (i == sizeof(chain_protos)/sizeof(struct pprot))
-				exit_error(PARAMETER_PROBLEM,
-					   "unknown protocol `%s' specified",
-					   s);
-		}
-	}
-
-	return (u_int16_t)proto;
 }
 
 /* These are invalid numbers as upper layer protocol */
@@ -738,7 +674,7 @@ print_firewall(const struct ip6t_entry *fw,
 
 	fputc(fw->ipv6.invflags & IP6T_INV_PROTO ? '!' : ' ', stdout);
 	{
-		char *pname = proto_to_name(fw->ipv6.proto, format&FMT_NUMERIC);
+		const char *pname = proto_to_name(fw->ipv6.proto, format&FMT_NUMERIC);
 		if (pname)
 			printf(FMT("%-5s", "%s "), pname);
 		else
@@ -1144,10 +1080,10 @@ static void print_proto(u_int16_t proto, int invert)
 			return;
 		}
 
-		for (i = 0; i < sizeof(chain_protos)/sizeof(struct pprot); i++)
-			if (chain_protos[i].num == proto) {
+		for (i = 0; xtables_chain_protos[i].name != NULL; ++i)
+			if (xtables_chain_protos[i].num == proto) {
 				printf("-p %s%s ",
-				       invertstr, chain_protos[i].name);
+				       invertstr, xtables_chain_protos[i].name);
 				return;
 			}
 
@@ -1607,7 +1543,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				*protocol = tolower(*protocol);
 
 			protocol = argv[optind-1];
-			fw.ipv6.proto = parse_protocol(protocol);
+			fw.ipv6.proto = xtables_parse_protocol(protocol);
 			fw.ipv6.flags |= IP6T_F_PROTO;
 
 			if (fw.ipv6.proto == 0
