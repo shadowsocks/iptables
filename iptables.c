@@ -1705,7 +1705,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 			check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_VIANAMEIN, &fw.ip.invflags,
 				   invert);
-			parse_interface(argv[optind-1],
+			xtables_parse_interface(argv[optind-1],
 					fw.ip.iniface,
 					fw.ip.iniface_mask);
 			break;
@@ -1714,7 +1714,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 			check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_VIANAMEOUT, &fw.ip.invflags,
 				   invert);
-			parse_interface(argv[optind-1],
+			xtables_parse_interface(argv[optind-1],
 					fw.ip.outiface,
 					fw.ip.outiface_mask);
 			break;

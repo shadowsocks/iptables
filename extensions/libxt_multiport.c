@@ -81,7 +81,7 @@ parse_multi_ports(const char *portstring, u_int16_t *ports, const char *proto)
 	{
 		next=strchr(cp, ',');
 		if (next) *next++='\0';
-		ports[i] = parse_port(cp, proto);
+		ports[i] = xtables_parse_port(cp, proto);
 	}
 	if (cp) exit_error(PARAMETER_PROBLEM, "too many ports specified");
 	free(buffer);
@@ -113,10 +113,10 @@ parse_multi_ports_v1(const char *portstring,
 					   "too many ports specified");
 			*range++ = '\0';
 		}
-		multiinfo->ports[i] = parse_port(cp, proto);
+		multiinfo->ports[i] = xtables_parse_port(cp, proto);
 		if (range) {
 			multiinfo->pflags[i] = 1;
-			multiinfo->ports[++i] = parse_port(range, proto);
+			multiinfo->ports[++i] = xtables_parse_port(range, proto);
 			if (multiinfo->ports[i-1] >= multiinfo->ports[i])
 				exit_error(PARAMETER_PROBLEM,
 					   "invalid portrange specified");

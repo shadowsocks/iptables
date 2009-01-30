@@ -1700,7 +1700,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_VIANAMEIN, &fw.ipv6.invflags,
 				   invert);
-			parse_interface(argv[optind-1],
+			xtables_parse_interface(argv[optind-1],
 					fw.ipv6.iniface,
 					fw.ipv6.iniface_mask);
 			break;
@@ -1709,7 +1709,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_VIANAMEOUT, &fw.ipv6.invflags,
 				   invert);
-			parse_interface(argv[optind-1],
+			xtables_parse_interface(argv[optind-1],
 					fw.ipv6.outiface,
 					fw.ipv6.outiface_mask);
 			break;

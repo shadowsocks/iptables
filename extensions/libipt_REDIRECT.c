@@ -48,7 +48,7 @@ parse_ports(const char *arg, struct ip_nat_multi_range *mr)
 
 	port = atoi(arg);
 	if (port == 0)
-		port = service_to_port(arg, NULL);
+		port = xtables_service_to_port(arg, NULL);
 
 	if (port == 0 || port > 65535)
 		exit_error(PARAMETER_PROBLEM, "Port `%s' not valid\n", arg);

@@ -194,10 +194,10 @@ extern bool xtables_strtoul(const char *, char **, unsigned long *,
 	unsigned long, unsigned long);
 extern bool xtables_strtoui(const char *, char **, unsigned int *,
 	unsigned int, unsigned int);
-extern int service_to_port(const char *name, const char *proto);
-extern u_int16_t parse_port(const char *port, const char *proto);
+extern int xtables_service_to_port(const char *name, const char *proto);
+extern u_int16_t xtables_parse_port(const char *port, const char *proto);
 extern void
-parse_interface(const char *arg, char *vianame, unsigned char *mask);
+xtables_parse_interface(const char *arg, char *vianame, unsigned char *mask);
 
 /* this is a special 64bit data type that is 8-byte aligned */
 #define aligned_u64 u_int64_t __attribute__((aligned(8)))

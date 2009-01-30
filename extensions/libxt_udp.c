@@ -36,13 +36,13 @@ parse_udp_ports(const char *portstring, u_int16_t *ports)
 
 	buffer = strdup(portstring);
 	if ((cp = strchr(buffer, ':')) == NULL)
-		ports[0] = ports[1] = parse_port(buffer, "udp");
+		ports[0] = ports[1] = xtables_parse_port(buffer, "udp");
 	else {
 		*cp = '\0';
 		cp++;
 
-		ports[0] = buffer[0] ? parse_port(buffer, "udp") : 0;
-		ports[1] = cp[0] ? parse_port(cp, "udp") : 0xFFFF;
+		ports[0] = buffer[0] ? xtables_parse_port(buffer, "udp") : 0;
+		ports[1] = cp[0] ? xtables_parse_port(cp, "udp") : 0xFFFF;
 
 		if (ports[0] > ports[1])
 			exit_error(PARAMETER_PROBLEM,

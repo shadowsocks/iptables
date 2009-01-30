@@ -236,7 +236,7 @@ bool xtables_strtoui(const char *s, char **end, unsigned int *value,
 	return ret;
 }
 
-int service_to_port(const char *name, const char *proto)
+int xtables_service_to_port(const char *name, const char *proto)
 {
 	struct servent *service;
 
@@ -246,19 +246,20 @@ int service_to_port(const char *name, const char *proto)
 	return -1;
 }
 
-u_int16_t parse_port(const char *port, const char *proto)
+u_int16_t xtables_parse_port(const char *port, const char *proto)
 {
 	unsigned int portnum;
 
 	if (xtables_strtoui(port, NULL, &portnum, 0, UINT16_MAX) ||
-	    (portnum = service_to_port(port, proto)) != (unsigned)-1)
+	    (portnum = xtables_service_to_port(port, proto)) != (unsigned)-1)
 		return portnum;
 
 	exit_error(PARAMETER_PROBLEM,
 		   "invalid port/service `%s' specified", port);
 }
 
-void parse_interface(const char *arg, char *vianame, unsigned char *mask)
+void xtables_parse_interface(const char *arg, char *vianame,
+			     unsigned char *mask)
 {
 	int vialen = strlen(arg);
 	unsigned int i;
