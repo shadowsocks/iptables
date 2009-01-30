@@ -128,7 +128,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 	unsigned int naddr = 0;
 	int mode;
 
-	check_inverse(optarg, &invert, &optind, 0);
+	xtables_check_inverse(optarg, &invert, &optind, 0);
 
 	switch (c) {
 	case '1':

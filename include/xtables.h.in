@@ -202,7 +202,8 @@ xtables_parse_interface(const char *arg, char *vianame, unsigned char *mask);
 /* this is a special 64bit data type that is 8-byte aligned */
 #define aligned_u64 u_int64_t __attribute__((aligned(8)))
 
-int check_inverse(const char option[], int *invert, int *my_optind, int argc);
+int xtables_check_inverse(const char option[], int *invert,
+	int *my_optind, int argc);
 void exit_error(enum xtables_exittype, const char *, ...)
 	__attribute__((noreturn, format(printf,2,3)));
 extern void xtables_param_act(unsigned int, const char *, ...);

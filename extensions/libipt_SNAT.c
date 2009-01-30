@@ -152,7 +152,7 @@ static int SNAT_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --to-source");
 

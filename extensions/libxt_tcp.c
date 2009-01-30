@@ -150,7 +150,7 @@ tcp_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & TCP_SRC_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--source-port' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_ports(argv[optind-1], tcpinfo->spts);
 		if (invert)
 			tcpinfo->invflags |= XT_TCP_INV_SRCPT;
@@ -161,7 +161,7 @@ tcp_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & TCP_DST_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--destination-port' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_ports(argv[optind-1], tcpinfo->dpts);
 		if (invert)
 			tcpinfo->invflags |= XT_TCP_INV_DSTPT;
@@ -182,7 +182,7 @@ tcp_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one of `--syn' or `--tcp-flags' "
 				   " allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if (!argv[optind]
 		    || argv[optind][0] == '-' || argv[optind][0] == '!')
@@ -199,7 +199,7 @@ tcp_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & TCP_OPTION)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--tcp-option' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_option(argv[optind-1], &tcpinfo->option);
 		if (invert)
 			tcpinfo->invflags |= XT_TCP_INV_OPTION;

@@ -297,7 +297,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		parse_states(argv[optind-1], sinfo);
 		if (invert) {
@@ -307,7 +307,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '2':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if(invert)
 			sinfo->invflags |= XT_CONNTRACK_PROTO;
@@ -328,7 +328,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '3':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_ORIGSRC;
@@ -348,7 +348,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '4':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_ORIGDST;
@@ -368,7 +368,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '5':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_REPLSRC;
@@ -388,7 +388,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '6':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_REPLDST;
@@ -408,7 +408,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '7':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		parse_statuses(argv[optind-1], sinfo);
 		if (invert) {
@@ -418,7 +418,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '8':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		parse_expires(argv[optind-1], sinfo);
 		if (invert) {

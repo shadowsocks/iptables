@@ -118,7 +118,7 @@ static int NETMAP_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --%s", NETMAP_opts[0].name);
 

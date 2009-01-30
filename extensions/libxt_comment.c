@@ -46,7 +46,7 @@ comment_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		check_inverse(argv[optind-1], &invert, &optind, 0);
+		xtables_check_inverse(argv[optind-1], &invert, &optind, 0);
 		if (invert) {
 			exit_error(PARAMETER_PROBLEM,
 					"Sorry, you can't have an inverted comment");

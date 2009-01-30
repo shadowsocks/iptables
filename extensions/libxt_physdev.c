@@ -43,7 +43,7 @@ physdev_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 		if (*flags & XT_PHYSDEV_OP_IN)
 			goto multiple_use;
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		xtables_parse_interface(argv[optind-1], info->physindev,
 				(unsigned char *)info->in_mask);
 		if (invert)
@@ -55,7 +55,7 @@ physdev_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '2':
 		if (*flags & XT_PHYSDEV_OP_OUT)
 			goto multiple_use;
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		xtables_parse_interface(argv[optind-1], info->physoutdev,
 				(unsigned char *)info->out_mask);
 		if (invert)
@@ -67,7 +67,7 @@ physdev_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '3':
 		if (*flags & XT_PHYSDEV_OP_ISIN)
 			goto multiple_use;
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		info->bitmask |= XT_PHYSDEV_OP_ISIN;
 		if (invert)
 			info->invert |= XT_PHYSDEV_OP_ISIN;
@@ -77,7 +77,7 @@ physdev_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '4':
 		if (*flags & XT_PHYSDEV_OP_ISOUT)
 			goto multiple_use;
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		info->bitmask |= XT_PHYSDEV_OP_ISOUT;
 		if (invert)
 			info->invert |= XT_PHYSDEV_OP_ISOUT;
@@ -87,7 +87,7 @@ physdev_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '5':
 		if (*flags & XT_PHYSDEV_OP_BRIDGED)
 			goto multiple_use;
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		if (invert)
 			info->invert |= XT_PHYSDEV_OP_BRIDGED;
 		*flags |= XT_PHYSDEV_OP_BRIDGED;

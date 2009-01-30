@@ -125,7 +125,7 @@ static int dst_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IP6T_OPTS_LEN)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--dst-len' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		optinfo->hdrlen = parse_opts_num(argv[optind-1], "length");
 		if (invert)
 			optinfo->invflags |= IP6T_OPTS_INV_LEN;
@@ -136,7 +136,7 @@ static int dst_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IP6T_OPTS_OPTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--dst-opts' allowed");
-                check_inverse(optarg, &invert, &optind, 0);
+                xtables_check_inverse(optarg, &invert, &optind, 0);
                 if (invert)
                         exit_error(PARAMETER_PROBLEM,
 				" '!' not allowed with `--dst-opts'");

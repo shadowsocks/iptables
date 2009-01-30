@@ -157,7 +157,7 @@ static int realm_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 		char *end;
 	case '1':
-		check_inverse(argv[optind-1], &invert, &optind, 0);
+		xtables_check_inverse(argv[optind-1], &invert, &optind, 0);
 		end = optarg = argv[optind-1];
 		realminfo->id = strtoul(optarg, &end, 0);
 		if (end != optarg && (*end == '/' || *end == '\0')) {

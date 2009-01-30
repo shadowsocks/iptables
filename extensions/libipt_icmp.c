@@ -182,7 +182,7 @@ static int icmp_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags == 1)
 			exit_error(PARAMETER_PROBLEM,
 				   "icmp match: only use --icmp-type once!");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_icmp(argv[optind-1], &icmpinfo->type, 
 			   icmpinfo->code);
 		if (invert)

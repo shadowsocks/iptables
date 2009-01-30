@@ -450,26 +450,6 @@ add_command(unsigned int *cmd, const int newcmd, const int othercmds,
 	*cmd |= newcmd;
 }
 
-int
-check_inverse(const char option[], int *invert, int *my_optind, int argc)
-{
-	if (option && strcmp(option, "!") == 0) {
-		if (*invert)
-			exit_error(PARAMETER_PROBLEM,
-				   "Multiple `!' flags not allowed");
-		*invert = TRUE;
-		if (my_optind != NULL) {
-			++*my_optind;
-			if (argc && *my_optind > argc)
-				exit_error(PARAMETER_PROBLEM,
-					   "no argument following `!'");
-		}
-
-		return TRUE;
-	}
-	return FALSE;
-}
-
 /*
  *	All functions starting with "parse" should succeed, otherwise
  *	the program fails.
@@ -1618,7 +1598,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			 * Option selection
 			 */
 		case 'p':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_PROTOCOL, &fw.ipv6.invflags,
 				   invert);
 
@@ -1644,14 +1624,14 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			break;
 
 		case 's':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_SOURCE, &fw.ipv6.invflags,
 				   invert);
 			shostnetworkmask = argv[optind-1];
 			break;
 
 		case 'd':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_DESTINATION, &fw.ipv6.invflags,
 				   invert);
 			dhostnetworkmask = argv[optind-1];
@@ -1697,7 +1677,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 
 
 		case 'i':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_VIANAMEIN, &fw.ipv6.invflags,
 				   invert);
 			xtables_parse_interface(argv[optind-1],
@@ -1706,7 +1686,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			break;
 
 		case 'o':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_VIANAMEOUT, &fw.ipv6.invflags,
 				   invert);
 			xtables_parse_interface(argv[optind-1],

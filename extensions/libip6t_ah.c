@@ -86,7 +86,7 @@ static int ah_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IP6T_AH_SPI)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--ahspi' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_ah_spis(argv[optind-1], ahinfo->spis);
 		if (invert)
 			ahinfo->invflags |= IP6T_AH_INV_SPI;
@@ -96,7 +96,7 @@ static int ah_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IP6T_AH_LEN)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--ahlen' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		ahinfo->hdrlen = parse_ah_spi(argv[optind-1], "length");
 		if (invert)
 			ahinfo->invflags |= IP6T_AH_INV_LEN;

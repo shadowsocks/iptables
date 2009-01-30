@@ -158,7 +158,7 @@ static int rt_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IP6T_RT_TYP)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--rt-type' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		rtinfo->rt_type = parse_rt_num(argv[optind-1], "type");
 		if (invert)
 			rtinfo->invflags |= IP6T_RT_INV_TYP;
@@ -169,7 +169,7 @@ static int rt_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IP6T_RT_SGS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--rt-segsleft' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_rt_segsleft(argv[optind-1], rtinfo->segsleft);
 		if (invert)
 			rtinfo->invflags |= IP6T_RT_INV_SGS;
@@ -180,7 +180,7 @@ static int rt_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IP6T_RT_LEN)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--rt-len' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		rtinfo->hdrlen = parse_rt_num(argv[optind-1], "length");
 		if (invert)
 			rtinfo->invflags |= IP6T_RT_INV_LEN;
@@ -204,7 +204,7 @@ static int rt_parse(int c, char **argv, int invert, unsigned int *flags,
 		if ( !(*flags & IP6T_RT_TYP) || (rtinfo->rt_type != 0) || (rtinfo->invflags & IP6T_RT_INV_TYP) )
 			exit_error(PARAMETER_PROBLEM,
 				   "`--rt-type 0' required before `--rt-0-addrs'");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		if (invert)
 			exit_error(PARAMETER_PROBLEM,
 				   " '!' not allowed with `--rt-0-addrs'");

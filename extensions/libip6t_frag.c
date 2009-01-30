@@ -94,7 +94,7 @@ static int frag_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IP6T_FRAG_IDS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--fragid' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_frag_ids(argv[optind-1], fraginfo->ids);
 		if (invert)
 			fraginfo->invflags |= IP6T_FRAG_INV_IDS;
@@ -105,7 +105,7 @@ static int frag_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IP6T_FRAG_LEN)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--fraglen' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		fraginfo->hdrlen = parse_frag_id(argv[optind-1], "length");
 		if (invert)
 			fraginfo->invflags |= IP6T_FRAG_INV_LEN;

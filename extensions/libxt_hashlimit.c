@@ -219,7 +219,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '%':
 		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit",
 		          *flags & PARAM_LIMIT);
-		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
+		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!parse_rate(optarg, &r->cfg.avg))
 			exit_error(PARAMETER_PROBLEM,
 				   "bad rate `%s'", optarg);
@@ -229,7 +229,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '$':
 		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-burst",
 		          *flags & PARAM_BURST);
-		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
+		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, 10000))
 			exit_error(PARAMETER_PROBLEM,
 				   "bad --hashlimit-burst `%s'", optarg);
@@ -239,7 +239,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '&':
 		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-htable-size",
 		          *flags & PARAM_SIZE);
-		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
+		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
 			exit_error(PARAMETER_PROBLEM,
 				"bad --hashlimit-htable-size: `%s'", optarg);
@@ -249,7 +249,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '*':
 		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-htable-max",
 		          *flags & PARAM_MAX);
-		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
+		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
 			exit_error(PARAMETER_PROBLEM,
 				"bad --hashlimit-htable-max: `%s'", optarg);
@@ -260,7 +260,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		xtables_param_act(XTF_ONLY_ONCE, "hashlimit",
 		          "--hashlimit-htable-gcinterval",
 		          *flags & PARAM_GCINTERVAL);
-		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
+		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
 			exit_error(PARAMETER_PROBLEM,
 				"bad --hashlimit-htable-gcinterval: `%s'", 
@@ -272,7 +272,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 	case ')':
 		xtables_param_act(XTF_ONLY_ONCE, "hashlimit",
 		          "--hashlimit-htable-expire", *flags & PARAM_EXPIRE);
-		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
+		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
 			exit_error(PARAMETER_PROBLEM,
 				"bad --hashlimit-htable-expire: `%s'", optarg);
@@ -283,7 +283,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '_':
 		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-mode",
 		          *flags & PARAM_MODE);
-		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
+		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (parse_mode(&r->cfg.mode, optarg) < 0)
 			exit_error(PARAMETER_PROBLEM, 
 				   "bad --hashlimit-mode: `%s'\n", optarg);
@@ -292,7 +292,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '"':
 		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-name",
 		          *flags & PARAM_NAME);
-		if (check_inverse(argv[optind-1], &invert, &optind, 0)) break;
+		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (strlen(optarg) == 0)
 			exit_error(PARAMETER_PROBLEM, "Zero-length name?");
 		strncpy(r->name, optarg, sizeof(r->name));

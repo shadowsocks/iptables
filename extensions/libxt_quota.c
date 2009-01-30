@@ -60,7 +60,7 @@ quota_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM, "quota: unexpected '!'");
 		if (!parse_quota(optarg, &info->quota))
 			exit_error(PARAMETER_PROBLEM,

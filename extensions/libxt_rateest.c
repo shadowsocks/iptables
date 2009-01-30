@@ -118,7 +118,7 @@ rateest_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case OPT_RATEEST1:
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		if (invert)
 			exit_error(PARAMETER_PROBLEM,
 				   "rateest: rateest can't be inverted");
@@ -132,7 +132,7 @@ rateest_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case OPT_RATEEST2:
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		if (invert)
 			exit_error(PARAMETER_PROBLEM,
 				   "rateest: rateest can't be inverted");
@@ -147,7 +147,7 @@ rateest_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case OPT_RATEEST_BPS1:
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		if (invert)
 			exit_error(PARAMETER_PROBLEM,
 				   "rateest: rateest-bps can't be inverted");
@@ -171,7 +171,7 @@ rateest_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case OPT_RATEEST_PPS1:
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		if (invert)
 			exit_error(PARAMETER_PROBLEM,
 				   "rateest: rateest-pps can't be inverted");
@@ -196,7 +196,7 @@ rateest_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case OPT_RATEEST_BPS2:
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		if (invert)
 			exit_error(PARAMETER_PROBLEM,
 				   "rateest: rateest-bps can't be inverted");
@@ -220,7 +220,7 @@ rateest_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case OPT_RATEEST_PPS2:
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		if (invert)
 			exit_error(PARAMETER_PROBLEM,
 				   "rateest: rateest-pps can't be inverted");
@@ -245,7 +245,7 @@ rateest_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case OPT_RATEEST_DELTA:
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		if (invert)
 			exit_error(PARAMETER_PROBLEM,
 				   "rateest: rateest-delta can't be inverted");
@@ -259,7 +259,7 @@ rateest_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case OPT_RATEEST_EQ:
-		check_inverse(argv[optind-1], &invert, &optind, 0);
+		xtables_check_inverse(argv[optind-1], &invert, &optind, 0);
 
 		if (*flags & (1 << c))
 			exit_error(PARAMETER_PROBLEM,
@@ -272,7 +272,7 @@ rateest_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case OPT_RATEEST_LT:
-		check_inverse(argv[optind-1], &invert, &optind, 0);
+		xtables_check_inverse(argv[optind-1], &invert, &optind, 0);
 
 		if (*flags & (1 << c))
 			exit_error(PARAMETER_PROBLEM,
@@ -285,7 +285,7 @@ rateest_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case OPT_RATEEST_GT:
-		check_inverse(argv[optind-1], &invert, &optind, 0);
+		xtables_check_inverse(argv[optind-1], &invert, &optind, 0);
 
 		if (*flags & (1 << c))
 			exit_error(PARAMETER_PROBLEM,

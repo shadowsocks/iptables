@@ -1257,3 +1257,31 @@ void xtables_save_string(const char *value)
 		printf("\" ");
 	}
 }
+
+/**
+ * Check for option-intrapositional negation.
+ * Do not use in new code.
+ */
+int xtables_check_inverse(const char option[], int *invert,
+			  int *my_optind, int argc)
+{
+	if (option && strcmp(option, "!") == 0) {
+		fprintf(stderr, "Using intrapositioned negation "
+		        "(`--option ! this`) is deprecated in favor of "
+		        "extrapositioned (`! --option this`).\n");
+
+		if (*invert)
+			exit_error(PARAMETER_PROBLEM,
+				   "Multiple `!' flags not allowed");
+		*invert = true;
+		if (my_optind != NULL) {
+			++*my_optind;
+			if (argc && *my_optind > argc)
+				exit_error(PARAMETER_PROBLEM,
+					   "no argument following `!'");
+		}
+
+		return true;
+	}
+	return false;
+}

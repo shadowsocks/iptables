@@ -82,7 +82,7 @@ dscp_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
 			           "DSCP match: Only use --dscp ONCE!");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_dscp(argv[optind-1], dinfo);
 		if (invert)
 			dinfo->invert = 1;
@@ -93,7 +93,7 @@ dscp_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
 					"DSCP match: Only use --dscp-class ONCE!");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_class(argv[optind - 1], dinfo);
 		if (invert)
 			dinfo->invert = 1;

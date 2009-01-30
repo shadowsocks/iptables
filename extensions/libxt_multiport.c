@@ -161,7 +161,7 @@ __multiport_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		check_inverse(argv[optind-1], &invert, &optind, 0);
+		xtables_check_inverse(argv[optind-1], &invert, &optind, 0);
 		proto = check_proto(pnum, invflags);
 		multiinfo->count = parse_multi_ports(argv[optind-1],
 						     multiinfo->ports, proto);
@@ -169,7 +169,7 @@ __multiport_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '2':
-		check_inverse(argv[optind-1], &invert, &optind, 0);
+		xtables_check_inverse(argv[optind-1], &invert, &optind, 0);
 		proto = check_proto(pnum, invflags);
 		multiinfo->count = parse_multi_ports(argv[optind-1],
 						     multiinfo->ports, proto);
@@ -177,7 +177,7 @@ __multiport_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '3':
-		check_inverse(argv[optind-1], &invert, &optind, 0);
+		xtables_check_inverse(argv[optind-1], &invert, &optind, 0);
 		proto = check_proto(pnum, invflags);
 		multiinfo->count = parse_multi_ports(argv[optind-1],
 						     multiinfo->ports, proto);
@@ -228,21 +228,21 @@ __multiport_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		check_inverse(argv[optind-1], &invert, &optind, 0);
+		xtables_check_inverse(argv[optind-1], &invert, &optind, 0);
 		proto = check_proto(pnum, invflags);
 		parse_multi_ports_v1(argv[optind-1], multiinfo, proto);
 		multiinfo->flags = XT_MULTIPORT_SOURCE;
 		break;
 
 	case '2':
-		check_inverse(argv[optind-1], &invert, &optind, 0);
+		xtables_check_inverse(argv[optind-1], &invert, &optind, 0);
 		proto = check_proto(pnum, invflags);
 		parse_multi_ports_v1(argv[optind-1], multiinfo, proto);
 		multiinfo->flags = XT_MULTIPORT_DESTINATION;
 		break;
 
 	case '3':
-		check_inverse(argv[optind-1], &invert, &optind, 0);
+		xtables_check_inverse(argv[optind-1], &invert, &optind, 0);
 		proto = check_proto(pnum, invflags);
 		parse_multi_ports_v1(argv[optind-1], multiinfo, proto);
 		multiinfo->flags = XT_MULTIPORT_EITHER;

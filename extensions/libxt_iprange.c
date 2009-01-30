@@ -70,7 +70,7 @@ static int iprange_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= IPRANGE_SRC;
 
 		info->flags |= IPRANGE_SRC;
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		if (invert)
 			info->flags |= IPRANGE_SRC_INV;
 		parse_iprange(optarg, &info->src);
@@ -84,7 +84,7 @@ static int iprange_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= IPRANGE_DST;
 
 		info->flags |= IPRANGE_DST;
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		if (invert)
 			info->flags |= IPRANGE_DST_INV;
 

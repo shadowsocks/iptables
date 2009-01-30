@@ -270,7 +270,7 @@ sctp_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 			           "Only one `--source-port' allowed");
 		einfo->flags |= XT_SCTP_SRC_PORTS;
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_sctp_ports(argv[optind-1], einfo->spts);
 		if (invert)
 			einfo->invflags |= XT_SCTP_SRC_PORTS;
@@ -282,7 +282,7 @@ sctp_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--destination-port' allowed");
 		einfo->flags |= XT_SCTP_DEST_PORTS;
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_sctp_ports(argv[optind-1], einfo->dpts);
 		if (invert)
 			einfo->invflags |= XT_SCTP_DEST_PORTS;
@@ -293,7 +293,7 @@ sctp_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & XT_SCTP_CHUNK_TYPES)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--chunk-types' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if (!argv[optind] 
 		    || argv[optind][0] == '-' || argv[optind][0] == '!')

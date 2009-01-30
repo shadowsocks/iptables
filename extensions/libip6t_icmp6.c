@@ -157,7 +157,7 @@ static int icmp6_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags == 1)
 			exit_error(PARAMETER_PROBLEM,
 				   "icmpv6 match: only use --icmpv6-type once!");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_icmpv6(argv[optind-1], &icmpv6info->type, 
 			     icmpv6info->code);
 		if (invert)

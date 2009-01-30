@@ -40,7 +40,7 @@ static int TTL_parse(int c, char **argv, int invert, unsigned int *flags,
 		exit_error(PARAMETER_PROBLEM, 
 				"TTL: You must specify a value");
 
-	if (check_inverse(optarg, &invert, NULL, 0))
+	if (xtables_check_inverse(optarg, &invert, NULL, 0))
 		exit_error(PARAMETER_PROBLEM,
 				"TTL: unexpected `!'");
 	
