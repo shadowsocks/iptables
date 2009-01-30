@@ -352,14 +352,14 @@ static void print_entry(char *prefix, const struct ipt_policy_elem *e,
 	if (e->match.daddr) {
 		PRINT_INVERT(e->invert.daddr);
 		printf("%stunnel-dst %s%s ", prefix,
-		       ipaddr_to_numeric((const void *)&e->daddr),
-		       ipmask_to_numeric((const void *)&e->dmask));
+		       xtables_ipaddr_to_numeric((const void *)&e->daddr),
+		       xtables_ipmask_to_numeric((const void *)&e->dmask));
 	}
 	if (e->match.saddr) {
 		PRINT_INVERT(e->invert.saddr);
 		printf("%stunnel-src %s%s ", prefix,
-		       ipaddr_to_numeric((const void *)&e->saddr),
-		       ipmask_to_numeric((const void *)&e->smask));
+		       xtables_ipaddr_to_numeric((const void *)&e->saddr),
+		       xtables_ipmask_to_numeric((const void *)&e->smask));
 	}
 }
 

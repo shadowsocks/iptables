@@ -748,7 +748,7 @@ void xtables_param_act(unsigned int status, const char *p1, ...)
 	va_end(args);
 }
 
-const char *ipaddr_to_numeric(const struct in_addr *addrp)
+const char *xtables_ipaddr_to_numeric(const struct in_addr *addrp)
 {
 	static char buf[20];
 	const unsigned char *bytep = (const void *)&addrp->s_addr;
@@ -778,7 +778,7 @@ static const char *ipaddr_to_network(const struct in_addr *addr)
 	return NULL;
 }
 
-const char *ipaddr_to_anyname(const struct in_addr *addr)
+const char *xtables_ipaddr_to_anyname(const struct in_addr *addr)
 {
 	const char *name;
 
@@ -786,10 +786,10 @@ const char *ipaddr_to_anyname(const struct in_addr *addr)
 	    (name = ipaddr_to_network(addr)) != NULL)
 		return name;
 
-	return ipaddr_to_numeric(addr);
+	return xtables_ipaddr_to_numeric(addr);
 }
 
-const char *ipmask_to_numeric(const struct in_addr *mask)
+const char *xtables_ipmask_to_numeric(const struct in_addr *mask)
 {
 	static char buf[20];
 	uint32_t maskaddr, bits;
@@ -809,7 +809,7 @@ const char *ipmask_to_numeric(const struct in_addr *mask)
 		sprintf(buf, "/%d", i);
 	else
 		/* mask was not a decent combination of 1's and 0's */
-		sprintf(buf, "/%s", ipaddr_to_numeric(mask));
+		sprintf(buf, "/%s", xtables_ipaddr_to_numeric(mask));
 
 	return buf;
 }
@@ -987,7 +987,7 @@ void ipparse_hostnetworkmask(const char *name, struct in_addr **addrpp,
 	}
 }
 
-const char *ip6addr_to_numeric(const struct in6_addr *addrp)
+const char *xtables_ip6addr_to_numeric(const struct in6_addr *addrp)
 {
 	/* 0000:0000:0000:0000:0000:000.000.000.000
 	 * 0000:0000:0000:0000:0000:0000:0000:0000 */
@@ -1020,14 +1020,14 @@ static const char *ip6addr_to_host(const struct in6_addr *addr)
 	return hostname;
 }
 
-const char *ip6addr_to_anyname(const struct in6_addr *addr)
+const char *xtables_ip6addr_to_anyname(const struct in6_addr *addr)
 {
 	const char *name;
 
 	if ((name = ip6addr_to_host(addr)) != NULL)
 		return name;
 
-	return ip6addr_to_numeric(addr);
+	return xtables_ip6addr_to_numeric(addr);
 }
 
 static int ip6addr_prefix_length(const struct in6_addr *k)
@@ -1054,14 +1054,14 @@ static int ip6addr_prefix_length(const struct in6_addr *k)
 	return bits;
 }
 
-const char *ip6mask_to_numeric(const struct in6_addr *addrp)
+const char *xtables_ip6mask_to_numeric(const struct in6_addr *addrp)
 {
 	static char buf[50+2];
 	int l = ip6addr_prefix_length(addrp);
 
 	if (l == -1) {
 		strcpy(buf, "/");
-		strcat(buf, ip6addr_to_numeric(addrp));
+		strcat(buf, xtables_ip6addr_to_numeric(addrp));
 		return buf;
 	}
 	sprintf(buf, "/%d", l);

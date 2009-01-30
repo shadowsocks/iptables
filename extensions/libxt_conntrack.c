@@ -761,9 +761,9 @@ conntrack_dump_addr(const union nf_inet_addr *addr,
 			return;
 		}
 		if (numeric)
-			printf("%s ", ipaddr_to_numeric(&addr->in));
+			printf("%s ", xtables_ipaddr_to_numeric(&addr->in));
 		else
-			printf("%s ", ipaddr_to_anyname(&addr->in));
+			printf("%s ", xtables_ipaddr_to_anyname(&addr->in));
 	} else if (family == NFPROTO_IPV6) {
 		if (!numeric && addr->ip6[0] == 0 && addr->ip6[1] == 0 &&
 		    addr->ip6[2] == 0 && addr->ip6[3] == 0) {
@@ -771,9 +771,9 @@ conntrack_dump_addr(const union nf_inet_addr *addr,
 			return;
 		}
 		if (numeric)
-			printf("%s ", ip6addr_to_numeric(&addr->in6));
+			printf("%s ", xtables_ip6addr_to_numeric(&addr->in6));
 		else
-			printf("%s ", ip6addr_to_anyname(&addr->in6));
+			printf("%s ", xtables_ip6addr_to_anyname(&addr->in6));
 	}
 }
 
@@ -789,10 +789,10 @@ print_addr(struct in_addr *addr, struct in_addr *mask, int inv, int numeric)
 		printf("%s ", "anywhere");
 	else {
 		if (numeric)
-			sprintf(buf, "%s", ipaddr_to_numeric(addr));
+			strcpy(buf, xtables_ipaddr_to_numeric(addr));
 		else
-			sprintf(buf, "%s", ipaddr_to_anyname(addr));
-		strcat(buf, ipmask_to_numeric(mask));
+			strcpy(buf, xtables_ipaddr_to_anyname(addr));
+		strcat(buf, xtables_ipmask_to_numeric(mask));
 		printf("%s ", buf);
 	}
 }

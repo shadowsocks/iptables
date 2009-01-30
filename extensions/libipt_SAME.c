@@ -151,13 +151,13 @@ static void SAME_print(const void *ip, const struct xt_entry_target *target,
 
 		a.s_addr = r->min_ip;
 
-		printf("%s", ipaddr_to_numeric(&a));
+		printf("%s", xtables_ipaddr_to_numeric(&a));
 		a.s_addr = r->max_ip;
 		
 		if (r->min_ip == r->max_ip)
 			printf(" ");
 		else
-			printf("-%s ", ipaddr_to_numeric(&a));
+			printf("-%s ", xtables_ipaddr_to_numeric(&a));
 		if (r->flags & IP_NAT_RANGE_PROTO_RANDOM) 
 			random_selection = 1;
 	}
@@ -181,13 +181,13 @@ static void SAME_save(const void *ip, const struct xt_entry_target *target)
 		struct in_addr a;
 
 		a.s_addr = r->min_ip;
-		printf("--to %s", ipaddr_to_numeric(&a));
+		printf("--to %s", xtables_ipaddr_to_numeric(&a));
 		a.s_addr = r->max_ip;
 
 		if (r->min_ip == r->max_ip)
 			printf(" ");
 		else
-			printf("-%s ", ipaddr_to_numeric(&a));
+			printf("-%s ", xtables_ipaddr_to_numeric(&a));
 		if (r->flags & IP_NAT_RANGE_PROTO_RANDOM) 
 			random_selection = 1;
 	}

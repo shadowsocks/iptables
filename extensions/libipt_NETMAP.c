@@ -148,11 +148,11 @@ static void NETMAP_print(const void *ip, const struct xt_entry_target *target,
 	int bits;
 
 	a.s_addr = r->min_ip;
-	printf("%s", ipaddr_to_numeric(&a));
+	printf("%s", xtables_ipaddr_to_numeric(&a));
 	a.s_addr = ~(r->min_ip ^ r->max_ip);
 	bits = netmask2bits(a.s_addr);
 	if (bits < 0)
-		printf("/%s", ipaddr_to_numeric(&a));
+		printf("/%s", xtables_ipaddr_to_numeric(&a));
 	else
 		printf("/%d", bits);
 }

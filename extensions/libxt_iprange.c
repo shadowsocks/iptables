@@ -250,15 +250,15 @@ iprange_mt4_print(const void *ip, const struct xt_entry_match *match,
 		 * ipaddr_to_numeric() uses a static buffer, so cannot
 		 * combine the printf() calls.
 		 */
-		printf("%s", ipaddr_to_numeric(&info->src_min.in));
-		printf("-%s ", ipaddr_to_numeric(&info->src_max.in));
+		printf("%s", xtables_ipaddr_to_numeric(&info->src_min.in));
+		printf("-%s ", xtables_ipaddr_to_numeric(&info->src_max.in));
 	}
 	if (info->flags & IPRANGE_DST) {
 		printf("destination IP range ");
 		if (info->flags & IPRANGE_DST_INV)
 			printf("! ");
-		printf("%s", ipaddr_to_numeric(&info->dst_min.in));
-		printf("-%s ", ipaddr_to_numeric(&info->dst_max.in));
+		printf("%s", xtables_ipaddr_to_numeric(&info->dst_min.in));
+		printf("-%s ", xtables_ipaddr_to_numeric(&info->dst_max.in));
 	}
 }
 
@@ -276,15 +276,15 @@ iprange_mt6_print(const void *ip, const struct xt_entry_match *match,
 		 * ipaddr_to_numeric() uses a static buffer, so cannot
 		 * combine the printf() calls.
 		 */
-		printf("%s", ip6addr_to_numeric(&info->src_min.in6));
-		printf("-%s ", ip6addr_to_numeric(&info->src_max.in6));
+		printf("%s", xtables_ip6addr_to_numeric(&info->src_min.in6));
+		printf("-%s ", xtables_ip6addr_to_numeric(&info->src_max.in6));
 	}
 	if (info->flags & IPRANGE_DST) {
 		printf("destination IP range ");
 		if (info->flags & IPRANGE_DST_INV)
 			printf("! ");
-		printf("%s", ip6addr_to_numeric(&info->dst_min.in6));
-		printf("-%s ", ip6addr_to_numeric(&info->dst_max.in6));
+		printf("%s", xtables_ip6addr_to_numeric(&info->dst_min.in6));
+		printf("-%s ", xtables_ip6addr_to_numeric(&info->dst_max.in6));
 	}
 }
 
@@ -315,14 +315,14 @@ static void iprange_mt4_save(const void *ip, const struct xt_entry_match *match)
 	if (info->flags & IPRANGE_SRC) {
 		if (info->flags & IPRANGE_SRC_INV)
 			printf("! ");
-		printf("--src-range %s", ipaddr_to_numeric(&info->src_min.in));
-		printf("-%s ", ipaddr_to_numeric(&info->src_max.in));
+		printf("--src-range %s", xtables_ipaddr_to_numeric(&info->src_min.in));
+		printf("-%s ", xtables_ipaddr_to_numeric(&info->src_max.in));
 	}
 	if (info->flags & IPRANGE_DST) {
 		if (info->flags & IPRANGE_DST_INV)
 			printf("! ");
-		printf("--dst-range %s", ipaddr_to_numeric(&info->dst_min.in));
-		printf("-%s ", ipaddr_to_numeric(&info->dst_max.in));
+		printf("--dst-range %s", xtables_ipaddr_to_numeric(&info->dst_min.in));
+		printf("-%s ", xtables_ipaddr_to_numeric(&info->dst_max.in));
 	}
 }
 
@@ -333,14 +333,14 @@ static void iprange_mt6_save(const void *ip, const struct xt_entry_match *match)
 	if (info->flags & IPRANGE_SRC) {
 		if (info->flags & IPRANGE_SRC_INV)
 			printf("! ");
-		printf("--src-range %s", ip6addr_to_numeric(&info->src_min.in6));
-		printf("-%s ", ip6addr_to_numeric(&info->src_max.in6));
+		printf("--src-range %s", xtables_ip6addr_to_numeric(&info->src_min.in6));
+		printf("-%s ", xtables_ip6addr_to_numeric(&info->src_max.in6));
 	}
 	if (info->flags & IPRANGE_DST) {
 		if (info->flags & IPRANGE_DST_INV)
 			printf("! ");
-		printf("--dst-range %s", ip6addr_to_numeric(&info->dst_min.in6));
-		printf("-%s ", ip6addr_to_numeric(&info->dst_max.in6));
+		printf("--dst-range %s", xtables_ip6addr_to_numeric(&info->dst_min.in6));
+		printf("-%s ", xtables_ip6addr_to_numeric(&info->dst_max.in6));
 	}
 }
 

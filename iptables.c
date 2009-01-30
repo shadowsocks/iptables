@@ -803,10 +803,10 @@ print_firewall(const struct ipt_entry *fw,
 		printf(FMT("%-19s ","%s "), "anywhere");
 	else {
 		if (format & FMT_NUMERIC)
-			sprintf(buf, "%s", ipaddr_to_numeric(&fw->ip.src));
+			strcpy(buf, xtables_ipaddr_to_numeric(&fw->ip.src));
 		else
-			sprintf(buf, "%s", ipaddr_to_anyname(&fw->ip.src));
-		strcat(buf, ipmask_to_numeric(&fw->ip.smsk));
+			strcpy(buf, xtables_ipaddr_to_anyname(&fw->ip.src));
+		strcat(buf, xtables_ipmask_to_numeric(&fw->ip.smsk));
 		printf(FMT("%-19s ","%s "), buf);
 	}
 
@@ -815,10 +815,10 @@ print_firewall(const struct ipt_entry *fw,
 		printf(FMT("%-19s ","-> %s"), "anywhere");
 	else {
 		if (format & FMT_NUMERIC)
-			sprintf(buf, "%s", ipaddr_to_numeric(&fw->ip.dst));
+			strcpy(buf, xtables_ipaddr_to_numeric(&fw->ip.dst));
 		else
-			sprintf(buf, "%s", ipaddr_to_anyname(&fw->ip.dst));
-		strcat(buf, ipmask_to_numeric(&fw->ip.dmsk));
+			strcpy(buf, xtables_ipaddr_to_anyname(&fw->ip.dst));
+		strcat(buf, xtables_ipmask_to_numeric(&fw->ip.dmsk));
 		printf(FMT("%-19s ","-> %s"), buf);
 	}
 

@@ -114,7 +114,7 @@ static void tproxy_tg_print(const void *ip, const struct xt_entry_target *target
 {
 	const struct xt_tproxy_target_info *info = (const void *)target->data;
 	printf("TPROXY redirect %s:%u mark 0x%x/0x%x",
-	       ipaddr_to_numeric((const struct in_addr *)&info->laddr),
+	       xtables_ipaddr_to_numeric((const struct in_addr *)&info->laddr),
 	       ntohs(info->lport), (unsigned int)info->mark_value,
 	       (unsigned int)info->mark_mask);
 }
@@ -125,7 +125,7 @@ static void tproxy_tg_save(const void *ip, const struct xt_entry_target *target)
 
 	printf("--on-port %u ", ntohs(info->lport));
 	printf("--on-ip %s ",
-	       ipaddr_to_numeric((const struct in_addr *)&info->laddr));
+	       xtables_ipaddr_to_numeric((const struct in_addr *)&info->laddr));
 	printf("--tproxy-mark 0x%x/0x%x ",
 	       (unsigned int)info->mark_value, (unsigned int)info->mark_mask);
 }

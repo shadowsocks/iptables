@@ -809,10 +809,10 @@ print_firewall(const struct ip6t_entry *fw,
 		printf(FMT("%-19s ","%s "), "anywhere");
 	else {
 		if (format & FMT_NUMERIC)
-			sprintf(buf, "%s", ip6addr_to_numeric(&fw->ipv6.src));
+			strcpy(buf, xtables_ip6addr_to_numeric(&fw->ipv6.src));
 		else
-			sprintf(buf, "%s", ip6addr_to_anyname(&fw->ipv6.src));
-		strcat(buf, ip6mask_to_numeric(&fw->ipv6.smsk));
+			strcpy(buf, xtables_ip6addr_to_anyname(&fw->ipv6.src));
+		strcat(buf, xtables_ip6mask_to_numeric(&fw->ipv6.smsk));
 		printf(FMT("%-19s ","%s "), buf);
 	}
 
@@ -822,10 +822,10 @@ print_firewall(const struct ip6t_entry *fw,
 		printf(FMT("%-19s ","-> %s"), "anywhere");
 	else {
 		if (format & FMT_NUMERIC)
-			sprintf(buf, "%s", ip6addr_to_numeric(&fw->ipv6.dst));
+			strcpy(buf, xtables_ip6addr_to_numeric(&fw->ipv6.dst));
 		else
-			sprintf(buf, "%s", ip6addr_to_anyname(&fw->ipv6.dst));
-		strcat(buf, ip6mask_to_numeric(&fw->ipv6.dmsk));
+			strcpy(buf, xtables_ip6addr_to_anyname(&fw->ipv6.dst));
+		strcat(buf, xtables_ip6mask_to_numeric(&fw->ipv6.dmsk));
 		printf(FMT("%-19s ","-> %s"), buf);
 	}
 
