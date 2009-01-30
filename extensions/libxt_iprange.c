@@ -40,14 +40,14 @@ parse_iprange(char *arg, struct ipt_iprange *range)
 	if (dash != NULL)
 		*dash = '\0';
 
-	ip = numeric_to_ipaddr(arg);
+	ip = xtables_numeric_to_ipaddr(arg);
 	if (!ip)
 		exit_error(PARAMETER_PROBLEM, "iprange match: Bad IP address `%s'\n",
 			   arg);
 	range->min_ip = ip->s_addr;
 
 	if (dash != NULL) {
-		ip = numeric_to_ipaddr(dash+1);
+		ip = xtables_numeric_to_ipaddr(dash+1);
 		if (!ip)
 			exit_error(PARAMETER_PROBLEM, "iprange match: Bad IP address `%s'\n",
 				   dash+1);
@@ -112,11 +112,11 @@ iprange_mt4_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (end == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange", "--src-range", optarg);
 		*end = '\0';
-		ia = numeric_to_ipaddr(optarg);
+		ia = xtables_numeric_to_ipaddr(optarg);
 		if (ia == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange", "--src-range", optarg);
 		memcpy(&info->src_min.in, ia, sizeof(*ia));
-		ia = numeric_to_ipaddr(end+1);
+		ia = xtables_numeric_to_ipaddr(end+1);
 		if (ia == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange", "--src-range", end + 1);
 		memcpy(&info->src_max.in, ia, sizeof(*ia));
@@ -131,11 +131,11 @@ iprange_mt4_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (end == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange", "--dst-range", optarg);
 		*end = '\0';
-		ia = numeric_to_ipaddr(optarg);
+		ia = xtables_numeric_to_ipaddr(optarg);
 		if (ia == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange", "--dst-range", optarg);
 		memcpy(&info->dst_min.in, ia, sizeof(*ia));
-		ia = numeric_to_ipaddr(end + 1);
+		ia = xtables_numeric_to_ipaddr(end + 1);
 		if (ia == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange", "--dst-range", end + 1);
 		memcpy(&info->dst_max.in, ia, sizeof(*ia));
@@ -162,11 +162,11 @@ iprange_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (end == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange", "--src-range", optarg);
 		*end = '\0';
-		ia = numeric_to_ip6addr(optarg);
+		ia = xtables_numeric_to_ip6addr(optarg);
 		if (ia == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange", "--src-range", optarg);
 		memcpy(&info->src_min.in, ia, sizeof(*ia));
-		ia = numeric_to_ip6addr(end+1);
+		ia = xtables_numeric_to_ip6addr(end+1);
 		if (ia == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange", "--src-range", end + 1);
 		memcpy(&info->src_max.in, ia, sizeof(*ia));
@@ -181,11 +181,11 @@ iprange_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (end == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange", "--dst-range", optarg);
 		*end = '\0';
-		ia = numeric_to_ip6addr(optarg);
+		ia = xtables_numeric_to_ip6addr(optarg);
 		if (ia == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange", "--dst-range", optarg);
 		memcpy(&info->dst_min.in, ia, sizeof(*ia));
-		ia = numeric_to_ip6addr(end + 1);
+		ia = xtables_numeric_to_ip6addr(end + 1);
 		if (ia == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange", "--dst-range", end + 1);
 		memcpy(&info->dst_max.in, ia, sizeof(*ia));

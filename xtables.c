@@ -860,12 +860,12 @@ static struct in_addr *__numeric_to_ipaddr(const char *dotted, bool is_mask)
 	return &addr;
 }
 
-struct in_addr *numeric_to_ipaddr(const char *dotted)
+struct in_addr *xtables_numeric_to_ipaddr(const char *dotted)
 {
 	return __numeric_to_ipaddr(dotted, false);
 }
 
-struct in_addr *numeric_to_ipmask(const char *dotted)
+struct in_addr *xtables_numeric_to_ipmask(const char *dotted)
 {
 	return __numeric_to_ipaddr(dotted, true);
 }
@@ -914,7 +914,7 @@ ipparse_hostnetwork(const char *name, unsigned int *naddrs)
 {
 	struct in_addr *addrptmp, *addrp;
 
-	if ((addrptmp = numeric_to_ipaddr(name)) != NULL ||
+	if ((addrptmp = xtables_numeric_to_ipaddr(name)) != NULL ||
 	    (addrptmp = network_to_ipaddr(name)) != NULL) {
 		addrp = xtables_malloc(sizeof(struct in_addr));
 		memcpy(addrp, addrptmp, sizeof(*addrp));
@@ -938,7 +938,7 @@ static struct in_addr *parse_ipmask(const char *mask)
 		maskaddr.s_addr = 0xFFFFFFFF;
 		return &maskaddr;
 	}
-	if ((addrp = numeric_to_ipmask(mask)) != NULL)
+	if ((addrp = xtables_numeric_to_ipmask(mask)) != NULL)
 		/* dotted_to_addr already returns a network byte order addr */
 		return addrp;
 	if (!xtables_strtoui(mask, NULL, &bits, 0, 32))
@@ -1068,7 +1068,7 @@ const char *xtables_ip6mask_to_numeric(const struct in6_addr *addrp)
 	return buf;
 }
 
-struct in6_addr *numeric_to_ip6addr(const char *num)
+struct in6_addr *xtables_numeric_to_ip6addr(const char *num)
 {
 	static struct in6_addr ap;
 	int err;
@@ -1136,7 +1136,7 @@ ip6parse_hostnetwork(const char *name, unsigned int *naddrs)
 {
 	struct in6_addr *addrp, *addrptmp;
 
-	if ((addrptmp = numeric_to_ip6addr(name)) != NULL ||
+	if ((addrptmp = xtables_numeric_to_ip6addr(name)) != NULL ||
 	    (addrptmp = network_to_ip6addr(name)) != NULL) {
 		addrp = xtables_malloc(sizeof(struct in6_addr));
 		memcpy(addrp, addrptmp, sizeof(*addrp));
@@ -1160,7 +1160,7 @@ static struct in6_addr *parse_ip6mask(char *mask)
 		memset(&maskaddr, 0xff, sizeof maskaddr);
 		return &maskaddr;
 	}
-	if ((addrp = numeric_to_ip6addr(mask)) != NULL)
+	if ((addrp = xtables_numeric_to_ip6addr(mask)) != NULL)
 		return addrp;
 	if (!xtables_strtoui(mask, NULL, &bits, 0, 128))
 		exit_error(PARAMETER_PROBLEM,

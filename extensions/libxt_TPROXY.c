@@ -50,7 +50,7 @@ static void parse_tproxy_laddr(const char *s, struct xt_tproxy_target_info *info
 {
 	struct in_addr *laddr;
 
-	if ((laddr = numeric_to_ipaddr(s)) == NULL)
+	if ((laddr = xtables_numeric_to_ipaddr(s)) == NULL)
 		xtables_param_act(XTF_BAD_VALUE, "TPROXY", "--on-ip", s);
 
 	info->laddr = laddr->s_addr;

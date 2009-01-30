@@ -56,14 +56,14 @@ parse_to(char *arg, struct ip_nat_range *range)
 	if (dash)
 		*dash = '\0';
 
-	ip = numeric_to_ipaddr(arg);
+	ip = xtables_numeric_to_ipaddr(arg);
 	if (!ip)
 		exit_error(PARAMETER_PROBLEM, "Bad IP address `%s'\n",
 			   arg);
 	range->min_ip = ip->s_addr;
 
 	if (dash) {
-		ip = numeric_to_ipaddr(dash+1);
+		ip = xtables_numeric_to_ipaddr(dash+1);
 		if (!ip)
 			exit_error(PARAMETER_PROBLEM, "Bad IP address `%s'\n",
 				   dash+1);
