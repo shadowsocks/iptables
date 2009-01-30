@@ -333,7 +333,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_ORIGSRC;
 
-		ipparse_hostnetworkmask(argv[optind-1], &addrs,
+		xtables_ipparse_any(argv[optind-1], &addrs,
 					&sinfo->sipmsk[IP_CT_DIR_ORIGINAL],
 					&naddrs);
 		if(naddrs > 1)
@@ -353,7 +353,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_ORIGDST;
 
-		ipparse_hostnetworkmask(argv[optind-1], &addrs,
+		xtables_ipparse_any(argv[optind-1], &addrs,
 					&sinfo->dipmsk[IP_CT_DIR_ORIGINAL],
 					&naddrs);
 		if(naddrs > 1)
@@ -373,7 +373,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_REPLSRC;
 
-		ipparse_hostnetworkmask(argv[optind-1], &addrs,
+		xtables_ipparse_any(argv[optind-1], &addrs,
 					&sinfo->sipmsk[IP_CT_DIR_REPLY],
 					&naddrs);
 		if(naddrs > 1)
@@ -393,7 +393,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_REPLDST;
 
-		ipparse_hostnetworkmask(argv[optind-1], &addrs,
+		xtables_ipparse_any(argv[optind-1], &addrs,
 					&sinfo->dipmsk[IP_CT_DIR_REPLY],
 					&naddrs);
 		if(naddrs > 1)
@@ -551,7 +551,7 @@ conntrack_mt4_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '3': /* --ctorigsrc */
-		ipparse_hostnetworkmask(optarg, &addr, &info->origsrc_mask.in,
+		xtables_ipparse_any(optarg, &addr, &info->origsrc_mask.in,
 		                        &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -564,7 +564,7 @@ conntrack_mt4_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '4': /* --ctorigdst */
-		ipparse_hostnetworkmask(optarg, &addr, &info->origdst_mask.in,
+		xtables_ipparse_any(optarg, &addr, &info->origdst_mask.in,
 		                        &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -577,7 +577,7 @@ conntrack_mt4_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '5': /* --ctreplsrc */
-		ipparse_hostnetworkmask(optarg, &addr, &info->replsrc_mask.in,
+		xtables_ipparse_any(optarg, &addr, &info->replsrc_mask.in,
 		                        &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -590,7 +590,7 @@ conntrack_mt4_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '6': /* --ctrepldst */
-		ipparse_hostnetworkmask(optarg, &addr, &info->repldst_mask.in,
+		xtables_ipparse_any(optarg, &addr, &info->repldst_mask.in,
 		                        &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -621,7 +621,7 @@ conntrack_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '3': /* --ctorigsrc */
-		ip6parse_hostnetworkmask(optarg, &addr,
+		xtables_ip6parse_any(optarg, &addr,
 		                         &info->origsrc_mask.in6, &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -634,7 +634,7 @@ conntrack_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '4': /* --ctorigdst */
-		ip6parse_hostnetworkmask(optarg, &addr,
+		xtables_ip6parse_any(optarg, &addr,
 		                         &info->origdst_mask.in6, &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -647,7 +647,7 @@ conntrack_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '5': /* --ctreplsrc */
-		ip6parse_hostnetworkmask(optarg, &addr,
+		xtables_ip6parse_any(optarg, &addr,
 		                         &info->replsrc_mask.in6, &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -660,7 +660,7 @@ conntrack_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '6': /* --ctrepldst */
-		ip6parse_hostnetworkmask(optarg, &addr,
+		xtables_ip6parse_any(optarg, &addr,
 		                         &info->repldst_mask.in6, &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,

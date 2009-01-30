@@ -235,7 +235,7 @@ static void LOG_save(const void *ip, const struct xt_entry_target *target)
 
 	if (strcmp(loginfo->prefix, "") != 0) {
 		printf("--log-prefix ");
-		save_string(loginfo->prefix);
+		xtables_save_string(loginfo->prefix);
 	}
 
 	if (loginfo->level != LOG_DEFAULT_LEVEL)

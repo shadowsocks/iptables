@@ -1945,11 +1945,11 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 	}
 
 	if (shostnetworkmask)
-		ip6parse_hostnetworkmask(shostnetworkmask, &saddrs,
+		xtables_ip6parse_any(shostnetworkmask, &saddrs,
 		                         &fw.ipv6.smsk, &nsaddrs);
 
 	if (dhostnetworkmask)
-		ip6parse_hostnetworkmask(dhostnetworkmask, &daddrs,
+		xtables_ip6parse_any(dhostnetworkmask, &daddrs,
 		                         &fw.ipv6.dmsk, &ndaddrs);
 
 	if ((nsaddrs > 1 || ndaddrs > 1) &&

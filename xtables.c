@@ -954,8 +954,15 @@ static struct in_addr *parse_ipmask(const char *mask)
 	return &maskaddr;
 }
 
-void ipparse_hostnetworkmask(const char *name, struct in_addr **addrpp,
-                             struct in_addr *maskp, unsigned int *naddrs)
+/**
+ * xtables_ipparse_any - transform arbitrary name to in_addr
+ *
+ * Possible inputs (pseudo regex):
+ * 	m{^($hostname|$networkname|$ipaddr)(/$mask)?}
+ * "1.2.3.4/5", "1.2.3.4", "hostname", "networkname"
+ */
+void xtables_ipparse_any(const char *name, struct in_addr **addrpp,
+                         struct in_addr *maskp, unsigned int *naddrs)
 {
 	unsigned int i, j, k, n;
 	struct in_addr *addrp;
@@ -1178,8 +1185,8 @@ static struct in6_addr *parse_ip6mask(char *mask)
 	return &maskaddr;
 }
 
-void ip6parse_hostnetworkmask(const char *name, struct in6_addr **addrpp,
-                              struct in6_addr *maskp, unsigned int *naddrs)
+void xtables_ip6parse_any(const char *name, struct in6_addr **addrpp,
+                          struct in6_addr *maskp, unsigned int *naddrs)
 {
 	struct in6_addr *addrp;
 	unsigned int i, j, k, n;
@@ -1214,7 +1221,7 @@ void ip6parse_hostnetworkmask(const char *name, struct in6_addr **addrpp,
 	}
 }
 
-void save_string(const char *value)
+void xtables_save_string(const char *value)
 {
 	static const char no_quote_chars[] = "_-0123456789"
 		"abcdefghijklmnopqrstuvwxyz"

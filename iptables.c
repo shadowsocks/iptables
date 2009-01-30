@@ -1974,11 +1974,11 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 	}
 
 	if (shostnetworkmask)
-		ipparse_hostnetworkmask(shostnetworkmask, &saddrs,
+		xtables_ipparse_any(shostnetworkmask, &saddrs,
 					&fw.ip.smsk, &nsaddrs);
 
 	if (dhostnetworkmask)
-		ipparse_hostnetworkmask(dhostnetworkmask, &daddrs,
+		xtables_ipparse_any(dhostnetworkmask, &daddrs,
 					&fw.ip.dmsk, &ndaddrs);
 
 	if ((nsaddrs > 1 || ndaddrs > 1) &&

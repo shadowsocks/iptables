@@ -65,7 +65,7 @@ static void helper_save(const void *ip, const struct xt_entry_match *match)
 	struct xt_helper_info *info = (struct xt_helper_info *)match->data;
 
 	printf("%s--helper ",info->invert ? "! " : "");
-	save_string(info->name);
+	xtables_save_string(info->name);
 }
 
 static struct xtables_match helper_match = {

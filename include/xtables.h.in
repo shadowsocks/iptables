@@ -212,21 +212,21 @@ extern const char *xtables_ipaddr_to_anyname(const struct in_addr *);
 extern const char *xtables_ipmask_to_numeric(const struct in_addr *);
 extern struct in_addr *xtables_numeric_to_ipaddr(const char *);
 extern struct in_addr *xtables_numeric_to_ipmask(const char *);
-extern void ipparse_hostnetworkmask(const char *, struct in_addr **,
+extern void xtables_ipparse_any(const char *, struct in_addr **,
 	struct in_addr *, unsigned int *);
 
 extern struct in6_addr *xtables_numeric_to_ip6addr(const char *);
 extern const char *xtables_ip6addr_to_numeric(const struct in6_addr *);
 extern const char *xtables_ip6addr_to_anyname(const struct in6_addr *);
 extern const char *xtables_ip6mask_to_numeric(const struct in6_addr *);
-extern void ip6parse_hostnetworkmask(const char *, struct in6_addr **,
+extern void xtables_ip6parse_any(const char *, struct in6_addr **,
 	struct in6_addr *, unsigned int *);
 
 /**
  * Print the specified value to standard output, quoting dangerous
  * characters if required.
  */
-extern void save_string(const char *value);
+extern void xtables_save_string(const char *value);
 
 #ifdef NO_SHARED_LIBS
 #	ifdef _INIT

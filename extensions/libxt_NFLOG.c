@@ -113,7 +113,7 @@ static void nflog_print(const struct xt_nflog_info *info, char *prefix)
 {
 	if (info->prefix[0] != '\0') {
 		printf("%snflog-prefix ", prefix);
-		save_string(info->prefix);
+		xtables_save_string(info->prefix);
 	}
 	if (info->group)
 		printf("%snflog-group %u ", prefix, info->group);

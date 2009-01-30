@@ -151,7 +151,7 @@ static void ULOG_save(const void *ip, const struct xt_entry_target *target)
 
 	if (strcmp(loginfo->prefix, "") != 0) {
 		fputs("--ulog-prefix ", stdout);
-		save_string(loginfo->prefix);
+		xtables_save_string(loginfo->prefix);
 	}
 
 	if (loginfo->nl_group != ULOG_DEFAULT_NLGROUP) {
