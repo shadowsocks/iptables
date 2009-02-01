@@ -43,10 +43,6 @@ struct xtables_rule_match {
 
 extern char *lib_dir;
 
-extern const char *modprobe_program;
-extern int xtables_insmod(const char *modname, const char *modprobe, int quiet);
-extern int load_xtables_ko(const char *modprobe, int quiet);
-
 /* This is decleared in ip[6]tables.c */
 extern struct afinfo afinfo;
 

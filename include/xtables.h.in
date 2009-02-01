@@ -140,8 +140,13 @@ struct xtables_target
 #endif
 };
 
+extern const char *xtables_modprobe_program;
+
 extern void *xtables_calloc(size_t, size_t);
 extern void *xtables_malloc(size_t);
+
+extern int xtables_insmod(const char *, const char *, bool);
+extern int xtables_load_ko(const char *, bool);
 
 /* Your shared library should call one of these. */
 extern void xtables_register_match(struct xtables_match *me);

@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <limits.h>
 #include <ip6tables.h>
 #include <xtables.h>
@@ -1769,7 +1770,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			break;
 
 		case 'M':
-			modprobe_program = optarg;
+			xtables_modprobe_program = optarg;
 			break;
 
 		case 'c':
@@ -1967,7 +1968,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		*handle = ip6tc_init(*table);
 
 	/* try to insmod the module if iptc_init failed */
-	if (!*handle && load_xtables_ko(modprobe_program, 0) != -1)
+	if (!*handle && xtables_load_ko(xtables_modprobe_program, false) != -1)
 		*handle = ip6tc_init(*table);
 
 	if (!*handle)

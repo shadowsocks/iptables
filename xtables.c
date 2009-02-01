@@ -47,7 +47,7 @@
 char *lib_dir;
 
 /* the path to command to load kernel module */
-const char *modprobe_program = NULL;
+const char *xtables_modprobe_program;
 
 /* Keeping track of external matches and targets: linked lists.  */
 struct xtables_match *xtables_matches;
@@ -108,7 +108,7 @@ static char *get_modprobe(void)
 	return NULL;
 }
 
-int xtables_insmod(const char *modname, const char *modprobe, int quiet)
+int xtables_insmod(const char *modname, const char *modprobe, bool quiet)
 {
 	char *buf = NULL;
 	char *argv[4];
@@ -150,9 +150,9 @@ int xtables_insmod(const char *modname, const char *modprobe, int quiet)
 	return -1;
 }
 
-int load_xtables_ko(const char *modprobe, int quiet)
+int xtables_load_ko(const char *modprobe, bool quiet)
 {
-	static int loaded = 0;
+	static bool loaded = false;
 	static int ret = -1;
 
 	if (!loaded) {
@@ -502,7 +502,7 @@ static int compatible_revision(const char *name, u_int8_t revision, int opt)
 		exit(1);
 	}
 
-	load_xtables_ko(modprobe_program, 1);
+	xtables_load_ko(xtables_modprobe_program, true);
 
 	strcpy(rev.name, name);
 	rev.revision = revision;

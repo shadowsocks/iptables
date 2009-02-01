@@ -29,6 +29,7 @@
 #include <string.h>
 #include <netdb.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -1786,7 +1787,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 			break;
 
 		case 'M':
-			modprobe_program = optarg;
+			xtables_modprobe_program = optarg;
 			break;
 
 		case 'c':
@@ -1996,7 +1997,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 		*handle = iptc_init(*table);
 
 	/* try to insmod the module if iptc_init failed */
-	if (!*handle && load_xtables_ko(modprobe_program, 0) != -1)
+	if (!*handle && xtables_load_ko(xtables_modprobe_program, false) != -1)
 		*handle = iptc_init(*table);
 
 	if (!*handle)
