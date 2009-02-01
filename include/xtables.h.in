@@ -140,6 +140,9 @@ struct xtables_target
 #endif
 };
 
+extern void *xtables_calloc(size_t, size_t);
+extern void *xtables_malloc(size_t);
+
 /* Your shared library should call one of these. */
 extern void xtables_register_match(struct xtables_match *me);
 extern void xtables_register_target(struct xtables_target *me);

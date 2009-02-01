@@ -53,7 +53,10 @@ const char *modprobe_program = NULL;
 struct xtables_match *xtables_matches;
 struct xtables_target *xtables_targets;
 
-void *fw_calloc(size_t count, size_t size)
+/**
+ * xtables_*alloc - wrappers that exit on failure
+ */
+void *xtables_calloc(size_t count, size_t size)
 {
 	void *p;
 
@@ -65,7 +68,7 @@ void *fw_calloc(size_t count, size_t size)
 	return p;
 }
 
-void *fw_malloc(size_t size)
+void *xtables_malloc(size_t size)
 {
 	void *p;
 
@@ -379,7 +382,7 @@ struct xtables_match *find_match(const char *name, enum xt_tryload tryload,
 				break;
 
 			/* Second and subsequent clones */
-			clone = fw_malloc(sizeof(struct xtables_match));
+			clone = xtables_malloc(sizeof(struct xtables_match));
 			memcpy(clone, ptr, sizeof(struct xtables_match));
 			clone->mflags = 0;
 			/* This is a clone: */
@@ -416,7 +419,7 @@ struct xtables_match *find_match(const char *name, enum xt_tryload tryload,
 		struct xtables_rule_match **i;
 		struct xtables_rule_match *newentry;
 
-		newentry = fw_malloc(sizeof(struct xtables_rule_match));
+		newentry = xtables_malloc(sizeof(struct xtables_rule_match));
 
 		for (i = matches; *i; i = &(*i)->next) {
 			if (strcmp(name, (*i)->match->name) == 0)
@@ -876,7 +879,7 @@ static struct in_addr *host_to_ipaddr(const char *name, unsigned int *naddr)
 
 		while (host->h_addr_list[*naddr] != NULL)
 			++*naddr;
-		addr = fw_calloc(*naddr, sizeof(struct in_addr) * *naddr);
+		addr = xtables_calloc(*naddr, sizeof(struct in_addr) * *naddr);
 		for (i = 0; i < *naddr; i++)
 			memcpy(&addr[i], host->h_addr_list[i],
 			       sizeof(struct in_addr));
@@ -893,7 +896,7 @@ ipparse_hostnetwork(const char *name, unsigned int *naddrs)
 
 	if ((addrptmp = numeric_to_ipaddr(name)) != NULL ||
 	    (addrptmp = network_to_ipaddr(name)) != NULL) {
-		addrp = fw_malloc(sizeof(struct in_addr));
+		addrp = xtables_malloc(sizeof(struct in_addr));
 		memcpy(addrp, addrptmp, sizeof(*addrp));
 		*naddrs = 1;
 		return addrp;
@@ -1089,7 +1092,7 @@ host_to_ip6addr(const char *name, unsigned int *naddr)
 		        ip6addr_to_numeric(&((struct sockaddr_in6 *)res->ai_addr)->sin6_addr));
 #endif
 		/* Get the first element of the address-chain */
-		addr = fw_malloc(sizeof(struct in6_addr));
+		addr = xtables_malloc(sizeof(struct in6_addr));
 		memcpy(addr, &((const struct sockaddr_in6 *)res->ai_addr)->sin6_addr,
 		       sizeof(struct in6_addr));
 		freeaddrinfo(res);
@@ -1115,7 +1118,7 @@ ip6parse_hostnetwork(const char *name, unsigned int *naddrs)
 
 	if ((addrptmp = numeric_to_ip6addr(name)) != NULL ||
 	    (addrptmp = network_to_ip6addr(name)) != NULL) {
-		addrp = fw_malloc(sizeof(struct in6_addr));
+		addrp = xtables_malloc(sizeof(struct in6_addr));
 		memcpy(addrp, addrptmp, sizeof(*addrp));
 		*naddrs = 1;
 		return addrp;
