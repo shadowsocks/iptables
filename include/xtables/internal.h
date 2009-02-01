@@ -26,33 +26,10 @@ struct afinfo {
 	int so_rev_target;
 };
 
-enum xt_tryload {
-	DONT_LOAD,
-	DURING_LOAD,
-	TRY_LOAD,
-	LOAD_MUST_SUCCEED
-};
-
-struct xtables_rule_match {
-	struct xtables_rule_match *next;
-	struct xtables_match *match;
-	/* Multiple matches of the same type: the ones before
-	   the current one are completed from parsing point of view */
-	unsigned int completed;
-};
-
 extern char *lib_dir;
 
 /* This is decleared in ip[6]tables.c */
 extern struct afinfo afinfo;
-
-/* Keeping track of external matches and targets: linked lists.  */
-extern struct xtables_match *xtables_matches;
-extern struct xtables_target *xtables_targets;
-
-extern struct xtables_match *find_match(const char *name, enum xt_tryload,
-					struct xtables_rule_match **match);
-extern struct xtables_target *find_target(const char *name, enum xt_tryload);
 
 extern void _init(void);
 
