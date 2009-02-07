@@ -141,6 +141,7 @@ int main(int argc, char *argv[])
 
 	xtables_program_name = program_name;
 	xtables_init();
+	xtables_set_nfproto(NFPROTO_IPV6);
 #ifdef NO_SHARED_LIBS
 	init_extensions();
 #endif

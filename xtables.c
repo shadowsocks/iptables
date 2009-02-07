@@ -32,7 +32,8 @@
 #include <arpa/inet.h>
 
 #include <xtables.h>
-#include <ip6tables.h>
+#include <linux/netfilter_ipv4/ip_tables.h>
+#include <linux/netfilter_ipv6/ip6_tables.h>
 #include <libiptc/libxtc.h>
 
 #ifndef NO_SHARED_LIBS
@@ -44,6 +45,44 @@
 #ifndef PROC_SYS_MODPROBE
 #define PROC_SYS_MODPROBE "/proc/sys/kernel/modprobe"
 #endif
+
+/**
+ * xtables_afinfo - protocol family dependent information
+ * @kmod:		kernel module basename (e.g. "ip_tables")
+ * @libprefix:		prefix of .so library name (e.g. "libipt_")
+ * @family:		nfproto family
+ * @ipproto:		used by setsockopt (e.g. IPPROTO_IP)
+ * @so_rev_match:	optname to check revision support of match
+ * @so_rev_target:	optname to check revision support of target
+ */
+struct xtables_afinfo {
+	const char *kmod;
+	const char *libprefix;
+	uint8_t family;
+	uint8_t ipproto;
+	int so_rev_match;
+	int so_rev_target;
+};
+
+static const struct xtables_afinfo afinfo_ipv4 = {
+	.kmod          = "ip_tables",
+	.libprefix     = "libipt_",
+	.family	       = NFPROTO_IPV4,
+	.ipproto       = IPPROTO_IP,
+	.so_rev_match  = IPT_SO_GET_REVISION_MATCH,
+	.so_rev_target = IPT_SO_GET_REVISION_TARGET,
+};
+
+static const struct xtables_afinfo afinfo_ipv6 = {
+	.kmod          = "ip6_tables",
+	.libprefix     = "libip6t_",
+	.family        = NFPROTO_IPV6,
+	.ipproto       = IPPROTO_IPV6,
+	.so_rev_match  = IP6T_SO_GET_REVISION_MATCH,
+	.so_rev_target = IP6T_SO_GET_REVISION_TARGET,
+};
+
+static const struct xtables_afinfo *afinfo;
 
 /**
  * Program will set this to its own name.
@@ -72,6 +111,21 @@ void xtables_init(void)
 		return;
 	}
 	xtables_libdir = XTABLES_LIBDIR;
+}
+
+void xtables_set_nfproto(uint8_t nfproto)
+{
+	switch (nfproto) {
+	case NFPROTO_IPV4:
+		afinfo = &afinfo_ipv4;
+		break;
+	case NFPROTO_IPV6:
+		afinfo = &afinfo_ipv6;
+		break;
+	default:
+		fprintf(stderr, "libxtables: unhandled NFPROTO in %s\n",
+		        __func__);
+	}
 }
 
 /**
@@ -177,7 +231,7 @@ int xtables_load_ko(const char *modprobe, bool quiet)
 	static int ret = -1;
 
 	if (!loaded) {
-		ret = xtables_insmod(afinfo.kmod, modprobe, quiet);
+		ret = xtables_insmod(afinfo->kmod, modprobe, quiet);
 		loaded = (ret == 0);
 	}
 
@@ -387,7 +441,7 @@ xtables_find_match(const char *name, enum xtables_tryload tryload,
 
 #ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != XTF_DONT_LOAD && tryload != XTF_DURING_LOAD) {
-		ptr = load_extension(xtables_libdir, afinfo.libprefix,
+		ptr = load_extension(xtables_libdir, afinfo->libprefix,
 		      name, false);
 
 		if (ptr == NULL && tryload == XTF_LOAD_MUST_SUCCEED)
@@ -447,7 +501,7 @@ xtables_find_target(const char *name, enum xtables_tryload tryload)
 
 #ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != XTF_DONT_LOAD && tryload != XTF_DURING_LOAD) {
-		ptr = load_extension(xtables_libdir, afinfo.libprefix,
+		ptr = load_extension(xtables_libdir, afinfo->libprefix,
 		      name, true);
 
 		if (ptr == NULL && tryload == XTF_LOAD_MUST_SUCCEED)
@@ -480,7 +534,7 @@ static int compatible_revision(const char *name, u_int8_t revision, int opt)
 	socklen_t s = sizeof(rev);
 	int max_rev, sockfd;
 
-	sockfd = socket(afinfo.family, SOCK_RAW, IPPROTO_RAW);
+	sockfd = socket(afinfo->family, SOCK_RAW, IPPROTO_RAW);
 	if (sockfd < 0) {
 		if (errno == EPERM) {
 			/* revision 0 is always supported. */
@@ -501,7 +555,7 @@ static int compatible_revision(const char *name, u_int8_t revision, int opt)
 	strcpy(rev.name, name);
 	rev.revision = revision;
 
-	max_rev = getsockopt(sockfd, afinfo.ipproto, opt, &rev, &s);
+	max_rev = getsockopt(sockfd, afinfo->ipproto, opt, &rev, &s);
 	if (max_rev < 0) {
 		/* Definitely don't support this? */
 		if (errno == ENOENT || errno == EPROTONOSUPPORT) {
@@ -524,12 +578,12 @@ static int compatible_revision(const char *name, u_int8_t revision, int opt)
 
 static int compatible_match_revision(const char *name, u_int8_t revision)
 {
-	return compatible_revision(name, revision, afinfo.so_rev_match);
+	return compatible_revision(name, revision, afinfo->so_rev_match);
 }
 
 static int compatible_target_revision(const char *name, u_int8_t revision)
 {
-	return compatible_revision(name, revision, afinfo.so_rev_target);
+	return compatible_revision(name, revision, afinfo->so_rev_target);
 }
 
 void xtables_register_match(struct xtables_match *me)
@@ -559,7 +613,7 @@ void xtables_register_match(struct xtables_match *me)
 	}
 
 	/* ignore not interested match */
-	if (me->family != afinfo.family && me->family != AF_UNSPEC)
+	if (me->family != afinfo->family && me->family != AF_UNSPEC)
 		return;
 
 	old = xtables_find_match(me->name, XTF_DURING_LOAD, NULL);
@@ -632,7 +686,7 @@ void xtables_register_target(struct xtables_target *me)
 	}
 
 	/* ignore not interested target */
-	if (me->family != afinfo.family && me->family != AF_UNSPEC)
+	if (me->family != afinfo->family && me->family != AF_UNSPEC)
 		return;
 
 	old = xtables_find_target(me->name, XTF_DURING_LOAD);

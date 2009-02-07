@@ -199,15 +199,6 @@ struct pprot {
 	u_int8_t num;
 };
 
-struct afinfo afinfo = {
-	.family		= NFPROTO_IPV6,
-	.libprefix	= "libip6t_",
-	.ipproto	= IPPROTO_IPV6,
-	.kmod		= "ip6_tables",
-	.so_rev_match	= IP6T_SO_GET_REVISION_MATCH,
-	.so_rev_target	= IP6T_SO_GET_REVISION_TARGET,
-};
-
 static const char *
 proto_to_name(u_int8_t proto, int nolookup)
 {

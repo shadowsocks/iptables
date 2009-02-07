@@ -7,30 +7,6 @@
 #	define XT_LIB_DIR "/usr/local/lib/iptables"
 #endif
 
-/* protocol family dependent informations */
-struct afinfo {
-	/* protocol family */
-	int family;
-
-	/* prefix of library name (ex "libipt_" */
-	char *libprefix;
-
-	/* used by setsockopt (ex IPPROTO_IP */
-	int ipproto;
-
-	/* kernel module (ex "ip_tables" */
-	char *kmod;
-
-	/* optname to check revision support of match */
-	int so_rev_match;
-
-	/* optname to check revision support of match */
-	int so_rev_target;
-};
-
-/* This is decleared in ip[6]tables.c */
-extern struct afinfo afinfo;
-
 /**
  * Program's own name and version.
  */

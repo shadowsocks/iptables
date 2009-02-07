@@ -194,15 +194,6 @@ const char *program_name;
 
 int kernel_version;
 
-struct afinfo afinfo = {
-	.family		= NFPROTO_IPV4,
-	.libprefix	= "libipt_",
-	.ipproto	= IPPROTO_IP,
-	.kmod		= "ip_tables",
-	.so_rev_match	= IPT_SO_GET_REVISION_MATCH,
-	.so_rev_target	= IPT_SO_GET_REVISION_TARGET,
-};
-
 /* Primitive headers... */
 /* defined in netinet/in.h */
 #if 0
