@@ -31,7 +31,7 @@ helper_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
 					"helper match: Only use --helper ONCE!");
-		check_inverse(optarg, &invert, &invert, 0);
+		xtables_check_inverse(optarg, &invert, &invert, 0);
 		strncpy(info->name, optarg, 29);
 		info->name[29] = '\0';
 		if (invert)
@@ -65,7 +65,7 @@ static void helper_save(const void *ip, const struct xt_entry_match *match)
 	struct xt_helper_info *info = (struct xt_helper_info *)match->data;
 
 	printf("%s--helper ",info->invert ? "! " : "");
-	save_string(info->name);
+	xtables_save_string(info->name);
 }
 
 static struct xtables_match helper_match = {

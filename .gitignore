@@ -18,6 +18,7 @@ Makefile.in
 /extensions/targets?.man
 
 /include/xtables.h
+/include/xtables/internal.h
 
 /aclocal.m4
 /autom4te*.cache

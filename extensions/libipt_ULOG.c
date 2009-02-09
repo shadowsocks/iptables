@@ -77,7 +77,7 @@ static int ULOG_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --ulog-nlgroup twice");
 
-		if (check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --ulog-nlgroup");
 		group_d = atoi(optarg);
@@ -95,7 +95,7 @@ static int ULOG_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --ulog-prefix twice");
 
-		if (check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --ulog-prefix");
 
@@ -151,7 +151,7 @@ static void ULOG_save(const void *ip, const struct xt_entry_target *target)
 
 	if (strcmp(loginfo->prefix, "") != 0) {
 		fputs("--ulog-prefix ", stdout);
-		save_string(loginfo->prefix);
+		xtables_save_string(loginfo->prefix);
 	}
 
 	if (loginfo->nl_group != ULOG_DEFAULT_NLGROUP) {

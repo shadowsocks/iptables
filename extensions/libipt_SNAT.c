@@ -117,13 +117,13 @@ parse_to(char *arg, int portok, struct ipt_natinfo *info)
 	if (dash)
 		*dash = '\0';
 
-	ip = numeric_to_ipaddr(arg);
+	ip = xtables_numeric_to_ipaddr(arg);
 	if (!ip)
 		exit_error(PARAMETER_PROBLEM, "Bad IP address `%s'\n",
 			   arg);
 	range.min_ip = ip->s_addr;
 	if (dash) {
-		ip = numeric_to_ipaddr(dash+1);
+		ip = xtables_numeric_to_ipaddr(dash+1);
 		if (!ip)
 			exit_error(PARAMETER_PROBLEM, "Bad IP address `%s'\n",
 				   dash+1);
@@ -152,7 +152,7 @@ static int SNAT_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --to-source");
 
@@ -196,10 +196,10 @@ static void print_range(const struct ip_nat_range *r)
 		struct in_addr a;
 
 		a.s_addr = r->min_ip;
-		printf("%s", ipaddr_to_numeric(&a));
+		printf("%s", xtables_ipaddr_to_numeric(&a));
 		if (r->max_ip != r->min_ip) {
 			a.s_addr = r->max_ip;
-			printf("-%s", ipaddr_to_numeric(&a));
+			printf("-%s", xtables_ipaddr_to_numeric(&a));
 		}
 	}
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {

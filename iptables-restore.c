@@ -129,19 +129,12 @@ main(int argc, char *argv[])
 	const char *tablename = NULL;
 
 	program_name = "iptables-restore";
-	program_version = XTABLES_VERSION;
+	program_version = IPTABLES_VERSION;
 	line = 0;
 
-	lib_dir = getenv("XTABLES_LIBDIR");
-	if (lib_dir == NULL) {
-		lib_dir = getenv("IPTABLES_LIB_DIR");
-		if (lib_dir != NULL)
-			fprintf(stderr, "IPTABLES_LIB_DIR is deprecated, "
-			        "use XTABLES_LIBDIR.\n");
-	}
-	if (lib_dir == NULL)
-		lib_dir = XTABLES_LIBDIR;
-
+	xtables_program_name = program_name;
+	xtables_init();
+	xtables_set_nfproto(NFPROTO_IPV4);
 #ifdef NO_SHARED_LIBS
 	init_extensions();
 #endif
@@ -162,7 +155,7 @@ main(int argc, char *argv[])
 				break;
 			case 'h':
 				print_usage("iptables-restore",
-					    XTABLES_VERSION);
+					    IPTABLES_VERSION);
 				break;
 			case 'n':
 				noflush = 1;

@@ -49,19 +49,19 @@ connmark_mt_parse(int c, char **argv, int invert, unsigned int *flags,
                   const void *entry, struct xt_entry_match **match)
 {
 	struct xt_connmark_mtinfo1 *info = (void *)(*match)->data;
-	unsigned int mark, mask = ~0U;
+	unsigned int mark, mask = UINT32_MAX;
 	char *end;
 
 	switch (c) {
 	case '1': /* --mark */
-		param_act(P_ONLY_ONCE, "connmark", "--mark", *flags & F_MARK);
-		if (!strtonum(optarg, &end, &mark, 0, ~0U))
-			param_act(P_BAD_VALUE, "connmark", "--mark", optarg);
+		xtables_param_act(XTF_ONLY_ONCE, "connmark", "--mark", *flags & F_MARK);
+		if (!xtables_strtoui(optarg, &end, &mark, 0, UINT32_MAX))
+			xtables_param_act(XTF_BAD_VALUE, "connmark", "--mark", optarg);
 		if (*end == '/')
-			if (!strtonum(end + 1, &end, &mask, 0, ~0U))
-				param_act(P_BAD_VALUE, "connmark", "--mark", optarg);
+			if (!xtables_strtoui(end + 1, &end, &mask, 0, UINT32_MAX))
+				xtables_param_act(XTF_BAD_VALUE, "connmark", "--mark", optarg);
 		if (*end != '\0')
-			param_act(P_BAD_VALUE, "connmark", "--mark", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "connmark", "--mark", optarg);
 
 		if (invert)
 			info->invert = true;
@@ -82,7 +82,7 @@ connmark_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 		char *end;
 	case '1':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		markinfo->mark = strtoul(optarg, &end, 0);
 		markinfo->mask = 0xffffffffUL;

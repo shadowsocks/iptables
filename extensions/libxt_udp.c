@@ -36,13 +36,13 @@ parse_udp_ports(const char *portstring, u_int16_t *ports)
 
 	buffer = strdup(portstring);
 	if ((cp = strchr(buffer, ':')) == NULL)
-		ports[0] = ports[1] = parse_port(buffer, "udp");
+		ports[0] = ports[1] = xtables_parse_port(buffer, "udp");
 	else {
 		*cp = '\0';
 		cp++;
 
-		ports[0] = buffer[0] ? parse_port(buffer, "udp") : 0;
-		ports[1] = cp[0] ? parse_port(cp, "udp") : 0xFFFF;
+		ports[0] = buffer[0] ? xtables_parse_port(buffer, "udp") : 0;
+		ports[1] = cp[0] ? xtables_parse_port(cp, "udp") : 0xFFFF;
 
 		if (ports[0] > ports[1])
 			exit_error(PARAMETER_PROBLEM,
@@ -72,7 +72,7 @@ udp_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & UDP_SRC_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--source-port' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_udp_ports(argv[optind-1], udpinfo->spts);
 		if (invert)
 			udpinfo->invflags |= XT_UDP_INV_SRCPT;
@@ -83,7 +83,7 @@ udp_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & UDP_DST_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--destination-port' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_udp_ports(argv[optind-1], udpinfo->dpts);
 		if (invert)
 			udpinfo->invflags |= XT_UDP_INV_DSTPT;

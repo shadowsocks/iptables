@@ -41,7 +41,7 @@ parse_ah_spi(const char *spistr)
 		exit_error(PARAMETER_PROBLEM,
 			   "AH error parsing spi `%s'", spistr);
 	}
-	return (u_int32_t) spi;
+	return spi;
 }
 
 static void
@@ -82,7 +82,7 @@ static int ah_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & AH_SPI)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--ahspi' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_ah_spis(argv[optind-1], ahinfo->spis);
 		if (invert)
 			ahinfo->invflags |= IPT_AH_INV_SPI;

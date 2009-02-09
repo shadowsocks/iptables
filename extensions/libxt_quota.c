@@ -46,7 +46,7 @@ parse_quota(const char *s, u_int64_t * quota)
 	printf("Quota: %llu\n", *quota);
 #endif
 
-	if (*quota == (u_int64_t)-1)
+	if (*quota == UINT64_MAX)
 		exit_error(PARAMETER_PROBLEM, "quota invalid: '%s'\n", s);
 	else
 		return 1;
@@ -60,7 +60,7 @@ quota_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM, "quota: unexpected '!'");
 		if (!parse_quota(optarg, &info->quota))
 			exit_error(PARAMETER_PROBLEM,

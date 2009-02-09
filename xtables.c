@@ -32,6 +32,8 @@
 #include <arpa/inet.h>
 
 #include <xtables.h>
+#include <linux/netfilter_ipv4/ip_tables.h>
+#include <linux/netfilter_ipv6/ip6_tables.h>
 #include <libiptc/libxtc.h>
 
 #ifndef NO_SHARED_LIBS
@@ -44,7 +46,51 @@
 #define PROC_SYS_MODPROBE "/proc/sys/kernel/modprobe"
 #endif
 
-char *lib_dir;
+/**
+ * xtables_afinfo - protocol family dependent information
+ * @kmod:		kernel module basename (e.g. "ip_tables")
+ * @libprefix:		prefix of .so library name (e.g. "libipt_")
+ * @family:		nfproto family
+ * @ipproto:		used by setsockopt (e.g. IPPROTO_IP)
+ * @so_rev_match:	optname to check revision support of match
+ * @so_rev_target:	optname to check revision support of target
+ */
+struct xtables_afinfo {
+	const char *kmod;
+	const char *libprefix;
+	uint8_t family;
+	uint8_t ipproto;
+	int so_rev_match;
+	int so_rev_target;
+};
+
+static const struct xtables_afinfo afinfo_ipv4 = {
+	.kmod          = "ip_tables",
+	.libprefix     = "libipt_",
+	.family	       = NFPROTO_IPV4,
+	.ipproto       = IPPROTO_IP,
+	.so_rev_match  = IPT_SO_GET_REVISION_MATCH,
+	.so_rev_target = IPT_SO_GET_REVISION_TARGET,
+};
+
+static const struct xtables_afinfo afinfo_ipv6 = {
+	.kmod          = "ip6_tables",
+	.libprefix     = "libip6t_",
+	.family        = NFPROTO_IPV6,
+	.ipproto       = IPPROTO_IPV6,
+	.so_rev_match  = IP6T_SO_GET_REVISION_MATCH,
+	.so_rev_target = IP6T_SO_GET_REVISION_TARGET,
+};
+
+static const struct xtables_afinfo *afinfo;
+
+/**
+ * Program will set this to its own name.
+ */
+const char *xtables_program_name;
+
+/* Search path for Xtables .so files */
+static const char *xtables_libdir;
 
 /* the path to command to load kernel module */
 const char *xtables_modprobe_program;
@@ -52,6 +98,35 @@ const char *xtables_modprobe_program;
 /* Keeping track of external matches and targets: linked lists.  */
 struct xtables_match *xtables_matches;
 struct xtables_target *xtables_targets;
+
+void xtables_init(void)
+{
+	xtables_libdir = getenv("XTABLES_LIBDIR");
+	if (xtables_libdir != NULL)
+		return;
+	xtables_libdir = getenv("IPTABLES_LIB_DIR");
+	if (xtables_libdir != NULL) {
+		fprintf(stderr, "IPTABLES_LIB_DIR is deprecated, "
+		        "use XTABLES_LIBDIR.\n");
+		return;
+	}
+	xtables_libdir = XTABLES_LIBDIR;
+}
+
+void xtables_set_nfproto(uint8_t nfproto)
+{
+	switch (nfproto) {
+	case NFPROTO_IPV4:
+		afinfo = &afinfo_ipv4;
+		break;
+	case NFPROTO_IPV6:
+		afinfo = &afinfo_ipv6;
+		break;
+	default:
+		fprintf(stderr, "libxtables: unhandled NFPROTO in %s\n",
+		        __func__);
+	}
+}
 
 /**
  * xtables_*alloc - wrappers that exit on failure
@@ -156,64 +231,31 @@ int xtables_load_ko(const char *modprobe, bool quiet)
 	static int ret = -1;
 
 	if (!loaded) {
-		ret = xtables_insmod(afinfo.kmod, modprobe, quiet);
+		ret = xtables_insmod(afinfo->kmod, modprobe, quiet);
 		loaded = (ret == 0);
 	}
 
 	return ret;
 }
 
-int string_to_number_ll(const char *s, unsigned long long min,
-			unsigned long long max, unsigned long long *ret)
-{
-	unsigned long long number;
-	char *end;
-
-	/* Handle hex, octal, etc. */
-	errno = 0;
-	number = strtoull(s, &end, 0);
-	if (*end == '\0' && end != s) {
-		/* we parsed a number, let's see if we want this */
-		if (errno != ERANGE && min <= number && (!max || number <= max)) {
-			*ret = number;
-			return 0;
-		}
-	}
-	return -1;
-}
-
-int string_to_number_l(const char *s, unsigned long min, unsigned long max,
-		       unsigned long *ret)
-{
-	int result;
-	unsigned long long number;
-
-	result = string_to_number_ll(s, min, max, &number);
-	*ret = (unsigned long)number;
-
-	return result;
-}
-
-int string_to_number(const char *s, unsigned int min, unsigned int max,
-		unsigned int *ret)
-{
-	int result;
-	unsigned long number;
-
-	result = string_to_number_l(s, min, max, &number);
-	*ret = (unsigned int)number;
-
-	return result;
-}
-
-/*
- * strtonum{,l} - string to number conversion
+/**
+ * xtables_strtou{i,l} - string to number conversion
+ * @s:	input string
+ * @end:	like strtoul's "end" pointer
+ * @value:	pointer for result
+ * @min:	minimum accepted value
+ * @max:	maximum accepted value
  *
- * If @end is NULL, we assume the caller does not want
- * a case like "15a", so reject it.
+ * If @end is NULL, we assume the caller wants a "strict strtoul", and hence
+ * "15a" is rejected.
+ * In either case, the value obtained is compared for min-max compliance.
+ * Base is always 0, i.e. autodetect depending on @s.
+ *
+ * Returns true/false whether number was accepted. On failure, *value has
+ * undefined contents.
  */
-bool strtonuml(const char *s, char **end, unsigned long *value,
-               unsigned long min, unsigned long max)
+bool xtables_strtoul(const char *s, char **end, unsigned long *value,
+                     unsigned long min, unsigned long max)
 {
 	unsigned long v;
 	char *my_end;
@@ -237,19 +279,19 @@ bool strtonuml(const char *s, char **end, unsigned long *value,
 	return false;
 }
 
-bool strtonum(const char *s, char **end, unsigned int *value,
-                  unsigned int min, unsigned int max)
+bool xtables_strtoui(const char *s, char **end, unsigned int *value,
+                     unsigned int min, unsigned int max)
 {
 	unsigned long v;
 	bool ret;
 
-	ret = strtonuml(s, end, &v, min, max);
+	ret = xtables_strtoul(s, end, &v, min, max);
 	if (value != NULL)
 		*value = v;
 	return ret;
 }
 
-int service_to_port(const char *name, const char *proto)
+int xtables_service_to_port(const char *name, const char *proto)
 {
 	struct servent *service;
 
@@ -259,19 +301,20 @@ int service_to_port(const char *name, const char *proto)
 	return -1;
 }
 
-u_int16_t parse_port(const char *port, const char *proto)
+u_int16_t xtables_parse_port(const char *port, const char *proto)
 {
 	unsigned int portnum;
 
-	if ((string_to_number(port, 0, 65535, &portnum)) != -1 ||
-	    (portnum = service_to_port(port, proto)) != (unsigned)-1)
-		return (u_int16_t)portnum;
+	if (xtables_strtoui(port, NULL, &portnum, 0, UINT16_MAX) ||
+	    (portnum = xtables_service_to_port(port, proto)) != (unsigned)-1)
+		return portnum;
 
 	exit_error(PARAMETER_PROBLEM,
 		   "invalid port/service `%s' specified", port);
 }
 
-void parse_interface(const char *arg, char *vianame, unsigned char *mask)
+void xtables_parse_interface(const char *arg, char *vianame,
+			     unsigned char *mask)
 {
 	int vialen = strlen(arg);
 	unsigned int i;
@@ -398,7 +441,8 @@ xtables_find_match(const char *name, enum xtables_tryload tryload,
 
 #ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != XTF_DONT_LOAD && tryload != XTF_DURING_LOAD) {
-		ptr = load_extension(lib_dir, afinfo.libprefix, name, false);
+		ptr = load_extension(xtables_libdir, afinfo->libprefix,
+		      name, false);
 
 		if (ptr == NULL && tryload == XTF_LOAD_MUST_SUCCEED)
 			exit_error(PARAMETER_PROBLEM,
@@ -457,7 +501,8 @@ xtables_find_target(const char *name, enum xtables_tryload tryload)
 
 #ifndef NO_SHARED_LIBS
 	if (!ptr && tryload != XTF_DONT_LOAD && tryload != XTF_DURING_LOAD) {
-		ptr = load_extension(lib_dir, afinfo.libprefix, name, true);
+		ptr = load_extension(xtables_libdir, afinfo->libprefix,
+		      name, true);
 
 		if (ptr == NULL && tryload == XTF_LOAD_MUST_SUCCEED)
 			exit_error(PARAMETER_PROBLEM,
@@ -489,7 +534,7 @@ static int compatible_revision(const char *name, u_int8_t revision, int opt)
 	socklen_t s = sizeof(rev);
 	int max_rev, sockfd;
 
-	sockfd = socket(afinfo.family, SOCK_RAW, IPPROTO_RAW);
+	sockfd = socket(afinfo->family, SOCK_RAW, IPPROTO_RAW);
 	if (sockfd < 0) {
 		if (errno == EPERM) {
 			/* revision 0 is always supported. */
@@ -510,7 +555,7 @@ static int compatible_revision(const char *name, u_int8_t revision, int opt)
 	strcpy(rev.name, name);
 	rev.revision = revision;
 
-	max_rev = getsockopt(sockfd, afinfo.ipproto, opt, &rev, &s);
+	max_rev = getsockopt(sockfd, afinfo->ipproto, opt, &rev, &s);
 	if (max_rev < 0) {
 		/* Definitely don't support this? */
 		if (errno == ENOENT || errno == EPROTONOSUPPORT) {
@@ -533,40 +578,42 @@ static int compatible_revision(const char *name, u_int8_t revision, int opt)
 
 static int compatible_match_revision(const char *name, u_int8_t revision)
 {
-	return compatible_revision(name, revision, afinfo.so_rev_match);
+	return compatible_revision(name, revision, afinfo->so_rev_match);
 }
 
 static int compatible_target_revision(const char *name, u_int8_t revision)
 {
-	return compatible_revision(name, revision, afinfo.so_rev_target);
+	return compatible_revision(name, revision, afinfo->so_rev_target);
 }
 
 void xtables_register_match(struct xtables_match *me)
 {
 	struct xtables_match **i, *old;
 
-	if (strcmp(me->version, program_version) != 0) {
-		fprintf(stderr, "%s: match `%s' v%s (I'm v%s).\n",
-			program_name, me->name, me->version, program_version);
+	if (strcmp(me->version, XTABLES_VERSION) != 0) {
+		fprintf(stderr, "%s: match \"%s\" has version \"%s\", "
+		        "but \"%s\" is required.\n",
+			xtables_program_name, me->name,
+			me->version, XTABLES_VERSION);
 		exit(1);
 	}
 
 	/* Revision field stole a char from name. */
 	if (strlen(me->name) >= XT_FUNCTION_MAXNAMELEN-1) {
 		fprintf(stderr, "%s: target `%s' has invalid name\n",
-			program_name, me->name);
+			xtables_program_name, me->name);
 		exit(1);
 	}
 
 	if (me->family >= NPROTO) {
 		fprintf(stderr,
 			"%s: BUG: match %s has invalid protocol family\n",
-			program_name, me->name);
+			xtables_program_name, me->name);
 		exit(1);
 	}
 
 	/* ignore not interested match */
-	if (me->family != afinfo.family && me->family != AF_UNSPEC)
+	if (me->family != afinfo->family && me->family != AF_UNSPEC)
 		return;
 
 	old = xtables_find_match(me->name, XTF_DURING_LOAD, NULL);
@@ -575,7 +622,7 @@ void xtables_register_match(struct xtables_match *me)
 		    old->family == me->family) {
 			fprintf(stderr,
 				"%s: match `%s' already registered.\n",
-				program_name, me->name);
+				xtables_program_name, me->name);
 			exit(1);
 		}
 
@@ -599,7 +646,7 @@ void xtables_register_match(struct xtables_match *me)
 
 	if (me->size != XT_ALIGN(me->size)) {
 		fprintf(stderr, "%s: match `%s' has invalid size %u.\n",
-			program_name, me->name, (unsigned int)me->size);
+			xtables_program_name, me->name, (unsigned int)me->size);
 		exit(1);
 	}
 
@@ -616,28 +663,30 @@ void xtables_register_target(struct xtables_target *me)
 {
 	struct xtables_target *old;
 
-	if (strcmp(me->version, program_version) != 0) {
-		fprintf(stderr, "%s: target `%s' v%s (I'm v%s).\n",
-			program_name, me->name, me->version, program_version);
+	if (strcmp(me->version, XTABLES_VERSION) != 0) {
+		fprintf(stderr, "%s: target \"%s\" has version \"%s\", "
+		        "but \"%s\" is required.\n",
+			xtables_program_name, me->name,
+			me->version, XTABLES_VERSION);
 		exit(1);
 	}
 
 	/* Revision field stole a char from name. */
 	if (strlen(me->name) >= XT_FUNCTION_MAXNAMELEN-1) {
 		fprintf(stderr, "%s: target `%s' has invalid name\n",
-			program_name, me->name);
+			xtables_program_name, me->name);
 		exit(1);
 	}
 
 	if (me->family >= NPROTO) {
 		fprintf(stderr,
 			"%s: BUG: target %s has invalid protocol family\n",
-			program_name, me->name);
+			xtables_program_name, me->name);
 		exit(1);
 	}
 
 	/* ignore not interested target */
-	if (me->family != afinfo.family && me->family != AF_UNSPEC)
+	if (me->family != afinfo->family && me->family != AF_UNSPEC)
 		return;
 
 	old = xtables_find_target(me->name, XTF_DURING_LOAD);
@@ -648,7 +697,7 @@ void xtables_register_target(struct xtables_target *me)
 		    old->family == me->family) {
 			fprintf(stderr,
 				"%s: target `%s' already registered.\n",
-				program_name, me->name);
+				xtables_program_name, me->name);
 			exit(1);
 		}
 
@@ -672,7 +721,7 @@ void xtables_register_target(struct xtables_target *me)
 
 	if (me->size != XT_ALIGN(me->size)) {
 		fprintf(stderr, "%s: target `%s' has invalid size %u.\n",
-			program_name, me->name, (unsigned int)me->size);
+			xtables_program_name, me->name, (unsigned int)me->size);
 		exit(1);
 	}
 
@@ -683,7 +732,31 @@ void xtables_register_target(struct xtables_target *me)
 	me->tflags = 0;
 }
 
-void param_act(unsigned int status, const char *p1, ...)
+/**
+ * xtables_param_act - act on condition
+ * @status:	a constant from enum xtables_exittype
+ *
+ * %XTF_ONLY_ONCE: print error message that option may only be used once.
+ * @p1:		module name (e.g. "mark")
+ * @p2(...):	option in conflict (e.g. "--mark")
+ * @p3(...):	condition to match on (see extensions/ for examples)
+ *
+ * %XTF_NO_INVERT: option does not support inversion
+ * @p1:		module name
+ * @p2:		option in conflict
+ * @p3:		condition to match on
+ *
+ * %XTF_BAD_VALUE: bad value for option
+ * @p1:		module name
+ * @p2:		option with which the problem occured (e.g. "--mark")
+ * @p3:		string the user passed in (e.g. "99999999999999")
+ *
+ * %XTF_ONE_ACTION: two mutually exclusive actions have been specified
+ * @p1:		module name
+ *
+ * Displays an error message and exits the program.
+ */
+void xtables_param_act(unsigned int status, const char *p1, ...)
 {
 	const char *p2, *p3;
 	va_list args;
@@ -692,7 +765,7 @@ void param_act(unsigned int status, const char *p1, ...)
 	va_start(args, p1);
 
 	switch (status) {
-	case P_ONLY_ONCE:
+	case XTF_ONLY_ONCE:
 		p2 = va_arg(args, const char *);
 		b  = va_arg(args, unsigned int);
 		if (!b)
@@ -701,7 +774,7 @@ void param_act(unsigned int status, const char *p1, ...)
 		           "%s: \"%s\" option may only be specified once",
 		           p1, p2);
 		break;
-	case P_NO_INVERT:
+	case XTF_NO_INVERT:
 		p2 = va_arg(args, const char *);
 		b  = va_arg(args, unsigned int);
 		if (!b)
@@ -709,14 +782,14 @@ void param_act(unsigned int status, const char *p1, ...)
 		exit_error(PARAMETER_PROBLEM,
 		           "%s: \"%s\" option cannot be inverted", p1, p2);
 		break;
-	case P_BAD_VALUE:
+	case XTF_BAD_VALUE:
 		p2 = va_arg(args, const char *);
 		p3 = va_arg(args, const char *);
 		exit_error(PARAMETER_PROBLEM,
 		           "%s: Bad value for \"%s\" option: \"%s\"",
 		           p1, p2, p3);
 		break;
-	case P_ONE_ACTION:
+	case XTF_ONE_ACTION:
 		b = va_arg(args, unsigned int);
 		if (!b)
 			return;
@@ -731,7 +804,7 @@ void param_act(unsigned int status, const char *p1, ...)
 	va_end(args);
 }
 
-const char *ipaddr_to_numeric(const struct in_addr *addrp)
+const char *xtables_ipaddr_to_numeric(const struct in_addr *addrp)
 {
 	static char buf[20];
 	const unsigned char *bytep = (const void *)&addrp->s_addr;
@@ -761,7 +834,7 @@ static const char *ipaddr_to_network(const struct in_addr *addr)
 	return NULL;
 }
 
-const char *ipaddr_to_anyname(const struct in_addr *addr)
+const char *xtables_ipaddr_to_anyname(const struct in_addr *addr)
 {
 	const char *name;
 
@@ -769,10 +842,10 @@ const char *ipaddr_to_anyname(const struct in_addr *addr)
 	    (name = ipaddr_to_network(addr)) != NULL)
 		return name;
 
-	return ipaddr_to_numeric(addr);
+	return xtables_ipaddr_to_numeric(addr);
 }
 
-const char *ipmask_to_numeric(const struct in_addr *mask)
+const char *xtables_ipmask_to_numeric(const struct in_addr *mask)
 {
 	static char buf[20];
 	uint32_t maskaddr, bits;
@@ -792,7 +865,7 @@ const char *ipmask_to_numeric(const struct in_addr *mask)
 		sprintf(buf, "/%d", i);
 	else
 		/* mask was not a decent combination of 1's and 0's */
-		sprintf(buf, "/%s", ipaddr_to_numeric(mask));
+		sprintf(buf, "/%s", xtables_ipaddr_to_numeric(mask));
 
 	return buf;
 }
@@ -817,7 +890,7 @@ static struct in_addr *__numeric_to_ipaddr(const char *dotted, bool is_mask)
 				return NULL;
 
 			/* autocomplete, this is a network address */
-			if (!strtonum(p, NULL, &onebyte, 0, 255))
+			if (!xtables_strtoui(p, NULL, &onebyte, 0, UINT8_MAX))
 				return NULL;
 
 			addrp[i] = onebyte;
@@ -828,7 +901,7 @@ static struct in_addr *__numeric_to_ipaddr(const char *dotted, bool is_mask)
 		}
 
 		*q = '\0';
-		if (!strtonum(p, NULL, &onebyte, 0, 255))
+		if (!xtables_strtoui(p, NULL, &onebyte, 0, UINT8_MAX))
 			return NULL;
 
 		addrp[i] = onebyte;
@@ -836,19 +909,19 @@ static struct in_addr *__numeric_to_ipaddr(const char *dotted, bool is_mask)
 	}
 
 	/* we have checked 3 bytes, now we check the last one */
-	if (!strtonum(p, NULL, &onebyte, 0, 255))
+	if (!xtables_strtoui(p, NULL, &onebyte, 0, UINT8_MAX))
 		return NULL;
 
 	addrp[3] = onebyte;
 	return &addr;
 }
 
-struct in_addr *numeric_to_ipaddr(const char *dotted)
+struct in_addr *xtables_numeric_to_ipaddr(const char *dotted)
 {
 	return __numeric_to_ipaddr(dotted, false);
 }
 
-struct in_addr *numeric_to_ipmask(const char *dotted)
+struct in_addr *xtables_numeric_to_ipmask(const char *dotted)
 {
 	return __numeric_to_ipaddr(dotted, true);
 }
@@ -897,7 +970,7 @@ ipparse_hostnetwork(const char *name, unsigned int *naddrs)
 {
 	struct in_addr *addrptmp, *addrp;
 
-	if ((addrptmp = numeric_to_ipaddr(name)) != NULL ||
+	if ((addrptmp = xtables_numeric_to_ipaddr(name)) != NULL ||
 	    (addrptmp = network_to_ipaddr(name)) != NULL) {
 		addrp = xtables_malloc(sizeof(struct in_addr));
 		memcpy(addrp, addrptmp, sizeof(*addrp));
@@ -921,10 +994,10 @@ static struct in_addr *parse_ipmask(const char *mask)
 		maskaddr.s_addr = 0xFFFFFFFF;
 		return &maskaddr;
 	}
-	if ((addrp = numeric_to_ipmask(mask)) != NULL)
+	if ((addrp = xtables_numeric_to_ipmask(mask)) != NULL)
 		/* dotted_to_addr already returns a network byte order addr */
 		return addrp;
-	if (string_to_number(mask, 0, 32, &bits) == -1)
+	if (!xtables_strtoui(mask, NULL, &bits, 0, 32))
 		exit_error(PARAMETER_PROBLEM,
 			   "invalid mask `%s' specified", mask);
 	if (bits != 0) {
@@ -936,8 +1009,15 @@ static struct in_addr *parse_ipmask(const char *mask)
 	return &maskaddr;
 }
 
-void ipparse_hostnetworkmask(const char *name, struct in_addr **addrpp,
-                             struct in_addr *maskp, unsigned int *naddrs)
+/**
+ * xtables_ipparse_any - transform arbitrary name to in_addr
+ *
+ * Possible inputs (pseudo regex):
+ * 	m{^($hostname|$networkname|$ipaddr)(/$mask)?}
+ * "1.2.3.4/5", "1.2.3.4", "hostname", "networkname"
+ */
+void xtables_ipparse_any(const char *name, struct in_addr **addrpp,
+                         struct in_addr *maskp, unsigned int *naddrs)
 {
 	unsigned int i, j, k, n;
 	struct in_addr *addrp;
@@ -970,7 +1050,7 @@ void ipparse_hostnetworkmask(const char *name, struct in_addr **addrpp,
 	}
 }
 
-const char *ip6addr_to_numeric(const struct in6_addr *addrp)
+const char *xtables_ip6addr_to_numeric(const struct in6_addr *addrp)
 {
 	/* 0000:0000:0000:0000:0000:000.000.000.000
 	 * 0000:0000:0000:0000:0000:0000:0000:0000 */
@@ -1003,14 +1083,14 @@ static const char *ip6addr_to_host(const struct in6_addr *addr)
 	return hostname;
 }
 
-const char *ip6addr_to_anyname(const struct in6_addr *addr)
+const char *xtables_ip6addr_to_anyname(const struct in6_addr *addr)
 {
 	const char *name;
 
 	if ((name = ip6addr_to_host(addr)) != NULL)
 		return name;
 
-	return ip6addr_to_numeric(addr);
+	return xtables_ip6addr_to_numeric(addr);
 }
 
 static int ip6addr_prefix_length(const struct in6_addr *k)
@@ -1037,21 +1117,21 @@ static int ip6addr_prefix_length(const struct in6_addr *k)
 	return bits;
 }
 
-const char *ip6mask_to_numeric(const struct in6_addr *addrp)
+const char *xtables_ip6mask_to_numeric(const struct in6_addr *addrp)
 {
 	static char buf[50+2];
 	int l = ip6addr_prefix_length(addrp);
 
 	if (l == -1) {
 		strcpy(buf, "/");
-		strcat(buf, ip6addr_to_numeric(addrp));
+		strcat(buf, xtables_ip6addr_to_numeric(addrp));
 		return buf;
 	}
 	sprintf(buf, "/%d", l);
 	return buf;
 }
 
-struct in6_addr *numeric_to_ip6addr(const char *num)
+struct in6_addr *xtables_numeric_to_ip6addr(const char *num)
 {
 	static struct in6_addr ap;
 	int err;
@@ -1119,7 +1199,7 @@ ip6parse_hostnetwork(const char *name, unsigned int *naddrs)
 {
 	struct in6_addr *addrp, *addrptmp;
 
-	if ((addrptmp = numeric_to_ip6addr(name)) != NULL ||
+	if ((addrptmp = xtables_numeric_to_ip6addr(name)) != NULL ||
 	    (addrptmp = network_to_ip6addr(name)) != NULL) {
 		addrp = xtables_malloc(sizeof(struct in6_addr));
 		memcpy(addrp, addrptmp, sizeof(*addrp));
@@ -1143,9 +1223,9 @@ static struct in6_addr *parse_ip6mask(char *mask)
 		memset(&maskaddr, 0xff, sizeof maskaddr);
 		return &maskaddr;
 	}
-	if ((addrp = numeric_to_ip6addr(mask)) != NULL)
+	if ((addrp = xtables_numeric_to_ip6addr(mask)) != NULL)
 		return addrp;
-	if (string_to_number(mask, 0, 128, &bits) == -1)
+	if (!xtables_strtoui(mask, NULL, &bits, 0, 128))
 		exit_error(PARAMETER_PROBLEM,
 			   "invalid mask `%s' specified", mask);
 	if (bits != 0) {
@@ -1160,8 +1240,8 @@ static struct in6_addr *parse_ip6mask(char *mask)
 	return &maskaddr;
 }
 
-void ip6parse_hostnetworkmask(const char *name, struct in6_addr **addrpp,
-                              struct in6_addr *maskp, unsigned int *naddrs)
+void xtables_ip6parse_any(const char *name, struct in6_addr **addrpp,
+                          struct in6_addr *maskp, unsigned int *naddrs)
 {
 	struct in6_addr *addrp;
 	unsigned int i, j, k, n;
@@ -1196,7 +1276,7 @@ void ip6parse_hostnetworkmask(const char *name, struct in6_addr **addrpp,
 	}
 }
 
-void save_string(const char *value)
+void xtables_save_string(const char *value)
 {
 	static const char no_quote_chars[] = "_-0123456789"
 		"abcdefghijklmnopqrstuvwxyz"
@@ -1231,4 +1311,83 @@ void save_string(const char *value)
 		fputs(value, stdout);
 		printf("\" ");
 	}
+}
+
+/**
+ * Check for option-intrapositional negation.
+ * Do not use in new code.
+ */
+int xtables_check_inverse(const char option[], int *invert,
+			  int *my_optind, int argc)
+{
+	if (option && strcmp(option, "!") == 0) {
+		fprintf(stderr, "Using intrapositioned negation "
+		        "(`--option ! this`) is deprecated in favor of "
+		        "extrapositioned (`! --option this`).\n");
+
+		if (*invert)
+			exit_error(PARAMETER_PROBLEM,
+				   "Multiple `!' flags not allowed");
+		*invert = true;
+		if (my_optind != NULL) {
+			++*my_optind;
+			if (argc && *my_optind > argc)
+				exit_error(PARAMETER_PROBLEM,
+					   "no argument following `!'");
+		}
+
+		return true;
+	}
+	return false;
+}
+
+const struct xtables_pprot xtables_chain_protos[] = {
+	{"tcp",       IPPROTO_TCP},
+	{"sctp",      IPPROTO_SCTP},
+	{"udp",       IPPROTO_UDP},
+	{"udplite",   IPPROTO_UDPLITE},
+	{"icmp",      IPPROTO_ICMP},
+	{"icmpv6",    IPPROTO_ICMPV6},
+	{"ipv6-icmp", IPPROTO_ICMPV6},
+	{"esp",       IPPROTO_ESP},
+	{"ah",        IPPROTO_AH},
+	{"ipv6-mh",   IPPROTO_MH},
+	{"mh",        IPPROTO_MH},
+	{"all",       0},
+	{NULL},
+};
+
+u_int16_t
+xtables_parse_protocol(const char *s)
+{
+	unsigned int proto;
+
+	if (!xtables_strtoui(s, NULL, &proto, 0, UINT8_MAX)) {
+		struct protoent *pent;
+
+		/* first deal with the special case of 'all' to prevent
+		 * people from being able to redefine 'all' in nsswitch
+		 * and/or provoke expensive [not working] ldap/nis/...
+		 * lookups */
+		if (!strcmp(s, "all"))
+			return 0;
+
+		if ((pent = getprotobyname(s)))
+			proto = pent->p_proto;
+		else {
+			unsigned int i;
+			for (i = 0; i < ARRAY_SIZE(xtables_chain_protos); ++i) {
+				if (strcmp(s, xtables_chain_protos[i].name) == 0) {
+					proto = xtables_chain_protos[i].num;
+					break;
+				}
+			}
+			if (i == ARRAY_SIZE(xtables_chain_protos))
+				exit_error(PARAMETER_PROBLEM,
+					   "unknown protocol `%s' specified",
+					   s);
+		}
+	}
+
+	return proto;
 }

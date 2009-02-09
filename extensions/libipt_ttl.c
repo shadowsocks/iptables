@@ -29,11 +29,11 @@ static int ttl_parse(int c, char **argv, int invert, unsigned int *flags,
 	struct ipt_ttl_info *info = (struct ipt_ttl_info *) (*match)->data;
 	unsigned int value;
 
-	check_inverse(optarg, &invert, &optind, 0);
+	xtables_check_inverse(optarg, &invert, &optind, 0);
 
 	switch (c) {
 		case '2':
-			if (string_to_number(optarg, 0, 255, &value) == -1)
+			if (!xtables_strtoui(optarg, NULL, &value, 0, UINT8_MAX))
 				exit_error(PARAMETER_PROBLEM,
 				           "ttl: Expected value between 0 and 255");
 
@@ -46,7 +46,7 @@ static int ttl_parse(int c, char **argv, int invert, unsigned int *flags,
 			info->ttl = value;
 			break;
 		case '3':
-			if (string_to_number(optarg, 0, 255, &value) == -1)
+			if (!xtables_strtoui(optarg, NULL, &value, 0, UINT8_MAX))
 				exit_error(PARAMETER_PROBLEM,
 				           "ttl: Expected value between 0 and 255");
 
@@ -58,7 +58,7 @@ static int ttl_parse(int c, char **argv, int invert, unsigned int *flags,
 			info->ttl = value;
 			break;
 		case '4':
-			if (string_to_number(optarg, 0, 255, &value) == -1)
+			if (!xtables_strtoui(optarg, NULL, &value, 0, UINT8_MAX))
 				exit_error(PARAMETER_PROBLEM,
 				           "ttl: Expected value between 0 and 255");
 

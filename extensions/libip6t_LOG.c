@@ -70,7 +70,7 @@ parse_level(const char *level)
 	unsigned int lev = -1;
 	unsigned int set = 0;
 
-	if (string_to_number(level, 0, 7, &lev) == -1) {
+	if (!xtables_strtoui(level, NULL, &lev, 0, 7)) {
 		unsigned int i = 0;
 
 		for (i = 0;
@@ -91,7 +91,7 @@ parse_level(const char *level)
 				   "log-level `%s' unknown", level);
 	}
 
-	return (u_int8_t)lev;
+	return lev;
 }
 
 #define IP6T_LOG_OPT_LEVEL 0x01
@@ -112,7 +112,7 @@ static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --log-level twice");
 
-		if (check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --log-level");
 
@@ -125,7 +125,7 @@ static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --log-prefix twice");
 
-		if (check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --log-prefix");
 

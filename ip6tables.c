@@ -199,43 +199,7 @@ struct pprot {
 	u_int8_t num;
 };
 
-struct afinfo afinfo = {
-	.family		= NFPROTO_IPV6,
-	.libprefix	= "libip6t_",
-	.ipproto	= IPPROTO_IPV6,
-	.kmod		= "ip6_tables",
-	.so_rev_match	= IP6T_SO_GET_REVISION_MATCH,
-	.so_rev_target	= IP6T_SO_GET_REVISION_TARGET,
-};
-
-/* Primitive headers... */
-/* defined in netinet/in.h */
-#if 0
-#ifndef IPPROTO_ESP
-#define IPPROTO_ESP 50
-#endif
-#ifndef IPPROTO_AH
-#define IPPROTO_AH 51
-#endif
-#endif
-#ifndef IPPROTO_MH
-#define IPPROTO_MH 135
-#endif
-
-static const struct pprot chain_protos[] = {
-	{ "tcp", IPPROTO_TCP },
-	{ "udp", IPPROTO_UDP },
-	{ "udplite", IPPROTO_UDPLITE },
-	{ "icmpv6", IPPROTO_ICMPV6 },
-	{ "ipv6-icmp", IPPROTO_ICMPV6 },
-	{ "esp", IPPROTO_ESP },
-	{ "ah", IPPROTO_AH },
-	{ "ipv6-mh", IPPROTO_MH },
-	{ "mh", IPPROTO_MH },
-	{ "all", 0 },
-};
-
-static char *
+static const char *
 proto_to_name(u_int8_t proto, int nolookup)
 {
 	unsigned int i;
@@ -246,9 +210,9 @@ proto_to_name(u_int8_t proto, int nolookup)
 			return pent->p_name;
 	}
 
-	for (i = 0; i < sizeof(chain_protos)/sizeof(struct pprot); i++)
-		if (chain_protos[i].num == proto)
-			return chain_protos[i].name;
+	for (i = 0; xtables_chain_protos[i].name != NULL; ++i)
+		if (xtables_chain_protos[i].num == proto)
+			return xtables_chain_protos[i].name;
 
 	return NULL;
 }
@@ -365,7 +329,7 @@ exit_printhelp(struct ip6tables_rule_match *matches)
 }
 
 void
-exit_error(enum exittype status, const char *msg, ...)
+exit_error(enum xtables_exittype status, const char *msg, ...)
 {
 	va_list args;
 
@@ -450,26 +414,6 @@ add_command(unsigned int *cmd, const int newcmd, const int othercmds,
 	*cmd |= newcmd;
 }
 
-int
-check_inverse(const char option[], int *invert, int *my_optind, int argc)
-{
-	if (option && strcmp(option, "!") == 0) {
-		if (*invert)
-			exit_error(PARAMETER_PROBLEM,
-				   "Multiple `!' flags not allowed");
-		*invert = TRUE;
-		if (my_optind != NULL) {
-			++*my_optind;
-			if (argc && *my_optind > argc)
-				exit_error(PARAMETER_PROBLEM,
-					   "no argument following `!'");
-		}
-
-		return TRUE;
-	}
-	return FALSE;
-}
-
 /*
  *	All functions starting with "parse" should succeed, otherwise
  *	the program fails.
@@ -486,8 +430,8 @@ find_proto(const char *pname, enum xtables_tryload tryload,
 {
 	unsigned int proto;
 
-	if (string_to_number(pname, 0, 255, &proto) != -1) {
-		char *protoname = proto_to_name(proto, nolookup);
+	if (xtables_strtoui(pname, NULL, &proto, 0, UINT8_MAX)) {
+		const char *protoname = proto_to_name(proto, nolookup);
 
 		if (protoname)
 			return xtables_find_match(protoname, tryload, matches);
@@ -495,43 +439,6 @@ find_proto(const char *pname, enum xtables_tryload tryload,
 		return xtables_find_match(pname, tryload, matches);
 
 	return NULL;
-}
-
-u_int16_t
-parse_protocol(const char *s)
-{
-	unsigned int proto;
-
-	if (string_to_number(s, 0, 255, &proto) == -1) {
-		struct protoent *pent;
-
-		/* first deal with the special case of 'all' to prevent
-		 * people from being able to redefine 'all' in nsswitch
-		 * and/or provoke expensive [not working] ldap/nis/...
-		 * lookups */
-		if (!strcmp(s, "all"))
-			return 0;
-
-		if ((pent = getprotobyname(s)))
-			proto = pent->p_proto;
-		else {
-			unsigned int i;
-			for (i = 0;
-			     i < sizeof(chain_protos)/sizeof(struct pprot);
-			     i++) {
-				if (strcmp(s, chain_protos[i].name) == 0) {
-					proto = chain_protos[i].num;
-					break;
-				}
-			}
-			if (i == sizeof(chain_protos)/sizeof(struct pprot))
-				exit_error(PARAMETER_PROBLEM,
-					   "unknown protocol `%s' specified",
-					   s);
-		}
-	}
-
-	return (u_int16_t)proto;
 }
 
 /* These are invalid numbers as upper layer protocol */
@@ -549,7 +456,7 @@ parse_rulenumber(const char *rule)
 {
 	unsigned int rulenum;
 
-	if (string_to_number(rule, 1, INT_MAX, &rulenum) == -1)
+	if (!xtables_strtoui(rule, NULL, &rulenum, 1, INT_MAX))
 		exit_error(PARAMETER_PROBLEM,
 			   "Invalid rule number `%s'", rule);
 
@@ -758,7 +665,7 @@ print_firewall(const struct ip6t_entry *fw,
 
 	fputc(fw->ipv6.invflags & IP6T_INV_PROTO ? '!' : ' ', stdout);
 	{
-		char *pname = proto_to_name(fw->ipv6.proto, format&FMT_NUMERIC);
+		const char *pname = proto_to_name(fw->ipv6.proto, format&FMT_NUMERIC);
 		if (pname)
 			printf(FMT("%-5s", "%s "), pname);
 		else
@@ -809,10 +716,10 @@ print_firewall(const struct ip6t_entry *fw,
 		printf(FMT("%-19s ","%s "), "anywhere");
 	else {
 		if (format & FMT_NUMERIC)
-			sprintf(buf, "%s", ip6addr_to_numeric(&fw->ipv6.src));
+			strcpy(buf, xtables_ip6addr_to_numeric(&fw->ipv6.src));
 		else
-			sprintf(buf, "%s", ip6addr_to_anyname(&fw->ipv6.src));
-		strcat(buf, ip6mask_to_numeric(&fw->ipv6.smsk));
+			strcpy(buf, xtables_ip6addr_to_anyname(&fw->ipv6.src));
+		strcat(buf, xtables_ip6mask_to_numeric(&fw->ipv6.smsk));
 		printf(FMT("%-19s ","%s "), buf);
 	}
 
@@ -822,10 +729,10 @@ print_firewall(const struct ip6t_entry *fw,
 		printf(FMT("%-19s ","-> %s"), "anywhere");
 	else {
 		if (format & FMT_NUMERIC)
-			sprintf(buf, "%s", ip6addr_to_numeric(&fw->ipv6.dst));
+			strcpy(buf, xtables_ip6addr_to_numeric(&fw->ipv6.dst));
 		else
-			sprintf(buf, "%s", ip6addr_to_anyname(&fw->ipv6.dst));
-		strcat(buf, ip6mask_to_numeric(&fw->ipv6.dmsk));
+			strcpy(buf, xtables_ip6addr_to_anyname(&fw->ipv6.dst));
+		strcat(buf, xtables_ip6mask_to_numeric(&fw->ipv6.dmsk));
 		printf(FMT("%-19s ","-> %s"), buf);
 	}
 
@@ -1164,10 +1071,10 @@ static void print_proto(u_int16_t proto, int invert)
 			return;
 		}
 
-		for (i = 0; i < sizeof(chain_protos)/sizeof(struct pprot); i++)
-			if (chain_protos[i].num == proto) {
+		for (i = 0; xtables_chain_protos[i].name != NULL; ++i)
+			if (xtables_chain_protos[i].num == proto) {
 				printf("-p %s%s ",
-				       invertstr, chain_protos[i].name);
+				       invertstr, xtables_chain_protos[i].name);
 				return;
 			}
 
@@ -1618,7 +1525,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			 * Option selection
 			 */
 		case 'p':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_PROTOCOL, &fw.ipv6.invflags,
 				   invert);
 
@@ -1627,7 +1534,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				*protocol = tolower(*protocol);
 
 			protocol = argv[optind-1];
-			fw.ipv6.proto = parse_protocol(protocol);
+			fw.ipv6.proto = xtables_parse_protocol(protocol);
 			fw.ipv6.flags |= IP6T_F_PROTO;
 
 			if (fw.ipv6.proto == 0
@@ -1644,14 +1551,14 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			break;
 
 		case 's':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_SOURCE, &fw.ipv6.invflags,
 				   invert);
 			shostnetworkmask = argv[optind-1];
 			break;
 
 		case 'd':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_DESTINATION, &fw.ipv6.invflags,
 				   invert);
 			dhostnetworkmask = argv[optind-1];
@@ -1697,19 +1604,19 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 
 
 		case 'i':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_VIANAMEIN, &fw.ipv6.invflags,
 				   invert);
-			parse_interface(argv[optind-1],
+			xtables_parse_interface(argv[optind-1],
 					fw.ipv6.iniface,
 					fw.ipv6.iniface_mask);
 			break;
 
 		case 'o':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_VIANAMEOUT, &fw.ipv6.invflags,
 				   invert);
-			parse_interface(argv[optind-1],
+			xtables_parse_interface(argv[optind-1],
 					fw.ipv6.outiface,
 					fw.ipv6.outiface_mask);
 			break;
@@ -1945,11 +1852,11 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 	}
 
 	if (shostnetworkmask)
-		ip6parse_hostnetworkmask(shostnetworkmask, &saddrs,
+		xtables_ip6parse_any(shostnetworkmask, &saddrs,
 		                         &fw.ipv6.smsk, &nsaddrs);
 
 	if (dhostnetworkmask)
-		ip6parse_hostnetworkmask(dhostnetworkmask, &daddrs,
+		xtables_ip6parse_any(dhostnetworkmask, &daddrs,
 		                         &fw.ipv6.dmsk, &ndaddrs);
 
 	if ((nsaddrs > 1 || ndaddrs > 1) &&

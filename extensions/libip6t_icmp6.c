@@ -123,12 +123,12 @@ parse_icmpv6(const char *icmpv6type, u_int8_t *type, u_int8_t code[])
 		if (slash)
 			*slash = '\0';
 
-		if (string_to_number(buffer, 0, 255, &number) == -1)
+		if (!xtables_strtoui(buffer, NULL, &number, 0, UINT8_MAX))
 			exit_error(PARAMETER_PROBLEM,
 				   "Invalid ICMPv6 type `%s'\n", buffer);
 		*type = number;
 		if (slash) {
-			if (string_to_number(slash+1, 0, 255, &number) == -1)
+			if (!xtables_strtoui(slash+1, NULL, &number, 0, UINT8_MAX))
 				exit_error(PARAMETER_PROBLEM,
 					   "Invalid ICMPv6 code `%s'\n",
 					   slash+1);
@@ -157,7 +157,7 @@ static int icmp6_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags == 1)
 			exit_error(PARAMETER_PROBLEM,
 				   "icmpv6 match: only use --icmpv6-type once!");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_icmpv6(argv[optind-1], &icmpv6info->type, 
 			     icmpv6info->code);
 		if (invert)

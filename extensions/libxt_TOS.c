@@ -82,10 +82,10 @@ static int tos_tg_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '=':
-		param_act(P_ONLY_ONCE, "TOS", "--set-tos", *flags & FLAG_TOS);
-		param_act(P_NO_INVERT, "TOS", "--set-tos", invert);
+		xtables_param_act(XTF_ONLY_ONCE, "TOS", "--set-tos", *flags & FLAG_TOS);
+		xtables_param_act(XTF_NO_INVERT, "TOS", "--set-tos", invert);
 		if (!tos_parse_symbolic(optarg, &tvm, 0xFF))
-			param_act(P_BAD_VALUE, "TOS", "--set-tos", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "TOS", "--set-tos", optarg);
 		if (tvm.mask != 0xFF)
 			exit_error(PARAMETER_PROBLEM, "tos match: Your kernel "
 			           "is too old to support anything besides "
@@ -107,37 +107,37 @@ static int tos_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '=': /* --set-tos */
-		param_act(P_ONLY_ONCE, "TOS", "--set-tos", *flags & FLAG_TOS);
-		param_act(P_NO_INVERT, "TOS", "--set-tos", invert);
+		xtables_param_act(XTF_ONLY_ONCE, "TOS", "--set-tos", *flags & FLAG_TOS);
+		xtables_param_act(XTF_NO_INVERT, "TOS", "--set-tos", invert);
 		if (!tos_parse_symbolic(optarg, &tvm, 0x3F))
-			param_act(P_BAD_VALUE, "TOS", "--set-tos", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "TOS", "--set-tos", optarg);
 		info->tos_value = tvm.value;
 		info->tos_mask  = tvm.mask;
 		break;
 
 	case '&': /* --and-tos */
-		param_act(P_ONLY_ONCE, "TOS", "--and-tos", *flags & FLAG_TOS);
-		param_act(P_NO_INVERT, "TOS", "--and-tos", invert);
-		if (!strtonum(optarg, NULL, &bits, 0, 0xFF))
-			param_act(P_BAD_VALUE, "TOS", "--and-tos", optarg);
+		xtables_param_act(XTF_ONLY_ONCE, "TOS", "--and-tos", *flags & FLAG_TOS);
+		xtables_param_act(XTF_NO_INVERT, "TOS", "--and-tos", invert);
+		if (!xtables_strtoui(optarg, NULL, &bits, 0, UINT8_MAX))
+			xtables_param_act(XTF_BAD_VALUE, "TOS", "--and-tos", optarg);
 		info->tos_value = 0;
 		info->tos_mask  = ~bits;
 		break;
 
 	case '|': /* --or-tos */
-		param_act(P_ONLY_ONCE, "TOS", "--or-tos", *flags & FLAG_TOS);
-		param_act(P_NO_INVERT, "TOS", "--or-tos", invert);
-		if (!strtonum(optarg, NULL, &bits, 0, 0xFF))
-			param_act(P_BAD_VALUE, "TOS", "--or-tos", optarg);
+		xtables_param_act(XTF_ONLY_ONCE, "TOS", "--or-tos", *flags & FLAG_TOS);
+		xtables_param_act(XTF_NO_INVERT, "TOS", "--or-tos", invert);
+		if (!xtables_strtoui(optarg, NULL, &bits, 0, UINT8_MAX))
+			xtables_param_act(XTF_BAD_VALUE, "TOS", "--or-tos", optarg);
 		info->tos_value = bits;
 		info->tos_mask  = bits;
 		break;
 
 	case '^': /* --xor-tos */
-		param_act(P_ONLY_ONCE, "TOS", "--xor-tos", *flags & FLAG_TOS);
-		param_act(P_NO_INVERT, "TOS", "--xor-tos", invert);
-		if (!strtonum(optarg, NULL, &bits, 0, 0xFF))
-			param_act(P_BAD_VALUE, "TOS", "--xor-tos", optarg);
+		xtables_param_act(XTF_ONLY_ONCE, "TOS", "--xor-tos", *flags & FLAG_TOS);
+		xtables_param_act(XTF_NO_INVERT, "TOS", "--xor-tos", invert);
+		if (!xtables_strtoui(optarg, NULL, &bits, 0, UINT8_MAX))
+			xtables_param_act(XTF_BAD_VALUE, "TOS", "--xor-tos", optarg);
 		info->tos_value = bits;
 		info->tos_mask  = 0;
 		break;

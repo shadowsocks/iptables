@@ -52,7 +52,7 @@ parse_opts_num(const char *idstr, const char *typestr)
 		exit_error(PARAMETER_PROBLEM,
 			   "hbh: error parsing %s `%s'", typestr, idstr);
 	}
-	return (u_int32_t) id;
+	return id;
 }
 
 static int
@@ -75,12 +75,11 @@ parse_options(const char *optsstr, u_int16_t *opts)
                                            "too many ports specified");
                         *range++ = '\0';
                 }
-                opts[i] = (u_int16_t)((parse_opts_num(cp,"opt") & 0x000000FF)<<8); 
+		opts[i] = (parse_opts_num(cp, "opt") & 0xFF) << 8;
                 if (range) {
 			if (opts[i] == 0)
         			exit_error(PARAMETER_PROBLEM, "PAD0 hasn't got length");
-                        opts[i] |= (u_int16_t)(parse_opts_num(range,"length") &
-					0x000000FF);
+			opts[i] |= parse_opts_num(range, "length") & 0xFF;
                 } else {
                         opts[i] |= (0x00FF);
 		}
@@ -121,7 +120,7 @@ static int hbh_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IP6T_OPTS_LEN)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--hbh-len' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		optinfo->hdrlen = parse_opts_num(argv[optind-1], "length");
 		if (invert)
 			optinfo->invflags |= IP6T_OPTS_INV_LEN;
@@ -132,7 +131,7 @@ static int hbh_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IP6T_OPTS_OPTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--hbh-opts' allowed");
-                check_inverse(optarg, &invert, &optind, 0);
+                xtables_check_inverse(optarg, &invert, &optind, 0);
                 if (invert)
                         exit_error(PARAMETER_PROBLEM,
 				" '!' not allowed with `--hbh-opts'");

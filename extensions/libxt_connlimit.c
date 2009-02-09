@@ -63,7 +63,7 @@ static int connlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				"--connlimit-above may be given only once");
 		*flags |= 0x1;
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		info->limit   = strtoul(argv[optind-1], NULL, 0);
 		info->inverse = invert;
 		break;

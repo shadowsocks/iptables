@@ -44,13 +44,13 @@ parse_tcp_ports(const char *portstring, u_int16_t *ports)
 
 	buffer = strdup(portstring);
 	if ((cp = strchr(buffer, ':')) == NULL)
-		ports[0] = ports[1] = parse_port(buffer, "tcp");
+		ports[0] = ports[1] = xtables_parse_port(buffer, "tcp");
 	else {
 		*cp = '\0';
 		cp++;
 
-		ports[0] = buffer[0] ? parse_port(buffer, "tcp") : 0;
-		ports[1] = cp[0] ? parse_port(cp, "tcp") : 0xFFFF;
+		ports[0] = buffer[0] ? xtables_parse_port(buffer, "tcp") : 0;
+		ports[1] = cp[0] ? xtables_parse_port(cp, "tcp") : 0xFFFF;
 
 		if (ports[0] > ports[1])
 			exit_error(PARAMETER_PROBLEM,
@@ -121,10 +121,10 @@ parse_tcp_option(const char *option, u_int8_t *result)
 {
 	unsigned int ret;
 
-	if (string_to_number(option, 1, 255, &ret) == -1)
+	if (!xtables_strtoui(option, NULL, &ret, 1, UINT8_MAX))
 		exit_error(PARAMETER_PROBLEM, "Bad TCP option `%s'", option);
 
-	*result = (u_int8_t)ret;
+	*result = ret;
 }
 
 static void tcp_init(struct xt_entry_match *m)
@@ -150,7 +150,7 @@ tcp_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & TCP_SRC_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--source-port' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_ports(argv[optind-1], tcpinfo->spts);
 		if (invert)
 			tcpinfo->invflags |= XT_TCP_INV_SRCPT;
@@ -161,7 +161,7 @@ tcp_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & TCP_DST_PORTS)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--destination-port' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_ports(argv[optind-1], tcpinfo->dpts);
 		if (invert)
 			tcpinfo->invflags |= XT_TCP_INV_DSTPT;
@@ -182,7 +182,7 @@ tcp_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one of `--syn' or `--tcp-flags' "
 				   " allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if (!argv[optind]
 		    || argv[optind][0] == '-' || argv[optind][0] == '!')
@@ -199,7 +199,7 @@ tcp_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & TCP_OPTION)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--tcp-option' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_option(argv[optind-1], &tcpinfo->option);
 		if (invert)
 			tcpinfo->invflags |= XT_TCP_INV_OPTION;

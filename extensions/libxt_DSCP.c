@@ -48,7 +48,7 @@ parse_dscp(const char *s, struct xt_DSCP_info *dinfo)
 {
 	unsigned int dscp;
        
-	if (string_to_number(s, 0, 255, &dscp) == -1)
+	if (!xtables_strtoui(s, NULL, &dscp, 0, UINT8_MAX))
 		exit_error(PARAMETER_PROBLEM,
 			   "Invalid dscp `%s'\n", s);
 
@@ -56,8 +56,7 @@ parse_dscp(const char *s, struct xt_DSCP_info *dinfo)
 		exit_error(PARAMETER_PROBLEM,
 			   "DSCP `%d` out of range\n", dscp);
 
-    	dinfo->dscp = (u_int8_t )dscp;
-    	return;
+	dinfo->dscp = dscp;
 }
 
 
@@ -67,7 +66,7 @@ parse_class(const char *s, struct xt_DSCP_info *dinfo)
 	unsigned int dscp = class_to_dscp(s);
 
 	/* Assign the value */
-	dinfo->dscp = (u_int8_t)dscp;
+	dinfo->dscp = dscp;
 }
 
 

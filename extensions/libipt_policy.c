@@ -128,7 +128,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 	unsigned int naddr = 0;
 	int mode;
 
-	check_inverse(optarg, &invert, &optind, 0);
+	xtables_check_inverse(optarg, &invert, &optind, 0);
 
 	switch (c) {
 	case '1':
@@ -182,7 +182,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: double --tunnel-src option");
 
-		ipparse_hostnetworkmask(argv[optind-1], &addr, &mask, &naddr);
+		xtables_ipparse_any(argv[optind-1], &addr, &mask, &naddr);
 		if (naddr > 1)
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: name resolves to multiple IPs");
@@ -197,7 +197,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: double --tunnel-dst option");
 
-		ipparse_hostnetworkmask(argv[optind-1], &addr, &mask, &naddr);
+		xtables_ipparse_any(argv[optind-1], &addr, &mask, &naddr);
 		if (naddr > 1)
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: name resolves to multiple IPs");
@@ -212,7 +212,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: double --proto option");
 
-		e->proto = parse_protocol(argv[optind-1]);
+		e->proto = xtables_parse_protocol(argv[optind-1]);
 		if (e->proto != IPPROTO_AH && e->proto != IPPROTO_ESP &&
 		    e->proto != IPPROTO_COMP)
 			exit_error(PARAMETER_PROBLEM,
@@ -352,14 +352,14 @@ static void print_entry(char *prefix, const struct ipt_policy_elem *e,
 	if (e->match.daddr) {
 		PRINT_INVERT(e->invert.daddr);
 		printf("%stunnel-dst %s%s ", prefix,
-		       ipaddr_to_numeric((const void *)&e->daddr),
-		       ipmask_to_numeric((const void *)&e->dmask));
+		       xtables_ipaddr_to_numeric((const void *)&e->daddr),
+		       xtables_ipmask_to_numeric((const void *)&e->dmask));
 	}
 	if (e->match.saddr) {
 		PRINT_INVERT(e->invert.saddr);
 		printf("%stunnel-src %s%s ", prefix,
-		       ipaddr_to_numeric((const void *)&e->saddr),
-		       ipmask_to_numeric((const void *)&e->smask));
+		       xtables_ipaddr_to_numeric((const void *)&e->saddr),
+		       xtables_ipmask_to_numeric((const void *)&e->smask));
 	}
 }
 

@@ -55,7 +55,8 @@ static int __TCPMSS_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
 			           "TCPMSS target: Only one option may be specified");
-		if (string_to_number(optarg, 0, 65535 - hdrsize, &mssval) == -1)
+		if (!xtables_strtoui(optarg, NULL, &mssval,
+		    0, UINT16_MAX - hdrsize))
 			exit_error(PARAMETER_PROBLEM, "Bad TCPMSS value `%s'", optarg);
 		
 		mssinfo->mss = mssval;

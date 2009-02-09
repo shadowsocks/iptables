@@ -50,18 +50,11 @@ main(int argc, char *argv[])
 	struct ip6tc_handle *handle = NULL;
 
 	program_name = "ip6tables";
-	program_version = XTABLES_VERSION;
+	program_version = IPTABLES_VERSION;
 
-	lib_dir = getenv("XTABLES_LIBDIR");
-	if (lib_dir == NULL) {
-		lib_dir = getenv("IP6TABLES_LIB_DIR");
-		if (lib_dir != NULL)
-			fprintf(stderr, "IP6TABLES_LIB_DIR is deprecated, "
-			        "use XTABLES_LIBDIR.\n");
-	}
-	if (lib_dir == NULL)
-		lib_dir = XTABLES_LIBDIR;
-
+	xtables_program_name = program_name;
+	xtables_init();
+	xtables_set_nfproto(NFPROTO_IPV6);
 #ifdef NO_SHARED_LIBS
 	init_extensions();
 #endif

@@ -110,7 +110,7 @@ name_to_proto(const char *s)
         			s);
         }
 
-        return (u_int16_t)proto;
+        return proto;
 }
 
 static unsigned int 
@@ -192,7 +192,7 @@ ipv6header_parse(int c, char **argv, int invert, unsigned int *flags,
 				exit_error(PARAMETER_PROBLEM,
 					"Only one `--header' allowed");
 
-			check_inverse(optarg, &invert, &optind, 0);
+			xtables_check_inverse(optarg, &invert, &optind, 0);
 
 			if (! (info->matchflags = parse_header(argv[optind-1])) )
 				exit_error(PARAMETER_PROBLEM, "ip6t_ipv6header: cannot parse header names");
@@ -262,8 +262,6 @@ static void ipv6header_print(const void *ip,
 
 	if (info->modeflag)
 		printf("soft ");
-
-	return;
 }
 
 static void ipv6header_save(const void *ip, const struct xt_entry_match *match)
@@ -276,8 +274,6 @@ static void ipv6header_save(const void *ip, const struct xt_entry_match *match)
 	printf(" ");
 	if (info->modeflag)
 		printf("--soft ");
-
-	return;
 }
 
 static struct xtables_match ipv6header_mt6_reg = {

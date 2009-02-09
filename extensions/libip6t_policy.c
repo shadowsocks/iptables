@@ -160,7 +160,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 	unsigned int naddr = 0;
 	int mode;
 
-	check_inverse(optarg, &invert, &optind, 0);
+	xtables_check_inverse(optarg, &invert, &optind, 0);
 
 	switch (c) {
 	case '1':
@@ -214,7 +214,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: double --tunnel-src option");
 
-		ip6parse_hostnetworkmask(argv[optind-1], &addr, &mask, &naddr);
+		xtables_ip6parse_any(argv[optind-1], &addr, &mask, &naddr);
 		if (naddr > 1)
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: name resolves to multiple IPs");
@@ -229,7 +229,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: double --tunnel-dst option");
 
-		ip6parse_hostnetworkmask(argv[optind-1], &addr, &mask, &naddr);
+		xtables_ip6parse_any(argv[optind-1], &addr, &mask, &naddr);
 		if (naddr > 1)
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: name resolves to multiple IPs");
@@ -244,7 +244,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 			           "policy match: double --proto option");
 
-		e->proto = parse_protocol(argv[optind-1]);
+		e->proto = xtables_parse_protocol(argv[optind-1]);
 		if (e->proto != IPPROTO_AH && e->proto != IPPROTO_ESP &&
 		    e->proto != IPPROTO_COMP)
 			exit_error(PARAMETER_PROBLEM,

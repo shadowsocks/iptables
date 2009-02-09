@@ -75,21 +75,21 @@ parse_to(char *arg, struct ip_nat_range *range)
 	if (slash)
 		*slash = '\0';
 
-	ip = numeric_to_ipaddr(arg);
+	ip = xtables_numeric_to_ipaddr(arg);
 	if (!ip)
 		exit_error(PARAMETER_PROBLEM, "Bad IP address `%s'\n",
 			   arg);
 	range->min_ip = ip->s_addr;
 	if (slash) {
 		if (strchr(slash+1, '.')) {
-			ip = numeric_to_ipmask(slash+1);
+			ip = xtables_numeric_to_ipmask(slash+1);
 			if (!ip)
 				exit_error(PARAMETER_PROBLEM, "Bad netmask `%s'\n",
 					   slash+1);
 			netmask = ip->s_addr;
 		}
 		else {
-			if (string_to_number(slash+1, 0, 32, &bits) == -1)
+			if (!xtables_strtoui(slash+1, NULL, &bits, 0, 32))
 				exit_error(PARAMETER_PROBLEM, "Bad netmask `%s'\n",
 					   slash+1);
 			netmask = bits2netmask(bits);
@@ -118,7 +118,7 @@ static int NETMAP_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --%s", NETMAP_opts[0].name);
 
@@ -148,11 +148,11 @@ static void NETMAP_print(const void *ip, const struct xt_entry_target *target,
 	int bits;
 
 	a.s_addr = r->min_ip;
-	printf("%s", ipaddr_to_numeric(&a));
+	printf("%s", xtables_ipaddr_to_numeric(&a));
 	a.s_addr = ~(r->min_ip ^ r->max_ip);
 	bits = netmask2bits(a.s_addr);
 	if (bits < 0)
-		printf("/%s", ipaddr_to_numeric(&a));
+		printf("/%s", xtables_ipaddr_to_numeric(&a));
 	else
 		printf("/%d", bits);
 }

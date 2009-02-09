@@ -30,7 +30,7 @@ const char *program_version;
 
 #ifndef IPTABLES_MULTI
 int line = 0;
-void exit_error(enum exittype status, const char *msg, ...)
+void exit_error(enum xtables_exittype status, const char *msg, ...)
 {
 	va_list args;
 
@@ -531,8 +531,6 @@ do_rule_part(char *leveltag1, char *leveltag2, int part, int argc,
 	if (level1)
 		printf("%s", leveli1);
 	CLOSE_LEVEL(1);
-
-	return;
 }
 
 static int
@@ -645,7 +643,7 @@ main(int argc, char *argv[])
 	FILE *in;
 
 	program_name = "iptables-xml";
-	program_version = XTABLES_VERSION;
+	program_version = IPTABLES_VERSION;
 	line = 0;
 
 	while ((c = getopt_long(argc, argv, "cvh", options, NULL)) != -1) {
@@ -658,7 +656,7 @@ main(int argc, char *argv[])
 			verbose = 1;
 			break;
 		case 'h':
-			print_usage("iptables-xml", XTABLES_VERSION);
+			print_usage("iptables-xml", IPTABLES_VERSION);
 			break;
 		}
 	}

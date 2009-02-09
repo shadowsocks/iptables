@@ -194,22 +194,6 @@ const char *program_name;
 
 int kernel_version;
 
-/* A few hardcoded protocols for 'all' and in case the user has no
-   /etc/protocols */
-struct pprot {
-	char *name;
-	u_int8_t num;
-};
-
-struct afinfo afinfo = {
-	.family		= NFPROTO_IPV4,
-	.libprefix	= "libipt_",
-	.ipproto	= IPPROTO_IP,
-	.kmod		= "ip_tables",
-	.so_rev_match	= IPT_SO_GET_REVISION_MATCH,
-	.so_rev_target	= IPT_SO_GET_REVISION_TARGET,
-};
-
 /* Primitive headers... */
 /* defined in netinet/in.h */
 #if 0
@@ -221,18 +205,7 @@ struct afinfo afinfo = {
 #endif
 #endif
 
-static const struct pprot chain_protos[] = {
-	{ "tcp", IPPROTO_TCP },
-	{ "udp", IPPROTO_UDP },
-	{ "udplite", IPPROTO_UDPLITE },
-	{ "icmp", IPPROTO_ICMP },
-	{ "esp", IPPROTO_ESP },
-	{ "ah", IPPROTO_AH },
-	{ "sctp", IPPROTO_SCTP },
-	{ "all", 0 },
-};
-
-static char *
+static const char *
 proto_to_name(u_int8_t proto, int nolookup)
 {
 	unsigned int i;
@@ -243,9 +216,9 @@ proto_to_name(u_int8_t proto, int nolookup)
 			return pent->p_name;
 	}
 
-	for (i = 0; i < sizeof(chain_protos)/sizeof(struct pprot); i++)
-		if (chain_protos[i].num == proto)
-			return chain_protos[i].name;
+	for (i = 0; xtables_chain_protos[i].name != NULL; ++i)
+		if (xtables_chain_protos[i].num == proto)
+			return xtables_chain_protos[i].name;
 
 	return NULL;
 }
@@ -367,7 +340,7 @@ exit_printhelp(struct iptables_rule_match *matches)
 }
 
 void
-exit_error(enum exittype status, const char *msg, ...)
+exit_error(enum xtables_exittype status, const char *msg, ...)
 {
 	va_list args;
 
@@ -452,26 +425,6 @@ add_command(unsigned int *cmd, const int newcmd, const int othercmds,
 	*cmd |= newcmd;
 }
 
-int
-check_inverse(const char option[], int *invert, int *my_optind, int argc)
-{
-	if (option && strcmp(option, "!") == 0) {
-		if (*invert)
-			exit_error(PARAMETER_PROBLEM,
-				   "Multiple `!' flags not allowed");
-		*invert = TRUE;
-		if (my_optind != NULL) {
-			++*my_optind;
-			if (argc && *my_optind > argc)
-				exit_error(PARAMETER_PROBLEM,
-					   "no argument following `!'");
-		}
-
-		return TRUE;
-	}
-	return FALSE;
-}
-
 /*
  *	All functions starting with "parse" should succeed, otherwise
  *	the program fails.
@@ -488,8 +441,8 @@ find_proto(const char *pname, enum xtables_tryload tryload,
 {
 	unsigned int proto;
 
-	if (string_to_number(pname, 0, 255, &proto) != -1) {
-		char *protoname = proto_to_name(proto, nolookup);
+	if (xtables_strtoui(pname, NULL, &proto, 0, UINT8_MAX)) {
+		const char *protoname = proto_to_name(proto, nolookup);
 
 		if (protoname)
 			return xtables_find_match(protoname, tryload, matches);
@@ -499,50 +452,13 @@ find_proto(const char *pname, enum xtables_tryload tryload,
 	return NULL;
 }
 
-u_int16_t
-parse_protocol(const char *s)
-{
-	unsigned int proto;
-
-	if (string_to_number(s, 0, 255, &proto) == -1) {
-		struct protoent *pent;
-
-		/* first deal with the special case of 'all' to prevent
-		 * people from being able to redefine 'all' in nsswitch
-		 * and/or provoke expensive [not working] ldap/nis/... 
-		 * lookups */
-		if (!strcmp(s, "all"))
-			return 0;
-
-		if ((pent = getprotobyname(s)))
-			proto = pent->p_proto;
-		else {
-			unsigned int i;
-			for (i = 0;
-			     i < sizeof(chain_protos)/sizeof(struct pprot);
-			     i++) {
-				if (strcmp(s, chain_protos[i].name) == 0) {
-					proto = chain_protos[i].num;
-					break;
-				}
-			}
-			if (i == sizeof(chain_protos)/sizeof(struct pprot))
-				exit_error(PARAMETER_PROBLEM,
-					   "unknown protocol `%s' specified",
-					   s);
-		}
-	}
-
-	return (u_int16_t)proto;
-}
-
 /* Can't be zero. */
 static int
 parse_rulenumber(const char *rule)
 {
 	unsigned int rulenum;
 
-	if (string_to_number(rule, 1, INT_MAX, &rulenum) == -1)
+	if (!xtables_strtoui(rule, NULL, &rulenum, 1, INT_MAX))
 		exit_error(PARAMETER_PROBLEM,
 			   "Invalid rule number `%s'", rule);
 
@@ -753,7 +669,7 @@ print_firewall(const struct ipt_entry *fw,
 
 	fputc(fw->ip.invflags & IPT_INV_PROTO ? '!' : ' ', stdout);
 	{
-		char *pname = proto_to_name(fw->ip.proto, format&FMT_NUMERIC);
+		const char *pname = proto_to_name(fw->ip.proto, format&FMT_NUMERIC);
 		if (pname)
 			printf(FMT("%-5s", "%s "), pname);
 		else
@@ -803,10 +719,10 @@ print_firewall(const struct ipt_entry *fw,
 		printf(FMT("%-19s ","%s "), "anywhere");
 	else {
 		if (format & FMT_NUMERIC)
-			sprintf(buf, "%s", ipaddr_to_numeric(&fw->ip.src));
+			strcpy(buf, xtables_ipaddr_to_numeric(&fw->ip.src));
 		else
-			sprintf(buf, "%s", ipaddr_to_anyname(&fw->ip.src));
-		strcat(buf, ipmask_to_numeric(&fw->ip.smsk));
+			strcpy(buf, xtables_ipaddr_to_anyname(&fw->ip.src));
+		strcat(buf, xtables_ipmask_to_numeric(&fw->ip.smsk));
 		printf(FMT("%-19s ","%s "), buf);
 	}
 
@@ -815,10 +731,10 @@ print_firewall(const struct ipt_entry *fw,
 		printf(FMT("%-19s ","-> %s"), "anywhere");
 	else {
 		if (format & FMT_NUMERIC)
-			sprintf(buf, "%s", ipaddr_to_numeric(&fw->ip.dst));
+			strcpy(buf, xtables_ipaddr_to_numeric(&fw->ip.dst));
 		else
-			sprintf(buf, "%s", ipaddr_to_anyname(&fw->ip.dst));
-		strcat(buf, ipmask_to_numeric(&fw->ip.dmsk));
+			strcpy(buf, xtables_ipaddr_to_anyname(&fw->ip.dst));
+		strcat(buf, xtables_ipmask_to_numeric(&fw->ip.dmsk));
 		printf(FMT("%-19s ","-> %s"), buf);
 	}
 
@@ -1127,10 +1043,10 @@ static void print_proto(u_int16_t proto, int invert)
 			return;
 		}
 
-		for (i = 0; i < sizeof(chain_protos)/sizeof(struct pprot); i++)
-			if (chain_protos[i].num == proto) {
+		for (i = 0; xtables_chain_protos[i].name != NULL; ++i)
+			if (xtables_chain_protos[i].num == proto) {
 				printf("-p %s%s ",
-				       invertstr, chain_protos[i].name);
+				       invertstr, xtables_chain_protos[i].name);
 				return;
 			}
 
@@ -1631,7 +1547,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 			 * Option selection
 			 */
 		case 'p':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_PROTOCOL, &fw.ip.invflags,
 				   invert);
 
@@ -1640,7 +1556,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 				*protocol = tolower(*protocol);
 
 			protocol = argv[optind-1];
-			fw.ip.proto = parse_protocol(protocol);
+			fw.ip.proto = xtables_parse_protocol(protocol);
 
 			if (fw.ip.proto == 0
 			    && (fw.ip.invflags & IPT_INV_PROTO))
@@ -1649,14 +1565,14 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 			break;
 
 		case 's':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_SOURCE, &fw.ip.invflags,
 				   invert);
 			shostnetworkmask = argv[optind-1];
 			break;
 
 		case 'd':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_DESTINATION, &fw.ip.invflags,
 				   invert);
 			dhostnetworkmask = argv[optind-1];
@@ -1702,19 +1618,19 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 
 
 		case 'i':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_VIANAMEIN, &fw.ip.invflags,
 				   invert);
-			parse_interface(argv[optind-1],
+			xtables_parse_interface(argv[optind-1],
 					fw.ip.iniface,
 					fw.ip.iniface_mask);
 			break;
 
 		case 'o':
-			check_inverse(optarg, &invert, &optind, argc);
+			xtables_check_inverse(optarg, &invert, &optind, argc);
 			set_option(&options, OPT_VIANAMEOUT, &fw.ip.invflags,
 				   invert);
-			parse_interface(argv[optind-1],
+			xtables_parse_interface(argv[optind-1],
 					fw.ip.outiface,
 					fw.ip.outiface_mask);
 			break;
@@ -1974,11 +1890,11 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 	}
 
 	if (shostnetworkmask)
-		ipparse_hostnetworkmask(shostnetworkmask, &saddrs,
+		xtables_ipparse_any(shostnetworkmask, &saddrs,
 					&fw.ip.smsk, &nsaddrs);
 
 	if (dhostnetworkmask)
-		ipparse_hostnetworkmask(dhostnetworkmask, &daddrs,
+		xtables_ipparse_any(dhostnetworkmask, &daddrs,
 					&fw.ip.dmsk, &ndaddrs);
 
 	if ((nsaddrs > 1 || ndaddrs > 1) &&

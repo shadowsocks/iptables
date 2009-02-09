@@ -93,7 +93,7 @@ static unsigned int name_to_type(const char *name)
 	} else {
 		unsigned int number;
 
-		if (string_to_number(name, 0, 255, &number) == -1)
+		if (!xtables_strtoui(name, NULL, &number, 0, UINT8_MAX))
 			exit_error(PARAMETER_PROBLEM,
 				   "Invalid MH type `%s'\n", name);
 		return number;
@@ -134,7 +134,7 @@ static int mh_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & MH_TYPES)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--mh-type' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_mh_types(argv[optind-1], mhinfo->types);
 		if (invert)
 			mhinfo->invflags |= IP6T_MH_INV_TYPE;

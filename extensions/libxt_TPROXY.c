@@ -40,34 +40,34 @@ static void parse_tproxy_lport(const char *s, struct xt_tproxy_target_info *info
 {
 	unsigned int lport;
 
-	if (string_to_number(s, 0, 65535, &lport) != -1)
+	if (xtables_strtoui(s, NULL, &lport, 0, UINT16_MAX))
 		info->lport = htons(lport);
 	else
-		param_act(P_BAD_VALUE, "TPROXY", "--on-port", s);
+		xtables_param_act(XTF_BAD_VALUE, "TPROXY", "--on-port", s);
 }
 
 static void parse_tproxy_laddr(const char *s, struct xt_tproxy_target_info *info)
 {
 	struct in_addr *laddr;
 
-	if ((laddr = numeric_to_ipaddr(s)) == NULL)
-		param_act(P_BAD_VALUE, "TPROXY", "--on-ip", s);
+	if ((laddr = xtables_numeric_to_ipaddr(s)) == NULL)
+		xtables_param_act(XTF_BAD_VALUE, "TPROXY", "--on-ip", s);
 
 	info->laddr = laddr->s_addr;
 }
 
 static void parse_tproxy_mark(char *s, struct xt_tproxy_target_info *info)
 {
-	unsigned int value, mask = ~0U;
+	unsigned int value, mask = UINT32_MAX;
 	char *end;
 
-	if (!strtonum(s, &end, &value, 0, UINT_MAX))
-		param_act(P_BAD_VALUE, "TPROXY", "--tproxy-mark", s);
+	if (!xtables_strtoui(s, &end, &value, 0, UINT32_MAX))
+		xtables_param_act(XTF_BAD_VALUE, "TPROXY", "--tproxy-mark", s);
 	if (*end == '/')
-		if (!strtonum(end + 1, &end, &mask, 0, UINT_MAX))
-			param_act(P_BAD_VALUE, "TPROXY", "--tproxy-mark", s);
+		if (!xtables_strtoui(end + 1, &end, &mask, 0, UINT32_MAX))
+			xtables_param_act(XTF_BAD_VALUE, "TPROXY", "--tproxy-mark", s);
 	if (*end != '\0')
-		param_act(P_BAD_VALUE, "TPROXY", "--tproxy-mark", s);
+		xtables_param_act(XTF_BAD_VALUE, "TPROXY", "--tproxy-mark", s);
 
 	info->mark_mask = mask;
 	info->mark_value = value;
@@ -80,20 +80,20 @@ static int tproxy_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		param_act(P_ONLY_ONCE, "TPROXY", "--on-port", *flags & PARAM_ONPORT);
-		param_act(P_NO_INVERT, "TPROXY", "--on-port", invert);
+		xtables_param_act(XTF_ONLY_ONCE, "TPROXY", "--on-port", *flags & PARAM_ONPORT);
+		xtables_param_act(XTF_NO_INVERT, "TPROXY", "--on-port", invert);
 		parse_tproxy_lport(optarg, tproxyinfo);
 		*flags |= PARAM_ONPORT;
 		return 1;
 	case '2':
-		param_act(P_ONLY_ONCE, "TPROXY", "--on-ip", *flags & PARAM_ONIP);
-		param_act(P_NO_INVERT, "TPROXY", "--on-ip", invert);
+		xtables_param_act(XTF_ONLY_ONCE, "TPROXY", "--on-ip", *flags & PARAM_ONIP);
+		xtables_param_act(XTF_NO_INVERT, "TPROXY", "--on-ip", invert);
 		parse_tproxy_laddr(optarg, tproxyinfo);
 		*flags |= PARAM_ONIP;
 		return 1;
 	case '3':
-		param_act(P_ONLY_ONCE, "TPROXY", "--tproxy-mark", *flags & PARAM_MARK);
-		param_act(P_NO_INVERT, "TPROXY", "--tproxy-mark", invert);
+		xtables_param_act(XTF_ONLY_ONCE, "TPROXY", "--tproxy-mark", *flags & PARAM_MARK);
+		xtables_param_act(XTF_NO_INVERT, "TPROXY", "--tproxy-mark", invert);
 		parse_tproxy_mark(optarg, tproxyinfo);
 		*flags |= PARAM_MARK;
 		return 1;
@@ -114,7 +114,7 @@ static void tproxy_tg_print(const void *ip, const struct xt_entry_target *target
 {
 	const struct xt_tproxy_target_info *info = (const void *)target->data;
 	printf("TPROXY redirect %s:%u mark 0x%x/0x%x",
-	       ipaddr_to_numeric((const struct in_addr *)&info->laddr),
+	       xtables_ipaddr_to_numeric((const struct in_addr *)&info->laddr),
 	       ntohs(info->lport), (unsigned int)info->mark_value,
 	       (unsigned int)info->mark_mask);
 }
@@ -125,7 +125,7 @@ static void tproxy_tg_save(const void *ip, const struct xt_entry_target *target)
 
 	printf("--on-port %u ", ntohs(info->lport));
 	printf("--on-ip %s ",
-	       ipaddr_to_numeric((const struct in_addr *)&info->laddr));
+	       xtables_ipaddr_to_numeric((const struct in_addr *)&info->laddr));
 	printf("--tproxy-mark 0x%x/0x%x ",
 	       (unsigned int)info->mark_value, (unsigned int)info->mark_mask);
 }

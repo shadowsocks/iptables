@@ -228,7 +228,7 @@ parse_expire(const char *s)
 {
 	unsigned int len;
 
-	if (string_to_number(s, 0, 0, &len) == -1)
+	if (!xtables_strtoui(s, NULL, &len, 0, UINT32_MAX))
 		exit_error(PARAMETER_PROBLEM, "expire value invalid: `%s'\n", s);
 	else
 		return len;
@@ -268,14 +268,14 @@ conntrack_ps_expires(struct xt_conntrack_mtinfo1 *info, const char *s)
 	unsigned int min, max;
 	char *end;
 
-	if (!strtonum(s, &end, &min, 0, ~0))
-		param_act(P_BAD_VALUE, "conntrack", "--expires", s);
+	if (!xtables_strtoui(s, &end, &min, 0, UINT32_MAX))
+		xtables_param_act(XTF_BAD_VALUE, "conntrack", "--expires", s);
 	max = min;
 	if (*end == ':')
-		if (!strtonum(s, &end, &max, 0, ~0U))
-			param_act(P_BAD_VALUE, "conntrack", "--expires", s);
+		if (!xtables_strtoui(s, &end, &max, 0, UINT32_MAX))
+			xtables_param_act(XTF_BAD_VALUE, "conntrack", "--expires", s);
 	if (*end != '\0')
-		param_act(P_BAD_VALUE, "conntrack", "--expires", s);
+		xtables_param_act(XTF_BAD_VALUE, "conntrack", "--expires", s);
 
 	if (min > max)
 		exit_error(PARAMETER_PROBLEM,
@@ -297,7 +297,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		parse_states(argv[optind-1], sinfo);
 		if (invert) {
@@ -307,7 +307,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '2':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if(invert)
 			sinfo->invflags |= XT_CONNTRACK_PROTO;
@@ -317,7 +317,8 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 			*protocol = tolower(*protocol);
 
 		protocol = argv[optind-1];
-		sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum = parse_protocol(protocol);
+		sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum =
+			xtables_parse_protocol(protocol);
 
 		if (sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum == 0
 		    && (sinfo->invflags & XT_INV_PROTO))
@@ -328,12 +329,12 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '3':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_ORIGSRC;
 
-		ipparse_hostnetworkmask(argv[optind-1], &addrs,
+		xtables_ipparse_any(argv[optind-1], &addrs,
 					&sinfo->sipmsk[IP_CT_DIR_ORIGINAL],
 					&naddrs);
 		if(naddrs > 1)
@@ -348,12 +349,12 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '4':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_ORIGDST;
 
-		ipparse_hostnetworkmask(argv[optind-1], &addrs,
+		xtables_ipparse_any(argv[optind-1], &addrs,
 					&sinfo->dipmsk[IP_CT_DIR_ORIGINAL],
 					&naddrs);
 		if(naddrs > 1)
@@ -368,12 +369,12 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '5':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_REPLSRC;
 
-		ipparse_hostnetworkmask(argv[optind-1], &addrs,
+		xtables_ipparse_any(argv[optind-1], &addrs,
 					&sinfo->sipmsk[IP_CT_DIR_REPLY],
 					&naddrs);
 		if(naddrs > 1)
@@ -388,12 +389,12 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '6':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_REPLDST;
 
-		ipparse_hostnetworkmask(argv[optind-1], &addrs,
+		xtables_ipparse_any(argv[optind-1], &addrs,
 					&sinfo->dipmsk[IP_CT_DIR_REPLY],
 					&naddrs);
 		if(naddrs > 1)
@@ -408,7 +409,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '7':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		parse_statuses(argv[optind-1], sinfo);
 		if (invert) {
@@ -418,7 +419,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '8':
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		parse_expires(argv[optind-1], sinfo);
 		if (invert) {
@@ -455,7 +456,7 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 		/* Canonicalize into lower case */
 		for (p = optarg; *p != '\0'; ++p)
 			*p = tolower(*p);
-		info->l4proto = parse_protocol(optarg);
+		info->l4proto = xtables_parse_protocol(optarg);
 
 		if (info->l4proto == 0 && (info->invert_flags & XT_INV_PROTO))
 			exit_error(PARAMETER_PROBLEM, "conntrack: rule would "
@@ -481,8 +482,8 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case 'a': /* --ctorigsrcport */
-		if (!strtonum(optarg, NULL, &port, 0, ~(u_int16_t)0))
-			param_act(P_BAD_VALUE, "conntrack",
+		if (!xtables_strtoui(optarg, NULL, &port, 0, UINT16_MAX))
+			xtables_param_act(XTF_BAD_VALUE, "conntrack",
 			          "--ctorigsrcport", optarg);
 		info->match_flags |= XT_CONNTRACK_ORIGSRC_PORT;
 		info->origsrc_port = htons(port);
@@ -491,8 +492,8 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case 'b': /* --ctorigdstport */
-		if (!strtonum(optarg, NULL, &port, 0, ~(u_int16_t)0))
-			param_act(P_BAD_VALUE, "conntrack",
+		if (!xtables_strtoui(optarg, NULL, &port, 0, UINT16_MAX))
+			xtables_param_act(XTF_BAD_VALUE, "conntrack",
 			          "--ctorigdstport", optarg);
 		info->match_flags |= XT_CONNTRACK_ORIGDST_PORT;
 		info->origdst_port = htons(port);
@@ -501,8 +502,8 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case 'c': /* --ctreplsrcport */
-		if (!strtonum(optarg, NULL, &port, 0, ~(u_int16_t)0))
-			param_act(P_BAD_VALUE, "conntrack",
+		if (!xtables_strtoui(optarg, NULL, &port, 0, UINT16_MAX))
+			xtables_param_act(XTF_BAD_VALUE, "conntrack",
 			          "--ctreplsrcport", optarg);
 		info->match_flags |= XT_CONNTRACK_REPLSRC_PORT;
 		info->replsrc_port = htons(port);
@@ -511,8 +512,8 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case 'd': /* --ctrepldstport */
-		if (!strtonum(optarg, NULL, &port, 0, ~(u_int16_t)0))
-			param_act(P_BAD_VALUE, "conntrack",
+		if (!xtables_strtoui(optarg, NULL, &port, 0, UINT16_MAX))
+			xtables_param_act(XTF_BAD_VALUE, "conntrack",
 			          "--ctrepldstport", optarg);
 		info->match_flags |= XT_CONNTRACK_REPLDST_PORT;
 		info->repldst_port = htons(port);
@@ -521,7 +522,7 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case 'e': /* --ctdir */
-		param_act(P_NO_INVERT, "conntrack", "--ctdir", invert);
+		xtables_param_act(XTF_NO_INVERT, "conntrack", "--ctdir", invert);
 		if (strcasecmp(optarg, "ORIGINAL") == 0) {
 			info->match_flags  |= XT_CONNTRACK_DIRECTION;
 			info->invert_flags &= ~XT_CONNTRACK_DIRECTION;
@@ -529,7 +530,7 @@ conntrack_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 			info->match_flags  |= XT_CONNTRACK_DIRECTION;
 			info->invert_flags |= XT_CONNTRACK_DIRECTION;
 		} else {
-			param_act(P_BAD_VALUE, "conntrack", "--ctdir", optarg);
+			xtables_param_act(XTF_BAD_VALUE, "conntrack", "--ctdir", optarg);
 		}
 		break;
 
@@ -551,7 +552,7 @@ conntrack_mt4_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '3': /* --ctorigsrc */
-		ipparse_hostnetworkmask(optarg, &addr, &info->origsrc_mask.in,
+		xtables_ipparse_any(optarg, &addr, &info->origsrc_mask.in,
 		                        &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -564,7 +565,7 @@ conntrack_mt4_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '4': /* --ctorigdst */
-		ipparse_hostnetworkmask(optarg, &addr, &info->origdst_mask.in,
+		xtables_ipparse_any(optarg, &addr, &info->origdst_mask.in,
 		                        &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -577,7 +578,7 @@ conntrack_mt4_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '5': /* --ctreplsrc */
-		ipparse_hostnetworkmask(optarg, &addr, &info->replsrc_mask.in,
+		xtables_ipparse_any(optarg, &addr, &info->replsrc_mask.in,
 		                        &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -590,7 +591,7 @@ conntrack_mt4_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '6': /* --ctrepldst */
-		ipparse_hostnetworkmask(optarg, &addr, &info->repldst_mask.in,
+		xtables_ipparse_any(optarg, &addr, &info->repldst_mask.in,
 		                        &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -621,7 +622,7 @@ conntrack_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '3': /* --ctorigsrc */
-		ip6parse_hostnetworkmask(optarg, &addr,
+		xtables_ip6parse_any(optarg, &addr,
 		                         &info->origsrc_mask.in6, &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -634,7 +635,7 @@ conntrack_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '4': /* --ctorigdst */
-		ip6parse_hostnetworkmask(optarg, &addr,
+		xtables_ip6parse_any(optarg, &addr,
 		                         &info->origdst_mask.in6, &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -647,7 +648,7 @@ conntrack_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '5': /* --ctreplsrc */
-		ip6parse_hostnetworkmask(optarg, &addr,
+		xtables_ip6parse_any(optarg, &addr,
 		                         &info->replsrc_mask.in6, &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -660,7 +661,7 @@ conntrack_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case '6': /* --ctrepldst */
-		ip6parse_hostnetworkmask(optarg, &addr,
+		xtables_ip6parse_any(optarg, &addr,
 		                         &info->repldst_mask.in6, &naddrs);
 		if (naddrs > 1)
 			exit_error(PARAMETER_PROBLEM,
@@ -761,9 +762,9 @@ conntrack_dump_addr(const union nf_inet_addr *addr,
 			return;
 		}
 		if (numeric)
-			printf("%s ", ipaddr_to_numeric(&addr->in));
+			printf("%s ", xtables_ipaddr_to_numeric(&addr->in));
 		else
-			printf("%s ", ipaddr_to_anyname(&addr->in));
+			printf("%s ", xtables_ipaddr_to_anyname(&addr->in));
 	} else if (family == NFPROTO_IPV6) {
 		if (!numeric && addr->ip6[0] == 0 && addr->ip6[1] == 0 &&
 		    addr->ip6[2] == 0 && addr->ip6[3] == 0) {
@@ -771,9 +772,9 @@ conntrack_dump_addr(const union nf_inet_addr *addr,
 			return;
 		}
 		if (numeric)
-			printf("%s ", ip6addr_to_numeric(&addr->in6));
+			printf("%s ", xtables_ip6addr_to_numeric(&addr->in6));
 		else
-			printf("%s ", ip6addr_to_anyname(&addr->in6));
+			printf("%s ", xtables_ip6addr_to_anyname(&addr->in6));
 	}
 }
 
@@ -789,10 +790,10 @@ print_addr(struct in_addr *addr, struct in_addr *mask, int inv, int numeric)
 		printf("%s ", "anywhere");
 	else {
 		if (numeric)
-			sprintf(buf, "%s", ipaddr_to_numeric(addr));
+			strcpy(buf, xtables_ipaddr_to_numeric(addr));
 		else
-			sprintf(buf, "%s", ipaddr_to_anyname(addr));
-		strcat(buf, ipmask_to_numeric(mask));
+			strcpy(buf, xtables_ipaddr_to_anyname(addr));
+		strcat(buf, xtables_ipmask_to_numeric(mask));
 		printf("%s ", buf);
 	}
 }

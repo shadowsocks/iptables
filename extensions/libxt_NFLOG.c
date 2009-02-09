@@ -51,7 +51,7 @@ static int NFLOG_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & NFLOG_GROUP)
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --nflog-group twice");
-		if (check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --nflog-group");
 
@@ -65,7 +65,7 @@ static int NFLOG_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & NFLOG_PREFIX)
 			exit_error(PARAMETER_PROBLEM,
 				   "Can't specify --nflog-prefix twice");
-		if (check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0))
 			exit_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --nflog-prefix");
 
@@ -113,7 +113,7 @@ static void nflog_print(const struct xt_nflog_info *info, char *prefix)
 {
 	if (info->prefix[0] != '\0') {
 		printf("%snflog-prefix ", prefix);
-		save_string(info->prefix);
+		xtables_save_string(info->prefix);
 	}
 	if (info->group)
 		printf("%snflog-group %u ", prefix, info->group);

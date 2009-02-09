@@ -58,7 +58,7 @@ static int set_parse(int c, char **argv, int invert, unsigned int *flags,
 			exit_error(PARAMETER_PROBLEM,
 				   "--set can be specified only once");
 
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		if (invert)
 			info->flags[0] |= IPSET_MATCH_INV;
 

@@ -26,8 +26,8 @@ parse_tcp_mssvalue(const char *mssvalue)
 {
 	unsigned int mssvaluenum;
 
-	if (string_to_number(mssvalue, 0, 65535, &mssvaluenum) != -1)
-		return (u_int16_t)mssvaluenum;
+	if (!xtables_strtoui(mssvalue, NULL, &mssvaluenum, 0, UINT16_MAX))
+		return mssvaluenum;
 
 	exit_error(PARAMETER_PROBLEM,
 		   "Invalid mss `%s' specified", mssvalue);
@@ -65,7 +65,7 @@ tcpmss_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags)
 			exit_error(PARAMETER_PROBLEM,
 				   "Only one `--mss' allowed");
-		check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_mssvalues(argv[optind-1],
 				    &mssinfo->mss_min, &mssinfo->mss_max);
 		if (invert)

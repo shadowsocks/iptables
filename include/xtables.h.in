@@ -1,6 +1,11 @@
 #ifndef _XTABLES_H
 #define _XTABLES_H
 
+/*
+ * Changing any structs/functions may incur a needed change
+ * in libxtables_vcurrent/vage too.
+ */
+
 #include <sys/socket.h> /* PF_* */
 #include <sys/types.h>
 #include <stdbool.h>
@@ -16,14 +21,15 @@
 #ifndef IPPROTO_DCCP
 #define IPPROTO_DCCP 33
 #endif
+#ifndef IPPROTO_MH
+#	define IPPROTO_MH 135
+#endif
 #ifndef IPPROTO_UDPLITE
 #define IPPROTO_UDPLITE	136
 #endif
 
-#define XTABLES_VERSION "@PACKAGE_VERSION@"
-#define XTABLES_VERSION_CODE (0x10000 * @XTABLES_VERSION_MAJOR@ + 0x100 * @XTABLES_VERSION_MINOR@ + @XTABLES_VERSION_PATCH@)
-
-#define XTABLES_API_VERSION(x,y,z)    (0x10000*(x) + 0x100*(y) + z)
+#define XTABLES_VERSION "libxtables.so.@libxtables_vmajor@"
+#define XTABLES_VERSION_CODE @libxtables_vmajor@
 
 struct in_addr;
 
@@ -148,6 +154,17 @@ struct xtables_rule_match {
 	bool completed;
 };
 
+/**
+ * struct xtables_pprot -
+ *
+ * A few hardcoded protocols for 'all' and in case the user has no
+ * /etc/protocols.
+ */
+struct xtables_pprot {
+	const char *name;
+	u_int8_t num;
+};
+
 enum xtables_tryload {
 	XTF_DONT_LOAD,
 	XTF_DURING_LOAD,
@@ -155,10 +172,24 @@ enum xtables_tryload {
 	XTF_LOAD_MUST_SUCCEED,
 };
 
+enum xtables_exittype {
+	OTHER_PROBLEM = 1,
+	PARAMETER_PROBLEM,
+	VERSION_PROBLEM,
+	RESOURCE_PROBLEM,
+	XTF_ONLY_ONCE,
+	XTF_NO_INVERT,
+	XTF_BAD_VALUE,
+	XTF_ONE_ACTION,
+};
+
+extern const char *xtables_program_name;
 extern const char *xtables_modprobe_program;
 extern struct xtables_match *xtables_matches;
 extern struct xtables_target *xtables_targets;
 
+extern void xtables_init(void);
+extern void xtables_set_nfproto(uint8_t);
 extern void *xtables_calloc(size_t, size_t);
 extern void *xtables_malloc(size_t);
 
@@ -174,67 +205,44 @@ extern struct xtables_target *xtables_find_target(const char *name,
 extern void xtables_register_match(struct xtables_match *me);
 extern void xtables_register_target(struct xtables_target *me);
 
-extern int string_to_number_ll(const char *s,
-			       unsigned long long min,
-			       unsigned long long max,
-			       unsigned long long *ret);
-extern int string_to_number_l(const char *s,
-			      unsigned long min,
-			      unsigned long max,
-			      unsigned long *ret);
-extern int string_to_number(const char *s,
-			    unsigned int min,
-			    unsigned int max,
-			    unsigned int *ret);
-extern bool strtonuml(const char *, char **, unsigned long *,
+extern bool xtables_strtoul(const char *, char **, unsigned long *,
 	unsigned long, unsigned long);
-extern bool strtonum(const char *, char **, unsigned int *,
+extern bool xtables_strtoui(const char *, char **, unsigned int *,
 	unsigned int, unsigned int);
-extern int service_to_port(const char *name, const char *proto);
-extern u_int16_t parse_port(const char *port, const char *proto);
+extern int xtables_service_to_port(const char *name, const char *proto);
+extern u_int16_t xtables_parse_port(const char *port, const char *proto);
 extern void
-parse_interface(const char *arg, char *vianame, unsigned char *mask);
-
-enum exittype {
-	OTHER_PROBLEM = 1,
-	PARAMETER_PROBLEM,
-	VERSION_PROBLEM,
-	RESOURCE_PROBLEM,
-	P_ONLY_ONCE,
-	P_NO_INVERT,
-	P_BAD_VALUE,
-	P_ONE_ACTION,
-};
+xtables_parse_interface(const char *arg, char *vianame, unsigned char *mask);
 
 /* this is a special 64bit data type that is 8-byte aligned */
 #define aligned_u64 u_int64_t __attribute__((aligned(8)))
 
-int check_inverse(const char option[], int *invert, int *my_optind, int argc);
-void exit_error(enum exittype, const char *, ...)__attribute__((noreturn,
-							  format(printf,2,3)));
-extern void param_act(unsigned int, const char *, ...);
-extern const char *program_name, *program_version;
+int xtables_check_inverse(const char option[], int *invert,
+	int *my_optind, int argc);
+void exit_error(enum xtables_exittype, const char *, ...)
+	__attribute__((noreturn, format(printf,2,3)));
+extern void xtables_param_act(unsigned int, const char *, ...);
 
-extern const char *ipaddr_to_numeric(const struct in_addr *);
-extern const char *ipaddr_to_anyname(const struct in_addr *);
-extern const char *ipmask_to_numeric(const struct in_addr *);
-extern struct in_addr *numeric_to_ipaddr(const char *);
-extern struct in_addr *numeric_to_ipmask(const char *);
-extern void ipparse_hostnetworkmask(const char *, struct in_addr **,
+extern const char *xtables_ipaddr_to_numeric(const struct in_addr *);
+extern const char *xtables_ipaddr_to_anyname(const struct in_addr *);
+extern const char *xtables_ipmask_to_numeric(const struct in_addr *);
+extern struct in_addr *xtables_numeric_to_ipaddr(const char *);
+extern struct in_addr *xtables_numeric_to_ipmask(const char *);
+extern void xtables_ipparse_any(const char *, struct in_addr **,
 	struct in_addr *, unsigned int *);
 
-extern struct in6_addr *numeric_to_ip6addr(const char *);
-extern const char *ip6addr_to_numeric(const struct in6_addr *);
-extern const char *ip6addr_to_anyname(const struct in6_addr *);
-extern const char *ip6mask_to_numeric(const struct in6_addr *);
-extern void ip6parse_hostnetworkmask(const char *, struct in6_addr **,
+extern struct in6_addr *xtables_numeric_to_ip6addr(const char *);
+extern const char *xtables_ip6addr_to_numeric(const struct in6_addr *);
+extern const char *xtables_ip6addr_to_anyname(const struct in6_addr *);
+extern const char *xtables_ip6mask_to_numeric(const struct in6_addr *);
+extern void xtables_ip6parse_any(const char *, struct in6_addr **,
 	struct in6_addr *, unsigned int *);
 
 /**
  * Print the specified value to standard output, quoting dangerous
  * characters if required.
  */
-extern void save_string(const char *value);
+extern void xtables_save_string(const char *value);
 
 #ifdef NO_SHARED_LIBS
 #	ifdef _INIT
@@ -246,10 +254,13 @@ extern void save_string(const char *value);
 #	define _init __attribute__((constructor)) _INIT
 #endif
 
-/* Present in both iptables.c and ip6tables.c */
-extern u_int16_t parse_protocol(const char *s);
+extern const struct xtables_pprot xtables_chain_protos[];
+extern u_int16_t xtables_parse_protocol(const char *s);
 
 #ifdef XTABLES_INTERNAL
+#	ifndef ARRAY_SIZE
+#		define ARRAY_SIZE(x) (sizeof(x) / sizeof(*(x)))
+#	endif
 #	include <xtables/internal.h>
 #endif
 

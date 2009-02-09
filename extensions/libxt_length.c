@@ -26,10 +26,10 @@ parse_length(const char *s)
 {
 	unsigned int len;
 	
-	if (string_to_number(s, 0, 0xFFFF, &len) == -1)
+	if (!xtables_strtoui(s, NULL, &len, 0, UINT32_MAX))
 		exit_error(PARAMETER_PROBLEM, "length invalid: `%s'\n", s);
 	else
-		return (u_int16_t )len;
+		return len;
 }
 
 /* If a single value is provided, min and max are both set to the value */
@@ -70,7 +70,7 @@ length_parse(int c, char **argv, int invert, unsigned int *flags,
 				exit_error(PARAMETER_PROBLEM,
 				           "length: `--length' may only be "
 				           "specified once");
-			check_inverse(optarg, &invert, &optind, 0);
+			xtables_check_inverse(optarg, &invert, &optind, 0);
 			parse_lengths(argv[optind-1], info);
 			if (invert)
 				info->invert = 1;

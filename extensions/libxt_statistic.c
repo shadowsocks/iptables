@@ -40,6 +40,7 @@ statistic_parse(int c, char **argv, int invert, unsigned int *flags,
                 const void *entry, struct xt_entry_match **match)
 {
 	struct xt_statistic_info *info = (void *)(*match)->data;
+	unsigned int val;
 	double prob;
 
 	if (invert)
@@ -70,10 +71,10 @@ statistic_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '3':
 		if (*flags & 0x4)
 			exit_error(PARAMETER_PROBLEM, "double --every");
-		if (string_to_number(optarg, 0, 0xFFFFFFFF,
-				     &info->u.nth.every) == -1)
+		if (!xtables_strtoui(optarg, NULL, &val, 0, UINT32_MAX))
 			exit_error(PARAMETER_PROBLEM,
 				   "cannot parse --every `%s'", optarg);
+		info->u.nth.every = val;
 		if (info->u.nth.every == 0)
 			exit_error(PARAMETER_PROBLEM, "--every cannot be 0");
 		info->u.nth.every--;
@@ -82,10 +83,10 @@ statistic_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '4':
 		if (*flags & 0x8)
 			exit_error(PARAMETER_PROBLEM, "double --packet");
-		if (string_to_number(optarg, 0, 0xFFFFFFFF,
-				     &info->u.nth.packet) == -1)
+		if (!xtables_strtoui(optarg, NULL, &val, 0, UINT32_MAX))
 			exit_error(PARAMETER_PROBLEM,
 				   "cannot parse --packet `%s'", optarg);
+		info->u.nth.packet = val;
 		*flags |= 0x8;
 		break;
 	default:
