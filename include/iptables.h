@@ -6,8 +6,6 @@
 #include <libiptc/libiptc.h>
 #include <iptables/internal.h>
 
-extern int line;
-
 /* Your shared library should call one of these. */
 extern int do_command(int argc, char *argv[], char **table,
 		      struct iptc_handle **handle);

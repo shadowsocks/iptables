@@ -6,8 +6,6 @@
 #include <libiptc/libip6tc.h>
 #include <iptables/internal.h>
 
-extern int line;
-
 /* Your shared library should call one of these. */
 extern int do_command6(int argc, char *argv[], char **table,
 		       struct ip6tc_handle **handle);
