@@ -6,11 +6,6 @@
 #include <libiptc/libip6tc.h>
 #include <iptables/internal.h>
 
-#ifndef IP6T_SO_GET_REVISION_MATCH /* Old kernel source. */
-#define IP6T_SO_GET_REVISION_MATCH	68
-#define IP6T_SO_GET_REVISION_TARGET	69
-#endif /* IP6T_SO_GET_REVISION_MATCH   Old kernel source */
-
 extern int line;
 
 /* Your shared library should call one of these. */

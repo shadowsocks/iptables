@@ -39,6 +39,15 @@
 #ifndef NO_SHARED_LIBS
 #include <dlfcn.h>
 #endif
+#ifndef IPT_SO_GET_REVISION_MATCH /* Old kernel source. */
+#	define IPT_SO_GET_REVISION_MATCH	(IPT_BASE_CTL + 2)
+#	define IPT_SO_GET_REVISION_TARGET	(IPT_BASE_CTL + 3)
+#endif
+#ifndef IP6T_SO_GET_REVISION_MATCH /* Old kernel source. */
+#	define IP6T_SO_GET_REVISION_MATCH	68
+#	define IP6T_SO_GET_REVISION_TARGET	69
+#endif
+
 
 #define NPROTO	255
 
