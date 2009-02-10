@@ -11,8 +11,6 @@
 #define IPT_SO_GET_REVISION_TARGET	(IPT_BASE_CTL + 3)
 #endif /* IPT_SO_GET_REVISION_MATCH   Old kernel source */
 
-#define ipt_tryload		xt_tryload
-
 extern int line;
 
 /* Your shared library should call one of these. */

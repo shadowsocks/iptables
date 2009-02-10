@@ -11,8 +11,6 @@
 #define IP6T_SO_GET_REVISION_TARGET	69
 #endif /* IP6T_SO_GET_REVISION_MATCH   Old kernel source */
 
-#define ip6t_tryload		xt_tryload
-
 extern int line;
 
 /* Your shared library should call one of these. */
