@@ -3,10 +3,6 @@
 
 #define IPTABLES_VERSION "@PACKAGE_VERSION@"
 
-#ifndef XT_LIB_DIR
-#	define XT_LIB_DIR "/usr/local/lib/iptables"
-#endif
-
 /**
  * Program's own name and version.
  */
