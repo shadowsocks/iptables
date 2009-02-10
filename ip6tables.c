@@ -239,9 +239,9 @@ exit_tryhelp(int status)
 }
 
 static void
-exit_printhelp(struct ip6tables_rule_match *matches)
+exit_printhelp(struct xtables_rule_match *matches)
 {
-	struct ip6tables_rule_match *matchp = NULL;
+	struct xtables_rule_match *matchp = NULL;
 	struct xtables_target *t = NULL;
 
 	printf("%s v%s\n\n"
@@ -426,7 +426,7 @@ add_command(unsigned int *cmd, const int newcmd, const int othercmds,
 /* Christophe Burki wants `-p 6' to imply `-m tcp'.  */
 static struct xtables_match *
 find_proto(const char *pname, enum xtables_tryload tryload,
-	   int nolookup, struct ip6tables_rule_match **matches)
+	   int nolookup, struct xtables_rule_match **matches)
 {
 	unsigned int proto;
 
@@ -839,11 +839,11 @@ insert_entry(const ip6t_chainlabel chain,
 }
 
 static unsigned char *
-make_delete_mask(struct ip6t_entry *fw, struct ip6tables_rule_match *matches)
+make_delete_mask(struct ip6t_entry *fw, struct xtables_rule_match *matches)
 {
 	/* Establish mask for comparison */
 	unsigned int size;
-	struct ip6tables_rule_match *matchp;
+	struct xtables_rule_match *matchp;
 	unsigned char *mask, *mptr;
 
 	size = sizeof(struct ip6t_entry);
@@ -880,7 +880,7 @@ delete_entry(const ip6t_chainlabel chain,
 	     const struct in6_addr daddrs[],
 	     int verbose,
 	     struct ip6tc_handle *handle,
-	     struct ip6tables_rule_match *matches)
+	     struct xtables_rule_match *matches)
 {
 	unsigned int i, j;
 	int ret = 1;
@@ -1271,11 +1271,11 @@ list_rules(const ip6t_chainlabel chain, int rulenum, int counters,
 
 static struct ip6t_entry *
 generate_entry(const struct ip6t_entry *fw,
-	       struct ip6tables_rule_match *matches,
+	       struct xtables_rule_match *matches,
 	       struct ip6t_entry_target *target)
 {
 	unsigned int size;
-	struct ip6tables_rule_match *matchp;
+	struct xtables_rule_match *matchp;
 	struct ip6t_entry *e;
 
 	size = sizeof(struct ip6t_entry);
@@ -1297,9 +1297,9 @@ generate_entry(const struct ip6t_entry *fw,
 	return e;
 }
 
-static void clear_rule_matches(struct ip6tables_rule_match **matches)
+static void clear_rule_matches(struct xtables_rule_match **matches)
 {
-	struct ip6tables_rule_match *matchp, *tmp;
+	struct xtables_rule_match *matchp, *tmp;
 
 	for (matchp = *matches; matchp;) {
 		tmp = matchp->next;
@@ -1342,8 +1342,8 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 	const char *pcnt = NULL, *bcnt = NULL;
 	int ret = 1;
 	struct xtables_match *m;
-	struct ip6tables_rule_match *matches = NULL;
-	struct ip6tables_rule_match *matchp;
+	struct xtables_rule_match *matches = NULL;
+	struct xtables_rule_match *matchp;
 	struct xtables_target *target = NULL;
 	struct xtables_target *t;
 	const char *jumpto = "";

@@ -11,7 +11,6 @@
 #define IPT_SO_GET_REVISION_TARGET	(IPT_BASE_CTL + 3)
 #endif /* IPT_SO_GET_REVISION_MATCH   Old kernel source */
 
-#define iptables_rule_match	xtables_rule_match
 #define ipt_tryload		xt_tryload
 
 extern int line;

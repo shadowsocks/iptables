@@ -250,9 +250,9 @@ exit_tryhelp(int status)
 }
 
 static void
-exit_printhelp(struct iptables_rule_match *matches)
+exit_printhelp(struct xtables_rule_match *matches)
 {
-	struct iptables_rule_match *matchp = NULL;
+	struct xtables_rule_match *matchp = NULL;
 	struct xtables_target *t = NULL;
 
 	printf("%s v%s\n\n"
@@ -437,7 +437,7 @@ add_command(unsigned int *cmd, const int newcmd, const int othercmds,
 /* Christophe Burki wants `-p 6' to imply `-m tcp'.  */
 static struct xtables_match *
 find_proto(const char *pname, enum xtables_tryload tryload,
-	   int nolookup, struct iptables_rule_match **matches)
+	   int nolookup, struct xtables_rule_match **matches)
 {
 	unsigned int proto;
 
@@ -841,11 +841,11 @@ insert_entry(const ipt_chainlabel chain,
 }
 
 static unsigned char *
-make_delete_mask(struct ipt_entry *fw, struct iptables_rule_match *matches)
+make_delete_mask(struct ipt_entry *fw, struct xtables_rule_match *matches)
 {
 	/* Establish mask for comparison */
 	unsigned int size;
-	struct iptables_rule_match *matchp;
+	struct xtables_rule_match *matchp;
 	unsigned char *mask, *mptr;
 
 	size = sizeof(struct ipt_entry);
@@ -882,7 +882,7 @@ delete_entry(const ipt_chainlabel chain,
 	     const struct in_addr daddrs[],
 	     int verbose,
 	     struct iptc_handle *handle,
-	     struct iptables_rule_match *matches)
+	     struct xtables_rule_match *matches)
 {
 	unsigned int i, j;
 	int ret = 1;
@@ -1279,11 +1279,11 @@ list_rules(const ipt_chainlabel chain, int rulenum, int counters,
 
 static struct ipt_entry *
 generate_entry(const struct ipt_entry *fw,
-	       struct iptables_rule_match *matches,
+	       struct xtables_rule_match *matches,
 	       struct ipt_entry_target *target)
 {
 	unsigned int size;
-	struct iptables_rule_match *matchp;
+	struct xtables_rule_match *matchp;
 	struct ipt_entry *e;
 
 	size = sizeof(struct ipt_entry);
@@ -1305,9 +1305,9 @@ generate_entry(const struct ipt_entry *fw,
 	return e;
 }
 
-static void clear_rule_matches(struct iptables_rule_match **matches)
+static void clear_rule_matches(struct xtables_rule_match **matches)
 {
-	struct iptables_rule_match *matchp, *tmp;
+	struct xtables_rule_match *matchp, *tmp;
 
 	for (matchp = *matches; matchp;) {
 		tmp = matchp->next;
@@ -1364,8 +1364,8 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 	const char *pcnt = NULL, *bcnt = NULL;
 	int ret = 1;
 	struct xtables_match *m;
-	struct iptables_rule_match *matches = NULL;
-	struct iptables_rule_match *matchp;
+	struct xtables_rule_match *matches = NULL;
+	struct xtables_rule_match *matchp;
 	struct xtables_target *target = NULL;
 	struct xtables_target *t;
 	const char *jumpto = "";
