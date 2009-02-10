@@ -15,11 +15,12 @@ libiptc_libiptc_a_SOURCES = libiptc/libip4tc.c libiptc/libip6tc.c
 lib_LTLIBRARIES       = libxtables.la
 libxtables_la_SOURCES = xtables.c
 libxtables_la_LDFLAGS = -version-info ${libxtables_vcurrent}:0:${libxtables_vage}
+libxtables_la_LIBADD  = -ldl
 
 # iptables, dynamic
 iptables_SOURCES          = iptables-standalone.c iptables.c
 iptables_LDFLAGS          = -rdynamic
-iptables_LDADD            = -ldl -lm libiptc/libiptc.a extensions/libext4.a libxtables.la
+iptables_LDADD            = -lm libiptc/libiptc.a extensions/libext4.a libxtables.la
 
 iptables_multi_SOURCES    = iptables-multi.c iptables-save.c \
                             iptables-restore.c iptables-xml.c \
@@ -46,7 +47,7 @@ iptables_xml_SOURCES      = iptables-xml.c
 # ip6tables, dynamic
 ip6tables_SOURCES         = ip6tables-standalone.c ip6tables.c
 ip6tables_LDFLAGS         = -rdynamic
-ip6tables_LDADD           = -ldl -lm libiptc/libiptc.a extensions/libext6.a libxtables.la
+ip6tables_LDADD           = -lm libiptc/libiptc.a extensions/libext6.a libxtables.la
 
 ip6tables_multi_SOURCES   = ip6tables-multi.c ip6tables-save.c \
                             ip6tables-restore.c ip6tables-standalone.c \
