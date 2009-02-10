@@ -4,6 +4,7 @@
 #include <netinet/ip.h>
 #include <xtables.h>
 #include <libiptc/libiptc.h>
+#include <iptables/internal.h>
 
 #ifndef IPT_SO_GET_REVISION_MATCH /* Old kernel source. */
 #define IPT_SO_GET_REVISION_MATCH	(IPT_BASE_CTL + 2)

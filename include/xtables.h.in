@@ -258,10 +258,15 @@ extern const struct xtables_pprot xtables_chain_protos[];
 extern u_int16_t xtables_parse_protocol(const char *s);
 
 #ifdef XTABLES_INTERNAL
+
+/* Shipped modules rely on this... */
+
 #	ifndef ARRAY_SIZE
 #		define ARRAY_SIZE(x) (sizeof(x) / sizeof(*(x)))
 #	endif
-#	include <xtables/internal.h>
+
+extern void _init(void);
+
 #endif
 
 #endif /* _XTABLES_H */

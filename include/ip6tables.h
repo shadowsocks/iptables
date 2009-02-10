@@ -4,6 +4,7 @@
 #include <netinet/ip.h>
 #include <xtables.h>
 #include <libiptc/libip6tc.h>
+#include <iptables/internal.h>
 
 #ifndef IP6T_SO_GET_REVISION_MATCH /* Old kernel source. */
 #define IP6T_SO_GET_REVISION_MATCH	68

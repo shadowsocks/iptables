@@ -1,5 +1,5 @@
-#ifndef _XTABLES_INTERNAL_H
-#define _XTABLES_INTERNAL_H 1
+#ifndef IPTABLES_INTERNAL_H
+#define IPTABLES_INTERNAL_H 1
 
 #define IPTABLES_VERSION "@PACKAGE_VERSION@"
 
@@ -8,6 +8,4 @@
  */
 extern const char *program_name, *program_version;
 
-extern void _init(void);
-
-#endif /* _XTABLES_INTERNAL_H */
+#endif /* IPTABLES_INTERNAL_H */
