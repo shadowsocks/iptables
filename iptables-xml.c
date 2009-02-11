@@ -31,18 +31,6 @@ const char *program_version;
 
 #ifndef IPTABLES_MULTI
 int line = 0;
-void exit_error(enum xtables_exittype status, const char *msg, ...)
-{
-	va_list args;
-
-	va_start(args, msg);
-	fprintf(stderr, "%s v%s: ", program_name, program_version);
-	vfprintf(stderr, msg, args);
-	va_end(args);
-	fprintf(stderr, "\n");
-	/* On error paths, make sure that we don't leak memory */
-	exit(status);
-}
 #endif
 
 static void print_usage(const char *name, const char *version)
@@ -634,7 +622,6 @@ struct xtables_globals iptables_xml_globals = {
 	.option_offset = 0,
 	.program_version = IPTABLES_VERSION,
 	.program_name = "iptables-xml",
-	.exit_error = exit_error,
 };
 
 #ifdef IPTABLES_MULTI

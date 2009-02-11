@@ -46,9 +46,11 @@
 #define PROC_SYS_MODPROBE "/proc/sys/kernel/modprobe"
 #endif
 
+void basic_exit_err(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
+
 struct xtables_globals *xt_params = NULL;
 
-void basic_exit_error(enum xtables_exittype status, const char *msg, ...)
+void basic_exit_err(enum xtables_exittype status, const char *msg, ...)
 {
 	va_list args;
 
@@ -59,6 +61,7 @@ void basic_exit_error(enum xtables_exittype status, const char *msg, ...)
 	fprintf(stderr, "\n");
 	exit(status);
 }
+
 
 /**
  * xtables_set_params - set the global parameters used by xtables
@@ -79,8 +82,8 @@ int xtables_set_params(struct xtables_globals *xtp)
 
 	xt_params = xtp;
 
-	if (!xt_params->exit_error)
-		xt_params->exit_error = basic_exit_error;
+	if (!xt_params->exit_err)
+		xt_params->exit_err = basic_exit_err;
 
 	return 0;
 }
@@ -359,7 +362,7 @@ u_int16_t xtables_parse_port(const char *port, const char *proto)
 	    (portnum = xtables_service_to_port(port, proto)) != (unsigned)-1)
 		return portnum;
 
-	xt_params->exit_error(PARAMETER_PROBLEM,
+	xt_params->exit_err(PARAMETER_PROBLEM,
 		   "invalid port/service `%s' specified", port);
 }
 
@@ -373,7 +376,7 @@ void xtables_parse_interface(const char *arg, char *vianame,
 	memset(vianame, 0, IFNAMSIZ);
 
 	if (vialen + 1 > IFNAMSIZ)
-		xt_params->exit_error(PARAMETER_PROBLEM,
+		xt_params->exit_err(PARAMETER_PROBLEM,
 			   "interface name `%s' must be shorter than IFNAMSIZ"
 			   " (%i)", arg, IFNAMSIZ-1);
 
@@ -495,7 +498,7 @@ xtables_find_match(const char *name, enum xtables_tryload tryload,
 		      name, false);
 
 		if (ptr == NULL && tryload == XTF_LOAD_MUST_SUCCEED)
-			xt_params->exit_error(PARAMETER_PROBLEM,
+			xt_params->exit_err(PARAMETER_PROBLEM,
 				   "Couldn't load match `%s':%s\n",
 				   name, dlerror());
 	}
@@ -507,7 +510,7 @@ xtables_find_match(const char *name, enum xtables_tryload tryload,
 			ptr = NULL;
 	}
 	if(!ptr && (tryload == XTF_LOAD_MUST_SUCCEED)) {
-		xt_params->exit_error(PARAMETER_PROBLEM,
+		xt_params->exit_err(PARAMETER_PROBLEM,
 			   "Couldn't find match `%s'\n", name);
 	}
 #endif
@@ -555,7 +558,7 @@ xtables_find_target(const char *name, enum xtables_tryload tryload)
 		      name, true);
 
 		if (ptr == NULL && tryload == XTF_LOAD_MUST_SUCCEED)
-			xt_params->exit_error(PARAMETER_PROBLEM,
+			xt_params->exit_err(PARAMETER_PROBLEM,
 				   "Couldn't load target `%s':%s\n",
 				   name, dlerror());
 	}
@@ -567,7 +570,7 @@ xtables_find_target(const char *name, enum xtables_tryload tryload)
 			ptr = NULL;
 	}
 	if(!ptr && (tryload == LOAD_MUST_SUCCEED)) {
-		xt_params->exit_error(PARAMETER_PROBLEM,
+		xt_params->exit_err(PARAMETER_PROBLEM,
 			   "Couldn't find target `%s'\n", name);
 	}
 #endif
@@ -820,7 +823,7 @@ void xtables_param_act(unsigned int status, const char *p1, ...)
 		b  = va_arg(args, unsigned int);
 		if (!b)
 			return;
-		xt_params->exit_error(PARAMETER_PROBLEM,
+		xt_params->exit_err(PARAMETER_PROBLEM,
 		           "%s: \"%s\" option may only be specified once",
 		           p1, p2);
 		break;
@@ -829,13 +832,13 @@ void xtables_param_act(unsigned int status, const char *p1, ...)
 		b  = va_arg(args, unsigned int);
 		if (!b)
 			return;
-		xt_params->exit_error(PARAMETER_PROBLEM,
+		xt_params->exit_err(PARAMETER_PROBLEM,
 		           "%s: \"%s\" option cannot be inverted", p1, p2);
 		break;
 	case XTF_BAD_VALUE:
 		p2 = va_arg(args, const char *);
 		p3 = va_arg(args, const char *);
-		xt_params->exit_error(PARAMETER_PROBLEM,
+		xt_params->exit_err(PARAMETER_PROBLEM,
 		           "%s: Bad value for \"%s\" option: \"%s\"",
 		           p1, p2, p3);
 		break;
@@ -843,11 +846,11 @@ void xtables_param_act(unsigned int status, const char *p1, ...)
 		b = va_arg(args, unsigned int);
 		if (!b)
 			return;
-		xt_params->exit_error(PARAMETER_PROBLEM,
+		xt_params->exit_err(PARAMETER_PROBLEM,
 		           "%s: At most one action is possible", p1);
 		break;
 	default:
-		xt_params->exit_error(status, p1, args);
+		xt_params->exit_err(status, p1, args);
 		break;
 	}
 
@@ -1030,7 +1033,7 @@ ipparse_hostnetwork(const char *name, unsigned int *naddrs)
 	if ((addrptmp = host_to_ipaddr(name, naddrs)) != NULL)
 		return addrptmp;
 
-	xt_params->exit_error(PARAMETER_PROBLEM, "host/network `%s' not found", name);
+	xt_params->exit_err(PARAMETER_PROBLEM, "host/network `%s' not found", name);
 }
 
 static struct in_addr *parse_ipmask(const char *mask)
@@ -1048,7 +1051,7 @@ static struct in_addr *parse_ipmask(const char *mask)
 		/* dotted_to_addr already returns a network byte order addr */
 		return addrp;
 	if (!xtables_strtoui(mask, NULL, &bits, 0, 32))
-		xt_params->exit_error(PARAMETER_PROBLEM,
+		xt_params->exit_err(PARAMETER_PROBLEM,
 			   "invalid mask `%s' specified", mask);
 	if (bits != 0) {
 		maskaddr.s_addr = htonl(0xFFFFFFFF << (32 - bits));
@@ -1259,7 +1262,7 @@ ip6parse_hostnetwork(const char *name, unsigned int *naddrs)
 	if ((addrp = host_to_ip6addr(name, naddrs)) != NULL)
 		return addrp;
 
-	xt_params->exit_error(PARAMETER_PROBLEM, "host/network `%s' not found", name);
+	xt_params->exit_err(PARAMETER_PROBLEM, "host/network `%s' not found", name);
 }
 
 static struct in6_addr *parse_ip6mask(char *mask)
@@ -1276,7 +1279,7 @@ static struct in6_addr *parse_ip6mask(char *mask)
 	if ((addrp = xtables_numeric_to_ip6addr(mask)) != NULL)
 		return addrp;
 	if (!xtables_strtoui(mask, NULL, &bits, 0, 128))
-		xt_params->exit_error(PARAMETER_PROBLEM,
+		xt_params->exit_err(PARAMETER_PROBLEM,
 			   "invalid mask `%s' specified", mask);
 	if (bits != 0) {
 		char *p = (void *)&maskaddr;
@@ -1376,13 +1379,13 @@ int xtables_check_inverse(const char option[], int *invert,
 		        "extrapositioned (`! --option this`).\n");
 
 		if (*invert)
-			xt_params->exit_error(PARAMETER_PROBLEM,
+			xt_params->exit_err(PARAMETER_PROBLEM,
 				   "Multiple `!' flags not allowed");
 		*invert = true;
 		if (my_optind != NULL) {
 			++*my_optind;
 			if (argc && *my_optind > argc)
-				xt_params->exit_error(PARAMETER_PROBLEM,
+				xt_params->exit_err(PARAMETER_PROBLEM,
 					   "no argument following `!'");
 		}
 
@@ -1433,7 +1436,7 @@ xtables_parse_protocol(const char *s)
 				}
 			}
 			if (i == ARRAY_SIZE(xtables_chain_protos))
-				xt_params->exit_error(PARAMETER_PROBLEM,
+				xt_params->exit_err(PARAMETER_PROBLEM,
 					   "unknown protocol `%s' specified",
 					   s);
 		}

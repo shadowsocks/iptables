@@ -145,12 +145,14 @@ int line = -1;
 static struct option *opts = original_opts;
 static unsigned int global_option_offset = 0;
 
+void iptables_exit_error(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
+
 struct xtables_globals iptables_globals = {
 	.option_offset = 0,
 	.program_version = IPTABLES_VERSION,
 	.program_name = "iptables",
 	.opts = original_opts,
-	.exit_error = exit_error,
+	.exit_err = iptables_exit_error,
 };
 
 /* Table of legal combinations of commands and options.  If any of the
@@ -348,7 +350,7 @@ exit_printhelp(struct iptables_rule_match *matches)
 }
 
 void
-exit_error(enum xtables_exittype status, const char *msg, ...)
+iptables_exit_error(enum xtables_exittype status, const char *msg, ...)
 {
 	va_list args;
 

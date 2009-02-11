@@ -189,7 +189,7 @@ struct xtables_globals
 	char *program_version;
 	char *program_name;
 	struct option *opts;
-	void (*exit_error)(enum xtables_exittype status, const char *msg, ...);
+	void (*exit_err)(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
 };
 
 extern const char *xtables_program_name;
@@ -204,7 +204,7 @@ extern void *xtables_malloc(size_t);
 
 extern int xtables_insmod(const char *, const char *, bool);
 extern int xtables_load_ko(const char *, bool);
-int xtables_set_params(struct xtables_globals *xtp);
+extern int xtables_set_params(struct xtables_globals *xtp);
 void xtables_free_opts(int reset_offset, struct option *original_opts);
 
 extern struct xtables_match *xtables_find_match(const char *name,
@@ -230,8 +230,8 @@ xtables_parse_interface(const char *arg, char *vianame, unsigned char *mask);
 
 int xtables_check_inverse(const char option[], int *invert,
 	int *my_optind, int argc);
-void exit_error(enum xtables_exittype, const char *, ...)
-	__attribute__((noreturn, format(printf,2,3)));
+extern struct xtables_globals *xt_params;
+#define exit_error xt_params->exit_err
 extern void xtables_param_act(unsigned int, const char *, ...);
 
 extern const char *xtables_ipaddr_to_numeric(const struct in_addr *);
