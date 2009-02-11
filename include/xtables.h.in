@@ -33,6 +33,14 @@
 
 struct in_addr;
 
+struct xtables_globals
+{
+	unsigned int option_offset;
+	char *program_version;
+	char *program_name;
+	struct option *opts;
+};
+
 /* Include file for additions: new matches and targets. */
 struct xtables_match
 {
@@ -195,6 +203,7 @@ extern void *xtables_malloc(size_t);
 
 extern int xtables_insmod(const char *, const char *, bool);
 extern int xtables_load_ko(const char *, bool);
+int xtables_set_params(struct xtables_globals *xtp);
 
 extern struct xtables_match *xtables_find_match(const char *name,
 	enum xtables_tryload, struct xtables_rule_match **match);

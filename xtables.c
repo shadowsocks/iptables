@@ -46,6 +46,28 @@
 #define PROC_SYS_MODPROBE "/proc/sys/kernel/modprobe"
 #endif
 
+struct xtables_globals *xt_params;
+/**
+ * xtables_set_params - set the global parameters used by xtables
+ * @xtp:	input xtables_globals structure
+ *
+ * The app is expected to pass a valid xtables_globals data-filled
+ * with proper values
+ * @xtp cannot be NULL
+ *
+ * Returns -1 on failure to set and 0 on success
+ */
+int xtables_set_params(struct xtables_globals *xtp)
+{
+	if (!xtp) {
+		fprintf(stderr, "%s: Illegal global params\n",__func__);
+		return -1;
+	}
+
+	xt_params = xtp;
+	return 0;
+}
+
 /**
  * xtables_afinfo - protocol family dependent information
  * @kmod:		kernel module basename (e.g. "ip_tables")
