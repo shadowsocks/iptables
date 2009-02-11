@@ -35,6 +35,7 @@ Makefile.in
 /ltmain.sh
 /missing
 /stamp-h1
+/libiptc.pc
 /xtables.pc
 
 /ip6tables

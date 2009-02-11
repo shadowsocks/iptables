@@ -11,11 +11,14 @@ endif
 if ENABLE_LIBIPQ
 SUBDIRS         += libipq
 endif
+lib_LTLIBRARIES =
 
 # libiptc
-libiptc_libiptc_a_SOURCES = libiptc/libip4tc.c libiptc/libip6tc.c
+lib_LTLIBRARIES           += libiptc/libiptc.la
+libiptc_libiptc_la_SOURCES = libiptc/libip4tc.c libiptc/libip6tc.c
+libiptc_libiptc_la_LDFLAGS = -version-info 0:0:0
 
-lib_LTLIBRARIES       = libxtables.la
+lib_LTLIBRARIES      += libxtables.la
 libxtables_la_SOURCES = xtables.c
 libxtables_la_LDFLAGS = -version-info ${libxtables_vcurrent}:0:${libxtables_vage}
 libxtables_la_LIBADD  = -ldl
@@ -23,7 +26,7 @@ libxtables_la_LIBADD  = -ldl
 # iptables, dynamic
 iptables_SOURCES          = iptables-standalone.c iptables.c
 iptables_LDFLAGS          = -rdynamic
-iptables_LDADD            = -lm libiptc/libiptc.a extensions/libext4.a libxtables.la
+iptables_LDADD            = -lm libiptc/libiptc.la extensions/libext4.a libxtables.la
 
 iptables_xml_LDADD        = libxtables.la
 iptables_multi_SOURCES    = iptables-multi.c iptables-save.c \
@@ -44,14 +47,14 @@ iptables_save_LDADD       = ${iptables_LDADD}
 # iptables-multi, semi-static
 iptables_static_SOURCES   = ${iptables_multi_SOURCES} xtables.c
 iptables_static_CFLAGS    = ${iptables_multi_CFLAGS} -DNO_SHARED_LIBS=1
-iptables_static_LDADD     = -lm libiptc/libiptc.a extensions/libext4.a
+iptables_static_LDADD     = -lm libiptc/libiptc.la extensions/libext4.a
 
 iptables_xml_SOURCES      = iptables-xml.c
 
 # ip6tables, dynamic
 ip6tables_SOURCES         = ip6tables-standalone.c ip6tables.c
 ip6tables_LDFLAGS         = -rdynamic
-ip6tables_LDADD           = -lm libiptc/libiptc.a extensions/libext6.a libxtables.la
+ip6tables_LDADD           = -lm libiptc/libiptc.la extensions/libext6.a libxtables.la
 
 ip6tables_multi_SOURCES   = ip6tables-multi.c ip6tables-save.c \
                             ip6tables-restore.c ip6tables-standalone.c \
@@ -71,9 +74,8 @@ ip6tables_save_LDADD      = ${ip6tables_LDADD}
 # iptables-multi, semi-static
 ip6tables_static_SOURCES    = ${ip6tables_multi_SOURCES} xtables.c
 ip6tables_static_CFLAGS     = ${ip6tables_multi_CFLAGS} -DNO_SHARED_LIBS=1
-ip6tables_static_LDADD      = -lm libiptc/libiptc.a extensions/libext6.a
+ip6tables_static_LDADD      = -lm libiptc/libiptc.la extensions/libext6.a
 
-noinst_LIBRARIES = libiptc/libiptc.a
 bin_PROGRAMS     = iptables-xml
 sbin_PROGRAMS    =
 noinst_PROGRAMS  =
@@ -96,7 +98,7 @@ iptables.8: ${srcdir}/iptables.8.in extensions/matches4.man extensions/targets4.
 ip6tables.8: ${srcdir}/ip6tables.8.in extensions/matches6.man extensions/targets6.man
 	${AM_VERBOSE_GEN} sed -e 's/@PACKAGE_AND_VERSION@/${PACKAGE} ${PACKAGE_VERSION}/g' -e '/@MATCH@/ r extensions/matches6.man' -e '/@TARGET@/ r extensions/targets6.man' $< >$@;
 
-pkgconfig_DATA = xtables.pc
+pkgconfig_DATA = libiptc.pc xtables.pc
 
 .PHONY: tarball
 tarball:
