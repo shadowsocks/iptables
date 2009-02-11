@@ -33,14 +33,6 @@
 
 struct in_addr;
 
-struct xtables_globals
-{
-	unsigned int option_offset;
-	char *program_version;
-	char *program_name;
-	struct option *opts;
-};
-
 /* Include file for additions: new matches and targets. */
 struct xtables_match
 {
@@ -189,6 +181,15 @@ enum xtables_exittype {
 	XTF_NO_INVERT,
 	XTF_BAD_VALUE,
 	XTF_ONE_ACTION,
+};
+
+struct xtables_globals
+{
+	unsigned int option_offset;
+	char *program_version;
+	char *program_name;
+	struct option *opts;
+	void (*exit_error)(enum xtables_exittype status, const char *msg, ...);
 };
 
 extern const char *xtables_program_name;

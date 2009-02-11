@@ -46,7 +46,20 @@
 #define PROC_SYS_MODPROBE "/proc/sys/kernel/modprobe"
 #endif
 
-struct xtables_globals *xt_params;
+struct xtables_globals *xt_params = NULL;
+
+void basic_exit_error(enum xtables_exittype status, const char *msg, ...)
+{
+	va_list args;
+
+	va_start(args, msg);
+	fprintf(stderr, "%s v%s: ", xt_params->program_name, xt_params->program_version);
+	vfprintf(stderr, msg, args);
+	va_end(args);
+	fprintf(stderr, "\n");
+	exit(status);
+}
+
 /**
  * xtables_set_params - set the global parameters used by xtables
  * @xtp:	input xtables_globals structure
@@ -65,6 +78,10 @@ int xtables_set_params(struct xtables_globals *xtp)
 	}
 
 	xt_params = xtp;
+
+	if (!xt_params->exit_error)
+		xt_params->exit_error = basic_exit_error;
+
 	return 0;
 }
 
