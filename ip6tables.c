@@ -145,6 +145,13 @@ int line = -1;
 
 static struct option *opts = original_opts;
 static unsigned int global_option_offset = 0;
+struct xtables_globals ip6tables_globals = {
+	.option_offset = 0,
+	.program_version = IPTABLES_VERSION,
+	.program_name = "ip6tables",
+	.opts = original_opts,
+	.exit_error = exit_error,
+};
 
 /* Table of legal combinations of commands and options.  If any of the
  * given commands make an option legal, that option is legal (applies to
@@ -1371,6 +1378,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
            demand-load a protocol. */
 	opterr = 0;
 
+	xtables_set_params(&ip6tables_globals);
 	while ((c = getopt_long(argc, argv,
 	   "-A:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:bvnt:m:xc:g:",
 					   opts, NULL)) != -1) {

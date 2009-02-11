@@ -17,6 +17,7 @@
 #include "iptables.h"
 #include "libiptc/libiptc.h"
 #include "iptables-multi.h"
+#include <xtables.h>
 
 #ifdef DEBUG
 #define DEBUGP(x, args...) fprintf(stderr, x, ## args)
@@ -629,6 +630,12 @@ do_rule(char *pcnt, char *bcnt, int argc, char *argv[], int argvattr[])
 	do_rule_part(NULL, NULL, 1, argc, argv, argvattr);
 }
 
+struct xtables_globals iptables_xml_globals = {
+	.option_offset = 0,
+	.program_version = IPTABLES_VERSION,
+	.program_name = "iptables-xml",
+	.exit_error = exit_error,
+};
 
 #ifdef IPTABLES_MULTI
 int
@@ -646,6 +653,7 @@ main(int argc, char *argv[])
 	program_version = IPTABLES_VERSION;
 	line = 0;
 
+	xtables_set_params(&iptables_xml_globals);
 	while ((c = getopt_long(argc, argv, "cvh", options, NULL)) != -1) {
 		switch (c) {
 		case 'c':

@@ -21,6 +21,7 @@ iptables_SOURCES          = iptables-standalone.c iptables.c
 iptables_LDFLAGS          = -rdynamic
 iptables_LDADD            = -ldl -lm libiptc/libiptc.a extensions/libext4.a libxtables.la
 
+iptables_xml_LDADD        = -ldl libxtables.la
 iptables_multi_SOURCES    = iptables-multi.c iptables-save.c \
                             iptables-restore.c iptables-xml.c \
                             iptables-standalone.c iptables.c
