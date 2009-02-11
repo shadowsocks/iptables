@@ -186,8 +186,7 @@ enum xtables_exittype {
 struct xtables_globals
 {
 	unsigned int option_offset;
-	char *program_version;
-	char *program_name;
+	const char *program_name, *program_version;
 	struct option *opts;
 	void (*exit_err)(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
 };
