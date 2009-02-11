@@ -15,4 +15,6 @@ extern int flush_entries(const ip6t_chainlabel chain, int verbose, struct ip6tc_
 extern int delete_chain(const ip6t_chainlabel chain, int verbose, struct ip6tc_handle *handle);
 void print_rule(const struct ip6t_entry *e, struct ip6tc_handle *h, const char *chain, int counters);
 
+extern struct xtables_globals ip6tables_globals;
+
 #endif /*_IP6TABLES_USER_H*/

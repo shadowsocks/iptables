@@ -26,4 +26,6 @@ extern void get_kernel_version(void);
 #define LINUX_VERSION_MINOR(x)	(((x)>> 8) & 0xFF)
 #define LINUX_VERSION_PATCH(x)	( (x)      & 0xFF)
 
+extern struct xtables_globals iptables_globals;
+
 #endif /*_IPTABLES_USER_H*/

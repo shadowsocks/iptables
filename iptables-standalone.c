@@ -56,6 +56,7 @@ main(int argc, char *argv[])
 	xtables_program_name = program_name;
 	xtables_init();
 	xtables_set_nfproto(NFPROTO_IPV4);
+	iptables_globals.program_name = "iptables";
 #ifdef NO_SHARED_LIBS
 	init_extensions();
 #endif
