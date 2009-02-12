@@ -56,6 +56,13 @@ Accept the packet and continue traversal within the kernel.
 .TP
 .B NF_DROP
 Drop the packet.
+.TP
+\fBNF_QUEUE\fP
+Requeue the packet.
+.PP
+\fBNF_STOLEN\fP and \fBNF_REPEAT\fP are kernel-internal constants and should
+not be used from userspace as their exact side effects have not been
+investigated.
 .PP
 The
 .I data_len
