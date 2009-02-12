@@ -272,6 +272,12 @@ int xtables_insmod(const char *modname, const char *modprobe, bool quiet)
 		modprobe = buf;
 	}
 
+	/*
+	 * Need to flush the buffer, or the child may output it again
+	 * when switching the program thru execv.
+	 */
+	fflush(stdout);
+
 	switch (fork()) {
 	case 0:
 		argv[0] = (char *)modprobe;
