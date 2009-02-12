@@ -108,6 +108,14 @@ void xtables_free_opts(int reset_offset, struct option *original_opts)
 	}
 }
 
+void xtables_set_revision(char *name, u_int8_t revision)
+{
+	/* Old kernel sources don't have ".revision" field,
+	*            but we stole a byte from name. */
+	name[XT_FUNCTION_MAXNAMELEN - 2] = '\0';
+	name[XT_FUNCTION_MAXNAMELEN - 1] = revision;
+}
+
 /**
  * xtables_afinfo - protocol family dependent information
  * @kmod:		kernel module basename (e.g. "ip_tables")

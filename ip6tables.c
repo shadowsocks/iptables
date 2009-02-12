@@ -1325,14 +1325,6 @@ static void clear_rule_matches(struct xtables_rule_match **matches)
 	*matches = NULL;
 }
 
-static void set_revision(char *name, u_int8_t revision)
-{
-	/* Old kernel sources don't have ".revision" field,
-	   but we stole a byte from name. */
-	name[IP6T_FUNCTION_MAXNAMELEN - 2] = '\0';
-	name[IP6T_FUNCTION_MAXNAMELEN - 1] = revision;
-}
-
 int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **handle)
 {
 	struct ip6t_entry fw, *e = NULL;
@@ -1597,7 +1589,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				target->t = xtables_calloc(1, size);
 				target->t->u.target_size = size;
 				strcpy(target->t->u.user.name, jumpto);
-				set_revision(target->t->u.user.name,
+				xtables_set_revision(target->t->u.user.name,
 					     target->revision);
 				if (target->init != NULL)
 					target->init(target->t);
@@ -1650,7 +1642,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			m->m = xtables_calloc(1, size);
 			m->m->u.match_size = size;
 			strcpy(m->m->u.user.name, m->name);
-			set_revision(m->m->u.user.name, m->revision);
+			xtables_set_revision(m->m->u.user.name, m->revision);
 			if (m->init != NULL)
 				m->init(m->m);
 			if (m != m->next)
@@ -1797,7 +1789,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 					m->m = xtables_calloc(1, size);
 					m->m->u.match_size = size;
 					strcpy(m->m->u.user.name, m->name);
-					set_revision(m->m->u.user.name,
+					xtables_set_revision(m->m->u.user.name,
 						     m->revision);
 					if (m->init != NULL)
 						m->init(m->m);
