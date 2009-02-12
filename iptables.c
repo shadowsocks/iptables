@@ -151,6 +151,7 @@ struct xtables_globals iptables_globals = {
 	.option_offset = 0,
 	.program_version = IPTABLES_VERSION,
 	.opts = original_opts,
+	.orig_opts = original_opts,
 	.exit_err = iptables_exit_error,
 };
 
@@ -237,16 +238,6 @@ enum {
 	IPT_DOTTED_MASK
 };
 
-static void free_opts(int reset_offset)
-{
-	if (opts != original_opts) {
-		free(opts);
-		opts = original_opts;
-		if (reset_offset)
-			global_option_offset = 0;
-	}
-}
-
 static void
 exit_tryhelp(int status)
 {
@@ -254,7 +245,7 @@ exit_tryhelp(int status)
 		fprintf(stderr, "Error occurred at line: %d\n", line);
 	fprintf(stderr, "Try `%s -h' or '%s --help' for more information.\n",
 			program_name, program_name );
-	free_opts(1);
+	xtables_free_opts(1);
 	exit(status);
 }
 
@@ -364,7 +355,7 @@ iptables_exit_error(enum xtables_exittype status, const char *msg, ...)
 		fprintf(stderr,
 			"Perhaps iptables or your kernel needs to be upgraded.\n");
 	/* On error paths, make sure that we don't leak memory */
-	free_opts(1);
+	xtables_free_opts(1);
 	exit(status);
 }
 
@@ -536,7 +527,7 @@ merge_options(struct option *oldopts, const struct option *newopts,
 	if (merge == NULL)
 		return NULL;
 	memcpy(merge, oldopts, num_old * sizeof(struct option));
-	free_opts(0); /* Release previous options merged if any */
+	xtables_free_opts(0); /* Release previous options merged if any */
 	for (i = 0; i < num_new; i++) {
 		merge[num_old + i] = newopts[i];
 		merge[num_old + i].val += *option_offset;
@@ -1342,7 +1333,7 @@ get_kernel_version(void) {
 
 	if (uname(&uts) == -1) {
 		fprintf(stderr, "Unable to retrieve kernel version.\n");
-		free_opts(1);
+		xtables_free_opts(1);
 		exit(1);
 	}
 
@@ -2087,7 +2078,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 
 	free(saddrs);
 	free(daddrs);
-	free_opts(1);
+	xtables_free_opts(1);
 
 	return ret;
 }

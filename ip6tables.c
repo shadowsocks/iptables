@@ -150,6 +150,7 @@ struct xtables_globals ip6tables_globals = {
 	.option_offset = 0,
 	.program_version = IPTABLES_VERSION,
 	.opts = original_opts,
+	.orig_opts = original_opts,
 	.exit_err = ip6tables_exit_error,
 };
 
@@ -224,16 +225,6 @@ proto_to_name(u_int8_t proto, int nolookup)
 	return NULL;
 }
 
-static void free_opts(int reset_offset)
-{
-	if (opts != original_opts) {
-		free(opts);
-		opts = original_opts;
-		if (reset_offset)
-			global_option_offset = 0;
-	}
-}
-
 static void
 exit_tryhelp(int status)
 {
@@ -241,7 +232,7 @@ exit_tryhelp(int status)
 		fprintf(stderr, "Error occurred at line: %d\n", line);
 	fprintf(stderr, "Try `%s -h' or '%s --help' for more information.\n",
 			program_name, program_name );
-	free_opts(1);
+	xtables_free_opts(1);
 	exit(status);
 }
 
@@ -351,7 +342,7 @@ ip6tables_exit_error(enum xtables_exittype status, const char *msg, ...)
 		fprintf(stderr,
 			"Perhaps ip6tables or your kernel needs to be upgraded.\n");
 	/* On error paths, make sure that we don't leak memory */
-	free_opts(1);
+	xtables_free_opts(1);
 	exit(status);
 }
 
@@ -530,7 +521,7 @@ merge_options(struct option *oldopts, const struct option *newopts,
 
 	merge = malloc(sizeof(struct option) * (num_new + num_old + 1));
 	memcpy(merge, oldopts, num_old * sizeof(struct option));
-	free_opts(0); /* Release previous options merged if any */
+	xtables_free_opts(0); /* Release previous options merged if any */
 	for (i = 0; i < num_new; i++) {
 		merge[num_old + i] = newopts[i];
 		merge[num_old + i].val += *option_offset;
@@ -2048,7 +2039,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 	for (i = 0; i < ndaddrs; i++)
 		free(&daddrs[i]);
 
-	free_opts(1);
+	xtables_free_opts(1);
 
 	return ret;
 }

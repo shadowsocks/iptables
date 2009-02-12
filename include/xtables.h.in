@@ -187,6 +187,7 @@ struct xtables_globals
 {
 	unsigned int option_offset;
 	const char *program_name, *program_version;
+	struct option *orig_opts;
 	struct option *opts;
 	void (*exit_err)(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
 };
@@ -205,7 +206,7 @@ extern int xtables_insmod(const char *, const char *, bool);
 extern int xtables_load_ko(const char *, bool);
 extern int xtables_set_params(struct xtables_globals *xtp);
 extern void xtables_set_revision(char *name, u_int8_t revision);
-void xtables_free_opts(int reset_offset, struct option *original_opts);
+extern void xtables_free_opts(int reset_offset);
 
 extern struct xtables_match *xtables_find_match(const char *name,
 	enum xtables_tryload, struct xtables_rule_match **match);

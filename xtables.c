@@ -97,12 +97,11 @@ int xtables_set_params(struct xtables_globals *xtp)
 	return 0;
 }
 
-void xtables_free_opts(int reset_offset, struct option *original_opts)
+void xtables_free_opts(int reset_offset)
 {
-	if (xt_params->opts != original_opts) {
-		if (original_opts) 
-			free(xt_params->opts);
-		xt_params->opts = original_opts;
+	if (xt_params->opts != xt_params->orig_opts) {
+		free(xt_params->opts);
+		xt_params->opts = xt_params->orig_opts;
 		if (reset_offset)
 			xt_params->option_offset = 0;
 	}
