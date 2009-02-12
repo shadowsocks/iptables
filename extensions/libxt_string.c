@@ -20,6 +20,7 @@
  *             updated to work with slightly modified
  *             ipt_string_info.
  */
+#define _GNU_SOURCE 1
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -207,7 +208,8 @@ string_parse(int c, char **argv, int invert, unsigned int *flags,
 			else
 				stringinfo->u.v1.flags |= XT_STRING_FLAG_INVERT;
 		}
-		stringinfo->patlen=strlen((char *)&stringinfo->pattern);
+		stringinfo->patlen = strnlen((char *)&stringinfo->pattern,
+			sizeof(stringinfo->patlen));
 		*flags |= STRING;
 		break;
 
