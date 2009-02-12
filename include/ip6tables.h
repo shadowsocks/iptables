@@ -4,16 +4,7 @@
 #include <netinet/ip.h>
 #include <xtables.h>
 #include <libiptc/libip6tc.h>
-
-#ifndef IP6T_SO_GET_REVISION_MATCH /* Old kernel source. */
-#define IP6T_SO_GET_REVISION_MATCH	68
-#define IP6T_SO_GET_REVISION_TARGET	69
-#endif /* IP6T_SO_GET_REVISION_MATCH   Old kernel source */
-
-#define ip6tables_rule_match	xtables_rule_match
-#define ip6t_tryload		xt_tryload
-
-extern int line;
+#include <iptables/internal.h>
 
 /* Your shared library should call one of these. */
 extern int do_command6(int argc, char *argv[], char **table,

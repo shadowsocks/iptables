@@ -4,16 +4,7 @@
 #include <netinet/ip.h>
 #include <xtables.h>
 #include <libiptc/libiptc.h>
-
-#ifndef IPT_SO_GET_REVISION_MATCH /* Old kernel source. */
-#define IPT_SO_GET_REVISION_MATCH	(IPT_BASE_CTL + 2)
-#define IPT_SO_GET_REVISION_TARGET	(IPT_BASE_CTL + 3)
-#endif /* IPT_SO_GET_REVISION_MATCH   Old kernel source */
-
-#define iptables_rule_match	xtables_rule_match
-#define ipt_tryload		xt_tryload
-
-extern int line;
+#include <iptables/internal.h>
 
 /* Your shared library should call one of these. */
 extern int do_command(int argc, char *argv[], char **table,

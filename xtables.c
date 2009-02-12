@@ -39,6 +39,15 @@
 #ifndef NO_SHARED_LIBS
 #include <dlfcn.h>
 #endif
+#ifndef IPT_SO_GET_REVISION_MATCH /* Old kernel source. */
+#	define IPT_SO_GET_REVISION_MATCH	(IPT_BASE_CTL + 2)
+#	define IPT_SO_GET_REVISION_TARGET	(IPT_BASE_CTL + 3)
+#endif
+#ifndef IP6T_SO_GET_REVISION_MATCH /* Old kernel source. */
+#	define IP6T_SO_GET_REVISION_MATCH	68
+#	define IP6T_SO_GET_REVISION_TARGET	69
+#endif
+
 
 #define NPROTO	255
 
@@ -160,6 +169,19 @@ void xtables_init(void)
 	xtables_libdir = getenv("IPTABLES_LIB_DIR");
 	if (xtables_libdir != NULL) {
 		fprintf(stderr, "IPTABLES_LIB_DIR is deprecated, "
+		        "use XTABLES_LIBDIR.\n");
+		return;
+	}
+	/*
+	 * Well yes, IP6TABLES_LIB_DIR is of lower priority over
+	 * IPTABLES_LIB_DIR since this moved to libxtables; I think that is ok
+	 * for these env vars are deprecated anyhow, and in light of the
+	 * (shared) libxt_*.so files, makes less sense to have
+	 * IPTABLES_LIB_DIR != IP6TABLES_LIB_DIR.
+	 */
+	xtables_libdir = getenv("IP6TABLES_LIB_DIR");
+	if (xtables_libdir != NULL) {
+		fprintf(stderr, "IP6TABLES_LIB_DIR is deprecated, "
 		        "use XTABLES_LIBDIR.\n");
 		return;
 	}
