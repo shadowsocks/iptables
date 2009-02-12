@@ -5,6 +5,9 @@ AUTOMAKE_OPTIONS = foreign subdir-objects
 
 AM_CFLAGS        = ${regular_CFLAGS} -I${top_builddir}/include -I${top_srcdir}/include ${kinclude_CFLAGS}
 SUBDIRS          = extensions
+if ENABLE_DEVEL
+SUBDIRS         += include
+endif
 if ENABLE_LIBIPQ
 SUBDIRS         += libipq
 endif
@@ -78,9 +81,6 @@ man_MANS         = iptables.8 iptables-restore.8 iptables-save.8 \
                    iptables-xml.8 ip6tables.8 ip6tables-restore.8 \
                    ip6tables-save.8
 CLEANFILES       = iptables.8 ip6tables.8
-if ENABLE_DEVEL
-include_HEADERS  = include/xtables.h
-endif
 
 if ENABLE_STATIC
 sbin_PROGRAMS += iptables-static ip6tables-static
