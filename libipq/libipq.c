@@ -32,6 +32,8 @@
 #include <sys/types.h>
 
 #include <libipq/libipq.h>
+#include <netinet/in.h>
+#include <linux/netfilter.h>
 
 /****************************************************************************
  *
