@@ -207,6 +207,8 @@ extern int xtables_load_ko(const char *, bool);
 extern int xtables_set_params(struct xtables_globals *xtp);
 extern void xtables_set_revision(char *name, u_int8_t revision);
 extern void xtables_free_opts(int reset_offset);
+extern struct option *xtables_merge_options(struct option *oldopts,
+	const struct option *newopts, unsigned int *option_offset);
 
 extern struct xtables_match *xtables_find_match(const char *name,
 	enum xtables_tryload, struct xtables_rule_match **match);
@@ -233,6 +235,8 @@ int xtables_check_inverse(const char option[], int *invert,
 	int *my_optind, int argc);
 extern struct xtables_globals *xt_params;
 #define exit_error xt_params->exit_err
+#define OPTION_OFFSET 256
+
 extern void xtables_param_act(unsigned int, const char *, ...);
 
 extern const char *xtables_ipaddr_to_numeric(const struct in_addr *);

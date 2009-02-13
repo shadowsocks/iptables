@@ -81,8 +81,6 @@
 static const char cmdflags[] = { 'I', 'D', 'D', 'R', 'A', 'L', 'F', 'Z',
 				 'N', 'X', 'P', 'E', 'S' };
 
-#define OPTION_OFFSET 256
-
 #define OPT_NONE	0x00000U
 #define OPT_NUMERIC	0x00001U
 #define OPT_SOURCE	0x00002U
@@ -143,7 +141,6 @@ static struct option original_opts[] = {
 int line = -1;
 
 static struct option *opts = original_opts;
-static unsigned int global_option_offset = 0;
 
 void iptables_exit_error(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
 
@@ -505,36 +502,6 @@ set_option(unsigned int *options, unsigned int option, u_int8_t *invflg,
 				   opt2char(option));
 		*invflg |= inverse_for_options[i];
 	}
-}
-
-static struct option *
-merge_options(struct option *oldopts, const struct option *newopts,
-	      unsigned int *option_offset)
-{
-	unsigned int num_old, num_new, i;
-	struct option *merge;
-
-	if (newopts == NULL)
-		return oldopts;
-
-	for (num_old = 0; oldopts[num_old].name; num_old++);
-	for (num_new = 0; newopts[num_new].name; num_new++);
-
-	global_option_offset += OPTION_OFFSET;
-	*option_offset = global_option_offset;
-
-	merge = malloc(sizeof(struct option) * (num_new + num_old + 1));
-	if (merge == NULL)
-		return NULL;
-	memcpy(merge, oldopts, num_old * sizeof(struct option));
-	xtables_free_opts(0); /* Release previous options merged if any */
-	for (i = 0; i < num_new; i++) {
-		merge[num_old + i] = newopts[i];
-		merge[num_old + i].val += *option_offset;
-	}
-	memset(merge + num_old + num_new, 0, sizeof(struct option));
-
-	return merge;
 }
 
 static void
@@ -1600,7 +1567,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 					     target->revision);
 				if (target->init != NULL)
 					target->init(target->t);
-				opts = merge_options(opts,
+				opts = xtables_merge_options(opts,
 						     target->extra_opts,
 						     &target->option_offset);
 				if (opts == NULL)
@@ -1660,7 +1627,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 				m->init(m->m);
 			if (m != m->next) {
 				/* Merge options for non-cloned matches */
-				opts = merge_options(opts,
+				opts = xtables_merge_options(opts,
 						     m->extra_opts,
 						     &m->option_offset);
 				if (opts == NULL)
@@ -1814,7 +1781,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 					if (m->init != NULL)
 						m->init(m->m);
 
-					opts = merge_options(opts,
+					opts = xtables_merge_options(opts,
 							     m->extra_opts,
 							     &m->option_offset);
 					if (opts == NULL)

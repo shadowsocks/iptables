@@ -47,6 +47,7 @@
 #	define IP6T_SO_GET_REVISION_MATCH	68
 #	define IP6T_SO_GET_REVISION_TARGET	69
 #endif
+#include <getopt.h>
 
 
 #define NPROTO	255
@@ -105,6 +106,36 @@ void xtables_free_opts(int reset_offset)
 		if (reset_offset)
 			xt_params->option_offset = 0;
 	}
+}
+
+struct option *xtables_merge_options(struct option *oldopts,
+				     const struct option *newopts,
+				     unsigned int *option_offset)
+{
+	unsigned int num_old, num_new, i;
+	struct option *merge;
+
+	if (newopts == NULL)
+		return oldopts;
+
+	for (num_old = 0; oldopts[num_old].name; num_old++) ;
+	for (num_new = 0; newopts[num_new].name; num_new++) ;
+
+	xt_params->option_offset += OPTION_OFFSET;
+	*option_offset = xt_params->option_offset;
+
+	merge = malloc(sizeof(struct option) * (num_new + num_old + 1));
+	if (merge == NULL)
+		return NULL;
+	memcpy(merge, oldopts, num_old * sizeof(struct option));
+	xtables_free_opts(0);	/* Release any old options merged  */
+	for (i = 0; i < num_new; i++) {
+		merge[num_old + i] = newopts[i];
+		merge[num_old + i].val += *option_offset;
+	}
+	memset(merge + num_old + num_new, 0, sizeof(struct option));
+
+	return merge;
 }
 
 void xtables_set_revision(char *name, u_int8_t revision)
