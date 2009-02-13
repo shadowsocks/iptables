@@ -25,13 +25,17 @@
 #define DEBUGP(x, args...)
 #endif
 
-/* no need to link with iptables.o */
-const char *program_name;
-const char *program_version;
-
 #ifndef IPTABLES_MULTI
 int line = 0;
 #endif
+
+struct xtables_globals iptables_xml_globals = {
+	.option_offset = 0,
+	.program_version = IPTABLES_VERSION,
+	.program_name = "iptables-xml",
+};
+#define prog_name iptables_xml_globals.program_name
+#define prog_vers iptables_xml_globals.program_version
 
 static void print_usage(const char *name, const char *version)
 	    __attribute__ ((noreturn));
@@ -294,7 +298,7 @@ saveChain(char *chain, char *policy, struct ipt_counters *ctr)
 	if (nextChain >= maxChains) {
 		exit_error(PARAMETER_PROBLEM,
 			   "%s: line %u chain name invalid\n",
-			   program_name, line);
+			   prog_name, line);
 		exit(1);
 	};
 	chains[nextChain].chain = strdup(chain);
@@ -618,12 +622,6 @@ do_rule(char *pcnt, char *bcnt, int argc, char *argv[], int argvattr[])
 	do_rule_part(NULL, NULL, 1, argc, argv, argvattr);
 }
 
-struct xtables_globals iptables_xml_globals = {
-	.option_offset = 0,
-	.program_version = IPTABLES_VERSION,
-	.program_name = "iptables-xml",
-};
-
 #ifdef IPTABLES_MULTI
 int
 iptables_xml_main(int argc, char *argv[])
@@ -636,8 +634,6 @@ main(int argc, char *argv[])
 	int c;
 	FILE *in;
 
-	program_name = "iptables-xml";
-	program_version = IPTABLES_VERSION;
 	line = 0;
 
 	xtables_set_params(&iptables_xml_globals);
@@ -703,7 +699,7 @@ main(int argc, char *argv[])
 			if (!table) {
 				exit_error(PARAMETER_PROBLEM,
 					   "%s: line %u table name invalid\n",
-					   program_name, line);
+					   prog_name, line);
 				exit(1);
 			}
 			openTable(table);
@@ -720,7 +716,7 @@ main(int argc, char *argv[])
 			if (!chain) {
 				exit_error(PARAMETER_PROBLEM,
 					   "%s: line %u chain name invalid\n",
-					   program_name, line);
+					   prog_name, line);
 				exit(1);
 			}
 
@@ -731,7 +727,7 @@ main(int argc, char *argv[])
 			if (!policy) {
 				exit_error(PARAMETER_PROBLEM,
 					   "%s: line %u policy invalid\n",
-					   program_name, line);
+					   prog_name, line);
 				exit(1);
 			}
 
@@ -864,13 +860,13 @@ main(int argc, char *argv[])
 		}
 		if (!ret) {
 			fprintf(stderr, "%s: line %u failed\n",
-				program_name, line);
+				prog_name, line);
 			exit(1);
 		}
 	}
 	if (curTable[0]) {
 		fprintf(stderr, "%s: COMMIT expected at line %u\n",
-			program_name, line + 1);
+			prog_name, line + 1);
 		exit(1);
 	}
 

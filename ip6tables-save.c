@@ -136,10 +136,6 @@ int main(int argc, char *argv[])
 	const char *tablename = NULL;
 	int c;
 
-	program_name = "ip6tables-save";
-	program_version = IPTABLES_VERSION;
-
-	xtables_program_name = program_name;
 	ip6tables_globals.program_name = "ip6tables-save";
 	c = xtables_init_all(&ip6tables_globals, NFPROTO_IPV6);
 	if (c < 0) {

@@ -136,10 +136,6 @@ main(int argc, char *argv[])
 	const char *tablename = NULL;
 	int c;
 
-	program_name = "iptables-save";
-	program_version = IPTABLES_VERSION;
-
-	xtables_program_name = program_name;
 	iptables_globals.program_name = "iptables-save";
 	c = xtables_init_all(&iptables_globals, NFPROTO_IPV4);
 	if (c < 0) {

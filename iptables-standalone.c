@@ -50,10 +50,6 @@ main(int argc, char *argv[])
 	char *table = "filter";
 	struct iptc_handle *handle = NULL;
 
-	program_name = "iptables";
-	program_version = IPTABLES_VERSION;
-
-	xtables_program_name = program_name;
 	iptables_globals.program_name = "iptables";
 	ret = xtables_init_all(&iptables_globals, NFPROTO_IPV4);
 	if (ret < 0) {

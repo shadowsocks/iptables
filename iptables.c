@@ -196,8 +196,8 @@ static int inverse_for_options[NUMBER_OF_OPT] =
 /* -c */ 0,
 };
 
-const char *program_version;
-const char *program_name;
+#define prog_name iptables_globals.program_name
+#define prog_vers iptables_globals.program_version
 
 int kernel_version;
 
@@ -241,7 +241,7 @@ exit_tryhelp(int status)
 	if (line != -1)
 		fprintf(stderr, "Error occurred at line: %d\n", line);
 	fprintf(stderr, "Try `%s -h' or '%s --help' for more information.\n",
-			program_name, program_name );
+			prog_name, prog_name);
 	xtables_free_opts(1);
 	exit(status);
 }
@@ -262,9 +262,9 @@ exit_printhelp(struct xtables_rule_match *matches)
 "       %s -E old-chain-name new-chain-name\n"
 "       %s -P chain target [options]\n"
 "       %s -h (print this help information)\n\n",
-	       program_name, program_version, program_name, program_name,
-	       program_name, program_name, program_name, program_name,
-	       program_name, program_name, program_name);
+	       prog_name, prog_vers, prog_name, prog_name,
+	       prog_name, prog_name, prog_name, prog_name,
+	       prog_name, prog_name, prog_name);
 
 	printf(
 "Commands:\n"
@@ -342,7 +342,7 @@ iptables_exit_error(enum xtables_exittype status, const char *msg, ...)
 	va_list args;
 
 	va_start(args, msg);
-	fprintf(stderr, "%s v%s: ", program_name, program_version);
+	fprintf(stderr, "%s v%s: ", prog_name, prog_vers);
 	vfprintf(stderr, msg, args);
 	va_end(args);
 	fprintf(stderr, "\n");
@@ -1655,10 +1655,10 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 
 		case 'V':
 			if (invert)
-				printf("Not %s ;-)\n", program_version);
+				printf("Not %s ;-)\n", prog_vers);
 			else
 				printf("%s v%s\n",
-				       program_name, program_version);
+				       prog_name, prog_vers);
 			exit(0);
 
 		case '0':

@@ -71,7 +71,8 @@ static struct ip6tc_handle *create_handle(const char *tablename)
 
 	if (!handle) {
 		exit_error(PARAMETER_PROBLEM, "%s: unable to initialize "
-			"table '%s'\n", program_name, tablename);
+			"table '%s'\n", ip6tables_globals.program_name,
+			tablename);
 		exit(1);
 	}
 	return handle;
@@ -126,11 +127,8 @@ int main(int argc, char *argv[])
 	FILE *in;
 	int in_table = 0, testing = 0;
 
-	program_name = "ip6tables-restore";
-	program_version = IPTABLES_VERSION;
 	line = 0;
 
-	xtables_program_name = program_name;
 	ip6tables_globals.program_name = "ip6tables-restore";
 	c = xtables_init_all(&ip6tables_globals, NFPROTO_IPV6);
 	if (c < 0) {
@@ -215,7 +213,8 @@ int main(int argc, char *argv[])
 			if (!table) {
 				exit_error(PARAMETER_PROBLEM,
 					"%s: line %u table name invalid\n",
-					program_name, line);
+					ip6tables_globals.program_name,
+					line);
 				exit(1);
 			}
 			strncpy(curtable, table, IP6T_TABLE_MAXNAMELEN);
@@ -249,7 +248,8 @@ int main(int argc, char *argv[])
 			if (!chain) {
 				exit_error(PARAMETER_PROBLEM,
 					   "%s: line %u chain name invalid\n",
-					   program_name, line);
+					   ip6tables_globals.program_name,
+					   line);
 				exit(1);
 			}
 
@@ -276,7 +276,8 @@ int main(int argc, char *argv[])
 			if (!policy) {
 				exit_error(PARAMETER_PROBLEM,
 					   "%s: line %u policy invalid\n",
-					   program_name, line);
+					   ip6tables_globals.program_name,
+					   line);
 				exit(1);
 			}
 
@@ -441,13 +442,15 @@ int main(int argc, char *argv[])
 		}
 		if (!ret) {
 			fprintf(stderr, "%s: line %u failed\n",
-					program_name, line);
+					ip6tables_globals.program_name,
+					line);
 			exit(1);
 		}
 	}
 	if (in_table) {
 		fprintf(stderr, "%s: COMMIT expected at line %u\n",
-				program_name, line + 1);
+				ip6tables_globals.program_name,
+				line + 1);
 		exit(1);
 	}
 

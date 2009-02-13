@@ -159,11 +159,6 @@ static const struct xtables_afinfo afinfo_ipv6 = {
 
 static const struct xtables_afinfo *afinfo;
 
-/**
- * Program will set this to its own name.
- */
-const char *xtables_program_name;
-
 /* Search path for Xtables .so files */
 static const char *xtables_libdir;
 
@@ -719,7 +714,7 @@ void xtables_register_match(struct xtables_match *me)
 	if (strcmp(me->version, XTABLES_VERSION) != 0) {
 		fprintf(stderr, "%s: match \"%s\" has version \"%s\", "
 		        "but \"%s\" is required.\n",
-			xtables_program_name, me->name,
+			xt_params->program_name, me->name,
 			me->version, XTABLES_VERSION);
 		exit(1);
 	}
@@ -727,14 +722,14 @@ void xtables_register_match(struct xtables_match *me)
 	/* Revision field stole a char from name. */
 	if (strlen(me->name) >= XT_FUNCTION_MAXNAMELEN-1) {
 		fprintf(stderr, "%s: target `%s' has invalid name\n",
-			xtables_program_name, me->name);
+			xt_params->program_name, me->name);
 		exit(1);
 	}
 
 	if (me->family >= NPROTO) {
 		fprintf(stderr,
 			"%s: BUG: match %s has invalid protocol family\n",
-			xtables_program_name, me->name);
+			xt_params->program_name, me->name);
 		exit(1);
 	}
 
@@ -748,7 +743,7 @@ void xtables_register_match(struct xtables_match *me)
 		    old->family == me->family) {
 			fprintf(stderr,
 				"%s: match `%s' already registered.\n",
-				xtables_program_name, me->name);
+				xt_params->program_name, me->name);
 			exit(1);
 		}
 
@@ -772,7 +767,8 @@ void xtables_register_match(struct xtables_match *me)
 
 	if (me->size != XT_ALIGN(me->size)) {
 		fprintf(stderr, "%s: match `%s' has invalid size %u.\n",
-			xtables_program_name, me->name, (unsigned int)me->size);
+		        xt_params->program_name, me->name,
+		        (unsigned int)me->size);
 		exit(1);
 	}
 
@@ -792,7 +788,7 @@ void xtables_register_target(struct xtables_target *me)
 	if (strcmp(me->version, XTABLES_VERSION) != 0) {
 		fprintf(stderr, "%s: target \"%s\" has version \"%s\", "
 		        "but \"%s\" is required.\n",
-			xtables_program_name, me->name,
+			xt_params->program_name, me->name,
 			me->version, XTABLES_VERSION);
 		exit(1);
 	}
@@ -800,14 +796,14 @@ void xtables_register_target(struct xtables_target *me)
 	/* Revision field stole a char from name. */
 	if (strlen(me->name) >= XT_FUNCTION_MAXNAMELEN-1) {
 		fprintf(stderr, "%s: target `%s' has invalid name\n",
-			xtables_program_name, me->name);
+			xt_params->program_name, me->name);
 		exit(1);
 	}
 
 	if (me->family >= NPROTO) {
 		fprintf(stderr,
 			"%s: BUG: target %s has invalid protocol family\n",
-			xtables_program_name, me->name);
+			xt_params->program_name, me->name);
 		exit(1);
 	}
 
@@ -823,7 +819,7 @@ void xtables_register_target(struct xtables_target *me)
 		    old->family == me->family) {
 			fprintf(stderr,
 				"%s: target `%s' already registered.\n",
-				xtables_program_name, me->name);
+				xt_params->program_name, me->name);
 			exit(1);
 		}
 
@@ -847,7 +843,8 @@ void xtables_register_target(struct xtables_target *me)
 
 	if (me->size != XT_ALIGN(me->size)) {
 		fprintf(stderr, "%s: target `%s' has invalid size %u.\n",
-			xtables_program_name, me->name, (unsigned int)me->size);
+		        xt_params->program_name, me->name,
+		        (unsigned int)me->size);
 		exit(1);
 	}
 

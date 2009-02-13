@@ -49,10 +49,6 @@ main(int argc, char *argv[])
 	char *table = "filter";
 	struct ip6tc_handle *handle = NULL;
 
-	program_name = "ip6tables";
-	program_version = IPTABLES_VERSION;
-
-	xtables_program_name = program_name;
 	ip6tables_globals.program_name = "ip6tables";
 	ret = xtables_init_all(&ip6tables_globals, NFPROTO_IPV6);
 	if (ret < 0) {

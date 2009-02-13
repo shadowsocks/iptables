@@ -41,6 +41,8 @@ static const struct option options[] = {
 
 static void print_usage(const char *name, const char *version) __attribute__((noreturn));
 
+#define prog_name iptables_globals.program_name
+
 static void print_usage(const char *name, const char *version)
 {
 	fprintf(stderr, "Usage: %s [-b] [-c] [-v] [-t] [-h]\n"
@@ -70,7 +72,7 @@ static struct iptc_handle *create_handle(const char *tablename)
 
 	if (!handle) {
 		exit_error(PARAMETER_PROBLEM, "%s: unable to initialize "
-			"table '%s'\n", program_name, tablename);
+			"table '%s'\n", prog_name, tablename);
 		exit(1);
 	}
 	return handle;
@@ -128,11 +130,8 @@ main(int argc, char *argv[])
 	int in_table = 0, testing = 0;
 	const char *tablename = NULL;
 
-	program_name = "iptables-restore";
-	program_version = IPTABLES_VERSION;
 	line = 0;
 
-	xtables_program_name = program_name;
 	iptables_globals.program_name = "iptables-restore";
 	c = xtables_init_all(&iptables_globals, NFPROTO_IPV4);
 	if (c < 0) {
@@ -220,7 +219,7 @@ main(int argc, char *argv[])
 			if (!table) {
 				exit_error(PARAMETER_PROBLEM,
 					"%s: line %u table name invalid\n",
-					program_name, line);
+					prog_name, line);
 				exit(1);
 			}
 			strncpy(curtable, table, IPT_TABLE_MAXNAMELEN);
@@ -256,7 +255,7 @@ main(int argc, char *argv[])
 			if (!chain) {
 				exit_error(PARAMETER_PROBLEM,
 					   "%s: line %u chain name invalid\n",
-					   program_name, line);
+					   prog_name, line);
 				exit(1);
 			}
 
@@ -283,7 +282,7 @@ main(int argc, char *argv[])
 			if (!policy) {
 				exit_error(PARAMETER_PROBLEM,
 					   "%s: line %u policy invalid\n",
-					   program_name, line);
+					   prog_name, line);
 				exit(1);
 			}
 
@@ -450,13 +449,13 @@ main(int argc, char *argv[])
 			continue;
 		if (!ret) {
 			fprintf(stderr, "%s: line %u failed\n",
-					program_name, line);
+					prog_name, line);
 			exit(1);
 		}
 	}
 	if (in_table) {
 		fprintf(stderr, "%s: COMMIT expected at line %u\n",
-				program_name, line + 1);
+				prog_name, line + 1);
 		exit(1);
 	}
 
