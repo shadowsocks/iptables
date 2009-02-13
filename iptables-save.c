@@ -140,9 +140,14 @@ main(int argc, char *argv[])
 	program_version = IPTABLES_VERSION;
 
 	xtables_program_name = program_name;
-	xtables_init();
-	xtables_set_nfproto(NFPROTO_IPV4);
 	iptables_globals.program_name = "iptables-save";
+	c = xtables_init_all(&iptables_globals, NFPROTO_IPV4);
+	if (c < 0) {
+		fprintf(stderr, "%s/%s Failed to initialize xtables\n",
+				iptables_globals.program_name,
+				iptables_globals.program_version);
+		exit(1);
+	}
 #ifdef NO_SHARED_LIBS
 	init_extensions();
 #endif

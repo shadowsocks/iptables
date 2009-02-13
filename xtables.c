@@ -73,31 +73,6 @@ void basic_exit_err(enum xtables_exittype status, const char *msg, ...)
 }
 
 
-/**
- * xtables_set_params - set the global parameters used by xtables
- * @xtp:	input xtables_globals structure
- *
- * The app is expected to pass a valid xtables_globals data-filled
- * with proper values
- * @xtp cannot be NULL
- *
- * Returns -1 on failure to set and 0 on success
- */
-int xtables_set_params(struct xtables_globals *xtp)
-{
-	if (!xtp) {
-		fprintf(stderr, "%s: Illegal global params\n",__func__);
-		return -1;
-	}
-
-	xt_params = xtp;
-
-	if (!xt_params->exit_err)
-		xt_params->exit_err = basic_exit_err;
-
-	return 0;
-}
-
 void xtables_free_opts(int reset_offset)
 {
 	if (xt_params->opts != xt_params->orig_opts) {
@@ -239,6 +214,38 @@ void xtables_set_nfproto(uint8_t nfproto)
 		fprintf(stderr, "libxtables: unhandled NFPROTO in %s\n",
 		        __func__);
 	}
+}
+
+/**
+ * xtables_set_params - set the global parameters used by xtables
+ * @xtp:	input xtables_globals structure
+ *
+ * The app is expected to pass a valid xtables_globals data-filled
+ * with proper values
+ * @xtp cannot be NULL
+ *
+ * Returns -1 on failure to set and 0 on success
+ */
+int xtables_set_params(struct xtables_globals *xtp)
+{
+	if (!xtp) {
+		fprintf(stderr, "%s: Illegal global params\n",__func__);
+		return -1;
+	}
+
+	xt_params = xtp;
+
+	if (!xt_params->exit_err)
+		xt_params->exit_err = basic_exit_err;
+
+	return 0;
+}
+
+int xtables_init_all(struct xtables_globals *xtp, uint8_t nfproto)
+{
+	xtables_init();
+	xtables_set_nfproto(nfproto);
+	return xtables_set_params(xtp);
 }
 
 /**

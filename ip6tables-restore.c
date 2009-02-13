@@ -131,9 +131,14 @@ int main(int argc, char *argv[])
 	line = 0;
 
 	xtables_program_name = program_name;
-	xtables_init();
-	xtables_set_nfproto(NFPROTO_IPV6);
 	ip6tables_globals.program_name = "ip6tables-restore";
+	c = xtables_init_all(&ip6tables_globals, NFPROTO_IPV6);
+	if (c < 0) {
+		fprintf(stderr, "%s/%s Failed to initialize xtables\n",
+				ip6tables_globals.program_name,
+				ip6tables_globals.program_version);
+		exit(1);
+	}
 #ifdef NO_SHARED_LIBS
 	init_extensions();
 #endif

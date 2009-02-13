@@ -1352,7 +1352,6 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
            demand-load a protocol. */
 	opterr = 0;
 
-	xtables_set_params(&iptables_globals);
 	while ((c = getopt_long(argc, argv,
 	   "-A:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:fbvnt:m:xc:g:",
 					   opts, NULL)) != -1) {
