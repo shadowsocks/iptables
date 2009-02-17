@@ -108,7 +108,8 @@ tarball:
 	tar -C /tmp -cjf ${PACKAGE_TARNAME}-${PACKAGE_VERSION}.tar.bz2 --owner=root --group=root ${PACKAGE_TARNAME}-${PACKAGE_VERSION}/;
 	rm -Rf /tmp/${PACKAGE_TARNAME}-${PACKAGE_VERSION};
 
-config.status: include/xtables.h.in include/iptables/internal.h.in
+config.status: extensions/GNUmakefile.in \
+	include/xtables.h.in include/iptables/internal.h.in
 
 # ldconfig may fail when we are not root (as is the case in build systems)
 # so add appropriate protection that it does not let `make` fail.
