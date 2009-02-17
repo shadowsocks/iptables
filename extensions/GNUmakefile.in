@@ -166,13 +166,7 @@ man_run    = \
 			cat "$$f"; \
 			continue; \
 		fi; \
-		f="${srcdir}/libipt_$$ext.man"; \
-		if [ -f "$$f" ]; then \
-			echo ".SS $$ext"; \
-			cat "$$f"; \
-			continue; \
-		fi; \
-		f="${srcdir}/libip6t_$$ext.man"; \
+		f="${srcdir}/lib$(2)t_$$ext.man"; \
 		if [ -f "$$f" ]; then \
 			echo ".SS $$ext"; \
 			cat "$$f"; \
@@ -181,13 +175,13 @@ man_run    = \
 	done >$@;
 
 matches4.man: .initext4.dd $(wildcard ${srcdir}/lib*.man)
-	$(call man_run,$(call ex_matches,${pfx_build_mod} ${pf4_build_mod}))
+	$(call man_run,$(call ex_matches,${pfx_build_mod} ${pf4_build_mod}),ip)
 
 matches6.man: .initext6.dd $(wildcard ${srcdir}/lib*.man)
-	$(call man_run,$(call ex_matches,${pfx_build_mod} ${pf6_build_mod}))
+	$(call man_run,$(call ex_matches,${pfx_build_mod} ${pf6_build_mod}),ip6)
 
 targets4.man: .initext4.dd $(wildcard ${srcdir}/lib*.man)
-	$(call man_run,$(call ex_targets,${pfx_build_mod} ${pf4_build_mod}))
+	$(call man_run,$(call ex_targets,${pfx_build_mod} ${pf4_build_mod}),ip)
 
 targets6.man: .initext6.dd $(wildcard ${srcdir}/lib*.man)
-	$(call man_run,$(call ex_targets,${pfx_build_mod} ${pf6_build_mod}))
+	$(call man_run,$(call ex_targets,${pfx_build_mod} ${pf6_build_mod}),ip6)
