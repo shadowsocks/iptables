@@ -198,7 +198,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		e->match.reqid = 1;
 		e->invert.reqid = invert;
-		e->reqid = strtol(argv[optind-1], NULL, 10);
+		e->reqid = strtoul(argv[optind-1], NULL, 10);
 		break;
 	case '5':
 		if (e->match.spi)
@@ -207,7 +207,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		e->match.spi = 1;
 		e->invert.spi = invert;
-		e->spi = strtol(argv[optind-1], NULL, 0x10);
+		e->spi = strtoul(argv[optind-1], NULL, 0x10);
 		break;
 	case '6':
 		if (e->match.saddr)
