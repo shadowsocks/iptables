@@ -30,16 +30,16 @@ ip6tables - IPv6 packet filter administration
 \fBip6tables\fP [\fB\-t\fP \fItable\fP] {\fB\-A\fP|\fB\-D\fP} \fIchain
 rule-specification\fP [\fIoptions...\fP]
 .PP
-\fBip6tables\fP [\fB\-t\fP \fItable\fP] \fB\-I\fP [\fIrulenum\fP]
+\fBip6tables\fP [\fB\-t\fP \fItable\fP] \fB\-I\fP \fIchain\fP [\fIrulenum\fP]
 \fIrule-specification\fP [\fIoptions...\fP]
 .PP
-\fBip6tables\fP [\fB\-t\fP \fItable\fP] \fB\-R\fP \fIrulenum
+\fBip6tables\fP [\fB\-t\fP \fItable\fP] \fB\-R\fP \fIchain rulenum
 rule-specification\fP [\fIoptions...\fP]
 .PP
 \fBip6tables\fP [\fB\-t\fP \fItable\fP] \fB\-D\fP \fIchain rulenum\fP
 [\fIoptions...\fP]
 .PP
-\fBip6tables\fP [\fB\-t\fP \fItable\fP] \fB\-S\fP [\fIchain\fP]
+\fBip6tables\fP [\fB\-t\fP \fItable\fP] \fB\-S\fP [\fIchain\fP [\fIrulenum\fP]]
 .PP
 \fBip6tables\fP [\fB\-t\fP \fItable\fP] {\fB\-F\fP|\fB\-L\fP|\fB\-Z\fP}
 [\fIchain\fP] [\fIoptions...\fP]

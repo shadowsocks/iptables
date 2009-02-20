@@ -240,7 +240,8 @@ exit_printhelp(struct xtables_rule_match *matches)
 
 	printf("%s v%s\n\n"
 "Usage: %s -[AD] chain rule-specification [options]\n"
-"       %s -[RI] chain rulenum rule-specification [options]\n"
+"       %s -I chain [rulenum] rule-specification [options]\n"
+"       %s -R chain rulenum rule-specification [options]\n"
 "       %s -D chain rulenum [options]\n"
 "       %s -[LS] [chain [rulenum]] [options]\n"
 "       %s -[FZ] [chain] [options]\n"
@@ -250,7 +251,7 @@ exit_printhelp(struct xtables_rule_match *matches)
 "       %s -h (print this help information)\n\n",
 	       prog_name, prog_vers, prog_name, prog_name,
 	       prog_name, prog_name, prog_name, prog_name,
-	       prog_name, prog_name, prog_name);
+	       prog_name, prog_name, prog_name, prog_name);
 
 	printf(
 "Commands:\n"

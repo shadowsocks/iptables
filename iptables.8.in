@@ -27,13 +27,13 @@ iptables - administration tool for IPv4 packet filtering and NAT
 .SH SYNOPSIS
 \fBiptables\fP [\fB\-t\fP \fItable\fP] {\fB\-A\fP|\fB\-D\fP} \fIchain\fP \fIrule-specification\fP
 .PP
-\fBiptables\fP [\fB\-t\fP \fItable\fP] \fB\-I\fP [\fIrulenum\fP] \fIrule-specification\fP
+\fBiptables\fP [\fB\-t\fP \fItable\fP] \fB\-I\fP \fIchain\fP [\fIrulenum\fP] \fIrule-specification\fP
 .PP
-\fBiptables\fP [\fB\-t\fP \fItable\fP] \fB\-R\fP \fIrulenum rule-specification\fP
+\fBiptables\fP [\fB\-t\fP \fItable\fP] \fB\-R\fP \fIchain rulenum rule-specification\fP
 .PP
 \fBiptables\fP [\fB\-t\fP \fItable\fP] \fB\-D\fP \fIchain rulenum\fP
 .PP
-\fBiptables\fP [\fB\-t\fP \fItable\fP] \fB\-S\fP [\fIchain\fP]
+\fBiptables\fP [\fB\-t\fP \fItable\fP] \fB\-S\fP [\fIchain\fP [\fIrulenum\fP]]
 .PP
 \fBiptables\fP [\fB\-t\fP \fItable\fP] {\fB\-F\fP|\fB\-L\fP|\fB\-Z\fP} [\fIchain\fP] [\fIoptions...\fP]
 .PP
