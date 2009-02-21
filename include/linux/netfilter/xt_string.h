@@ -6,7 +6,7 @@
 
 enum {
 	XT_STRING_FLAG_INVERT		= 0x01,
-	XT_STRING_FLAG_IGNORECASE 	= 0x02
+	XT_STRING_FLAG_IGNORECASE	= 0x02
 };
 
 struct xt_string_info
@@ -18,11 +18,11 @@ struct xt_string_info
 	u_int8_t  patlen;
 	union {
 		struct {
-			u_int8_t invert;
+			u_int8_t  invert;
 		} v0;
 
 		struct {
-			u_int8_t flags;
+			u_int8_t  flags;
 		} v1;
 	} u;
 

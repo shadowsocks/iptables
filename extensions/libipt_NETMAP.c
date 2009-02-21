@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <xtables.h>
-#include <linux/netfilter/nf_nat.h>
+#include <net/netfilter/nf_nat.h>
 
 #define MODULENAME "NETMAP"
 
@@ -53,7 +53,7 @@ netmask2bits(u_int32_t netmask)
 
 static void NETMAP_init(struct xt_entry_target *t)
 {
-	struct ip_nat_multi_range *mr = (struct ip_nat_multi_range *)t->data;
+	struct nf_nat_multi_range *mr = (struct nf_nat_multi_range *)t->data;
 
 	/* Actually, it's 0, but it's ignored at the moment. */
 	mr->rangesize = 1;
@@ -62,7 +62,7 @@ static void NETMAP_init(struct xt_entry_target *t)
 
 /* Parses network address */
 static void
-parse_to(char *arg, struct ip_nat_range *range)
+parse_to(char *arg, struct nf_nat_range *range)
 {
 	char *slash;
 	const struct in_addr *ip;
@@ -112,8 +112,8 @@ parse_to(char *arg, struct ip_nat_range *range)
 static int NETMAP_parse(int c, char **argv, int invert, unsigned int *flags,
                         const void *entry, struct xt_entry_target **target)
 {
-	struct ip_nat_multi_range *mr
-		= (struct ip_nat_multi_range *)(*target)->data;
+	struct nf_nat_multi_range *mr
+		= (struct nf_nat_multi_range *)(*target)->data;
 
 	switch (c) {
 	case '1':
@@ -140,9 +140,9 @@ static void NETMAP_check(unsigned int flags)
 static void NETMAP_print(const void *ip, const struct xt_entry_target *target,
                          int numeric)
 {
-	struct ip_nat_multi_range *mr
-		= (struct ip_nat_multi_range *)target->data;
-	struct ip_nat_range *r = &mr->range[0];
+	struct nf_nat_multi_range *mr
+		= (struct nf_nat_multi_range *)target->data;
+	struct nf_nat_range *r = &mr->range[0];
 	struct in_addr a;
 	int bits;
 
@@ -166,8 +166,8 @@ static struct xtables_target netmap_tg_reg = {
 	.name		= MODULENAME,
 	.version	= XTABLES_VERSION,
 	.family		= NFPROTO_IPV4,
-	.size		= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
-	.userspacesize	= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
+	.size		= XT_ALIGN(sizeof(struct nf_nat_multi_range)),
+	.userspacesize	= XT_ALIGN(sizeof(struct nf_nat_multi_range)),
 	.help		= NETMAP_help,
 	.init		= NETMAP_init,
 	.parse		= NETMAP_parse,

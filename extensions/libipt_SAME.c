@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <xtables.h>
-#include <linux/netfilter/nf_nat.h>
+#include <net/netfilter/nf_nat.h>
 /* For 64bit kernel / 32bit userspace */
 #include <linux/netfilter_ipv4/ipt_SAME.h>
 
@@ -44,7 +44,7 @@ static void SAME_init(struct xt_entry_target *t)
 
 /* Parses range of IPs */
 static void
-parse_to(char *arg, struct ip_nat_range *range)
+parse_to(char *arg, struct nf_nat_range *range)
 {
 	char *dash;
 	const struct in_addr *ip;
@@ -145,7 +145,7 @@ static void SAME_print(const void *ip, const struct xt_entry_target *target,
 	printf("same:");
 	
 	for (count = 0; count < mr->rangesize; count++) {
-		struct ip_nat_range *r = &mr->range[count];
+		struct nf_nat_range *r = &mr->range[count];
 		struct in_addr a;
 
 		a.s_addr = r->min_ip;
@@ -176,7 +176,7 @@ static void SAME_save(const void *ip, const struct xt_entry_target *target)
 	int random_selection = 0;
 
 	for (count = 0; count < mr->rangesize; count++) {
-		struct ip_nat_range *r = &mr->range[count];
+		struct nf_nat_range *r = &mr->range[count];
 		struct in_addr a;
 
 		a.s_addr = r->min_ip;

@@ -7,7 +7,7 @@
 #include <xtables.h>
 #include <iptables.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
-#include <linux/netfilter/nf_nat.h>
+#include <net/netfilter/nf_nat.h>
 
 #define IPT_SNAT_OPT_SOURCE 0x01
 #define IPT_SNAT_OPT_RANDOM 0x02
@@ -17,7 +17,7 @@
 struct ipt_natinfo
 {
 	struct xt_entry_target t;
-	struct ip_nat_multi_range mr;
+	struct nf_nat_multi_range mr;
 };
 
 static void SNAT_help(void)
@@ -36,7 +36,7 @@ static const struct option SNAT_opts[] = {
 };
 
 static struct ipt_natinfo *
-append_range(struct ipt_natinfo *info, const struct ip_nat_range *range)
+append_range(struct ipt_natinfo *info, const struct nf_nat_range *range)
 {
 	unsigned int size;
 
@@ -58,7 +58,7 @@ append_range(struct ipt_natinfo *info, const struct ip_nat_range *range)
 static struct xt_entry_target *
 parse_to(char *arg, int portok, struct ipt_natinfo *info)
 {
-	struct ip_nat_range range;
+	struct nf_nat_range range;
 	char *colon, *dash, *error;
 	const struct in_addr *ip;
 
@@ -190,7 +190,7 @@ static void SNAT_check(unsigned int flags)
 			   "You must specify --to-source");
 }
 
-static void print_range(const struct ip_nat_range *r)
+static void print_range(const struct nf_nat_range *r)
 {
 	if (r->flags & IP_NAT_RANGE_MAP_IPS) {
 		struct in_addr a;
@@ -243,8 +243,8 @@ static struct xtables_target snat_tg_reg = {
 	.name		= "SNAT",
 	.version	= XTABLES_VERSION,
 	.family		= NFPROTO_IPV4,
-	.size		= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
-	.userspacesize	= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
+	.size		= XT_ALIGN(sizeof(struct nf_nat_multi_range)),
+	.userspacesize	= XT_ALIGN(sizeof(struct nf_nat_multi_range)),
 	.help		= SNAT_help,
 	.parse		= SNAT_parse,
 	.final_check	= SNAT_check,

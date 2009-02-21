@@ -6,7 +6,7 @@
 #include <getopt.h>
 #include <xtables.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
-#include <linux/netfilter/nf_nat.h>
+#include <net/netfilter/nf_nat.h>
 
 #define IPT_REDIRECT_OPT_DEST	0x01
 #define IPT_REDIRECT_OPT_RANDOM	0x02
@@ -27,7 +27,7 @@ static const struct option REDIRECT_opts[] = {
 
 static void REDIRECT_init(struct xt_entry_target *t)
 {
-	struct ip_nat_multi_range *mr = (struct ip_nat_multi_range *)t->data;
+	struct nf_nat_multi_range *mr = (struct nf_nat_multi_range *)t->data;
 
 	/* Actually, it's 0, but it's ignored at the moment. */
 	mr->rangesize = 1;
@@ -36,7 +36,7 @@ static void REDIRECT_init(struct xt_entry_target *t)
 
 /* Parses ports */
 static void
-parse_ports(const char *arg, struct ip_nat_multi_range *mr)
+parse_ports(const char *arg, struct nf_nat_multi_range *mr)
 {
 	const char *dash;
 	int port;
@@ -78,8 +78,8 @@ static int REDIRECT_parse(int c, char **argv, int invert, unsigned int *flags,
                           const void *e, struct xt_entry_target **target)
 {
 	const struct ipt_entry *entry = e;
-	struct ip_nat_multi_range *mr
-		= (struct ip_nat_multi_range *)(*target)->data;
+	struct nf_nat_multi_range *mr
+		= (struct nf_nat_multi_range *)(*target)->data;
 	int portok;
 
 	if (entry->ip.proto == IPPROTO_TCP
@@ -123,9 +123,9 @@ static int REDIRECT_parse(int c, char **argv, int invert, unsigned int *flags,
 static void REDIRECT_print(const void *ip, const struct xt_entry_target *target,
                            int numeric)
 {
-	struct ip_nat_multi_range *mr
-		= (struct ip_nat_multi_range *)target->data;
-	struct ip_nat_range *r = &mr->range[0];
+	struct nf_nat_multi_range *mr
+		= (struct nf_nat_multi_range *)target->data;
+	struct nf_nat_range *r = &mr->range[0];
 
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
 		printf("redir ports ");
@@ -140,9 +140,9 @@ static void REDIRECT_print(const void *ip, const struct xt_entry_target *target,
 
 static void REDIRECT_save(const void *ip, const struct xt_entry_target *target)
 {
-	struct ip_nat_multi_range *mr
-		= (struct ip_nat_multi_range *)target->data;
-	struct ip_nat_range *r = &mr->range[0];
+	struct nf_nat_multi_range *mr
+		= (struct nf_nat_multi_range *)target->data;
+	struct nf_nat_range *r = &mr->range[0];
 
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
 		printf("--to-ports ");
@@ -159,8 +159,8 @@ static struct xtables_target redirect_tg_reg = {
 	.name		= "REDIRECT",
 	.version	= XTABLES_VERSION,
 	.family		= NFPROTO_IPV4,
-	.size		= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
-	.userspacesize	= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
+	.size		= XT_ALIGN(sizeof(struct nf_nat_multi_range)),
+	.userspacesize	= XT_ALIGN(sizeof(struct nf_nat_multi_range)),
 	.help		= REDIRECT_help,
 	.init		= REDIRECT_init,
  	.parse		= REDIRECT_parse,

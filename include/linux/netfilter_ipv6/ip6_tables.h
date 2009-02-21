@@ -15,6 +15,8 @@
 #ifndef _IP6_TABLES_H
 #define _IP6_TABLES_H
 
+#include <linux/types.h>
+
 #include <linux/netfilter_ipv6.h>
 
 #include <linux/netfilter/x_tables.h>

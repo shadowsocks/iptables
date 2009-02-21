@@ -6,7 +6,7 @@
 #include <getopt.h>
 #include <xtables.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
-#include <linux/netfilter/nf_nat.h>
+#include <net/netfilter/nf_nat.h>
 
 static void MASQUERADE_help(void)
 {
@@ -26,7 +26,7 @@ static const struct option MASQUERADE_opts[] = {
 
 static void MASQUERADE_init(struct xt_entry_target *t)
 {
-	struct ip_nat_multi_range *mr = (struct ip_nat_multi_range *)t->data;
+	struct nf_nat_multi_range *mr = (struct nf_nat_multi_range *)t->data;
 
 	/* Actually, it's 0, but it's ignored at the moment. */
 	mr->rangesize = 1;
@@ -35,7 +35,7 @@ static void MASQUERADE_init(struct xt_entry_target *t)
 
 /* Parses ports */
 static void
-parse_ports(const char *arg, struct ip_nat_multi_range *mr)
+parse_ports(const char *arg, struct nf_nat_multi_range *mr)
 {
 	const char *dash;
 	int port;
@@ -72,8 +72,8 @@ static int MASQUERADE_parse(int c, char **argv, int invert, unsigned int *flags,
 {
 	const struct ipt_entry *entry = e;
 	int portok;
-	struct ip_nat_multi_range *mr
-		= (struct ip_nat_multi_range *)(*target)->data;
+	struct nf_nat_multi_range *mr
+		= (struct nf_nat_multi_range *)(*target)->data;
 
 	if (entry->ip.proto == IPPROTO_TCP
 	    || entry->ip.proto == IPPROTO_UDP
@@ -110,9 +110,9 @@ static void
 MASQUERADE_print(const void *ip, const struct xt_entry_target *target,
                  int numeric)
 {
-	struct ip_nat_multi_range *mr
-		= (struct ip_nat_multi_range *)target->data;
-	struct ip_nat_range *r = &mr->range[0];
+	struct nf_nat_multi_range *mr
+		= (struct nf_nat_multi_range *)target->data;
+	struct nf_nat_range *r = &mr->range[0];
 
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
 		printf("masq ports: ");
@@ -129,9 +129,9 @@ MASQUERADE_print(const void *ip, const struct xt_entry_target *target,
 static void
 MASQUERADE_save(const void *ip, const struct xt_entry_target *target)
 {
-	struct ip_nat_multi_range *mr
-		= (struct ip_nat_multi_range *)target->data;
-	struct ip_nat_range *r = &mr->range[0];
+	struct nf_nat_multi_range *mr
+		= (struct nf_nat_multi_range *)target->data;
+	struct nf_nat_range *r = &mr->range[0];
 
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
 		printf("--to-ports %hu", ntohs(r->min.tcp.port));
@@ -148,8 +148,8 @@ static struct xtables_target masquerade_tg_reg = {
 	.name		= "MASQUERADE",
 	.version	= XTABLES_VERSION,
 	.family		= NFPROTO_IPV4,
-	.size		= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
-	.userspacesize	= XT_ALIGN(sizeof(struct ip_nat_multi_range)),
+	.size		= XT_ALIGN(sizeof(struct nf_nat_multi_range)),
+	.userspacesize	= XT_ALIGN(sizeof(struct nf_nat_multi_range)),
 	.help		= MASQUERADE_help,
 	.init		= MASQUERADE_init,
 	.parse		= MASQUERADE_parse,
