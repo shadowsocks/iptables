@@ -124,7 +124,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 	struct ipt_policy_info *info = (void *)(*match)->data;
 	struct ipt_policy_elem *e = &info->pol[info->len];
 	struct in_addr *addr = NULL, mask;
-	unsigned int naddr = 0;
+	unsigned int naddr = 0, num;
 	int mode;
 
 	xtables_check_inverse(optarg, &invert, &optind, 0);
@@ -165,7 +165,9 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		e->match.reqid = 1;
 		e->invert.reqid = invert;
-		e->reqid = strtoul(argv[optind-1], NULL, 10);
+		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
+			xtables_param_act(XTF_BAD_VALUE, "policy", "--spi", optarg);
+		e->reqid = num;
 		break;
 	case '5':
 		if (e->match.spi)
@@ -174,7 +176,9 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		e->match.spi = 1;
 		e->invert.spi = invert;
-		e->spi = strtoul(argv[optind-1], NULL, 0x10);
+		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
+			xtables_param_act(XTF_BAD_VALUE, "policy", "--spi", optarg);
+		e->spi = num;
 		break;
 	case '6':
 		if (e->match.saddr)
