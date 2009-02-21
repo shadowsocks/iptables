@@ -25,12 +25,12 @@ parse_bindings(const char *opt_arg, struct ipt_set_info *info)
 		else if (strncmp(ptr, "dst", 3) == 0)
 			info->flags[i++] |= IPSET_DST;
 		else
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "You must spefify (the comma separated list of) 'src' or 'dst'.");
 	}
 
 	if (tmp)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "Can't follow bindings deeper than %i.", 
 			   IP_SET_MAX_BINDINGS - 1);
 
@@ -42,7 +42,7 @@ static int get_set_getsockopt(void *data, socklen_t * size)
 	int sockfd = -1;
 	sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
 	if (sockfd < 0)
-		exit_error(OTHER_PROBLEM,
+		xtables_error(OTHER_PROBLEM,
 			   "Can't open socket to ipset.\n");
 	/* Send! */
 	return getsockopt(sockfd, SOL_IP, SO_IP_SET, data, size);
@@ -60,16 +60,16 @@ static void get_set_byname(const char *setname, struct ipt_set_info *info)
 	req.set.name[IP_SET_MAXNAMELEN - 1] = '\0';
 	res = get_set_getsockopt(&req, &size);
 	if (res != 0)
-		exit_error(OTHER_PROBLEM,
+		xtables_error(OTHER_PROBLEM,
 			   "Problem when communicating with ipset, errno=%d.\n",
 			   errno);
 	if (size != sizeof(struct ip_set_req_get_set))
-		exit_error(OTHER_PROBLEM,
+		xtables_error(OTHER_PROBLEM,
 			   "Incorrect return size from kernel during ipset lookup, "
 			   "(want %zu, got %zu)\n",
 			   sizeof(struct ip_set_req_get_set), (size_t)size);
 	if (req.set.index == IP_SET_INVALID_ID)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "Set %s doesn't exist.\n", setname);
 
 	info->index = req.set.index;
@@ -86,16 +86,16 @@ static void get_set_byid(char * setname, ip_set_id_t idx)
 	req.set.index = idx;
 	res = get_set_getsockopt(&req, &size);
 	if (res != 0)
-		exit_error(OTHER_PROBLEM,
+		xtables_error(OTHER_PROBLEM,
 			   "Problem when communicating with ipset, errno=%d.\n",
 			   errno);
 	if (size != sizeof(struct ip_set_req_get_set))
-		exit_error(OTHER_PROBLEM,
+		xtables_error(OTHER_PROBLEM,
 			   "Incorrect return size from kernel during ipset lookup, "
 			   "(want %zu, got %zu)\n",
 			   sizeof(struct ip_set_req_get_set), (size_t)size);
 	if (req.set.name[0] == '\0')
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "Set id %i in kernel doesn't exist.\n", idx);
 
 	strncpy(setname, req.set.name, IP_SET_MAXNAMELEN);

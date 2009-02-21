@@ -53,7 +53,7 @@ parse_tcp_ports(const char *portstring, u_int16_t *ports)
 		ports[1] = cp[0] ? xtables_parse_port(cp, "tcp") : 0xFFFF;
 
 		if (ports[0] > ports[1])
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "invalid portrange (min > max)");
 	}
 	free(buffer);
@@ -95,7 +95,7 @@ parse_tcp_flag(const char *flags)
 			}
 		}
 		if (i == sizeof(tcp_flag_names)/sizeof(struct tcp_flag_names))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Unknown TCP flag `%s'", ptr);
 		}
 
@@ -122,7 +122,7 @@ parse_tcp_option(const char *option, u_int8_t *result)
 	unsigned int ret;
 
 	if (!xtables_strtoui(option, NULL, &ret, 1, UINT8_MAX))
-		exit_error(PARAMETER_PROBLEM, "Bad TCP option `%s'", option);
+		xtables_error(PARAMETER_PROBLEM, "Bad TCP option \"%s\"", option);
 
 	*result = ret;
 }
@@ -148,7 +148,7 @@ tcp_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags & TCP_SRC_PORTS)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--source-port' allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_ports(argv[optind-1], tcpinfo->spts);
@@ -159,7 +159,7 @@ tcp_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '2':
 		if (*flags & TCP_DST_PORTS)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--destination-port' allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_ports(argv[optind-1], tcpinfo->dpts);
@@ -170,7 +170,7 @@ tcp_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '3':
 		if (*flags & TCP_FLAGS)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one of `--syn' or `--tcp-flags' "
 				   " allowed");
 		parse_tcp_flags(tcpinfo, "SYN,RST,ACK,FIN", "SYN", invert);
@@ -179,14 +179,14 @@ tcp_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '4':
 		if (*flags & TCP_FLAGS)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one of `--syn' or `--tcp-flags' "
 				   " allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if (!argv[optind]
 		    || argv[optind][0] == '-' || argv[optind][0] == '!')
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "--tcp-flags requires two args.");
 
 		parse_tcp_flags(tcpinfo, argv[optind-1], argv[optind],
@@ -197,7 +197,7 @@ tcp_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '5':
 		if (*flags & TCP_OPTION)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--tcp-option' allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_option(argv[optind-1], &tcpinfo->option);

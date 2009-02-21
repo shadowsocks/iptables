@@ -166,12 +166,12 @@ static int realm_parse(int c, char **argv, int invert, unsigned int *flags,
 			else
 				realminfo->mask = 0xffffffff;
 			if (*end != '\0' || end == optarg)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "Bad realm value `%s'", optarg);
 		} else {
 			id = realm_name2id(optarg);
 			if (id == -1)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "Realm `%s' not found", optarg);
 			realminfo->id = id;
 			realminfo->mask = 0xffffffff;
@@ -230,7 +230,7 @@ static void realm_save(const void *ip, const struct xt_entry_match *match)
 static void realm_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "realm match: You must specify `--realm'");
 }
 

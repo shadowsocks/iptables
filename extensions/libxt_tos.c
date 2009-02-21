@@ -54,7 +54,7 @@ static int tos_mt_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		if (!tos_parse_symbolic(optarg, &tvm, 0xFF))
 			xtables_param_act(XTF_BAD_VALUE, "tos", "--tos", optarg);
 		if (tvm.mask != 0xFF)
-			exit_error(PARAMETER_PROBLEM, "tos: Your kernel is "
+			xtables_error(PARAMETER_PROBLEM, "tos: Your kernel is "
 			           "too old to support anything besides /0xFF "
 				   "as a mask.");
 		info->tos = tvm.value;
@@ -90,7 +90,7 @@ static int tos_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 static void tos_mt_check(unsigned int flags)
 {
 	if (flags == 0)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "tos: --tos parameter required");
 }
 

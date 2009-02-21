@@ -63,18 +63,18 @@ MARK_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (!xtables_strtoui(optarg, NULL, &mark, 0, UINT32_MAX))
-			exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
+			xtables_error(PARAMETER_PROBLEM, "Bad MARK value \"%s\"", optarg);
 		markinfo->mark = mark;
 		if (*flags)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "MARK target: Can't specify --set-mark twice");
 		*flags = 1;
 		break;
 	case '2':
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "MARK target: kernel too old for --and-mark");
 	case '3':
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "MARK target: kernel too old for --or-mark");
 	default:
 		return 0;
@@ -86,7 +86,7 @@ MARK_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 static void MARK_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "MARK target: Parameter --set/and/or-mark"
 			   " is required");
 }
@@ -114,10 +114,10 @@ MARK_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 	}
 
 	if (!xtables_strtoui(optarg, NULL, &mark, 0, UINT32_MAX))
-		exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
+		xtables_error(PARAMETER_PROBLEM, "Bad MARK value \"%s\"", optarg);
 	markinfo->mark = mark;
 	if (*flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "MARK target: Can't specify --set-mark twice");
 
 	*flags = 1;
@@ -188,7 +188,7 @@ static int mark_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 static void mark_tg_check(unsigned int flags)
 {
 	if (flags == 0)
-		exit_error(PARAMETER_PROBLEM, "MARK: One of the --set-xmark, "
+		xtables_error(PARAMETER_PROBLEM, "MARK: One of the --set-xmark, "
 		           "--{and,or,xor,set}-mark options is required");
 }
 

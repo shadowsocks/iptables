@@ -122,7 +122,7 @@ parse_icmp(const char *icmptype, u_int8_t *type, u_int8_t code[])
 		if (strncasecmp(icmp_codes[i].name, icmptype, strlen(icmptype))
 		    == 0) {
 			if (match != limit)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "Ambiguous ICMP type `%s':"
 					   " `%s' or `%s'?",
 					   icmptype,
@@ -148,12 +148,12 @@ parse_icmp(const char *icmptype, u_int8_t *type, u_int8_t code[])
 			*slash = '\0';
 
 		if (!xtables_strtoui(buffer, NULL, &number, 0, UINT8_MAX))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Invalid ICMP type `%s'\n", buffer);
 		*type = number;
 		if (slash) {
 			if (!xtables_strtoui(slash+1, NULL, &number, 0, UINT8_MAX))
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "Invalid ICMP code `%s'\n",
 					   slash+1);
 			code[0] = code[1] = number;
@@ -180,7 +180,7 @@ static int icmp_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags == 1)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "icmp match: only use --icmp-type once!");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_icmp(argv[optind-1], &icmpinfo->type, 

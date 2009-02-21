@@ -49,11 +49,11 @@ parse_dscp(const char *s, struct xt_DSCP_info *dinfo)
 	unsigned int dscp;
        
 	if (!xtables_strtoui(s, NULL, &dscp, 0, UINT8_MAX))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "Invalid dscp `%s'\n", s);
 
 	if (dscp > XT_DSCP_MAX)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "DSCP `%d` out of range\n", dscp);
 
 	dinfo->dscp = dscp;
@@ -79,14 +79,14 @@ static int DSCP_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case 'F':
 		if (*flags)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "DSCP target: Only use --set-dscp ONCE!");
 		parse_dscp(optarg, dinfo);
 		*flags = 1;
 		break;
 	case 'G':
 		if (*flags)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "DSCP target: Only use --set-dscp-class ONCE!");
 		parse_class(optarg, dinfo);
 		*flags = 1;
@@ -102,7 +102,7 @@ static int DSCP_parse(int c, char **argv, int invert, unsigned int *flags,
 static void DSCP_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "DSCP target: Parameter --set-dscp is required");
 }
 

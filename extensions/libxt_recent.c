@@ -70,7 +70,7 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 		case 201:
 			if (*flags & RECENT_CMDS)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--rcheck' "
 					"`--update' or `--remove' may be set");
 			xtables_check_inverse(optarg, &invert, &optind, 0);
@@ -81,7 +81,7 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		case 202:
 			if (*flags & RECENT_CMDS)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--rcheck' "
 					"`--update' or `--remove' may be set");
 			xtables_check_inverse(optarg, &invert, &optind, 0);
@@ -92,7 +92,7 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		case 203:
 			if (*flags & RECENT_CMDS)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--rcheck' "
 					"`--update' or `--remove' may be set");
 			xtables_check_inverse(optarg, &invert, &optind, 0);
@@ -103,7 +103,7 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		case 206:
 			if (*flags & RECENT_CMDS)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--rcheck' "
 					"`--update' or `--remove' may be set");
 			xtables_check_inverse(optarg, &invert, &optind, 0);
@@ -148,12 +148,12 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 static void recent_check(unsigned int flags)
 {
 	if (!(flags & RECENT_CMDS))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			"recent: you must specify one of `--set', `--rcheck' "
 			"`--update' or `--remove'");
 	if ((flags & XT_RECENT_TTL) &&
 	    (flags & (XT_RECENT_SET | XT_RECENT_REMOVE)))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "recent: --rttl may only be used with --rcheck or "
 		           "--update");
 }

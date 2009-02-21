@@ -39,16 +39,16 @@ parse_frag_id(const char *idstr, const char *typestr)
 	id = strtoul(idstr, &ep, 0);
 
 	if ( idstr == ep ) {
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "FRAG no valid digits in %s `%s'", typestr, idstr);
 	}
 	if ( id == ULONG_MAX  && errno == ERANGE ) {
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "%s `%s' specified too big: would overflow",
 			   typestr, idstr);
 	}	
 	if ( *idstr != '\0'  && *ep != '\0' ) {
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "FRAG error parsing %s `%s'", typestr, idstr);
 	}
 	return id;
@@ -92,7 +92,7 @@ static int frag_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags & IP6T_FRAG_IDS)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--fragid' allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_frag_ids(argv[optind-1], fraginfo->ids);
@@ -103,7 +103,7 @@ static int frag_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '2':
 		if (*flags & IP6T_FRAG_LEN)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--fraglen' allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		fraginfo->hdrlen = parse_frag_id(argv[optind-1], "length");
@@ -114,28 +114,28 @@ static int frag_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '3':
 		if (*flags & IP6T_FRAG_RES)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--fragres' allowed");
 		fraginfo->flags |= IP6T_FRAG_RES;
 		*flags |= IP6T_FRAG_RES;
 		break;
 	case '4':
 		if (*flags & IP6T_FRAG_FST)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--fragfirst' allowed");
 		fraginfo->flags |= IP6T_FRAG_FST;
 		*flags |= IP6T_FRAG_FST;
 		break;
 	case '5':
 		if (*flags & (IP6T_FRAG_MF|IP6T_FRAG_NMF)) 
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			   "Only one `--fragmore' or `--fraglast' allowed");
 		fraginfo->flags |= IP6T_FRAG_MF;
 		*flags |= IP6T_FRAG_MF;
 		break;
 	case '6':
 		if (*flags & (IP6T_FRAG_MF|IP6T_FRAG_NMF)) 
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			   "Only one `--fragmore' or `--fraglast' allowed");
 		fraginfo->flags |= IP6T_FRAG_NMF;
 		*flags |= IP6T_FRAG_NMF;

@@ -42,14 +42,14 @@ parse_iprange(char *arg, struct ipt_iprange *range)
 
 	ip = xtables_numeric_to_ipaddr(arg);
 	if (!ip)
-		exit_error(PARAMETER_PROBLEM, "iprange match: Bad IP address `%s'\n",
+		xtables_error(PARAMETER_PROBLEM, "iprange match: Bad IP address \"%s\"\n",
 			   arg);
 	range->min_ip = ip->s_addr;
 
 	if (dash != NULL) {
 		ip = xtables_numeric_to_ipaddr(dash+1);
 		if (!ip)
-			exit_error(PARAMETER_PROBLEM, "iprange match: Bad IP address `%s'\n",
+			xtables_error(PARAMETER_PROBLEM, "iprange match: Bad IP address \"%s\"\n",
 				   dash+1);
 		range->max_ip = ip->s_addr;
 	} else {
@@ -65,7 +65,7 @@ static int iprange_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags & IPRANGE_SRC)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "iprange match: Only use --src-range ONCE!");
 		*flags |= IPRANGE_SRC;
 
@@ -79,7 +79,7 @@ static int iprange_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '2':
 		if (*flags & IPRANGE_DST)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "iprange match: Only use --dst-range ONCE!");
 		*flags |= IPRANGE_DST;
 
@@ -201,7 +201,7 @@ iprange_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 static void iprange_mt_check(unsigned int flags)
 {
 	if (flags == 0)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "iprange match: You must specify `--src-range' or `--dst-range'");
 }
 

@@ -57,7 +57,7 @@ class_to_dscp(const char *name)
 			return ds_classes[i].dscp;
 	}
 
-	exit_error(PARAMETER_PROBLEM,
+	xtables_error(PARAMETER_PROBLEM,
 			"Invalid DSCP value `%s'\n", name);
 }
 
@@ -74,7 +74,7 @@ dscp_to_name(unsigned int dscp)
 	}
 
 
-	exit_error(PARAMETER_PROBLEM,
+	xtables_error(PARAMETER_PROBLEM,
 			"Invalid DSCP value `%d'\n", dscp);
 }
 #endif

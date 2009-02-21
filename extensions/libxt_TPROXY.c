@@ -105,7 +105,7 @@ static int tproxy_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 static void tproxy_tg_check(unsigned int flags)
 {
 	if (!(flags & PARAM_ONPORT))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "TPROXY target: Parameter --on-port is required");
 }
 

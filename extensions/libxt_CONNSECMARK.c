@@ -38,7 +38,7 @@ CONNSECMARK_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags & CONNSECMARK_SAVE)
-			exit_error(PARAMETER_PROBLEM, PFX
+			xtables_error(PARAMETER_PROBLEM, PFX
 				   "Can't specify --save twice");
 		info->mode = CONNSECMARK_SAVE;
 		*flags |= CONNSECMARK_SAVE;
@@ -46,7 +46,7 @@ CONNSECMARK_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '2':
 		if (*flags & CONNSECMARK_RESTORE)
-			exit_error(PARAMETER_PROBLEM, PFX
+			xtables_error(PARAMETER_PROBLEM, PFX
 				   "Can't specify --restore twice");
 		info->mode = CONNSECMARK_RESTORE;
 		*flags |= CONNSECMARK_RESTORE;
@@ -62,10 +62,10 @@ CONNSECMARK_parse(int c, char **argv, int invert, unsigned int *flags,
 static void CONNSECMARK_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM, PFX "parameter required");
+		xtables_error(PARAMETER_PROBLEM, PFX "parameter required");
 
 	if (flags == (CONNSECMARK_SAVE|CONNSECMARK_RESTORE))
-		exit_error(PARAMETER_PROBLEM, PFX "only one flag of --save "
+		xtables_error(PARAMETER_PROBLEM, PFX "only one flag of --save "
 		           "or --restore is allowed");
 }
 
@@ -81,7 +81,7 @@ static void print_connsecmark(struct xt_connsecmark_target_info *info)
 		break;
 		
 	default:
-		exit_error(OTHER_PROBLEM, PFX "invalid mode %hhu\n", info->mode);
+		xtables_error(OTHER_PROBLEM, PFX "invalid mode %hhu\n", info->mode);
 	}
 }
 

@@ -72,7 +72,7 @@ parse_dccp_ports(const char *portstring,
 		ports[1] = cp[0] ? xtables_parse_port(cp, "dccp") : 0xFFFF;
 
 		if (ports[0] > ports[1])
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "invalid portrange (min > max)");
 	}
 	free(buffer);
@@ -109,7 +109,7 @@ parse_dccp_types(const char *typestring)
 			}
 		}
 		if (i == sizeof(dccp_pkt_types)/sizeof(char *))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Unknown DCCP type `%s'", ptr);
 	}
 
@@ -122,7 +122,7 @@ static u_int8_t parse_dccp_option(char *optstring)
 	unsigned int ret;
 
 	if (!xtables_strtoui(optstring, NULL, &ret, 1, UINT8_MAX))
-		exit_error(PARAMETER_PROBLEM, "Bad DCCP option `%s'",
+		xtables_error(PARAMETER_PROBLEM, "Bad DCCP option \"%s\"",
 			   optstring);
 
 	return ret;
@@ -138,7 +138,7 @@ dccp_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags & XT_DCCP_SRC_PORTS)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "Only one `--source-port' allowed");
 		einfo->flags |= XT_DCCP_SRC_PORTS;
 		xtables_check_inverse(optarg, &invert, &optind, 0);
@@ -150,7 +150,7 @@ dccp_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '2':
 		if (*flags & XT_DCCP_DEST_PORTS)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--destination-port' allowed");
 		einfo->flags |= XT_DCCP_DEST_PORTS;
 		xtables_check_inverse(optarg, &invert, &optind, 0);
@@ -162,7 +162,7 @@ dccp_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '3':
 		if (*flags & XT_DCCP_TYPE)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--dccp-types' allowed");
 		einfo->flags |= XT_DCCP_TYPE;
 		xtables_check_inverse(optarg, &invert, &optind, 0);
@@ -174,7 +174,7 @@ dccp_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '4':
 		if (*flags & XT_DCCP_OPTION)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--dccp-option' allowed");
 		einfo->flags |= XT_DCCP_OPTION;
 		xtables_check_inverse(optarg, &invert, &optind, 0);

@@ -234,7 +234,7 @@ xtables_parse_interface(const char *arg, char *vianame, unsigned char *mask);
 int xtables_check_inverse(const char option[], int *invert,
 	int *my_optind, int argc);
 extern struct xtables_globals *xt_params;
-#define exit_error xt_params->exit_err
+#define xtables_error (xt_params->exit_err)
 
 extern void xtables_param_act(unsigned int, const char *, ...);
 

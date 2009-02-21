@@ -27,7 +27,7 @@ parse_length(const char *s)
 	unsigned int len;
 	
 	if (!xtables_strtoui(s, NULL, &len, 0, UINT32_MAX))
-		exit_error(PARAMETER_PROBLEM, "length invalid: `%s'\n", s);
+		xtables_error(PARAMETER_PROBLEM, "length invalid: \"%s\"\n", s);
 	else
 		return len;
 }
@@ -52,7 +52,7 @@ parse_lengths(const char *s, struct xt_length_info *info)
 	free(buffer);
 	
 	if (info->min > info->max)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "length min. range value `%u' greater than max. "
 		           "range value `%u'", info->min, info->max);
 	
@@ -67,7 +67,7 @@ length_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 		case '1':
 			if (*flags)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 				           "length: `--length' may only be "
 				           "specified once");
 			xtables_check_inverse(optarg, &invert, &optind, 0);
@@ -86,7 +86,7 @@ length_parse(int c, char **argv, int invert, unsigned int *flags,
 static void length_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "length: You must specify `--length'");
 }
 

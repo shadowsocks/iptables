@@ -95,7 +95,7 @@ parse_sctp_ports(const char *portstring,
 		ports[1] = cp[0] ? xtables_parse_port(cp, "sctp") : 0xFFFF;
 
 		if (ports[0] > ports[1])
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "invalid portrange (min > max)");
 	}
 	free(buffer);
@@ -151,7 +151,7 @@ save_chunk_flag_info(struct xt_sctp_flag_info *flag_info,
 	}
 	
 	if (*flag_count == XT_NUM_SCTP_FLAGS) {
-		exit_error (PARAMETER_PROBLEM,
+		xtables_error (PARAMETER_PROBLEM,
 			"Number of chunk types with flags exceeds currently allowed limit."
 			"Increasing this limit involves changing IPT_NUM_SCTP_FLAGS and"
 			"recompiling both the kernel space and user space modules\n");
@@ -208,7 +208,7 @@ parse_sctp_chunk(struct xt_sctp_info *einfo,
 			}
 		}
 		if (!found)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Unknown sctp chunk `%s'", ptr);
 
 		if (chunk_flags) {
@@ -226,7 +226,7 @@ parse_sctp_chunk(struct xt_sctp_info *einfo,
 						&(einfo->flag_count), i, bit, 
 						isupper(chunk_flags[j]));
 				} else {
-					exit_error(PARAMETER_PROBLEM, 
+					xtables_error(PARAMETER_PROBLEM,
 						"Invalid flags for chunk type %d\n", i);
 				}
 			}
@@ -249,7 +249,7 @@ parse_sctp_chunks(struct xt_sctp_info *einfo,
 	} else 	if (!strcasecmp(match_type, "ONLY")) {
 		einfo->chunk_match_type = SCTP_CHUNK_MATCH_ONLY;
 	} else {
-		exit_error (PARAMETER_PROBLEM, 
+		xtables_error (PARAMETER_PROBLEM,
 			"Match type has to be one of \"ALL\", \"ANY\" or \"ONLY\"");
 	}
 
@@ -267,7 +267,7 @@ sctp_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags & XT_SCTP_SRC_PORTS)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "Only one `--source-port' allowed");
 		einfo->flags |= XT_SCTP_SRC_PORTS;
 		xtables_check_inverse(optarg, &invert, &optind, 0);
@@ -279,7 +279,7 @@ sctp_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '2':
 		if (*flags & XT_SCTP_DEST_PORTS)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--destination-port' allowed");
 		einfo->flags |= XT_SCTP_DEST_PORTS;
 		xtables_check_inverse(optarg, &invert, &optind, 0);
@@ -291,13 +291,13 @@ sctp_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '3':
 		if (*flags & XT_SCTP_CHUNK_TYPES)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--chunk-types' allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 
 		if (!argv[optind] 
 		    || argv[optind][0] == '-' || argv[optind][0] == '!')
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "--chunk-types requires two args");
 
 		einfo->flags |= XT_SCTP_CHUNK_TYPES;

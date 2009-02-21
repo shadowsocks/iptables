@@ -87,7 +87,7 @@ static int tos_tg_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		if (!tos_parse_symbolic(optarg, &tvm, 0xFF))
 			xtables_param_act(XTF_BAD_VALUE, "TOS", "--set-tos", optarg);
 		if (tvm.mask != 0xFF)
-			exit_error(PARAMETER_PROBLEM, "tos match: Your kernel "
+			xtables_error(PARAMETER_PROBLEM, "tos match: Your kernel "
 			           "is too old to support anything besides "
 				   "/0xFF as a mask.");
 		info->tos = tvm.value;
@@ -153,7 +153,7 @@ static int tos_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 static void tos_tg_check(unsigned int flags)
 {
 	if (flags == 0)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "TOS: The --set-tos parameter is required");
 }
 

@@ -105,7 +105,7 @@ name_to_proto(const char *s)
         	}
 
         	if (i == sizeof(chain_protos)/sizeof(struct pprot))
-        		exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
         			"unknown header `%s' specified",
         			s);
         }
@@ -127,7 +127,7 @@ add_proto_to_mask(int proto){
 	}
 
 	if (i == sizeof(chain_flags)/sizeof(struct numflag))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		"unknown header `%d' specified",
 		proto);
 	
@@ -189,13 +189,13 @@ ipv6header_parse(int c, char **argv, int invert, unsigned int *flags,
 		case '1' : 
 			/* Parse the provided header names */
 			if (*flags & IPV6_HDR_HEADER)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"Only one `--header' allowed");
 
 			xtables_check_inverse(optarg, &invert, &optind, 0);
 
 			if (! (info->matchflags = parse_header(argv[optind-1])) )
-				exit_error(PARAMETER_PROBLEM, "ip6t_ipv6header: cannot parse header names");
+				xtables_error(PARAMETER_PROBLEM, "ip6t_ipv6header: cannot parse header names");
 
 			if (invert) 
 				info->invflags |= 0xFF;
@@ -204,7 +204,7 @@ ipv6header_parse(int c, char **argv, int invert, unsigned int *flags,
 		case '2' : 
 			/* Soft-mode requested? */
 			if (*flags & IPV6_HDR_SOFT)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"Only one `--soft' allowed");
 
 			info->modeflag |= 0xFF;
@@ -219,7 +219,7 @@ ipv6header_parse(int c, char **argv, int invert, unsigned int *flags,
 
 static void ipv6header_check(unsigned int flags)
 {
-	if (!flags) exit_error(PARAMETER_PROBLEM, "ip6t_ipv6header: no options specified");
+	if (!flags) xtables_error(PARAMETER_PROBLEM, "ip6t_ipv6header: no options specified");
 }
 
 static void

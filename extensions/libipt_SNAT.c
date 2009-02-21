@@ -45,7 +45,7 @@ append_range(struct ipt_natinfo *info, const struct ip_nat_range *range)
 
 	info = realloc(info, size);
 	if (!info)
-		exit_error(OTHER_PROBLEM, "Out of memory\n");
+		xtables_error(OTHER_PROBLEM, "Out of memory\n");
 
 	info->t.u.target_size = size;
 	info->mr.range[info->mr.rangesize] = *range;
@@ -69,19 +69,19 @@ parse_to(char *arg, int portok, struct ipt_natinfo *info)
 		int port;
 
 		if (!portok)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Need TCP, UDP, SCTP or DCCP with port specification");
 
 		range.flags |= IP_NAT_RANGE_PROTO_SPECIFIED;
 
 		port = atoi(colon+1);
 		if (port <= 0 || port > 65535)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Port `%s' not valid\n", colon+1);
 
 		error = strchr(colon+1, ':');
 		if (error)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Invalid port:port syntax - use dash\n");
 
 		dash = strchr(colon, '-');
@@ -94,11 +94,11 @@ parse_to(char *arg, int portok, struct ipt_natinfo *info)
 
 			maxport = atoi(dash + 1);
 			if (maxport <= 0 || maxport > 65535)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "Port `%s' not valid\n", dash+1);
 			if (maxport < port)
 				/* People are stupid. */
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "Port range `%s' funky\n", colon+1);
 			range.min.tcp.port = htons(port);
 			range.max.tcp.port = htons(maxport);
@@ -119,13 +119,13 @@ parse_to(char *arg, int portok, struct ipt_natinfo *info)
 
 	ip = xtables_numeric_to_ipaddr(arg);
 	if (!ip)
-		exit_error(PARAMETER_PROBLEM, "Bad IP address `%s'\n",
+		xtables_error(PARAMETER_PROBLEM, "Bad IP address \"%s\"\n",
 			   arg);
 	range.min_ip = ip->s_addr;
 	if (dash) {
 		ip = xtables_numeric_to_ipaddr(dash+1);
 		if (!ip)
-			exit_error(PARAMETER_PROBLEM, "Bad IP address `%s'\n",
+			xtables_error(PARAMETER_PROBLEM, "Bad IP address \"%s\"\n",
 				   dash+1);
 		range.max_ip = ip->s_addr;
 	} else
@@ -153,14 +153,14 @@ static int SNAT_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (xtables_check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --to-source");
 
 		if (*flags & IPT_SNAT_OPT_SOURCE) {
 			if (!kernel_version)
 				get_kernel_version();
 			if (kernel_version > LINUX_VERSION(2, 6, 10))
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "Multiple --to-source not supported");
 		}
 		*target = parse_to(optarg, portok, info);
@@ -186,7 +186,7 @@ static int SNAT_parse(int c, char **argv, int invert, unsigned int *flags,
 static void SNAT_check(unsigned int flags)
 {
 	if (!(flags & IPT_SNAT_OPT_SOURCE))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "You must specify --to-source");
 }
 

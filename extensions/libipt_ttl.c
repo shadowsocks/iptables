@@ -34,7 +34,7 @@ static int ttl_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 		case '2':
 			if (!xtables_strtoui(optarg, NULL, &value, 0, UINT8_MAX))
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 				           "ttl: Expected value between 0 and 255");
 
 			if (invert)
@@ -47,11 +47,11 @@ static int ttl_parse(int c, char **argv, int invert, unsigned int *flags,
 			break;
 		case '3':
 			if (!xtables_strtoui(optarg, NULL, &value, 0, UINT8_MAX))
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 				           "ttl: Expected value between 0 and 255");
 
 			if (invert) 
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 						"ttl: unexpected `!'");
 
 			info->mode = IPT_TTL_LT;
@@ -59,11 +59,11 @@ static int ttl_parse(int c, char **argv, int invert, unsigned int *flags,
 			break;
 		case '4':
 			if (!xtables_strtoui(optarg, NULL, &value, 0, UINT8_MAX))
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 				           "ttl: Expected value between 0 and 255");
 
 			if (invert)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 						"ttl: unexpected `!'");
 
 			info->mode = IPT_TTL_GT;
@@ -75,7 +75,7 @@ static int ttl_parse(int c, char **argv, int invert, unsigned int *flags,
 	}
 
 	if (*flags) 
-		exit_error(PARAMETER_PROBLEM, 
+		xtables_error(PARAMETER_PROBLEM,
 				"Can't specify TTL option twice");
 	*flags = 1;
 
@@ -85,7 +85,7 @@ static int ttl_parse(int c, char **argv, int invert, unsigned int *flags,
 static void ttl_check(unsigned int flags)
 {
 	if (!flags) 
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			"TTL match: You must specify one of "
 			"`--ttl-eq', `--ttl-lt', `--ttl-gt");
 }

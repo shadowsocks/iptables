@@ -44,7 +44,7 @@ parse_ports(const char *arg, struct ip_nat_multi_range *mr)
 
 	port = atoi(arg);
 	if (port <= 0 || port > 65535)
-		exit_error(PARAMETER_PROBLEM, "Port `%s' not valid\n", arg);
+		xtables_error(PARAMETER_PROBLEM, "Port \"%s\" not valid\n", arg);
 
 	dash = strchr(arg, '-');
 	if (!dash) {
@@ -56,11 +56,11 @@ parse_ports(const char *arg, struct ip_nat_multi_range *mr)
 
 		maxport = atoi(dash + 1);
 		if (maxport == 0 || maxport > 65535)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Port `%s' not valid\n", dash+1);
 		if (maxport < port)
 			/* People are stupid.  Present reader excepted. */
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Port range `%s' funky\n", arg);
 		mr->range[0].min.tcp.port = htons(port);
 		mr->range[0].max.tcp.port = htons(maxport);
@@ -87,11 +87,11 @@ static int MASQUERADE_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (!portok)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Need TCP, UDP, SCTP or DCCP with port specification");
 
 		if (xtables_check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --to-ports");
 
 		parse_ports(optarg, mr);

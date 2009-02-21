@@ -163,7 +163,7 @@ owner_mt_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 	case 'c':
 		xtables_param_act(XTF_ONLY_ONCE, "owner", "--cmd-owner", *flags & FLAG_COMM);
 		if (strlen(optarg) > sizeof(info->comm))
-			exit_error(PARAMETER_PROBLEM, "owner match: command "
+			xtables_error(PARAMETER_PROBLEM, "owner match: command "
 			           "\"%s\" too long, max. %zu characters",
 			           optarg, sizeof(info->comm));
 
@@ -316,7 +316,7 @@ static int owner_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 static void owner_mt_check(unsigned int flags)
 {
 	if (flags == 0)
-		exit_error(PARAMETER_PROBLEM, "owner: At least one of "
+		xtables_error(PARAMETER_PROBLEM, "owner: At least one of "
 		           "--uid-owner, --gid-owner or --socket-exists "
 		           "is required");
 }

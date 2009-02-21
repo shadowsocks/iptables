@@ -296,7 +296,7 @@ static void
 saveChain(char *chain, char *policy, struct ipt_counters *ctr)
 {
 	if (nextChain >= maxChains) {
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "%s: line %u chain name invalid\n",
 			   prog_name, line);
 		exit(1);
@@ -697,7 +697,7 @@ main(int argc, char *argv[])
 			table = strtok(buffer + 1, " \t\n");
 			DEBUGP("line %u, table '%s'\n", line, table);
 			if (!table) {
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "%s: line %u table name invalid\n",
 					   prog_name, line);
 				exit(1);
@@ -714,7 +714,7 @@ main(int argc, char *argv[])
 			chain = strtok(buffer + 1, " \t\n");
 			DEBUGP("line %u, chain '%s'\n", line, chain);
 			if (!chain) {
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "%s: line %u chain name invalid\n",
 					   prog_name, line);
 				exit(1);
@@ -725,7 +725,7 @@ main(int argc, char *argv[])
 			policy = strtok(NULL, " \t\n");
 			DEBUGP("line %u, policy '%s'\n", line, policy);
 			if (!policy) {
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "%s: line %u policy invalid\n",
 					   prog_name, line);
 				exit(1);
@@ -755,19 +755,19 @@ main(int argc, char *argv[])
 				/* we have counters in our input */
 				ptr = strchr(buffer, ']');
 				if (!ptr)
-					exit_error(PARAMETER_PROBLEM,
+					xtables_error(PARAMETER_PROBLEM,
 						   "Bad line %u: need ]\n",
 						   line);
 
 				pcnt = strtok(buffer + 1, ":");
 				if (!pcnt)
-					exit_error(PARAMETER_PROBLEM,
+					xtables_error(PARAMETER_PROBLEM,
 						   "Bad line %u: need :\n",
 						   line);
 
 				bcnt = strtok(NULL, "]");
 				if (!bcnt)
-					exit_error(PARAMETER_PROBLEM,
+					xtables_error(PARAMETER_PROBLEM,
 						   "Bad line %u: need ]\n",
 						   line);
 
@@ -827,7 +827,7 @@ main(int argc, char *argv[])
 					if (!strncmp(param_buffer, "-t", 3)
 					    || !strncmp(param_buffer,
 							"--table", 8)) {
-						exit_error(PARAMETER_PROBLEM,
+						xtables_error(PARAMETER_PROBLEM,
 							   "Line %u seems to have a "
 							   "-t table option.\n",
 							   line);

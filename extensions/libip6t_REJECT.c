@@ -86,7 +86,7 @@ static int REJECT_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch(c) {
 	case '1':
 		if (xtables_check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --reject-with");
 		for (i = 0; i < limit; i++) {
 			if ((strncasecmp(reject_table[i].name, optarg, strlen(optarg)) == 0)
@@ -95,7 +95,7 @@ static int REJECT_parse(int c, char **argv, int invert, unsigned int *flags,
 				return 1;
 			}
 		}
-		exit_error(PARAMETER_PROBLEM, "unknown reject type `%s'",optarg);
+		xtables_error(PARAMETER_PROBLEM, "unknown reject type \"%s\"", optarg);
 	default:
 		/* Fall through */
 		break;

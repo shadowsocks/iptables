@@ -94,7 +94,7 @@ static unsigned int name_to_type(const char *name)
 		unsigned int number;
 
 		if (!xtables_strtoui(name, NULL, &number, 0, UINT8_MAX))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Invalid MH type `%s'\n", name);
 		return number;
 	}
@@ -116,7 +116,7 @@ static void parse_mh_types(const char *mhtype, u_int8_t *types)
 		types[1] = cp[0] ? name_to_type(cp) : 0xFF;
 
 		if (types[0] > types[1])
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Invalid MH type range (min > max)");
 	}
 	free(buffer);
@@ -132,7 +132,7 @@ static int mh_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags & MH_TYPES)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--mh-type' allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_mh_types(argv[optind-1], mhinfo->types);

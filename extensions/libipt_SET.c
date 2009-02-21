@@ -54,20 +54,20 @@ parse_target(char **argv, int invert, unsigned int *flags,
              struct ipt_set_info *info, const char *what)
 {
 	if (info->flags[0])
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "--%s can be specified only once", what);
 
 	if (xtables_check_inverse(optarg, &invert, NULL, 0))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "Unexpected `!' after --%s", what);
 
 	if (!argv[optind]
 	    || argv[optind][0] == '-' || argv[optind][0] == '!')
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "--%s requires two args.", what);
 
 	if (strlen(argv[optind-1]) > IP_SET_MAXNAMELEN - 1)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "setname `%s' too long, max %d characters.",
 			   argv[optind-1], IP_SET_MAXNAMELEN - 1);
 
@@ -103,7 +103,7 @@ static int SET_parse(int c, char **argv, int invert, unsigned int *flags,
 static void SET_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "You must specify either `--add-set' or `--del-set'");
 }
 

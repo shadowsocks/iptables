@@ -31,14 +31,14 @@ parse_range(const char *arg, struct xt_connbytes_info *si)
 
 	si->count.from = strtoul(arg,&colon,10);
 	if (*colon != ':') 
-		exit_error(PARAMETER_PROBLEM, "Bad range `%s'", arg);
+		xtables_error(PARAMETER_PROBLEM, "Bad range \"%s\"", arg);
 	si->count.to = strtoul(colon+1,&p,10);
 	if (p == colon+1) {
 		/* second number omited */
 		si->count.to = 0xffffffff;
 	}
 	if (si->count.from > si->count.to)
-		exit_error(PARAMETER_PROBLEM, "%llu should be less than %llu",
+		xtables_error(PARAMETER_PROBLEM, "%llu should be less than %llu",
 			   (unsigned long long)si->count.from,
 			   (unsigned long long)si->count.to);
 }
@@ -71,7 +71,7 @@ connbytes_parse(int c, char **argv, int invert, unsigned int *flags,
 		else if (!strcmp(optarg, "both"))
 			sinfo->direction = XT_CONNBYTES_DIR_BOTH;
 		else
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Unknown --connbytes-dir `%s'", optarg);
 
 		*flags |= 2;
@@ -84,7 +84,7 @@ connbytes_parse(int c, char **argv, int invert, unsigned int *flags,
 		else if (!strcmp(optarg, "avgpkt"))
 			sinfo->what = XT_CONNBYTES_AVGPKT;
 		else
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Unknown --connbytes-mode `%s'", optarg);
 		*flags |= 4;
 		break;
@@ -98,7 +98,7 @@ connbytes_parse(int c, char **argv, int invert, unsigned int *flags,
 static void connbytes_check(unsigned int flags)
 {
 	if (flags != 7)
-		exit_error(PARAMETER_PROBLEM, "You must specify `--connbytes'"
+		xtables_error(PARAMETER_PROBLEM, "You must specify `--connbytes'"
 			   "`--connbytes-dir' and `--connbytes-mode'");
 }
 

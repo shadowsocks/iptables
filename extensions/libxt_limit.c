@@ -64,7 +64,7 @@ int parse_rate(const char *rate, u_int32_t *val)
 	/* This would get mapped to infinite (1/day is minimum they
            can specify, so we're ok at that end). */
 	if (r / mult > XT_LIMIT_SCALE)
-		exit_error(PARAMETER_PROBLEM, "Rate too fast `%s'\n", rate);
+		xtables_error(PARAMETER_PROBLEM, "Rate too fast \"%s\"\n", rate);
 
 	*val = XT_LIMIT_SCALE * mult / r;
 	return 1;
@@ -81,7 +81,7 @@ static void limit_init(struct xt_entry_match *m)
 
 /* FIXME: handle overflow:
 	if (r->avg*r->burst/r->burst != r->avg)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "Sorry: burst too large for that avg rate.\n");
 */
 
@@ -96,14 +96,14 @@ limit_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '%':
 		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!parse_rate(optarg, &r->avg))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "bad rate `%s'", optarg);
 		break;
 
 	case '$':
 		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, 10000))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "bad --limit-burst `%s'", optarg);
 		r->burst = num;
 		break;
@@ -113,7 +113,7 @@ limit_parse(int c, char **argv, int invert, unsigned int *flags,
 	}
 
 	if (invert)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "limit does not support invert");
 
 	return 1;

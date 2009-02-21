@@ -35,12 +35,12 @@ static int SECMARK_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags & SECMARK_MODE_SEL)
-			exit_error(PARAMETER_PROBLEM, PFX
+			xtables_error(PARAMETER_PROBLEM, PFX
 				   "Can't specify --selctx twice");
 		info->mode = SECMARK_MODE_SEL;
 
 		if (strlen(optarg) > SECMARK_SELCTX_MAX-1)
-			exit_error(PARAMETER_PROBLEM, PFX
+			xtables_error(PARAMETER_PROBLEM, PFX
 				   "Maximum length %u exceeded by --selctx"
 				   " parameter (%zu)",
 				   SECMARK_SELCTX_MAX-1, strlen(optarg));
@@ -58,7 +58,7 @@ static int SECMARK_parse(int c, char **argv, int invert, unsigned int *flags,
 static void SECMARK_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM, PFX "parameter required");
+		xtables_error(PARAMETER_PROBLEM, PFX "parameter required");
 }
 
 static void print_secmark(struct xt_secmark_target_info *info)
@@ -69,7 +69,7 @@ static void print_secmark(struct xt_secmark_target_info *info)
 		break;
 	
 	default:
-		exit_error(OTHER_PROBLEM, PFX "invalid mode %hhu\n", info->mode);
+		xtables_error(OTHER_PROBLEM, PFX "invalid mode %hhu\n", info->mode);
 	}
 }
 

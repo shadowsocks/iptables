@@ -31,7 +31,7 @@ parse_mac(const char *mac, struct xt_mac_info *info)
 	unsigned int i = 0;
 
 	if (strlen(mac) != ETH_ALEN*3-1)
-		exit_error(PARAMETER_PROBLEM, "Bad mac address `%s'", mac);
+		xtables_error(PARAMETER_PROBLEM, "Bad mac address \"%s\"", mac);
 
 	for (i = 0; i < ETH_ALEN; i++) {
 		long number;
@@ -44,7 +44,7 @@ parse_mac(const char *mac, struct xt_mac_info *info)
 		    && number <= 255)
 			info->srcaddr[i] = number;
 		else
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Bad mac address `%s'", mac);
 	}
 }
@@ -84,7 +84,7 @@ static void print_mac(const unsigned char macaddress[ETH_ALEN])
 static void mac_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "You must specify `--mac-source'");
 }
 

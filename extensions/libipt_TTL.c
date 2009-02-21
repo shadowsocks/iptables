@@ -32,20 +32,20 @@ static int TTL_parse(int c, char **argv, int invert, unsigned int *flags,
 	unsigned int value;
 
 	if (*flags & IPT_TTL_USED) {
-		exit_error(PARAMETER_PROBLEM, 
+		xtables_error(PARAMETER_PROBLEM,
 				"Can't specify TTL option twice");
 	}
 
 	if (!optarg) 
-		exit_error(PARAMETER_PROBLEM, 
+		xtables_error(PARAMETER_PROBLEM,
 				"TTL: You must specify a value");
 
 	if (xtables_check_inverse(optarg, &invert, NULL, 0))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 				"TTL: unexpected `!'");
 	
 	if (!xtables_strtoui(optarg, NULL, &value, 0, UINT8_MAX))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "TTL: Expected value between 0 and 255");
 
 	switch (c) {
@@ -56,7 +56,7 @@ static int TTL_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		case '2':
 			if (value == 0) {
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"TTL: decreasing by 0?");
 			}
 
@@ -65,7 +65,7 @@ static int TTL_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		case '3':
 			if (value == 0) {
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"TTL: increasing by 0?");
 			}
 
@@ -86,7 +86,7 @@ static int TTL_parse(int c, char **argv, int invert, unsigned int *flags,
 static void TTL_check(unsigned int flags)
 {
 	if (!(flags & IPT_TTL_USED))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 				"TTL: You must specify an action");
 }
 

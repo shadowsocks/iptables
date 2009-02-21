@@ -111,34 +111,34 @@ CONNMARK_parse(int c, char **argv, int invert, unsigned int *flags,
 		    markinfo->mask = strtoul(end+1, &end, 0);
 
 		if (*end != '\0' || end == optarg)
-			exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
+			xtables_error(PARAMETER_PROBLEM, "Bad MARK value \"%s\"", optarg);
 		if (*flags)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "CONNMARK target: Can't specify --set-mark twice");
 		*flags = 1;
 		break;
 	case '2':
 		markinfo->mode = XT_CONNMARK_SAVE;
 		if (*flags)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "CONNMARK target: Can't specify --save-mark twice");
 		*flags = 1;
 		break;
 	case '3':
 		markinfo->mode = XT_CONNMARK_RESTORE;
 		if (*flags)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "CONNMARK target: Can't specify --restore-mark twice");
 		*flags = 1;
 		break;
 	case '4':
 		if (!*flags)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "CONNMARK target: Can't specify --mask without a operation");
 		markinfo->mask = strtoul(optarg, &end, 0);
 
 		if (*end != '\0' || end == optarg)
-			exit_error(PARAMETER_PROBLEM, "Bad MASK value `%s'", optarg);
+			xtables_error(PARAMETER_PROBLEM, "Bad MASK value \"%s\"", optarg);
 		break;
 	default:
 		return 0;
@@ -218,7 +218,7 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 
 	case 'n': /* --nfmask */
 		if (!(*flags & F_SR_MARK))
-			exit_error(PARAMETER_PROBLEM, "CONNMARK: --save-mark "
+			xtables_error(PARAMETER_PROBLEM, "CONNMARK: --save-mark "
 			           "or --restore-mark is required for "
 			           "--nfmask");
 		if (!xtables_strtoui(optarg, NULL, &value, 0, UINT32_MAX))
@@ -228,7 +228,7 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 
 	case 'c': /* --ctmask */
 		if (!(*flags & F_SR_MARK))
-			exit_error(PARAMETER_PROBLEM, "CONNMARK: --save-mark "
+			xtables_error(PARAMETER_PROBLEM, "CONNMARK: --save-mark "
 			           "or --restore-mark is required for "
 			           "--ctmask");
 		if (!xtables_strtoui(optarg, NULL, &value, 0, UINT32_MAX))
@@ -238,7 +238,7 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 
 	case 'm': /* --mask */
 		if (!(*flags & F_SR_MARK))
-			exit_error(PARAMETER_PROBLEM, "CONNMARK: --save-mark "
+			xtables_error(PARAMETER_PROBLEM, "CONNMARK: --save-mark "
 			           "or --restore-mark is required for "
 			           "--mask");
 		if (!xtables_strtoui(optarg, NULL, &value, 0, UINT32_MAX))
@@ -253,7 +253,7 @@ static int connmark_tg_parse(int c, char **argv, int invert,
 static void connmark_tg_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "CONNMARK target: No operation specified");
 }
 

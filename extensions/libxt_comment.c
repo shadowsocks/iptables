@@ -32,7 +32,7 @@ parse_comment(const char *s, struct xt_comment_info *info)
 	int slen = strlen(s);
 
 	if (slen >= XT_MAX_COMMENT_LEN) {
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			"COMMENT must be shorter than %i characters", XT_MAX_COMMENT_LEN);
 	}
 	strcpy((char *)info->comment, s);
@@ -48,7 +48,7 @@ comment_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 		xtables_check_inverse(argv[optind-1], &invert, &optind, 0);
 		if (invert) {
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 					"Sorry, you can't have an inverted comment");
 		}
 		parse_comment(argv[optind-1], commentinfo);
@@ -64,7 +64,7 @@ comment_parse(int c, char **argv, int invert, unsigned int *flags,
 static void comment_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "COMMENT match: You must specify `--comment'");
 }
 

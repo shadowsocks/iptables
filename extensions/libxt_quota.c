@@ -47,7 +47,7 @@ parse_quota(const char *s, u_int64_t * quota)
 #endif
 
 	if (*quota == UINT64_MAX)
-		exit_error(PARAMETER_PROBLEM, "quota invalid: '%s'\n", s);
+		xtables_error(PARAMETER_PROBLEM, "quota invalid: '%s'\n", s);
 	else
 		return 1;
 }
@@ -61,9 +61,9 @@ quota_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (xtables_check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM, "quota: unexpected '!'");
+			xtables_error(PARAMETER_PROBLEM, "quota: unexpected '!'");
 		if (!parse_quota(optarg, &info->quota))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "bad quota: '%s'", optarg);
 		break;
 

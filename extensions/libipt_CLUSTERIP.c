@@ -57,7 +57,7 @@ parse_mac(const char *mac, char *macbuf)
 	unsigned int i = 0;
 
 	if (strlen(mac) != ETH_ALEN*3-1)
-		exit_error(PARAMETER_PROBLEM, "Bad mac address `%s'", mac);
+		xtables_error(PARAMETER_PROBLEM, "Bad mac address \"%s\"", mac);
 
 	for (i = 0; i < ETH_ALEN; i++) {
 		long number;
@@ -70,7 +70,7 @@ parse_mac(const char *mac, char *macbuf)
 		    && number <= 255)
 			macbuf[i] = number;
 		else
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Bad mac address `%s'", mac);
 	}
 }
@@ -86,14 +86,14 @@ static int CLUSTERIP_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 		cipinfo->flags |= CLUSTERIP_FLAG_NEW;
 		if (*flags & PARAM_NEW)
-			exit_error(PARAMETER_PROBLEM, "Can only specify `--new' once\n");
+			xtables_error(PARAMETER_PROBLEM, "Can only specify \"--new\" once\n");
 		*flags |= PARAM_NEW;
 		break;
 	case '2':
 		if (!(*flags & PARAM_NEW))
-			exit_error(PARAMETER_PROBLEM, "Can only specify hashmode combined with `--new'\n");
+			xtables_error(PARAMETER_PROBLEM, "Can only specify hashmode combined with \"--new\"\n");
 		if (*flags & PARAM_HMODE)
-			exit_error(PARAMETER_PROBLEM, "Can only specify hashmode once\n");
+			xtables_error(PARAMETER_PROBLEM, "Can only specify hashmode once\n");
 		if (!strcmp(optarg, "sourceip"))
 			cipinfo->hash_mode = CLUSTERIP_HASHMODE_SIP;
 		else if (!strcmp(optarg, "sourceip-sourceport"))
@@ -101,48 +101,48 @@ static int CLUSTERIP_parse(int c, char **argv, int invert, unsigned int *flags,
 		else if (!strcmp(optarg, "sourceip-sourceport-destport"))
 			cipinfo->hash_mode = CLUSTERIP_HASHMODE_SIP_SPT_DPT;
 		else
-			exit_error(PARAMETER_PROBLEM, "Unknown hashmode `%s'\n",
+			xtables_error(PARAMETER_PROBLEM, "Unknown hashmode \"%s\"\n",
 				   optarg);
 		*flags |= PARAM_HMODE;
 		break;
 	case '3':
 		if (!(*flags & PARAM_NEW))
-			exit_error(PARAMETER_PROBLEM, "Can only specify MAC combined with `--new'\n");
+			xtables_error(PARAMETER_PROBLEM, "Can only specify MAC combined with \"--new\"\n");
 		if (*flags & PARAM_MAC)
-			exit_error(PARAMETER_PROBLEM, "Can only specify MAC once\n");
+			xtables_error(PARAMETER_PROBLEM, "Can only specify MAC once\n");
 		parse_mac(optarg, (char *)cipinfo->clustermac);
 		if (!(cipinfo->clustermac[0] & 0x01))
-			exit_error(PARAMETER_PROBLEM, "MAC has to be a multicast ethernet address\n");
+			xtables_error(PARAMETER_PROBLEM, "MAC has to be a multicast ethernet address\n");
 		*flags |= PARAM_MAC;
 		break;
 	case '4':
 		if (!(*flags & PARAM_NEW))
-			exit_error(PARAMETER_PROBLEM, "Can only specify node number combined with `--new'\n");
+			xtables_error(PARAMETER_PROBLEM, "Can only specify node number combined with \"--new\"\n");
 		if (*flags & PARAM_TOTALNODE)
-			exit_error(PARAMETER_PROBLEM, "Can only specify total node number once\n");
+			xtables_error(PARAMETER_PROBLEM, "Can only specify total node number once\n");
 		if (!xtables_strtoui(optarg, NULL, &num, 1, CLUSTERIP_MAX_NODES))
-			exit_error(PARAMETER_PROBLEM, "Unable to parse `%s'\n", optarg);
+			xtables_error(PARAMETER_PROBLEM, "Unable to parse \"%s\"\n", optarg);
 		cipinfo->num_total_nodes = num;
 		*flags |= PARAM_TOTALNODE;
 		break;
 	case '5':
 		if (!(*flags & PARAM_NEW))
-			exit_error(PARAMETER_PROBLEM, "Can only specify node number combined with `--new'\n");
+			xtables_error(PARAMETER_PROBLEM, "Can only specify node number combined with \"--new\"\n");
 		if (*flags & PARAM_LOCALNODE)
-			exit_error(PARAMETER_PROBLEM, "Can only specify local node number once\n");
+			xtables_error(PARAMETER_PROBLEM, "Can only specify local node number once\n");
 		if (!xtables_strtoui(optarg, NULL, &num, 1, CLUSTERIP_MAX_NODES))
-			exit_error(PARAMETER_PROBLEM, "Unable to parse `%s'\n", optarg);
+			xtables_error(PARAMETER_PROBLEM, "Unable to parse \"%s\"\n", optarg);
 		cipinfo->num_local_nodes = 1;
 		cipinfo->local_nodes[0] = num;
 		*flags |= PARAM_LOCALNODE;
 		break;
 	case '6':
 		if (!(*flags & PARAM_NEW))
-			exit_error(PARAMETER_PROBLEM, "Can only specify hash init value combined with `--new'\n");
+			xtables_error(PARAMETER_PROBLEM, "Can only specify hash init value combined with \"--new\"\n");
 		if (*flags & PARAM_HASHINIT)
-			exit_error(PARAMETER_PROBLEM, "Can specify hash init value only once\n");
+			xtables_error(PARAMETER_PROBLEM, "Can specify hash init value only once\n");
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT_MAX))
-			exit_error(PARAMETER_PROBLEM, "Unable to parse `%s'\n", optarg);
+			xtables_error(PARAMETER_PROBLEM, "Unable to parse \"%s\"\n", optarg);
 		cipinfo->hash_initval = num;
 		*flags |= PARAM_HASHINIT;
 		break;
@@ -162,7 +162,7 @@ static void CLUSTERIP_check(unsigned int flags)
 		== (PARAM_NEW|PARAM_HMODE|PARAM_MAC|PARAM_TOTALNODE|PARAM_LOCALNODE))
 		return;
 
-	exit_error(PARAMETER_PROBLEM, "CLUSTERIP target: Invalid parameter combination\n");
+	xtables_error(PARAMETER_PROBLEM, "CLUSTERIP target: Invalid parameter combination\n");
 }
 
 static char *hashmode2str(enum clusterip_hashmode mode)

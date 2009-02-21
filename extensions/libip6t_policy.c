@@ -130,7 +130,7 @@ static int parse_direction(char *s)
 		return IP6T_POLICY_MATCH_IN;
 	if (strcmp(s, "out") == 0)
 		return IP6T_POLICY_MATCH_OUT;
-	exit_error(PARAMETER_PROBLEM, "policy_match: invalid dir `%s'", s);
+	xtables_error(PARAMETER_PROBLEM, "policy_match: invalid dir \"%s\"", s);
 }
 
 static int parse_policy(char *s)
@@ -139,7 +139,7 @@ static int parse_policy(char *s)
 		return IP6T_POLICY_MATCH_NONE;
 	if (strcmp(s, "ipsec") == 0)
 		return 0;
-	exit_error(PARAMETER_PROBLEM, "policy match: invalid policy `%s'", s);
+	xtables_error(PARAMETER_PROBLEM, "policy match: invalid policy \"%s\"", s);
 }
 
 static int parse_mode(char *s)
@@ -148,7 +148,7 @@ static int parse_mode(char *s)
 		return IP6T_POLICY_MODE_TRANSPORT;
 	if (strcmp(s, "tunnel") == 0)
 		return IP6T_POLICY_MODE_TUNNEL;
-	exit_error(PARAMETER_PROBLEM, "policy match: invalid mode `%s'", s);
+	xtables_error(PARAMETER_PROBLEM, "policy match: invalid mode \"%s\"", s);
 }
 
 static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
@@ -165,35 +165,35 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (info->flags & (IP6T_POLICY_MATCH_IN|IP6T_POLICY_MATCH_OUT))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: double --dir option");
 		if (invert)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: can't invert --dir option");
 
 		info->flags |= parse_direction(argv[optind-1]);
 		break;
 	case '2':
 		if (invert)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: can't invert --policy option");
 
 		info->flags |= parse_policy(argv[optind-1]);
 		break;
 	case '3':
 		if (info->flags & IP6T_POLICY_MATCH_STRICT)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: double --strict option");
 
 		if (invert)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: can't invert --strict option");
 
 		info->flags |= IP6T_POLICY_MATCH_STRICT;
 		break;
 	case '4':
 		if (e->match.reqid)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: double --reqid option");
 
 		e->match.reqid = 1;
@@ -202,7 +202,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '5':
 		if (e->match.spi)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: double --spi option");
 
 		e->match.spi = 1;
@@ -211,12 +211,12 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '6':
 		if (e->match.saddr)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: double --tunnel-src option");
 
 		xtables_ip6parse_any(argv[optind-1], &addr, &mask, &naddr);
 		if (naddr > 1)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: name resolves to multiple IPs");
 
 		e->match.saddr = 1;
@@ -226,12 +226,12 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
                 break;
 	case '7':
 		if (e->match.daddr)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: double --tunnel-dst option");
 
 		xtables_ip6parse_any(argv[optind-1], &addr, &mask, &naddr);
 		if (naddr > 1)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: name resolves to multiple IPs");
 
 		e->match.daddr = 1;
@@ -241,20 +241,20 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '8':
 		if (e->match.proto)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: double --proto option");
 
 		e->proto = xtables_parse_protocol(argv[optind-1]);
 		if (e->proto != IPPROTO_AH && e->proto != IPPROTO_ESP &&
 		    e->proto != IPPROTO_COMP)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: protocol must ah/esp/ipcomp");
 		e->match.proto = 1;
 		e->invert.proto = invert;
 		break;
 	case '9':
 		if (e->match.mode)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: double --mode option");
 
 		mode = parse_mode(argv[optind-1]);
@@ -264,11 +264,11 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case 'a':
 		if (invert)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: can't invert --next option");
 
 		if (++info->len == IP6T_POLICY_MAX_ELEM)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: maximum policy depth reached");
 		break;
 	default:
@@ -286,26 +286,26 @@ static void policy_check(unsigned int flags)
 	int i;
 
 	if (info == NULL)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "policy match: no parameters given");
 
 	if (!(info->flags & (IP6T_POLICY_MATCH_IN|IP6T_POLICY_MATCH_OUT)))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "policy match: neither --in nor --out specified");
 
 	if (info->flags & IP6T_POLICY_MATCH_NONE) {
 		if (info->flags & IP6T_POLICY_MATCH_STRICT)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: policy none but --strict given");
 
 		if (info->len != 0)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: policy none but policy given");
 	} else
 		info->len++;	/* increase len by 1, no --next after last element */
 
 	if (!(info->flags & IP6T_POLICY_MATCH_STRICT) && info->len > 1)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "policy match: multiple elements but no --strict");
 
 	for (i = 0; i < info->len; i++) {
@@ -314,13 +314,13 @@ static void policy_check(unsigned int flags)
                 if (info->flags & IP6T_POLICY_MATCH_STRICT &&
 		    !(e->match.reqid || e->match.spi || e->match.saddr ||
                       e->match.daddr || e->match.proto || e->match.mode))
-                        exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
                                    "policy match: empty policy element");
 
 		if ((e->match.saddr || e->match.daddr)
 		    && ((e->mode == IP6T_POLICY_MODE_TUNNEL && e->invert.mode) ||
 		        (e->mode == IP6T_POLICY_MODE_TRANSPORT && !e->invert.mode)))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: --tunnel-src/--tunnel-dst "
 			           "is only valid in tunnel mode");
 	}

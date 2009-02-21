@@ -42,7 +42,7 @@ static int ecn_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case 'F':
 		if (*flags & IPT_ECN_OP_MATCH_CWR)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "ECN match: can only use parameter ONCE!");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		einfo->operation |= IPT_ECN_OP_MATCH_CWR;
@@ -53,7 +53,7 @@ static int ecn_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case 'G':
 		if (*flags & IPT_ECN_OP_MATCH_ECE)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "ECN match: can only use parameter ONCE!");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		einfo->operation |= IPT_ECN_OP_MATCH_ECE;
@@ -64,7 +64,7 @@ static int ecn_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case 'H':
 		if (*flags & IPT_ECN_OP_MATCH_IP)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "ECN match: can only use parameter ONCE!");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		if (invert)
@@ -72,7 +72,7 @@ static int ecn_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= IPT_ECN_OP_MATCH_IP;
 		einfo->operation |= IPT_ECN_OP_MATCH_IP;
 		if (!xtables_strtoui(optarg, NULL, &result, 0, 3))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "ECN match: Value out of range");
 		einfo->ip_ect = result;
 		break;
@@ -86,7 +86,7 @@ static int ecn_parse(int c, char **argv, int invert, unsigned int *flags,
 static void ecn_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "ECN match: some option required");
 }
 

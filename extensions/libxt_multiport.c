@@ -75,7 +75,7 @@ parse_multi_ports(const char *portstring, u_int16_t *ports, const char *proto)
 	unsigned int i;
 
 	buffer = strdup(portstring);
-	if (!buffer) exit_error(OTHER_PROBLEM, "strdup failed");
+	if (!buffer) xtables_error(OTHER_PROBLEM, "strdup failed");
 
 	for (cp=buffer, i=0; cp && i<XT_MULTI_PORTS; cp=next,i++)
 	{
@@ -83,7 +83,7 @@ parse_multi_ports(const char *portstring, u_int16_t *ports, const char *proto)
 		if (next) *next++='\0';
 		ports[i] = xtables_parse_port(cp, proto);
 	}
-	if (cp) exit_error(PARAMETER_PROBLEM, "too many ports specified");
+	if (cp) xtables_error(PARAMETER_PROBLEM, "too many ports specified");
 	free(buffer);
 	return i;
 }
@@ -98,7 +98,7 @@ parse_multi_ports_v1(const char *portstring,
 	u_int16_t m;
 
 	buffer = strdup(portstring);
-	if (!buffer) exit_error(OTHER_PROBLEM, "strdup failed");
+	if (!buffer) xtables_error(OTHER_PROBLEM, "strdup failed");
 
 	for (i=0; i<XT_MULTI_PORTS; i++)
 		multiinfo->pflags[i] = 0;
@@ -109,7 +109,7 @@ parse_multi_ports_v1(const char *portstring,
 		range = strchr(cp, ':');
 		if (range) {
 			if (i == XT_MULTI_PORTS-1)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "too many ports specified");
 			*range++ = '\0';
 		}
@@ -118,13 +118,13 @@ parse_multi_ports_v1(const char *portstring,
 			multiinfo->pflags[i] = 1;
 			multiinfo->ports[++i] = xtables_parse_port(range, proto);
 			if (multiinfo->ports[i-1] >= multiinfo->ports[i])
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "invalid portrange specified");
 			m <<= 1;
 		}
  	}
 	multiinfo->count = i;
- 	if (cp) exit_error(PARAMETER_PROBLEM, "too many ports specified");
+	if (cp) xtables_error(PARAMETER_PROBLEM, "too many ports specified");
  	free(buffer);
 }
 
@@ -134,17 +134,17 @@ check_proto(u_int16_t pnum, u_int8_t invflags)
 	char *proto;
 
 	if (invflags & XT_INV_PROTO)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "multiport only works with TCP, UDP, UDPLITE, SCTP and DCCP");
 
 	if ((proto = proto_to_name(pnum)) != NULL)
 		return proto;
 	else if (!pnum)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "multiport needs `-p tcp', `-p udp', `-p udplite', "
 			   "`-p sctp' or `-p dccp'");
 	else
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "multiport only works with TCP, UDP, UDPLITE, SCTP and DCCP");
 }
 
@@ -189,11 +189,11 @@ __multiport_parse(int c, char **argv, int invert, unsigned int *flags,
 	}
 
 	if (invert)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "multiport does not support invert");
 
 	if (*flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "multiport can only have one option");
 	*flags = 1;
 	return 1;
@@ -256,7 +256,7 @@ __multiport_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 		multiinfo->invert = 1;
 
 	if (*flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "multiport can only have one option");
 	*flags = 1;
 	return 1;
@@ -284,7 +284,7 @@ multiport_parse6_v1(int c, char **argv, int invert, unsigned int *flags,
 static void multiport_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM, "multiport expection an option");
+		xtables_error(PARAMETER_PROBLEM, "multiport expection an option");
 }
 
 static char *

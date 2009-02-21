@@ -32,20 +32,20 @@ static int HL_parse(int c, char **argv, int invert, unsigned int *flags,
 	unsigned int value;
 
 	if (*flags & IP6T_HL_USED) {
-		exit_error(PARAMETER_PROBLEM, 
+		xtables_error(PARAMETER_PROBLEM,
 				"Can't specify HL option twice");
 	}
 
 	if (!optarg) 
-		exit_error(PARAMETER_PROBLEM, 
+		xtables_error(PARAMETER_PROBLEM,
 				"HL: You must specify a value");
 
 	if (xtables_check_inverse(optarg, &invert, NULL, 0))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 				"HL: unexpected `!'");
 	
 	if (!xtables_strtoui(optarg, NULL, &value, 0, UINT8_MAX))
-		exit_error(PARAMETER_PROBLEM,	
+		xtables_error(PARAMETER_PROBLEM,
 		           "HL: Expected value between 0 and 255");
 
 	switch (c) {
@@ -56,7 +56,7 @@ static int HL_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		case '2':
 			if (value == 0) {
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"HL: decreasing by 0?");
 			}
 
@@ -65,7 +65,7 @@ static int HL_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		case '3':
 			if (value == 0) {
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"HL: increasing by 0?");
 			}
 
@@ -86,7 +86,7 @@ static int HL_parse(int c, char **argv, int invert, unsigned int *flags,
 static void HL_check(unsigned int flags)
 {
 	if (!(flags & IP6T_HL_USED))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 				"HL: You must specify an action");
 }
 

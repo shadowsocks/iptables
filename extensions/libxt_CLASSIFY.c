@@ -45,10 +45,10 @@ CLASSIFY_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (CLASSIFY_string_to_priority(optarg, &clinfo->priority))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Bad class value `%s'", optarg);
 		if (*flags)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "CLASSIFY: Can't specify --set-class twice");
 		*flags = 1;
 		break;
@@ -64,7 +64,7 @@ static void
 CLASSIFY_final_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "CLASSIFY: Parameter --set-class is required");
 }
 

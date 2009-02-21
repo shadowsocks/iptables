@@ -81,13 +81,13 @@ static void parse_types(const char *arg, u_int16_t *mask)
 
 	while ((comma = strchr(arg, ',')) != NULL) {
 		if (comma == arg || !parse_type(arg, comma-arg, mask))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "addrtype: bad type `%s'", arg);
 		arg = comma + 1;
 	}
 
 	if (strlen(arg) == 0 || !parse_type(arg, strlen(arg), mask))
-		exit_error(PARAMETER_PROBLEM, "addrtype: bad type `%s'", arg);
+		xtables_error(PARAMETER_PROBLEM, "addrtype: bad type \"%s\"", arg);
 }
 	
 #define IPT_ADDRTYPE_OPT_SRCTYPE	0x1
@@ -105,7 +105,7 @@ addrtype_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags&IPT_ADDRTYPE_OPT_SRCTYPE)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "addrtype: can't specify src-type twice");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_types(argv[optind-1], &info->source);
@@ -115,7 +115,7 @@ addrtype_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '2':
 		if (*flags&IPT_ADDRTYPE_OPT_DSTTYPE)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "addrtype: can't specify dst-type twice");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_types(argv[optind-1], &info->dest);
@@ -140,7 +140,7 @@ addrtype_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags & IPT_ADDRTYPE_OPT_SRCTYPE)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "addrtype: can't specify src-type twice");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_types(argv[optind-1], &info->source);
@@ -150,7 +150,7 @@ addrtype_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '2':
 		if (*flags & IPT_ADDRTYPE_OPT_DSTTYPE)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "addrtype: can't specify dst-type twice");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_types(argv[optind-1], &info->dest);
@@ -160,14 +160,14 @@ addrtype_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '3':
 		if (*flags & IPT_ADDRTYPE_OPT_LIMIT_IFACE_IN)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "addrtype: can't specify limit-iface-in twice");
 		info->flags |= IPT_ADDRTYPE_LIMIT_IFACE_IN;
 		*flags |= IPT_ADDRTYPE_OPT_LIMIT_IFACE_IN;
 		break;
 	case '4':
 		if (*flags & IPT_ADDRTYPE_OPT_LIMIT_IFACE_OUT)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "addrtype: can't specify limit-iface-out twice");
 		info->flags |= IPT_ADDRTYPE_LIMIT_IFACE_OUT;
 		*flags |= IPT_ADDRTYPE_OPT_LIMIT_IFACE_OUT;
@@ -182,18 +182,18 @@ addrtype_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 static void addrtype_check_v0(unsigned int flags)
 {
 	if (!(flags & (IPT_ADDRTYPE_OPT_SRCTYPE|IPT_ADDRTYPE_OPT_DSTTYPE)))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "addrtype: you must specify --src-type or --dst-type");
 }
 
 static void addrtype_check_v1(unsigned int flags)
 {
 	if (!(flags & (IPT_ADDRTYPE_OPT_SRCTYPE|IPT_ADDRTYPE_OPT_DSTTYPE)))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "addrtype: you must specify --src-type or --dst-type");
 	if (flags & IPT_ADDRTYPE_OPT_LIMIT_IFACE_IN &&
 	    flags & IPT_ADDRTYPE_OPT_LIMIT_IFACE_OUT)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "addrtype: you can't specify both --limit-iface-in "
 			   "and --limit-iface-out");
 }

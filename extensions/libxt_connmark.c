@@ -91,7 +91,7 @@ connmark_parse(int c, char **argv, int invert, unsigned int *flags,
 			markinfo->mask = strtoul(end+1, &end, 0);
 
 		if (*end != '\0' || end == optarg)
-			exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
+			xtables_error(PARAMETER_PROBLEM, "Bad MARK value \"%s\"", optarg);
 		if (invert)
 			markinfo->invert = 1;
 		*flags = 1;
@@ -114,7 +114,7 @@ static void print_mark(unsigned int mark, unsigned int mask)
 static void connmark_mt_check(unsigned int flags)
 {
 	if (flags == 0)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "connmark: The --mark option is required");
 }
 

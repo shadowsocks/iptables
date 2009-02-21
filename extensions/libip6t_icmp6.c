@@ -98,7 +98,7 @@ parse_icmpv6(const char *icmpv6type, u_int8_t *type, u_int8_t code[])
 		if (strncasecmp(icmpv6_codes[i].name, icmpv6type, strlen(icmpv6type))
 		    == 0) {
 			if (match != limit)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "Ambiguous ICMPv6 type `%s':"
 					   " `%s' or `%s'?",
 					   icmpv6type,
@@ -124,12 +124,12 @@ parse_icmpv6(const char *icmpv6type, u_int8_t *type, u_int8_t code[])
 			*slash = '\0';
 
 		if (!xtables_strtoui(buffer, NULL, &number, 0, UINT8_MAX))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Invalid ICMPv6 type `%s'\n", buffer);
 		*type = number;
 		if (slash) {
 			if (!xtables_strtoui(slash+1, NULL, &number, 0, UINT8_MAX))
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "Invalid ICMPv6 code `%s'\n",
 					   slash+1);
 			code[0] = code[1] = number;
@@ -155,7 +155,7 @@ static int icmp6_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags == 1)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "icmpv6 match: only use --icmpv6-type once!");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_icmpv6(argv[optind-1], &icmpv6info->type, 
@@ -240,7 +240,7 @@ static void icmp6_save(const void *ip, const struct xt_entry_match *match)
 static void icmp6_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "icmpv6 match: You must specify `--icmpv6-type'");
 }
 

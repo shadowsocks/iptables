@@ -80,7 +80,7 @@ static void parse_pkttype(const char *pkttype, struct xt_pkttype_info *info)
 		}
 	}
 	
-	exit_error(PARAMETER_PROBLEM, "Bad packet type '%s'", pkttype);
+	xtables_error(PARAMETER_PROBLEM, "Bad packet type '%s'", pkttype);
 }
 
 static int pkttype_parse(int c, char **argv, int invert, unsigned int *flags,
@@ -108,7 +108,7 @@ static int pkttype_parse(int c, char **argv, int invert, unsigned int *flags,
 static void pkttype_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM, "You must specify `--pkt-type'");
+		xtables_error(PARAMETER_PROBLEM, "You must specify \"--pkt-type\"");
 }
 
 static void print_pkttype(struct xt_pkttype_info *info)

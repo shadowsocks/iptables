@@ -42,13 +42,13 @@ static bool tos_parse_numeric(const char *str, struct tos_value_mask *tvm,
 		const char *p = end + 1;
 
 		if (!xtables_strtoui(p, &end, &value, 0, max))
-			exit_error(PARAMETER_PROBLEM, "Illegal value: \"%s\"",
+			xtables_error(PARAMETER_PROBLEM, "Illegal value: \"%s\"",
 			           str);
 		tvm->mask = value;
 	}
 
 	if (*end != '\0')
-		exit_error(PARAMETER_PROBLEM, "Illegal value: \"%s\"", str);
+		xtables_error(PARAMETER_PROBLEM, "Illegal value: \"%s\"", str);
 	return true;
 }
 
@@ -70,7 +70,7 @@ static bool tos_parse_symbolic(const char *str, struct tos_value_mask *tvm,
 			return true;
 		}
 
-	exit_error(PARAMETER_PROBLEM, "Symbolic name \"%s\" is unknown", str);
+	xtables_error(PARAMETER_PROBLEM, "Symbolic name \"%s\" is unknown", str);
 	return false;
 }
 

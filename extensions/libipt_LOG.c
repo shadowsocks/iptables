@@ -79,7 +79,7 @@ parse_level(const char *level)
 			if (strncasecmp(level, ipt_log_names[i].name,
 					strlen(level)) == 0) {
 				if (set++)
-					exit_error(PARAMETER_PROBLEM,
+					xtables_error(PARAMETER_PROBLEM,
 						   "log-level `%s' ambiguous",
 						   level);
 				lev = ipt_log_names[i].level;
@@ -87,7 +87,7 @@ parse_level(const char *level)
 		}
 
 		if (!set)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "log-level `%s' unknown", level);
 	}
 
@@ -109,11 +109,11 @@ static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '!':
 		if (*flags & IPT_LOG_OPT_LEVEL)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify --log-level twice");
 
 		if (xtables_check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --log-level");
 
 		loginfo->level = parse_level(optarg);
@@ -122,24 +122,24 @@ static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '#':
 		if (*flags & IPT_LOG_OPT_PREFIX)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify --log-prefix twice");
 
 		if (xtables_check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --log-prefix");
 
 		if (strlen(optarg) > sizeof(loginfo->prefix) - 1)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Maximum prefix length %u for --log-prefix",
 				   (unsigned int)sizeof(loginfo->prefix) - 1);
 
 		if (strlen(optarg) == 0)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "No prefix specified for --log-prefix");
 
 		if (strlen(optarg) != strlen(strtok(optarg, "\n")))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Newlines not allowed in --log-prefix");
 
 		strcpy(loginfo->prefix, optarg);
@@ -148,7 +148,7 @@ static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '1':
 		if (*flags & IPT_LOG_OPT_TCPSEQ)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify --log-tcp-sequence "
 				   "twice");
 
@@ -158,7 +158,7 @@ static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '2':
 		if (*flags & IPT_LOG_OPT_TCPOPT)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify --log-tcp-options twice");
 
 		loginfo->logflags |= IPT_LOG_TCPOPT;
@@ -167,7 +167,7 @@ static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '3':
 		if (*flags & IPT_LOG_OPT_IPOPT)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify --log-ip-options twice");
 
 		loginfo->logflags |= IPT_LOG_IPOPT;
@@ -176,7 +176,7 @@ static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '4':
 		if (*flags & IPT_LOG_OPT_UID)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify --log-uid twice");
 
 		loginfo->logflags |= IPT_LOG_UID;

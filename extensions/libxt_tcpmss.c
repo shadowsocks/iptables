@@ -29,7 +29,7 @@ parse_tcp_mssvalue(const char *mssvalue)
 	if (!xtables_strtoui(mssvalue, NULL, &mssvaluenum, 0, UINT16_MAX))
 		return mssvaluenum;
 
-	exit_error(PARAMETER_PROBLEM,
+	xtables_error(PARAMETER_PROBLEM,
 		   "Invalid mss `%s' specified", mssvalue);
 }
 
@@ -63,7 +63,7 @@ tcpmss_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--mss' allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_tcp_mssvalues(argv[optind-1],
@@ -81,7 +81,7 @@ tcpmss_parse(int c, char **argv, int invert, unsigned int *flags,
 static void tcpmss_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "tcpmss match: You must specify `--mss'");
 }
 

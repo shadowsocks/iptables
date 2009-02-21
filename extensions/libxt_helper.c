@@ -29,7 +29,7 @@ helper_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 					"helper match: Only use --helper ONCE!");
 		xtables_check_inverse(optarg, &invert, &invert, 0);
 		strncpy(info->name, optarg, 29);
@@ -48,7 +48,7 @@ helper_parse(int c, char **argv, int invert, unsigned int *flags,
 static void helper_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "helper match: You must specify `--helper'");
 }
 

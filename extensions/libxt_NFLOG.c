@@ -49,56 +49,56 @@ static int NFLOG_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case NFLOG_GROUP:
 		if (*flags & NFLOG_GROUP)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify --nflog-group twice");
 		if (xtables_check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --nflog-group");
 
 		n = atoi(optarg);
 		if (n < 0)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "--nflog-group can not be negative");
 		info->group = n;
 		break;
 	case NFLOG_PREFIX:
 		if (*flags & NFLOG_PREFIX)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify --nflog-prefix twice");
 		if (xtables_check_inverse(optarg, &invert, NULL, 0))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --nflog-prefix");
 
 		length = strlen(optarg);
 		if (length == 0)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "No prefix specified for --nflog-prefix");
 		if (length >= sizeof(info->prefix))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "--nflog-prefix too long, max %Zu characters",
 				   sizeof(info->prefix) - 1);
 		if (length != strlen(strtok(optarg, "\n")))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Newlines are not allowed in --nflog-prefix");
 		strcpy(info->prefix, optarg);
 		break;
 	case NFLOG_RANGE:
 		if (*flags & NFLOG_RANGE)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify --nflog-range twice");
 		n = atoi(optarg);
 		if (n < 0)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Invalid --nflog-range, must be >= 0");
 		info->len = n;
 		break;
 	case NFLOG_THRESHOLD:
 		if (*flags & NFLOG_THRESHOLD)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify --nflog-threshold twice");
 		n = atoi(optarg);
 		if (n < 1)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Invalid --nflog-threshold, must be >= 1");
 		info->threshold = n;
 		break;

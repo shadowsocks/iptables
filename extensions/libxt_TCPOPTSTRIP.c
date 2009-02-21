@@ -84,15 +84,15 @@ static void parse_list(struct xt_tcpoptstrip_target_info *info, char *arg)
 
 		if (option == 0 &&
 		    !xtables_strtoui(arg, NULL, &option, 0, UINT8_MAX))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "Bad TCP option value \"%s\"", arg);
 
 		if (option < 2)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "Option value may not be 0 or 1");
 
 		if (tcpoptstrip_test_bit(info->strip_bmap, option))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "Option \"%s\" already specified", arg);
 
 		tcpoptstrip_set_bit(info->strip_bmap, option);
@@ -111,7 +111,7 @@ static int tcpoptstrip_tg_parse(int c, char **argv, int invert,
 	switch (c) {
 	case 's':
 		if (*flags & FLAG_STRIP)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "You can specify --strip-options only once");
 		parse_list(info, optarg);
 		*flags |= FLAG_STRIP;
@@ -124,7 +124,7 @@ static int tcpoptstrip_tg_parse(int c, char **argv, int invert,
 static void tcpoptstrip_tg_check(unsigned int flags)
 {
 	if (flags == 0)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "TCPOPTSTRIP: --strip-options parameter required");
 }
 

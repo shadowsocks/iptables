@@ -70,7 +70,7 @@ static struct ip6tc_handle *create_handle(const char *tablename)
 	}
 
 	if (!handle) {
-		exit_error(PARAMETER_PROBLEM, "%s: unable to initialize "
+		xtables_error(PARAMETER_PROBLEM, "%s: unable to initialize "
 			"table '%s'\n", ip6tables_globals.program_name,
 			tablename);
 		exit(1);
@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
 			table = strtok(buffer+1, " \t\n");
 			DEBUGP("line %u, table '%s'\n", line, table);
 			if (!table) {
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"%s: line %u table name invalid\n",
 					ip6tables_globals.program_name,
 					line);
@@ -246,7 +246,7 @@ int main(int argc, char *argv[])
 			chain = strtok(buffer+1, " \t\n");
 			DEBUGP("line %u, chain '%s'\n", line, chain);
 			if (!chain) {
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "%s: line %u chain name invalid\n",
 					   ip6tables_globals.program_name,
 					   line);
@@ -257,14 +257,14 @@ int main(int argc, char *argv[])
 				if (noflush && ip6tc_is_chain(chain, handle)) {
 					DEBUGP("Flushing existing user defined chain '%s'\n", chain);
 					if (!ip6tc_flush_entries(chain, handle))
-						exit_error(PARAMETER_PROBLEM,
+						xtables_error(PARAMETER_PROBLEM,
 							   "error flushing chain "
 							   "'%s':%s\n", chain,
 							   strerror(errno));
 				} else {
 					DEBUGP("Creating new chain '%s'\n", chain);
 					if (!ip6tc_create_chain(chain, handle))
-						exit_error(PARAMETER_PROBLEM,
+						xtables_error(PARAMETER_PROBLEM,
 							   "error creating chain "
 							   "'%s':%s\n", chain,
 							   strerror(errno));
@@ -274,7 +274,7 @@ int main(int argc, char *argv[])
 			policy = strtok(NULL, " \t\n");
 			DEBUGP("line %u, policy '%s'\n", line, policy);
 			if (!policy) {
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "%s: line %u policy invalid\n",
 					   ip6tables_globals.program_name,
 					   line);
@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
 					ctrs = strtok(NULL, " \t\n");
 
 					if (!ctrs || !parse_counters(ctrs, &count))
-						exit_error(PARAMETER_PROBLEM,
+						xtables_error(PARAMETER_PROBLEM,
 							  "invalid policy counters "
 							  "for chain '%s'\n", chain);
 
@@ -303,7 +303,7 @@ int main(int argc, char *argv[])
 
 				if (!ip6tc_set_policy(chain, policy, &count,
 						     handle))
-					exit_error(OTHER_PROBLEM,
+					xtables_error(OTHER_PROBLEM,
 						"Can't set policy `%s'"
 						" on `%s' line %u: %s\n",
 						chain, policy, line,
@@ -331,19 +331,19 @@ int main(int argc, char *argv[])
 				/* we have counters in our input */
 				ptr = strchr(buffer, ']');
 				if (!ptr)
-					exit_error(PARAMETER_PROBLEM,
+					xtables_error(PARAMETER_PROBLEM,
 						   "Bad line %u: need ]\n",
 						   line);
 
 				pcnt = strtok(buffer+1, ":");
 				if (!pcnt)
-					exit_error(PARAMETER_PROBLEM,
+					xtables_error(PARAMETER_PROBLEM,
 						   "Bad line %u: need :\n",
 						   line);
 
 				bcnt = strtok(NULL, "]");
 				if (!bcnt)
-					exit_error(PARAMETER_PROBLEM,
+					xtables_error(PARAMETER_PROBLEM,
 						   "Bad line %u: need ]\n",
 						   line);
 
@@ -410,7 +410,7 @@ int main(int argc, char *argv[])
 					/* check if table name specified */
 					if (!strncmp(param_buffer, "-t", 2)
                                             || !strncmp(param_buffer, "--table", 8)) {
-						exit_error(PARAMETER_PROBLEM,
+						xtables_error(PARAMETER_PROBLEM,
 						   "Line %u seems to have a "
 						   "-t table option.\n", line);
 						exit(1);
@@ -423,7 +423,7 @@ int main(int argc, char *argv[])
 					param_buffer[param_len++] = *curchar;
 
 					if (param_len >= sizeof(param_buffer))
-						exit_error(PARAMETER_PROBLEM, 
+						xtables_error(PARAMETER_PROBLEM,
 						   "Parameter too long!");
 				}
 			}

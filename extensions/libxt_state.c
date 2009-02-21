@@ -51,15 +51,15 @@ state_parse_states(const char *arg, struct xt_state_info *sinfo)
 
 	while ((comma = strchr(arg, ',')) != NULL) {
 		if (comma == arg || !state_parse_state(arg, comma-arg, sinfo))
-			exit_error(PARAMETER_PROBLEM, "Bad state `%s'", arg);
+			xtables_error(PARAMETER_PROBLEM, "Bad state \"%s\"", arg);
 		arg = comma+1;
 	}
 	if (!*arg)
-		exit_error(PARAMETER_PROBLEM, "`--state' requires a list of "
+		xtables_error(PARAMETER_PROBLEM, "\"--state\" requires a list of "
 					      "states with no spaces, e.g. "
 					      "ESTABLISHED,RELATED");
 	if (strlen(arg) == 0 || !state_parse_state(arg, strlen(arg), sinfo))
-		exit_error(PARAMETER_PROBLEM, "Bad state `%s'", arg);
+		xtables_error(PARAMETER_PROBLEM, "Bad state \"%s\"", arg);
 }
 
 static int
@@ -89,7 +89,7 @@ state_parse(int c, char **argv, int invert, unsigned int *flags,
 static void state_final_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM, "You must specify `--state'");
+		xtables_error(PARAMETER_PROBLEM, "You must specify \"--state\"");
 }
 
 static void state_print_state(unsigned int statemask)

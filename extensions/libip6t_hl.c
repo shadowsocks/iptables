@@ -34,11 +34,11 @@ static int hl_parse(int c, char **argv, int invert, unsigned int *flags,
 	value = atoi(argv[optind-1]);
 
 	if (*flags) 
-		exit_error(PARAMETER_PROBLEM, 
+		xtables_error(PARAMETER_PROBLEM,
 				"Can't specify HL option twice");
 
 	if (!optarg)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 				"hl: You must specify a value");
 	switch (c) {
 		case '2':
@@ -54,7 +54,7 @@ static int hl_parse(int c, char **argv, int invert, unsigned int *flags,
 			break;
 		case '3':
 			if (invert) 
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 						"hl: unexpected `!'");
 
 			info->mode = IP6T_HL_LT;
@@ -64,7 +64,7 @@ static int hl_parse(int c, char **argv, int invert, unsigned int *flags,
 			break;
 		case '4':
 			if (invert)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 						"hl: unexpected `!'");
 
 			info->mode = IP6T_HL_GT;
@@ -82,7 +82,7 @@ static int hl_parse(int c, char **argv, int invert, unsigned int *flags,
 static void hl_check(unsigned int flags)
 {
 	if (!flags) 
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			"HL match: You must specify one of "
 			"`--hl-eq', `--hl-lt', `--hl-gt'");
 }

@@ -60,7 +60,7 @@ static int connlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case 'A':
 		if (*flags & 0x1)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				"--connlimit-above may be given only once");
 		*flags |= 0x1;
 		xtables_check_inverse(optarg, &invert, &optind, 0);
@@ -69,20 +69,20 @@ static int connlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case 'M':
 		if (*flags & 0x2)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				"--connlimit-mask may be given only once");
 
 		*flags |= 0x2;
 		i = strtoul(argv[optind-1], &err, 0);
 		if (family == NFPROTO_IPV6) {
 			if (i > 128 || *err != '\0')
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"--connlimit-mask must be between "
 					"0 and 128");
 			prefix_to_netmask(info->v6_mask, i);
 		} else {
 			if (i > 32 || *err != '\0')
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"--connlimit-mask must be between "
 					"0 and 32");
 			if (i == 0)
@@ -117,7 +117,7 @@ static int connlimit_parse6(int c, char **argv, int invert,
 static void connlimit_check(unsigned int flags)
 {
 	if (!(flags & 0x1))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			"You must specify \"--connlimit-above\"");
 }
 

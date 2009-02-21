@@ -55,7 +55,7 @@ static int set_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':		/* --set <set> <flag>[,<flag> */
 		if (info->flags[0])
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "--set can be specified only once");
 
 		xtables_check_inverse(optarg, &invert, &optind, 0);
@@ -65,11 +65,11 @@ static int set_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (!argv[optind]
 		    || argv[optind][0] == '-'
 		    || argv[optind][0] == '!')
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "--set requires two args.");
 
 		if (strlen(argv[optind-1]) > IP_SET_MAXNAMELEN - 1)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "setname `%s' too long, max %d characters.",
 				   argv[optind-1], IP_SET_MAXNAMELEN - 1);
 
@@ -91,7 +91,7 @@ static int set_parse(int c, char **argv, int invert, unsigned int *flags,
 static void set_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "You must specify `--set' with proper arguments");
 	DEBUGP("final check OK\n");
 }

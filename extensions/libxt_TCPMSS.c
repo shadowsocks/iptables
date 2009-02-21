@@ -53,11 +53,11 @@ static int __TCPMSS_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '1':
 		if (*flags)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "TCPMSS target: Only one option may be specified");
 		if (!xtables_strtoui(optarg, NULL, &mssval,
 		    0, UINT16_MAX - hdrsize))
-			exit_error(PARAMETER_PROBLEM, "Bad TCPMSS value `%s'", optarg);
+			xtables_error(PARAMETER_PROBLEM, "Bad TCPMSS value \"%s\"", optarg);
 		
 		mssinfo->mss = mssval;
 		*flags = 1;
@@ -65,7 +65,7 @@ static int __TCPMSS_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	case '2':
 		if (*flags)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 			           "TCPMSS target: Only one option may be specified");
 		mssinfo->mss = XT_TCPMSS_CLAMP_PMTU;
 		*flags = 1;
@@ -93,7 +93,7 @@ static int TCPMSS_parse6(int c, char **argv, int invert, unsigned int *flags,
 static void TCPMSS_check(unsigned int flags)
 {
 	if (!flags)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "TCPMSS target: At least one parameter is required");
 }
 

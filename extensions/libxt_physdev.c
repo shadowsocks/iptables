@@ -100,7 +100,7 @@ physdev_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	return 1;
 multiple_use:
-	exit_error(PARAMETER_PROBLEM,
+	xtables_error(PARAMETER_PROBLEM,
 	   "multiple use of the same physdev option is not allowed");
 
 }
@@ -108,7 +108,7 @@ multiple_use:
 static void physdev_check(unsigned int flags)
 {
 	if (flags == 0)
-		exit_error(PARAMETER_PROBLEM, "PHYSDEV: no physdev option specified");
+		xtables_error(PARAMETER_PROBLEM, "PHYSDEV: no physdev option specified");
 }
 
 static void

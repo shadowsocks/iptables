@@ -124,7 +124,7 @@ int parse_rate(const char *rate, u_int32_t *val)
 	/* This would get mapped to infinite (1/day is minimum they
            can specify, so we're ok at that end). */
 	if (r / mult > XT_HASHLIMIT_SCALE)
-		exit_error(PARAMETER_PROBLEM, "Rate too fast `%s'\n", rate);
+		xtables_error(PARAMETER_PROBLEM, "Rate too fast \"%s\"\n", rate);
 
 	*val = XT_HASHLIMIT_SCALE * mult / r;
 	return 1;
@@ -221,7 +221,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		          *flags & PARAM_LIMIT);
 		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!parse_rate(optarg, &r->cfg.avg))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "bad rate `%s'", optarg);
 		*flags |= PARAM_LIMIT;
 		break;
@@ -231,7 +231,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		          *flags & PARAM_BURST);
 		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, 10000))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "bad --hashlimit-burst `%s'", optarg);
 		r->cfg.burst = num;
 		*flags |= PARAM_BURST;
@@ -241,7 +241,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		          *flags & PARAM_SIZE);
 		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				"bad --hashlimit-htable-size: `%s'", optarg);
 		r->cfg.size = num;
 		*flags |= PARAM_SIZE;
@@ -251,7 +251,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		          *flags & PARAM_MAX);
 		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				"bad --hashlimit-htable-max: `%s'", optarg);
 		r->cfg.max = num;
 		*flags |= PARAM_MAX;
@@ -262,7 +262,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		          *flags & PARAM_GCINTERVAL);
 		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				"bad --hashlimit-htable-gcinterval: `%s'", 
 				optarg);
 		/* FIXME: not HZ dependent!! */
@@ -274,7 +274,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		          "--hashlimit-htable-expire", *flags & PARAM_EXPIRE);
 		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, UINT32_MAX))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				"bad --hashlimit-htable-expire: `%s'", optarg);
 		/* FIXME: not HZ dependent */
 		r->cfg.expire = num;
@@ -285,7 +285,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		          *flags & PARAM_MODE);
 		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (parse_mode(&r->cfg.mode, optarg) < 0)
-			exit_error(PARAMETER_PROBLEM, 
+			xtables_error(PARAMETER_PROBLEM,
 				   "bad --hashlimit-mode: `%s'\n", optarg);
 		*flags |= PARAM_MODE;
 		break;
@@ -294,7 +294,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		          *flags & PARAM_NAME);
 		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
 		if (strlen(optarg) == 0)
-			exit_error(PARAMETER_PROBLEM, "Zero-length name?");
+			xtables_error(PARAMETER_PROBLEM, "Zero-length name?");
 		strncpy(r->name, optarg, sizeof(r->name));
 		*flags |= PARAM_NAME;
 		break;
@@ -303,7 +303,7 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 	}
 
 	if (invert)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "hashlimit does not support invert");
 
 	return 1;
@@ -404,7 +404,7 @@ hashlimit_mt_parse(struct xt_hashlimit_mtinfo1 *info, unsigned int *flags,
 		xtables_param_act(XTF_ONLY_ONCE, "hashlimit", "--hashlimit-name",
 		          *flags & PARAM_NAME);
 		if (strlen(optarg) == 0)
-			exit_error(PARAMETER_PROBLEM, "Zero-length name?");
+			xtables_error(PARAMETER_PROBLEM, "Zero-length name?");
 		strncpy(info->name, optarg, sizeof(info->name));
 		info->name[sizeof(info->name)-1] = '\0';
 		*flags |= PARAM_NAME;
@@ -452,23 +452,23 @@ hashlimit_mt6_parse(int c, char **argv, int invert, unsigned int *flags,
 static void hashlimit_check(unsigned int flags)
 {
 	if (!(flags & PARAM_LIMIT))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 				"You have to specify --hashlimit");
 	if (!(flags & PARAM_MODE))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 				"You have to specify --hashlimit-mode");
 	if (!(flags & PARAM_NAME))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 				"You have to specify --hashlimit-name");
 }
 
 static void hashlimit_mt_check(unsigned int flags)
 {
 	if (!(flags & PARAM_LIMIT))
-		exit_error(PARAMETER_PROBLEM, "You have to specify "
+		xtables_error(PARAMETER_PROBLEM, "You have to specify "
 		           "--hashlimit-upto or --hashlimit-above");
 	if (!(flags & PARAM_NAME))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 		           "You have to specify --hashlimit-name");
 }
 

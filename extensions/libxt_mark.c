@@ -69,7 +69,7 @@ mark_parse(int c, char **argv, int invert, unsigned int *flags,
 		} else
 			markinfo->mask = 0xffffffff;
 		if (*end != '\0' || end == optarg)
-			exit_error(PARAMETER_PROBLEM, "Bad MARK value `%s'", optarg);
+			xtables_error(PARAMETER_PROBLEM, "Bad MARK value \"%s\"", optarg);
 		if (invert)
 			markinfo->invert = 1;
 		*flags = 1;
@@ -92,7 +92,7 @@ static void print_mark(unsigned int mark, unsigned int mask)
 static void mark_mt_check(unsigned int flags)
 {
 	if (flags == 0)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "mark match: The --mark option is required");
 }
 

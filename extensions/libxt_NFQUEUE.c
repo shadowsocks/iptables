@@ -34,7 +34,7 @@ parse_num(const char *s, struct xt_NFQ_info *tinfo)
 	unsigned int num;
        
 	if (!xtables_strtoui(s, NULL, &num, 0, UINT16_MAX))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "Invalid queue number `%s'\n", s);
 
     	tinfo->queuenum = num & 0xffff;
@@ -50,7 +50,7 @@ NFQUEUE_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case 'F':
 		if (*flags)
-			exit_error(PARAMETER_PROBLEM, "NFQUEUE target: "
+			xtables_error(PARAMETER_PROBLEM, "NFQUEUE target: "
 				   "Only use --queue-num ONCE!");
 		parse_num(optarg, tinfo);
 		break;

@@ -49,42 +49,42 @@ statistic_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags & 0x1)
-			exit_error(PARAMETER_PROBLEM, "double --mode");
+			xtables_error(PARAMETER_PROBLEM, "double --mode");
 		if (!strcmp(optarg, "random"))
 			info->mode = XT_STATISTIC_MODE_RANDOM;
 		else if (!strcmp(optarg, "nth"))
 			info->mode = XT_STATISTIC_MODE_NTH;
 		else
-			exit_error(PARAMETER_PROBLEM, "Bad mode `%s'", optarg);
+			xtables_error(PARAMETER_PROBLEM, "Bad mode \"%s\"", optarg);
 		*flags |= 0x1;
 		break;
 	case '2':
 		if (*flags & 0x2)
-			exit_error(PARAMETER_PROBLEM, "double --probability");
+			xtables_error(PARAMETER_PROBLEM, "double --probability");
 		prob = atof(optarg);
 		if (prob < 0 || prob > 1)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "--probability must be between 0 and 1");
 		info->u.random.probability = 0x80000000 * prob;
 		*flags |= 0x2;
 		break;
 	case '3':
 		if (*flags & 0x4)
-			exit_error(PARAMETER_PROBLEM, "double --every");
+			xtables_error(PARAMETER_PROBLEM, "double --every");
 		if (!xtables_strtoui(optarg, NULL, &val, 0, UINT32_MAX))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "cannot parse --every `%s'", optarg);
 		info->u.nth.every = val;
 		if (info->u.nth.every == 0)
-			exit_error(PARAMETER_PROBLEM, "--every cannot be 0");
+			xtables_error(PARAMETER_PROBLEM, "--every cannot be 0");
 		info->u.nth.every--;
 		*flags |= 0x4;
 		break;
 	case '4':
 		if (*flags & 0x8)
-			exit_error(PARAMETER_PROBLEM, "double --packet");
+			xtables_error(PARAMETER_PROBLEM, "double --packet");
 		if (!xtables_strtoui(optarg, NULL, &val, 0, UINT32_MAX))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "cannot parse --packet `%s'", optarg);
 		info->u.nth.packet = val;
 		*flags |= 0x8;
@@ -98,25 +98,25 @@ statistic_parse(int c, char **argv, int invert, unsigned int *flags,
 static void statistic_check(unsigned int flags)
 {
 	if (!(flags & 0x1))
-		exit_error(PARAMETER_PROBLEM, "no mode specified");
+		xtables_error(PARAMETER_PROBLEM, "no mode specified");
 	if ((flags & 0x2) && (flags & (0x4 | 0x8)))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "both nth and random parameters given");
 	if (flags & 0x2 && global_info->mode != XT_STATISTIC_MODE_RANDOM)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "--probability can only be used in random mode");
 	if (flags & 0x4 && global_info->mode != XT_STATISTIC_MODE_NTH)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "--every can only be used in nth mode");
 	if (flags & 0x8 && global_info->mode != XT_STATISTIC_MODE_NTH)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "--packet can only be used in nth mode");
 	if ((flags & 0x8) && !(flags & 0x4))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "--packet can only be used with --every");
 	/* at this point, info->u.nth.every have been decreased. */
 	if (global_info->u.nth.packet > global_info->u.nth.every)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			  "the --packet p must be 0 <= p <= n-1");
 
 

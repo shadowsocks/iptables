@@ -42,13 +42,13 @@ static int for_each_table(int (*func)(const char *tablename))
 
 	procfile = fopen("/proc/net/ip6_tables_names", "r");
 	if (!procfile)
-		exit_error(OTHER_PROBLEM,
+		xtables_error(OTHER_PROBLEM,
 			   "Unable to open /proc/net/ip6_tables_names: %s\n",
 			   strerror(errno));
 
 	while (fgets(tablename, sizeof(tablename), procfile)) {
 		if (tablename[strlen(tablename) - 1] != '\n')
-			exit_error(OTHER_PROBLEM, 
+			xtables_error(OTHER_PROBLEM,
 				   "Badly formed tablename `%s'\n",
 				   tablename);
 		tablename[strlen(tablename) - 1] = '\0';
@@ -69,7 +69,7 @@ static int do_output(const char *tablename)
 
 	h = ip6tc_init(tablename);
 	if (!h)
-		exit_error(OTHER_PROBLEM, "Can't initialize: %s\n",
+		xtables_error(OTHER_PROBLEM, "Cannot initialize: %s\n",
 			   ip6tc_strerror(errno));
 
 	if (!show_binary) {
@@ -115,7 +115,7 @@ static int do_output(const char *tablename)
 		printf("# Completed on %s", ctime(&now));
 	} else {
 		/* Binary, huh?  OK. */
-		exit_error(OTHER_PROBLEM, "Binary NYI\n");
+		xtables_error(OTHER_PROBLEM, "Binary NYI\n");
 	}
 
 	ip6tc_free(h);

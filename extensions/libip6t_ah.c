@@ -33,16 +33,16 @@ parse_ah_spi(const char *spistr, const char *typestr)
 	spi = strtoul(spistr, &ep, 0);
 
 	if ( spistr == ep )
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "AH no valid digits in %s `%s'", typestr, spistr);
 
 	if ( spi == ULONG_MAX  && errno == ERANGE )
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "%s `%s' specified too big: would overflow",
 			   typestr, spistr);
 
 	if ( *spistr != '\0'  && *ep != '\0' )
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "AH error parsing %s `%s'", typestr, spistr);
 
 	return spi;
@@ -84,7 +84,7 @@ static int ah_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		if (*flags & IP6T_AH_SPI)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--ahspi' allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		parse_ah_spis(argv[optind-1], ahinfo->spis);
@@ -94,7 +94,7 @@ static int ah_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '2':
 		if (*flags & IP6T_AH_LEN)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--ahlen' allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0);
 		ahinfo->hdrlen = parse_ah_spi(argv[optind-1], "length");
@@ -104,7 +104,7 @@ static int ah_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 	case '3':
 		if (*flags & IP6T_AH_RES)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--ahres' allowed");
 		ahinfo->hdrres = 1;
 		*flags |= IP6T_AH_RES;

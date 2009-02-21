@@ -361,7 +361,7 @@ generic_opt_check(int command, int options)
 
 			if (!(options & (1<<i))) {
 				if (commands_v_options[j][i] == '+')
-					exit_error(PARAMETER_PROBLEM,
+					xtables_error(PARAMETER_PROBLEM,
 						   "You need to supply the `-%c' "
 						   "option for this command\n",
 						   optflags[i]);
@@ -373,7 +373,7 @@ generic_opt_check(int command, int options)
 			}
 		}
 		if (legal == -1)
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Illegal option `-%c' with this command\n",
 				   optflags[i]);
 	}
@@ -402,9 +402,9 @@ add_command(unsigned int *cmd, const int newcmd, const int othercmds,
 	    int invert)
 {
 	if (invert)
-		exit_error(PARAMETER_PROBLEM, "unexpected ! flag");
+		xtables_error(PARAMETER_PROBLEM, "unexpected '!' flag");
 	if (*cmd & (~othercmds))
-		exit_error(PARAMETER_PROBLEM, "Can't use -%c with -%c\n",
+		xtables_error(PARAMETER_PROBLEM, "Cannot use -%c with -%c\n",
 			   cmd2char(newcmd), cmd2char(*cmd & (~othercmds)));
 	*cmd |= newcmd;
 }
@@ -452,7 +452,7 @@ parse_rulenumber(const char *rule)
 	unsigned int rulenum;
 
 	if (!xtables_strtoui(rule, NULL, &rulenum, 1, INT_MAX))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "Invalid rule number `%s'", rule);
 
 	return rulenum;
@@ -464,17 +464,17 @@ parse_target(const char *targetname)
 	const char *ptr;
 
 	if (strlen(targetname) < 1)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "Invalid target name (too short)");
 
 	if (strlen(targetname)+1 > sizeof(ip6t_chainlabel))
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "Invalid target name `%s' (%u chars max)",
 			   targetname, (unsigned int)sizeof(ip6t_chainlabel)-1);
 
 	for (ptr = targetname; *ptr; ptr++)
 		if (isspace(*ptr))
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "Invalid target name `%s'", targetname);
 	return targetname;
 }
@@ -484,7 +484,7 @@ set_option(unsigned int *options, unsigned int option, u_int8_t *invflg,
 	   int invert)
 {
 	if (*options & option)
-		exit_error(PARAMETER_PROBLEM, "multiple -%c flags not allowed",
+		xtables_error(PARAMETER_PROBLEM, "multiple -%c flags not allowed",
 			   opt2char(option));
 	*options |= option;
 
@@ -493,7 +493,7 @@ set_option(unsigned int *options, unsigned int option, u_int8_t *invflg,
 		for (i = 0; 1 << i != option; i++);
 
 		if (!inverse_for_options[i])
-			exit_error(PARAMETER_PROBLEM,
+			xtables_error(PARAMETER_PROBLEM,
 				   "cannot have ! before -%c",
 				   opt2char(option));
 		*invflg |= inverse_for_options[i];
@@ -1362,7 +1362,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			    && argv[optind][0] != '!')
 				rulenum = parse_rulenumber(argv[optind++]);
 			else
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "-%c requires a rule number",
 					   cmd2char(CMD_REPLACE));
 			break;
@@ -1421,11 +1421,11 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 
 		case 'N':
 			if (optarg && (*optarg == '-' || *optarg == '!'))
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "chain name not allowed to start "
 					   "with `%c'\n", *optarg);
 			if (xtables_find_target(optarg, XTF_TRY_LOAD))
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "chain name may not clash "
 					   "with target name\n");
 			add_command(&command, CMD_NEW_CHAIN, CMD_NONE,
@@ -1450,7 +1450,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			    && argv[optind][0] != '!')
 				newname = argv[optind++];
 			else
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "-%c requires old-chain-name and "
 					   "new-chain-name",
 					    cmd2char(CMD_RENAME_CHAIN));
@@ -1464,7 +1464,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			    && argv[optind][0] != '!')
 				policy = argv[optind++];
 			else
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "-%c requires a chain and a policy",
 					   cmd2char(CMD_SET_POLICY));
 			break;
@@ -1498,7 +1498,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 
 			if (fw.ipv6.proto == 0
 			    && (fw.ipv6.invflags & IP6T_INV_PROTO))
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "rule would never match protocol");
 
 			if (is_exthdr(fw.ipv6.proto)
@@ -1556,7 +1556,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 						     target->extra_opts,
 						     &target->option_offset);
 				if (opts == NULL)
-					exit_error(OTHER_PROBLEM,
+					xtables_error(OTHER_PROBLEM,
 						   "can't alloc memory!");
 			}
 			break;
@@ -1591,7 +1591,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			size_t size;
 
 			if (invert)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "unexpected ! flag before --match");
 
 			m = xtables_find_match(optarg, XTF_LOAD_MUST_SUCCEED,
@@ -1617,7 +1617,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 
 		case 't':
 			if (invert)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "unexpected ! flag before --table");
 			*table = optarg;
 			break;
@@ -1656,18 +1656,18 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			    && argv[optind][0] != '!')
 				bcnt = argv[optind++];
 			if (!bcnt)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"-%c requires packet and byte counter",
 					opt2char(OPT_COUNTERS));
 
 			if (sscanf(pcnt, "%llu", &cnt) != 1)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"-%c packet counter not numeric",
 					opt2char(OPT_COUNTERS));
 			fw.counters.pcnt = cnt;
 
 			if (sscanf(bcnt, "%llu", &cnt) != 1)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					"-%c byte counter not numeric",
 					opt2char(OPT_COUNTERS));
 			fw.counters.bcnt = cnt;
@@ -1676,7 +1676,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		case 1: /* non option */
 			if (optarg[0] == '!' && optarg[1] == '\0') {
 				if (invert)
-					exit_error(PARAMETER_PROBLEM,
+					xtables_error(PARAMETER_PROBLEM,
 						   "multiple consecutive ! not"
 						   " allowed");
 				invert = TRUE;
@@ -1763,21 +1763,21 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				if (!m) {
 					if (c == '?') {
 						if (optopt) {
-							exit_error(
+							xtables_error(
 							   PARAMETER_PROBLEM,
 							   "option `%s' "
 							   "requires an "
 							   "argument",
 							   argv[optind-1]);
 						} else {
-							exit_error(
+							xtables_error(
 							   PARAMETER_PROBLEM,
 							   "unknown option "
 							   "`%s'",
 							   argv[optind-1]);
 						}
 					}
-					exit_error(PARAMETER_PROBLEM,
+					xtables_error(PARAMETER_PROBLEM,
 						   "Unknown arg `%s'", optarg);
 				}
 			}
@@ -1795,12 +1795,12 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 	/* Fix me: must put inverse options checking here --MN */
 
 	if (optind < argc)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "unknown arguments found on commandline");
 	if (!command)
-		exit_error(PARAMETER_PROBLEM, "no command specified");
+		xtables_error(PARAMETER_PROBLEM, "no command specified");
 	if (invert)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "nothing appropriate following !");
 
 	if (command & (CMD_REPLACE | CMD_INSERT | CMD_DELETE | CMD_APPEND)) {
@@ -1820,17 +1820,17 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 
 	if ((nsaddrs > 1 || ndaddrs > 1) &&
 	    (fw.ipv6.invflags & (IP6T_INV_SRCIP | IP6T_INV_DSTIP)))
-		exit_error(PARAMETER_PROBLEM, "! not allowed with multiple"
+		xtables_error(PARAMETER_PROBLEM, "! not allowed with multiple"
 			   " source or destination IP addresses");
 
 	if (command == CMD_REPLACE && (nsaddrs != 1 || ndaddrs != 1))
-		exit_error(PARAMETER_PROBLEM, "Replacement rule does not "
+		xtables_error(PARAMETER_PROBLEM, "Replacement rule does not "
 			   "specify a unique address");
 
 	generic_opt_check(command, options);
 
 	if (chain && strlen(chain) > IP6T_FUNCTION_MAXNAMELEN)
-		exit_error(PARAMETER_PROBLEM,
+		xtables_error(PARAMETER_PROBLEM,
 			   "chain name `%s' too long (must be under %i chars)",
 			   chain, IP6T_FUNCTION_MAXNAMELEN);
 
@@ -1843,7 +1843,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		*handle = ip6tc_init(*table);
 
 	if (!*handle)
-		exit_error(VERSION_PROBLEM,
+		xtables_error(VERSION_PROBLEM,
 			"can't initialize ip6tables table `%s': %s",
 			*table, ip6tc_strerror(errno));
 
@@ -1855,7 +1855,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		    || strcmp(chain, "INPUT") == 0) {
 			/* -o not valid with incoming packets. */
 			if (options & OPT_VIANAMEOUT)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "Can't use -%c with %s\n",
 					   opt2char(OPT_VIANAMEOUT),
 					   chain);
@@ -1865,7 +1865,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		    || strcmp(chain, "OUTPUT") == 0) {
 			/* -i not valid with outgoing packets */
 			if (options & OPT_VIANAMEIN)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 					   "Can't use -%c with %s\n",
 					   opt2char(OPT_VIANAMEIN),
 					   chain);
@@ -1908,7 +1908,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			 * chain. */
 #ifdef IP6T_F_GOTO
 			if (fw.ipv6.flags & IP6T_F_GOTO)
-				exit_error(PARAMETER_PROBLEM,
+				xtables_error(PARAMETER_PROBLEM,
 						"goto '%s' is not a chain\n", jumpto);
 #endif
 			xtables_find_target(jumpto, XTF_LOAD_MUST_SUCCEED);
