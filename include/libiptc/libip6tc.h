@@ -4,6 +4,11 @@
 
 #include <linux/types.h>
 #include <libiptc/ipt_kernel_headers.h>
+#ifdef __cplusplus
+#	include <climits>
+#else
+#	include <limits.h> /* INT_MAX in ip6_tables.h */
+#endif
 #include <linux/netfilter_ipv6/ip6_tables.h>
 
 #ifndef IP6T_MIN_ALIGN

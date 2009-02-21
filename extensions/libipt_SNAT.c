@@ -6,6 +6,7 @@
 #include <getopt.h>
 #include <xtables.h>
 #include <iptables.h>
+#include <limits.h> /* INT_MAX in ip_tables.h */
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <net/netfilter/nf_nat.h>
 

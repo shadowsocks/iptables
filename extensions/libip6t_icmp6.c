@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <xtables.h>
+#include <limits.h> /* INT_MAX in ip6_tables.h */
 #include <linux/netfilter_ipv6/ip6_tables.h>
 
 struct icmpv6_names {
