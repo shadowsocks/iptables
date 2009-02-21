@@ -96,7 +96,7 @@ struct option *xtables_merge_options(struct option *oldopts,
 	for (num_old = 0; oldopts[num_old].name; num_old++) ;
 	for (num_new = 0; newopts[num_new].name; num_new++) ;
 
-	xt_params->option_offset += OPTION_OFFSET;
+	xt_params->option_offset += 256;
 	*option_offset = xt_params->option_offset;
 
 	merge = malloc(sizeof(struct option) * (num_new + num_old + 1));

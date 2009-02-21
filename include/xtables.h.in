@@ -235,7 +235,6 @@ int xtables_check_inverse(const char option[], int *invert,
 	int *my_optind, int argc);
 extern struct xtables_globals *xt_params;
 #define exit_error xt_params->exit_err
-#define OPTION_OFFSET 256
 
 extern void xtables_param_act(unsigned int, const char *, ...);
 
