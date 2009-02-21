@@ -13,7 +13,6 @@ on whether they contain certain headers */
 #include <netdb.h>
 #include <sys/types.h>
 
-#include <linux/netfilter_ipv6/ip6_tables.h>
 #include <linux/netfilter_ipv6/ip6t_ipv6header.h>
 
 /* This maybe required 

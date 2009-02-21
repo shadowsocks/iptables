@@ -12,7 +12,6 @@
 #include <getopt.h>
 #include <xtables.h>
 
-#include <linux/netfilter_ipv6/ip6_tables.h>
 #include <linux/netfilter_ipv6/ip6t_hl.h>
 
 static void hl_help(void)

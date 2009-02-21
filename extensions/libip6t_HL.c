@@ -5,13 +5,12 @@
  * This program is distributed under the terms of GNU GPL
  */
 
+#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <getopt.h>
 #include <xtables.h>
 
-#include <linux/netfilter_ipv6/ip6_tables.h>
 #include <linux/netfilter_ipv6/ip6t_HL.h>
 
 #define IP6T_HL_USED	1
