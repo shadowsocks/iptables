@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <xtables.h>
-#include <iptables.h>
+#include <iptables.h> /* get_kernel_version */
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter/nf_nat.h>
 

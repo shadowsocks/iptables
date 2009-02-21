@@ -6,7 +6,6 @@
 #include <syslog.h>
 #include <getopt.h>
 #include <xtables.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_LOG.h>
 
 #define LOG_DEFAULT_LEVEL LOG_WARNING

@@ -5,7 +5,6 @@
 #include <getopt.h>
 
 #include <xtables.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
 
 static void MIRROR_help(void)
 {

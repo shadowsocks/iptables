@@ -14,7 +14,6 @@
 #include <getopt.h>
 
 #include <xtables.h>
-#include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_ECN.h>
 
 static void ECN_help(void)

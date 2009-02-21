@@ -12,7 +12,6 @@
 #include <arpa/inet.h>
 #include <xtables.h>
 
-#include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv4/ipt_policy.h>
 
 /*
