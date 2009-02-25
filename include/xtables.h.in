@@ -8,6 +8,7 @@
 
 #include <sys/socket.h> /* PF_* */
 #include <sys/types.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <netinet/in.h>
 #include <net/if.h>
