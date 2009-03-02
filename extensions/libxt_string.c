@@ -64,9 +64,10 @@ static void string_init(struct xt_entry_match *m)
 static void
 parse_string(const char *s, struct xt_string_info *info)
 {	
+	/* xt_string does not need \0 at the end of the pattern */
 	if (strlen(s) <= XT_STRING_MAX_PATTERN_SIZE) {
 		strncpy(info->pattern, s, XT_STRING_MAX_PATTERN_SIZE);
-		info->patlen = strlen(s);
+		info->patlen = strnlen(s, XT_STRING_MAX_PATTERN_SIZE);
 		return;
 	}
 	xtables_error(PARAMETER_PROBLEM, "STRING too long \"%s\"", s);
@@ -75,7 +76,8 @@ parse_string(const char *s, struct xt_string_info *info)
 static void
 parse_algo(const char *s, struct xt_string_info *info)
 {
-	if (strlen(s) <= XT_STRING_MAX_ALGO_NAME_SIZE) {
+	/* xt_string needs \0 for algo name */
+	if (strlen(s) < XT_STRING_MAX_ALGO_NAME_SIZE) {
 		strncpy(info->algo, s, XT_STRING_MAX_ALGO_NAME_SIZE);
 		return;
 	}
@@ -208,8 +210,6 @@ string_parse(int c, char **argv, int invert, unsigned int *flags,
 			else
 				stringinfo->u.v1.flags |= XT_STRING_FLAG_INVERT;
 		}
-		stringinfo->patlen = strnlen((char *)&stringinfo->pattern,
-			sizeof(stringinfo->patlen));
 		*flags |= STRING;
 		break;
 
