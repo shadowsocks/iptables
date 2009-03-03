@@ -141,7 +141,6 @@ static struct option original_opts[] = {
  * magic number of -1 */
 int line = -1;
 
-static struct option *opts = original_opts;
 void ip6tables_exit_error(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
 struct xtables_globals ip6tables_globals = {
 	.option_offset = 0,
@@ -194,6 +193,7 @@ static int inverse_for_options[NUMBER_OF_OPT] =
 /* -c */ 0,
 };
 
+#define opts ip6tables_globals.opts
 #define prog_name ip6tables_globals.program_name
 #define prog_vers ip6tables_globals.program_version
 /* A few hardcoded protocols for 'all' and in case the user has no
