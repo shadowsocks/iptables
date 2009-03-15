@@ -140,8 +140,6 @@ static struct option original_opts[] = {
  * magic number of -1 */
 int line = -1;
 
-static struct option *opts = original_opts;
-
 void iptables_exit_error(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
 
 struct xtables_globals iptables_globals = {
@@ -196,6 +194,7 @@ static int inverse_for_options[NUMBER_OF_OPT] =
 /* -c */ 0,
 };
 
+#define opts iptables_globals.opts
 #define prog_name iptables_globals.program_name
 #define prog_vers iptables_globals.program_version
 
