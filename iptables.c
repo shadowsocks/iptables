@@ -1819,10 +1819,9 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 	if (strcmp(*table, "nat") == 0 &&
 	    ((policy != NULL && strcmp(policy, "DROP") == 0) ||
 	    (jumpto != NULL && strcmp(jumpto, "DROP") == 0)))
-		fprintf(stderr, "\nThe \"nat\" table is not intended for "
-		        "filtering, hence the use of DROP is deprecated and "
-		        "will permanently be disabled in the next iptables "
-		        "release. Please adjust your scripts.\n\n");
+		xtables_error(PARAMETER_PROBLEM,
+			"\nThe \"nat\" table is not intended for filtering, "
+		        "the use of DROP is therefore inhibited.\n\n");
 
 	for (matchp = matches; matchp; matchp = matchp->next)
 		if (matchp->match->final_check != NULL)
