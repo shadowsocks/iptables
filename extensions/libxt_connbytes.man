@@ -9,6 +9,12 @@ scheduled using a lower priority band in traffic control.
 .PP
 The transferred bytes per connection can also be viewed through
 `conntrack -L` and accessed via ctnetlink.
+.PP
+NOTE that for connections which have no accounting information, the match will
+always return false. The "net.netfilter.nf_conntrack_acct" sysctl flag controls
+whether \fBnew\fP connections will be byte/packet counted. Existing connection
+flows will not be gaining/losing a/the accounting structure when be sysctl flag
+is flipped.
 .TP
 [\fB!\fP] \fB\-\-connbytes\fP \fIfrom\fP[\fB:\fP\fIto\fP]
 match packets from a connection whose packets/bytes/average packet
