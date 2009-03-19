@@ -84,7 +84,8 @@ comment_save(const void *ip, const struct xt_entry_match *match)
 	struct xt_comment_info *commentinfo = (struct xt_comment_info *)match->data;
 
 	commentinfo->comment[XT_MAX_COMMENT_LEN-1] = '\0';
-	printf("--comment \"%s\" ", commentinfo->comment);
+	printf("--comment ");
+	xtables_save_string((const char *)commentinfo->comment);
 }
 
 static struct xtables_match comment_match = {
