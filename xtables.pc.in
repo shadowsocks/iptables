@@ -8,4 +8,5 @@ includedir=@includedir@
 Name:		xtables
 Description:	Shared Xtables code for extensions and iproute2
 Version:	@PACKAGE_VERSION@
-Libs:		-lxtables
+Cflags:		-I${includedir}
+Libs:		-L${libdir} -lxtables
