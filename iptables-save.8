@@ -21,13 +21,17 @@
 .SH NAME
 iptables-save \- Save IP Tables
 .SH SYNOPSIS
-.BR "iptables-save " "[-c] [-t table]"
+.BR "iptables-save " "[-M modprobe] [-c] [-t table]"
 .br
 .SH DESCRIPTION
 .PP
 .B iptables-save
 is used to dump the contents of an IP Table in easily parseable format
 to STDOUT. Use I/O-redirection provided by your shell to write to a file.
+.TP
+\fB\-M\fP \fImodprobe_program\fP
+Specify the path to the modprobe program. By default, iptables-save will
+inspect /proc/sys/kernel/modprobe to determine the executable's path.
 .TP
 \fB\-c\fR, \fB\-\-counters\fR
 include the current values of all packet and byte counters in the output

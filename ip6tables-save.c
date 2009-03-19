@@ -29,6 +29,7 @@ static const struct option options[] = {
 	{.name = "counters", .has_arg = false, .val = 'c'},
 	{.name = "dump",     .has_arg = false, .val = 'd'},
 	{.name = "table",    .has_arg = true,  .val = 't'},
+	{.name = "modprobe", .has_arg = true,  .val = 'M'},
 	{NULL},
 };
 
@@ -42,9 +43,7 @@ static int for_each_table(int (*func)(const char *tablename))
 
 	procfile = fopen("/proc/net/ip6_tables_names", "r");
 	if (!procfile)
-		xtables_error(OTHER_PROBLEM,
-			   "Unable to open /proc/net/ip6_tables_names: %s\n",
-			   strerror(errno));
+		return ret;
 
 	while (fgets(tablename, sizeof(tablename), procfile)) {
 		if (tablename[strlen(tablename) - 1] != '\n')
@@ -68,6 +67,10 @@ static int do_output(const char *tablename)
 		return for_each_table(&do_output);
 
 	h = ip6tc_init(tablename);
+	if (h == NULL) {
+		xtables_load_ko(xtables_modprobe_program, false);
+		h = ip6tc_init(tablename);
+	}
 	if (!h)
 		xtables_error(OTHER_PROBLEM, "Cannot initialize: %s\n",
 			   ip6tc_strerror(errno));
@@ -161,6 +164,9 @@ int main(int argc, char *argv[])
 		case 't':
 			/* Select specific table. */
 			tablename = optarg;
+			break;
+		case 'M':
+			xtables_modprobe_program = optarg;
 			break;
 		case 'd':
 			do_output(tablename);

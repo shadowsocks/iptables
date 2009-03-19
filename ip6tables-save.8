@@ -21,13 +21,17 @@
 .SH NAME
 ip6tables-save \- Save IPv6 Tables
 .SH SYNOPSIS
-.BR "ip6tables-save " "[-c] [-t table]"
+.BR "ip6tables-save " "[-M modprobe] [-c] [-t table]"
 .br
 .SH DESCRIPTION
 .PP
 .B ip6tables-save
 is used to dump the contents of an IPv6 Table in easily parseable format
 to STDOUT. Use I/O-redirection provided by your shell to write to a file.
+.TP
+\fB\-M\fP \fImodprobe_program\fP
+Specify the path to the modprobe program. By default, iptables-save will
+inspect /proc/sys/kernel/modprobe to determine the executable's path.
 .TP
 \fB\-c\fR, \fB\-\-counters\fR
 include the current values of all packet and byte counters in the output
