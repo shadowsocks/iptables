@@ -19,10 +19,10 @@
 .\"
 .\"
 .SH NAME
-ip6tables-save \- Save IPv6 Tables
+ip6tables-save - dump iptables rules to stdout
 .SH SYNOPSIS
-.BR "ip6tables-save " "[-M modprobe] [-c] [-t table]"
-.br
+\fBip6tables\-save\fP [\fB\-M\fP \fImodprobe\fP] [\fB\-c\fP]
+[\fB\-t\fP \fItable\fP
 .SH DESCRIPTION
 .PP
 .B ip6tables-save
@@ -36,8 +36,7 @@ inspect /proc/sys/kernel/modprobe to determine the executable's path.
 \fB\-c\fR, \fB\-\-counters\fR
 include the current values of all packet and byte counters in the output
 .TP
-\fB\-t\fR, \fB\-\-table\fR \fBtablename\fR
-.TP
+\fB\-t\fR, \fB\-\-table\fR \fItablename\fP
 restrict output to only one table. If not specified, output includes all
 available tables.
 .SH BUGS
