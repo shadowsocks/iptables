@@ -2404,8 +2404,15 @@ int TC_RENAME_CHAIN(const IPT_CHAINLABEL oldname,
 		return 0;
 	}
 
+	/* This only unlinks "c" from the list, thus no free(c) */
+	iptcc_chain_index_delete_chain(c, handle);
+
+	/* Change the name of the chain */
 	strncpy(c->name, newname, sizeof(IPT_CHAINLABEL));
-	
+
+	/* Insert sorted into to list again */
+	iptc_insert_chain(handle, c);
+
 	set_changed(handle);
 
 	return 1;
