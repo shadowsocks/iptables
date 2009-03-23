@@ -841,7 +841,7 @@ static int __iptcc_p_del_policy(struct xtc_handle *h, unsigned int num)
 }
 
 /* alphabetically insert a chain into the list */
-static inline void iptc_insert_chain(struct xtc_handle *h, struct chain_head *c)
+static void iptc_insert_chain(struct xtc_handle *h, struct chain_head *c)
 {
 	struct chain_head *tmp;
 	struct list_head  *list_start_pos;
