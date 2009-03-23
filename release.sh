@@ -2,7 +2,7 @@
 #
 set -e
 
-VERSION=1.4.3-rc1
+VERSION=1.4.3
 PREV_VERSION=1.4.2
 TMPDIR=/tmp/ipt-release
 IPTDIR="$TMPDIR/iptables-$VERSION"
