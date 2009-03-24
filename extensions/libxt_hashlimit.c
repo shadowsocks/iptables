@@ -636,7 +636,7 @@ hashlimit_mt_save(const struct xt_hashlimit_mtinfo1 *info, unsigned int dmask)
 	if (info->cfg.max != 0)
 		printf("--hashlimit-htable-max %u ", info->cfg.max);
 	if (info->cfg.gc_interval != XT_HASHLIMIT_GCINTERVAL)
-		printf("--hashlimit-htable-gcinterval %u", info->cfg.gc_interval);
+		printf("--hashlimit-htable-gcinterval %u ", info->cfg.gc_interval);
 	if (info->cfg.expire != XT_HASHLIMIT_EXPIRE)
 		printf("--hashlimit-htable-expire %u ", info->cfg.expire);
 
