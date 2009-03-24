@@ -26,7 +26,7 @@ libxtables_la_LIBADD  = -ldl
 # iptables, dynamic
 iptables_SOURCES          = iptables-standalone.c iptables.c
 iptables_LDFLAGS          = -rdynamic
-iptables_LDADD            = -lm libiptc/libiptc.la extensions/libext4.a libxtables.la
+iptables_LDADD            = libiptc/libiptc.la extensions/libext4.a libxtables.la -lm
 
 iptables_xml_LDADD        = libxtables.la
 iptables_multi_SOURCES    = iptables-multi.c iptables-save.c \
@@ -47,14 +47,14 @@ iptables_save_LDADD       = ${iptables_LDADD}
 # iptables-multi, semi-static
 iptables_static_SOURCES   = ${iptables_multi_SOURCES} xtables.c
 iptables_static_CFLAGS    = ${iptables_multi_CFLAGS} -DNO_SHARED_LIBS=1
-iptables_static_LDADD     = -lm libiptc/libiptc.la extensions/libext4.a
+iptables_static_LDADD     = libiptc/libiptc.la extensions/libext4.a -lm
 
 iptables_xml_SOURCES      = iptables-xml.c
 
 # ip6tables, dynamic
 ip6tables_SOURCES         = ip6tables-standalone.c ip6tables.c
 ip6tables_LDFLAGS         = -rdynamic
-ip6tables_LDADD           = -lm libiptc/libiptc.la extensions/libext6.a libxtables.la
+ip6tables_LDADD           = libiptc/libiptc.la extensions/libext6.a libxtables.la -lm
 
 ip6tables_multi_SOURCES   = ip6tables-multi.c ip6tables-save.c \
                             ip6tables-restore.c ip6tables-standalone.c \
@@ -74,7 +74,7 @@ ip6tables_save_LDADD      = ${ip6tables_LDADD}
 # iptables-multi, semi-static
 ip6tables_static_SOURCES    = ${ip6tables_multi_SOURCES} xtables.c
 ip6tables_static_CFLAGS     = ${ip6tables_multi_CFLAGS} -DNO_SHARED_LIBS=1
-ip6tables_static_LDADD      = -lm libiptc/libiptc.la extensions/libext6.a
+ip6tables_static_LDADD      = libiptc/libiptc.la extensions/libext6.a -lm
 
 bin_PROGRAMS     = iptables-xml
 sbin_PROGRAMS    =
