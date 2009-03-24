@@ -68,10 +68,16 @@ main(int argc, char *argv[])
 		ip6tc_free(handle);
 	}
 
-	if (!ret)
-		fprintf(stderr, "ip6tables: %s. "
-				"Run `dmesg' for more information.\n",
-			ip6tc_strerror(errno));
+	if (!ret) {
+		if (errno == EINVAL) {
+			fprintf(stderr, "ip6tables: %s. "
+					"Run `dmesg' for more information.\n",
+				ip6tc_strerror(errno));
+		} else {
+			fprintf(stderr, "ip6tables: %s.\n",
+				ip6tc_strerror(errno));
+		}
+	}
 
 	exit(!ret);
 }
