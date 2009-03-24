@@ -26,7 +26,7 @@ parse_tcp_mssvalue(const char *mssvalue)
 {
 	unsigned int mssvaluenum;
 
-	if (!xtables_strtoui(mssvalue, NULL, &mssvaluenum, 0, UINT16_MAX))
+	if (xtables_strtoui(mssvalue, NULL, &mssvaluenum, 0, UINT16_MAX))
 		return mssvaluenum;
 
 	xtables_error(PARAMETER_PROBLEM,
