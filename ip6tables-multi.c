@@ -16,7 +16,8 @@ int main(int argc, char **argv) {
   } else {
     progname = basename(argv[0]);
 
-    if (!strcmp(progname, "ip6tables"))
+    if (!strcmp(progname, "ip6tables") ||
+        strcmp(progname, "ip6tables-static") == 0)
       return ip6tables_main(argc, argv);
     
     if (!strcmp(progname, "ip6tables-save"))
