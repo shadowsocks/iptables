@@ -638,7 +638,7 @@ xtables_find_target(const char *name, enum xtables_tryload tryload)
 		else
 			ptr = NULL;
 	}
-	if(!ptr && (tryload == LOAD_MUST_SUCCEED)) {
+	if (ptr == NULL && tryload == XTF_LOAD_MUST_SUCCEED) {
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			   "Couldn't find target `%s'\n", name);
 	}
