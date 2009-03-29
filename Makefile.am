@@ -111,7 +111,6 @@ tarball:
 config.status: extensions/GNUmakefile.in \
 	include/xtables.h.in include/iptables/internal.h.in
 
-# ldconfig may fail when we are not root (as is the case in build systems)
-# so add appropriate protection that it does not let `make` fail.
+# Using if..fi avoids an ugly "error (ignored)" message :)
 install-exec-hook:
-	-/sbin/ldconfig || :;
+	-if test -z "${DESTDIR}"; then /sbin/ldconfig; fi;
