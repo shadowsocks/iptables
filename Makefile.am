@@ -85,11 +85,16 @@ man_MANS         = iptables.8 iptables-restore.8 iptables-save.8 \
 CLEANFILES       = iptables.8 ip6tables.8
 
 if ENABLE_STATIC
-sbin_PROGRAMS += iptables-static ip6tables-static
+sbin_PROGRAMS += iptables-static
+if ENABLE_IPV6
+sbin_PROGRAMS += ip6tables-static
+endif
 endif
 if ENABLE_SHARED
-sbin_PROGRAMS += iptables iptables-multi iptables-restore iptables-save \
-                 ip6tables ip6tables-multi ip6tables-restore ip6tables-save
+sbin_PROGRAMS += iptables iptables-multi iptables-restore iptables-save
+if ENABLE_IPV6
+sbin_PROGRAMS += ip6tables ip6tables-multi ip6tables-restore ip6tables-save
+endif
 endif
 
 iptables.8: ${srcdir}/iptables.8.in extensions/matches4.man extensions/targets4.man
