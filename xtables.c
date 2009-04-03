@@ -1367,6 +1367,7 @@ static struct in6_addr *parse_ip6mask(char *mask)
 void xtables_ip6parse_any(const char *name, struct in6_addr **addrpp,
                           struct in6_addr *maskp, unsigned int *naddrs)
 {
+	static const struct in6_addr zero_addr;
 	struct in6_addr *addrp;
 	unsigned int i, j, k, n;
 	char buf[256], *p;
@@ -1382,7 +1383,7 @@ void xtables_ip6parse_any(const char *name, struct in6_addr **addrpp,
 	memcpy(maskp, addrp, sizeof(*maskp));
 
 	/* if a null mask is given, the name is ignored, like in "any/0" */
-	if (memcmp(maskp, &in6addr_any, sizeof(in6addr_any)) == 0)
+	if (memcmp(maskp, &zero_addr, sizeof(zero_addr)) == 0)
 		strcpy(buf, "::");
 
 	addrp = *addrpp = ip6parse_hostnetwork(buf, naddrs);
