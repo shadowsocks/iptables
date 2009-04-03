@@ -85,13 +85,17 @@ man_MANS         = iptables.8 iptables-restore.8 iptables-save.8 \
 CLEANFILES       = iptables.8 ip6tables.8
 
 if ENABLE_STATIC
+if ENABLE_IPV4
 sbin_PROGRAMS += iptables-static
+endif
 if ENABLE_IPV6
 sbin_PROGRAMS += ip6tables-static
 endif
 endif
 if ENABLE_SHARED
+if ENABLE_IPV4
 sbin_PROGRAMS += iptables iptables-multi iptables-restore iptables-save
+endif
 if ENABLE_IPV6
 sbin_PROGRAMS += ip6tables ip6tables-multi ip6tables-restore ip6tables-save
 endif
