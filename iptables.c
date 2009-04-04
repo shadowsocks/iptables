@@ -1006,18 +1006,18 @@ static void print_proto(u_int16_t proto, int invert)
 
 		struct protoent *pent = getprotobynumber(proto);
 		if (pent) {
-			printf("-p %s%s ", invertstr, pent->p_name);
+			printf("%s-p %s ", invertstr, pent->p_name);
 			return;
 		}
 
 		for (i = 0; xtables_chain_protos[i].name != NULL; ++i)
 			if (xtables_chain_protos[i].num == proto) {
-				printf("-p %s%s ",
+				printf("%s-p %s ",
 				       invertstr, xtables_chain_protos[i].name);
 				return;
 			}
 
-		printf("-p %s%u ", invertstr, proto);
+		printf("%s-p %u ", invertstr, proto);
 	}
 }
 
@@ -1039,7 +1039,7 @@ print_iface(char letter, const char *iface, const unsigned char *mask,
 	if (mask[0] == 0)
 		return;
 
-	printf("-%c %s", letter, invert ? "! " : "");
+	printf("%s-%c ", invert ? "! " : "", letter);
 
 	for (i = 0; i < IFNAMSIZ; i++) {
 		if (mask[i] != 0) {
@@ -1089,9 +1089,9 @@ static void print_ip(char *prefix, u_int32_t ip, u_int32_t mask, int invert)
 	if (!mask && !ip && !invert)
 		return;
 
-	printf("%s %s%u.%u.%u.%u",
-		prefix,
+	printf("%s%s %u.%u.%u.%u",
 		invert ? "! " : "",
+		prefix,
 		IP_PARTS(ip));
 
 	if (mask == 0xFFFFFFFFU) {

@@ -2,7 +2,7 @@
 AC_INIT([iptables], [1.4.3.1])
 
 # See libtool.info "Libtool's versioning system"
-libxtables_vcurrent=1
+libxtables_vcurrent=2
 libxtables_vage=0
 
 AC_CONFIG_HEADERS([config.h])
@@ -31,6 +31,12 @@ AC_ARG_WITH([xtlibdir],
 	[Path where to install Xtables extensions [[LIBEXECDIR/xtables]]]),
 	[xtlibdir="$withval"],
 	[xtlibdir="${libexecdir}/xtables"])
+AC_ARG_ENABLE([ipv4],
+	AS_HELP_STRING([--disable-ipv4], [Do not build iptables]),
+	[enable_ipv4="$enableval"], [enable_ipv4="yes"])
+AC_ARG_ENABLE([ipv6],
+	AS_HELP_STRING([--disable-ipv6], [Do not build ip6tables]),
+	[enable_ipv6="$enableval"], [enable_ipv6="yes"])
 AC_ARG_ENABLE([devel],
 	AS_HELP_STRING([--enable-devel],
 	[Install Xtables development headers]),
@@ -51,6 +57,8 @@ AC_SUBST([blacklist_modules])
 
 AM_CONDITIONAL([ENABLE_STATIC], [test "$enable_static" = "yes"])
 AM_CONDITIONAL([ENABLE_SHARED], [test "$enable_shared" = "yes"])
+AM_CONDITIONAL([ENABLE_IPV4], [test "$enable_ipv4" = "yes"])
+AM_CONDITIONAL([ENABLE_IPV6], [test "$enable_ipv6" = "yes"])
 AM_CONDITIONAL([ENABLE_DEVEL], [test "$enable_devel" = "yes"])
 AM_CONDITIONAL([ENABLE_LIBIPQ], [test "$enable_libipq" = "yes"])
 

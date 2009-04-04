@@ -85,11 +85,20 @@ man_MANS         = iptables.8 iptables-restore.8 iptables-save.8 \
 CLEANFILES       = iptables.8 ip6tables.8
 
 if ENABLE_STATIC
-sbin_PROGRAMS += iptables-static ip6tables-static
+if ENABLE_IPV4
+sbin_PROGRAMS += iptables-static
+endif
+if ENABLE_IPV6
+sbin_PROGRAMS += ip6tables-static
+endif
 endif
 if ENABLE_SHARED
-sbin_PROGRAMS += iptables iptables-multi iptables-restore iptables-save \
-                 ip6tables ip6tables-multi ip6tables-restore ip6tables-save
+if ENABLE_IPV4
+sbin_PROGRAMS += iptables iptables-multi iptables-restore iptables-save
+endif
+if ENABLE_IPV6
+sbin_PROGRAMS += ip6tables ip6tables-multi ip6tables-restore ip6tables-save
+endif
 endif
 
 iptables.8: ${srcdir}/iptables.8.in extensions/matches4.man extensions/targets4.man
@@ -111,7 +120,6 @@ tarball:
 config.status: extensions/GNUmakefile.in \
 	include/xtables.h.in include/iptables/internal.h.in
 
-# ldconfig may fail when we are not root (as is the case in build systems)
-# so add appropriate protection that it does not let `make` fail.
+# Using if..fi avoids an ugly "error (ignored)" message :)
 install-exec-hook:
-	-/sbin/ldconfig || :;
+	-if test -z "${DESTDIR}"; then /sbin/ldconfig; fi;
