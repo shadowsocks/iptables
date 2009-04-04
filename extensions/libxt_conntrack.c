@@ -910,7 +910,7 @@ conntrack_dump(const struct xt_conntrack_mtinfo1 *info, const char *prefix,
 	}
 
 	if (info->match_flags & XT_CONNTRACK_ORIGSRC) {
-		if (info->invert_flags & XT_CONNTRACK_PROTO)
+		if (info->invert_flags & XT_CONNTRACK_ORIGSRC)
 			printf("! ");
 		printf("%sctorigsrc ", prefix);
 		conntrack_dump_addr(&info->origsrc_addr, &info->origsrc_mask,
@@ -918,7 +918,7 @@ conntrack_dump(const struct xt_conntrack_mtinfo1 *info, const char *prefix,
 	}
 
 	if (info->match_flags & XT_CONNTRACK_ORIGDST) {
-		if (info->invert_flags & XT_CONNTRACK_PROTO)
+		if (info->invert_flags & XT_CONNTRACK_ORIGDST)
 			printf("! ");
 		printf("%sctorigdst ", prefix);
 		conntrack_dump_addr(&info->origdst_addr, &info->origdst_mask,
@@ -926,7 +926,7 @@ conntrack_dump(const struct xt_conntrack_mtinfo1 *info, const char *prefix,
 	}
 
 	if (info->match_flags & XT_CONNTRACK_REPLSRC) {
-		if (info->invert_flags & XT_CONNTRACK_PROTO)
+		if (info->invert_flags & XT_CONNTRACK_REPLSRC)
 			printf("! ");
 		printf("%sctreplsrc ", prefix);
 		conntrack_dump_addr(&info->replsrc_addr, &info->replsrc_mask,
@@ -934,7 +934,7 @@ conntrack_dump(const struct xt_conntrack_mtinfo1 *info, const char *prefix,
 	}
 
 	if (info->match_flags & XT_CONNTRACK_REPLDST) {
-		if (info->invert_flags & XT_CONNTRACK_PROTO)
+		if (info->invert_flags & XT_CONNTRACK_REPLDST)
 			printf("! ");
 		printf("%sctrepldst ", prefix);
 		conntrack_dump_addr(&info->repldst_addr, &info->repldst_mask,
