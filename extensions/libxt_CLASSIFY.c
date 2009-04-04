@@ -15,7 +15,7 @@ CLASSIFY_help(void)
 {
 	printf(
 "CLASSIFY target options:\n"
-"  --set-class [MAJOR:MINOR]    Set skb->priority value\n");
+"--set-class MAJOR:MINOR    Set skb->priority value (always hexadecimal!)\n");
 }
 
 static const struct option CLASSIFY_opts[] = {
