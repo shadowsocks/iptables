@@ -271,6 +271,18 @@ void *xtables_malloc(size_t size)
 	return p;
 }
 
+void *xtables_realloc(void *ptr, size_t size)
+{
+	void *p;
+
+	if ((p = realloc(ptr, size)) == NULL) {
+		perror("ip[6]tables: realloc failed");
+		exit(1);
+	}
+
+	return p;
+}
+
 static char *get_modprobe(void)
 {
 	int procfile;
@@ -1133,6 +1145,86 @@ static struct in_addr *parse_ipmask(const char *mask)
 	return &maskaddr;
 }
 
+void xtables_ipparse_multiple(const char *name, struct in_addr **addrpp,
+                              struct in_addr **maskpp, unsigned int *naddrs)
+{
+	struct in_addr *addrp;
+	char buf[256], *p;
+	unsigned int len, i, j, n, count = 1;
+	const char *loop = name;
+
+	while ((loop = strchr(loop, ',')) != NULL) {
+		++count;
+		++loop; /* skip ',' */
+	}
+
+	*addrpp = xtables_malloc(sizeof(struct in_addr) * count);
+	*maskpp = xtables_malloc(sizeof(struct in_addr) * count);
+
+	loop = name;
+
+	for (i = 0; i < count; ++i) {
+		if (loop == NULL)
+			break;
+		if (*loop == ',')
+			++loop;
+		if (*loop == '\0')
+			break;
+		p = strchr(loop, ',');
+		if (p != NULL)
+			len = p - loop;
+		else
+			len = strlen(loop);
+		if (len == 0 || sizeof(buf) - 1 < len)
+			break;
+
+		strncpy(buf, loop, len);
+		buf[len] = '\0';
+		loop += len;
+		if ((p = strrchr(buf, '/')) != NULL) {
+			*p = '\0';
+			addrp = parse_ipmask(p + 1);
+		} else {
+			addrp = parse_ipmask(NULL);
+		}
+		memcpy(*maskpp + i, addrp, sizeof(*addrp));
+
+		/* if a null mask is given, the name is ignored, like in "any/0" */
+		if ((*maskpp + i)->s_addr == 0)
+			/*
+			 * A bit pointless to process multiple addresses
+			 * in this case...
+			 */
+			strcpy(buf, "0.0.0.0");
+
+		addrp = ipparse_hostnetwork(buf, &n);
+		if (n > 1) {
+			count += n - 1;
+			*addrpp = xtables_realloc(*addrpp,
+			          sizeof(struct in_addr) * count);
+			*maskpp = xtables_realloc(*maskpp,
+			          sizeof(struct in_addr) * count);
+			for (j = 0; j < n; ++j)
+				/* for each new addr */
+				memcpy(*addrpp + i + j, addrp + j,
+				       sizeof(*addrp));
+			for (j = 1; j < n; ++j)
+				/* for each new mask */
+				memcpy(*maskpp + i + j, *maskpp + i,
+				       sizeof(*addrp));
+			i += n - 1;
+		} else {
+			memcpy(*addrpp + i, addrp, sizeof(*addrp));
+		}
+		/* free what ipparse_hostnetwork had allocated: */
+		free(addrp);
+	}
+	*naddrs = count;
+	for (i = 0; i < n; ++i)
+		(*addrpp+i)->s_addr &= (*maskpp+i)->s_addr;
+}
+
+
 /**
  * xtables_ipparse_any - transform arbitrary name to in_addr
  *
@@ -1362,6 +1454,89 @@ static struct in6_addr *parse_ip6mask(char *mask)
 
 	memset(&maskaddr, 0, sizeof(maskaddr));
 	return &maskaddr;
+}
+
+void
+xtables_ip6parse_multiple(const char *name, struct in6_addr **addrpp,
+		      struct in6_addr **maskpp, unsigned int *naddrs)
+{
+	struct in6_addr *addrp;
+	char buf[256], *p;
+	unsigned int len, i, j, n, count = 1;
+	const char *loop = name;
+
+	while ((loop = strchr(loop, ',')) != NULL) {
+		++count;
+		++loop; /* skip ',' */
+	}
+
+	*addrpp = xtables_malloc(sizeof(struct in6_addr) * count);
+	*maskpp = xtables_malloc(sizeof(struct in6_addr) * count);
+
+	loop = name;
+
+	for (i = 0; i < count /*NB: count can grow*/; ++i) {
+		if (loop == NULL)
+			break;
+		if (*loop == ',')
+			++loop;
+		if (*loop == '\0')
+			break;
+		p = strchr(loop, ',');
+		if (p != NULL)
+			len = p - loop;
+		else
+			len = strlen(loop);
+		if (len == 0 || sizeof(buf) - 1 < len)
+			break;
+
+		strncpy(buf, loop, len);
+		buf[len] = '\0';
+		loop += len;
+		if ((p = strrchr(buf, '/')) != NULL) {
+			*p = '\0';
+			addrp = parse_ip6mask(p + 1);
+		} else {
+			addrp = parse_ip6mask(NULL);
+		}
+		memcpy(*maskpp + i, addrp, sizeof(*addrp));
+
+		/* if a null mask is given, the name is ignored, like in "any/0" */
+		if (memcmp(*maskpp + i, &in6addr_any, sizeof(in6addr_any)) == 0)
+			strcpy(buf, "::");
+
+		addrp = ip6parse_hostnetwork(buf, &n);
+		/* ip6parse_hostnetwork only ever returns one IP
+		address (it exits if the resolution fails).
+		Therefore, n will always be 1 here.  Leaving the
+		code below in anyway in case ip6parse_hostnetwork
+		is improved some day to behave like
+		ipparse_hostnetwork: */
+		if (n > 1) {
+			count += n - 1;
+			*addrpp = xtables_realloc(*addrpp,
+			          sizeof(struct in6_addr) * count);
+			*maskpp = xtables_realloc(*maskpp,
+			          sizeof(struct in6_addr) * count);
+			for (j = 0; j < n; ++j)
+				/* for each new addr */
+				memcpy(*addrpp + i + j, addrp + j,
+				       sizeof(*addrp));
+			for (j = 1; j < n; ++j)
+				/* for each new mask */
+				memcpy(*maskpp + i + j, *maskpp + i,
+				       sizeof(*addrp));
+			i += n - 1;
+		} else {
+			memcpy(*addrpp + i, addrp, sizeof(*addrp));
+		}
+		/* free what ip6parse_hostnetwork had allocated: */
+		free(addrp);
+	}
+	*naddrs = count;
+	for (i = 0; i < n; ++i)
+		for (j = 0; j < 4; ++j)
+			(*addrpp+i)->s6_addr32[j] &= (*maskpp+i)->s6_addr32[j];
 }
 
 void xtables_ip6parse_any(const char *name, struct in6_addr **addrpp,

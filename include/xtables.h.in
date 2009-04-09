@@ -215,6 +215,7 @@ extern void xtables_init(void);
 extern void xtables_set_nfproto(uint8_t);
 extern void *xtables_calloc(size_t, size_t);
 extern void *xtables_malloc(size_t);
+extern void *xtables_realloc(void *, size_t);
 
 extern int xtables_insmod(const char *, const char *, bool);
 extern int xtables_load_ko(const char *, bool);
@@ -260,6 +261,8 @@ extern struct in_addr *xtables_numeric_to_ipaddr(const char *);
 extern struct in_addr *xtables_numeric_to_ipmask(const char *);
 extern void xtables_ipparse_any(const char *, struct in_addr **,
 	struct in_addr *, unsigned int *);
+extern void xtables_ipparse_multiple(const char *, struct in_addr **,
+	struct in_addr **, unsigned int *);
 
 extern struct in6_addr *xtables_numeric_to_ip6addr(const char *);
 extern const char *xtables_ip6addr_to_numeric(const struct in6_addr *);
@@ -267,6 +270,8 @@ extern const char *xtables_ip6addr_to_anyname(const struct in6_addr *);
 extern const char *xtables_ip6mask_to_numeric(const struct in6_addr *);
 extern void xtables_ip6parse_any(const char *, struct in6_addr **,
 	struct in6_addr *, unsigned int *);
+extern void xtables_ip6parse_multiple(const char *, struct in6_addr **,
+	struct in6_addr **, unsigned int *);
 
 /**
  * Print the specified value to standard output, quoting dangerous

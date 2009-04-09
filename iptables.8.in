@@ -236,7 +236,7 @@ Protocol \fBall\fP
 will match with all protocols and is taken as default when this
 option is omitted.
 .TP
-[\fB!\fP] \fB\-s\fP, \fB\-\-source\fP \fIaddress\fP[\fB/\fP\fImask\fP]
+[\fB!\fP] \fB\-s\fP, \fB\-\-source\fP \fIaddress\fP[\fB/\fP\fImask\fP][\fB,\fP\fI...\fP]
 Source specification. \fIAddress\fP
 can be either a network name, a hostname (please note that specifying
 any name to be resolved with a remote query such as DNS is a really bad idea),
@@ -247,8 +247,11 @@ specifying the number of 1's at the left side of the network mask.
 Thus, a mask of \fI24\fP is equivalent to \fI255.255.255.0\fP.
 A "!" argument before the address specification inverts the sense of
 the address. The flag \fB\-\-src\fP is an alias for this option.
+Multiple addresses can be specified, but this will \fBexpand to multiple
+rules\fP (when adding with \-A), or will cause multiple rules to be
+deleted (with \-D).
 .TP
-[\fB!\fP] \fB\-d\fP, \fB\-\-destination\fP \fIaddress\fP[\fB/\fP\fImask\fP]
+[\fB!\fP] \fB\-d\fP, \fB\-\-destination\fP \fIaddress\fP[\fB/\fP\fImask\fP][\fB,\fP\fI...\fP]
 Destination specification. 
 See the description of the \fB\-s\fP
 (source) flag for a detailed description of the syntax.  The flag

@@ -281,9 +281,9 @@ exit_printhelp(struct xtables_rule_match *matches)
 
 "Options:\n"
 "[!] --proto	-p proto	protocol: by number or name, eg. `tcp'\n"
-"[!] --source	-s address[/mask]\n"
+"[!] --source	-s address[/mask][,...]\n"
 "				source specification\n"
-"[!] --destination -d address[/mask]\n"
+"[!] --destination -d address[/mask][,...]\n"
 "				destination specification\n"
 "[!] --in-interface -i input name[+]\n"
 "				network interface name ([+] for wildcard)\n"
@@ -740,8 +740,10 @@ append_entry(const ip6t_chainlabel chain,
 	     struct ip6t_entry *fw,
 	     unsigned int nsaddrs,
 	     const struct in6_addr saddrs[],
+	     const struct in6_addr smasks[],
 	     unsigned int ndaddrs,
 	     const struct in6_addr daddrs[],
+	     const struct in6_addr dmasks[],
 	     int verbose,
 	     struct ip6tc_handle *handle)
 {
@@ -750,8 +752,10 @@ append_entry(const ip6t_chainlabel chain,
 
 	for (i = 0; i < nsaddrs; i++) {
 		fw->ipv6.src = saddrs[i];
+		fw->ipv6.smsk = smasks[i];
 		for (j = 0; j < ndaddrs; j++) {
 			fw->ipv6.dst = daddrs[j];
+			fw->ipv6.dmsk = dmasks[j];
 			if (verbose)
 				print_firewall_line(fw, handle);
 			ret &= ip6tc_append_entry(chain, fw, handle);
@@ -784,8 +788,10 @@ insert_entry(const ip6t_chainlabel chain,
 	     unsigned int rulenum,
 	     unsigned int nsaddrs,
 	     const struct in6_addr saddrs[],
+	     const struct in6_addr smasks[],
 	     unsigned int ndaddrs,
 	     const struct in6_addr daddrs[],
+	     const struct in6_addr dmasks[],
 	     int verbose,
 	     struct ip6tc_handle *handle)
 {
@@ -794,8 +800,10 @@ insert_entry(const ip6t_chainlabel chain,
 
 	for (i = 0; i < nsaddrs; i++) {
 		fw->ipv6.src = saddrs[i];
+		fw->ipv6.smsk = smasks[i];
 		for (j = 0; j < ndaddrs; j++) {
 			fw->ipv6.dst = daddrs[j];
+			fw->ipv6.dmsk = dmasks[j];
 			if (verbose)
 				print_firewall_line(fw, handle);
 			ret &= ip6tc_insert_entry(chain, fw, rulenum, handle);
@@ -806,7 +814,7 @@ insert_entry(const ip6t_chainlabel chain,
 }
 
 static unsigned char *
-make_delete_mask(struct ip6t_entry *fw, struct xtables_rule_match *matches)
+make_delete_mask(struct xtables_rule_match *matches)
 {
 	/* Establish mask for comparison */
 	unsigned int size;
@@ -843,8 +851,10 @@ delete_entry(const ip6t_chainlabel chain,
 	     struct ip6t_entry *fw,
 	     unsigned int nsaddrs,
 	     const struct in6_addr saddrs[],
+	     const struct in6_addr smasks[],
 	     unsigned int ndaddrs,
 	     const struct in6_addr daddrs[],
+	     const struct in6_addr dmasks[],
 	     int verbose,
 	     struct ip6tc_handle *handle,
 	     struct xtables_rule_match *matches)
@@ -853,11 +863,13 @@ delete_entry(const ip6t_chainlabel chain,
 	int ret = 1;
 	unsigned char *mask;
 
-	mask = make_delete_mask(fw, matches);
+	mask = make_delete_mask(matches);
 	for (i = 0; i < nsaddrs; i++) {
 		fw->ipv6.src = saddrs[i];
+		fw->ipv6.smsk = smasks[i];
 		for (j = 0; j < ndaddrs; j++) {
 			fw->ipv6.dst = daddrs[j];
+			fw->ipv6.dmsk = dmasks[j];
 			if (verbose)
 				print_firewall_line(fw, handle);
 			ret &= ip6tc_delete_entry(chain, fw, mask, handle);
@@ -1291,9 +1303,9 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 	int invert = 0;
 	unsigned int nsaddrs = 0, ndaddrs = 0;
 	struct in6_addr *saddrs = NULL, *daddrs = NULL;
+	struct in6_addr *smasks = NULL, *dmasks = NULL;
 
 	int c, verbose = 0;
-	unsigned i;
 	const char *chain = NULL;
 	const char *shostnetworkmask = NULL, *dhostnetworkmask = NULL;
 	const char *policy = NULL, *newname = NULL;
@@ -1811,12 +1823,12 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 	}
 
 	if (shostnetworkmask)
-		xtables_ip6parse_any(shostnetworkmask, &saddrs,
-		                         &fw.ipv6.smsk, &nsaddrs);
+		xtables_ip6parse_multiple(shostnetworkmask, &saddrs,
+					  &smasks, &nsaddrs);
 
 	if (dhostnetworkmask)
-		xtables_ip6parse_any(dhostnetworkmask, &daddrs,
-		                         &fw.ipv6.dmsk, &ndaddrs);
+		xtables_ip6parse_multiple(dhostnetworkmask, &daddrs,
+					  &dmasks, &ndaddrs);
 
 	if ((nsaddrs > 1 || ndaddrs > 1) &&
 	    (fw.ipv6.invflags & (IP6T_INV_SRCIP | IP6T_INV_DSTIP)))
@@ -1921,13 +1933,15 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 	switch (command) {
 	case CMD_APPEND:
 		ret = append_entry(chain, e,
-				   nsaddrs, saddrs, ndaddrs, daddrs,
+				   nsaddrs, saddrs, smasks,
+				   ndaddrs, daddrs, dmasks,
 				   options&OPT_VERBOSE,
 				   *handle);
 		break;
 	case CMD_DELETE:
 		ret = delete_entry(chain, e,
-				   nsaddrs, saddrs, ndaddrs, daddrs,
+				   nsaddrs, saddrs, smasks,
+				   ndaddrs, daddrs, dmasks,
 				   options&OPT_VERBOSE,
 				   *handle, matches);
 		break;
@@ -1941,7 +1955,8 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		break;
 	case CMD_INSERT:
 		ret = insert_entry(chain, e, rulenum - 1,
-				   nsaddrs, saddrs, ndaddrs, daddrs,
+				   nsaddrs, saddrs, smasks,
+				   ndaddrs, daddrs, dmasks,
 				   options&OPT_VERBOSE,
 				   *handle);
 		break;
@@ -2001,12 +2016,10 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		e = NULL;
 	}
 
-	for (i = 0; i < nsaddrs; i++)
-		free(&saddrs[i]);
-
-	for (i = 0; i < ndaddrs; i++)
-		free(&daddrs[i]);
-
+	free(saddrs);
+	free(smasks);
+	free(daddrs);
+	free(dmasks);
 	xtables_free_opts(1);
 
 	return ret;

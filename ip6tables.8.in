@@ -248,6 +248,9 @@ specifying the number of 1's at the left side of the network mask.
 A "!" argument before the address specification inverts the sense of
 the address. The flag \fB\-\-src\fP
 is an alias for this option.
+Multiple addresses can be specified, but this will \fBexpand to multiple
+rules\fP (when adding with \-A), or will cause multiple rules to be
+deleted (with \-D).
 .TP
 [\fB!\fP] \fB\-d\fP, \fB\-\-destination\fP \fIaddress\fP[\fB/\fP\fImask\fP]
 Destination specification. 

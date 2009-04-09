@@ -294,9 +294,9 @@ exit_printhelp(struct xtables_rule_match *matches)
 
 "Options:\n"
 "[!] --proto	-p proto	protocol: by number or name, eg. `tcp'\n"
-"[!] --source	-s address[/mask]\n"
+"[!] --source	-s address[/mask][...]\n"
 "				source specification\n"
-"[!] --destination -d address[/mask]\n"
+"[!] --destination -d address[/mask][...]\n"
 "				destination specification\n"
 "[!] --in-interface -i input name[+]\n"
 "				network interface name ([+] for wildcard)\n"
@@ -742,8 +742,10 @@ append_entry(const ipt_chainlabel chain,
 	     struct ipt_entry *fw,
 	     unsigned int nsaddrs,
 	     const struct in_addr saddrs[],
+	     const struct in_addr smasks[],
 	     unsigned int ndaddrs,
 	     const struct in_addr daddrs[],
+	     const struct in_addr dmasks[],
 	     int verbose,
 	     struct iptc_handle *handle)
 {
@@ -752,8 +754,10 @@ append_entry(const ipt_chainlabel chain,
 
 	for (i = 0; i < nsaddrs; i++) {
 		fw->ip.src.s_addr = saddrs[i].s_addr;
+		fw->ip.smsk.s_addr = smasks[i].s_addr;
 		for (j = 0; j < ndaddrs; j++) {
 			fw->ip.dst.s_addr = daddrs[j].s_addr;
+			fw->ip.dmsk.s_addr = dmasks[j].s_addr;
 			if (verbose)
 				print_firewall_line(fw, handle);
 			ret &= iptc_append_entry(chain, fw, handle);
@@ -786,8 +790,10 @@ insert_entry(const ipt_chainlabel chain,
 	     unsigned int rulenum,
 	     unsigned int nsaddrs,
 	     const struct in_addr saddrs[],
+	     const struct in_addr smasks[],
 	     unsigned int ndaddrs,
 	     const struct in_addr daddrs[],
+	     const struct in_addr dmasks[],
 	     int verbose,
 	     struct iptc_handle *handle)
 {
@@ -796,8 +802,10 @@ insert_entry(const ipt_chainlabel chain,
 
 	for (i = 0; i < nsaddrs; i++) {
 		fw->ip.src.s_addr = saddrs[i].s_addr;
+		fw->ip.smsk.s_addr = smasks[i].s_addr;
 		for (j = 0; j < ndaddrs; j++) {
 			fw->ip.dst.s_addr = daddrs[j].s_addr;
+			fw->ip.dmsk.s_addr = dmasks[j].s_addr;
 			if (verbose)
 				print_firewall_line(fw, handle);
 			ret &= iptc_insert_entry(chain, fw, rulenum, handle);
@@ -808,7 +816,7 @@ insert_entry(const ipt_chainlabel chain,
 }
 
 static unsigned char *
-make_delete_mask(struct ipt_entry *fw, struct xtables_rule_match *matches)
+make_delete_mask(struct xtables_rule_match *matches)
 {
 	/* Establish mask for comparison */
 	unsigned int size;
@@ -845,8 +853,10 @@ delete_entry(const ipt_chainlabel chain,
 	     struct ipt_entry *fw,
 	     unsigned int nsaddrs,
 	     const struct in_addr saddrs[],
+	     const struct in_addr smasks[],
 	     unsigned int ndaddrs,
 	     const struct in_addr daddrs[],
+	     const struct in_addr dmasks[],
 	     int verbose,
 	     struct iptc_handle *handle,
 	     struct xtables_rule_match *matches)
@@ -855,11 +865,13 @@ delete_entry(const ipt_chainlabel chain,
 	int ret = 1;
 	unsigned char *mask;
 
-	mask = make_delete_mask(fw, matches);
+	mask = make_delete_mask(matches);
 	for (i = 0; i < nsaddrs; i++) {
 		fw->ip.src.s_addr = saddrs[i].s_addr;
+		fw->ip.smsk.s_addr = smasks[i].s_addr;
 		for (j = 0; j < ndaddrs; j++) {
 			fw->ip.dst.s_addr = daddrs[j].s_addr;
+			fw->ip.dmsk.s_addr = dmasks[j].s_addr;
 			if (verbose)
 				print_firewall_line(fw, handle);
 			ret &= iptc_delete_entry(chain, fw, mask, handle);
@@ -1313,7 +1325,8 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 	struct ipt_entry fw, *e = NULL;
 	int invert = 0;
 	unsigned int nsaddrs = 0, ndaddrs = 0;
-	struct in_addr *saddrs = NULL, *daddrs = NULL;
+	struct in_addr *saddrs = NULL, *smasks = NULL;
+	struct in_addr *daddrs = NULL, *dmasks = NULL;
 
 	int c, verbose = 0;
 	const char *chain = NULL;
@@ -1848,12 +1861,12 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 	}
 
 	if (shostnetworkmask)
-		xtables_ipparse_any(shostnetworkmask, &saddrs,
-					&fw.ip.smsk, &nsaddrs);
+		xtables_ipparse_multiple(shostnetworkmask, &saddrs,
+					 &smasks, &nsaddrs);
 
 	if (dhostnetworkmask)
-		xtables_ipparse_any(dhostnetworkmask, &daddrs,
-					&fw.ip.dmsk, &ndaddrs);
+		xtables_ipparse_multiple(dhostnetworkmask, &daddrs,
+					 &dmasks, &ndaddrs);
 
 	if ((nsaddrs > 1 || ndaddrs > 1) &&
 	    (fw.ip.invflags & (IPT_INV_SRCIP | IPT_INV_DSTIP)))
@@ -1961,13 +1974,15 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 	switch (command) {
 	case CMD_APPEND:
 		ret = append_entry(chain, e,
-				   nsaddrs, saddrs, ndaddrs, daddrs,
+				   nsaddrs, saddrs, smasks,
+				   ndaddrs, daddrs, dmasks,
 				   options&OPT_VERBOSE,
 				   *handle);
 		break;
 	case CMD_DELETE:
 		ret = delete_entry(chain, e,
-				   nsaddrs, saddrs, ndaddrs, daddrs,
+				   nsaddrs, saddrs, smasks,
+				   ndaddrs, daddrs, dmasks,
 				   options&OPT_VERBOSE,
 				   *handle, matches);
 		break;
@@ -1981,7 +1996,8 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 		break;
 	case CMD_INSERT:
 		ret = insert_entry(chain, e, rulenum - 1,
-				   nsaddrs, saddrs, ndaddrs, daddrs,
+				   nsaddrs, saddrs, smasks,
+				   ndaddrs, daddrs, dmasks,
 				   options&OPT_VERBOSE,
 				   *handle);
 		break;
@@ -2042,7 +2058,9 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 	}
 
 	free(saddrs);
+	free(smasks);
 	free(daddrs);
+	free(dmasks);
 	xtables_free_opts(1);
 
 	return ret;
