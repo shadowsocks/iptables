@@ -27,12 +27,13 @@ static void SNAT_help(void)
 "SNAT target options:\n"
 " --to-source <ipaddr>[-<ipaddr>][:port-port]\n"
 "				Address to map source to.\n"
-"[--random]\n");
+"[--random] [--persistent]\n");
 }
 
 static const struct option SNAT_opts[] = {
 	{ "to-source", 1, NULL, '1' },
 	{ "random", 0, NULL, '2' },
+	{ "persistent", 0, NULL, '3' },
 	{ .name = NULL }
 };
 
@@ -179,6 +180,10 @@ static int SNAT_parse(int c, char **argv, int invert, unsigned int *flags,
 			*flags |= IPT_SNAT_OPT_RANDOM;
 		return 1;
 
+	case '3':
+		info->mr.range[0].flags |= IP_NAT_RANGE_PERSISTENT;
+		return 1;
+
 	default:
 		return 0;
 	}
@@ -223,6 +228,8 @@ static void SNAT_print(const void *ip, const struct xt_entry_target *target,
 		printf(" ");
 		if (info->mr.range[i].flags & IP_NAT_RANGE_PROTO_RANDOM)
 			printf("random ");
+		if (info->mr.range[i].flags & IP_NAT_RANGE_PERSISTENT)
+			printf("persistent ");
 	}
 }
 
@@ -237,6 +244,8 @@ static void SNAT_save(const void *ip, const struct xt_entry_target *target)
 		printf(" ");
 		if (info->mr.range[i].flags & IP_NAT_RANGE_PROTO_RANDOM)
 			printf("--random ");
+		if (info->mr.range[i].flags & IP_NAT_RANGE_PERSISTENT)
+			printf("--persistent ");
 	}
 }
 

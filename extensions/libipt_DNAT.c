@@ -27,12 +27,13 @@ static void DNAT_help(void)
 "DNAT target options:\n"
 " --to-destination <ipaddr>[-<ipaddr>][:port-port]\n"
 "				Address to map destination to.\n"
-"[--random]\n");
+"[--random] [--persistent]\n");
 }
 
 static const struct option DNAT_opts[] = {
 	{ "to-destination", 1, NULL, '1' },
 	{ "random", 0, NULL, '2' },
+	{ "persistent", 0, NULL, '3' },
 	{ .name = NULL }
 };
 
@@ -178,6 +179,11 @@ static int DNAT_parse(int c, char **argv, int invert, unsigned int *flags,
 		} else
 			*flags |= IPT_DNAT_OPT_RANDOM;
 		return 1;
+
+	case '3':
+		info->mr.range[0].flags |= IP_NAT_RANGE_PERSISTENT;
+		return 1;
+
 	default:
 		return 0;
 	}
@@ -222,6 +228,8 @@ static void DNAT_print(const void *ip, const struct xt_entry_target *target,
 		printf(" ");
 		if (info->mr.range[i].flags & IP_NAT_RANGE_PROTO_RANDOM)
 			printf("random ");
+		if (info->mr.range[i].flags & IP_NAT_RANGE_PERSISTENT)
+			printf("persistent ");
 	}
 }
 
@@ -236,6 +244,8 @@ static void DNAT_save(const void *ip, const struct xt_entry_target *target)
 		printf(" ");
 		if (info->mr.range[i].flags & IP_NAT_RANGE_PROTO_RANDOM)
 			printf("--random ");
+		if (info->mr.range[i].flags & IP_NAT_RANGE_PERSISTENT)
+			printf("--persistent ");
 	}
 }
 
