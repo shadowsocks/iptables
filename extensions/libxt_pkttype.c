@@ -46,11 +46,9 @@ static void print_types(void)
 	unsigned int	i;
 	
 	printf("Valid packet types:\n");
-	for (i = 0; i < sizeof(supported_types)/sizeof(struct pkttypes); i++)
-	{
+	for (i = 0; i < ARRAY_SIZE(supported_types); ++i)
 		if(supported_types[i].printhelp == 1)
 			printf("\t%-14s\t\t%s\n", supported_types[i].name, supported_types[i].help);
-	}
 	printf("\n");
 }
 
@@ -71,14 +69,12 @@ static void parse_pkttype(const char *pkttype, struct xt_pkttype_info *info)
 {
 	unsigned int	i;
 	
-	for (i = 0; i < sizeof(supported_types)/sizeof(struct pkttypes); i++)
-	{
+	for (i = 0; i < ARRAY_SIZE(supported_types); ++i)
 		if(strcasecmp(pkttype, supported_types[i].name)==0)
 		{
 			info->pkttype=supported_types[i].pkttype;
 			return;
 		}
-	}
 	
 	xtables_error(PARAMETER_PROBLEM, "Bad packet type '%s'", pkttype);
 }
@@ -115,14 +111,12 @@ static void print_pkttype(const struct xt_pkttype_info *info)
 {
 	unsigned int	i;
 	
-	for (i = 0; i < sizeof(supported_types)/sizeof(struct pkttypes); i++)
-	{
+	for (i = 0; i < ARRAY_SIZE(supported_types); ++i)
 		if(supported_types[i].pkttype==info->pkttype)
 		{
 			printf("%s ", supported_types[i].name);
 			return;
 		}
-	}
 
 	printf("%d ", info->pkttype);	/* in case we didn't find an entry in named-packtes */
 }

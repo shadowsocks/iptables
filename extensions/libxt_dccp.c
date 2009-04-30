@@ -102,13 +102,12 @@ parse_dccp_types(const char *typestring)
 
 	for (ptr = strtok(buffer, ","); ptr; ptr = strtok(NULL, ",")) {
 		unsigned int i;
-		for (i = 0; i < sizeof(dccp_pkt_types)/sizeof(char *); i++) {
+		for (i = 0; i < ARRAY_SIZE(dccp_pkt_types); ++i)
 			if (!strcasecmp(dccp_pkt_types[i], ptr)) {
 				typemask |= (1 << i);
 				break;
 			}
-		}
-		if (i == sizeof(dccp_pkt_types)/sizeof(char *))
+		if (i == ARRAY_SIZE(dccp_pkt_types))
 			xtables_error(PARAMETER_PROBLEM,
 				   "Unknown DCCP type `%s'", ptr);
 	}

@@ -110,7 +110,7 @@ static int
 add_argv(char *what, int quoted)
 {
 	DEBUGP("add_argv: %d %s\n", newargc, what);
-	if (what && ((newargc + 1) < sizeof(newargv) / sizeof(char *))) {
+	if (what && newargc + 1 < ARRAY_SIZE(newargv)) {
 		newargv[newargc] = strdup(what);
 		newargvattr[newargc] = quoted;
 		newargc++;

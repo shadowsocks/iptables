@@ -48,7 +48,7 @@ static void print_types_all(void)
 	unsigned int i;
 	printf("Valid MH types:");
 
-	for (i = 0; i < sizeof(mh_names)/sizeof(struct mh_name); i++) {
+	for (i = 0; i < ARRAY_SIZE(mh_names); ++i) {
 		if (i && mh_names[i].type == mh_names[i-1].type)
 			printf(" (%s)", mh_names[i].name);
 		else
@@ -75,7 +75,7 @@ static void mh_init(struct xt_entry_match *m)
 static unsigned int name_to_type(const char *name)
 {
 	int namelen = strlen(name);
-	unsigned int limit = sizeof(mh_names)/sizeof(struct mh_name);
+	static const unsigned int limit = ARRAY_SIZE(mh_names);
 	unsigned int match = limit;
 	unsigned int i;
 
@@ -151,10 +151,9 @@ static const char *type_to_name(u_int8_t type)
 {
 	unsigned int i;
 
-	for (i = 0; i < sizeof(mh_names)/sizeof(struct mh_name); i++) {
+	for (i = 0; i < ARRAY_SIZE(mh_names); ++i)
 		if (mh_names[i].type == type)
 			return mh_names[i].name;
-	}
 
 	return NULL;
 }

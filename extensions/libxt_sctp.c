@@ -17,19 +17,7 @@
 #include <netinet/in.h>
 #include <xtables.h>
 
-#ifndef ARRAY_SIZE
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-#endif
-
 #include <linux/netfilter/xt_sctp.h>
-
-/* Some ZS!#@:$%*#$! has replaced the ELEMCOUNT macro in ipt_sctp.h with
- * ARRAY_SIZE without noticing that this file is used from userspace,
- * and userspace doesn't have ARRAY_SIZE */
-
-#ifndef ELEMCOUNT
-#define ELEMCOUNT ARRAY_SIZE
-#endif
 
 #if 0
 #define DEBUGP(format, first...) printf(format, ##first)
@@ -198,7 +186,7 @@ parse_sctp_chunk(struct xt_sctp_info *einfo,
 			*chunk_flags++ = 0;
 		}
 		
-		for (i = 0; i < ELEMCOUNT(sctp_chunk_names); i++) {
+		for (i = 0; i < ARRAY_SIZE(sctp_chunk_names); ++i)
 			if (strcasecmp(sctp_chunk_names[i].name, ptr) == 0) {
 				DEBUGP("Chunk num %d\n", sctp_chunk_names[i].chunk_type);
 				SCTP_CHUNKMAP_SET(einfo->chunkmap, 
@@ -206,7 +194,6 @@ parse_sctp_chunk(struct xt_sctp_info *einfo,
 				found = 1;
 				break;
 			}
-		}
 		if (!found)
 			xtables_error(PARAMETER_PROBLEM,
 				   "Unknown sctp chunk `%s'", ptr);
@@ -389,10 +376,9 @@ print_chunk(u_int32_t chunknum, int numeric)
 	else {
 		int i;
 
-		for (i = 0; i < ELEMCOUNT(sctp_chunk_names); i++) {
+		for (i = 0; i < ARRAY_SIZE(sctp_chunk_names); ++i)
 			if (sctp_chunk_names[i].chunk_type == chunknum)
 				printf("%s", sctp_chunk_names[chunknum].name);
-		}
 	}
 }
 

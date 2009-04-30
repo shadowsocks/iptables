@@ -86,18 +86,15 @@ parse_tcp_flag(const char *flags)
 
 	for (ptr = strtok(buffer, ","); ptr; ptr = strtok(NULL, ",")) {
 		unsigned int i;
-		for (i = 0;
-		     i < sizeof(tcp_flag_names)/sizeof(struct tcp_flag_names);
-		     i++) {
+		for (i = 0; i < ARRAY_SIZE(tcp_flag_names); ++i)
 			if (strcasecmp(tcp_flag_names[i].name, ptr) == 0) {
 				ret |= tcp_flag_names[i].flag;
 				break;
 			}
-		}
-		if (i == sizeof(tcp_flag_names)/sizeof(struct tcp_flag_names))
+		if (i == ARRAY_SIZE(tcp_flag_names))
 			xtables_error(PARAMETER_PROBLEM,
 				   "Unknown TCP flag `%s'", ptr);
-		}
+	}
 
 	free(buffer);
 	return ret;

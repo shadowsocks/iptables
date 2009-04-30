@@ -485,11 +485,10 @@ static void print_rate(u_int32_t period)
 {
 	unsigned int i;
 
-	for (i = 1; i < sizeof(rates)/sizeof(struct rates); i++) {
+	for (i = 1; i < ARRAY_SIZE(rates); ++i)
 		if (period > rates[i].mult
             || rates[i].mult/period < rates[i].mult%period)
 			break;
-	}
 
 	printf("%u/%s ", rates[i-1].mult / period, rates[i-1].name);
 }

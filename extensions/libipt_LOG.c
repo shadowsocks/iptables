@@ -72,9 +72,7 @@ parse_level(const char *level)
 	if (!xtables_strtoui(level, NULL, &lev, 0, 7)) {
 		unsigned int i = 0;
 
-		for (i = 0;
-		     i < sizeof(ipt_log_names) / sizeof(struct ipt_log_names);
-		     i++) {
+		for (i = 0; i < ARRAY_SIZE(ipt_log_names); ++i)
 			if (strncasecmp(level, ipt_log_names[i].name,
 					strlen(level)) == 0) {
 				if (set++)
@@ -83,7 +81,6 @@ parse_level(const char *level)
 						   level);
 				lev = ipt_log_names[i].level;
 			}
-		}
 
 		if (!set)
 			xtables_error(PARAMETER_PROBLEM,
@@ -201,15 +198,12 @@ static void LOG_print(const void *ip, const struct xt_entry_target *target,
 		printf("flags %u level %u ",
 		       loginfo->logflags, loginfo->level);
 	else {
-		for (i = 0;
-		     i < sizeof(ipt_log_names) / sizeof(struct ipt_log_names);
-		     i++) {
+		for (i = 0; i < ARRAY_SIZE(ipt_log_names); ++i)
 			if (loginfo->level == ipt_log_names[i].level) {
 				printf("level %s ", ipt_log_names[i].name);
 				break;
 			}
-		}
-		if (i == sizeof(ipt_log_names) / sizeof(struct ipt_log_names))
+		if (i == ARRAY_SIZE(ipt_log_names))
 			printf("UNKNOWN level %u ", loginfo->level);
 		if (loginfo->logflags & IPT_LOG_TCPSEQ)
 			printf("tcp-sequence ");

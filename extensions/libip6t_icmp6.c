@@ -59,7 +59,7 @@ print_icmpv6types(void)
 	unsigned int i;
 	printf("Valid ICMPv6 Types:");
 
-	for (i = 0; i < sizeof(icmpv6_codes)/sizeof(struct icmpv6_names); i++) {
+	for (i = 0; i < ARRAY_SIZE(icmpv6_codes); ++i) {
 		if (i && icmpv6_codes[i].type == icmpv6_codes[i-1].type) {
 			if (icmpv6_codes[i].code_min == icmpv6_codes[i-1].code_min
 			    && (icmpv6_codes[i].code_max
@@ -91,7 +91,7 @@ static const struct option icmp6_opts[] = {
 static void
 parse_icmpv6(const char *icmpv6type, u_int8_t *type, u_int8_t code[])
 {
-	unsigned int limit = sizeof(icmpv6_codes)/sizeof(struct icmpv6_names);
+	static const unsigned int limit = ARRAY_SIZE(icmpv6_codes);
 	unsigned int match = limit;
 	unsigned int i;
 
@@ -181,16 +181,13 @@ static void print_icmpv6type(u_int8_t type,
 	if (!numeric) {
 		unsigned int i;
 
-		for (i = 0;
-		     i < sizeof(icmpv6_codes)/sizeof(struct icmpv6_names);
-		     i++) {
+		for (i = 0; i < ARRAY_SIZE(icmpv6_codes); ++i)
 			if (icmpv6_codes[i].type == type
 			    && icmpv6_codes[i].code_min == code_min
 			    && icmpv6_codes[i].code_max == code_max)
 				break;
-		}
 
-		if (i != sizeof(icmpv6_codes)/sizeof(struct icmpv6_names)) {
+		if (i != ARRAY_SIZE(icmpv6_codes)) {
 			printf("%s%s ",
 			       invert ? "!" : "",
 			       icmpv6_codes[i].name);

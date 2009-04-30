@@ -77,7 +77,7 @@ proto_to_name(u_int8_t proto, int nolookup)
                         return pent->p_name;
         }
 
-        for (i = 0; i < sizeof(chain_protos)/sizeof(struct pprot); i++)
+        for (i = 0; i < ARRAY_SIZE(chain_protos); ++i)
                 if (chain_protos[i].num == proto)
                         return chain_protos[i].name;
 
@@ -94,16 +94,13 @@ name_to_proto(const char *s)
         	proto = pent->p_proto;
         else {
         	unsigned int i;
-        	for (i = 0;
-        		i < sizeof(chain_protos)/sizeof(struct pprot);
-        		i++) {
+        	for (i = 0; i < ARRAY_SIZE(chain_protos); ++i)
         		if (strcmp(s, chain_protos[i].name) == 0) {
         			proto = chain_protos[i].num;
         			break;
         		}
-        	}
 
-        	if (i == sizeof(chain_protos)/sizeof(struct pprot))
+		if (i == ARRAY_SIZE(chain_protos))
 			xtables_error(PARAMETER_PROBLEM,
         			"unknown header `%s' specified",
         			s);
@@ -116,16 +113,13 @@ static unsigned int
 add_proto_to_mask(int proto){
 	unsigned int i=0, flag=0;
 
-	for (i = 0;
-		i < sizeof(chain_flags)/sizeof(struct numflag);
-		i++) {
+	for (i = 0; i < ARRAY_SIZE(chain_flags); ++i)
 			if (proto == chain_flags[i].proto){
 				flag = chain_flags[i].flag;
 				break;
 			}
-	}
 
-	if (i == sizeof(chain_flags)/sizeof(struct numflag))
+	if (i == ARRAY_SIZE(chain_flags))
 		xtables_error(PARAMETER_PROBLEM,
 		"unknown header `%d' specified",
 		proto);
