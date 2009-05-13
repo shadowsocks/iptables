@@ -58,7 +58,7 @@ chains. It cannot be specified with the
 option.
 .TP
 \fB\-\-limit\-iface\-out\fP
-The address type checiking can be limited to the interface the packet is going
+The address type checking can be limited to the interface the packet is going
 out. This option is only valid in the
 .BR POSTROUTING ,
 .B OUTPUT
