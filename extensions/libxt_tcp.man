@@ -12,7 +12,7 @@ The flag
 \fB\-\-sport\fP
 is a convenient alias for this option.
 .TP
-[\fB!\fP] \fB\-\-destination\-port\fP,\fB\-\-dport\fP \fIport\fP[\fB,\fP\fIport\fP]
+[\fB!\fP] \fB\-\-destination\-port\fP,\fB\-\-dport\fP \fIport\fP[\fB:\fP\fIport\fP]
 Destination port or port range specification.  The flag
 \fB\-\-dport\fP
 is a convenient alias for this option.
