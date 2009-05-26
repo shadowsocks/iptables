@@ -144,14 +144,14 @@ static void print_rate(u_int32_t period)
 static void
 limit_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
-	struct xt_rateinfo *r = (struct xt_rateinfo *)match->data;
+	const struct xt_rateinfo *r = (const void *)match->data;
 	printf("limit: avg "); print_rate(r->avg);
 	printf("burst %u ", r->burst);
 }
 
 static void limit_save(const void *ip, const struct xt_entry_match *match)
 {
-	struct xt_rateinfo *r = (struct xt_rateinfo *)match->data;
+	const struct xt_rateinfo *r = (const void *)match->data;
 
 	printf("--limit "); print_rate(r->avg);
 	if (r->burst != XT_LIMIT_BURST)

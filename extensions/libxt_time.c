@@ -406,7 +406,7 @@ static inline void divide_time(unsigned int fulltime, unsigned int *hours,
 static void time_print(const void *ip, const struct xt_entry_match *match,
                        int numeric)
 {
-	struct xt_time_info *info = (void *)match->data;
+	const struct xt_time_info *info = (const void *)match->data;
 	unsigned int h, m, s;
 
 	printf("TIME ");

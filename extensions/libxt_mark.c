@@ -110,7 +110,7 @@ mark_mt_print(const void *ip, const struct xt_entry_match *match, int numeric)
 static void
 mark_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
-	struct xt_mark_info *info = (struct xt_mark_info *)match->data;
+	const struct xt_mark_info *info = (const void *)match->data;
 
 	printf("MARK match ");
 
@@ -134,7 +134,7 @@ static void mark_mt_save(const void *ip, const struct xt_entry_match *match)
 static void
 mark_save(const void *ip, const struct xt_entry_match *match)
 {
-	struct xt_mark_info *info = (struct xt_mark_info *)match->data;
+	const struct xt_mark_info *info = (const void *)match->data;
 
 	if (info->invert)
 		printf("! ");

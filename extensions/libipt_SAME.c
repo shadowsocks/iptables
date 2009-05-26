@@ -138,14 +138,13 @@ static void SAME_print(const void *ip, const struct xt_entry_target *target,
                        int numeric)
 {
 	unsigned int count;
-	struct ipt_same_info *mr
-		= (struct ipt_same_info *)target->data;
+	const struct ipt_same_info *mr = (const void *)target->data;
 	int random_selection = 0;
 	
 	printf("same:");
 	
 	for (count = 0; count < mr->rangesize; count++) {
-		struct nf_nat_range *r = &mr->range[count];
+		const struct nf_nat_range *r = &mr->range[count];
 		struct in_addr a;
 
 		a.s_addr = r->min_ip;
@@ -171,12 +170,11 @@ static void SAME_print(const void *ip, const struct xt_entry_target *target,
 static void SAME_save(const void *ip, const struct xt_entry_target *target)
 {
 	unsigned int count;
-	struct ipt_same_info *mr
-		= (struct ipt_same_info *)target->data;
+	const struct ipt_same_info *mr = (const void *)target->data;
 	int random_selection = 0;
 
 	for (count = 0; count < mr->rangesize; count++) {
-		struct nf_nat_range *r = &mr->range[count];
+		const struct nf_nat_range *r = &mr->range[count];
 		struct in_addr a;
 
 		a.s_addr = r->min_ip;

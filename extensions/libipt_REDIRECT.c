@@ -124,9 +124,8 @@ static int REDIRECT_parse(int c, char **argv, int invert, unsigned int *flags,
 static void REDIRECT_print(const void *ip, const struct xt_entry_target *target,
                            int numeric)
 {
-	struct nf_nat_multi_range *mr
-		= (struct nf_nat_multi_range *)target->data;
-	struct nf_nat_range *r = &mr->range[0];
+	const struct nf_nat_multi_range *mr = (const void *)target->data;
+	const struct nf_nat_range *r = &mr->range[0];
 
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
 		printf("redir ports ");
@@ -141,9 +140,8 @@ static void REDIRECT_print(const void *ip, const struct xt_entry_target *target,
 
 static void REDIRECT_save(const void *ip, const struct xt_entry_target *target)
 {
-	struct nf_nat_multi_range *mr
-		= (struct nf_nat_multi_range *)target->data;
-	struct nf_nat_range *r = &mr->range[0];
+	const struct nf_nat_multi_range *mr = (const void *)target->data;
+	const struct nf_nat_range *r = &mr->range[0];
 
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
 		printf("--to-ports ");

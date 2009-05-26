@@ -207,7 +207,7 @@ print_realm(unsigned long id, unsigned long mask, int numeric)
 static void realm_print(const void *ip, const struct xt_entry_match *match,
                         int numeric)
 {
-	struct ipt_realm_info *ri = (struct ipt_realm_info *) match->data;
+	const struct ipt_realm_info *ri = (const void *)match->data;
 
 	if (ri->invert)
 		printf("! ");
@@ -218,7 +218,7 @@ static void realm_print(const void *ip, const struct xt_entry_match *match,
 
 static void realm_save(const void *ip, const struct xt_entry_match *match)
 {
-	struct ipt_realm_info *ri = (struct ipt_realm_info *) match->data;
+	const struct ipt_realm_info *ri = (const void *)match->data;
 
 	if (ri->invert)
 		printf("! ");

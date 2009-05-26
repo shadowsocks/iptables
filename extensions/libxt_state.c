@@ -124,7 +124,7 @@ state_print(const void *ip,
       const struct xt_entry_match *match,
       int numeric)
 {
-	struct xt_state_info *sinfo = (struct xt_state_info *)match->data;
+	const struct xt_state_info *sinfo = (const void *)match->data;
 
 	printf("state ");
 	state_print_state(sinfo->statemask);
@@ -132,7 +132,7 @@ state_print(const void *ip,
 
 static void state_save(const void *ip, const struct xt_entry_match *match)
 {
-	struct xt_state_info *sinfo = (struct xt_state_info *)match->data;
+	const struct xt_state_info *sinfo = (const void *)match->data;
 
 	printf("--state ");
 	state_print_state(sinfo->statemask);

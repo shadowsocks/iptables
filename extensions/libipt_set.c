@@ -121,16 +121,14 @@ print_match(const char *prefix, const struct ipt_set_info *info)
 static void set_print(const void *ip, const struct xt_entry_match *match,
                       int numeric)
 {
-	struct ipt_set_info_match *info = 
-		(struct ipt_set_info_match *) match->data;
+	const struct ipt_set_info_match *info = (const void *)match->data;
 
 	print_match("set", &info->match_set);
 }
 
 static void set_save(const void *ip, const struct xt_entry_match *match)
 {
-	struct ipt_set_info_match *info = 
-		(struct ipt_set_info_match *) match->data;
+	const struct ipt_set_info_match *info = (const void *)match->data;
 
 	print_match("--set", &info->match_set);
 }

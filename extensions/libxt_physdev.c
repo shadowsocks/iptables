@@ -114,8 +114,7 @@ static void physdev_check(unsigned int flags)
 static void
 physdev_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
-	struct xt_physdev_info *info =
-		(struct xt_physdev_info*)match->data;
+	const struct xt_physdev_info *info = (const void *)match->data;
 
 	printf("PHYSDEV match");
 	if (info->bitmask & XT_PHYSDEV_OP_ISIN)
@@ -139,8 +138,7 @@ physdev_print(const void *ip, const struct xt_entry_match *match, int numeric)
 
 static void physdev_save(const void *ip, const struct xt_entry_match *match)
 {
-	struct xt_physdev_info *info =
-		(struct xt_physdev_info*)match->data;
+	const struct xt_physdev_info *info = (const void *)match->data;
 
 	if (info->bitmask & XT_PHYSDEV_OP_ISIN)
 		printf("%s--physdev-is-in ",

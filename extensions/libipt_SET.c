@@ -129,8 +129,7 @@ print_target(const char *prefix, const struct ipt_set_info *info)
 static void SET_print(const void *ip, const struct xt_entry_target *target,
                       int numeric)
 {
-	struct ipt_set_info_target *info =
-	    (struct ipt_set_info_target *) target->data;
+	const struct ipt_set_info_target *info = (const void *)target->data;
 
 	print_target("add-set", &info->add_set);
 	print_target("del-set", &info->del_set);
@@ -138,8 +137,7 @@ static void SET_print(const void *ip, const struct xt_entry_target *target,
 
 static void SET_save(const void *ip, const struct xt_entry_target *target)
 {
-	struct ipt_set_info_target *info =
-	    (struct ipt_set_info_target *) target->data;
+	const struct ipt_set_info_target *info = (const void *)target->data;
 
 	print_target("--add-set", &info->add_set);
 	print_target("--del-set", &info->del_set);

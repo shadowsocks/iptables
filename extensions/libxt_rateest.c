@@ -332,7 +332,8 @@ rateest_print_rate(u_int32_t rate, int numeric)
 }
 
 static void
-rateest_print_mode(struct xt_rateest_match_info *info, const char *prefix)
+rateest_print_mode(const struct xt_rateest_match_info *info,
+                   const char *prefix)
 {
 	if (info->flags & XT_RATEEST_MATCH_INVERT)
 		printf("! ");
@@ -355,7 +356,7 @@ rateest_print_mode(struct xt_rateest_match_info *info, const char *prefix)
 static void
 rateest_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
-	struct xt_rateest_match_info *info = (void *)match->data;
+	const struct xt_rateest_match_info *info = (const void *)match->data;
 
 	printf("rateest match ");
 
@@ -405,7 +406,7 @@ rateest_print(const void *ip, const struct xt_entry_match *match, int numeric)
 static void
 rateest_save(const void *ip, const struct xt_entry_match *match)
 {
-	struct xt_rateest_match_info *info = (void *)match->data;
+	const struct xt_rateest_match_info *info = (const void *)match->data;
 
 	if (info->flags & XT_RATEEST_MATCH_REL) {
 		printf("--rateest1 %s ", info->name1);

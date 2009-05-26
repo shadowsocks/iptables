@@ -140,9 +140,8 @@ static void NETMAP_check(unsigned int flags)
 static void NETMAP_print(const void *ip, const struct xt_entry_target *target,
                          int numeric)
 {
-	struct nf_nat_multi_range *mr
-		= (struct nf_nat_multi_range *)target->data;
-	struct nf_nat_range *r = &mr->range[0];
+	const struct nf_nat_multi_range *mr = (const void *)target->data;
+	const struct nf_nat_range *r = &mr->range[0];
 	struct in_addr a;
 	int bits;
 

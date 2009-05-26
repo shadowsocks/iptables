@@ -102,7 +102,7 @@ static void connbytes_check(unsigned int flags)
 			   "`--connbytes-dir' and `--connbytes-mode'");
 }
 
-static void print_mode(struct xt_connbytes_info *sinfo)
+static void print_mode(const struct xt_connbytes_info *sinfo)
 {
 	switch (sinfo->what) {
 		case XT_CONNBYTES_PKTS:
@@ -120,7 +120,7 @@ static void print_mode(struct xt_connbytes_info *sinfo)
 	}
 }
 
-static void print_direction(struct xt_connbytes_info *sinfo)
+static void print_direction(const struct xt_connbytes_info *sinfo)
 {
 	switch (sinfo->direction) {
 		case XT_CONNBYTES_DIR_ORIGINAL:
@@ -141,7 +141,7 @@ static void print_direction(struct xt_connbytes_info *sinfo)
 static void
 connbytes_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
-	struct xt_connbytes_info *sinfo = (struct xt_connbytes_info *)match->data;
+	const struct xt_connbytes_info *sinfo = (const void *)match->data;
 
 	if (sinfo->count.from > sinfo->count.to) 
 		printf("connbytes ! %llu:%llu ",
@@ -161,7 +161,7 @@ connbytes_print(const void *ip, const struct xt_entry_match *match, int numeric)
 
 static void connbytes_save(const void *ip, const struct xt_entry_match *match)
 {
-	struct xt_connbytes_info *sinfo = (struct xt_connbytes_info *)match->data;
+	const struct xt_connbytes_info *sinfo = (const void *)match->data;
 
 	if (sinfo->count.from > sinfo->count.to) 
 		printf("! --connbytes %llu:%llu ",

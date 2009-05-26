@@ -146,7 +146,7 @@ static void print_match(const struct xt_statistic_info *info, char *prefix)
 static void
 statistic_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
-	struct xt_statistic_info *info = (struct xt_statistic_info *)match->data;
+	const struct xt_statistic_info *info = (const void *)match->data;
 
 	printf("statistic ");
 	print_match(info, "");
@@ -154,7 +154,7 @@ statistic_print(const void *ip, const struct xt_entry_match *match, int numeric)
 
 static void statistic_save(const void *ip, const struct xt_entry_match *match)
 {
-	struct xt_statistic_info *info = (struct xt_statistic_info *)match->data;
+	const struct xt_statistic_info *info = (const void *)match->data;
 
 	print_match(info, "--");
 }

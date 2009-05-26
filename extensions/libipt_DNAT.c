@@ -219,7 +219,7 @@ static void print_range(const struct nf_nat_range *r)
 static void DNAT_print(const void *ip, const struct xt_entry_target *target,
                        int numeric)
 {
-	struct ipt_natinfo *info = (void *)target;
+	const struct ipt_natinfo *info = (const void *)target;
 	unsigned int i = 0;
 
 	printf("to:");
@@ -235,7 +235,7 @@ static void DNAT_print(const void *ip, const struct xt_entry_target *target,
 
 static void DNAT_save(const void *ip, const struct xt_entry_target *target)
 {
-	struct ipt_natinfo *info = (void *)target;
+	const struct ipt_natinfo *info = (const void *)target;
 	unsigned int i = 0;
 
 	for (i = 0; i < info->mr.rangesize; i++) {

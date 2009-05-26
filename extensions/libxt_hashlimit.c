@@ -525,8 +525,7 @@ static void print_mode(unsigned int mode, char separator)
 static void hashlimit_print(const void *ip,
                             const struct xt_entry_match *match, int numeric)
 {
-	struct xt_hashlimit_info *r = 
-		(struct xt_hashlimit_info *)match->data;
+	const struct xt_hashlimit_info *r = (const void *)match->data;
 	fputs("limit: avg ", stdout); print_rate(r->cfg.avg);
 	printf("burst %u ", r->cfg.burst);
 	fputs("mode ", stdout);
@@ -590,8 +589,7 @@ hashlimit_mt6_print(const void *ip, const struct xt_entry_match *match,
 
 static void hashlimit_save(const void *ip, const struct xt_entry_match *match)
 {
-	struct xt_hashlimit_info *r = 
-		(struct xt_hashlimit_info *)match->data;
+	const struct xt_hashlimit_info *r = (const void *)match->data;
 
 	fputs("--hashlimit ", stdout); print_rate(r->cfg.avg);
 	if (r->cfg.burst != XT_HASHLIMIT_BURST)

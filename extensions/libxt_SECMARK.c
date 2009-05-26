@@ -61,7 +61,7 @@ static void SECMARK_check(unsigned int flags)
 		xtables_error(PARAMETER_PROBLEM, PFX "parameter required");
 }
 
-static void print_secmark(struct xt_secmark_target_info *info)
+static void print_secmark(const struct xt_secmark_target_info *info)
 {
 	switch (info->mode) {
 	case SECMARK_MODE_SEL:
@@ -76,7 +76,7 @@ static void print_secmark(struct xt_secmark_target_info *info)
 static void SECMARK_print(const void *ip, const struct xt_entry_target *target,
                           int numeric)
 {
-	struct xt_secmark_target_info *info =
+	const struct xt_secmark_target_info *info =
 		(struct xt_secmark_target_info*)(target)->data;
 
 	printf("SECMARK ");
@@ -85,7 +85,7 @@ static void SECMARK_print(const void *ip, const struct xt_entry_target *target,
 
 static void SECMARK_save(const void *ip, const struct xt_entry_target *target)
 {
-	struct xt_secmark_target_info *info =
+	const struct xt_secmark_target_info *info =
 		(struct xt_secmark_target_info*)target->data;
 
 	printf("--");

@@ -71,7 +71,7 @@ static void comment_check(unsigned int flags)
 static void
 comment_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
-	struct xt_comment_info *commentinfo = (struct xt_comment_info *)match->data;
+	struct xt_comment_info *commentinfo = (void *)match->data;
 
 	commentinfo->comment[XT_MAX_COMMENT_LEN-1] = '\0';
 	printf("/* %s */ ", commentinfo->comment);
@@ -81,7 +81,7 @@ comment_print(const void *ip, const struct xt_entry_match *match, int numeric)
 static void
 comment_save(const void *ip, const struct xt_entry_match *match)
 {
-	struct xt_comment_info *commentinfo = (struct xt_comment_info *)match->data;
+	struct xt_comment_info *commentinfo = (void *)match->data;
 
 	commentinfo->comment[XT_MAX_COMMENT_LEN-1] = '\0';
 	printf("--comment ");

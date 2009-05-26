@@ -779,7 +779,8 @@ conntrack_dump_addr(const union nf_inet_addr *addr,
 }
 
 static void
-print_addr(struct in_addr *addr, struct in_addr *mask, int inv, int numeric)
+print_addr(const struct in_addr *addr, const struct in_addr *mask,
+           int inv, int numeric)
 {
 	char buf[BUFSIZ];
 
@@ -801,7 +802,7 @@ print_addr(struct in_addr *addr, struct in_addr *mask, int inv, int numeric)
 static void
 matchinfo_print(const void *ip, const struct xt_entry_match *match, int numeric, const char *optpfx)
 {
-	struct xt_conntrack_info *sinfo = (void *)match->data;
+	const struct xt_conntrack_info *sinfo = (const void *)match->data;
 
 	if(sinfo->flags & XT_CONNTRACK_STATE) {
         	if (sinfo->invflags & XT_CONNTRACK_STATE)

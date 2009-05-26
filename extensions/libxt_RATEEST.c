@@ -174,7 +174,7 @@ RATEEST_final_check(unsigned int flags)
 static void
 __RATEEST_print(const struct xt_entry_target *target, const char *prefix)
 {
-	struct xt_rateest_target_info *info = (void *)target->data;
+	const struct xt_rateest_target_info *info = (const void *)target->data;
 	unsigned int local_interval;
 	unsigned int local_ewma_log;
 

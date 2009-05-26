@@ -69,7 +69,7 @@ static void CONNSECMARK_check(unsigned int flags)
 		           "or --restore is allowed");
 }
 
-static void print_connsecmark(struct xt_connsecmark_target_info *info)
+static void print_connsecmark(const struct xt_connsecmark_target_info *info)
 {
 	switch (info->mode) {
 	case CONNSECMARK_SAVE:
@@ -89,7 +89,7 @@ static void
 CONNSECMARK_print(const void *ip, const struct xt_entry_target *target,
                   int numeric)
 {
-	struct xt_connsecmark_target_info *info =
+	const struct xt_connsecmark_target_info *info =
 		(struct xt_connsecmark_target_info*)(target)->data;
 
 	printf("CONNSECMARK ");
@@ -99,7 +99,7 @@ CONNSECMARK_print(const void *ip, const struct xt_entry_target *target,
 static void
 CONNSECMARK_save(const void *ip, const struct xt_entry_target *target)
 {
-	struct xt_connsecmark_target_info *info =
+	const struct xt_connsecmark_target_info *info =
 		(struct xt_connsecmark_target_info*)target->data;
 
 	printf("--");

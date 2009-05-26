@@ -111,9 +111,8 @@ static void
 MASQUERADE_print(const void *ip, const struct xt_entry_target *target,
                  int numeric)
 {
-	struct nf_nat_multi_range *mr
-		= (struct nf_nat_multi_range *)target->data;
-	struct nf_nat_range *r = &mr->range[0];
+	const struct nf_nat_multi_range *mr = (const void *)target->data;
+	const struct nf_nat_range *r = &mr->range[0];
 
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
 		printf("masq ports: ");
@@ -130,9 +129,8 @@ MASQUERADE_print(const void *ip, const struct xt_entry_target *target,
 static void
 MASQUERADE_save(const void *ip, const struct xt_entry_target *target)
 {
-	struct nf_nat_multi_range *mr
-		= (struct nf_nat_multi_range *)target->data;
-	struct nf_nat_range *r = &mr->range[0];
+	const struct nf_nat_multi_range *mr = (const void *)target->data;
+	const struct nf_nat_range *r = &mr->range[0];
 
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
 		printf("--to-ports %hu", ntohs(r->min.tcp.port));

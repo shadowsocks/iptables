@@ -55,14 +55,14 @@ static void helper_check(unsigned int flags)
 static void
 helper_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
-	struct xt_helper_info *info = (struct xt_helper_info *)match->data;
+	const struct xt_helper_info *info = (const void *)match->data;
 
 	printf("helper match %s\"%s\" ", info->invert ? "! " : "", info->name);
 }
 
 static void helper_save(const void *ip, const struct xt_entry_match *match)
 {
-	struct xt_helper_info *info = (struct xt_helper_info *)match->data;
+	const struct xt_helper_info *info = (const void *)match->data;
 
 	printf("%s--helper ",info->invert ? "! " : "");
 	xtables_save_string(info->name);

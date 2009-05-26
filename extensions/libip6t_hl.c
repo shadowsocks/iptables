@@ -89,7 +89,7 @@ static void hl_check(unsigned int flags)
 static void hl_print(const void *ip, const struct xt_entry_match *match,
                      int numeric)
 {
-	static const char *op[] = {
+	static const char *const op[] = {
 		[IP6T_HL_EQ] = "==",
 		[IP6T_HL_NE] = "!=",
 		[IP6T_HL_LT] = "<",

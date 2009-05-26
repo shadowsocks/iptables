@@ -121,7 +121,7 @@ static void connmark_mt_check(unsigned int flags)
 static void
 connmark_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
-	struct xt_connmark_info *info = (struct xt_connmark_info *)match->data;
+	const struct xt_connmark_info *info = (const void *)match->data;
 
 	printf("CONNMARK match ");
 	if (info->invert)
@@ -142,7 +142,7 @@ connmark_mt_print(const void *ip, const struct xt_entry_match *match, int numeri
 
 static void connmark_save(const void *ip, const struct xt_entry_match *match)
 {
-	struct xt_connmark_info *info = (struct xt_connmark_info *)match->data;
+	const struct xt_connmark_info *info = (const void *)match->data;
 
 	if (info->invert)
 		printf("! ");

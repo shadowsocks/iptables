@@ -111,7 +111,7 @@ static void pkttype_check(unsigned int flags)
 		xtables_error(PARAMETER_PROBLEM, "You must specify \"--pkt-type\"");
 }
 
-static void print_pkttype(struct xt_pkttype_info *info)
+static void print_pkttype(const struct xt_pkttype_info *info)
 {
 	unsigned int	i;
 	
@@ -130,7 +130,7 @@ static void print_pkttype(struct xt_pkttype_info *info)
 static void pkttype_print(const void *ip, const struct xt_entry_match *match,
                           int numeric)
 {
-	struct xt_pkttype_info *info = (struct xt_pkttype_info *)match->data;
+	const struct xt_pkttype_info *info = (const void *)match->data;
 	
 	printf("PKTTYPE %s= ", info->invert?"!":"");
 	print_pkttype(info);
@@ -138,7 +138,7 @@ static void pkttype_print(const void *ip, const struct xt_entry_match *match,
 
 static void pkttype_save(const void *ip, const struct xt_entry_match *match)
 {
-	struct xt_pkttype_info *info = (struct xt_pkttype_info *)match->data;
+	const struct xt_pkttype_info *info = (const void *)match->data;
 	
 	printf("%s--pkt-type ", info->invert ? "! " : "");
 	print_pkttype(info);
