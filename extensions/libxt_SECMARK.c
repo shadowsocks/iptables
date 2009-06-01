@@ -93,7 +93,7 @@ static void SECMARK_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target secmark_target = {
-	.family		= AF_UNSPEC,
+	.family		= NFPROTO_UNSPEC,
 	.name		= "SECMARK",
 	.version	= XTABLES_VERSION,
 	.revision	= 0,

@@ -219,7 +219,7 @@ cluster_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match cluster_mt_reg = {
-	.family		= AF_UNSPEC,
+	.family		= NFPROTO_UNSPEC,
 	.name		= "cluster",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_cluster_match_info)),

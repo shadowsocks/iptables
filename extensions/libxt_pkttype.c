@@ -139,7 +139,7 @@ static void pkttype_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match pkttype_match = {
-	.family		= AF_UNSPEC,
+	.family		= NFPROTO_UNSPEC,
 	.name		= "pkttype",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_pkttype_info)),

@@ -114,7 +114,7 @@ static void length_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match length_match = {
-	.family		= AF_UNSPEC,
+	.family		= NFPROTO_UNSPEC,
 	.name		= "length",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_length_info)),

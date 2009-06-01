@@ -467,7 +467,7 @@ static void time_save(const void *ip, const struct xt_entry_match *match)
 
 static struct xtables_match time_match = {
 	.name          = "time",
-	.family        = AF_UNSPEC,
+	.family        = NFPROTO_UNSPEC,
 	.version       = XTABLES_VERSION,
 	.size          = XT_ALIGN(sizeof(struct xt_time_info)),
 	.userspacesize = XT_ALIGN(sizeof(struct xt_time_info)),

@@ -96,7 +96,7 @@ CLASSIFY_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target classify_target = { 
-	.family		= AF_UNSPEC,
+	.family		= NFPROTO_UNSPEC,
 	.name		= "CLASSIFY",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_classify_target_info)),

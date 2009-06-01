@@ -21,7 +21,7 @@ static int standard_parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static struct xtables_target standard_target = {
-	.family		= AF_UNSPEC,
+	.family		= NFPROTO_UNSPEC,
 	.name		= "standard",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(int)),

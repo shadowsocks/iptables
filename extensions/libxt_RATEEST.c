@@ -202,7 +202,7 @@ RATEEST_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target rateest_tg_reg = {
-	.family		= AF_UNSPEC,
+	.family		= NFPROTO_UNSPEC,
 	.name		= "RATEEST",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_rateest_target_info)),

@@ -353,7 +353,7 @@ static void string_save(const void *ip, const struct xt_entry_match *match)
 static struct xtables_match string_match = {
     .name		= "string",
     .revision		= 0,
-    .family		= AF_UNSPEC,
+    .family		= NFPROTO_UNSPEC,
     .version		= XTABLES_VERSION,
     .size		= XT_ALIGN(sizeof(struct xt_string_info)),
     .userspacesize	= offsetof(struct xt_string_info, config),
@@ -369,7 +369,7 @@ static struct xtables_match string_match = {
 static struct xtables_match string_match_v1 = {
     .name		= "string",
     .revision		= 1,
-    .family		= AF_UNSPEC,
+    .family		= NFPROTO_UNSPEC,
     .version		= XTABLES_VERSION,
     .size		= XT_ALIGN(sizeof(struct xt_string_info)),
     .userspacesize	= offsetof(struct xt_string_info, config),

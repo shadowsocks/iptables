@@ -144,7 +144,7 @@ mark_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match mark_match = {
-	.family		= AF_UNSPEC,
+	.family		= NFPROTO_UNSPEC,
 	.name		= "mark",
 	.revision	= 0,
 	.version	= XTABLES_VERSION,
@@ -162,7 +162,7 @@ static struct xtables_match mark_mt_reg = {
 	.version        = XTABLES_VERSION,
 	.name           = "mark",
 	.revision       = 1,
-	.family         = AF_UNSPEC,
+	.family         = NFPROTO_UNSPEC,
 	.size           = XT_ALIGN(sizeof(struct xt_mark_mtinfo1)),
 	.userspacesize  = XT_ALIGN(sizeof(struct xt_mark_mtinfo1)),
 	.help           = mark_mt_help,

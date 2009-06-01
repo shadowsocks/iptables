@@ -432,7 +432,7 @@ rateest_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match rateest_mt_reg = {
-	.family		= AF_UNSPEC,
+	.family		= NFPROTO_UNSPEC,
 	.name		= "rateest",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_rateest_match_info)),

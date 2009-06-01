@@ -160,7 +160,7 @@ static void statistic_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match statistic_match = {
-	.family		= AF_UNSPEC,
+	.family		= NFPROTO_UNSPEC,
 	.name		= "statistic",
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_statistic_info)),
