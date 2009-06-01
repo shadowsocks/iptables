@@ -161,13 +161,16 @@ man_run    = \
 	${AM_VERBOSE_GEN} \
 	for ext in $(1); do \
 		f="${srcdir}/libxt_$$ext.man"; \
-		if [ -f "$$f" ] && grep -q "$(3)" "$$f"; then \
+		cf="${srcdir}/libxt_$$ext.c"; \
+		if [ -f "$$f" ] && grep -Eq "$(3)|NFPROTO_UNSPEC" "$$cf"; then \
+			echo -e "\t+ $$f" >&2; \
 			echo ".SS $$ext"; \
 			cat "$$f"; \
 			continue; \
 		fi; \
 		f="${srcdir}/lib$(2)t_$$ext.man"; \
 		if [ -f "$$f" ]; then \
+			echo -e "\t+ $$f" >&2; \
 			echo ".SS $$ext"; \
 			cat "$$f"; \
 			continue; \
