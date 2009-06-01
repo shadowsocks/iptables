@@ -118,12 +118,12 @@ static int parse_mode(char *s)
 	xtables_error(PARAMETER_PROBLEM, "policy match: invalid mode \"%s\"", s);
 }
 
-static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
-                        const void *entry, struct xt_entry_match **match)
+static int policy_parse(int c, int invert, unsigned int *flags,
+                        struct xt_policy_info *info, uint8_t family)
 {
-	struct xt_policy_info *info = (void *)(*match)->data;
 	struct xt_policy_elem *e = &info->pol[info->len];
 	struct in_addr *addr = NULL, mask;
+	struct in6_addr *addr6 = NULL, mask6;
 	unsigned int naddr = 0, num;
 	int mode;
 
@@ -138,14 +138,14 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: can't invert --dir option");
 
-		info->flags |= parse_direction(argv[optind-1]);
+		info->flags |= parse_direction(optarg);
 		break;
 	case '2':
 		if (invert)
 			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: can't invert --policy option");
 
-		info->flags |= parse_policy(argv[optind-1]);
+		info->flags |= parse_policy(optarg);
 		break;
 	case '3':
 		if (info->flags & XT_POLICY_MATCH_STRICT)
@@ -185,37 +185,53 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: double --tunnel-src option");
 
-		xtables_ipparse_any(argv[optind-1], &addr, &mask, &naddr);
+		if (family == NFPROTO_IPV6)
+			xtables_ip6parse_any(optarg, &addr6, &mask6, &naddr);
+		else
+			xtables_ipparse_any(optarg, &addr, &mask, &naddr);
 		if (naddr > 1)
 			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: name resolves to multiple IPs");
 
 		e->match.saddr = 1;
 		e->invert.saddr = invert;
-		e->saddr.a4 = addr[0];
-		e->smask.a4 = mask;
+		if (family == NFPROTO_IPV6) {
+			memcpy(&e->saddr.a6, addr6, sizeof(*addr6));
+			memcpy(&e->smask.a6, &mask6, sizeof(mask6));
+		} else {
+			e->saddr.a4 = addr[0];
+			e->smask.a4 = mask;
+		}
                 break;
 	case '7':
 		if (e->match.daddr)
 			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: double --tunnel-dst option");
 
-		xtables_ipparse_any(argv[optind-1], &addr, &mask, &naddr);
+		if (family == NFPROTO_IPV6)
+			xtables_ip6parse_any(optarg, &addr6, &mask6, &naddr);
+		else
+			xtables_ipparse_any(optarg, &addr, &mask, &naddr);
 		if (naddr > 1)
 			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: name resolves to multiple IPs");
 
 		e->match.daddr = 1;
 		e->invert.daddr = invert;
-		e->daddr.a4 = addr[0];
-		e->dmask.a4 = mask;
+		if (family == NFPROTO_IPV6) {
+			memcpy(&e->daddr.a6, addr6, sizeof(*addr6));
+			memcpy(&e->dmask.a6, &mask6, sizeof(mask6));
+		} else {
+			e->daddr.a4 = addr[0];
+			e->dmask.a4 = mask;
+		}
 		break;
 	case '8':
 		if (e->match.proto)
 			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: double --proto option");
 
-		e->proto = xtables_parse_protocol(argv[optind-1]);
+		e->proto = xtables_parse_protocol(optarg);
 		if (e->proto != IPPROTO_AH && e->proto != IPPROTO_ESP &&
 		    e->proto != IPPROTO_COMP)
 			xtables_error(PARAMETER_PROBLEM,
@@ -228,7 +244,7 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: double --mode option");
 
-		mode = parse_mode(argv[optind-1]);
+		mode = parse_mode(optarg);
 		e->match.mode = 1;
 		e->invert.mode = invert;
 		e->mode = mode;
@@ -248,6 +264,20 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	policy_info = info;
 	return 1;
+}
+
+static int policy4_parse(int c, char **argv, int invert, unsigned int *flags,
+                         const void *entry, struct xt_entry_match **match)
+{
+	return policy_parse(c, invert, flags, (void *)(*match)->data,
+	       NFPROTO_IPV4);
+}
+
+static int policy6_parse(int c, char **argv, int invert, unsigned int *flags,
+                        const void *entry, struct xt_entry_match **match)
+{
+	return policy_parse(c, invert, flags, (void *)(*match)->data,
+	       NFPROTO_IPV6);
 }
 
 static void policy_check(unsigned int flags)
@@ -297,7 +327,7 @@ static void policy_check(unsigned int flags)
 	}
 }
 
-static void print_mode(char *prefix, u_int8_t mode, int numeric)
+static void print_mode(const char *prefix, u_int8_t mode, int numeric)
 {
 	printf("%smode ", prefix);
 
@@ -314,7 +344,7 @@ static void print_mode(char *prefix, u_int8_t mode, int numeric)
 	}
 }
 
-static void print_proto(char *prefix, u_int8_t proto, int numeric)
+static void print_proto(const char *prefix, u_int8_t proto, int numeric)
 {
 	struct protoent *p = NULL;
 
@@ -333,8 +363,8 @@ do {				\
 		printf("! ");	\
 } while(0)
 
-static void print_entry(char *prefix, const struct xt_policy_elem *e,
-                        int numeric)
+static void print_entry(const char *prefix, const struct xt_policy_elem *e,
+                        bool numeric, uint8_t family)
 {
 	if (e->match.reqid) {
 		PRINT_INVERT(e->invert.reqid);
@@ -354,15 +384,25 @@ static void print_entry(char *prefix, const struct xt_policy_elem *e,
 	}
 	if (e->match.daddr) {
 		PRINT_INVERT(e->invert.daddr);
-		printf("%stunnel-dst %s%s ", prefix,
-		       xtables_ipaddr_to_numeric((const void *)&e->daddr),
-		       xtables_ipmask_to_numeric((const void *)&e->dmask));
+		if (family == NFPROTO_IPV6)
+			printf("%stunnel-dst %s%s ", prefix,
+			       xtables_ip6addr_to_numeric(&e->daddr.a6),
+			       xtables_ip6mask_to_numeric(&e->dmask.a6));
+		else
+			printf("%stunnel-dst %s%s ", prefix,
+			       xtables_ipaddr_to_numeric(&e->daddr.a4),
+			       xtables_ipmask_to_numeric(&e->dmask.a4));
 	}
 	if (e->match.saddr) {
 		PRINT_INVERT(e->invert.saddr);
-		printf("%stunnel-src %s%s ", prefix,
-		       xtables_ipaddr_to_numeric((const void *)&e->saddr),
-		       xtables_ipmask_to_numeric((const void *)&e->smask));
+		if (family == NFPROTO_IPV6)
+			printf("%stunnel-src %s%s ", prefix,
+			       xtables_ip6addr_to_numeric(&e->saddr.a6),
+			       xtables_ip6mask_to_numeric(&e->smask.a6));
+		else
+			printf("%stunnel-src %s%s ", prefix,
+			       xtables_ipaddr_to_numeric(&e->saddr.a4),
+			       xtables_ipmask_to_numeric(&e->smask.a4));
 	}
 }
 
@@ -382,8 +422,8 @@ static void print_flags(char *prefix, const struct xt_policy_info *info)
 		printf("%sstrict ", prefix);
 }
 
-static void policy_print(const void *ip, const struct xt_entry_match *match,
-                         int numeric)
+static void policy4_print(const void *ip, const struct xt_entry_match *match,
+                          int numeric)
 {
 	const struct xt_policy_info *info = (void *)match->data;
 	unsigned int i;
@@ -393,18 +433,46 @@ static void policy_print(const void *ip, const struct xt_entry_match *match,
 	for (i = 0; i < info->len; i++) {
 		if (info->len > 1)
 			printf("[%u] ", i);
-		print_entry("", &info->pol[i], numeric);
+		print_entry("", &info->pol[i], numeric, NFPROTO_IPV4);
 	}
 }
 
-static void policy_save(const void *ip, const struct xt_entry_match *match)
+static void policy6_print(const void *ip, const struct xt_entry_match *match,
+                          int numeric)
+{
+	const struct xt_policy_info *info = (void *)match->data;
+	unsigned int i;
+
+	printf("policy match ");
+	print_flags("", info);
+	for (i = 0; i < info->len; i++) {
+		if (info->len > 1)
+			printf("[%u] ", i);
+		print_entry("", &info->pol[i], numeric, NFPROTO_IPV6);
+	}
+}
+
+static void policy4_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_policy_info *info = (void *)match->data;
 	unsigned int i;
 
 	print_flags("--", info);
 	for (i = 0; i < info->len; i++) {
-		print_entry("--", &info->pol[i], 0);
+		print_entry("--", &info->pol[i], false, NFPROTO_IPV4);
+		if (i + 1 < info->len)
+			printf("--next ");
+	}
+}
+
+static void policy6_save(const void *ip, const struct xt_entry_match *match)
+{
+	const struct xt_policy_info *info = (void *)match->data;
+	unsigned int i;
+
+	print_flags("--", info);
+	for (i = 0; i < info->len; i++) {
+		print_entry("--", &info->pol[i], false, NFPROTO_IPV6);
 		if (i + 1 < info->len)
 			printf("--next ");
 	}
@@ -417,14 +485,29 @@ static struct xtables_match policy_mt_reg = {
 	.size		= XT_ALIGN(sizeof(struct xt_policy_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_policy_info)),
 	.help		= policy_help,
-	.parse		= policy_parse,
+	.parse		= policy4_parse,
 	.final_check	= policy_check,
-	.print		= policy_print,
-	.save		= policy_save,
+	.print		= policy4_print,
+	.save		= policy4_save,
+	.extra_opts	= policy_opts,
+};
+
+static struct xtables_match policy_mt6_reg = {
+	.name		= "policy",
+	.version	= XTABLES_VERSION,
+	.family		= NFPROTO_IPV6,
+	.size		= XT_ALIGN(sizeof(struct xt_policy_info)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_policy_info)),
+	.help		= policy_help,
+	.parse		= policy6_parse,
+	.final_check	= policy_check,
+	.print		= policy6_print,
+	.save		= policy6_save,
 	.extra_opts	= policy_opts,
 };
 
 void _init(void)
 {
 	xtables_register_match(&policy_mt_reg);
+	xtables_register_match(&policy_mt6_reg);
 }
