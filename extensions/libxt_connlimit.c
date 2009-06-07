@@ -26,7 +26,9 @@ static const struct option connlimit_opts[] = {
 static void connlimit_init(struct xt_entry_match *match)
 {
 	struct xt_connlimit_info *info = (void *)match->data;
-	info->v4_mask = 0xFFFFFFFFUL;
+
+	/* This will also initialize the v4 mask correctly */
+	memset(info->v6_mask, 0xFF, sizeof(info->v6_mask));
 }
 
 static void prefix_to_netmask(u_int32_t *mask, unsigned int prefix_len)
