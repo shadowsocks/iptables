@@ -32,5 +32,8 @@ anymore.
 If option
 \fB\-\-random\fP
 is used then port mapping will be randomized (kernel >= 2.6.22).
-.RS
-.PP
+.TP
+\fB\-\-persistent\fP
+Gives a client the same source-/destination-address for each connection.
+This supersedes the SAME target. Support for persistent mappings is available
+from 2.6.29-rc2.
