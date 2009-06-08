@@ -215,7 +215,7 @@ static int
 multiport_parse6(int c, char **argv, int invert, unsigned int *flags,
                  const void *e, struct xt_entry_match **match)
 {
-	const struct ip6t_entry *entry = (const struct ip6t_entry *)e;
+	const struct ip6t_entry *entry = e;
 	return __multiport_parse(c, argv, invert, flags, match,
 	       entry->ipv6.proto, entry->ipv6.invflags);
 }
@@ -278,7 +278,7 @@ static int
 multiport_parse6_v1(int c, char **argv, int invert, unsigned int *flags,
                     const void *e, struct xt_entry_match **match)
 {
-	const struct ip6t_entry *entry = (const struct ip6t_entry *)e;
+	const struct ip6t_entry *entry = e;
 	return __multiport_parse_v1(c, argv, invert, flags, match,
 	       entry->ipv6.proto, entry->ipv6.invflags);
 }
@@ -358,7 +358,7 @@ static void multiport_print(const void *ip_void,
 static void multiport_print6(const void *ip_void,
                              const struct xt_entry_match *match, int numeric)
 {
-	const struct ip6t_ip6 *ip = (const struct ip6t_ip6 *)ip_void;
+	const struct ip6t_ip6 *ip = ip_void;
 	__multiport_print(match, numeric, ip->proto);
 }
 
@@ -413,7 +413,7 @@ static void multiport_print_v1(const void *ip_void,
 static void multiport_print6_v1(const void *ip_void,
                                 const struct xt_entry_match *match, int numeric)
 {
-	const struct ip6t_ip6 *ip = (const struct ip6t_ip6 *)ip_void;
+	const struct ip6t_ip6 *ip = ip_void;
 	__multiport_print_v1(match, numeric, ip->proto);
 }
 
@@ -456,7 +456,7 @@ static void multiport_save(const void *ip_void,
 static void multiport_save6(const void *ip_void,
                             const struct xt_entry_match *match)
 {
-	const struct ip6t_ip6 *ip = (const struct ip6t_ip6 *)ip_void;
+	const struct ip6t_ip6 *ip = ip_void;
 	__multiport_save(match, ip->proto);
 }
 
@@ -505,7 +505,7 @@ static void multiport_save_v1(const void *ip_void,
 static void multiport_save6_v1(const void *ip_void,
                                const struct xt_entry_match *match)
 {
-	const struct ip6t_ip6 *ip = (const struct ip6t_ip6 *)ip_void;
+	const struct ip6t_ip6 *ip = ip_void;
 	__multiport_save_v1(match, ip->proto);
 }
 

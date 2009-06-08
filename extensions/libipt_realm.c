@@ -86,14 +86,14 @@ static void load_realms(void)
 			continue;
 
 		/* found valid data */
-		newnm = (struct realmname*)malloc(sizeof(struct realmname));
+		newnm = malloc(sizeof(struct realmname));
 		if (newnm == NULL) {
 			perror("libipt_realm: malloc failed");
 			exit(1);
 		}
 		newnm->id = id;
 		newnm->len = nxt - cur;
-		newnm->name = (char*)malloc(newnm->len + 1);
+		newnm->name = malloc(newnm->len + 1);
 		if (newnm->name == NULL) {
 			perror("libipt_realm: malloc failed");
 			exit(1);
