@@ -54,6 +54,7 @@ static int for_each_table(int (*func)(const char *tablename))
 		ret &= func(tablename);
 	}
 
+	fclose(procfile);
 	return ret;
 }
 

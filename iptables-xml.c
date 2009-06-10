@@ -870,6 +870,8 @@ main(int argc, char *argv[])
 		exit(1);
 	}
 
+	if (in != NULL)
+		fclose(in);
 	printf("</iptables-rules>\n");
 	free_argv();
 
