@@ -21,7 +21,7 @@ network (24 bit netmask)
 iptables \-p tcp \-\-syn \-\-dport 80 \-m connlimit \-\-connlimit\-above 16
 \-\-connlimit\-mask 24 \-j REJECT
 .TP
-# limit the number of parallel HTTP requests to 16 for the link local network \
+# limit the number of parallel HTTP requests to 16 for the link local network
 (ipv6)
 ip6tables \-p tcp \-\-syn \-\-dport 80 \-s fe80::/64 \-m connlimit \-\-connlimit\-above
 16 \-\-connlimit\-mask 64 \-j REJECT

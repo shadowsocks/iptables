@@ -29,10 +29,9 @@ ssh works fine, but scp hangs after initial handshaking.
 .PD
 Workaround: activate this option and add a rule to your firewall
 configuration like:
-.nf
- iptables \-t mangle \-A FORWARD \-p tcp \-\-tcp\-flags SYN,RST SYN \\
+.IP
+ iptables \-t mangle \-A FORWARD \-p tcp \-\-tcp\-flags SYN,RST SYN
              \-j TCPMSS \-\-clamp\-mss\-to\-pmtu
-.fi
 .TP
 \fB\-\-set\-mss\fP \fIvalue\fP
 Explicitly set MSS option to specified value.
