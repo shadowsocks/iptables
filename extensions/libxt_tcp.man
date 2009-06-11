@@ -4,15 +4,15 @@ provides the following options:
 [\fB!\fP] \fB\-\-source\-port\fP,\fB\-\-sport\fP \fIport\fP[\fB:\fP\fIport\fP]
 Source port or port range specification. This can either be a service
 name or a port number. An inclusive range can also be specified,
-using the format \fIport\fP\fB:\fP\fIport\fP.
+using the format \fIfirst\fP\fB:\fP\fIlast\fP.
 If the first port is omitted, "0" is assumed; if the last is omitted,
 "65535" is assumed.
-If the second port is greater than the first they will be swapped.
+If the first port is greater than the second one they will be swapped.
 The flag
 \fB\-\-sport\fP
 is a convenient alias for this option.
 .TP
-[\fB!\fP] \fB\-\-destination\-port\fP,\fB\-\-dport\fP \fIport\fP[\fB,\fP\fIport\fP]
+[\fB!\fP] \fB\-\-destination\-port\fP,\fB\-\-dport\fP \fIport\fP[\fB:\fP\fIport\fP]
 Destination port or port range specification.  The flag
 \fB\-\-dport\fP
 is a convenient alias for this option.

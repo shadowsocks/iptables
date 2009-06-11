@@ -13,7 +13,7 @@ rule also specifies \fB\-p tcp\fP or \fB\-p udp\fP.
 \fB\-\-on\-ip\fP \fIaddress\fP
 This specifies a destination address to use. By default the address is the IP
 address of the incoming interface. This is only valid if the rule also
-specifies \fB\-p tcp\fP or \fP\-p udp\fP.
+specifies \fB\-p tcp\fP or \fB\-p udp\fP.
 .TP
 \fB\-\-tproxy\-mark\fP \fIvalue\fP[\fB/\fP\fImask\fP]
 Marks packets with the given value/mask. The fwmark value set here can be used
