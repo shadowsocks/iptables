@@ -29,23 +29,23 @@ libxtables_la_LDFLAGS = -version-info ${libxtables_vcurrent}:0:${libxtables_vage
 libxtables_la_LIBADD  = -ldl
 
 # iptables, dynamic
-iptables_SOURCES          = iptables-standalone.c iptables.c
+iptables_SOURCES          = iptables-standalone.c iptables.c xshared.c
 iptables_LDFLAGS          = -rdynamic
 iptables_LDADD            = libiptc/libip4tc.la extensions/libext4.a libxtables.la -lm
 
 iptables_xml_LDADD        = libxtables.la
 iptables_multi_SOURCES    = iptables-multi.c iptables-save.c \
                             iptables-restore.c iptables-xml.c \
-                            iptables-standalone.c iptables.c
+                            iptables-standalone.c iptables.c xshared.c
 iptables_multi_CFLAGS     = ${AM_CFLAGS} -DIPTABLES_MULTI
 iptables_multi_LDFLAGS    = ${iptables_LDFLAGS}
 iptables_multi_LDADD      = ${iptables_LDADD}
 
-iptables_restore_SOURCES  = iptables-restore.c iptables.c
+iptables_restore_SOURCES  = iptables-restore.c iptables.c xshared.c
 iptables_restore_LDFLAGS  = ${iptables_LDFLAGS}
 iptables_restore_LDADD    = ${iptables_LDADD}
 
-iptables_save_SOURCES     = iptables-save.c iptables.c
+iptables_save_SOURCES     = iptables-save.c iptables.c xshared.c
 iptables_save_LDFLAGS     = ${iptables_LDFLAGS}
 iptables_save_LDADD       = ${iptables_LDADD}
 
@@ -57,22 +57,22 @@ iptables_static_LDADD     = libiptc/libip4tc.la extensions/libext4.a -lm
 iptables_xml_SOURCES      = iptables-xml.c
 
 # ip6tables, dynamic
-ip6tables_SOURCES         = ip6tables-standalone.c ip6tables.c
+ip6tables_SOURCES         = ip6tables-standalone.c ip6tables.c xshared.c
 ip6tables_LDFLAGS         = -rdynamic
 ip6tables_LDADD           = libiptc/libip6tc.la extensions/libext6.a libxtables.la -lm
 
 ip6tables_multi_SOURCES   = ip6tables-multi.c ip6tables-save.c \
                             ip6tables-restore.c ip6tables-standalone.c \
-                            ip6tables.c
+                            ip6tables.c xshared.c
 ip6tables_multi_CFLAGS    = ${AM_CFLAGS} -DIPTABLES_MULTI
 ip6tables_multi_LDFLAGS   = ${ip6tables_LDFLAGS}
 ip6tables_multi_LDADD     = ${ip6tables_LDADD}
 
-ip6tables_restore_SOURCES = ip6tables-restore.c ip6tables.c
+ip6tables_restore_SOURCES = ip6tables-restore.c ip6tables.c xshared.c
 ip6tables_restore_LDFLAGS = ${ip6tables_LDFLAGS}
 ip6tables_restore_LDADD   = ${ip6tables_LDADD}
 
-ip6tables_save_SOURCES    = ip6tables-save.c ip6tables.c
+ip6tables_save_SOURCES    = ip6tables-save.c ip6tables.c xshared.c
 ip6tables_save_LDFLAGS    = ${ip6tables_LDFLAGS}
 ip6tables_save_LDADD      = ${ip6tables_LDADD}
 

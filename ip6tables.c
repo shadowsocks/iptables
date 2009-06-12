@@ -43,6 +43,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "ip6tables-multi.h"
+#include "xshared.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -235,9 +236,6 @@ exit_tryhelp(int status)
 static void
 exit_printhelp(struct xtables_rule_match *matches)
 {
-	struct xtables_rule_match *matchp = NULL;
-	struct xtables_target *t = NULL;
-
 	printf("%s v%s\n\n"
 "Usage: %s -[AD] chain rule-specification [options]\n"
 "       %s -I chain [rulenum] rule-specification [options]\n"
@@ -307,19 +305,7 @@ exit_printhelp(struct xtables_rule_match *matches)
 "  --set-counters PKTS BYTES	set the counter during insert/append\n"
 "[!] --version	-V		print package version.\n");
 
-	/* Print out any special helps. A user might like to be able to add a --help
-	   to the commandline, and see expected results. So we call help for all
-	   specified matches & targets */
-	for (t = xtables_targets; t; t = t->next) {
-		if (t->used) {
-			printf("\n");
-			t->help();
-		}
-	}
-	for (matchp = matches; matchp; matchp = matchp->next) {
-		printf("\n");
-		matchp->match->help();
-	}
+	print_extension_helps(xtables_targets, matches);
 	exit(0);
 }
 
