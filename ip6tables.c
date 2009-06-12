@@ -1699,13 +1699,14 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			exit_tryhelp(2);
 
 		default:
-			if (!target
-			    || !(target->parse(c - target->option_offset,
+			if (target == NULL || target->parse == NULL ||
+			    !target->parse(c - target->option_offset,
 					       argv, invert,
 					       &target->tflags,
-					       &fw, &target->t))) {
+					       &fw, &target->t)) {
 				for (matchp = matches; matchp; matchp = matchp->next) {
-					if (matchp->completed)
+					if (matchp->completed ||
+					    matchp->match->parse == NULL)
 						continue;
 					if (matchp->match->parse(c - matchp->match->option_offset,
 						     argv, invert,
