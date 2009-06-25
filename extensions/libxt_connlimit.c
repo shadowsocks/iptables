@@ -179,38 +179,38 @@ static void connlimit_save6(const void *ip, const struct xt_entry_match *match)
 	       count_bits6(info->v6_mask));
 }
 
-static struct xtables_match connlimit_match = {
-	.name          = "connlimit",
-	.family        = NFPROTO_IPV4,
-	.version       = XTABLES_VERSION,
-	.size          = XT_ALIGN(sizeof(struct xt_connlimit_info)),
-	.userspacesize = offsetof(struct xt_connlimit_info, data),
-	.help          = connlimit_help,
-	.init          = connlimit_init,
-	.parse         = connlimit_parse4,
-	.final_check   = connlimit_check,
-	.print         = connlimit_print4,
-	.save          = connlimit_save4,
-	.extra_opts    = connlimit_opts,
-};
-
-static struct xtables_match connlimit_match6 = {
-	.name          = "connlimit",
-	.family        = NFPROTO_IPV6,
-	.version       = XTABLES_VERSION,
-	.size          = XT_ALIGN(sizeof(struct xt_connlimit_info)),
-	.userspacesize = offsetof(struct xt_connlimit_info, data),
-	.help          = connlimit_help,
-	.init          = connlimit_init,
-	.parse         = connlimit_parse6,
-	.final_check   = connlimit_check,
-	.print         = connlimit_print6,
-	.save          = connlimit_save6,
-	.extra_opts    = connlimit_opts,
+static struct xtables_match connlimit_mt_reg[] = {
+	{
+		.name          = "connlimit",
+		.family        = NFPROTO_IPV4,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_connlimit_info)),
+		.userspacesize = offsetof(struct xt_connlimit_info, data),
+		.help          = connlimit_help,
+		.init          = connlimit_init,
+		.parse         = connlimit_parse4,
+		.final_check   = connlimit_check,
+		.print         = connlimit_print4,
+		.save          = connlimit_save4,
+		.extra_opts    = connlimit_opts,
+	},
+	{
+		.name          = "connlimit",
+		.family        = NFPROTO_IPV6,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_connlimit_info)),
+		.userspacesize = offsetof(struct xt_connlimit_info, data),
+		.help          = connlimit_help,
+		.init          = connlimit_init,
+		.parse         = connlimit_parse6,
+		.final_check   = connlimit_check,
+		.print         = connlimit_print6,
+		.save          = connlimit_save6,
+		.extra_opts    = connlimit_opts,
+	},
 };
 
 void _init(void)
 {
-	xtables_register_match(&connlimit_match);
-	xtables_register_match(&connlimit_match6);
+	xtables_register_matches(connlimit_mt_reg, ARRAY_SIZE(connlimit_mt_reg));
 }

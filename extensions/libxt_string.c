@@ -350,40 +350,40 @@ static void string_save(const void *ip, const struct xt_entry_match *match)
 }
 
 
-static struct xtables_match string_match = {
-    .name		= "string",
-    .revision		= 0,
-    .family		= NFPROTO_UNSPEC,
-    .version		= XTABLES_VERSION,
-    .size		= XT_ALIGN(sizeof(struct xt_string_info)),
-    .userspacesize	= offsetof(struct xt_string_info, config),
-    .help		= string_help,
-    .init		= string_init,
-    .parse		= string_parse,
-    .final_check	= string_check,
-    .print		= string_print,
-    .save		= string_save,
-    .extra_opts		= string_opts,
-};
-
-static struct xtables_match string_match_v1 = {
-    .name		= "string",
-    .revision		= 1,
-    .family		= NFPROTO_UNSPEC,
-    .version		= XTABLES_VERSION,
-    .size		= XT_ALIGN(sizeof(struct xt_string_info)),
-    .userspacesize	= offsetof(struct xt_string_info, config),
-    .help		= string_help,
-    .init		= string_init,
-    .parse		= string_parse,
-    .final_check	= string_check,
-    .print		= string_print,
-    .save		= string_save,
-    .extra_opts		= string_opts,
+static struct xtables_match string_mt_reg[] = {
+	{
+		.name          = "string",
+		.revision      = 0,
+		.family        = NFPROTO_UNSPEC,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_string_info)),
+		.userspacesize = offsetof(struct xt_string_info, config),
+		.help          = string_help,
+		.init          = string_init,
+		.parse         = string_parse,
+		.final_check   = string_check,
+		.print         = string_print,
+		.save          = string_save,
+		.extra_opts    = string_opts,
+	},
+	{
+		.name          = "string",
+		.revision      = 1,
+		.family        = NFPROTO_UNSPEC,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_string_info)),
+		.userspacesize = offsetof(struct xt_string_info, config),
+		.help          = string_help,
+		.init          = string_init,
+		.parse         = string_parse,
+		.final_check   = string_check,
+		.print         = string_print,
+		.save          = string_save,
+		.extra_opts    = string_opts,
+	},
 };
 
 void _init(void)
 {
-	xtables_register_match(&string_match);
-	xtables_register_match(&string_match_v1);
+	xtables_register_matches(string_mt_reg, ARRAY_SIZE(string_mt_reg));
 }

@@ -398,40 +398,40 @@ connmark_tg_save(const void *ip, const struct xt_entry_target *target)
 	}
 }
 
-static struct xtables_target connmark_target = {
-	.family		= NFPROTO_UNSPEC,
-	.name		= "CONNMARK",
-	.revision	= 0,
-	.version	= XTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_connmark_target_info)),
-	.help		= CONNMARK_help,
-	.init           = CONNMARK_init,
-	.parse		= CONNMARK_parse,
-	.final_check	= connmark_tg_check,
-	.print		= CONNMARK_print,
-	.save		= CONNMARK_save,
-	.extra_opts	= CONNMARK_opts,
-};
-
-static struct xtables_target connmark_tg_reg = {
-	.version        = XTABLES_VERSION,
-	.name           = "CONNMARK",
-	.revision       = 1,
-	.family         = NFPROTO_UNSPEC,
-	.size           = XT_ALIGN(sizeof(struct xt_connmark_tginfo1)),
-	.userspacesize  = XT_ALIGN(sizeof(struct xt_connmark_tginfo1)),
-	.help           = connmark_tg_help,
-	.init           = connmark_tg_init,
-	.parse          = connmark_tg_parse,
-	.final_check    = connmark_tg_check,
-	.print          = connmark_tg_print,
-	.save           = connmark_tg_save,
-	.extra_opts     = connmark_tg_opts,
+static struct xtables_target connmark_tg_reg[] = {
+	{
+		.family        = NFPROTO_UNSPEC,
+		.name          = "CONNMARK",
+		.revision      = 0,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_connmark_target_info)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_connmark_target_info)),
+		.help          = CONNMARK_help,
+		.init          = CONNMARK_init,
+		.parse         = CONNMARK_parse,
+		.final_check   = connmark_tg_check,
+		.print         = CONNMARK_print,
+		.save          = CONNMARK_save,
+		.extra_opts    = CONNMARK_opts,
+	},
+	{
+		.version       = XTABLES_VERSION,
+		.name          = "CONNMARK",
+		.revision      = 1,
+		.family        = NFPROTO_UNSPEC,
+		.size          = XT_ALIGN(sizeof(struct xt_connmark_tginfo1)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_connmark_tginfo1)),
+		.help          = connmark_tg_help,
+		.init          = connmark_tg_init,
+		.parse         = connmark_tg_parse,
+		.final_check   = connmark_tg_check,
+		.print         = connmark_tg_print,
+		.save          = connmark_tg_save,
+		.extra_opts    = connmark_tg_opts,
+	},
 };
 
 void _init(void)
 {
-	xtables_register_target(&connmark_target);
-	xtables_register_target(&connmark_tg_reg);
+	xtables_register_targets(connmark_tg_reg, ARRAY_SIZE(connmark_tg_reg));
 }

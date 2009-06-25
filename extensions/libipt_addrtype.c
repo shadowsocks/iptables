@@ -323,38 +323,38 @@ static const struct option addrtype_opts_v1[] = {
 	{ .name = NULL }
 };
 
-static struct xtables_match addrtype_mt_reg_v0 = {
-	.name 		= "addrtype",
-	.version 	= XTABLES_VERSION,
-	.family		= NFPROTO_IPV4,
-	.size 		= XT_ALIGN(sizeof(struct ipt_addrtype_info)),
-	.userspacesize 	= XT_ALIGN(sizeof(struct ipt_addrtype_info)),
-	.help 		= addrtype_help_v0,
-	.parse 		= addrtype_parse_v0,
-	.final_check 	= addrtype_check_v0,
-	.print 		= addrtype_print_v0,
-	.save 		= addrtype_save_v0,
-	.extra_opts 	= addrtype_opts_v0,
-};
-
-static struct xtables_match addrtype_mt_reg_v1 = {
-	.name 		= "addrtype",
-	.version 	= XTABLES_VERSION,
-	.family		= NFPROTO_IPV4,
-	.size 		= XT_ALIGN(sizeof(struct ipt_addrtype_info_v1)),
-	.userspacesize 	= XT_ALIGN(sizeof(struct ipt_addrtype_info_v1)),
-	.help 		= addrtype_help_v1,
-	.parse 		= addrtype_parse_v1,
-	.final_check 	= addrtype_check_v1,
-	.print 		= addrtype_print_v1,
-	.save 		= addrtype_save_v1,
-	.extra_opts 	= addrtype_opts_v1,
-	.revision	= 1,
+static struct xtables_match addrtype_mt_reg[] = {
+	{
+		.name          = "addrtype",
+		.version       = XTABLES_VERSION,
+		.family        = NFPROTO_IPV4,
+		.size          = XT_ALIGN(sizeof(struct ipt_addrtype_info)),
+		.userspacesize = XT_ALIGN(sizeof(struct ipt_addrtype_info)),
+		.help          = addrtype_help_v0,
+		.parse         = addrtype_parse_v0,
+		.final_check   = addrtype_check_v0,
+		.print         = addrtype_print_v0,
+		.save          = addrtype_save_v0,
+		.extra_opts    = addrtype_opts_v0,
+	},
+	{
+		.name          = "addrtype",
+		.revision      = 1,
+		.version       = XTABLES_VERSION,
+		.family        = NFPROTO_IPV4,
+		.size          = XT_ALIGN(sizeof(struct ipt_addrtype_info_v1)),
+		.userspacesize = XT_ALIGN(sizeof(struct ipt_addrtype_info_v1)),
+		.help          = addrtype_help_v1,
+		.parse         = addrtype_parse_v1,
+		.final_check   = addrtype_check_v1,
+		.print         = addrtype_print_v1,
+		.save          = addrtype_save_v1,
+		.extra_opts    = addrtype_opts_v1,
+	},
 };
 
 
 void _init(void) 
 {
-	xtables_register_match(&addrtype_mt_reg_v0);
-	xtables_register_match(&addrtype_mt_reg_v1);
+	xtables_register_matches(addrtype_mt_reg, ARRAY_SIZE(addrtype_mt_reg));
 }

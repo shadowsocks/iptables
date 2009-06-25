@@ -137,38 +137,38 @@ static void tos_mt_save(const void *ip, const struct xt_entry_match *match)
 	printf("--tos 0x%02x/0x%02x ", info->tos_value, info->tos_mask);
 }
 
-static struct xtables_match tos_mt_reg_v0 = {
-	.version       = XTABLES_VERSION,
-	.name          = "tos",
-	.family        = NFPROTO_IPV4,
-	.revision      = 0,
-	.size          = XT_ALIGN(sizeof(struct ipt_tos_info)),
-	.userspacesize = XT_ALIGN(sizeof(struct ipt_tos_info)),
-	.help          = tos_mt_help,
-	.parse         = tos_mt_parse_v0,
-	.final_check   = tos_mt_check,
-	.print         = tos_mt_print_v0,
-	.save          = tos_mt_save_v0,
-	.extra_opts    = tos_mt_opts,
-};
-
-static struct xtables_match tos_mt_reg = {
-	.version       = XTABLES_VERSION,
-	.name          = "tos",
-	.family        = NFPROTO_UNSPEC,
-	.revision      = 1,
-	.size          = XT_ALIGN(sizeof(struct xt_tos_match_info)),
-	.userspacesize = XT_ALIGN(sizeof(struct xt_tos_match_info)),
-	.help          = tos_mt_help,
-	.parse         = tos_mt_parse,
-	.final_check   = tos_mt_check,
-	.print         = tos_mt_print,
-	.save          = tos_mt_save,
-	.extra_opts    = tos_mt_opts,
+static struct xtables_match tos_mt_reg[] = {
+	{
+		.version       = XTABLES_VERSION,
+		.name          = "tos",
+		.family        = NFPROTO_IPV4,
+		.revision      = 0,
+		.size          = XT_ALIGN(sizeof(struct ipt_tos_info)),
+		.userspacesize = XT_ALIGN(sizeof(struct ipt_tos_info)),
+		.help          = tos_mt_help,
+		.parse         = tos_mt_parse_v0,
+		.final_check   = tos_mt_check,
+		.print         = tos_mt_print_v0,
+		.save          = tos_mt_save_v0,
+		.extra_opts    = tos_mt_opts,
+	},
+	{
+		.version       = XTABLES_VERSION,
+		.name          = "tos",
+		.family        = NFPROTO_UNSPEC,
+		.revision      = 1,
+		.size          = XT_ALIGN(sizeof(struct xt_tos_match_info)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_tos_match_info)),
+		.help          = tos_mt_help,
+		.parse         = tos_mt_parse,
+		.final_check   = tos_mt_check,
+		.print         = tos_mt_print,
+		.save          = tos_mt_save,
+		.extra_opts    = tos_mt_opts,
+	},
 };
 
 void _init(void)
 {
-	xtables_register_match(&tos_mt_reg_v0);
-	xtables_register_match(&tos_mt_reg);
+	xtables_register_matches(tos_mt_reg, ARRAY_SIZE(tos_mt_reg));
 }

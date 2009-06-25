@@ -143,38 +143,38 @@ mark_save(const void *ip, const struct xt_entry_match *match)
 	print_mark(info->mark, info->mask);
 }
 
-static struct xtables_match mark_match = {
-	.family		= NFPROTO_UNSPEC,
-	.name		= "mark",
-	.revision	= 0,
-	.version	= XTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_mark_info)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_info)),
-	.help		= mark_mt_help,
-	.parse		= mark_parse,
-	.final_check	= mark_mt_check,
-	.print		= mark_print,
-	.save		= mark_save,
-	.extra_opts	= mark_mt_opts,
-};
-
-static struct xtables_match mark_mt_reg = {
-	.version        = XTABLES_VERSION,
-	.name           = "mark",
-	.revision       = 1,
-	.family         = NFPROTO_UNSPEC,
-	.size           = XT_ALIGN(sizeof(struct xt_mark_mtinfo1)),
-	.userspacesize  = XT_ALIGN(sizeof(struct xt_mark_mtinfo1)),
-	.help           = mark_mt_help,
-	.parse          = mark_mt_parse,
-	.final_check    = mark_mt_check,
-	.print          = mark_mt_print,
-	.save           = mark_mt_save,
-	.extra_opts     = mark_mt_opts,
+static struct xtables_match mark_mt_reg[] = {
+	{
+		.family        = NFPROTO_UNSPEC,
+		.name          = "mark",
+		.revision      = 0,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_mark_info)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_mark_info)),
+		.help          = mark_mt_help,
+		.parse         = mark_parse,
+		.final_check   = mark_mt_check,
+		.print         = mark_print,
+		.save          = mark_save,
+		.extra_opts    = mark_mt_opts,
+	},
+	{
+		.version       = XTABLES_VERSION,
+		.name          = "mark",
+		.revision      = 1,
+		.family        = NFPROTO_UNSPEC,
+		.size          = XT_ALIGN(sizeof(struct xt_mark_mtinfo1)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_mark_mtinfo1)),
+		.help          = mark_mt_help,
+		.parse         = mark_mt_parse,
+		.final_check   = mark_mt_check,
+		.print         = mark_mt_print,
+		.save          = mark_mt_save,
+		.extra_opts    = mark_mt_opts,
+	},
 };
 
 void _init(void)
 {
-	xtables_register_match(&mark_match);
-	xtables_register_match(&mark_mt_reg);
+	xtables_register_matches(mark_mt_reg, ARRAY_SIZE(mark_mt_reg));
 }

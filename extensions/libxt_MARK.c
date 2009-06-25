@@ -277,54 +277,52 @@ static void mark_tg_save(const void *ip, const struct xt_entry_target *target)
 	printf("--set-xmark 0x%x/0x%x ", info->mark, info->mask);
 }
 
-static struct xtables_target mark_target_v0 = {
-	.family		= NFPROTO_UNSPEC,
-	.name		= "MARK",
-	.version	= XTABLES_VERSION,
-	.revision	= 0,
-	.size		= XT_ALIGN(sizeof(struct xt_mark_target_info)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_target_info)),
-	.help		= MARK_help,
-	.parse		= MARK_parse_v0,
-	.final_check	= MARK_check,
-	.print		= MARK_print_v0,
-	.save		= MARK_save_v0,
-	.extra_opts	= MARK_opts,
-};
-
-static struct xtables_target mark_target_v1 = {
-	.family		= NFPROTO_IPV4,
-	.name		= "MARK",
-	.version	= XTABLES_VERSION,
-	.revision	= 1,
-	.size		= XT_ALIGN(sizeof(struct xt_mark_target_info_v1)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_mark_target_info_v1)),
-	.help		= MARK_help,
-	.parse		= MARK_parse_v1,
-	.final_check	= MARK_check,
-	.print		= MARK_print_v1,
-	.save		= MARK_save_v1,
-	.extra_opts	= MARK_opts,
-};
-
-static struct xtables_target mark_tg_reg_v2 = {
-	.version       = XTABLES_VERSION,
-	.name          = "MARK",
-	.revision      = 2,
-	.family        = NFPROTO_UNSPEC,
-	.size          = XT_ALIGN(sizeof(struct xt_mark_tginfo2)),
-	.userspacesize = XT_ALIGN(sizeof(struct xt_mark_tginfo2)),
-	.help          = mark_tg_help,
-	.parse         = mark_tg_parse,
-	.final_check   = mark_tg_check,
-	.print         = mark_tg_print,
-	.save          = mark_tg_save,
-	.extra_opts    = mark_tg_opts,
+static struct xtables_target mark_tg_reg[] = {
+	{
+		.family        = NFPROTO_UNSPEC,
+		.name          = "MARK",
+		.version       = XTABLES_VERSION,
+		.revision      = 0,
+		.size          = XT_ALIGN(sizeof(struct xt_mark_target_info)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_mark_target_info)),
+		.help          = MARK_help,
+		.parse         = MARK_parse_v0,
+		.final_check   = MARK_check,
+		.print         = MARK_print_v0,
+		.save          = MARK_save_v0,
+		.extra_opts    = MARK_opts,
+	},
+	{
+		.family        = NFPROTO_IPV4,
+		.name          = "MARK",
+		.version       = XTABLES_VERSION,
+		.revision      = 1,
+		.size          = XT_ALIGN(sizeof(struct xt_mark_target_info_v1)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_mark_target_info_v1)),
+		.help          = MARK_help,
+		.parse         = MARK_parse_v1,
+		.final_check   = MARK_check,
+		.print         = MARK_print_v1,
+		.save          = MARK_save_v1,
+		.extra_opts    = MARK_opts,
+	},
+	{
+		.version       = XTABLES_VERSION,
+		.name          = "MARK",
+		.revision      = 2,
+		.family        = NFPROTO_UNSPEC,
+		.size          = XT_ALIGN(sizeof(struct xt_mark_tginfo2)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_mark_tginfo2)),
+		.help          = mark_tg_help,
+		.parse         = mark_tg_parse,
+		.final_check   = mark_tg_check,
+		.print         = mark_tg_print,
+		.save          = mark_tg_save,
+		.extra_opts    = mark_tg_opts,
+	},
 };
 
 void _init(void)
 {
-	xtables_register_target(&mark_target_v0);
-	xtables_register_target(&mark_target_v1);
-	xtables_register_target(&mark_tg_reg_v2);
+	xtables_register_targets(mark_tg_reg, ARRAY_SIZE(mark_tg_reg));
 }

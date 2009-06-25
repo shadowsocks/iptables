@@ -509,71 +509,67 @@ static void multiport_save6_v1(const void *ip_void,
 	__multiport_save_v1(match, ip->proto);
 }
 
-static struct xtables_match multiport_match = {
-	.family		= NFPROTO_IPV4,
-	.name		= "multiport",
-	.revision	= 0,
-	.version	= XTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_multiport)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport)),
-	.help		= multiport_help,
-	.parse		= multiport_parse,
-	.final_check	= multiport_check,
-	.print		= multiport_print,
-	.save		= multiport_save,
-	.extra_opts	= multiport_opts,
-};
-
-static struct xtables_match multiport_match6 = {
-	.family		= NFPROTO_IPV6,
-	.name		= "multiport",
-	.revision	= 0,
-	.version	= XTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_multiport)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport)),
-	.help		= multiport_help,
-	.parse		= multiport_parse6,
-	.final_check	= multiport_check,
-	.print		= multiport_print6,
-	.save		= multiport_save6,
-	.extra_opts	= multiport_opts,
-};
-
-static struct xtables_match multiport_match_v1 = {
-	.family		= NFPROTO_IPV4,
-	.name		= "multiport",
-	.version	= XTABLES_VERSION,
-	.revision	= 1,
-	.size		= XT_ALIGN(sizeof(struct xt_multiport_v1)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport_v1)),
-	.help		= multiport_help_v1,
-	.parse		= multiport_parse_v1,
-	.final_check	= multiport_check,
-	.print		= multiport_print_v1,
-	.save		= multiport_save_v1,
-	.extra_opts	= multiport_opts,
-};
-
-static struct xtables_match multiport_match6_v1 = {
-	.family		= NFPROTO_IPV6,
-	.name		= "multiport",
-	.version	= XTABLES_VERSION,
-	.revision	= 1,
-	.size		= XT_ALIGN(sizeof(struct xt_multiport_v1)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_multiport_v1)),
-	.help		= multiport_help_v1,
-	.parse		= multiport_parse6_v1,
-	.final_check	= multiport_check,
-	.print		= multiport_print6_v1,
-	.save		= multiport_save6_v1,
-	.extra_opts	= multiport_opts,
+static struct xtables_match multiport_mt_reg[] = {
+	{
+		.family        = NFPROTO_IPV4,
+		.name          = "multiport",
+		.revision      = 0,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_multiport)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_multiport)),
+		.help          = multiport_help,
+		.parse         = multiport_parse,
+		.final_check   = multiport_check,
+		.print         = multiport_print,
+		.save          = multiport_save,
+		.extra_opts    = multiport_opts,
+	},
+	{
+		.family        = NFPROTO_IPV6,
+		.name          = "multiport",
+		.revision      = 0,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_multiport)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_multiport)),
+		.help          = multiport_help,
+		.parse         = multiport_parse6,
+		.final_check   = multiport_check,
+		.print         = multiport_print6,
+		.save          = multiport_save6,
+		.extra_opts    = multiport_opts,
+	},
+	{
+		.family        = NFPROTO_IPV4,
+		.name          = "multiport",
+		.version       = XTABLES_VERSION,
+		.revision      = 1,
+		.size          = XT_ALIGN(sizeof(struct xt_multiport_v1)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_multiport_v1)),
+		.help          = multiport_help_v1,
+		.parse         = multiport_parse_v1,
+		.final_check   = multiport_check,
+		.print         = multiport_print_v1,
+		.save          = multiport_save_v1,
+		.extra_opts    = multiport_opts,
+	},
+	{
+		.family        = NFPROTO_IPV6,
+		.name          = "multiport",
+		.version       = XTABLES_VERSION,
+		.revision      = 1,
+		.size          = XT_ALIGN(sizeof(struct xt_multiport_v1)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_multiport_v1)),
+		.help          = multiport_help_v1,
+		.parse         = multiport_parse6_v1,
+		.final_check   = multiport_check,
+		.print         = multiport_print6_v1,
+		.save          = multiport_save6_v1,
+		.extra_opts    = multiport_opts,
+	},
 };
 
 void
 _init(void)
 {
-	xtables_register_match(&multiport_match);
-	xtables_register_match(&multiport_match6);
-	xtables_register_match(&multiport_match_v1);
-	xtables_register_match(&multiport_match6_v1);
+	xtables_register_matches(multiport_mt_reg, ARRAY_SIZE(multiport_mt_reg));
 }

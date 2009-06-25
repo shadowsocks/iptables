@@ -1034,54 +1034,52 @@ static void conntrack_mt6_save(const void *ip,
 	conntrack_dump((const void *)match->data, "--", NFPROTO_IPV6, true);
 }
 
-static struct xtables_match conntrack_match = {
-	.version       = XTABLES_VERSION,
-	.name          = "conntrack",
-	.revision      = 0,
-	.family        = NFPROTO_IPV4,
-	.size          = XT_ALIGN(sizeof(struct xt_conntrack_info)),
-	.userspacesize = XT_ALIGN(sizeof(struct xt_conntrack_info)),
-	.help          = conntrack_mt_help,
-	.parse         = conntrack_parse,
-	.final_check   = conntrack_mt_check,
-	.print         = conntrack_print,
-	.save          = conntrack_save,
-	.extra_opts    = conntrack_mt_opts_v0,
-};
-
-static struct xtables_match conntrack_mt_reg = {
-	.version       = XTABLES_VERSION,
-	.name          = "conntrack",
-	.revision      = 1,
-	.family        = NFPROTO_IPV4,
-	.size          = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo1)),
-	.userspacesize = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo1)),
-	.help          = conntrack_mt_help,
-	.parse         = conntrack_mt4_parse,
-	.final_check   = conntrack_mt_check,
-	.print         = conntrack_mt_print,
-	.save          = conntrack_mt_save,
-	.extra_opts    = conntrack_mt_opts,
-};
-
-static struct xtables_match conntrack_mt6_reg = {
-	.version       = XTABLES_VERSION,
-	.name          = "conntrack",
-	.revision      = 1,
-	.family        = NFPROTO_IPV6,
-	.size          = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo1)),
-	.userspacesize = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo1)),
-	.help          = conntrack_mt_help,
-	.parse         = conntrack_mt6_parse,
-	.final_check   = conntrack_mt_check,
-	.print         = conntrack_mt6_print,
-	.save          = conntrack_mt6_save,
-	.extra_opts    = conntrack_mt_opts,
+static struct xtables_match conntrack_mt_reg[] = {
+	{
+		.version       = XTABLES_VERSION,
+		.name          = "conntrack",
+		.revision      = 0,
+		.family        = NFPROTO_IPV4,
+		.size          = XT_ALIGN(sizeof(struct xt_conntrack_info)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_conntrack_info)),
+		.help          = conntrack_mt_help,
+		.parse         = conntrack_parse,
+		.final_check   = conntrack_mt_check,
+		.print         = conntrack_print,
+		.save          = conntrack_save,
+		.extra_opts    = conntrack_mt_opts_v0,
+	},
+	{
+		.version       = XTABLES_VERSION,
+		.name          = "conntrack",
+		.revision      = 1,
+		.family        = NFPROTO_IPV4,
+		.size          = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo1)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo1)),
+		.help          = conntrack_mt_help,
+		.parse         = conntrack_mt4_parse,
+		.final_check   = conntrack_mt_check,
+		.print         = conntrack_mt_print,
+		.save          = conntrack_mt_save,
+		.extra_opts    = conntrack_mt_opts,
+	},
+	{
+		.version       = XTABLES_VERSION,
+		.name          = "conntrack",
+		.revision      = 1,
+		.family        = NFPROTO_IPV6,
+		.size          = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo1)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo1)),
+		.help          = conntrack_mt_help,
+		.parse         = conntrack_mt6_parse,
+		.final_check   = conntrack_mt_check,
+		.print         = conntrack_mt6_print,
+		.save          = conntrack_mt6_save,
+		.extra_opts    = conntrack_mt_opts,
+	},
 };
 
 void _init(void)
 {
-	xtables_register_match(&conntrack_match);
-	xtables_register_match(&conntrack_mt_reg);
-	xtables_register_match(&conntrack_mt6_reg);
+	xtables_register_matches(conntrack_mt_reg, ARRAY_SIZE(conntrack_mt_reg));
 }

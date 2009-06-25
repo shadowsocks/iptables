@@ -344,54 +344,52 @@ static void iprange_mt6_save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-static struct xtables_match iprange_match = {
-	.version       = XTABLES_VERSION,
-	.name          = "iprange",
-	.revision      = 0,
-	.family        = NFPROTO_IPV4,
-	.size          = XT_ALIGN(sizeof(struct ipt_iprange_info)),
-	.userspacesize = XT_ALIGN(sizeof(struct ipt_iprange_info)),
-	.help          = iprange_mt_help,
-	.parse         = iprange_parse,
-	.final_check   = iprange_mt_check,
-	.print         = iprange_print,
-	.save          = iprange_save,
-	.extra_opts    = iprange_mt_opts,
-};
-
-static struct xtables_match iprange_mt_reg = {
-	.version        = XTABLES_VERSION,
-	.name           = "iprange",
-	.revision       = 1,
-	.family         = NFPROTO_IPV4,
-	.size           = XT_ALIGN(sizeof(struct xt_iprange_mtinfo)),
-	.userspacesize  = XT_ALIGN(sizeof(struct xt_iprange_mtinfo)),
-	.help           = iprange_mt_help,
-	.parse          = iprange_mt4_parse,
-	.final_check    = iprange_mt_check,
-	.print          = iprange_mt4_print,
-	.save           = iprange_mt4_save,
-	.extra_opts     = iprange_mt_opts,
-};
-
-static struct xtables_match iprange_mt6_reg = {
-	.version        = XTABLES_VERSION,
-	.name           = "iprange",
-	.revision       = 1,
-	.family         = NFPROTO_IPV6,
-	.size           = XT_ALIGN(sizeof(struct xt_iprange_mtinfo)),
-	.userspacesize  = XT_ALIGN(sizeof(struct xt_iprange_mtinfo)),
-	.help           = iprange_mt_help,
-	.parse          = iprange_mt6_parse,
-	.final_check    = iprange_mt_check,
-	.print          = iprange_mt6_print,
-	.save           = iprange_mt6_save,
-	.extra_opts     = iprange_mt_opts,
+static struct xtables_match iprange_mt_reg[] = {
+	{
+		.version       = XTABLES_VERSION,
+		.name          = "iprange",
+		.revision      = 0,
+		.family        = NFPROTO_IPV4,
+		.size          = XT_ALIGN(sizeof(struct ipt_iprange_info)),
+		.userspacesize = XT_ALIGN(sizeof(struct ipt_iprange_info)),
+		.help          = iprange_mt_help,
+		.parse         = iprange_parse,
+		.final_check   = iprange_mt_check,
+		.print         = iprange_print,
+		.save          = iprange_save,
+		.extra_opts    = iprange_mt_opts,
+	},
+	{
+		.version       = XTABLES_VERSION,
+		.name          = "iprange",
+		.revision      = 1,
+		.family        = NFPROTO_IPV4,
+		.size          = XT_ALIGN(sizeof(struct xt_iprange_mtinfo)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_iprange_mtinfo)),
+		.help          = iprange_mt_help,
+		.parse         = iprange_mt4_parse,
+		.final_check   = iprange_mt_check,
+		.print         = iprange_mt4_print,
+		.save          = iprange_mt4_save,
+		.extra_opts    = iprange_mt_opts,
+	},
+	{
+		.version       = XTABLES_VERSION,
+		.name          = "iprange",
+		.revision      = 1,
+		.family        = NFPROTO_IPV6,
+		.size          = XT_ALIGN(sizeof(struct xt_iprange_mtinfo)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_iprange_mtinfo)),
+		.help          = iprange_mt_help,
+		.parse         = iprange_mt6_parse,
+		.final_check   = iprange_mt_check,
+		.print         = iprange_mt6_print,
+		.save          = iprange_mt6_save,
+		.extra_opts    = iprange_mt_opts,
+	},
 };
 
 void _init(void)
 {
-	xtables_register_match(&iprange_match);
-	xtables_register_match(&iprange_mt_reg);
-	xtables_register_match(&iprange_mt6_reg);
+	xtables_register_matches(iprange_mt_reg, ARRAY_SIZE(iprange_mt_reg));
 }

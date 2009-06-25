@@ -478,36 +478,36 @@ static void policy6_save(const void *ip, const struct xt_entry_match *match)
 	}
 }
 
-static struct xtables_match policy_mt_reg = {
-	.name		= "policy",
-	.version	= XTABLES_VERSION,
-	.family		= NFPROTO_IPV4,
-	.size		= XT_ALIGN(sizeof(struct xt_policy_info)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_policy_info)),
-	.help		= policy_help,
-	.parse		= policy4_parse,
-	.final_check	= policy_check,
-	.print		= policy4_print,
-	.save		= policy4_save,
-	.extra_opts	= policy_opts,
-};
-
-static struct xtables_match policy_mt6_reg = {
-	.name		= "policy",
-	.version	= XTABLES_VERSION,
-	.family		= NFPROTO_IPV6,
-	.size		= XT_ALIGN(sizeof(struct xt_policy_info)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_policy_info)),
-	.help		= policy_help,
-	.parse		= policy6_parse,
-	.final_check	= policy_check,
-	.print		= policy6_print,
-	.save		= policy6_save,
-	.extra_opts	= policy_opts,
+static struct xtables_match policy_mt_reg[] = {
+	{
+		.name          = "policy",
+		.version       = XTABLES_VERSION,
+		.family        = NFPROTO_IPV4,
+		.size          = XT_ALIGN(sizeof(struct xt_policy_info)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_policy_info)),
+		.help          = policy_help,
+		.parse         = policy4_parse,
+		.final_check   = policy_check,
+		.print         = policy4_print,
+		.save          = policy4_save,
+		.extra_opts    = policy_opts,
+	},
+	{
+		.name          = "policy",
+		.version       = XTABLES_VERSION,
+		.family        = NFPROTO_IPV6,
+		.size          = XT_ALIGN(sizeof(struct xt_policy_info)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_policy_info)),
+		.help          = policy_help,
+		.parse         = policy6_parse,
+		.final_check   = policy_check,
+		.print         = policy6_print,
+		.save          = policy6_save,
+		.extra_opts    = policy_opts,
+	},
 };
 
 void _init(void)
 {
-	xtables_register_match(&policy_mt_reg);
-	xtables_register_match(&policy_mt6_reg);
+	xtables_register_matches(policy_mt_reg, ARRAY_SIZE(policy_mt_reg));
 }

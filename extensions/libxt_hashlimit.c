@@ -659,57 +659,55 @@ hashlimit_mt6_save(const void *ip, const struct xt_entry_match *match)
 	hashlimit_mt_save(info, 128);
 }
 
-static struct xtables_match hashlimit_match = {
-	.family		= NFPROTO_UNSPEC,
-	.name		= "hashlimit",
-	.version	= XTABLES_VERSION,
-	.revision	= 0,
-	.size		= XT_ALIGN(sizeof(struct xt_hashlimit_info)),
-	.userspacesize	= offsetof(struct xt_hashlimit_info, hinfo),
-	.help		= hashlimit_help,
-	.init		= hashlimit_init,
-	.parse		= hashlimit_parse,
-	.final_check	= hashlimit_check,
-	.print		= hashlimit_print,
-	.save		= hashlimit_save,
-	.extra_opts	= hashlimit_opts,
-};
-
-static struct xtables_match hashlimit_mt_reg = {
-	.version        = XTABLES_VERSION,
-	.name           = "hashlimit",
-	.revision       = 1,
-	.family         = NFPROTO_IPV4,
-	.size           = XT_ALIGN(sizeof(struct xt_hashlimit_mtinfo1)),
-	.userspacesize  = offsetof(struct xt_hashlimit_mtinfo1, hinfo),
-	.help           = hashlimit_mt_help,
-	.init           = hashlimit_mt4_init,
-	.parse          = hashlimit_mt4_parse,
-	.final_check	= hashlimit_mt_check,
-	.print          = hashlimit_mt4_print,
-	.save           = hashlimit_mt4_save,
-	.extra_opts     = hashlimit_mt_opts,
-};
-
-static struct xtables_match hashlimit_mt6_reg = {
-	.version        = XTABLES_VERSION,
-	.name           = "hashlimit",
-	.revision       = 1,
-	.family         = NFPROTO_IPV6,
-	.size           = XT_ALIGN(sizeof(struct xt_hashlimit_mtinfo1)),
-	.userspacesize  = offsetof(struct xt_hashlimit_mtinfo1, hinfo),
-	.help           = hashlimit_mt_help,
-	.init           = hashlimit_mt6_init,
-	.parse          = hashlimit_mt6_parse,
-	.final_check	= hashlimit_mt_check,
-	.print          = hashlimit_mt6_print,
-	.save           = hashlimit_mt6_save,
-	.extra_opts     = hashlimit_mt_opts,
+static struct xtables_match hashlimit_mt_reg[] = {
+	{
+		.family        = NFPROTO_UNSPEC,
+		.name          = "hashlimit",
+		.version       = XTABLES_VERSION,
+		.revision      = 0,
+		.size          = XT_ALIGN(sizeof(struct xt_hashlimit_info)),
+		.userspacesize = offsetof(struct xt_hashlimit_info, hinfo),
+		.help          = hashlimit_help,
+		.init          = hashlimit_init,
+		.parse         = hashlimit_parse,
+		.final_check   = hashlimit_check,
+		.print         = hashlimit_print,
+		.save          = hashlimit_save,
+		.extra_opts    = hashlimit_opts,
+	},
+	{
+		.version       = XTABLES_VERSION,
+		.name          = "hashlimit",
+		.revision      = 1,
+		.family        = NFPROTO_IPV4,
+		.size          = XT_ALIGN(sizeof(struct xt_hashlimit_mtinfo1)),
+		.userspacesize = offsetof(struct xt_hashlimit_mtinfo1, hinfo),
+		.help          = hashlimit_mt_help,
+		.init          = hashlimit_mt4_init,
+		.parse         = hashlimit_mt4_parse,
+		.final_check   = hashlimit_mt_check,
+		.print         = hashlimit_mt4_print,
+		.save          = hashlimit_mt4_save,
+		.extra_opts    = hashlimit_mt_opts,
+	},
+	{
+		.version       = XTABLES_VERSION,
+		.name          = "hashlimit",
+		.revision      = 1,
+		.family        = NFPROTO_IPV6,
+		.size          = XT_ALIGN(sizeof(struct xt_hashlimit_mtinfo1)),
+		.userspacesize = offsetof(struct xt_hashlimit_mtinfo1, hinfo),
+		.help          = hashlimit_mt_help,
+		.init          = hashlimit_mt6_init,
+		.parse         = hashlimit_mt6_parse,
+		.final_check   = hashlimit_mt_check,
+		.print         = hashlimit_mt6_print,
+		.save          = hashlimit_mt6_save,
+		.extra_opts    = hashlimit_mt_opts,
+	},
 };
 
 void _init(void)
 {
-	xtables_register_match(&hashlimit_match);
-	xtables_register_match(&hashlimit_mt_reg);
-	xtables_register_match(&hashlimit_mt6_reg);
+	xtables_register_matches(hashlimit_mt_reg, ARRAY_SIZE(hashlimit_mt_reg));
 }

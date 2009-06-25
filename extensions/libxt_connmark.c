@@ -163,38 +163,38 @@ connmark_mt_save(const void *ip, const struct xt_entry_match *match)
 	print_mark(info->mark, info->mask);
 }
 
-static struct xtables_match connmark_mt_reg_v0 = {
-	.family		= NFPROTO_UNSPEC,
-	.name		= "connmark",
-	.revision	= 0,
-	.version	= XTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_connmark_info)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_connmark_info)),
-	.help		= connmark_mt_help,
-	.parse		= connmark_parse,
-	.final_check	= connmark_mt_check,
-	.print		= connmark_print,
-	.save		= connmark_save,
-	.extra_opts	= connmark_mt_opts,
-};
-
-static struct xtables_match connmark_mt_reg = {
-	.version        = XTABLES_VERSION,
-	.name           = "connmark",
-	.revision       = 1,
-	.family         = NFPROTO_UNSPEC,
-	.size           = XT_ALIGN(sizeof(struct xt_connmark_mtinfo1)),
-	.userspacesize  = XT_ALIGN(sizeof(struct xt_connmark_mtinfo1)),
-	.help           = connmark_mt_help,
-	.parse          = connmark_mt_parse,
-	.final_check    = connmark_mt_check,
-	.print          = connmark_mt_print,
-	.save           = connmark_mt_save,
-	.extra_opts     = connmark_mt_opts,
+static struct xtables_match connmark_mt_reg[] = {
+	{
+		.family        = NFPROTO_UNSPEC,
+		.name          = "connmark",
+		.revision      = 0,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_connmark_info)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_connmark_info)),
+		.help          = connmark_mt_help,
+		.parse         = connmark_parse,
+		.final_check   = connmark_mt_check,
+		.print         = connmark_print,
+		.save          = connmark_save,
+		.extra_opts    = connmark_mt_opts,
+	},
+	{
+		.version       = XTABLES_VERSION,
+		.name          = "connmark",
+		.revision      = 1,
+		.family        = NFPROTO_UNSPEC,
+		.size          = XT_ALIGN(sizeof(struct xt_connmark_mtinfo1)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_connmark_mtinfo1)),
+		.help          = connmark_mt_help,
+		.parse         = connmark_mt_parse,
+		.final_check   = connmark_mt_check,
+		.print         = connmark_mt_print,
+		.save          = connmark_mt_save,
+		.extra_opts    = connmark_mt_opts,
+	},
 };
 
 void _init(void)
 {
-	xtables_register_match(&connmark_mt_reg_v0);
-	xtables_register_match(&connmark_mt_reg);
+	xtables_register_matches(connmark_mt_reg, ARRAY_SIZE(connmark_mt_reg));
 }
