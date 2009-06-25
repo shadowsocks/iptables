@@ -31,7 +31,7 @@ helper_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags)
 			xtables_error(PARAMETER_PROBLEM,
 					"helper match: Only use --helper ONCE!");
-		xtables_check_inverse(optarg, &invert, &invert, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0);
 		strncpy(info->name, optarg, 29);
 		info->name[29] = '\0';
 		if (invert)
