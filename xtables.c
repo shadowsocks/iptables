@@ -794,6 +794,13 @@ void xtables_register_match(struct xtables_match *me)
 	me->mflags = 0;
 }
 
+void xtables_register_matches(struct xtables_match *match, unsigned int n)
+{
+	do {
+		xtables_register_match(&match[--n]);
+	} while (n > 0);
+}
+
 void xtables_register_target(struct xtables_target *me)
 {
 	struct xtables_target *old;
@@ -866,6 +873,13 @@ void xtables_register_target(struct xtables_target *me)
 	xtables_targets = me;
 	me->t = NULL;
 	me->tflags = 0;
+}
+
+void xtables_register_targets(struct xtables_target *target, unsigned int n)
+{
+	do {
+		xtables_register_target(&target[--n]);
+	} while (n > 0);
 }
 
 /**

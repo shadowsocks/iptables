@@ -233,7 +233,9 @@ extern struct xtables_target *xtables_find_target(const char *name,
 
 /* Your shared library should call one of these. */
 extern void xtables_register_match(struct xtables_match *me);
+extern void xtables_register_matches(struct xtables_match *, unsigned int);
 extern void xtables_register_target(struct xtables_target *me);
+extern void xtables_register_targets(struct xtables_target *, unsigned int);
 
 extern bool xtables_strtoul(const char *, char **, unsigned long *,
 	unsigned long, unsigned long);
