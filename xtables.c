@@ -724,6 +724,11 @@ void xtables_register_match(struct xtables_match *me)
 {
 	struct xtables_match **i, *old;
 
+	if (me->version == NULL) {
+		fprintf(stderr, "%s: match %s<%u> is missing a version\n",
+		        xt_params->program_name, me->name, me->revision);
+		exit(1);
+	}
 	if (strcmp(me->version, XTABLES_VERSION) != 0) {
 		fprintf(stderr, "%s: match \"%s\" has version \"%s\", "
 		        "but \"%s\" is required.\n",
@@ -805,6 +810,11 @@ void xtables_register_target(struct xtables_target *me)
 {
 	struct xtables_target *old;
 
+	if (me->version == NULL) {
+		fprintf(stderr, "%s: target %s<%u> is missing a version\n",
+		        xt_params->program_name, me->name, me->revision);
+		exit(1);
+	}
 	if (strcmp(me->version, XTABLES_VERSION) != 0) {
 		fprintf(stderr, "%s: target \"%s\" has version \"%s\", "
 		        "but \"%s\" is required.\n",
