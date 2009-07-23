@@ -14,7 +14,7 @@ endif
 lib_LTLIBRARIES =
 
 # libiptc
-lib_LTLIBRARIES           += libiptc/libiptc.la libiptc/libip4tc.la libiptc/libip6tc.la
+lib_LTLIBRARIES           += libiptc/libip4tc.la libiptc/libip6tc.la libiptc/libiptc.la
 libiptc_libiptc_la_SOURCES  =
 libiptc_libiptc_la_LIBADD   = libiptc/libip4tc.la libiptc/libip6tc.la
 libiptc_libiptc_la_LDFLAGS  = -version-info 0:0:0
