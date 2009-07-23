@@ -90,9 +90,7 @@ struct xtables_match
 	unsigned int option_offset;
 	struct xt_entry_match *m;
 	unsigned int mflags;
-#ifdef NO_SHARED_LIBS
 	unsigned int loaded; /* simulate loading so options are merged properly */
-#endif
 };
 
 struct xtables_target
@@ -152,9 +150,7 @@ struct xtables_target
 	struct xt_entry_target *t;
 	unsigned int tflags;
 	unsigned int used;
-#ifdef NO_SHARED_LIBS
 	unsigned int loaded; /* simulate loading so options are merged properly */
-#endif
 };
 
 struct xtables_rule_match {
