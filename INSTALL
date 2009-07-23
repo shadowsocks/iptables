@@ -41,17 +41,21 @@ Configuring and compiling
 
 	It is enabled by default.
 
+--enable-static
+
+	Produce additional binaries, iptables-static/ip6tables-static,
+	which have all shipped extensions compiled in.
+
+--disable-shared
+
+	Produce binaries that have dynamic loading of extensions disabled.
+	This implies --enable-static.
+	(See some details below.)
+
 --enable-libipq
 
 	This option causes libipq to be installed into ${libdir} and
 	${includedir}.
-
---enable-static
-
-	Enable building single standalone multipurpose binaries,
-	(iptables-static and ip6tables-static), which contain every
-	extension compiled-in (and does not support additional
-	extensions).
 
 --with-ksource=
 
@@ -74,7 +78,22 @@ The make process will automatically build multipurpose binaries.
 These have the core (iptables), -save, -restore and -xml code
 compiled into one binary, but extensions remain as modules.
 
-If you want to build a statically linked version of the iptables binary,
-without the need for loading the plugins at runtime (e.g. for an
-embedded device or router-on-a-disk), you can use the --enable-static
-configure flag.
+
+Static and shared
+=================
+
+Basically there are three configuration modes defined:
+
+ --disable-static --enable-shared (this is the default)
+
+	Build a binary that relies upon dynamic loading of extensions.
+
+ --enable-static --enable-shared
+
+	Build a binary that has the shipped extensions built-in, but
+	is still capable of loading additional extensions.
+
+ --enable-static --disable-shared
+
+	Shipped extensions are built-in, and dynamic loading is
+	deactivated.

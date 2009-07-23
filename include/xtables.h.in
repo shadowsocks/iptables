@@ -277,7 +277,7 @@ extern void xtables_ip6parse_multiple(const char *, struct in6_addr **,
  */
 extern void xtables_save_string(const char *value);
 
-#ifdef NO_SHARED_LIBS
+#if defined(ALL_INCLUSIVE) || defined(NO_SHARED_LIBS)
 #	ifdef _INIT
 #		undef _init
 #		define _init _INIT

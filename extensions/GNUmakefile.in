@@ -56,8 +56,8 @@ targets := libext4.a libext6.a matches4.man matches6.man \
 targets_install :=
 @ENABLE_STATIC_TRUE@ libext4_objs := ${pfx_objs} ${pf4_objs}
 @ENABLE_STATIC_TRUE@ libext6_objs := ${pfx_objs} ${pf6_objs}
-@ENABLE_SHARED_TRUE@ targets += ${pfx_solibs} ${pf4_solibs} ${pf6_solibs}
-@ENABLE_SHARED_TRUE@ targets_install += ${pfx_solibs} ${pf4_solibs} ${pf6_solibs}
+@ENABLE_STATIC_FALSE@ targets += ${pfx_solibs} ${pf4_solibs} ${pf6_solibs}
+@ENABLE_STATIC_FALSE@ targets_install += ${pfx_solibs} ${pf4_solibs} ${pf6_solibs}
 
 .SECONDARY:
 

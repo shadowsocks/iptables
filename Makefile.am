@@ -26,7 +26,13 @@ libiptc_libip6tc_la_LDFLAGS = -version-info 0:0:0
 lib_LTLIBRARIES      += libxtables.la
 libxtables_la_SOURCES = xtables.c
 libxtables_la_LDFLAGS = -version-info ${libxtables_vcurrent}:0:${libxtables_vage}
+if ENABLE_SHARED
+libxtables_la_CFLAGS  = ${AM_CFLAGS}
 libxtables_la_LIBADD  = -ldl
+else
+libxtables_la_CFLAGS  = ${AM_CFLAGS} -DNO_SHARED_LIBS=1
+libxtables_la_LIBADD  =
+endif
 
 # iptables, dynamic
 iptables_SOURCES          = iptables-standalone.c iptables.c xshared.c
@@ -38,6 +44,9 @@ iptables_multi_SOURCES    = iptables-multi.c iptables-save.c \
                             iptables-restore.c iptables-xml.c \
                             iptables-standalone.c iptables.c xshared.c
 iptables_multi_CFLAGS     = ${AM_CFLAGS} -DIPTABLES_MULTI
+if ENABLE_STATIC
+iptables_multi_CFLAGS    += -DALL_INCLUSIVE
+endif
 iptables_multi_LDFLAGS    = ${iptables_LDFLAGS}
 iptables_multi_LDADD      = ${iptables_LDADD}
 
@@ -48,11 +57,6 @@ iptables_restore_LDADD    = ${iptables_LDADD}
 iptables_save_SOURCES     = iptables-save.c iptables.c xshared.c
 iptables_save_LDFLAGS     = ${iptables_LDFLAGS}
 iptables_save_LDADD       = ${iptables_LDADD}
-
-# iptables-multi, semi-static
-iptables_static_SOURCES   = ${iptables_multi_SOURCES} xtables.c
-iptables_static_CFLAGS    = ${iptables_multi_CFLAGS} -DNO_SHARED_LIBS=1
-iptables_static_LDADD     = libiptc/libip4tc.la extensions/libext4.a -lm
 
 iptables_xml_SOURCES      = iptables-xml.c
 
@@ -65,6 +69,9 @@ ip6tables_multi_SOURCES   = ip6tables-multi.c ip6tables-save.c \
                             ip6tables-restore.c ip6tables-standalone.c \
                             ip6tables.c xshared.c
 ip6tables_multi_CFLAGS    = ${AM_CFLAGS} -DIPTABLES_MULTI
+if ENABLE_STATIC
+ip6tables_multi_CFLAGS   += -DALL_INCLUSIVE
+endif
 ip6tables_multi_LDFLAGS   = ${ip6tables_LDFLAGS}
 ip6tables_multi_LDADD     = ${ip6tables_LDADD}
 
@@ -76,11 +83,6 @@ ip6tables_save_SOURCES    = ip6tables-save.c ip6tables.c xshared.c
 ip6tables_save_LDFLAGS    = ${ip6tables_LDFLAGS}
 ip6tables_save_LDADD      = ${ip6tables_LDADD}
 
-# iptables-multi, semi-static
-ip6tables_static_SOURCES    = ${ip6tables_multi_SOURCES} xtables.c
-ip6tables_static_CFLAGS     = ${ip6tables_multi_CFLAGS} -DNO_SHARED_LIBS=1
-ip6tables_static_LDADD      = libiptc/libip6tc.la extensions/libext6.a -lm
-
 bin_PROGRAMS     = iptables-xml
 sbin_PROGRAMS    =
 noinst_PROGRAMS  =
@@ -89,21 +91,11 @@ man_MANS         = iptables.8 iptables-restore.8 iptables-save.8 \
                    ip6tables-save.8
 CLEANFILES       = iptables.8 ip6tables.8
 
-if ENABLE_STATIC
-if ENABLE_IPV4
-sbin_PROGRAMS += iptables-static
-endif
-if ENABLE_IPV6
-sbin_PROGRAMS += ip6tables-static
-endif
-endif
-if ENABLE_SHARED
 if ENABLE_IPV4
 sbin_PROGRAMS += iptables iptables-multi iptables-restore iptables-save
 endif
 if ENABLE_IPV6
 sbin_PROGRAMS += ip6tables ip6tables-multi ip6tables-restore ip6tables-save
-endif
 endif
 
 iptables.8: ${srcdir}/iptables.8.in extensions/matches4.man extensions/targets4.man
