@@ -7,26 +7,39 @@ int ip6tables_main(int argc, char **argv);
 int ip6tables_save_main(int argc, char **argv);
 int ip6tables_restore_main(int argc, char **argv);
 
-int main(int argc, char **argv) {
-  char *progname;
+int main(int argc, char **argv)
+{
+	char *progname;
 
-  if (argc == 0) {
-    fprintf(stderr, "no argv[0]?");
-    exit(1);
-  } else {
-    progname = basename(argv[0]);
+	if (argc < 1) {
+		fprintf(stderr, "ERROR: This should not happen.\n");
+		exit(EXIT_FAILURE);
+	}
 
-    if (!strcmp(progname, "ip6tables") ||
-        strcmp(progname, "ip6tables-static") == 0)
-      return ip6tables_main(argc, argv);
-    
-    if (!strcmp(progname, "ip6tables-save"))
-      return ip6tables_save_main(argc, argv);
-    
-    if (!strcmp(progname, "ip6tables-restore"))
-      return ip6tables_restore_main(argc, argv);
-    
-    fprintf(stderr, "ip6tables multi-purpose version: unknown applet name %s\n", progname);
-    exit(1);
-  }
+	progname = basename(argv[0]);
+	if (strcmp(progname, "ip6tables") == 0)
+		return ip6tables_main(argc, argv);
+	if (strcmp(progname, "ip6tables-save") == 0)
+		return ip6tables_save_main(argc, argv);
+	if (strcmp(progname, "ip6tables-restore") == 0)
+		return ip6tables_restore_main(argc, argv);
+
+	++argv;
+	--argc;
+	if (argc < 1) {
+		fprintf(stderr, "ERROR: No subcommand given.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	progname = basename(argv[0]);
+	if (strcmp(progname, "main") == 0)
+		return ip6tables_main(argc, argv);
+	if (strcmp(progname, "save") == 0)
+		return ip6tables_save_main(argc, argv);
+	if (strcmp(progname, "restore") == 0)
+		return ip6tables_restore_main(argc, argv);
+
+	fprintf(stderr, "ip6tables multi-purpose version: "
+	        "unknown subcommand \"%s\"\n", progname);
+	exit(EXIT_FAILURE);
 }
