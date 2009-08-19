@@ -81,9 +81,10 @@
 #define CMD_SET_POLICY		0x0400U
 #define CMD_RENAME_CHAIN	0x0800U
 #define CMD_LIST_RULES		0x1000U
-#define NUMBER_OF_CMD	14
+#define CMD_ZERO_NUM		0x2000U
+#define NUMBER_OF_CMD	15
 static const char cmdflags[] = { 'I', 'D', 'D', 'R', 'A', 'L', 'F', 'Z',
-				 'N', 'X', 'P', 'E', 'S' };
+				 'Z', 'N', 'X', 'P', 'E', 'S' };
 
 #define OPT_NONE	0x00000U
 #define OPT_NUMERIC	0x00001U
@@ -172,6 +173,7 @@ static char commands_v_options[NUMBER_OF_CMD][NUMBER_OF_OPT] =
 /*LIST*/      {' ','x','x','x','x',' ',' ','x','x',' ','x'},
 /*FLUSH*/     {'x','x','x','x','x',' ','x','x','x','x','x'},
 /*ZERO*/      {'x','x','x','x','x',' ','x','x','x','x','x'},
+/*ZERO_NUM*/  {'x','x','x','x','x',' ','x','x','x','x','x'},
 /*NEW_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x','x'},
 /*DEL_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x','x'},
 /*SET_POLICY*/{'x','x','x','x','x',' ','x','x','x','x',' '},
@@ -267,7 +269,8 @@ exit_printhelp(struct xtables_rule_match *matches)
 "  --list-rules -S [chain [rulenum]]\n"
 "				Print the rules in a chain or all chains\n"
 "  --flush   -F [chain]		Delete all rules in  chain or all chains\n"
-"  --zero    -Z [chain]		Zero counters in chain or all chains\n"
+"  --zero    -Z [chain [rulenum]]\n"
+"				Zero counters in chain or all chains\n"
 "  --new     -N chain		Create a new user-defined chain\n"
 "  --delete-chain\n"
 "            -X [chain]		Delete a user-defined chain\n"
@@ -1376,8 +1379,8 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			break;
 
 		case 'L':
-			add_command(&command, CMD_LIST, CMD_ZERO,
-				    invert);
+			add_command(&command, CMD_LIST,
+				    CMD_ZERO | CMD_ZERO_NUM, invert);
 			if (optarg) chain = optarg;
 			else if (optind < argc && argv[optind][0] != '-'
 				 && argv[optind][0] != '!')
@@ -1388,8 +1391,8 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			break;
 
 		case 'S':
-			add_command(&command, CMD_LIST_RULES, CMD_ZERO,
-				    invert);
+			add_command(&command, CMD_LIST_RULES,
+				    CMD_ZERO | CMD_ZERO_NUM, invert);
 			if (optarg) chain = optarg;
 			else if (optind < argc && argv[optind][0] != '-'
 				 && argv[optind][0] != '!')
@@ -1415,6 +1418,11 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			else if (optind < argc && argv[optind][0] != '-'
 				&& argv[optind][0] != '!')
 				chain = argv[optind++];
+			if (optind < argc && argv[optind][0] != '-'
+				&& argv[optind][0] != '!') {
+				rulenum = parse_rulenumber(argv[optind++]);
+				command = CMD_ZERO_NUM;
+			}
 			break;
 
 		case 'N':
@@ -1953,8 +1961,12 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 	case CMD_ZERO:
 		ret = zero_entries(chain, options&OPT_VERBOSE, *handle);
 		break;
+	case CMD_ZERO_NUM:
+		ret = ip6tc_zero_counter(chain, rulenum, *handle);
+		break;
 	case CMD_LIST:
 	case CMD_LIST|CMD_ZERO:
+	case CMD_LIST|CMD_ZERO_NUM:
 		ret = list_entries(chain,
 				   rulenum,
 				   options&OPT_VERBOSE,
@@ -1965,9 +1977,12 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		if (ret && (command & CMD_ZERO))
 			ret = zero_entries(chain,
 					   options&OPT_VERBOSE, *handle);
+		if (ret && (command & CMD_ZERO_NUM))
+			ret = ip6tc_zero_counter(chain, rulenum, *handle);
 		break;
 	case CMD_LIST_RULES:
 	case CMD_LIST_RULES|CMD_ZERO:
+	case CMD_LIST_RULES|CMD_ZERO_NUM:
 		ret = list_rules(chain,
 				   rulenum,
 				   options&OPT_VERBOSE,
@@ -1975,6 +1990,8 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		if (ret && (command & CMD_ZERO))
 			ret = zero_entries(chain,
 					   options&OPT_VERBOSE, *handle);
+		if (ret && (command & CMD_ZERO_NUM))
+			ret = ip6tc_zero_counter(chain, rulenum, *handle);
 		break;
 	case CMD_NEW_CHAIN:
 		ret = ip6tc_create_chain(chain, *handle);
