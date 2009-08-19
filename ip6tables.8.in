@@ -42,7 +42,7 @@ rule-specification\fP [\fIoptions...\fP]
 \fBip6tables\fP [\fB\-t\fP \fItable\fP] \fB\-S\fP [\fIchain\fP [\fIrulenum\fP]]
 .PP
 \fBip6tables\fP [\fB\-t\fP \fItable\fP] {\fB\-F\fP|\fB\-L\fP|\fB\-Z\fP}
-[\fIchain\fP] [\fIoptions...\fP]
+[\fIchain\fP [\fIrulenum\fP]] [\fIoptions...\fP]
 .PP
 \fBip6tables\fP [\fB\-t\fP \fItable\fP] \fB\-N\fP \fIchain\fP
 .PP
@@ -182,8 +182,9 @@ it applies to the specified table (filter is the default).
 Flush the selected chain (all the chains in the table if none is given).
 This is equivalent to deleting all the rules one by one.
 .TP
-\fB\-Z\fP, \fB\-\-zero\fP [\fIchain\fP]
-Zero the packet and byte counters in all chains.  It is legal to
+\fB\-Z\fP, \fB\-\-zero\fP [\fIchain\fP [\fIrulenum\fP]]
+Zero the packet and byte counters in all chains, or only the given chain,
+or only the given rule in a chain. It is legal to
 specify the
 \fB\-L\fP, \fB\-\-list\fP
 (list) option as well, to see the counters immediately before they are
