@@ -1,4 +1,4 @@
-This modules macthes IP sets which can be defined by ipset(8).
+This modules matches IP sets which can be defined by ipset(8).
 .TP
 [\fB!\fP] \fB\-\-match\-set\fP \fIsetname\fP \fIflag\fP[\fB,\fP\fIflag\fP]...
 where flags are the comma separated list of
