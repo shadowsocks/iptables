@@ -20,7 +20,7 @@
 .\"
 .\"
 .SH NAME
-libipq \- iptables userspace packet queuing library.
+libipq \(em iptables userspace packet queuing library.
 .SH SYNOPSIS
 .B #include <linux/netfilter.h>
 .br
@@ -51,7 +51,7 @@ running the following commands:
 .br	
 	# modprobe ip_queue
 .br	
-	# iptables -A OUTPUT -p icmp -j QUEUE
+	# iptables \-A OUTPUT \-p icmp \-j QUEUE
 .PP
 will cause any locally generated ICMP packets (e.g. ping output) to
 be sent to the ip_queue module, which will then attempt to deliver the

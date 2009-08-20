@@ -23,7 +23,7 @@
 .\"
 .\"
 .SH NAME
-iptables - administration tool for IPv4 packet filtering and NAT
+iptables \(em administration tool for IPv4 packet filtering and NAT
 .SH SYNOPSIS
 \fBiptables\fP [\fB\-t\fP \fItable\fP] {\fB\-A\fP|\fB\-D\fP} \fIchain\fP \fIrule-specification\fP
 .PP
@@ -182,7 +182,7 @@ arguments given. The exact rules are suppressed until you use
 .TP
 \fB\-S\fP, \fB\-\-list\-rules\fP [\fIchain\fP]
 Print all rules in the selected chain.  If no chain is selected, all
-chains are printed like iptables\-save. Like every other iptables command,
+chains are printed like iptables-save. Like every other iptables command,
 it applies to the specified table (filter is the default).
 .TP
 \fB\-F\fP, \fB\-\-flush\fP [\fIchain\fP]

@@ -8,7 +8,7 @@ The primary use is to detect long-lived downloads and mark them to be
 scheduled using a lower priority band in traffic control.
 .PP
 The transferred bytes per connection can also be viewed through
-`conntrack -L` and accessed via ctnetlink.
+`conntrack \-L` and accessed via ctnetlink.
 .PP
 NOTE that for connections which have no accounting information, the match will
 always return false. The "net.netfilter.nf_conntrack_acct" sysctl flag controls

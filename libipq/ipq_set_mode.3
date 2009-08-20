@@ -20,7 +20,7 @@
 .\"
 .\"
 .SH NAME
-ipq_set_mode - set the ip_queue queuing mode
+ipq_set_mode \(em set the ip_queue queuing mode
 .SH SYNOPSIS
 .B #include <linux/netfilter.h>
 .br
@@ -68,7 +68,7 @@ Note that as the underlying Netlink messaging transport is connectionless,
 the ip_queue module does not know that a userspace application is ready to
 communicate until it receives a message such as this.
 .SH RETURN VALUE
-On failure, -1 is returned.
+On failure, \-1 is returned.
 .br
 On success, a non-zero positive value is returned.
 .SH ERRORS
