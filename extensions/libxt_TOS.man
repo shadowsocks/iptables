@@ -1,5 +1,5 @@
 This module sets the Type of Service field in the IPv4 header (including the
-'precedence' bits) or the Priority field in the IPv6 header. Note that TOS
+"precedence" bits) or the Priority field in the IPv6 header. Note that TOS
 shares the same bits as DSCP and ECN. The TOS target is only valid in the
 \fBmangle\fR table.
 .TP

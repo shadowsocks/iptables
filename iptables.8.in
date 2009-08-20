@@ -217,7 +217,7 @@ targets.
 Rename the user specified chain to the user supplied name.  This is
 cosmetic, and has no effect on the structure of the table.
 .TP
-\fB\-\h\fP
+\fB\-h\fP
 Help.
 Give a (currently very brief) description of the command syntax.
 .SS PARAMETERS
