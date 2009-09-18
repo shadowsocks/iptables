@@ -30,49 +30,56 @@ static const struct option iprange_mt_opts[] = {
 	{ .name = NULL }
 };
 
-static void iprange_parse_range(char *arg, union nf_inet_addr *range,
-				u_int8_t family, const char *optname)
+static void
+iprange_parse_spec(const char *from, const char *to, union nf_inet_addr *range,
+		   uint8_t family, const char *optname)
 {
 	struct in6_addr *ia6;
 	struct in_addr *ia4;
-	char *dash;
 
 	memset(range, 0, sizeof(union nf_inet_addr) * 2);
-	dash = strchr(arg, '-');
-	if (dash != NULL)
-		*dash = '\0';
 
 	if (family == NFPROTO_IPV6) {
-		ia6 = xtables_numeric_to_ip6addr(arg);
+		ia6 = xtables_numeric_to_ip6addr(from);
 		if (ia6 == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange",
-				optname, arg);
+				optname, from);
 		range[0].in6 = *ia6;
-		if (dash == NULL) {
-			range[1] = range[0];
-			return;
-		}
-		ia6 = xtables_numeric_to_ip6addr(dash + 1);
+		ia6 = xtables_numeric_to_ip6addr(to);
 		if (ia6 == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange",
-				optname, dash + 1);
+				optname, to);
 		range[1].in6 = *ia6;
 	} else {
-		ia4 = xtables_numeric_to_ipaddr(arg);
+		ia4 = xtables_numeric_to_ipaddr(from);
 		if (ia4 == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange",
-				optname, arg);
+				optname, from);
 		range[0].in = *ia4;
-		if (dash == NULL) {
-			range[1] = range[0];
-			return;
-		}
-		ia4 = xtables_numeric_to_ipaddr(dash + 1);
+		ia4 = xtables_numeric_to_ipaddr(to);
 		if (ia4 == NULL)
 			xtables_param_act(XTF_BAD_VALUE, "iprange",
-				optname, dash + 1);
+				optname, to);
 		range[1].in = *ia4;
 	}
+}
+
+static void iprange_parse_range(char *arg, union nf_inet_addr *range,
+				u_int8_t family, const char *optname)
+{
+	char *dash;
+
+	dash = strchr(arg, '-');
+	if (dash == NULL) {
+		iprange_parse_spec(arg, arg, range, family, optname);
+		return;
+	}
+
+	*dash = '\0';
+	iprange_parse_spec(arg, dash + 1, range, family, optname);
+	if (memcmp(&range[0], &range[1], sizeof(*range)) > 0)
+		fprintf(stderr, "xt_iprange: range %s-%s is reversed and "
+			"will never match\n", arg, dash + 1);
 }
 
 static int iprange_parse(int c, char **argv, int invert, unsigned int *flags,
