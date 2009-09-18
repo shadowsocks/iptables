@@ -34,33 +34,29 @@ static void
 iprange_parse_spec(const char *from, const char *to, union nf_inet_addr *range,
 		   uint8_t family, const char *optname)
 {
+	const char *spec[2] = {from, to};
 	struct in6_addr *ia6;
 	struct in_addr *ia4;
+	unsigned int i;
 
 	memset(range, 0, sizeof(union nf_inet_addr) * 2);
 
 	if (family == NFPROTO_IPV6) {
-		ia6 = xtables_numeric_to_ip6addr(from);
-		if (ia6 == NULL)
-			xtables_param_act(XTF_BAD_VALUE, "iprange",
-				optname, from);
-		range[0].in6 = *ia6;
-		ia6 = xtables_numeric_to_ip6addr(to);
-		if (ia6 == NULL)
-			xtables_param_act(XTF_BAD_VALUE, "iprange",
-				optname, to);
-		range[1].in6 = *ia6;
+		for (i = 0; i < ARRAY_SIZE(spec); ++i) {
+			ia6 = xtables_numeric_to_ip6addr(spec[i]);
+			if (ia6 == NULL)
+				xtables_param_act(XTF_BAD_VALUE, "iprange",
+					optname, spec[i]);
+			range[i].in6 = *ia6;
+		}
 	} else {
-		ia4 = xtables_numeric_to_ipaddr(from);
-		if (ia4 == NULL)
-			xtables_param_act(XTF_BAD_VALUE, "iprange",
-				optname, from);
-		range[0].in = *ia4;
-		ia4 = xtables_numeric_to_ipaddr(to);
-		if (ia4 == NULL)
-			xtables_param_act(XTF_BAD_VALUE, "iprange",
-				optname, to);
-		range[1].in = *ia4;
+		for (i = 0; i < ARRAY_SIZE(spec); ++i) {
+			ia4 = xtables_numeric_to_ipaddr(spec[i]);
+			if (ia4 == NULL)
+				xtables_param_act(XTF_BAD_VALUE, "iprange",
+					optname, spec[i]);
+			range[i].in = *ia4;
+		}
 	}
 }
 
