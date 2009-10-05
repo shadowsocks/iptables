@@ -1,4 +1,5 @@
-This module sets the netfilter mark value associated with a connection.
+This module sets the netfilter mark value associated with a connection. The
+mark is 32 bits wide.
 .TP
 \fB\-\-set\-xmark\fP \fIvalue\fP[\fB/\fP\fImask\fP]
 Zero out the bits given by \fImask\fR and XOR \fIvalue\fR into the ctmark.
