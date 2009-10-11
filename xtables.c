@@ -331,7 +331,7 @@ int xtables_insmod(const char *modname, const char *modprobe, bool quiet)
 	 */
 	fflush(stdout);
 
-	switch (fork()) {
+	switch (vfork()) {
 	case 0:
 		argv[0] = (char *)modprobe;
 		argv[1] = (char *)modname;
