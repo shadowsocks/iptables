@@ -107,7 +107,7 @@ addrtype_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 			           "addrtype: can't specify src-type twice");
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		parse_types(argv[optind-1], &info->source);
+		parse_types(optarg, &info->source);
 		if (invert)
 			info->invert_source = 1;
 		*flags |= IPT_ADDRTYPE_OPT_SRCTYPE;
@@ -117,7 +117,7 @@ addrtype_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 			           "addrtype: can't specify dst-type twice");
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		parse_types(argv[optind-1], &info->dest);
+		parse_types(optarg, &info->dest);
 		if (invert)
 			info->invert_dest = 1;
 		*flags |= IPT_ADDRTYPE_OPT_DSTTYPE;
@@ -142,7 +142,7 @@ addrtype_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 			           "addrtype: can't specify src-type twice");
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		parse_types(argv[optind-1], &info->source);
+		parse_types(optarg, &info->source);
 		if (invert)
 			info->flags |= IPT_ADDRTYPE_INVERT_SOURCE;
 		*flags |= IPT_ADDRTYPE_OPT_SRCTYPE;
@@ -152,7 +152,7 @@ addrtype_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 			           "addrtype: can't specify dst-type twice");
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		parse_types(argv[optind-1], &info->dest);
+		parse_types(optarg, &info->dest);
 		if (invert)
 			info->flags |= IPT_ADDRTYPE_INVERT_DEST;
 		*flags |= IPT_ADDRTYPE_OPT_DSTTYPE;

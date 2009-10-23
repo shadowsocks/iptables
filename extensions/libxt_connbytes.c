@@ -55,7 +55,7 @@ connbytes_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (xtables_check_inverse(optarg, &invert, &optind, 0, argv))
 			optind++;
 
-		parse_range(argv[optind-1], sinfo);
+		parse_range(optarg, sinfo);
 		if (invert) {
 			i = sinfo->count.from;
 			sinfo->count.from = sinfo->count.to;

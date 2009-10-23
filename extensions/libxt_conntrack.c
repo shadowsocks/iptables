@@ -300,7 +300,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 
-		parse_states(argv[optind-1], sinfo);
+		parse_states(optarg, sinfo);
 		if (invert) {
 			sinfo->invflags |= XT_CONNTRACK_STATE;
 		}
@@ -314,10 +314,10 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 			sinfo->invflags |= XT_CONNTRACK_PROTO;
 
 		/* Canonicalize into lower case */
-		for (protocol = argv[optind-1]; *protocol; protocol++)
+		for (protocol = optarg; *protocol; protocol++)
 			*protocol = tolower(*protocol);
 
-		protocol = argv[optind-1];
+		protocol = optarg;
 		sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum =
 			xtables_parse_protocol(protocol);
 
@@ -335,7 +335,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_ORIGSRC;
 
-		xtables_ipparse_any(argv[optind-1], &addrs,
+		xtables_ipparse_any(optarg, &addrs,
 					&sinfo->sipmsk[IP_CT_DIR_ORIGINAL],
 					&naddrs);
 		if(naddrs > 1)
@@ -355,7 +355,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_ORIGDST;
 
-		xtables_ipparse_any(argv[optind-1], &addrs,
+		xtables_ipparse_any(optarg, &addrs,
 					&sinfo->dipmsk[IP_CT_DIR_ORIGINAL],
 					&naddrs);
 		if(naddrs > 1)
@@ -375,7 +375,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_REPLSRC;
 
-		xtables_ipparse_any(argv[optind-1], &addrs,
+		xtables_ipparse_any(optarg, &addrs,
 					&sinfo->sipmsk[IP_CT_DIR_REPLY],
 					&naddrs);
 		if(naddrs > 1)
@@ -395,7 +395,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			sinfo->invflags |= XT_CONNTRACK_REPLDST;
 
-		xtables_ipparse_any(argv[optind-1], &addrs,
+		xtables_ipparse_any(optarg, &addrs,
 					&sinfo->dipmsk[IP_CT_DIR_REPLY],
 					&naddrs);
 		if(naddrs > 1)
@@ -412,7 +412,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '7':
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 
-		parse_statuses(argv[optind-1], sinfo);
+		parse_statuses(optarg, sinfo);
 		if (invert) {
 			sinfo->invflags |= XT_CONNTRACK_STATUS;
 		}
@@ -422,7 +422,7 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '8':
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 
-		parse_expires(argv[optind-1], sinfo);
+		parse_expires(optarg, sinfo);
 		if (invert) {
 			sinfo->invflags |= XT_CONNTRACK_EXPIRES;
 		}

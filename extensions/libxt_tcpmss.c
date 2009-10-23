@@ -66,7 +66,7 @@ tcpmss_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--mss' allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		parse_tcp_mssvalues(argv[optind-1],
+		parse_tcp_mssvalues(optarg,
 				    &mssinfo->mss_min, &mssinfo->mss_max);
 		if (invert)
 			mssinfo->invert = 1;

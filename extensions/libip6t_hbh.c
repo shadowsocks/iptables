@@ -121,7 +121,7 @@ static int hbh_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--hbh-len' allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		optinfo->hdrlen = parse_opts_num(argv[optind-1], "length");
+		optinfo->hdrlen = parse_opts_num(optarg, "length");
 		if (invert)
 			optinfo->invflags |= IP6T_OPTS_INV_LEN;
 		optinfo->flags |= IP6T_OPTS_LEN;
@@ -135,7 +135,7 @@ static int hbh_parse(int c, char **argv, int invert, unsigned int *flags,
                 if (invert)
 			xtables_error(PARAMETER_PROBLEM,
 				" '!' not allowed with `--hbh-opts'");
-		optinfo->optsnr = parse_options(argv[optind-1], optinfo->opts);
+		optinfo->optsnr = parse_options(optarg, optinfo->opts);
 		optinfo->flags |= IP6T_OPTS_OPTS;
 		*flags |= IP6T_OPTS_OPTS;
 		break;

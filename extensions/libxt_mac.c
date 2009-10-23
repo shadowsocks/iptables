@@ -58,7 +58,7 @@ mac_parse(int c, char **argv, int invert, unsigned int *flags,
 	switch (c) {
 	case '1':
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		parse_mac(argv[optind-1], macinfo);
+		parse_mac(optarg, macinfo);
 		if (invert)
 			macinfo->invert = 1;
 		*flags = 1;

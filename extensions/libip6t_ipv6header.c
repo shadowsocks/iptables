@@ -187,7 +187,7 @@ ipv6header_parse(int c, char **argv, int invert, unsigned int *flags,
 
 			xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 
-			if (! (info->matchflags = parse_header(argv[optind-1])) )
+			if (! (info->matchflags = parse_header(optarg)) )
 				xtables_error(PARAMETER_PROBLEM, "ip6t_ipv6header: cannot parse header names");
 
 			if (invert) 

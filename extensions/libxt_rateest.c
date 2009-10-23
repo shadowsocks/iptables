@@ -259,7 +259,7 @@ rateest_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case OPT_RATEEST_EQ:
-		xtables_check_inverse(argv[optind-1], &invert, &optind, 0, argv);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 
 		if (*flags & (1 << c))
 			xtables_error(PARAMETER_PROBLEM,
@@ -272,7 +272,7 @@ rateest_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case OPT_RATEEST_LT:
-		xtables_check_inverse(argv[optind-1], &invert, &optind, 0, argv);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 
 		if (*flags & (1 << c))
 			xtables_error(PARAMETER_PROBLEM,
@@ -285,7 +285,7 @@ rateest_parse(int c, char **argv, int invert, unsigned int *flags,
 		break;
 
 	case OPT_RATEEST_GT:
-		xtables_check_inverse(argv[optind-1], &invert, &optind, 0, argv);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 
 		if (*flags & (1 << c))
 			xtables_error(PARAMETER_PROBLEM,

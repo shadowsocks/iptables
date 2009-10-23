@@ -44,7 +44,7 @@ physdev_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & XT_PHYSDEV_OP_IN)
 			goto multiple_use;
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		xtables_parse_interface(argv[optind-1], info->physindev,
+		xtables_parse_interface(optarg, info->physindev,
 				(unsigned char *)info->in_mask);
 		if (invert)
 			info->invert |= XT_PHYSDEV_OP_IN;
@@ -56,7 +56,7 @@ physdev_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & XT_PHYSDEV_OP_OUT)
 			goto multiple_use;
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		xtables_parse_interface(argv[optind-1], info->physoutdev,
+		xtables_parse_interface(optarg, info->physoutdev,
 				(unsigned char *)info->out_mask);
 		if (invert)
 			info->invert |= XT_PHYSDEV_OP_OUT;

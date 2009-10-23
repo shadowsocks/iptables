@@ -1497,10 +1497,10 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				   invert);
 
 			/* Canonicalize into lower case */
-			for (protocol = argv[optind-1]; *protocol; protocol++)
+			for (protocol = optarg; *protocol; protocol++)
 				*protocol = tolower(*protocol);
 
-			protocol = argv[optind-1];
+			protocol = optarg;
 			fw.ipv6.proto = xtables_parse_protocol(protocol);
 			fw.ipv6.flags |= IP6T_F_PROTO;
 
@@ -1521,14 +1521,14 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			xtables_check_inverse(optarg, &invert, &optind, argc, argv);
 			set_option(&options, OPT_SOURCE, &fw.ipv6.invflags,
 				   invert);
-			shostnetworkmask = argv[optind-1];
+			shostnetworkmask = optarg;
 			break;
 
 		case 'd':
 			xtables_check_inverse(optarg, &invert, &optind, argc, argv);
 			set_option(&options, OPT_DESTINATION, &fw.ipv6.invflags,
 				   invert);
-			dhostnetworkmask = argv[optind-1];
+			dhostnetworkmask = optarg;
 			break;
 
 #ifdef IP6T_F_GOTO
@@ -1574,7 +1574,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			xtables_check_inverse(optarg, &invert, &optind, argc, argv);
 			set_option(&options, OPT_VIANAMEIN, &fw.ipv6.invflags,
 				   invert);
-			xtables_parse_interface(argv[optind-1],
+			xtables_parse_interface(optarg,
 					fw.ipv6.iniface,
 					fw.ipv6.iniface_mask);
 			break;
@@ -1583,7 +1583,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			xtables_check_inverse(optarg, &invert, &optind, argc, argv);
 			set_option(&options, OPT_VIANAMEOUT, &fw.ipv6.invflags,
 				   invert);
-			xtables_parse_interface(argv[optind-1],
+			xtables_parse_interface(optarg,
 					fw.ipv6.outiface,
 					fw.ipv6.outiface_mask);
 			break;

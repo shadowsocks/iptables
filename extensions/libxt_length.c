@@ -71,7 +71,7 @@ length_parse(int c, char **argv, int invert, unsigned int *flags,
 				           "length: `--length' may only be "
 				           "specified once");
 			xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-			parse_lengths(argv[optind-1], info);
+			parse_lengths(optarg, info);
 			if (invert)
 				info->invert = 1;
 			*flags = 1;

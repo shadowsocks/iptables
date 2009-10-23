@@ -1520,10 +1520,10 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 				   invert);
 
 			/* Canonicalize into lower case */
-			for (protocol = argv[optind-1]; *protocol; protocol++)
+			for (protocol = optarg; *protocol; protocol++)
 				*protocol = tolower(*protocol);
 
-			protocol = argv[optind-1];
+			protocol = optarg;
 			fw.ip.proto = xtables_parse_protocol(protocol);
 
 			if (fw.ip.proto == 0
@@ -1536,14 +1536,14 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 			xtables_check_inverse(optarg, &invert, &optind, argc, argv);
 			set_option(&options, OPT_SOURCE, &fw.ip.invflags,
 				   invert);
-			shostnetworkmask = argv[optind-1];
+			shostnetworkmask = optarg;
 			break;
 
 		case 'd':
 			xtables_check_inverse(optarg, &invert, &optind, argc, argv);
 			set_option(&options, OPT_DESTINATION, &fw.ip.invflags,
 				   invert);
-			dhostnetworkmask = argv[optind-1];
+			dhostnetworkmask = optarg;
 			break;
 
 #ifdef IPT_F_GOTO
@@ -1589,7 +1589,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 			xtables_check_inverse(optarg, &invert, &optind, argc, argv);
 			set_option(&options, OPT_VIANAMEIN, &fw.ip.invflags,
 				   invert);
-			xtables_parse_interface(argv[optind-1],
+			xtables_parse_interface(optarg,
 					fw.ip.iniface,
 					fw.ip.iniface_mask);
 			break;
@@ -1598,7 +1598,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 			xtables_check_inverse(optarg, &invert, &optind, argc, argv);
 			set_option(&options, OPT_VIANAMEOUT, &fw.ip.invflags,
 				   invert);
-			xtables_parse_interface(argv[optind-1],
+			xtables_parse_interface(optarg,
 					fw.ip.outiface,
 					fw.ip.outiface_mask);
 			break;

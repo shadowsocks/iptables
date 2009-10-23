@@ -134,7 +134,7 @@ static int mh_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--mh-type' allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		parse_mh_types(argv[optind-1], mhinfo->types);
+		parse_mh_types(optarg, mhinfo->types);
 		if (invert)
 			mhinfo->invflags |= IP6T_MH_INV_TYPE;
 		*flags |= MH_TYPES;

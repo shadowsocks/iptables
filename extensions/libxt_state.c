@@ -73,7 +73,7 @@ state_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 
-		state_parse_states(argv[optind-1], sinfo);
+		state_parse_states(optarg, sinfo);
 		if (invert)
 			sinfo->statemask = ~sinfo->statemask;
 		*flags = 1;

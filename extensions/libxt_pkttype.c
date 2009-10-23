@@ -88,7 +88,7 @@ static int pkttype_parse(int c, char **argv, int invert, unsigned int *flags,
 	{
 		case '1':
 			xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-			parse_pkttype(argv[optind-1], info);
+			parse_pkttype(optarg, info);
 			if(invert)
 				info->invert=1;
 			*flags=1;

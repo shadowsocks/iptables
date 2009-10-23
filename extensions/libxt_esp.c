@@ -89,7 +89,7 @@ esp_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--espspi' allowed");
 		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		parse_esp_spis(argv[optind-1], espinfo->spis);
+		parse_esp_spis(optarg, espinfo->spis);
 		if (invert)
 			espinfo->invflags |= XT_ESP_INV_SPI;
 		*flags |= ESP_SPI;

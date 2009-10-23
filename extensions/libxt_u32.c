@@ -107,7 +107,7 @@ static int u32_parse(int c, char **argv, int invert, unsigned int *flags,
 	struct xt_u32 *data = (void *)(*match)->data;
 	unsigned int testind = 0, locind = 0, valind = 0;
 	struct xt_u32_test *ct = &data->tests[testind]; /* current test */
-	char *arg = argv[optind-1]; /* the argument string */
+	char *arg = optarg; /* the argument string */
 	char *start = arg;
 	int state = 0;
 
