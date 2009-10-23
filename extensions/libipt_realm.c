@@ -35,10 +35,9 @@ struct realmname {
 };
 
 /* array of realms from /etc/iproute2/rt_realms */
-static struct realmname *realms = NULL;
+static struct realmname *realms;
 /* 1 if loading failed */
-static int rdberr = 0;
-
+static int rdberr;
 
 static void load_realms(void)
 {
