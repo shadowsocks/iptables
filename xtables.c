@@ -1645,25 +1645,25 @@ void xtables_save_string(const char *value)
 int xtables_check_inverse(const char option[], int *invert,
 			  int *my_optind, int argc)
 {
-	if (option && strcmp(option, "!") == 0) {
-		fprintf(stderr, "Using intrapositioned negation "
-		        "(`--option ! this`) is deprecated in favor of "
-		        "extrapositioned (`! --option this`).\n");
+	if (option == NULL || strcmp(option, "!") != 0)
+		return false;
 
-		if (*invert)
+	fprintf(stderr, "Using intrapositioned negation "
+	        "(`--option ! this`) is deprecated in favor of "
+	        "extrapositioned (`! --option this`).\n");
+
+	if (*invert)
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			   "Multiple `!' flags not allowed");
+	*invert = true;
+	if (my_optind != NULL) {
+		++*my_optind;
+		if (argc && *my_optind > argc)
 			xt_params->exit_err(PARAMETER_PROBLEM,
-				   "Multiple `!' flags not allowed");
-		*invert = true;
-		if (my_optind != NULL) {
-			++*my_optind;
-			if (argc && *my_optind > argc)
-				xt_params->exit_err(PARAMETER_PROBLEM,
-					   "no argument following `!'");
-		}
-
-		return true;
+				   "no argument following `!'");
 	}
-	return false;
+
+	return true;
 }
 
 const struct xtables_pprot xtables_chain_protos[] = {
