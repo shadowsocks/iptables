@@ -52,7 +52,7 @@ connbytes_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (xtables_check_inverse(optarg, &invert, &optind, 0))
+		if (xtables_check_inverse(optarg, &invert, &optind, 0, argv))
 			optind++;
 
 		parse_range(argv[optind-1], sinfo);

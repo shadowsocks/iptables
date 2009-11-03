@@ -154,7 +154,7 @@ static int DNAT_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch (c) {
 	case '1':
-		if (xtables_check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0, argv))
 			xtables_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --to-destination");
 

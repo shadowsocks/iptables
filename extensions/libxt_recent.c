@@ -73,7 +73,7 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 				xtables_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--rcheck' "
 					"`--update' or `--remove' may be set");
-			xtables_check_inverse(optarg, &invert, &optind, 0);
+			xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 			info->check_set |= XT_RECENT_SET;
 			if (invert) info->invert = 1;
 			*flags |= XT_RECENT_SET;
@@ -84,7 +84,7 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 				xtables_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--rcheck' "
 					"`--update' or `--remove' may be set");
-			xtables_check_inverse(optarg, &invert, &optind, 0);
+			xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 			info->check_set |= XT_RECENT_CHECK;
 			if(invert) info->invert = 1;
 			*flags |= XT_RECENT_CHECK;
@@ -95,7 +95,7 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 				xtables_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--rcheck' "
 					"`--update' or `--remove' may be set");
-			xtables_check_inverse(optarg, &invert, &optind, 0);
+			xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 			info->check_set |= XT_RECENT_UPDATE;
 			if (invert) info->invert = 1;
 			*flags |= XT_RECENT_UPDATE;
@@ -106,7 +106,7 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 				xtables_error(PARAMETER_PROBLEM,
 					"recent: only one of `--set', `--rcheck' "
 					"`--update' or `--remove' may be set");
-			xtables_check_inverse(optarg, &invert, &optind, 0);
+			xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 			info->check_set |= XT_RECENT_REMOVE;
 			if (invert) info->invert = 1;
 			*flags |= XT_RECENT_REMOVE;

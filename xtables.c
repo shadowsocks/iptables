@@ -1643,7 +1643,7 @@ void xtables_save_string(const char *value)
  * Do not use in new code.
  */
 int xtables_check_inverse(const char option[], int *invert,
-			  int *my_optind, int argc)
+			  int *my_optind, int argc, char **argv)
 {
 	if (option == NULL || strcmp(option, "!") != 0)
 		return false;
@@ -1657,6 +1657,7 @@ int xtables_check_inverse(const char option[], int *invert,
 			   "Multiple `!' flags not allowed");
 	*invert = true;
 	if (my_optind != NULL) {
+		optarg = argv[*my_optind];
 		++*my_optind;
 		if (argc && *my_optind > argc)
 			xt_params->exit_err(PARAMETER_PROBLEM,

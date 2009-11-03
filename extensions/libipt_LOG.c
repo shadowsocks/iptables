@@ -108,7 +108,7 @@ static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify --log-level twice");
 
-		if (xtables_check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0, argv))
 			xtables_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --log-level");
 
@@ -121,7 +121,7 @@ static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify --log-prefix twice");
 
-		if (xtables_check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0, argv))
 			xtables_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --log-prefix");
 

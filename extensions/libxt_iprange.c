@@ -92,7 +92,7 @@ static int iprange_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= IPRANGE_SRC;
 
 		info->flags |= IPRANGE_SRC;
-		xtables_check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 		if (invert)
 			info->flags |= IPRANGE_SRC_INV;
 		iprange_parse_range(optarg, range, NFPROTO_IPV4, "--src-range");
@@ -106,7 +106,7 @@ static int iprange_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= IPRANGE_DST;
 
 		info->flags |= IPRANGE_DST;
-		xtables_check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 		if (invert)
 			info->flags |= IPRANGE_DST_INV;
 

@@ -140,7 +140,7 @@ dccp_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 			           "Only one `--source-port' allowed");
 		einfo->flags |= XT_DCCP_SRC_PORTS;
-		xtables_check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 		parse_dccp_ports(argv[optind-1], einfo->spts);
 		if (invert)
 			einfo->invflags |= XT_DCCP_SRC_PORTS;
@@ -152,7 +152,7 @@ dccp_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--destination-port' allowed");
 		einfo->flags |= XT_DCCP_DEST_PORTS;
-		xtables_check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 		parse_dccp_ports(argv[optind-1], einfo->dpts);
 		if (invert)
 			einfo->invflags |= XT_DCCP_DEST_PORTS;
@@ -164,7 +164,7 @@ dccp_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--dccp-types' allowed");
 		einfo->flags |= XT_DCCP_TYPE;
-		xtables_check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 		einfo->typemask = parse_dccp_types(argv[optind-1]);
 		if (invert)
 			einfo->invflags |= XT_DCCP_TYPE;
@@ -176,7 +176,7 @@ dccp_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 				   "Only one `--dccp-option' allowed");
 		einfo->flags |= XT_DCCP_OPTION;
-		xtables_check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 		einfo->option = parse_dccp_option(argv[optind-1]);
 		if (invert)
 			einfo->invflags |= XT_DCCP_OPTION;

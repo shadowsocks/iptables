@@ -43,7 +43,7 @@ static int ecn_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_ECN_OP_MATCH_CWR)
 			xtables_error(PARAMETER_PROBLEM,
 			           "ECN match: can only use parameter ONCE!");
-		xtables_check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 		einfo->operation |= IPT_ECN_OP_MATCH_CWR;
 		if (invert)
 			einfo->invert |= IPT_ECN_OP_MATCH_CWR;
@@ -54,7 +54,7 @@ static int ecn_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_ECN_OP_MATCH_ECE)
 			xtables_error(PARAMETER_PROBLEM,
 				   "ECN match: can only use parameter ONCE!");
-		xtables_check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 		einfo->operation |= IPT_ECN_OP_MATCH_ECE;
 		if (invert)
 			einfo->invert |= IPT_ECN_OP_MATCH_ECE;
@@ -65,7 +65,7 @@ static int ecn_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & IPT_ECN_OP_MATCH_IP)
 			xtables_error(PARAMETER_PROBLEM,
 				   "ECN match: can only use parameter ONCE!");
-		xtables_check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 		if (invert)
 			einfo->invert |= IPT_ECN_OP_MATCH_IP;
 		*flags |= IPT_ECN_OP_MATCH_IP;

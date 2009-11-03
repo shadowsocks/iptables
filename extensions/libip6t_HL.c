@@ -39,7 +39,7 @@ static int HL_parse(int c, char **argv, int invert, unsigned int *flags,
 		xtables_error(PARAMETER_PROBLEM,
 				"HL: You must specify a value");
 
-	if (xtables_check_inverse(optarg, &invert, NULL, 0))
+	if (xtables_check_inverse(optarg, &invert, NULL, 0, argv))
 		xtables_error(PARAMETER_PROBLEM,
 				"HL: unexpected `!'");
 	

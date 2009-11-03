@@ -202,7 +202,7 @@ string_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*flags & STRING)
 			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify multiple --string");
-		xtables_check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 		parse_string(argv[optind-1], stringinfo);
 		if (invert) {
 			if (revision == 0)
@@ -218,7 +218,7 @@ string_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify multiple --hex-string");
 
-		xtables_check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 		parse_hex_string(argv[optind-1], stringinfo);  /* sets length */
 		if (invert) {
 			if (revision == 0)

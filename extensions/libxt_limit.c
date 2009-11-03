@@ -94,14 +94,14 @@ limit_parse(int c, char **argv, int invert, unsigned int *flags,
 
 	switch(c) {
 	case '%':
-		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
+		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0, argv)) break;
 		if (!parse_rate(optarg, &r->avg))
 			xtables_error(PARAMETER_PROBLEM,
 				   "bad rate `%s'", optarg);
 		break;
 
 	case '$':
-		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0)) break;
+		if (xtables_check_inverse(argv[optind-1], &invert, &optind, 0, argv)) break;
 		if (!xtables_strtoui(optarg, NULL, &num, 0, 10000))
 			xtables_error(PARAMETER_PROBLEM,
 				   "bad --limit-burst `%s'", optarg);

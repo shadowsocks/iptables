@@ -118,7 +118,7 @@ static int parse_mode(char *s)
 	xtables_error(PARAMETER_PROBLEM, "policy match: invalid mode \"%s\"", s);
 }
 
-static int policy_parse(int c, int invert, unsigned int *flags,
+static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
                         struct xt_policy_info *info, uint8_t family)
 {
 	struct xt_policy_elem *e = &info->pol[info->len];
@@ -127,7 +127,7 @@ static int policy_parse(int c, int invert, unsigned int *flags,
 	unsigned int naddr = 0, num;
 	int mode;
 
-	xtables_check_inverse(optarg, &invert, &optind, 0);
+	xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 
 	switch (c) {
 	case '1':
@@ -269,14 +269,14 @@ static int policy_parse(int c, int invert, unsigned int *flags,
 static int policy4_parse(int c, char **argv, int invert, unsigned int *flags,
                          const void *entry, struct xt_entry_match **match)
 {
-	return policy_parse(c, invert, flags, (void *)(*match)->data,
+	return policy_parse(c, argv, invert, flags, (void *)(*match)->data,
 	       NFPROTO_IPV4);
 }
 
 static int policy6_parse(int c, char **argv, int invert, unsigned int *flags,
                         const void *entry, struct xt_entry_match **match)
 {
-	return policy_parse(c, invert, flags, (void *)(*match)->data,
+	return policy_parse(c, argv, invert, flags, (void *)(*match)->data,
 	       NFPROTO_IPV6);
 }
 

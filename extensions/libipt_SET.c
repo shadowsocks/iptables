@@ -56,7 +56,7 @@ parse_target(char **argv, int invert, unsigned int *flags,
 		xtables_error(PARAMETER_PROBLEM,
 			   "--%s can be specified only once", what);
 
-	if (xtables_check_inverse(optarg, &invert, NULL, 0))
+	if (xtables_check_inverse(optarg, &invert, NULL, 0, argv))
 		xtables_error(PARAMETER_PROBLEM,
 			   "Unexpected `!' after --%s", what);
 

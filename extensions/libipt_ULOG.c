@@ -76,7 +76,7 @@ static int ULOG_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify --ulog-nlgroup twice");
 
-		if (xtables_check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0, argv))
 			xtables_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --ulog-nlgroup");
 		group_d = atoi(optarg);
@@ -94,7 +94,7 @@ static int ULOG_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 				   "Can't specify --ulog-prefix twice");
 
-		if (xtables_check_inverse(optarg, &invert, NULL, 0))
+		if (xtables_check_inverse(optarg, &invert, NULL, 0, argv))
 			xtables_error(PARAMETER_PROBLEM,
 				   "Unexpected `!' after --ulog-prefix");
 

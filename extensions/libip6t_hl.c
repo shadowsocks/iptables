@@ -29,7 +29,7 @@ static int hl_parse(int c, char **argv, int invert, unsigned int *flags,
 	struct ip6t_hl_info *info = (struct ip6t_hl_info *) (*match)->data;
 	u_int8_t value;
 
-	xtables_check_inverse(optarg, &invert, &optind, 0);
+	xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 	value = atoi(argv[optind-1]);
 
 	if (*flags) 

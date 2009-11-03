@@ -80,7 +80,7 @@ cluster_parse(int c, char **argv, int invert, unsigned int *flags,
 				      "`--cluster-local-nodemask' and "
 				      "`--cluster-local-node'");
 		}
-		xtables_check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 
 		if (!xtables_strtoui(optarg, NULL, &num, 1,
 				     XT_CLUSTER_NODES_MAX)) {
@@ -105,7 +105,7 @@ cluster_parse(int c, char **argv, int invert, unsigned int *flags,
 				      "`--cluster-local-nodemask' and "
 				      "`--cluster-local-node'");
 		}
-		xtables_check_inverse(optarg, &invert, &optind, 0);
+		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 
 		if (!xtables_strtoui(optarg, NULL, &num, 1,
 				     XT_CLUSTER_NODES_MAX)) {
