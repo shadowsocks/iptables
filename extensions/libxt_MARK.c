@@ -247,6 +247,8 @@ static void mark_tg_print(const void *ip, const struct xt_entry_target *target,
 		printf("MARK or 0x%x ", info->mark);
 	else if (info->mask == 0)
 		printf("MARK xor 0x%x ", info->mark);
+	else if (info->mask == 0xffffffffU)
+		printf("MARK set 0x%x ", info->mark);
 	else
 		printf("MARK xset 0x%x/0x%x ", info->mark, info->mask);
 }
