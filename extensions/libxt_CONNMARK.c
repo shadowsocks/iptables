@@ -312,6 +312,8 @@ connmark_tg_print(const void *ip, const struct xt_entry_target *target,
 			printf("CONNMARK or 0x%x ", info->ctmark);
 		else if (info->ctmask == 0)
 			printf("CONNMARK xor 0x%x ", info->ctmark);
+		else if (info->ctmask == 0xFFFFFFFFU)
+			printf("CONNMARK set 0x%x ", info->ctmark);
 		else
 			printf("CONNMARK xset 0x%x/0x%x ",
 			       info->ctmark, info->ctmask);
