@@ -273,7 +273,7 @@ conntrack_ps_expires(struct xt_conntrack_mtinfo2 *info, const char *s)
 		xtables_param_act(XTF_BAD_VALUE, "conntrack", "--expires", s);
 	max = min;
 	if (*end == ':')
-		if (!xtables_strtoui(s, &end, &max, 0, UINT32_MAX))
+		if (!xtables_strtoui(end + 1, &end, &max, 0, UINT32_MAX))
 			xtables_param_act(XTF_BAD_VALUE, "conntrack", "--expires", s);
 	if (*end != '\0')
 		xtables_param_act(XTF_BAD_VALUE, "conntrack", "--expires", s);
