@@ -760,13 +760,15 @@ static int
 replace_entry(const ipt_chainlabel chain,
 	      struct ipt_entry *fw,
 	      unsigned int rulenum,
-	      const struct in_addr *saddr,
-	      const struct in_addr *daddr,
+	      const struct in_addr *saddr, const struct in_addr *smask,
+	      const struct in_addr *daddr, const struct in_addr *dmask,
 	      int verbose,
 	      struct iptc_handle *handle)
 {
 	fw->ip.src.s_addr = saddr->s_addr;
 	fw->ip.dst.s_addr = daddr->s_addr;
+	fw->ip.smsk.s_addr = smask->s_addr;
+	fw->ip.dmsk.s_addr = dmask->s_addr;
 
 	if (verbose)
 		print_firewall_line(fw, handle);
@@ -1988,8 +1990,8 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 		break;
 	case CMD_REPLACE:
 		ret = replace_entry(chain, e, rulenum - 1,
-				    saddrs, daddrs, options&OPT_VERBOSE,
-				    *handle);
+				    saddrs, smasks, daddrs, dmasks,
+				    options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_INSERT:
 		ret = insert_entry(chain, e, rulenum - 1,

@@ -44,7 +44,9 @@ This option must be used in conjunction with one of \fB\-\-rcheck\fP or
 address is in the list and packets had been received greater than or equal to
 the given value. This option may be used along with \fB\-\-seconds\fP to create
 an even narrower match requiring a certain number of hits within a specific
-time frame.
+time frame. The maximum value for the hitcount parameter is given by the
+"ip_pkt_list_tot" parameter of the xt_recent kernel module. Exceeding this
+value on the command line will cause the rule to be rejected.
 .TP
 \fB\-\-rttl\fP
 This option may only be used in conjunction with one of \fB\-\-rcheck\fP or

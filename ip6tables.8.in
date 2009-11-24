@@ -240,10 +240,12 @@ option is omitted.
 .TP
 [\fB!\fP] \fB\-s\fP, \fB\-\-source\fP \fIaddress\fP[\fB/\fP\fImask\fP]
 Source specification.
-\fIAddress\fP can be either a hostname (please note that specifying
-any name to be resolved with a remote query such as DNS is a really bad idea),
-a network IPv6 address (with \fB/\fP\fImask\fP), or a plain IPv6 address.
-(the network name isn't supported now).
+\fIAddress\fP can be either be a hostname,
+a network IP address (with \fB/\fP\fImask\fP), or a plain IP address.
+Names will be resolved once only, before the rule is submitted to the kernel.
+Please note that specifying any name to be resolved with a remote query such as
+DNS is a really bad idea.
+(Resolving network names is not supported at this time.)
 The \fImask\fP is a plain number,
 specifying the number of 1's at the left side of the network mask.
 A "!" argument before the address specification inverts the sense of

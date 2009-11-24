@@ -758,13 +758,15 @@ static int
 replace_entry(const ip6t_chainlabel chain,
 	      struct ip6t_entry *fw,
 	      unsigned int rulenum,
-	      const struct in6_addr *saddr,
-	      const struct in6_addr *daddr,
+	      const struct in6_addr *saddr, const struct in6_addr *smask,
+	      const struct in6_addr *daddr, const struct in6_addr *dmask,
 	      int verbose,
 	      struct ip6tc_handle *handle)
 {
 	fw->ipv6.src = *saddr;
 	fw->ipv6.dst = *daddr;
+	fw->ipv6.smsk = *smask;
+	fw->ipv6.dmsk = *dmask;
 
 	if (verbose)
 		print_firewall_line(fw, handle);
@@ -1947,8 +1949,8 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		break;
 	case CMD_REPLACE:
 		ret = replace_entry(chain, e, rulenum - 1,
-				    saddrs, daddrs, options&OPT_VERBOSE,
-				    *handle);
+				    saddrs, smasks, daddrs, dmasks,
+				    options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_INSERT:
 		ret = insert_entry(chain, e, rulenum - 1,

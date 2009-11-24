@@ -239,9 +239,11 @@ option is omitted.
 .TP
 [\fB!\fP] \fB\-s\fP, \fB\-\-source\fP \fIaddress\fP[\fB/\fP\fImask\fP][\fB,\fP\fI...\fP]
 Source specification. \fIAddress\fP
-can be either a network name, a hostname (please note that specifying
-any name to be resolved with a remote query such as DNS is a really bad idea),
-a network IP address (with \fB/\fP\fImask\fP), or a plain IP address.
+can be either a network name, a hostname, a network IP address (with
+\fB/\fP\fImask\fP), or a plain IP address. Hostnames will
+be resolved once only, before the rule is submitted to the kernel.
+Please note that specifying any name to be resolved with a remote query such as
+DNS is a really bad idea.
 The \fImask\fP
 can be either a network mask or a plain number,
 specifying the number of 1's at the left side of the network mask.
