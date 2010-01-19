@@ -4,6 +4,9 @@ that list in a few different ways.
 For example, you can create a "badguy" list out of people attempting to connect
 to port 139 on your firewall and then DROP all future packets from them without
 considering them.
+.PP
+\fB\-\-set\fP, \fB\-\-rcheck\fP, \fB\-\-update\fP and \fB\-\-remove\fP are
+mutually exclusive.
 .TP
 \fB\-\-name\fP \fIname\fP
 Specify the list to use for the commands. If no name is given then
@@ -33,12 +36,12 @@ Check if the source address of the packet is currently in the list and if so
 that address will be removed from the list and the rule will return true. If
 the address is not found, false is returned.
 .TP
-[\fB!\fR] \fB\-\-seconds\fP \fIseconds\fP
+\fB\-\-seconds\fP \fIseconds\fP
 This option must be used in conjunction with one of \fB\-\-rcheck\fP or
 \fB\-\-update\fP. When used, this will narrow the match to only happen when the
 address is in the list and was seen within the last given number of seconds.
 .TP
-[\fB!\fR] \fB\-\-hitcount\fP \fIhits\fP
+\fB\-\-hitcount\fP \fIhits\fP
 This option must be used in conjunction with one of \fB\-\-rcheck\fP or
 \fB\-\-update\fP. When used, this will narrow the match to only happen when the
 address is in the list and packets had been received greater than or equal to
