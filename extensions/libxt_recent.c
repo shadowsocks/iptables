@@ -101,6 +101,14 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 			*flags |= XT_RECENT_UPDATE;
 			break;
 
+		case 204:
+			info->seconds = atoi(optarg);
+			break;
+
+		case 205:
+			info->hit_count = atoi(optarg);
+			break;
+
 		case 206:
 			if (*flags & RECENT_CMDS)
 				xtables_error(PARAMETER_PROBLEM,
@@ -110,14 +118,6 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 			info->check_set |= XT_RECENT_REMOVE;
 			if (invert) info->invert = 1;
 			*flags |= XT_RECENT_REMOVE;
-			break;
-
-		case 204:
-			info->seconds = atoi(optarg);
-			break;
-
-		case 205:
-			info->hit_count = atoi(optarg);
 			break;
 
 		case 207:
