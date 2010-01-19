@@ -12,3 +12,7 @@ where flags are
 and/or
 .BR "dst"
 specifications and there can be no more than six of them.
+.PP
+Use of -j SET requires that ipset kernel support is provided. As standard
+kernels do not ship this currently, the ipset or Xtables-addons package needs
+to be installed.
