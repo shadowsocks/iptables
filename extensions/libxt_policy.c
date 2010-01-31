@@ -292,7 +292,7 @@ static void policy_check(unsigned int flags)
 
 	if (!(info->flags & (XT_POLICY_MATCH_IN | XT_POLICY_MATCH_OUT)))
 		xtables_error(PARAMETER_PROBLEM,
-		           "policy match: neither --in nor --out specified");
+		           "policy match: neither --dir in nor --dir out specified");
 
 	if (info->flags & XT_POLICY_MATCH_NONE) {
 		if (info->flags & XT_POLICY_MATCH_STRICT)
