@@ -13,8 +13,12 @@
 
 #include <xtables.h>
 #include <linux/netfilter/xt_dscp.h>
-#include <linux/netfilter_ipv4/ipt_tos.h>
 #include "tos_values.c"
+
+struct ipt_tos_info {
+	u_int8_t tos;
+	u_int8_t invert;
+};
 
 enum {
 	FLAG_TOS = 1 << 0,

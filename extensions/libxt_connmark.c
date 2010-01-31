@@ -28,6 +28,11 @@
 #include <xtables.h>
 #include <linux/netfilter/xt_connmark.h>
 
+struct xt_connmark_info {
+	unsigned long mark, mask;
+	u_int8_t invert;
+};
+
 enum {
 	F_MARK = 1 << 0,
 };

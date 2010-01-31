@@ -9,7 +9,19 @@
 #include <xtables.h>
 #include <linux/netfilter.h>
 #include <linux/netfilter/xt_iprange.h>
-#include <linux/netfilter_ipv4/ipt_iprange.h>
+
+struct ipt_iprange {
+	/* Inclusive: network order. */
+	__be32 min_ip, max_ip;
+};
+
+struct ipt_iprange_info {
+	struct ipt_iprange src;
+	struct ipt_iprange dst;
+
+	/* Flags from above */
+	u_int8_t flags;
+};
 
 enum {
 	F_SRCIP = 1 << 0,

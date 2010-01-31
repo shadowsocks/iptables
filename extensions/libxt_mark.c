@@ -9,6 +9,11 @@
 #include <xtables.h>
 #include <linux/netfilter/xt_mark.h>
 
+struct xt_mark_info {
+	unsigned long mark, mask;
+	u_int8_t invert;
+};
+
 enum {
 	F_MARK = 1 << 0,
 };

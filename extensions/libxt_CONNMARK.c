@@ -28,6 +28,12 @@
 #include <linux/netfilter/x_tables.h>
 #include <linux/netfilter/xt_CONNMARK.h>
 
+struct xt_connmark_target_info {
+	unsigned long mark;
+	unsigned long mask;
+	u_int8_t mode;
+};
+
 enum {
 	F_MARK    = 1 << 0,
 	F_SR_MARK = 1 << 1,

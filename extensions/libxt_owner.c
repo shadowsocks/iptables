@@ -16,8 +16,38 @@
 
 #include <xtables.h>
 #include <linux/netfilter/xt_owner.h>
-#include <linux/netfilter_ipv4/ipt_owner.h>
-#include <linux/netfilter_ipv6/ip6t_owner.h>
+
+/* match and invert flags */
+enum {
+	IPT_OWNER_UID   = 0x01,
+	IPT_OWNER_GID   = 0x02,
+	IPT_OWNER_PID   = 0x04,
+	IPT_OWNER_SID   = 0x08,
+	IPT_OWNER_COMM  = 0x10,
+	IP6T_OWNER_UID  = IPT_OWNER_UID,
+	IP6T_OWNER_GID  = IPT_OWNER_GID,
+	IP6T_OWNER_PID  = IPT_OWNER_PID,
+	IP6T_OWNER_SID  = IPT_OWNER_SID,
+	IP6T_OWNER_COMM = IPT_OWNER_COMM,
+};
+
+struct ipt_owner_info {
+	uid_t uid;
+	gid_t gid;
+	pid_t pid;
+	pid_t sid;
+	char comm[16];
+	u_int8_t match, invert;	/* flags */
+};
+
+struct ip6t_owner_info {
+	uid_t uid;
+	gid_t gid;
+	pid_t pid;
+	pid_t sid;
+	char comm[16];
+	u_int8_t match, invert;	/* flags */
+};
 
 /*
  *	Note: "UINT32_MAX - 1" is used in the code because -1 is a reserved
