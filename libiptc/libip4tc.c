@@ -124,8 +124,8 @@ typedef unsigned int socklen_t;
 
 #define IP_PARTS(n) IP_PARTS_NATIVE(ntohl(n))
 
-int
-dump_entry(STRUCT_ENTRY *e, struct iptc_handle *const handle)
+static int
+dump_entry(struct ipt_entry *e, struct iptc_handle *const handle)
 {
 	size_t i;
 	STRUCT_ENTRY_TARGET *t;
