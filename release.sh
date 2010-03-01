@@ -2,8 +2,8 @@
 #
 set -e
 
-VERSION=1.4.5
-PREV_VERSION=1.4.4
+VERSION=1.4.7
+PREV_VERSION=1.4.6
 TMPDIR=/tmp/ipt-release
 IPTDIR="$TMPDIR/iptables-$VERSION"
 
