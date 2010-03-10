@@ -13,7 +13,7 @@ static void ct_help(void)
 "CT target options:\n"
 " --notrack			Don't track connection\n"
 " --helper name			Use conntrack helper 'name' for connection\n"
-" --ctevents event[,event...]	Generate specified conntrack vents for connection\n"
+" --ctevents event[,event...]	Generate specified conntrack events for connection\n"
 " --expevents event[,event...]	Generate specified expectation events for connection\n"
 " --zone ID			Assign/Lookup connection in zone ID\n"
 	);
