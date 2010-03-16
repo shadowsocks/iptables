@@ -545,6 +545,11 @@ xtables_find_match(const char *name, enum xtables_tryload tryload,
 	struct xtables_match *ptr;
 	const char *icmp6 = "icmp6";
 
+	if (strlen(name) > XT_FUNCTION_MAXNAMELEN - 1)
+		xtables_error(PARAMETER_PROBLEM,
+			   "Invalid match name \"%s\" (%u chars max)",
+			   name, XT_FUNCTION_MAXNAMELEN - 1);
+
 	/* This is ugly as hell. Nonetheless, there is no way of changing
 	 * this without hurting backwards compatibility */
 	if ( (strcmp(name,"icmpv6") == 0) ||

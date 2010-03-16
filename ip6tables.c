@@ -456,10 +456,10 @@ parse_target(const char *targetname)
 		xtables_error(PARAMETER_PROBLEM,
 			   "Invalid target name (too short)");
 
-	if (strlen(targetname)+1 > sizeof(ip6t_chainlabel))
+	if (strlen(targetname) > XT_FUNCTION_MAXNAMELEN - 1)
 		xtables_error(PARAMETER_PROBLEM,
 			   "Invalid target name `%s' (%u chars max)",
-			   targetname, (unsigned int)sizeof(ip6t_chainlabel)-1);
+			   targetname, XT_FUNCTION_MAXNAMELEN - 1);
 
 	for (ptr = targetname; *ptr; ptr++)
 		if (isspace(*ptr))
