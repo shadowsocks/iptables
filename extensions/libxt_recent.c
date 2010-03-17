@@ -183,7 +183,7 @@ static void recent_print(const void *ip, const struct xt_entry_match *match,
 	if (info->side == XT_RECENT_SOURCE)
 		printf("side: source ");
 	if (info->side == XT_RECENT_DEST)
-		printf("side: dest");
+		printf("side: dest ");
 }
 
 static void recent_save(const void *ip, const struct xt_entry_match *match)
