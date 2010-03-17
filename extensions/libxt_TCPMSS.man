@@ -4,10 +4,7 @@ outgoing interface's MTU minus 40 for IPv4 or 60 for IPv6, respectively).
 Of course, it can only be used
 in conjunction with
 \fB\-p tcp\fP.
-It is only valid in the
-.BR mangle
-table.
-.br
+.PP
 This target is used to overcome criminally braindead ISPs or servers
 which block "ICMP Fragmentation Needed" or "ICMPv6 Packet Too Big"
 packets.  The symptoms of this
