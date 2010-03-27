@@ -62,6 +62,10 @@ AM_CONDITIONAL([ENABLE_IPV6], [test "$enable_ipv6" = "yes"])
 AM_CONDITIONAL([ENABLE_DEVEL], [test "$enable_devel" = "yes"])
 AM_CONDITIONAL([ENABLE_LIBIPQ], [test "$enable_libipq" = "yes"])
 
+PKG_CHECK_MODULES([libnfnetlink], [libnfnetlink >= 1.0],
+	[nfnetlink=1], [nfnetlink=0])
+AM_CONDITIONAL([HAVE_LIBNFNETLINK], [test "$nfnetlink" = 1])
+
 regular_CFLAGS="-D_LARGEFILE_SOURCE=1 -D_LARGE_FILES -D_FILE_OFFSET_BITS=64 \
 	-D_REENTRANT -Wall -Waggregate-return -Wmissing-declarations \
 	-Wmissing-prototypes -Wredundant-decls -Wshadow -Wstrict-prototypes \
@@ -74,6 +78,7 @@ fi;
 if [[ -n "$ksourcedir" ]]; then
 	kinclude_CFLAGS="$kinclude_CFLAGS -I $ksourcedir/include";
 fi;
+pkgdatadir='${datadir}/xtables';
 
 AC_SUBST([regular_CFLAGS])
 AC_SUBST([kinclude_CFLAGS])
@@ -81,12 +86,13 @@ AC_SUBST([kbuilddir])
 AC_SUBST([ksourcedir])
 AC_SUBST([xtlibdir])
 AC_SUBST([pkgconfigdir])
+AC_SUBST([pkgdatadir])
 AC_SUBST([libxtables_vcurrent])
 AC_SUBST([libxtables_vage])
 libxtables_vmajor=$(($libxtables_vcurrent - $libxtables_vage));
 AC_SUBST([libxtables_vmajor])
 
 AC_CONFIG_FILES([Makefile extensions/GNUmakefile include/Makefile
-	libipq/Makefile
+	libipq/Makefile utils/Makefile
 	include/xtables.h include/iptables/internal.h libiptc.pc xtables.pc])
 AC_OUTPUT

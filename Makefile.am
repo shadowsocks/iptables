@@ -11,6 +11,9 @@ endif
 if ENABLE_LIBIPQ
 SUBDIRS         += libipq
 endif
+if HAVE_LIBNFNETLINK
+SUBDIRS         += utils
+endif
 lib_LTLIBRARIES =
 
 # libiptc
