@@ -40,8 +40,8 @@
 static void osf_help(void)
 {
 	printf("OS fingerprint match options:\n"
-		"--genre [!] string         Match a OS genre by passive fingerprinting.\n"
-		"--ttl                  Use some TTL check extensions to determine OS:\n"
+		"[!] --genre string     Match a OS genre by passive fingerprinting.\n"
+		"--ttl level            Use some TTL check extensions to determine OS:\n"
 		"       0                       true ip and fingerprint TTL comparison. Works for LAN.\n"
 		"       1                       check if ip TTL is less than fingerprint one. Works for global addresses.\n"
 		"       2                       do not compare TTL at all. Allows to detect NMAP, but can produce false results.\n"
