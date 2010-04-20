@@ -150,6 +150,8 @@ static void ct_print(const void *ip, const struct xt_entry_target *target, int n
 	if (info->exp_events)
 		ct_print_events("expevents", exp_event_tbl,
 				ARRAY_SIZE(exp_event_tbl), info->exp_events);
+	if (info->zone)
+		printf("zone %u ", info->zone);
 }
 
 static void ct_save(const void *ip, const struct xt_entry_target *target)
@@ -167,6 +169,8 @@ static void ct_save(const void *ip, const struct xt_entry_target *target)
 	if (info->exp_events)
 		ct_print_events("--expevents", exp_event_tbl,
 				ARRAY_SIZE(exp_event_tbl), info->exp_events);
+	if (info->zone)
+		printf("--zone %u ", info->zone);
 }
 
 static struct xtables_target ct_target = {
