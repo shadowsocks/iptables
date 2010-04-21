@@ -108,7 +108,8 @@ static int iprange_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			info->flags |= IPRANGE_SRC_INV;
 		iprange_parse_range(optarg, range, NFPROTO_IPV4, "--src-range");
-
+		info->src.min_ip = range[0].ip;
+		info->src.max_ip = range[1].ip;
 		break;
 
 	case '2':
@@ -122,8 +123,9 @@ static int iprange_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			info->flags |= IPRANGE_DST_INV;
 
-		iprange_parse_range(optarg, range, NFPROTO_IPV4, "--src-range");
-
+		iprange_parse_range(optarg, range, NFPROTO_IPV4, "--dst-range");
+		info->dst.min_ip = range[0].ip;
+		info->dst.max_ip = range[1].ip;
 		break;
 
 	default:
