@@ -67,9 +67,9 @@ static uint32_t ct_parse_events(const struct event_tbl *tbl, unsigned int size,
 	strcpy(str, events);
 	while ((t = strsep(&e, ","))) {
 		for (i = 0; i < size; i++) {
-			if (strcmp(t, tbl->name))
+			if (strcmp(t, tbl[i].name))
 				continue;
-			mask |= 1 << tbl->event;
+			mask |= 1 << tbl[i].event;
 			break;
 		}
 
