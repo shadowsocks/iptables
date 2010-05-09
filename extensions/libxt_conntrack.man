@@ -55,6 +55,10 @@ in both directions,
 meaning that the packet is starting a new connection, but is associated with an
 existing connection, such as an FTP data transfer, or an ICMP error.
 .TP
+\fBUNTRACKED\fR
+meaning that the packet is not tracked at all, which happens if you use
+the NOTRACK target in raw table.
+.TP
 \fBSNAT\fR
 A virtual state, matching if the original source address differs from the reply
 destination.
