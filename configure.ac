@@ -37,6 +37,11 @@ AC_ARG_ENABLE([ipv4],
 AC_ARG_ENABLE([ipv6],
 	AS_HELP_STRING([--disable-ipv6], [Do not build ip6tables]),
 	[enable_ipv6="$enableval"], [enable_ipv6="yes"])
+AC_ARG_ENABLE([largefile],
+	AS_HELP_STRING([--disable-largefile], [Do not build largefile support]),
+	[enable_largefile="$enableval"],
+	[enable_largefile="yes";
+	largefile_cflags='-D_LARGEFILE_SOURCE=1 -D_LARGE_FILES -D_FILE_OFFSET_BITS=64'])
 AC_ARG_ENABLE([devel],
 	AS_HELP_STRING([--enable-devel],
 	[Install Xtables development headers]),
@@ -59,6 +64,7 @@ AM_CONDITIONAL([ENABLE_STATIC], [test "$enable_static" = "yes"])
 AM_CONDITIONAL([ENABLE_SHARED], [test "$enable_shared" = "yes"])
 AM_CONDITIONAL([ENABLE_IPV4], [test "$enable_ipv4" = "yes"])
 AM_CONDITIONAL([ENABLE_IPV6], [test "$enable_ipv6" = "yes"])
+AM_CONDITIONAL([ENABLE_LARGEFILE], [test "$enable_largefile" = "yes"])
 AM_CONDITIONAL([ENABLE_DEVEL], [test "$enable_devel" = "yes"])
 AM_CONDITIONAL([ENABLE_LIBIPQ], [test "$enable_libipq" = "yes"])
 
@@ -66,7 +72,7 @@ PKG_CHECK_MODULES([libnfnetlink], [libnfnetlink >= 1.0],
 	[nfnetlink=1], [nfnetlink=0])
 AM_CONDITIONAL([HAVE_LIBNFNETLINK], [test "$nfnetlink" = 1])
 
-regular_CFLAGS="-D_LARGEFILE_SOURCE=1 -D_LARGE_FILES -D_FILE_OFFSET_BITS=64 \
+regular_CFLAGS="${largefile_cflags} \
 	-D_REENTRANT -Wall -Waggregate-return -Wmissing-declarations \
 	-Wmissing-prototypes -Wredundant-decls -Wshadow -Wstrict-prototypes \
 	-Winline -pipe \
