@@ -224,7 +224,7 @@ proto_to_name(u_int8_t proto, int nolookup)
 	return NULL;
 }
 
-static void
+static void __attribute__((noreturn))
 exit_tryhelp(int status)
 {
 	if (line != -1)

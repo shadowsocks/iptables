@@ -237,7 +237,7 @@ enum {
 	IPT_DOTTED_MASK
 };
 
-static void
+static void __attribute__((noreturn))
 exit_tryhelp(int status)
 {
 	if (line != -1)
