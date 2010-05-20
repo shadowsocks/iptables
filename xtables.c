@@ -1416,7 +1416,7 @@ host_to_ip6addr(const char *name, unsigned int *naddr)
 
 #ifdef DEBUG
 		fprintf(stderr, "resolved: len=%d  %s ", res->ai_addrlen,
-		        ip6addr_to_numeric(&((struct sockaddr_in6 *)res->ai_addr)->sin6_addr));
+		        xtables_ip6addr_to_numeric(&((struct sockaddr_in6 *)res->ai_addr)->sin6_addr));
 #endif
 		/* Get the first element of the address-chain */
 		addr = xtables_malloc(sizeof(struct in6_addr));
