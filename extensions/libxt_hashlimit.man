@@ -7,7 +7,7 @@ quantum per group":
 matching on source host
 "1000 packets per second for every host in 192.168.0.0/16"
 .TP
-matching on source prot
+matching on source port
 "100 packets per second for every service of 192.168.1.1"
 .TP
 matching on subnet
