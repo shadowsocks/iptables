@@ -259,11 +259,11 @@ main(int argc, char *argv[])
 				exit(1);
 			}
 
-			if (strlen(chain) > XT_FUNCTION_MAXNAMELEN - 1)
+			if (strlen(chain) >= XT_EXTENSION_MAXNAMELEN)
 				xtables_error(PARAMETER_PROBLEM,
 					   "Invalid chain name `%s' "
 					   "(%u chars max)",
-					   chain, XT_FUNCTION_MAXNAMELEN - 1);
+					   chain, XT_EXTENSION_MAXNAMELEN - 1);
 
 			if (iptc_builtin(chain, handle) <= 0) {
 				if (noflush && iptc_is_chain(chain, handle)) {
