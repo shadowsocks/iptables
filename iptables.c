@@ -1573,8 +1573,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 				target->t = xtables_calloc(1, size);
 				target->t->u.target_size = size;
 				strcpy(target->t->u.user.name, jumpto);
-				xtables_set_revision(target->t->u.user.name,
-					     target->revision);
+				target->t->u.user.revision = target->revision;
 				if (target->init != NULL)
 					target->init(target->t);
 				opts = xtables_merge_options(opts,
@@ -1632,7 +1631,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 			m->m = xtables_calloc(1, size);
 			m->m->u.match_size = size;
 			strcpy(m->m->u.user.name, m->name);
-			xtables_set_revision(m->m->u.user.name, m->revision);
+			m->m->u.user.revision = m->revision;
 			if (m->init != NULL)
 				m->init(m->m);
 			if (m != m->next) {
@@ -1787,8 +1786,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 					m->m = xtables_calloc(1, size);
 					m->m->u.match_size = size;
 					strcpy(m->m->u.user.name, m->name);
-					xtables_set_revision(m->m->u.user.name,
-						     m->revision);
+					m->m->u.user.revision = m->revision;
 					if (m->init != NULL)
 						m->init(m->m);
 
@@ -1947,8 +1945,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 			target->t->u.target_size = size;
 			strcpy(target->t->u.user.name, jumpto);
 			if (!iptc_is_chain(jumpto, *handle))
-				xtables_set_revision(target->t->u.user.name,
-					     target->revision);
+				target->t->u.user.revision = target->revision;
 			if (target->init != NULL)
 				target->init(target->t);
 		}
