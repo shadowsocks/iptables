@@ -97,7 +97,7 @@ struct sctp_chunk_names {
 
 /*'ALL' and 'NONE' will be treated specially. */
 static const struct sctp_chunk_names sctp_chunk_names[]
-= { { .name = "DATA", 		.chunk_type = 0,   .valid_flags = "-----UBE"},
+= { { .name = "DATA", 		.chunk_type = 0,   .valid_flags = "----IUBE"},
     { .name = "INIT", 		.chunk_type = 1,   .valid_flags = "--------"},
     { .name = "INIT_ACK", 	.chunk_type = 2,   .valid_flags = "--------"},
     { .name = "SACK",		.chunk_type = 3,   .valid_flags = "--------"},

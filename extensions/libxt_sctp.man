@@ -11,7 +11,7 @@ Chunk types: DATA INIT INIT_ACK SACK HEARTBEAT HEARTBEAT_ACK ABORT SHUTDOWN SHUT
 
 chunk type            available flags      
 .br
-DATA                  U B E u b e         
+DATA                  I U B E i u b e
 .br
 ABORT                 T t                 
 .br
