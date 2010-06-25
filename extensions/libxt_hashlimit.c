@@ -591,8 +591,7 @@ static void hashlimit_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_hashlimit_info *r = (const void *)match->data;
 
 	fputs("--hashlimit ", stdout); print_rate(r->cfg.avg);
-	if (r->cfg.burst != XT_HASHLIMIT_BURST)
-		printf("--hashlimit-burst %u ", r->cfg.burst);
+	printf("--hashlimit-burst %u ", r->cfg.burst);
 
 	fputs("--hashlimit-mode ", stdout);
 	print_mode(r->cfg.mode, ',');
@@ -617,8 +616,7 @@ hashlimit_mt_save(const struct xt_hashlimit_mtinfo1 *info, unsigned int dmask)
 	else
 		fputs("--hashlimit-upto ", stdout);
 	print_rate(info->cfg.avg);
-	if (info->cfg.burst != XT_HASHLIMIT_BURST)
-		printf("--hashlimit-burst %u ", info->cfg.burst);
+	printf("--hashlimit-burst %u ", info->cfg.burst);
 
 	if (info->cfg.mode & (XT_HASHLIMIT_HASH_SIP | XT_HASHLIMIT_HASH_SPT |
 	    XT_HASHLIMIT_HASH_DIP | XT_HASHLIMIT_HASH_DPT)) {
