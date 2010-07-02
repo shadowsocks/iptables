@@ -19,7 +19,7 @@ static const struct option quota_opts[] = {
 static void quota_help(void)
 {
 	printf("quota match options:\n"
-	       " --quota quota			quota (bytes)\n");
+	       "[!] --quota quota		quota (bytes)\n");
 }
 
 static void
