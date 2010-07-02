@@ -11,14 +11,14 @@ Name of the second rate estimator (if difference is to be calculated).
 \fB\-\-rateest\-delta\fP
 Compare difference(s) to given rate(s)
 .TP
-\fB\-\-rateest1\-bps\fP \fIvalue\fP
+\fB\-\-rateest\-bps1\fP \fIvalue\fP
 .TP
-\fB\-\-rateest2\-bps\fP \fIvalue\fP
+\fB\-\-rateest\-bps2\fP \fIvalue\fP
 Compare bytes per second.
 .TP
-\fB\-\-rateest1\-pps\fP \fIvalue\fP
+\fB\-\-rateest\-pps1\fP \fIvalue\fP
 .TP
-\fB\-\-rateest2\-pps\fP \fIvalue\fP
+\fB\-\-rateest\-pps2\fP \fIvalue\fP
 Compare packets per second.
 .TP
 [\fB!\fP] \fB\-\-rateest\-lt\fP
