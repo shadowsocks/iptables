@@ -65,6 +65,10 @@ quota_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (!parse_quota(optarg, &info->quota))
 			xtables_error(PARAMETER_PROBLEM,
 				   "bad quota: '%s'", optarg);
+
+		if (invert)
+			info->flags |= XT_QUOTA_INVERT;
+
 		break;
 
 	default:
