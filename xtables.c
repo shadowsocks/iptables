@@ -114,14 +114,6 @@ struct option *xtables_merge_options(struct option *oldopts,
 	return merge;
 }
 
-void xtables_set_revision(char *name, u_int8_t revision)
-{
-	/* Old kernel sources don't have ".revision" field,
-	*            but we stole a byte from name. */
-	name[XT_FUNCTION_MAXNAMELEN - 2] = '\0';
-	name[XT_FUNCTION_MAXNAMELEN - 1] = revision;
-}
-
 /**
  * xtables_afinfo - protocol family dependent information
  * @kmod:		kernel module basename (e.g. "ip_tables")
@@ -545,10 +537,10 @@ xtables_find_match(const char *name, enum xtables_tryload tryload,
 	struct xtables_match *ptr;
 	const char *icmp6 = "icmp6";
 
-	if (strlen(name) > XT_FUNCTION_MAXNAMELEN - 1)
+	if (strlen(name) >= XT_EXTENSION_MAXNAMELEN)
 		xtables_error(PARAMETER_PROBLEM,
 			   "Invalid match name \"%s\" (%u chars max)",
-			   name, XT_FUNCTION_MAXNAMELEN - 1);
+			   name, XT_EXTENSION_MAXNAMELEN - 1);
 
 	/* This is ugly as hell. Nonetheless, there is no way of changing
 	 * this without hurting backwards compatibility */
@@ -741,8 +733,7 @@ void xtables_register_match(struct xtables_match *me)
 		exit(1);
 	}
 
-	/* Revision field stole a char from name. */
-	if (strlen(me->name) >= XT_FUNCTION_MAXNAMELEN-1) {
+	if (strlen(me->name) >= XT_EXTENSION_MAXNAMELEN) {
 		fprintf(stderr, "%s: target `%s' has invalid name\n",
 			xt_params->program_name, me->name);
 		exit(1);
@@ -827,8 +818,7 @@ void xtables_register_target(struct xtables_target *me)
 		exit(1);
 	}
 
-	/* Revision field stole a char from name. */
-	if (strlen(me->name) >= XT_FUNCTION_MAXNAMELEN-1) {
+	if (strlen(me->name) >= XT_EXTENSION_MAXNAMELEN) {
 		fprintf(stderr, "%s: target `%s' has invalid name\n",
 			xt_params->program_name, me->name);
 		exit(1);

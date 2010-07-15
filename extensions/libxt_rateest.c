@@ -419,9 +419,11 @@ rateest_save(const void *ip, const struct xt_entry_match *match)
 	} else {
 		printf("--rateest %s ", info->name1);
 		if (info->flags & XT_RATEEST_MATCH_BPS) {
-			printf("--rateest-bps ");
-			rateest_print_mode(info, "--rateest-");
+			printf("--rateest-bps1 ");
+			rateest_print_rate(info->bps1, 0);
+			printf("--rateest-bps2 ");
 			rateest_print_rate(info->bps2, 0);
+			rateest_print_mode(info, "--rateest-");
 		}
 		if (info->flags & XT_RATEEST_MATCH_PPS) {
 			printf("--rateest-pps ");

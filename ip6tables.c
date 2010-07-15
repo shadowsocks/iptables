@@ -456,10 +456,10 @@ parse_target(const char *targetname)
 		xtables_error(PARAMETER_PROBLEM,
 			   "Invalid target name (too short)");
 
-	if (strlen(targetname) > XT_FUNCTION_MAXNAMELEN - 1)
+	if (strlen(targetname) >= XT_EXTENSION_MAXNAMELEN)
 		xtables_error(PARAMETER_PROBLEM,
 			   "Invalid target name `%s' (%u chars max)",
-			   targetname, XT_FUNCTION_MAXNAMELEN - 1);
+			   targetname, XT_EXTENSION_MAXNAMELEN - 1);
 
 	for (ptr = targetname; *ptr; ptr++)
 		if (isspace(*ptr))
@@ -1558,8 +1558,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				target->t = xtables_calloc(1, size);
 				target->t->u.target_size = size;
 				strcpy(target->t->u.user.name, jumpto);
-				xtables_set_revision(target->t->u.user.name,
-					     target->revision);
+				target->t->u.user.revision = target->revision;
 				if (target->init != NULL)
 					target->init(target->t);
 				opts = xtables_merge_options(opts,
@@ -1611,7 +1610,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			m->m = xtables_calloc(1, size);
 			m->m->u.match_size = size;
 			strcpy(m->m->u.user.name, m->name);
-			xtables_set_revision(m->m->u.user.name, m->revision);
+			m->m->u.user.revision = m->revision;
 			if (m->init != NULL)
 				m->init(m->m);
 			if (m != m->next)
@@ -1759,8 +1758,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 					m->m = xtables_calloc(1, size);
 					m->m->u.match_size = size;
 					strcpy(m->m->u.user.name, m->name);
-					xtables_set_revision(m->m->u.user.name,
-						     m->revision);
+					m->m->u.user.revision = m->revision;
 					if (m->init != NULL)
 						m->init(m->m);
 

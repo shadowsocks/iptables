@@ -216,7 +216,6 @@ extern void *xtables_realloc(void *, size_t);
 extern int xtables_insmod(const char *, const char *, bool);
 extern int xtables_load_ko(const char *, bool);
 extern int xtables_set_params(struct xtables_globals *xtp);
-extern void xtables_set_revision(char *name, u_int8_t revision);
 extern void xtables_free_opts(int reset_offset);
 extern struct option *xtables_merge_options(struct option *oldopts,
 	const struct option *newopts, unsigned int *option_offset);
