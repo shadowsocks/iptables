@@ -60,23 +60,20 @@ static int idletimer_tg_parse(int c, char **argv, int invert,
 
 	switch (c) {
 	case 't':
-		if (*flags & IDLETIMER_TG_OPT_TIMEOUT)
-			xtables_error(PARAMETER_PROBLEM,
-				      "Cannot specify timeout more than once");
+		xtables_param_act(XTF_ONLY_ONCE, "IDLETIMER", "--timeout",
+				  *flags & IDLETIMER_TG_OPT_TIMEOUT);
 
 		info->timeout = atoi(optarg);
 		*flags |= IDLETIMER_TG_OPT_TIMEOUT;
 		break;
 
 	case 'l':
-		if (*flags & IDLETIMER_TG_OPT_LABEL)
-			xtables_error(PARAMETER_PROBLEM,
-				      "Cannot specify label more than once");
+		xtables_param_act(XTF_ONLY_ONCE, "IDLETIMER", "--label",
+				  *flags & IDLETIMER_TG_OPT_TIMEOUT);
 
 		if (strlen(optarg) > MAX_IDLETIMER_LABEL_SIZE - 1)
-			xtables_error(PARAMETER_PROBLEM,
-				      "Maximum label length is %u for --label",
-				      MAX_IDLETIMER_LABEL_SIZE - 1);
+			xtables_param_act(XTF_BAD_VALUE, "IDLETIMER", "--label",
+					 optarg);
 
 		strcpy(info->label, optarg);
 		*flags |= IDLETIMER_TG_OPT_LABEL;

@@ -16,4 +16,5 @@ userspace, which can then decide what to do (eg. disconnect to save power).
 This is the time in seconds that will trigger the notification.
 .TP
 \fB\-\-label\fP \fIstring\fP
-This is a unique identifier for the timer.
+This is a unique identifier for the timer.  The maximum length for the
+label string is 27 characters.
