@@ -17,7 +17,8 @@ static void REDIRECT_help(void)
 	printf(
 "REDIRECT target options:\n"
 " --to-ports <port>[-<port>]\n"
-"				Port (range) to map to.\n");
+"				Port (range) to map to.\n"
+" [--random]\n");
 }
 
 static const struct option REDIRECT_opts[] = {
