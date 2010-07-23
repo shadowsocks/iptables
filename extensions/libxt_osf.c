@@ -20,7 +20,7 @@
 /*
  * xtables interface for OS fingerprint matching module.
  */
-
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -54,10 +54,10 @@ static void osf_help(void)
 
 
 static const struct option osf_opts[] = {
-	{ .name = "genre",	.has_arg = true, .val = '1' },
-	{ .name = "ttl",	.has_arg = true, .val = '2' },
-	{ .name = "log",	.has_arg = true, .val = '3' },
-	{ .name = NULL }
+	{.name = "genre", .has_arg = true, .val = '1'},
+	{.name = "ttl",   .has_arg = true, .val = '2'},
+	{.name = "log",   .has_arg = true, .val = '3'},
+	XT_GETOPT_TABLEEND,
 };
 
 

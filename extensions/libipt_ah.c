@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add AH support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -17,8 +18,8 @@ static void ah_help(void)
 }
 
 static const struct option ah_opts[] = {
-	{ "ahspi", 1, NULL, '1' },
-	{ .name = NULL }
+	{.name = "ahspi", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static u_int32_t

@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add bridge port matching support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -24,12 +25,12 @@ static void physdev_help(void)
 }
 
 static const struct option physdev_opts[] = {
-	{ "physdev-in", 1, NULL, '1' },
-	{ "physdev-out", 1, NULL, '2' },
-	{ "physdev-is-in", 0, NULL, '3' },
-	{ "physdev-is-out", 0, NULL, '4' },
-	{ "physdev-is-bridged", 0, NULL, '5' },
-	{ .name = NULL }
+	{.name = "physdev-in",         .has_arg = true,  .val = '1'},
+	{.name = "physdev-out",        .has_arg = true,  .val = '2'},
+	{.name = "physdev-is-in",      .has_arg = false, .val = '3'},
+	{.name = "physdev-is-out",     .has_arg = false, .val = '4'},
+	{.name = "physdev-is-bridged", .has_arg = false, .val = '5'},
+	XT_GETOPT_TABLEEND,
 };
 
 static int

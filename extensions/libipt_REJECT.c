@@ -2,6 +2,7 @@
  *
  * (C) 2000 Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -76,8 +77,8 @@ static void REJECT_help(void)
 }
 
 static const struct option REJECT_opts[] = {
-	{ "reject-with", 1, NULL, '1' },
-	{ .name = NULL }
+	{.name = "reject-with", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void REJECT_init(struct xt_entry_target *t)

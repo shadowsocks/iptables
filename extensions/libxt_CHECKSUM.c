@@ -8,6 +8,7 @@
  *
  * libxt_CHECKSUM.c borrowed some bits from libipt_ECN.c
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -24,8 +25,8 @@ static void CHECKSUM_help(void)
 }
 
 static const struct option CHECKSUM_opts[] = {
-	{ "checksum-fill", 0, NULL, 'F' },
-	{ .name = NULL }
+	{.name = "checksum-fill", .has_arg = false, .val = 'F'},
+	XT_GETOPT_TABLEEND,
 };
 
 static int CHECKSUM_parse(int c, char **argv, int invert, unsigned int *flags,

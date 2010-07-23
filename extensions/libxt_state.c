@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add state tracking support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -22,8 +23,8 @@ state_help(void)
 }
 
 static const struct option state_opts[] = {
-	{ "state", 1, NULL, '1' },
-	{ .name = NULL }
+	{.name = "state", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static int

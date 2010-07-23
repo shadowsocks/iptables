@@ -5,6 +5,7 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -38,11 +39,11 @@ enum {
 };
 
 static const struct option cluster_opts[] = {
-	{ "cluster-total-nodes", 	1, NULL, CLUSTER_OPT_TOTAL_NODES },
-	{ "cluster-local-node", 	1, NULL, CLUSTER_OPT_LOCAL_NODE },
-	{ "cluster-local-nodemask",	1, NULL, CLUSTER_OPT_NODE_MASK },
-	{ "cluster-hash-seed",		1, NULL, CLUSTER_OPT_HASH_SEED },
-	{ .name = NULL }
+	{.name = "cluster-total-nodes",    .has_arg = true, .val = CLUSTER_OPT_TOTAL_NODES},
+	{.name = "cluster-local-node",     .has_arg = true, .val = CLUSTER_OPT_LOCAL_NODE},
+	{.name = "cluster-local-nodemask", .has_arg = true, .val = CLUSTER_OPT_NODE_MASK},
+	{.name = "cluster-hash-seed",      .has_arg = true, .val = CLUSTER_OPT_HASH_SEED},
+	XT_GETOPT_TABLEEND,
 };
 
 static int 

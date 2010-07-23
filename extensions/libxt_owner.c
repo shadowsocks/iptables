@@ -113,7 +113,7 @@ static const struct option owner_mt_opts_v0[] = {
 #ifdef IPT_OWNER_COMM
 	{.name = "cmd-owner", .has_arg = true, .val = 'c'},
 #endif
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static const struct option owner_mt6_opts_v0[] = {
@@ -121,14 +121,14 @@ static const struct option owner_mt6_opts_v0[] = {
 	{.name = "gid-owner", .has_arg = true, .val = 'g'},
 	{.name = "pid-owner", .has_arg = true, .val = 'p'},
 	{.name = "sid-owner", .has_arg = true, .val = 's'},
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static const struct option owner_mt_opts[] = {
 	{.name = "uid-owner",     .has_arg = true,  .val = 'u'},
 	{.name = "gid-owner",     .has_arg = true,  .val = 'g'},
 	{.name = "socket-exists", .has_arg = false, .val = 'k'},
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static int

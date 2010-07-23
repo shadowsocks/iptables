@@ -25,10 +25,10 @@ IP6T_OPTS_OPTSNR);
 }
 
 static const struct option hbh_opts[] = {
-	{ "hbh-len", 1, NULL, '1' },
-	{ "hbh-opts", 1, NULL, '2' },
-	{ "hbh-not-strict", 1, NULL, '3' },
-	{ .name = NULL }
+	{.name = "hbh-len",        .has_arg = true, .val = '1'},
+	{.name = "hbh-opts",       .has_arg = true, .val = '2'},
+	{.name = "hbh-not-strict", .has_arg = true, .val = '3'},
+	XT_GETOPT_TABLEEND,
 };
 
 static u_int32_t

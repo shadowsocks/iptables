@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add source-NAT support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -31,10 +32,10 @@ static void SNAT_help(void)
 }
 
 static const struct option SNAT_opts[] = {
-	{ "to-source", 1, NULL, '1' },
-	{ "random", 0, NULL, '2' },
-	{ "persistent", 0, NULL, '3' },
-	{ .name = NULL }
+	{.name = "to-source",  .has_arg = true,  .val = '1'},
+	{.name = "random",     .has_arg = false, .val = '2'},
+	{.name = "persistent", .has_arg = false, .val = '3'},
+	XT_GETOPT_TABLEEND,
 };
 
 static struct ipt_natinfo *

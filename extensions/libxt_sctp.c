@@ -7,6 +7,7 @@
  * libipt_ecn.c borrowed heavily from libipt_dscp.c
  *
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -55,12 +56,12 @@ static void sctp_help(void)
 }
 
 static const struct option sctp_opts[] = {
-	{ .name = "source-port", .has_arg = 1, .val = '1' },
-	{ .name = "sport", .has_arg = 1, .val = '1' },
-	{ .name = "destination-port", .has_arg = 1, .val = '2' },
-	{ .name = "dport", .has_arg = 1, .val = '2' },
-	{ .name = "chunk-types", .has_arg = 1, .val = '3' },
-	{ .name = NULL }
+	{.name = "source-port",      .has_arg = true, .val = '1'},
+	{.name = "sport",            .has_arg = true, .val = '1'},
+	{.name = "destination-port", .has_arg = true, .val = '2'},
+	{.name = "dport",            .has_arg = true, .val = '2'},
+	{.name = "chunk-types",      .has_arg = true, .val = '3'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void

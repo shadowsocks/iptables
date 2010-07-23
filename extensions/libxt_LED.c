@@ -9,7 +9,7 @@
  * published by the Free Software Foundation.
  *
  */
-
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -24,7 +24,7 @@ static const struct option LED_opts[] = {
 	{.name = "led-trigger-id",   .has_arg = true,  .val = 'i'},
 	{.name = "led-delay",        .has_arg = true,  .val = 'd'},
 	{.name = "led-always-blink", .has_arg = false, .val = 'a'},
-	{.name = NULL},
+	XT_GETOPT_TABLEEND,
 };
 
 static void LED_help(void)

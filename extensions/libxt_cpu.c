@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add CPU match support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -15,8 +16,8 @@ static void cpu_help(void)
 }
 
 static const struct option cpu_opts[] = {
-	{ "cpu", 1, NULL, '1' },
-	{ .name = NULL }
+	{.name = "cpu", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void

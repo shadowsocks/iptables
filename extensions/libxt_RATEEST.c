@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -31,10 +32,10 @@ enum RATEEST_options {
 };
 
 static const struct option RATEEST_opts[] = {
-	{ "rateest-name",	1, NULL, RATEEST_OPT_NAME },
-	{ "rateest-interval",	1, NULL, RATEEST_OPT_INTERVAL },
-	{ "rateest-ewmalog",	1, NULL, RATEEST_OPT_EWMALOG },
-	{ .name = NULL },
+	{.name = "rateest-name",     .has_arg = true, .val = RATEEST_OPT_NAME},
+	{.name = "rateest-interval", .has_arg = true, .val = RATEEST_OPT_INTERVAL},
+	{.name = "rateest-ewmalog",  .has_arg = true, .val = RATEEST_OPT_EWMALOG},
+	XT_GETOPT_TABLEEND,
 };
 
 /* Copied from iproute */

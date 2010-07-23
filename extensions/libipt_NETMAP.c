@@ -1,7 +1,7 @@
 /* Shared library add-on to iptables to add static NAT support.
    Author: Svenning Soerensen <svenning@post5.tele.dk>
 */
-
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -13,8 +13,8 @@
 #define MODULENAME "NETMAP"
 
 static const struct option NETMAP_opts[] = {
-	{ "to", 1, NULL, '1' },
-	{ .name = NULL }
+	{.name = "to", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void NETMAP_help(void)

@@ -7,6 +7,7 @@
  * libipt_ecn.c borrowed heavily from libipt_dscp.c
  *
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -25,10 +26,10 @@ static void ecn_help(void)
 }
 
 static const struct option ecn_opts[] = {
-	{ .name = "ecn-tcp-cwr", .has_arg = 0, .val = 'F' },
-	{ .name = "ecn-tcp-ece", .has_arg = 0, .val = 'G' },
-	{ .name = "ecn-ip-ect",  .has_arg = 1, .val = 'H' },
-	{ .name = NULL }
+	{.name = "ecn-tcp-cwr", .has_arg = false, .val = 'F'},
+	{.name = "ecn-tcp-ece", .has_arg = false, .val = 'G'},
+	{.name = "ecn-ip-ect",  .has_arg = true,  .val = 'H'},
+	XT_GETOPT_TABLEEND,
 };
 
 static int ecn_parse(int c, char **argv, int invert, unsigned int *flags,

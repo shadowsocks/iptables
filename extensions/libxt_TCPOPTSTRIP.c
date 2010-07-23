@@ -28,7 +28,7 @@ struct tcp_optionmap {
 
 static const struct option tcpoptstrip_tg_opts[] = {
 	{.name = "strip-options", .has_arg = true, .val = 's'},
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static const struct tcp_optionmap tcp_optionmap[] = {
@@ -38,7 +38,7 @@ static const struct tcp_optionmap tcp_optionmap[] = {
 	{"sack",           "Selective ACK",        TCPOPT_SACK},
 	{"timestamp",      "Timestamp",            TCPOPT_TIMESTAMP},
 	{"md5",            "MD5 signature",        TCPOPT_MD5SIG},
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static void tcpoptstrip_tg_help(void)

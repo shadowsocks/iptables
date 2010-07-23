@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <getopt.h>
 #include <netdb.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -23,8 +24,8 @@
 #include <linux/netfilter/xt_u32.h>
 
 static const struct option u32_opts[] = {
-	{"u32", 1, NULL, 'u'},
-	{ .name = NULL }
+	{.name = "u32", .has_arg = true, .val = 'u'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void u32_help(void)

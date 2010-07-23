@@ -5,7 +5,7 @@
  * This program is released under the terms of GNU GPL
  * Cleanups by Stephane Ouellette <ouellettes@videotron.ca>
  */
-
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -116,11 +116,11 @@ static void hl_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static const struct option hl_opts[] = {
-	{ .name = "hl",    .has_arg = 1, .val = '2' },
-	{ .name = "hl-eq", .has_arg = 1, .val = '2' },
-	{ .name = "hl-lt", .has_arg = 1, .val = '3' },
-	{ .name = "hl-gt", .has_arg = 1, .val = '4' },
-	{ .name = NULL }
+	{.name = "hl",    .has_arg = true, .val = '2'},
+	{.name = "hl-eq", .has_arg = true, .val = '2'},
+	{.name = "hl-lt", .has_arg = true, .val = '3'},
+	{.name = "hl-gt", .has_arg = true, .val = '4'},
+	XT_GETOPT_TABLEEND,
 };
 
 static struct xtables_match hl_mt6_reg = {

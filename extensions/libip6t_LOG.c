@@ -1,4 +1,5 @@
 /* Shared library add-on to ip6tables to add LOG support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -30,14 +31,14 @@ static void LOG_help(void)
 }
 
 static const struct option LOG_opts[] = {
-	{ .name = "log-level",        .has_arg = 1, .val = '!' },
-	{ .name = "log-prefix",       .has_arg = 1, .val = '#' },
-	{ .name = "log-tcp-sequence", .has_arg = 0, .val = '1' },
-	{ .name = "log-tcp-options",  .has_arg = 0, .val = '2' },
-	{ .name = "log-ip-options",   .has_arg = 0, .val = '3' },
-	{ .name = "log-uid",          .has_arg = 0, .val = '4' },
-	{ .name = "log-macdecode",    .has_arg = 0, .val = '5' },
-	{ .name = NULL }
+	{.name = "log-level",        .has_arg = true,  .val = '!'},
+	{.name = "log-prefix",       .has_arg = true,  .val = '#'},
+	{.name = "log-tcp-sequence", .has_arg = false, .val = '1'},
+	{.name = "log-tcp-options",  .has_arg = false, .val = '2'},
+	{.name = "log-ip-options",   .has_arg = false, .val = '3'},
+	{.name = "log-uid",          .has_arg = false, .val = '4'},
+	{.name = "log-macdecode",    .has_arg = false, .val = '5'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void LOG_init(struct xt_entry_target *t)

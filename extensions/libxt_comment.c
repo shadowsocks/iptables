@@ -6,6 +6,7 @@
  *     2004-05-12: Brad Fisher <brad@info-link.net>
  *         Port to patch-o-matic-ng
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -22,8 +23,8 @@ static void comment_help(void)
 }
 
 static const struct option comment_opts[] = {
-	{ "comment", 1, NULL, '1' },
-	{ .name = NULL }
+	{.name = "comment", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void

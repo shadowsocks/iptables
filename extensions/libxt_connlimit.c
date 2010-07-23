@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add connection limit support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -18,9 +19,9 @@ static void connlimit_help(void)
 }
 
 static const struct option connlimit_opts[] = {
-	{"connlimit-above", 1, NULL, 'A'},
-	{"connlimit-mask",  1, NULL, 'M'},
-	{ .name = NULL }
+	{.name = "connlimit-above", .has_arg = true, .val = 'A'},
+	{.name = "connlimit-mask",  .has_arg = true, .val = 'M'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void connlimit_init(struct xt_entry_match *match)

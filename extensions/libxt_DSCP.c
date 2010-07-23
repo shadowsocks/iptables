@@ -9,6 +9,7 @@
  *
  * --set-class added by Iain Barnes
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -38,9 +39,9 @@ static void DSCP_help(void)
 }
 
 static const struct option DSCP_opts[] = {
-	{ "set-dscp", 1, NULL, 'F' },
-	{ "set-dscp-class", 1, NULL, 'G' },
-	{ .name = NULL }
+	{.name = "set-dscp",       .has_arg = true, .val = 'F'},
+	{.name = "set-dscp-class", .has_arg = true, .val = 'G'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void

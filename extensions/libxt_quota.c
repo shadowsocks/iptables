@@ -3,6 +3,7 @@
  *
  * Sam Johnston <samj@samj.net>
  */
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,8 +13,8 @@
 #include <linux/netfilter/xt_quota.h>
 
 static const struct option quota_opts[] = {
-	{"quota", 1, NULL, '1'},
-	{ .name = NULL }
+	{.name = "quota", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void quota_help(void)

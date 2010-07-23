@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add ESP support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -19,8 +20,8 @@ static void esp_help(void)
 }
 
 static const struct option esp_opts[] = {
-	{ "espspi", 1, NULL, '1' },
-	{ .name = NULL }
+	{.name = "espspi", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static u_int32_t

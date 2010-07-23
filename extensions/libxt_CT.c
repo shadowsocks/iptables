@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -28,12 +29,12 @@ enum ct_options {
 };
 
 static const struct option ct_opts[] = {
-	{ "notrack",	0, NULL, CT_OPT_NOTRACK },
-	{ "helper",	1, NULL, CT_OPT_HELPER },
-	{ "ctevents",	1, NULL, CT_OPT_CTEVENTS },
-	{ "expevents",	1, NULL, CT_OPT_EXPEVENTS },
-	{ "zone",	1, NULL, CT_OPT_ZONE },
-	{ .name	= NULL },
+	{.name = "notrack",	.has_arg = false, .val = CT_OPT_NOTRACK},
+	{.name = "helper",	.has_arg = true,  .val = CT_OPT_HELPER},
+	{.name = "ctevents",	.has_arg = true,  .val = CT_OPT_CTEVENTS},
+	{.name = "expevents",	.has_arg = true,  .val = CT_OPT_EXPEVENTS},
+	{.name = "zone",	.has_arg = true,  .val = CT_OPT_ZONE},
+	XT_GETOPT_TABLEEND,
 };
 
 struct event_tbl {

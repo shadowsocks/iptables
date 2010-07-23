@@ -3,6 +3,7 @@
  *
  * Development of this code was funded by SuSE AG, http://www.suse.com/
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -41,13 +42,13 @@ static void CLUSTERIP_help(void)
 #define PARAM_HASHINIT	0x0020
 
 static const struct option CLUSTERIP_opts[] = {
-	{ "new", 0, NULL, '1' },
-	{ "hashmode", 1, NULL, '2' },
-	{ "clustermac", 1, NULL, '3' },
-	{ "total-nodes", 1, NULL, '4' },
-	{ "local-node", 1, NULL, '5' },
-	{ "hash-init", 1, NULL, '6' },
-	{ .name = NULL }
+	{.name = "new",         .has_arg = false, .val = '1'},
+	{.name = "hashmode",    .has_arg = true,  .val = '2'},
+	{.name = "clustermac",  .has_arg = true,  .val = '3'},
+	{.name = "total-nodes", .has_arg = true,  .val = '4'},
+	{.name = "local-node",  .has_arg = true,  .val = '5'},
+	{.name = "hash-init",   .has_arg = true,  .val = '6'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void

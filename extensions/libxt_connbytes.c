@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add byte tracking support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -18,10 +19,10 @@ static void connbytes_help(void)
 }
 
 static const struct option connbytes_opts[] = {
-	{ "connbytes", 1, NULL, '1' },
-	{ "connbytes-dir", 1, NULL, '2' },
-	{ "connbytes-mode", 1, NULL, '3' },
-	{ .name = NULL }
+	{.name = "connbytes",      .has_arg = true, .val = '1'},
+	{.name = "connbytes-dir",  .has_arg = true, .val = '2'},
+	{.name = "connbytes-mode", .has_arg = true, .val = '3'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void

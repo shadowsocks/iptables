@@ -38,15 +38,15 @@ static const char *const week_days[] = {
 };
 
 static const struct option time_opts[] = {
-	{"datestart", true,  NULL, 'D'},
-	{"datestop",  true,  NULL, 'E'},
-	{"timestart", true,  NULL, 'X'},
-	{"timestop",  true,  NULL, 'Y'},
-	{"weekdays",  true,  NULL, 'w'},
-	{"monthdays", true,  NULL, 'm'},
-	{"localtz",   false, NULL, 'l'},
-	{"utc",       false, NULL, 'u'},
-	{ .name = NULL }
+	{.name = "datestart", .has_arg = true,  .val = 'D'},
+	{.name = "datestop",  .has_arg = true,  .val = 'E'},
+	{.name = "timestart", .has_arg = true,  .val = 'X'},
+	{.name = "timestop",  .has_arg = true,  .val = 'Y'},
+	{.name = "weekdays",  .has_arg = true,  .val = 'w'},
+	{.name = "monthdays", .has_arg = true,  .val = 'm'},
+	{.name = "localtz",   .has_arg = false, .val = 'l'},
+	{.name = "utc",       .has_arg = false, .val = 'u'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void time_help(void)

@@ -1,4 +1,5 @@
 /* Shared library add-on to ip6tables to add AH support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -18,10 +19,10 @@ static void ah_help(void)
 }
 
 static const struct option ah_opts[] = {
-	{ .name = "ahspi", .has_arg = 1, .val = '1' },
-	{ .name = "ahlen", .has_arg = 1, .val = '2' },
-	{ .name = "ahres", .has_arg = 0, .val = '3' },
-	{ .name = NULL }
+	{.name = "ahspi", .has_arg = true,  .val = '1'},
+	{.name = "ahlen", .has_arg = true,  .val = '2'},
+	{.name = "ahres", .has_arg = false, .val = '3'},
+	XT_GETOPT_TABLEEND,
 };
 
 static u_int32_t

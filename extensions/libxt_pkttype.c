@@ -4,6 +4,7 @@
  *
  * Michal Ludvig <michal@logix.cz>
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -61,8 +62,8 @@ static void pkttype_help(void)
 }
 
 static const struct option pkttype_opts[] = {
-	{"pkt-type", 1, NULL, '1'},
-	{ .name = NULL }
+	{.name = "pkt-type", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void parse_pkttype(const char *pkttype, struct xt_pkttype_info *info)

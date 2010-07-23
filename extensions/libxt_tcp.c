@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add TCP support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -26,14 +27,14 @@ static void tcp_help(void)
 }
 
 static const struct option tcp_opts[] = {
-	{ "source-port", 1, NULL, '1' },
-	{ "sport", 1, NULL, '1' }, /* synonym */
-	{ "destination-port", 1, NULL, '2' },
-	{ "dport", 1, NULL, '2' }, /* synonym */
-	{ "syn", 0, NULL, '3' },
-	{ "tcp-flags", 1, NULL, '4' },
-	{ "tcp-option", 1, NULL, '5' },
-	{ .name = NULL }
+	{.name = "source-port",      .has_arg = true,  .val = '1'},
+	{.name = "sport",            .has_arg = true,  .val = '1'}, /* synonym */
+	{.name = "destination-port", .has_arg = true,  .val = '2'},
+	{.name = "dport",            .has_arg = true,  .val = '2'}, /* synonym */
+	{.name = "syn",              .has_arg = false, .val = '3'},
+	{.name = "tcp-flags",        .has_arg = true,  .val = '4'},
+	{.name = "tcp-option",       .has_arg = true,  .val = '5'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void

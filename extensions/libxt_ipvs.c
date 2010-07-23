@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <getopt.h>
 #include <netdb.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -26,7 +27,7 @@ static const struct option ipvs_mt_opts[] = {
 	{ .name = "vdir",     .has_arg = true,  .val = '4' },
 	{ .name = "vmethod",  .has_arg = true,  .val = '5' },
 	{ .name = "vportctl", .has_arg = true,  .val = '6' },
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static void ipvs_mt_help(void)

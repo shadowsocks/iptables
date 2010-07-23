@@ -6,6 +6,7 @@ on whether they contain certain headers */
 
 #include <getopt.h>
 #include <xtables.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -140,9 +141,9 @@ static void ipv6header_help(void)
 }
 
 static const struct option ipv6header_opts[] = {
-	{ "header", 1, NULL, '1' },
-	{ "soft", 0, NULL, '2' },
-	{ .name = NULL }
+	{.name = "header", .has_arg = true,  .val = '1'},
+	{.name = "soft",   .has_arg = false, .val = '2'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void ipv6header_init(struct xt_entry_match *m)

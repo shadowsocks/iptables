@@ -20,7 +20,7 @@
  * 02110-1301 USA
  *
  */
-
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -36,9 +36,9 @@ enum {
 };
 
 static const struct option idletimer_tg_opts[] = {
-	{ .name = "timeout", .has_arg = true, .flag = 0, .val = 't' },
-	{ .name = "label",   .has_arg = true, .flag = 0, .val = 'l' },
-	{ .name = NULL }
+	{.name = "timeout", .has_arg = true, .val = 't'},
+	{.name = "label",   .has_arg = true, .val = 'l'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void idletimer_tg_help(void)

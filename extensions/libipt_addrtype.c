@@ -1,7 +1,7 @@
 /* Shared library add-on to iptables to add addrtype matching support 
  * 
  * This program is released under the terms of GNU GPL */
-
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -304,23 +304,23 @@ static void addrtype_save_v1(const void *ip, const struct xt_entry_match *match)
 }
 
 static const struct option addrtype_opts[] = {
-	{ "src-type", 1, NULL, '1' },
-	{ "dst-type", 1, NULL, '2' },
-	{ .name = NULL }
+	{.name = "src-type", .has_arg = true, .val = '1'},
+	{.name = "dst-type", .has_arg = true, .val = '2'},
+	XT_GETOPT_TABLEEND,
 };
 
 static const struct option addrtype_opts_v0[] = {
-	{ "src-type", 1, NULL, '1' },
-	{ "dst-type", 1, NULL, '2' },
-	{ .name = NULL }
+	{.name = "src-type", .has_arg = true, .val = '1'},
+	{.name = "dst-type", .has_arg = true, .val = '2'},
+	XT_GETOPT_TABLEEND,
 };
 
 static const struct option addrtype_opts_v1[] = {
-	{ "src-type", 1, NULL, '1' },
-	{ "dst-type", 1, NULL, '2' },
-	{ "limit-iface-in", 0, NULL, '3' },
-	{ "limit-iface-out", 0, NULL, '4' },
-	{ .name = NULL }
+	{.name = "src-type",        .has_arg = true,  .val = '1'},
+	{.name = "dst-type",        .has_arg = true,  .val = '2'},
+	{.name = "limit-iface-in",  .has_arg = false, .val = '3'},
+	{.name = "limit-iface-out", .has_arg = false, .val = '4'},
+	XT_GETOPT_TABLEEND,
 };
 
 static struct xtables_match addrtype_mt_reg[] = {
