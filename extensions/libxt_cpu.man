@@ -8,9 +8,9 @@ multiqueue NICS to spread network traffic on different queues.
 Example:
 .PP
 iptables \-t nat \-A PREROUTING \-p tcp \-\-dport 80 \-m cpu \-\-cpu 0 
-        \-j REDIRECT \-\-to\-port 8080
+\-j REDIRECT \-\-to\-port 8080
 .PP
 iptables \-t nat \-A PREROUTING \-p tcp \-\-dport 80 \-m cpu \-\-cpu 1 
-        \-j REDIRECT \-\-to\-port 8081
+\-j REDIRECT \-\-to\-port 8081
 .PP
 Available since linux 2.6.36
