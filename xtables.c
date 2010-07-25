@@ -285,7 +285,7 @@ static char *get_modprobe(void)
 	if (procfile < 0)
 		return NULL;
 
-	ret = (char *) malloc(PROCFILE_BUFSIZ);
+	ret = malloc(PROCFILE_BUFSIZ);
 	if (ret) {
 		memset(ret, 0, PROCFILE_BUFSIZ);
 		switch (read(procfile, ret, PROCFILE_BUFSIZ)) {
