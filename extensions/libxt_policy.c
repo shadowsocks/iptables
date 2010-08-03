@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add policy support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -42,53 +43,55 @@ static const struct option policy_opts[] =
 {
 	{
 		.name		= "dir",
-		.has_arg	= 1,
+		.has_arg	= true,
 		.val		= '1',
 	},
 	{
 		.name		= "pol",
-		.has_arg	= 1,
+		.has_arg	= true,
 		.val		= '2',
 	},
 	{
 		.name		= "strict",
+		.has_arg	= false,
 		.val		= '3'
 	},
 	{
 		.name		= "reqid",
-		.has_arg	= 1,
+		.has_arg	= true,
 		.val		= '4',
 	},
 	{
 		.name		= "spi",
-		.has_arg	= 1,
+		.has_arg	= true,
 		.val		= '5'
 	},
 	{
 		.name		= "tunnel-src",
-		.has_arg	= 1,
+		.has_arg	= true,
 		.val		= '6'
 	},
 	{
 		.name		= "tunnel-dst",
-		.has_arg	= 1,
+		.has_arg	= true,
 		.val		= '7'
 	},
 	{
 		.name		= "proto",
-		.has_arg	= 1,
+		.has_arg	= true,
 		.val		= '8'
 	},
 	{
 		.name		= "mode",
-		.has_arg	= 1,
+		.has_arg	= true,
 		.val		= '9'
 	},
 	{
 		.name		= "next",
+		.has_arg	= false,
 		.val		= 'a'
 	},
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static int parse_direction(char *s)

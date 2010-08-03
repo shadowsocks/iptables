@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add LOG support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -25,17 +26,19 @@ static void LOG_help(void)
 " --log-tcp-sequence		Log TCP sequence numbers.\n\n"
 " --log-tcp-options		Log TCP options.\n\n"
 " --log-ip-options		Log IP options.\n\n"
-" --log-uid			Log UID owning the local socket.\n\n");
+" --log-uid			Log UID owning the local socket.\n\n"
+" --log-macdecode		Decode MAC addresses and protocol.\n\n");
 }
 
 static const struct option LOG_opts[] = {
-	{ .name = "log-level",        .has_arg = 1, .val = '!' },
-	{ .name = "log-prefix",       .has_arg = 1, .val = '#' },
-	{ .name = "log-tcp-sequence", .has_arg = 0, .val = '1' },
-	{ .name = "log-tcp-options",  .has_arg = 0, .val = '2' },
-	{ .name = "log-ip-options",   .has_arg = 0, .val = '3' },
-	{ .name = "log-uid",          .has_arg = 0, .val = '4' },
-	{ .name = NULL }
+	{.name = "log-level",        .has_arg = true,  .val = '!'},
+	{.name = "log-prefix",       .has_arg = true,  .val = '#'},
+	{.name = "log-tcp-sequence", .has_arg = false, .val = '1'},
+	{.name = "log-tcp-options",  .has_arg = false, .val = '2'},
+	{.name = "log-ip-options",   .has_arg = false, .val = '3'},
+	{.name = "log-uid",          .has_arg = false, .val = '4'},
+	{.name = "log-macdecode",    .has_arg = false, .val = '5'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void LOG_init(struct xt_entry_target *t)
@@ -96,6 +99,7 @@ parse_level(const char *level)
 #define IPT_LOG_OPT_TCPOPT 0x08
 #define IPT_LOG_OPT_IPOPT 0x10
 #define IPT_LOG_OPT_UID 0x20
+#define IPT_LOG_OPT_MACDECODE 0x40
 
 static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
                      const void *entry, struct xt_entry_target **target)
@@ -179,6 +183,14 @@ static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= IPT_LOG_OPT_UID;
 		break;
 
+	case '5':
+		if (*flags & IPT_LOG_OPT_MACDECODE)
+			xtables_error(PARAMETER_PROBLEM,
+				      "Can't specifiy --log-macdecode twice");
+
+		loginfo->logflags |= IPT_LOG_MACDECODE;
+		*flags |= IPT_LOG_OPT_MACDECODE;
+		break;
 	default:
 		return 0;
 	}
@@ -213,6 +225,8 @@ static void LOG_print(const void *ip, const struct xt_entry_target *target,
 			printf("ip-options ");
 		if (loginfo->logflags & IPT_LOG_UID)
 			printf("uid ");
+		if (loginfo->logflags & IPT_LOG_MACDECODE)
+			printf("macdecode ");
 		if (loginfo->logflags & ~(IPT_LOG_MASK))
 			printf("unknown-flags ");
 	}
@@ -242,6 +256,8 @@ static void LOG_save(const void *ip, const struct xt_entry_target *target)
 		printf("--log-ip-options ");
 	if (loginfo->logflags & IPT_LOG_UID)
 		printf("--log-uid ");
+	if (loginfo->logflags & IPT_LOG_MACDECODE)
+		printf("--log-macdecode ");
 }
 
 static struct xtables_target log_tg_reg = {

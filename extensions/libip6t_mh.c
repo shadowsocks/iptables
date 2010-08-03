@@ -11,6 +11,7 @@
  *
  * Based on libip6t_{icmpv6,udp}.c
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -216,8 +217,8 @@ static void mh_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static const struct option mh_opts[] = {
-	{ "mh-type", 1, NULL, '1' },
-	{ .name = NULL }
+	{.name = "mh-type", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static struct xtables_match mh_mt6_reg = {

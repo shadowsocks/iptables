@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add simple non load-balancing SNAT support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -25,10 +26,10 @@ static void SAME_help(void)
 }
 
 static const struct option SAME_opts[] = {
-	{ "to", 1, NULL, '1' },
-	{ "nodst", 0, NULL, '2'},
-	{ "random", 0, NULL, '3' },
-	{ .name = NULL }
+	{.name = "to",     .has_arg = true,  .val = '1'},
+	{.name = "nodst",  .has_arg = false, .val = '2'},
+	{.name = "random", .has_arg = false, .val = '3'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void SAME_init(struct xt_entry_target *t)

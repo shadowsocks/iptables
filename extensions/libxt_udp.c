@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add UDP support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -21,11 +22,11 @@ static void udp_help(void)
 }
 
 static const struct option udp_opts[] = {
-	{ "source-port", 1, NULL, '1' },
-	{ "sport", 1, NULL, '1' }, /* synonym */
-	{ "destination-port", 1, NULL, '2' },
-	{ "dport", 1, NULL, '2' }, /* synonym */
-	{ .name = NULL }
+	{.name = "source-port",      .has_arg = true, .val = '1'},
+	{.name = "sport",            .has_arg = true, .val = '1'}, /* synonym */
+	{.name = "destination-port", .has_arg = true, .val = '2'},
+	{.name = "dport",            .has_arg = true, .val = '2'}, /* synonym */
+	XT_GETOPT_TABLEEND,
 };
 
 static void

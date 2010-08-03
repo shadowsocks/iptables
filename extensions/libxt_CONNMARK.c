@@ -19,6 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -49,11 +50,11 @@ static void CONNMARK_help(void)
 }
 
 static const struct option CONNMARK_opts[] = {
-	{ "set-mark", 1, NULL, '1' },
-	{ "save-mark", 0, NULL, '2' },
-	{ "restore-mark", 0, NULL, '3' },
-	{ "mask", 1, NULL, '4' },
-	{ .name = NULL }
+	{.name = "set-mark",     .has_arg = true,  .val = '1'},
+	{.name = "save-mark",    .has_arg = false, .val = '2'},
+	{.name = "restore-mark", .has_arg = false, .val = '3'},
+	{.name = "mask",         .has_arg = true,  .val = '4'},
+	XT_GETOPT_TABLEEND,
 };
 
 static const struct option connmark_tg_opts[] = {
@@ -67,7 +68,7 @@ static const struct option connmark_tg_opts[] = {
 	{.name = "ctmask",        .has_arg = true,  .val = 'c'},
 	{.name = "nfmask",        .has_arg = true,  .val = 'n'},
 	{.name = "mask",          .has_arg = true,  .val = 'm'},
-	{.name = NULL},
+	XT_GETOPT_TABLEEND,
 };
 
 static void connmark_tg_help(void)

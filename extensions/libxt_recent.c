@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add recent matching support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -9,17 +10,17 @@
 #include <linux/netfilter/xt_recent.h>
 
 static const struct option recent_opts[] = {
-	{ .name = "set",      .has_arg = 0, .val = 201 },
-	{ .name = "rcheck",   .has_arg = 0, .val = 202 },
-	{ .name = "update",   .has_arg = 0, .val = 203 },
-	{ .name = "seconds",  .has_arg = 1, .val = 204 },
-	{ .name = "hitcount", .has_arg = 1, .val = 205 },
-	{ .name = "remove",   .has_arg = 0, .val = 206 },
-	{ .name = "rttl",     .has_arg = 0, .val = 207 },
-	{ .name = "name",     .has_arg = 1, .val = 208 },
-	{ .name = "rsource",  .has_arg = 0, .val = 209 },
-	{ .name = "rdest",    .has_arg = 0, .val = 210 },
-	{ .name = NULL }
+	{.name = "set",      .has_arg = false, .val = 201},
+	{.name = "rcheck",   .has_arg = false, .val = 202},
+	{.name = "update",   .has_arg = false, .val = 203},
+	{.name = "seconds",  .has_arg = true,  .val = 204},
+	{.name = "hitcount", .has_arg = true,  .val = 205},
+	{.name = "remove",   .has_arg = false, .val = 206},
+	{.name = "rttl",     .has_arg = false, .val = 207},
+	{.name = "name",     .has_arg = true,  .val = 208},
+	{.name = "rsource",  .has_arg = false, .val = 209},
+	{.name = "rdest",    .has_arg = false, .val = 210},
+	XT_GETOPT_TABLEEND,
 };
 
 static void recent_help(void)

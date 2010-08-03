@@ -26,7 +26,7 @@ enum {
 
 static const struct option tos_mt_opts[] = {
 	{.name = "tos", .has_arg = true, .val = 't'},
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static void tos_mt_help(void)

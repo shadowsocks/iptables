@@ -52,12 +52,18 @@ AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
 	[Path to the pkgconfig directory [[LIBDIR/pkgconfig]]]),
 	[pkgconfigdir="$withval"], [pkgconfigdir='${libdir}/pkgconfig'])
 
-AC_CHECK_HEADER([linux/dccp.h])
-
 blacklist_modules="";
+
+AC_CHECK_HEADER([linux/dccp.h])
 if test "$ac_cv_header_linux_dccp_h" != "yes"; then
 	blacklist_modules="$blacklist_modules dccp";
 fi;
+
+AC_CHECK_HEADER([linux/ip_vs.h])
+if test "$ac_cv_header_linux_ip_vs_h" != "yes"; then
+	blacklist_modules="$blacklist_modules ipvs";
+fi;
+
 AC_SUBST([blacklist_modules])
 
 AM_CONDITIONAL([ENABLE_STATIC], [test "$enable_static" = "yes"])

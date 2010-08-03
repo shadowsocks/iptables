@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add packet length matching support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -17,8 +18,8 @@ static void length_help(void)
 }
   
 static const struct option length_opts[] = {
-	{ "length", 1, NULL, '1' },
-	{ .name = NULL }
+	{.name = "length", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static u_int16_t

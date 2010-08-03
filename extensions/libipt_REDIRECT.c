@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add redirect support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -22,9 +23,9 @@ static void REDIRECT_help(void)
 }
 
 static const struct option REDIRECT_opts[] = {
-	{ "to-ports", 1, NULL, '1' },
-	{ "random", 0, NULL, '2' },
-	{ .name = NULL }
+	{.name = "to-ports", .has_arg = true,  .val = '1'},
+	{.name = "random",   .has_arg = false, .val = '2'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void REDIRECT_init(struct xt_entry_target *t)

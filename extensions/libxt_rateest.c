@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -40,20 +41,20 @@ enum rateest_options {
 };
 
 static const struct option rateest_opts[] = {
-	{ "rateest1",		1, NULL, OPT_RATEEST1 },
-	{ "rateest",		1, NULL, OPT_RATEEST1 }, /* alias for absolute mode */
-	{ "rateest2",		1, NULL, OPT_RATEEST2 },
-	{ "rateest-bps1",	0, NULL, OPT_RATEEST_BPS1 },
-	{ "rateest-pps1",	0, NULL, OPT_RATEEST_PPS1 },
-	{ "rateest-bps2",	0, NULL, OPT_RATEEST_BPS2 },
-	{ "rateest-pps2",	0, NULL, OPT_RATEEST_PPS2 },
-	{ "rateest-bps",	0, NULL, OPT_RATEEST_BPS2 }, /* alias for absolute mode */
-	{ "rateest-pps",	0, NULL, OPT_RATEEST_PPS2 }, /* alias for absolute mode */
-	{ "rateest-delta",	0, NULL, OPT_RATEEST_DELTA },
-	{ "rateest-lt",		0, NULL, OPT_RATEEST_LT },
-	{ "rateest-gt",		0, NULL, OPT_RATEEST_GT },
-	{ "rateest-eq",		0, NULL, OPT_RATEEST_EQ },
-	{ .name = NULL }
+	{.name = "rateest1",      .has_arg = true,  .val = OPT_RATEEST1},
+	{.name = "rateest",       .has_arg = true,  .val = OPT_RATEEST1}, /* alias for absolute mode */
+	{.name = "rateest2",      .has_arg = true,  .val = OPT_RATEEST2},
+	{.name = "rateest-bps1",  .has_arg = false, .val = OPT_RATEEST_BPS1},
+	{.name = "rateest-pps1",  .has_arg = false, .val = OPT_RATEEST_PPS1},
+	{.name = "rateest-bps2",  .has_arg = false, .val = OPT_RATEEST_BPS2},
+	{.name = "rateest-pps2",  .has_arg = false, .val = OPT_RATEEST_PPS2},
+	{.name = "rateest-bps",   .has_arg = false, .val = OPT_RATEEST_BPS2}, /* alias for absolute mode */
+	{.name = "rateest-pps",   .has_arg = false, .val = OPT_RATEEST_PPS2}, /* alias for absolute mode */
+	{.name = "rateest-delta", .has_arg = false, .val = OPT_RATEEST_DELTA},
+	{.name = "rateest-lt",    .has_arg = false, .val = OPT_RATEEST_LT},
+	{.name = "rateest-gt",    .has_arg = false, .val = OPT_RATEEST_GT},
+	{.name = "rateest-eq",    .has_arg = false, .val = OPT_RATEEST_EQ},
+	XT_GETOPT_TABLEEND,
 };
 
 /* Copied from iproute. See http://physics.nist.gov/cuu/Units/binary.html */
@@ -79,7 +80,7 @@ static const struct rate_suffix {
 	{ "GBps",	8000000000. },
 	{ "TiBps",	8.*1024.*1024.*1024.*1024. },
 	{ "TBps",	8000000000000. },
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static int

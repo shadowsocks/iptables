@@ -88,7 +88,7 @@ static const struct option conntrack_mt_opts_v0[] = {
 	{.name = "ctrepldst", .has_arg = true, .val = '6'},
 	{.name = "ctstatus",  .has_arg = true, .val = '7'},
 	{.name = "ctexpire",  .has_arg = true, .val = '8'},
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static const struct option conntrack_mt_opts[] = {

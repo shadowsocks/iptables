@@ -9,6 +9,7 @@
  */
 
 /* Shared library add-on to iptables to add IP set mangling target. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -32,9 +33,9 @@ set_target_help(void)
 }
 
 static const struct option set_target_opts[] = {
-	{ .name = "add-set", .has_arg = true, .val = '1'},
-	{ .name = "del-set", .has_arg = true, .val = '2'},
-	{ .name = NULL }
+	{.name = "add-set", .has_arg = true, .val = '1'},
+	{.name = "del-set", .has_arg = true, .val = '2'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void

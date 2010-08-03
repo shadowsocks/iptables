@@ -9,6 +9,7 @@
  */
 
 /* Shared library add-on to iptables to add IP set matching. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -32,9 +33,9 @@ set_help(void)
 }
 
 static const struct option set_opts[] = {
-	{ .name = "match-set", .has_arg = true, .val = '1'},
-	{ .name = "set",       .has_arg = true, .val = '2'},
-	{ .name = NULL }
+	{.name = "match-set", .has_arg = true, .val = '1'},
+	{.name = "set",       .has_arg = true, .val = '2'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void

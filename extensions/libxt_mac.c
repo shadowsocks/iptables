@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add MAC address support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -21,8 +22,8 @@ static void mac_help(void)
 }
 
 static const struct option mac_opts[] = {
-	{ "mac-source", 1, NULL, '1' },
-	{ .name = NULL }
+	{.name = "mac-source", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void

@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add IP range matching support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -39,7 +40,7 @@ static void iprange_mt_help(void)
 static const struct option iprange_mt_opts[] = {
 	{.name = "src-range", .has_arg = true, .val = '1'},
 	{.name = "dst-range", .has_arg = true, .val = '2'},
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static void

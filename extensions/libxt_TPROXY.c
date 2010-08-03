@@ -15,10 +15,10 @@
 #include <linux/netfilter/xt_TPROXY.h>
 
 static const struct option tproxy_tg_opts[] = {
-	{ .name = "on-port", .has_arg = 1, .val = '1'},
-	{ .name = "on-ip", .has_arg = 1, .val = '2'},
-	{ .name = "tproxy-mark", .has_arg = 1, .val = '3'},
-	{NULL},
+	{.name = "on-port",     .has_arg = true, .val = '1'},
+	{.name = "on-ip",       .has_arg = true, .val = '2'},
+	{.name = "tproxy-mark", .has_arg = true, .val = '3'},
+	XT_GETOPT_TABLEEND,
 };
 
 enum {

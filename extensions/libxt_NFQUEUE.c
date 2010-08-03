@@ -5,6 +5,7 @@
  * This program is distributed under the terms of GNU GPL v2, 1991
  *
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -31,9 +32,9 @@ static void NFQUEUE_help_v1(void)
 }
 
 static const struct option NFQUEUE_opts[] = {
-	{ "queue-num", 1, NULL, 'F' },
-	{ "queue-balance", 1, NULL, 'B' },
-	{ .name = NULL }
+	{.name = "queue-num",     .has_arg = true, .val = 'F'},
+	{.name = "queue-balance", .has_arg = true, .val = 'B'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void exit_badqueue(const char *s)

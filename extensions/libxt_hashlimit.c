@@ -67,15 +67,15 @@ static void hashlimit_mt_help(void)
 }
 
 static const struct option hashlimit_opts[] = {
-	{ "hashlimit", 1, NULL, '%' },
-	{ "hashlimit-burst", 1, NULL, '$' },
-	{ "hashlimit-htable-size", 1, NULL, '&' },
-	{ "hashlimit-htable-max", 1, NULL, '*' },
-	{ "hashlimit-htable-gcinterval", 1, NULL, '(' },
-	{ "hashlimit-htable-expire", 1, NULL, ')' },
-	{ "hashlimit-mode", 1, NULL, '_' },
-	{ "hashlimit-name", 1, NULL, '"' },
-	{ .name = NULL }
+	{.name = "hashlimit",                   .has_arg = true, .val = '%'},
+	{.name = "hashlimit-burst",             .has_arg = true, .val = '$'},
+	{.name = "hashlimit-htable-size",       .has_arg = true, .val = '&'},
+	{.name = "hashlimit-htable-max",        .has_arg = true, .val = '*'},
+	{.name = "hashlimit-htable-gcinterval", .has_arg = true, .val = '('},
+	{.name = "hashlimit-htable-expire",     .has_arg = true, .val = ')'},
+	{.name = "hashlimit-mode",              .has_arg = true, .val = '_'},
+	{.name = "hashlimit-name",              .has_arg = true, .val = '"'},
+	XT_GETOPT_TABLEEND,
 };
 
 static const struct option hashlimit_mt_opts[] = {
@@ -91,7 +91,7 @@ static const struct option hashlimit_mt_opts[] = {
 	{.name = "hashlimit-htable-expire",     .has_arg = true, .val = ')'},
 	{.name = "hashlimit-mode",              .has_arg = true, .val = '_'},
 	{.name = "hashlimit-name",              .has_arg = true, .val = '"'},
-	{},
+	XT_GETOPT_TABLEEND,
 };
 
 static

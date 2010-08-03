@@ -12,6 +12,7 @@
  * http://www.iana.org/assignments/dscp-registry
  *
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -38,9 +39,9 @@ static void dscp_help(void)
 }
 
 static const struct option dscp_opts[] = {
-	{ "dscp", 1, NULL, 'F' },
-	{ "dscp-class", 1, NULL, 'G' },
-	{ .name = NULL }
+	{.name = "dscp",       .has_arg = true, .val = 'F'},
+	{.name = "dscp-class", .has_arg = true, .val = 'G'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void

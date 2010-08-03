@@ -19,19 +19,19 @@ Only match during the given daytime. The possible time range is 00:00:00 to
 23:59:59. Leading zeroes are allowed (e.g. "06:03") and correctly interpreted
 as base-10.
 .TP
-[\fB!\fR] \fB\-\-monthdays\fP \fIday\fP[\fB,\fP\fIday\fP...]
+[\fB!\fP] \fB\-\-monthdays\fP \fIday\fP[\fB,\fP\fIday\fP...]
 .IP
-Only match on the given days of the month. Possible values are \fB1\fR
-to \fB31\fR. Note that specifying \fB31\fR will of course not match
+Only match on the given days of the month. Possible values are \fB1\fP
+to \fB31\fP. Note that specifying \fB31\fP will of course not match
 on months which do not have a 31st day; the same goes for 28- or 29-day
 February.
 .TP
-[\fB!\fR] \fB\-\-weekdays\fP \fIday\fP[\fB,\fP\fIday\fP...]
+[\fB!\fP] \fB\-\-weekdays\fP \fIday\fP[\fB,\fP\fIday\fP...]
 .IP
-Only match on the given weekdays. Possible values are \fBMon\fR, \fBTue\fR,
-\fBWed\fR, \fBThu\fR, \fBFri\fR, \fBSat\fR, \fBSun\fR, or values from \fB1\fR
-to \fB7\fR, respectively. You may also use two-character variants (\fBMo\fP,
-\fBTu\fR, etc.).
+Only match on the given weekdays. Possible values are \fBMon\fP, \fBTue\fP,
+\fBWed\fP, \fBThu\fP, \fBFri\fP, \fBSat\fP, \fBSun\fP, or values from \fB1\fP
+to \fB7\fP, respectively. You may also use two-character variants (\fBMo\fP,
+\fBTu\fP, etc.).
 .TP
 \fB\-\-utc\fP
 .IP

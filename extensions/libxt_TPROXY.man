@@ -1,4 +1,4 @@
-This target is only valid in the \fBmangle\fR table, in the \fBPREROUTING\fR
+This target is only valid in the \fBmangle\fP table, in the \fBPREROUTING\fP
 chain and user-defined chains which are only called from this chain. It
 redirects the packet to a local socket without changing the packet header in
 any way. It can also change the mark value which can then be used in advanced

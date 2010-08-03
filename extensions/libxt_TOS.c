@@ -5,6 +5,7 @@
  * Contact: Jan Engelhardt <jengelh@computergmbh.de>
  */
 #include <getopt.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,7 +25,7 @@ enum {
 
 static const struct option tos_tg_opts_v0[] = {
 	{.name = "set-tos", .has_arg = true, .val = '='},
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static const struct option tos_tg_opts[] = {
@@ -32,7 +33,7 @@ static const struct option tos_tg_opts[] = {
 	{.name = "and-tos", .has_arg = true, .val = '&'},
 	{.name = "or-tos",  .has_arg = true, .val = '|'},
 	{.name = "xor-tos", .has_arg = true, .val = '^'},
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static void tos_tg_help_v0(void)

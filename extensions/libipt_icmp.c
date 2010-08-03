@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add ICMP support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -108,8 +109,8 @@ static void icmp_help(void)
 }
 
 static const struct option icmp_opts[] = {
-	{ "icmp-type", 1, NULL, '1' },
-	{ .name = NULL }
+	{.name = "icmp-type", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void 

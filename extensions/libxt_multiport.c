@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add multiple TCP port support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -44,12 +45,12 @@ static void multiport_help_v1(void)
 }
 
 static const struct option multiport_opts[] = {
-	{ "source-ports", 1, NULL, '1' },
-	{ "sports", 1, NULL, '1' }, /* synonym */
-	{ "destination-ports", 1, NULL, '2' },
-	{ "dports", 1, NULL, '2' }, /* synonym */
-	{ "ports", 1, NULL, '3' },
-	{ .name = NULL }
+	{.name = "source-ports",      .has_arg = true, .val = '1'},
+	{.name = "sports",            .has_arg = true, .val = '1'}, /* synonym */
+	{.name = "destination-ports", .has_arg = true, .val = '2'},
+	{.name = "dports",            .has_arg = true, .val = '2'}, /* synonym */
+	{.name = "ports",             .has_arg = true, .val = '3'},
+	XT_GETOPT_TABLEEND,
 };
 
 static char *

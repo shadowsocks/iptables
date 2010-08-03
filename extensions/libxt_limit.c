@@ -3,7 +3,7 @@
  * Jérôme de Vivie   <devivie@info.enserb.u-bordeaux.fr>
  * Hervé Eychenne    <rv@wallfire.org>
  */
-
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -29,9 +29,9 @@ XT_LIMIT_BURST);
 }
 
 static const struct option limit_opts[] = {
-	{ "limit", 1, NULL, '%' },
-	{ "limit-burst", 1, NULL, '$' },
-	{ .name = NULL }
+	{.name = "limit",       .has_arg = true, .val = '%'},
+	{.name = "limit-burst", .has_arg = true, .val = '$'},
+	XT_GETOPT_TABLEEND,
 };
 
 static

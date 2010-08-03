@@ -27,7 +27,7 @@ static void mark_mt_help(void)
 
 static const struct option mark_mt_opts[] = {
 	{.name = "mark", .has_arg = true, .val = '1'},
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static int mark_mt_parse(int c, char **argv, int invert, unsigned int *flags,

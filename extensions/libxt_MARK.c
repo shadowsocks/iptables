@@ -40,10 +40,10 @@ static void MARK_help(void)
 }
 
 static const struct option MARK_opts[] = {
-	{ "set-mark", 1, NULL, '1' },
-	{ "and-mark", 1, NULL, '2' },
-	{ "or-mark", 1, NULL, '3' },
-	{ .name = NULL }
+	{.name = "set-mark", .has_arg = true, .val = '1'},
+	{.name = "and-mark", .has_arg = true, .val = '2'},
+	{.name = "or-mark",  .has_arg = true, .val = '3'},
+	XT_GETOPT_TABLEEND,
 };
 
 static const struct option mark_tg_opts[] = {
@@ -52,7 +52,7 @@ static const struct option mark_tg_opts[] = {
 	{.name = "and-mark",  .has_arg = true, .val = '&'},
 	{.name = "or-mark",   .has_arg = true, .val = '|'},
 	{.name = "xor-mark",  .has_arg = true, .val = '^'},
-	{ .name = NULL }
+	XT_GETOPT_TABLEEND,
 };
 
 static void mark_tg_help(void)

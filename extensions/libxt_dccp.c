@@ -5,6 +5,7 @@
  * This program is distributed under the terms of GNU GPL v2, 1991
  *
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -43,13 +44,13 @@ static void dccp_help(void)
 }
 
 static const struct option dccp_opts[] = {
-	{ .name = "source-port", .has_arg = 1, .val = '1' },
-	{ .name = "sport", .has_arg = 1, .val = '1' },
-	{ .name = "destination-port", .has_arg = 1, .val = '2' },
-	{ .name = "dport", .has_arg = 1, .val = '2' },
-	{ .name = "dccp-types", .has_arg = 1, .val = '3' },
-	{ .name = "dccp-option", .has_arg = 1, .val = '4' },
-	{ .name = NULL }
+	{.name = "source-port",      .has_arg = true, .val = '1'},
+	{.name = "sport",            .has_arg = true, .val = '1'},
+	{.name = "destination-port", .has_arg = true, .val = '2'},
+	{.name = "dport",            .has_arg = true, .val = '2'},
+	{.name = "dccp-types",       .has_arg = true, .val = '3'},
+	{.name = "dccp-option",      .has_arg = true, .val = '4'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void

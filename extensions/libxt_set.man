@@ -15,7 +15,7 @@ the set type of the specified set is single dimension (for example ipmap),
 then the command will match packets for which the source address can be
 found in the specified set. 
 .PP
-The option \fB\-\-match\-set\fR can be replaced by \fB\-\-set\fR if that does 
+The option \fB\-\-match\-set\fP can be replaced by \fB\-\-set\fP if that does 
 not clash with an option of other extensions.
 .PP
 Use of -m set requires that ipset kernel support is provided. As standard

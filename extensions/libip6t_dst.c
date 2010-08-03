@@ -1,4 +1,5 @@
 /* Shared library add-on to ip6tables to add Dst header support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -22,10 +23,10 @@ IP6T_OPTS_OPTSNR);
 }
 
 static const struct option dst_opts[] = {
-	{ .name = "dst-len",        .has_arg = 1, .val = '1' },
-	{ .name = "dst-opts",       .has_arg = 1, .val = '2' },
-	{ .name = "dst-not-strict", .has_arg = 1, .val = '3' },
-	{ .name = NULL }
+	{.name = "dst-len",        .has_arg = true, .val = '1'},
+	{.name = "dst-opts",       .has_arg = true, .val = '2'},
+	{.name = "dst-not-strict", .has_arg = true, .val = '3'},
+	XT_GETOPT_TABLEEND,
 };
 
 static u_int32_t

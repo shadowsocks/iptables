@@ -1,4 +1,5 @@
 /* Shared library add-on to iptables to add related packet matching support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -16,8 +17,8 @@ static void helper_help(void)
 }
 
 static const struct option helper_opts[] = {
-	{ "helper", 1, NULL, '1' },
-	{ .name = NULL }
+	{.name = "helper", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static int

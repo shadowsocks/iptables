@@ -1,4 +1,5 @@
 /* Shared library add-on to ip6tables to add Routing header support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -28,13 +29,13 @@ IP6T_RT_HOPS);
 }
 
 static const struct option rt_opts[] = {
-	{ "rt-type", 1, NULL, '1' },
-	{ "rt-segsleft", 1, NULL, '2' },
-	{ "rt-len", 1, NULL, '3' },
-	{ "rt-0-res", 0, NULL, '4' },
-	{ "rt-0-addrs", 1, NULL, '5' },
-	{ "rt-0-not-strict", 0, NULL, '6' },
-	{ .name = NULL }
+	{.name = "rt-type",         .has_arg = true,  .val = '1'},
+	{.name = "rt-segsleft",     .has_arg = true,  .val = '2'},
+	{.name = "rt-len",          .has_arg = true,  .val = '3'},
+	{.name = "rt-0-res",        .has_arg = false, .val = '4'},
+	{.name = "rt-0-addrs",      .has_arg = true,  .val = '5'},
+	{.name = "rt-0-not-strict", .has_arg = false, .val = '6'},
+	XT_GETOPT_TABLEEND,
 };
 
 static u_int32_t

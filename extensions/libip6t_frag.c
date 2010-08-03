@@ -1,4 +1,5 @@
 /* Shared library add-on to ip6tables to add Fragmentation header support. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -21,13 +22,13 @@ static void frag_help(void)
 }
 
 static const struct option frag_opts[] = {
-	{ .name = "fragid",    .has_arg = 1, .val = '1' },
-	{ .name = "fraglen",   .has_arg = 1, .val = '2' },
-	{ .name = "fragres",   .has_arg = 0, .val = '3' },
-	{ .name = "fragfirst", .has_arg = 0, .val = '4' },
-	{ .name = "fragmore",  .has_arg = 0, .val = '5' },
-	{ .name = "fraglast",  .has_arg = 0, .val = '6' },
-	{ .name = NULL }
+	{.name = "fragid",    .has_arg = true,  .val = '1'},
+	{.name = "fraglen",   .has_arg = true,  .val = '2'},
+	{.name = "fragres",   .has_arg = false, .val = '3'},
+	{.name = "fragfirst", .has_arg = false, .val = '4'},
+	{.name = "fragmore",  .has_arg = false, .val = '5'},
+	{.name = "fraglast",  .has_arg = false, .val = '6'},
+	XT_GETOPT_TABLEEND,
 };
 
 static u_int32_t

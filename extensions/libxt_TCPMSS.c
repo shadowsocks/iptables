@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000 Marc Boucher
 */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -36,9 +37,9 @@ static void TCPMSS_help6(void)
 }
 
 static const struct option TCPMSS_opts[] = {
-	{ "set-mss", 1, NULL, '1' },
-	{ "clamp-mss-to-pmtu", 0, NULL, '2' },
-	{ .name = NULL }
+	{.name = "set-mss",           .has_arg = true,  .val = '1'},
+	{.name = "clamp-mss-to-pmtu", .has_arg = false, .val = '2'},
+	XT_GETOPT_TABLEEND,
 };
 
 static int __TCPMSS_parse(int c, char **argv, int invert, unsigned int *flags,

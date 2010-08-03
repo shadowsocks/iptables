@@ -5,6 +5,7 @@
  *
  * Copyright (C) 2006 Red Hat, Inc., James Morris <jmorris@redhat.com>
  */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -22,8 +23,8 @@ static void SECMARK_help(void)
 }
 
 static const struct option SECMARK_opts[] = {
-	{ "selctx", 1, NULL, '1' },
-	{ .name = NULL }
+	{.name = "selctx", .has_arg = true, .val = '1'},
+	XT_GETOPT_TABLEEND,
 };
 
 static int SECMARK_parse(int c, char **argv, int invert, unsigned int *flags,

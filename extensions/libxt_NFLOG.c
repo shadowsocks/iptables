@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -15,11 +16,11 @@ enum {
 };
 
 static const struct option NFLOG_opts[] = {
-	{ "nflog-group",     1, NULL, NFLOG_GROUP },
-	{ "nflog-prefix",    1, NULL, NFLOG_PREFIX },
-	{ "nflog-range",     1, NULL, NFLOG_RANGE },
-	{ "nflog-threshold", 1, NULL, NFLOG_THRESHOLD },
-	{ .name = NULL }
+	{.name = "nflog-group",     .has_arg = true, .val = NFLOG_GROUP},
+	{.name = "nflog-prefix",    .has_arg = true, .val = NFLOG_PREFIX},
+	{.name = "nflog-range",     .has_arg = true, .val = NFLOG_RANGE},
+	{.name = "nflog-threshold", .has_arg = true, .val = NFLOG_THRESHOLD},
+	XT_GETOPT_TABLEEND,
 };
 
 static void NFLOG_help(void)

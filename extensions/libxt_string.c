@@ -21,6 +21,7 @@
  *             ipt_string_info.
  */
 #define _GNU_SOURCE 1
+#include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <string.h>
@@ -44,13 +45,13 @@ static void string_help(void)
 }
 
 static const struct option string_opts[] = {
-	{ "from", 1, NULL, '1' },
-	{ "to", 1, NULL, '2' },
-	{ "algo", 1, NULL, '3' },
-	{ "string", 1, NULL, '4' },
-	{ "hex-string", 1, NULL, '5' },
-	{ "icase", 0, NULL, '6' },
-	{ .name = NULL }
+	{.name = "from",       .has_arg = true,  .val = '1'},
+	{.name = "to",         .has_arg = true,  .val = '2'},
+	{.name = "algo",       .has_arg = true,  .val = '3'},
+	{.name = "string",     .has_arg = true,  .val = '4'},
+	{.name = "hex-string", .has_arg = true,  .val = '5'},
+	{.name = "icase",      .has_arg = false, .val = '6'},
+	XT_GETOPT_TABLEEND,
 };
 
 static void string_init(struct xt_entry_match *m)
