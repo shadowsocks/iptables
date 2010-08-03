@@ -132,7 +132,7 @@ static struct xtables_target idletimer_tg_reg = {
 	.extra_opts    = idletimer_tg_opts,
 };
 
-static __attribute__((constructor)) void idletimer_tg_ldr(void)
+void _init(void)
 {
 	xtables_register_target(&idletimer_tg_reg);
 }
