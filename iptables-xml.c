@@ -64,7 +64,7 @@ print_usage(const char *name, const char *version)
 static int
 parse_counters(char *string, struct ipt_counters *ctr)
 {
-	u_int64_t *pcnt, *bcnt;
+	__u64 *pcnt, *bcnt;
 
 	if (string != NULL) {
 		pcnt = &ctr->pcnt;
