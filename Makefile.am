@@ -20,11 +20,11 @@ lib_LTLIBRARIES =
 lib_LTLIBRARIES           += libiptc/libip4tc.la libiptc/libip6tc.la libiptc/libiptc.la
 libiptc_libiptc_la_SOURCES  =
 libiptc_libiptc_la_LIBADD   = libiptc/libip4tc.la libiptc/libip6tc.la
-libiptc_libiptc_la_LDFLAGS  = -version-info 0:0:0
+libiptc_libiptc_la_LDFLAGS  = -version-info 0:0:0 ${libiptc_LDFLAGS2}
 libiptc_libip4tc_la_SOURCES = libiptc/libip4tc.c
 libiptc_libip4tc_la_LDFLAGS = -version-info 0:0:0
 libiptc_libip6tc_la_SOURCES = libiptc/libip6tc.c
-libiptc_libip6tc_la_LDFLAGS = -version-info 0:0:0
+libiptc_libip6tc_la_LDFLAGS = -version-info 0:0:0 ${libiptc_LDFLAGS2}
 
 lib_LTLIBRARIES      += libxtables.la
 libxtables_la_SOURCES = xtables.c

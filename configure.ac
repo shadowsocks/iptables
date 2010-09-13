@@ -52,6 +52,11 @@ AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
 	[Path to the pkgconfig directory [[LIBDIR/pkgconfig]]]),
 	[pkgconfigdir="$withval"], [pkgconfigdir='${libdir}/pkgconfig'])
 
+libiptc_LDFLAGS2="";
+AX_CHECK_LINKER_FLAGS([-Wl,--no-as-needed],
+	[libiptc_LDFLAGS2="-Wl,--no-as-needed"])
+AC_SUBST([libiptc_LDFLAGS2])
+
 blacklist_modules="";
 
 AC_CHECK_HEADER([linux/dccp.h])
