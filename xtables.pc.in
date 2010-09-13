@@ -10,3 +10,4 @@ Description:	Shared Xtables code for extensions and iproute2
 Version:	@PACKAGE_VERSION@
 Cflags:		-I${includedir}
 Libs:		-L${libdir} -lxtables
+Libs.private:	-ldl

@@ -8,4 +8,5 @@ Name:		libiptc
 Description:	iptables ruleset ADT and kernel interface
 Version:	@PACKAGE_VERSION@
 Libs:		-L${libdir} -liptc
+Libs.private:	-lip4tc -lip6tc
 Cflags:		-I${includedir}
