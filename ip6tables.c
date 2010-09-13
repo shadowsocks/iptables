@@ -1838,10 +1838,10 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 
 	generic_opt_check(command, options);
 
-	if (chain && strlen(chain) > IP6T_FUNCTION_MAXNAMELEN)
+	if (chain != NULL && strlen(chain) >= XT_EXTENSION_MAXNAMELEN)
 		xtables_error(PARAMETER_PROBLEM,
-			   "chain name `%s' too long (must be under %i chars)",
-			   chain, IP6T_FUNCTION_MAXNAMELEN);
+			   "chain name `%s' too long (must be under %u chars)",
+			   chain, XT_EXTENSION_MAXNAMELEN);
 
 	/* only allocate handle if we weren't called with a handle */
 	if (!*handle)
