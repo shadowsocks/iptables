@@ -312,7 +312,7 @@ int main(int argc, char *argv[])
 					xtables_error(OTHER_PROBLEM,
 						"Can't set policy `%s'"
 						" on `%s' line %u: %s\n",
-						chain, policy, line,
+						policy, chain, line,
 						ip6tc_strerror(errno));
 			}
 
