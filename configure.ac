@@ -1,5 +1,5 @@
 
-AC_INIT([iptables], [1.4.9])
+AC_INIT([iptables], [1.4.10])
 
 # See libtool.info "Libtool's versioning system"
 libxtables_vcurrent=5
