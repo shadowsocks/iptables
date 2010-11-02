@@ -26,15 +26,13 @@ static const struct tos_symbol_info {
 /*
  * tos_parse_numeric - parse sth. like "15/255"
  *
- * @s:		input string
- * @info:	accompanying structure
- * @bits:	number of bits that are allowed
- *		(8 for IPv4 TOS field, 4 for IPv6 Priority Field)
+ * @str:	input string
+ * @tvm:	(value/mask) tuple
+ * @max:	maximum allowed value (must be pow(2,some_int)-1)
  */
 static bool tos_parse_numeric(const char *str, struct tos_value_mask *tvm,
-                              unsigned int bits)
+                              unsigned int max)
 {
-	const unsigned int max = (1 << bits) - 1;
 	unsigned int value;
 	char *end;
 
@@ -56,17 +54,22 @@ static bool tos_parse_numeric(const char *str, struct tos_value_mask *tvm,
 	return true;
 }
 
+/**
+ * @str:	input string
+ * @tvm:	(value/mask) tuple
+ * @def_mask:	mask to force when a symbolic name is used
+ */
 static bool tos_parse_symbolic(const char *str, struct tos_value_mask *tvm,
     unsigned int def_mask)
 {
-	const unsigned int max = UINT8_MAX;
+	static const unsigned int max = UINT8_MAX;
 	const struct tos_symbol_info *symbol;
 	char *tmp;
 
 	if (xtables_strtoui(str, &tmp, NULL, 0, max))
 		return tos_parse_numeric(str, tvm, max);
 
-	/* Do not consider ECN bits */
+	/* Do not consider ECN bits when using preset names */
 	tvm->mask = def_mask;
 	for (symbol = tos_symbol_names; symbol->name != NULL; ++symbol)
 		if (strcasecmp(str, symbol->name) == 0) {
