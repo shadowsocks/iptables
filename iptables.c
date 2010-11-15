@@ -147,6 +147,7 @@ void iptables_exit_error(enum xtables_exittype status, const char *msg, ...) __a
 struct xtables_globals iptables_globals = {
 	.option_offset = 0,
 	.program_version = IPTABLES_VERSION,
+	.opts = original_opts,
 	.orig_opts = original_opts,
 	.exit_err = iptables_exit_error,
 };
@@ -1575,9 +1576,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 				target->t->u.user.revision = target->revision;
 				if (target->init != NULL)
 					target->init(target->t);
-				opts = xtables_merge_options(
-						     iptables_globals.orig_opts,
-						     opts,
+				opts = xtables_merge_options(opts,
 						     target->extra_opts,
 						     &target->option_offset);
 				if (opts == NULL)
@@ -1637,9 +1636,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 				m->init(m->m);
 			if (m != m->next) {
 				/* Merge options for non-cloned matches */
-				opts = xtables_merge_options(
-						     iptables_globals.orig_opts,
-						     opts,
+				opts = xtables_merge_options(opts,
 						     m->extra_opts,
 						     &m->option_offset);
 				if (opts == NULL)
@@ -1793,9 +1790,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 					if (m->init != NULL)
 						m->init(m->m);
 
-					opts = xtables_merge_options(
-							     iptables_globals.orig_opts,
-							     opts,
+					opts = xtables_merge_options(opts,
 							     m->extra_opts,
 							     &m->option_offset);
 					if (opts == NULL)

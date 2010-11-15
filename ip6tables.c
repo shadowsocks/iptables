@@ -147,6 +147,7 @@ void ip6tables_exit_error(enum xtables_exittype status, const char *msg, ...) __
 struct xtables_globals ip6tables_globals = {
 	.option_offset = 0,
 	.program_version = IPTABLES_VERSION,
+	.opts = original_opts,
 	.orig_opts = original_opts,
 	.exit_err = ip6tables_exit_error,
 };
@@ -1560,7 +1561,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				target->t->u.user.revision = target->revision;
 				if (target->init != NULL)
 					target->init(target->t);
-				opts = xtables_merge_options(ip6tables_globals.orig_opts, opts,
+				opts = xtables_merge_options(opts,
 						     target->extra_opts,
 						     &target->option_offset);
 				if (opts == NULL)
@@ -1614,7 +1615,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				m->init(m->m);
 			if (m != m->next)
 				/* Merge options for non-cloned matches */
-				opts = xtables_merge_options(ip6tables_globals.orig_opts, opts, m->extra_opts, &m->option_offset);
+				opts = xtables_merge_options(opts, m->extra_opts, &m->option_offset);
 		}
 		break;
 
@@ -1761,7 +1762,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 					if (m->init != NULL)
 						m->init(m->m);
 
-					opts = xtables_merge_options(ip6tables_globals.orig_opts, opts,
+					opts = xtables_merge_options(opts,
 					    m->extra_opts, &m->option_offset);
 
 					optind--;

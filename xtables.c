@@ -73,50 +73,44 @@ void basic_exit_err(enum xtables_exittype status, const char *msg, ...)
 	exit(status);
 }
 
-void xtables_free_opts(int unused)
+
+void xtables_free_opts(int reset_offset)
 {
-	free(xt_params->opts);
+	if (xt_params->opts != xt_params->orig_opts) {
+		free(xt_params->opts);
+		xt_params->opts = xt_params->orig_opts;
+		if (reset_offset)
+			xt_params->option_offset = 0;
+	}
 }
 
-struct option *xtables_merge_options(struct option *orig_opts,
-				     struct option *oldopts,
+struct option *xtables_merge_options(struct option *oldopts,
 				     const struct option *newopts,
 				     unsigned int *option_offset)
 {
-	unsigned int num_oold = 0, num_old = 0, num_new = 0, i;
-	struct option *merge, *mp;
+	unsigned int num_old, num_new, i;
+	struct option *merge;
 
 	if (newopts == NULL)
 		return oldopts;
 
-	for (num_oold = 0; orig_opts[num_oold].name; num_oold++) ;
-	if (oldopts != NULL)
-		for (num_old = 0; oldopts[num_old].name; num_old++) ;
+	for (num_old = 0; oldopts[num_old].name; num_old++) ;
 	for (num_new = 0; newopts[num_new].name; num_new++) ;
 
-	merge = malloc(sizeof(*mp) * (num_oold + num_old + num_new + 1));
-	if (merge == NULL)
-		return NULL;
-
-	/* Let the base options -[ADI...] have precedence over everything */
-	memcpy(merge, orig_opts, sizeof(*mp) * num_oold);
-	mp = merge + num_oold;
-
-	/* Second, the new options */
 	xt_params->option_offset += 256;
 	*option_offset = xt_params->option_offset;
-	memcpy(mp, newopts, sizeof(*mp) * num_new);
 
-	for (i = 0; i < num_new; ++i, ++mp)
-		mp->val += *option_offset;
+	merge = malloc(sizeof(struct option) * (num_new + num_old + 1));
+	if (merge == NULL)
+		return NULL;
+	memcpy(merge, oldopts, num_old * sizeof(struct option));
+	xtables_free_opts(0);	/* Release any old options merged  */
+	for (i = 0; i < num_new; i++) {
+		merge[num_old + i] = newopts[i];
+		merge[num_old + i].val += *option_offset;
+	}
+	memset(merge + num_old + num_new, 0, sizeof(struct option));
 
-	/* Third, the old options */
-	memcpy(mp, oldopts, sizeof(*mp) * num_old);
-	mp += num_old;
-	xtables_free_opts(0);
-
-	/* Clear trailing entry */
-	memset(mp, 0, sizeof(*mp));
 	return merge;
 }
 
