@@ -147,6 +147,7 @@ void iptables_exit_error(enum xtables_exittype status, const char *msg, ...) __a
 struct xtables_globals iptables_globals = {
 	.option_offset = 0,
 	.program_version = IPTABLES_VERSION,
+	.opts = original_opts,
 	.orig_opts = original_opts,
 	.exit_err = iptables_exit_error,
 };
