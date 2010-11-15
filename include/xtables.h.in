@@ -219,8 +219,9 @@ extern int xtables_insmod(const char *, const char *, bool);
 extern int xtables_load_ko(const char *, bool);
 extern int xtables_set_params(struct xtables_globals *xtp);
 extern void xtables_free_opts(int reset_offset);
-extern struct option *xtables_merge_options(struct option *oldopts,
-	const struct option *newopts, unsigned int *option_offset);
+extern struct option *xtables_merge_options(struct option *origopts,
+	struct option *oldopts, const struct option *newopts,
+	unsigned int *option_offset);
 
 extern int xtables_init_all(struct xtables_globals *xtp, uint8_t nfproto);
 extern struct xtables_match *xtables_find_match(const char *name,
