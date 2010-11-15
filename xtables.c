@@ -75,7 +75,8 @@ void basic_exit_err(enum xtables_exittype status, const char *msg, ...)
 
 void xtables_free_opts(int unused)
 {
-	free(xt_params->opts);
+	if (xt_params->opts != xt_params->orig_opts)
+		free(xt_params->opts);
 }
 
 struct option *xtables_merge_options(struct option *orig_opts,
