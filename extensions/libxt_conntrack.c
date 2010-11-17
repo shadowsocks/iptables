@@ -974,9 +974,9 @@ matchinfo_print(const void *ip, const struct xt_entry_match *match, int numeric,
 
 	if (sinfo->flags & XT_CONNTRACK_DIRECTION) {
 		if (sinfo->invflags & XT_CONNTRACK_DIRECTION)
-			printf("%sctdir REPLY", optpfx);
+			printf("%sctdir REPLY ", optpfx);
 		else
-			printf("%sctdir ORIGINAL", optpfx);
+			printf("%sctdir ORIGINAL ", optpfx);
 	}
 
 }
@@ -1079,9 +1079,9 @@ conntrack_dump(const struct xt_conntrack_mtinfo2 *info, const char *prefix,
 
 	if (info->match_flags & XT_CONNTRACK_DIRECTION) {
 		if (info->invert_flags & XT_CONNTRACK_DIRECTION)
-			printf("%sctdir REPLY", prefix);
+			printf("%sctdir REPLY ", prefix);
 		else
-			printf("%sctdir ORIGINAL", prefix);
+			printf("%sctdir ORIGINAL ", prefix);
 	}
 }
 
