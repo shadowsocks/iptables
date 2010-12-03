@@ -40,13 +40,13 @@ static int SECMARK_parse(int c, char **argv, int invert, unsigned int *flags,
 				   "Can't specify --selctx twice");
 		info->mode = SECMARK_MODE_SEL;
 
-		if (strlen(optarg) > SECMARK_SELCTX_MAX-1)
+		if (strlen(optarg) > SECMARK_SECCTX_MAX-1)
 			xtables_error(PARAMETER_PROBLEM, PFX
 				   "Maximum length %u exceeded by --selctx"
 				   " parameter (%zu)",
-				   SECMARK_SELCTX_MAX-1, strlen(optarg));
+				   SECMARK_SECCTX_MAX-1, strlen(optarg));
 
-		strcpy(info->u.sel.selctx, optarg);
+		strcpy(info->secctx, optarg);
 		*flags |= SECMARK_MODE_SEL;
 		break;
 	default:
@@ -66,7 +66,7 @@ static void print_secmark(const struct xt_secmark_target_info *info)
 {
 	switch (info->mode) {
 	case SECMARK_MODE_SEL:
-		printf("selctx %s ", info->u.sel.selctx);\
+		printf("selctx %s ", info->secctx);
 		break;
 	
 	default:
