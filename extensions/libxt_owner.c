@@ -558,9 +558,9 @@ static void owner_mt_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_owner_match_info *info = (void *)match->data;
 
-	owner_mt_print_item(info, "--socket-exists",  XT_OWNER_SOCKET, false);
-	owner_mt_print_item(info, "--uid-owner",      XT_OWNER_UID,    false);
-	owner_mt_print_item(info, "--gid-owner",      XT_OWNER_GID,    false);
+	owner_mt_print_item(info, "--socket-exists",  XT_OWNER_SOCKET, true);
+	owner_mt_print_item(info, "--uid-owner",      XT_OWNER_UID,    true);
+	owner_mt_print_item(info, "--gid-owner",      XT_OWNER_GID,    true);
 }
 
 static struct xtables_match owner_mt_reg[] = {
