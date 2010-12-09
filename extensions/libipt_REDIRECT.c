@@ -41,7 +41,7 @@ static void REDIRECT_init(struct xt_entry_target *t)
 static void
 parse_ports(const char *arg, struct nf_nat_multi_range *mr)
 {
-	char *end;
+	char *end = "";
 	unsigned int port, maxport;
 
 	mr->range[0].flags |= IP_NAT_RANGE_PROTO_SPECIFIED;
