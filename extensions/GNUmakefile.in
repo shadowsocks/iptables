@@ -165,14 +165,14 @@ man_run    = \
 		if [ -f "$$f" ] && grep -Eq "$(3)|NFPROTO_UNSPEC" "$$cf"; then \
 			echo -e "\t+ $$f" >&2; \
 			echo ".SS $$ext"; \
-			cat "$$f"; \
+			cat "$$f" || exit $$?; \
 			continue; \
 		fi; \
 		f="${srcdir}/lib$(2)t_$$ext.man"; \
 		if [ -f "$$f" ]; then \
 			echo -e "\t+ $$f" >&2; \
 			echo ".SS $$ext"; \
-			cat "$$f"; \
+			cat "$$f" || exit $$?; \
 			continue; \
 		fi; \
 	done >$@;
