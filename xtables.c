@@ -103,6 +103,10 @@ struct option *xtables_merge_options(struct option *orig_opts,
 	memcpy(merge, orig_opts, sizeof(*mp) * num_oold);
 	mp = merge + num_oold;
 
+	/* Since @opts also has @orig_opts already, skip the entries */
+	oldopts += num_oold;
+	num_old -= num_oold;
+
 	/* Second, the new options */
 	xt_params->option_offset += 256;
 	*option_offset = xt_params->option_offset;

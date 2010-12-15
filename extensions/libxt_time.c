@@ -20,6 +20,7 @@
 #include <time.h>
 #include <limits.h>
 
+#include <linux/types.h>
 #include <linux/netfilter/xt_time.h>
 #include <xtables.h>
 

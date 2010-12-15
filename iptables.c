@@ -147,7 +147,6 @@ void iptables_exit_error(enum xtables_exittype status, const char *msg, ...) __a
 struct xtables_globals iptables_globals = {
 	.option_offset = 0,
 	.program_version = IPTABLES_VERSION,
-	.opts = original_opts,
 	.orig_opts = original_opts,
 	.exit_err = iptables_exit_error,
 };
@@ -1358,6 +1357,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
            demand-load a protocol. */
 	opterr = 0;
 
+	opts = xt_params->orig_opts;
 	while ((c = getopt_long(argc, argv,
 	   "-A:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:fbvnt:m:xc:g:",
 					   opts, NULL)) != -1) {

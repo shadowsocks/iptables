@@ -155,8 +155,8 @@ initext6.c: .initext6.dd
 #
 #	Manual pages
 #
-ex_matches = $(sort $(shell echo $(1) | grep -Eo '\b[a-z0-9]+\b'))
-ex_targets = $(sort $(shell echo $(1) | grep -Eo '\b[A-Z0-9]+\b'))
+ex_matches = $(sort $(shell echo $(1) | LC_ALL=POSIX grep -Eo '\b[[:alnum:]]+\b'))
+ex_targets = $(sort $(shell echo $(1) | LC_ALL=POSIX grep -Eo '\b[[:alnum:]]+\b'))
 man_run    = \
 	${AM_VERBOSE_GEN} \
 	for ext in $(1); do \
@@ -165,14 +165,14 @@ man_run    = \
 		if [ -f "$$f" ] && grep -Eq "$(3)|NFPROTO_UNSPEC" "$$cf"; then \
 			echo -e "\t+ $$f" >&2; \
 			echo ".SS $$ext"; \
-			cat "$$f"; \
+			cat "$$f" || exit $$?; \
 			continue; \
 		fi; \
 		f="${srcdir}/lib$(2)t_$$ext.man"; \
 		if [ -f "$$f" ]; then \
 			echo -e "\t+ $$f" >&2; \
 			echo ".SS $$ext"; \
-			cat "$$f"; \
+			cat "$$f" || exit $$?; \
 			continue; \
 		fi; \
 	done >$@;
