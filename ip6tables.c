@@ -160,7 +160,7 @@ struct xtables_globals ip6tables_globals = {
  *     optional
  */
 
-static char commands_v_options[NUMBER_OF_CMD][NUMBER_OF_OPT] =
+static const char commands_v_options[NUMBER_OF_CMD][NUMBER_OF_OPT] =
 /* Well, it's better than "Re: Linux vs FreeBSD" */
 {
 	/*     -n  -s  -d  -p  -j  -v  -x  -i  -o --line -c */
@@ -180,7 +180,7 @@ static char commands_v_options[NUMBER_OF_CMD][NUMBER_OF_OPT] =
 /*LIST_RULES*/{'x','x','x','x','x',' ','x','x','x','x','x'}
 };
 
-static int inverse_for_options[NUMBER_OF_OPT] =
+static const unsigned int inverse_for_options[NUMBER_OF_OPT] =
 {
 /* -n */ 0,
 /* -s */ IP6T_INV_SRCIP,
@@ -201,7 +201,7 @@ static int inverse_for_options[NUMBER_OF_OPT] =
 /* A few hardcoded protocols for 'all' and in case the user has no
    /etc/protocols */
 struct pprot {
-	char *name;
+	const char *name;
 	u_int8_t num;
 };
 
@@ -211,7 +211,7 @@ proto_to_name(u_int8_t proto, int nolookup)
 	unsigned int i;
 
 	if (proto && !nolookup) {
-		struct protoent *pent = getprotobynumber(proto);
+		const struct protoent *pent = getprotobynumber(proto);
 		if (pent)
 			return pent->p_name;
 	}
@@ -235,7 +235,7 @@ exit_tryhelp(int status)
 }
 
 static void
-exit_printhelp(struct xtables_rule_match *matches)
+exit_printhelp(const struct xtables_rule_match *matches)
 {
 	printf("%s v%s\n\n"
 "Usage: %s -[AD] chain rule-specification [options]\n"
@@ -569,7 +569,7 @@ print_match(const struct ip6t_entry_match *m,
 	    const struct ip6t_ip6 *ip,
 	    int numeric)
 {
-	struct xtables_match *match =
+	const struct xtables_match *match =
 		xtables_find_match(m->u.user.name, XTF_TRY_LOAD, NULL);
 
 	if (match) {
@@ -593,7 +593,7 @@ print_firewall(const struct ip6t_entry *fw,
 	       unsigned int format,
 	       struct ip6tc_handle *const handle)
 {
-	struct xtables_target *target = NULL;
+	const struct xtables_target *target = NULL;
 	const struct ip6t_entry_target *t;
 	u_int8_t flags;
 	char buf[BUFSIZ];
@@ -804,12 +804,12 @@ insert_entry(const ip6t_chainlabel chain,
 }
 
 static unsigned char *
-make_delete_mask(struct xtables_rule_match *matches,
+make_delete_mask(const struct xtables_rule_match *matches,
 		 const struct xtables_target *target)
 {
 	/* Establish mask for comparison */
 	unsigned int size;
-	struct xtables_rule_match *matchp;
+	const struct xtables_rule_match *matchp;
 	unsigned char *mask, *mptr;
 
 	size = sizeof(struct ip6t_entry);
@@ -1035,7 +1035,7 @@ static void print_proto(u_int16_t proto, int invert)
 		unsigned int i;
 		const char *invertstr = invert ? "! " : "";
 
-		struct protoent *pent = getprotobynumber(proto);
+		const struct protoent *pent = getprotobynumber(proto);
 		if (pent) {
 			printf("%s-p %s ",
 			       invertstr, pent->p_name);
@@ -1056,7 +1056,7 @@ static void print_proto(u_int16_t proto, int invert)
 static int print_match_save(const struct ip6t_entry_match *e,
 			const struct ip6t_ip6 *ip)
 {
-	struct xtables_match *match =
+	const struct xtables_match *match =
 		xtables_find_match(e->u.user.name, XTF_TRY_LOAD, NULL);
 
 	if (match) {
@@ -1077,7 +1077,8 @@ static int print_match_save(const struct ip6t_entry_match *e,
 }
 
 /* print a given ip including mask if neccessary */
-static void print_ip(char *prefix, const struct in6_addr *ip, const struct in6_addr *mask, int invert)
+static void print_ip(const char *prefix, const struct in6_addr *ip,
+		     const struct in6_addr *mask, int invert)
 {
 	char buf[51];
 	int l = ipv6_prefix_length(mask);
@@ -1101,7 +1102,7 @@ static void print_ip(char *prefix, const struct in6_addr *ip, const struct in6_a
 void print_rule(const struct ip6t_entry *e,
 		       struct ip6tc_handle *h, const char *chain, int counters)
 {
-	struct ip6t_entry_target *t;
+	const struct ip6t_entry_target *t;
 	const char *target_name;
 
 	/* print counters for iptables-save */
