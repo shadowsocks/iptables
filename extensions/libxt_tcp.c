@@ -237,7 +237,7 @@ print_ports(const char *name, uint16_t min, uint16_t max,
 	const char *inv = invert ? "!" : "";
 
 	if (min != 0 || max != 0xFFFF || invert) {
-		printf("%s", name);
+		printf(" %s", name);
 		if (min == max) {
 			printf(":%s", inv);
 			print_port(min, numeric);
@@ -247,7 +247,6 @@ print_ports(const char *name, uint16_t min, uint16_t max,
 			printf(":");
 			print_port(max, numeric);
 		}
-		printf(" ");
 	}
 }
 
@@ -255,7 +254,7 @@ static void
 print_option(uint8_t option, int invert, int numeric)
 {
 	if (option || invert)
-		printf("option=%s%u ", invert ? "!" : "", option);
+		printf(" option=%s%u", invert ? "!" : "", option);
 }
 
 static void
@@ -286,12 +285,12 @@ print_flags(uint8_t mask, uint8_t cmp, int invert, int numeric)
 	if (mask || invert) {
 		printf("flags:%s", invert ? "!" : "");
 		if (numeric)
-			printf("0x%02X/0x%02X ", mask, cmp);
+			printf(" 0x%02X/0x%02X", mask, cmp);
 		else {
+			printf(" ");
 			print_tcpf(mask);
 			printf("/");
 			print_tcpf(cmp);
-			printf(" ");
 		}
 	}
 }
@@ -301,7 +300,7 @@ tcp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_tcp *tcp = (struct xt_tcp *)match->data;
 
-	printf("tcp ");
+	printf(" tcp");
 	print_ports("spt", tcp->spts[0], tcp->spts[1],
 		    tcp->invflags & XT_TCP_INV_SRCPT,
 		    numeric);
@@ -315,7 +314,7 @@ tcp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 		    tcp->invflags & XT_TCP_INV_FLAGS,
 		    numeric);
 	if (tcp->invflags & ~XT_TCP_INV_MASK)
-		printf("Unknown invflags: 0x%X ",
+		printf(" Unknown invflags: 0x%X",
 		       tcp->invflags & ~XT_TCP_INV_MASK);
 }
 
@@ -326,49 +325,48 @@ static void tcp_save(const void *ip, const struct xt_entry_match *match)
 	if (tcpinfo->spts[0] != 0
 	    || tcpinfo->spts[1] != 0xFFFF) {
 		if (tcpinfo->invflags & XT_TCP_INV_SRCPT)
-			printf("! ");
+			printf(" !");
 		if (tcpinfo->spts[0]
 		    != tcpinfo->spts[1])
-			printf("--sport %u:%u ",
+			printf(" --sport %u:%u",
 			       tcpinfo->spts[0],
 			       tcpinfo->spts[1]);
 		else
-			printf("--sport %u ",
+			printf(" --sport %u",
 			       tcpinfo->spts[0]);
 	}
 
 	if (tcpinfo->dpts[0] != 0
 	    || tcpinfo->dpts[1] != 0xFFFF) {
 		if (tcpinfo->invflags & XT_TCP_INV_DSTPT)
-			printf("! ");
+			printf(" !");
 		if (tcpinfo->dpts[0]
 		    != tcpinfo->dpts[1])
-			printf("--dport %u:%u ",
+			printf(" --dport %u:%u",
 			       tcpinfo->dpts[0],
 			       tcpinfo->dpts[1]);
 		else
-			printf("--dport %u ",
+			printf(" --dport %u",
 			       tcpinfo->dpts[0]);
 	}
 
 	if (tcpinfo->option
 	    || (tcpinfo->invflags & XT_TCP_INV_OPTION)) {
 		if (tcpinfo->invflags & XT_TCP_INV_OPTION)
-			printf("! ");
-		printf("--tcp-option %u ", tcpinfo->option);
+			printf(" !");
+		printf(" --tcp-option %u", tcpinfo->option);
 	}
 
 	if (tcpinfo->flg_mask
 	    || (tcpinfo->invflags & XT_TCP_INV_FLAGS)) {
 		if (tcpinfo->invflags & XT_TCP_INV_FLAGS)
-			printf("! ");
-		printf("--tcp-flags ");
+			printf(" !");
+		printf(" --tcp-flags ");
 		if (tcpinfo->flg_mask != 0xFF) {
 			print_tcpf(tcpinfo->flg_mask);
 		}
 		printf(" ");
 		print_tcpf(tcpinfo->flg_cmp);
-		printf(" ");
 	}
 }
 

@@ -105,16 +105,16 @@ static void print_mode(const struct xt_connbytes_info *sinfo)
 {
 	switch (sinfo->what) {
 		case XT_CONNBYTES_PKTS:
-			fputs("packets ", stdout);
+			fputs(" packets", stdout);
 			break;
 		case XT_CONNBYTES_BYTES:
-			fputs("bytes ", stdout);
+			fputs(" bytes", stdout);
 			break;
 		case XT_CONNBYTES_AVGPKT:
-			fputs("avgpkt ", stdout);
+			fputs(" avgpkt", stdout);
 			break;
 		default:
-			fputs("unknown ", stdout);
+			fputs(" unknown", stdout);
 			break;
 	}
 }
@@ -123,16 +123,16 @@ static void print_direction(const struct xt_connbytes_info *sinfo)
 {
 	switch (sinfo->direction) {
 		case XT_CONNBYTES_DIR_ORIGINAL:
-			fputs("original ", stdout);
+			fputs(" original", stdout);
 			break;
 		case XT_CONNBYTES_DIR_REPLY:
-			fputs("reply ", stdout);
+			fputs(" reply", stdout);
 			break;
 		case XT_CONNBYTES_DIR_BOTH:
-			fputs("both ", stdout);
+			fputs(" both", stdout);
 			break;
 		default:
-			fputs("unknown ", stdout);
+			fputs(" unknown", stdout);
 			break;
 	}
 }
@@ -143,18 +143,18 @@ connbytes_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	const struct xt_connbytes_info *sinfo = (const void *)match->data;
 
 	if (sinfo->count.from > sinfo->count.to) 
-		printf("connbytes ! %llu:%llu ",
+		printf(" connbytes ! %llu:%llu",
 			(unsigned long long)sinfo->count.to,
 			(unsigned long long)sinfo->count.from);
 	else
-		printf("connbytes %llu:%llu ",
+		printf(" connbytes %llu:%llu",
 			(unsigned long long)sinfo->count.from,
 			(unsigned long long)sinfo->count.to);
 
-	fputs("connbytes mode ", stdout);
+	fputs(" connbytes mode", stdout);
 	print_mode(sinfo);
 
-	fputs("connbytes direction ", stdout);
+	fputs(" connbytes direction", stdout);
 	print_direction(sinfo);
 }
 
@@ -163,18 +163,18 @@ static void connbytes_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_connbytes_info *sinfo = (const void *)match->data;
 
 	if (sinfo->count.from > sinfo->count.to) 
-		printf("! --connbytes %llu:%llu ",
+		printf(" ! --connbytes %llu:%llu",
 			(unsigned long long)sinfo->count.to,
 			(unsigned long long)sinfo->count.from);
 	else
-		printf("--connbytes %llu:%llu ",
+		printf(" --connbytes %llu:%llu",
 			(unsigned long long)sinfo->count.from,
 			(unsigned long long)sinfo->count.to);
 
-	fputs("--connbytes-mode ", stdout);
+	fputs(" --connbytes-mode", stdout);
 	print_mode(sinfo);
 
-	fputs("--connbytes-dir ", stdout);
+	fputs(" --connbytes-dir", stdout);
 	print_direction(sinfo);
 }
 

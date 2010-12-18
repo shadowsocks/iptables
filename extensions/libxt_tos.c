@@ -103,11 +103,11 @@ static void tos_mt_print_v0(const void *ip, const struct xt_entry_match *match,
 {
 	const struct ipt_tos_info *info = (const void *)match->data;
 
-	printf("tos match ");
+	printf(" tos match ");
 	if (info->invert)
 		printf("!");
 	if (numeric || !tos_try_print_symbolic("", info->tos, 0x3F))
-		printf("0x%02x ", info->tos);
+		printf("0x%02x", info->tos);
 }
 
 static void tos_mt_print(const void *ip, const struct xt_entry_match *match,
@@ -115,12 +115,12 @@ static void tos_mt_print(const void *ip, const struct xt_entry_match *match,
 {
 	const struct xt_tos_match_info *info = (const void *)match->data;
 
-	printf("tos match ");
+	printf(" tos match");
 	if (info->invert)
 		printf("!");
 	if (numeric ||
 	    !tos_try_print_symbolic("", info->tos_value, info->tos_mask))
-		printf("0x%02x/0x%02x ", info->tos_value, info->tos_mask);
+		printf("0x%02x/0x%02x", info->tos_value, info->tos_mask);
 }
 
 static void tos_mt_save_v0(const void *ip, const struct xt_entry_match *match)
@@ -128,8 +128,8 @@ static void tos_mt_save_v0(const void *ip, const struct xt_entry_match *match)
 	const struct ipt_tos_info *info = (const void *)match->data;
 
 	if (info->invert)
-		printf("! ");
-	printf("--tos 0x%02x ", info->tos);
+		printf(" !");
+	printf(" --tos 0x%02x", info->tos);
 }
 
 static void tos_mt_save(const void *ip, const struct xt_entry_match *match)
@@ -137,8 +137,8 @@ static void tos_mt_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_tos_match_info *info = (const void *)match->data;
 
 	if (info->invert)
-		printf("! ");
-	printf("--tos 0x%02x/0x%02x ", info->tos_value, info->tos_mask);
+		printf(" !");
+	printf(" --tos 0x%02x/0x%02x", info->tos_value, info->tos_mask);
 }
 
 static struct xtables_match tos_mt_reg[] = {

@@ -29,7 +29,7 @@ static void print_groups(unsigned int gmask)
 	for (b = 31; b >= 0; b--) {
 		test = (1 << b);
 		if (gmask & test)
-			printf("%d ", b + 1);
+			printf(" %d", b + 1);
 	}
 }
 
@@ -148,19 +148,19 @@ static void ULOG_save(const void *ip, const struct xt_entry_target *target)
 	    = (const struct ipt_ulog_info *) target->data;
 
 	if (strcmp(loginfo->prefix, "") != 0) {
-		fputs("--ulog-prefix ", stdout);
+		fputs(" --ulog-prefix", stdout);
 		xtables_save_string(loginfo->prefix);
 	}
 
 	if (loginfo->nl_group != ULOG_DEFAULT_NLGROUP) {
-		printf("--ulog-nlgroup ");
+		printf(" --ulog-nlgroup");
 		print_groups(loginfo->nl_group);
 	}
 	if (loginfo->copy_range)
-		printf("--ulog-cprange %u ", (unsigned int)loginfo->copy_range);
+		printf(" --ulog-cprange %u", (unsigned int)loginfo->copy_range);
 
 	if (loginfo->qthreshold != ULOG_DEFAULT_QTHRESHOLD)
-		printf("--ulog-qthreshold %u ", (unsigned int)loginfo->qthreshold);
+		printf(" --ulog-qthreshold %u", (unsigned int)loginfo->qthreshold);
 }
 
 static void ULOG_print(const void *ip, const struct xt_entry_target *target,
@@ -169,12 +169,12 @@ static void ULOG_print(const void *ip, const struct xt_entry_target *target,
 	const struct ipt_ulog_info *loginfo
 	    = (const struct ipt_ulog_info *) target->data;
 
-	printf("ULOG ");
-	printf("copy_range %u nlgroup ", (unsigned int)loginfo->copy_range);
+	printf(" ULOG ");
+	printf("copy_range %u nlgroup", (unsigned int)loginfo->copy_range);
 	print_groups(loginfo->nl_group);
 	if (strcmp(loginfo->prefix, "") != 0)
-		printf("prefix `%s' ", loginfo->prefix);
-	printf("queue_threshold %u ", (unsigned int)loginfo->qthreshold);
+		printf(" prefix \"%s\"", loginfo->prefix);
+	printf(" queue_threshold %u", (unsigned int)loginfo->qthreshold);
 }
 
 static struct xtables_target ulog_tg_reg = {

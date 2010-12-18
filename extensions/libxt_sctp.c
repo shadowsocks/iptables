@@ -329,7 +329,7 @@ print_ports(const char *name, uint16_t min, uint16_t max,
 	const char *inv = invert ? "!" : "";
 
 	if (min != 0 || max != 0xFFFF || invert) {
-		printf("%s", name);
+		printf(" %s", name);
 		if (min == max) {
 			printf(":%s", inv);
 			print_port(min, numeric);
@@ -339,7 +339,6 @@ print_ports(const char *name, uint16_t min, uint16_t max,
 			printf(":");
 			print_port(max, numeric);
 		}
-		printf(" ");
 	}
 }
 
@@ -391,19 +390,19 @@ print_chunks(const struct xt_sctp_info *einfo, int numeric)
 	int flag;
 
 	switch (chunk_match_type) {
-		case SCTP_CHUNK_MATCH_ANY:	printf("any "); break;
-		case SCTP_CHUNK_MATCH_ALL:	printf("all "); break;
-		case SCTP_CHUNK_MATCH_ONLY:	printf("only "); break;
+		case SCTP_CHUNK_MATCH_ANY:	printf(" any"); break;
+		case SCTP_CHUNK_MATCH_ALL:	printf(" all"); break;
+		case SCTP_CHUNK_MATCH_ONLY:	printf(" only"); break;
 		default:	printf("Never reach here\n"); break;
 	}
 
 	if (SCTP_CHUNKMAP_IS_CLEAR(einfo->chunkmap)) {
-		printf("NONE ");
+		printf(" NONE");
 		goto out;
 	}
 	
 	if (SCTP_CHUNKMAP_IS_ALL_SET(einfo->chunkmap)) {
-		printf("ALL ");
+		printf(" ALL");
 		goto out;
 	}
 	
@@ -412,6 +411,8 @@ print_chunks(const struct xt_sctp_info *einfo, int numeric)
 		if (SCTP_CHUNKMAP_IS_SET(einfo->chunkmap, i)) {
 			if (flag)
 				printf(",");
+			else
+				putchar(' ');
 			flag = 1;
 			print_chunk(i, numeric);
 			for (j = 0; j < flag_count; j++) {
@@ -422,9 +423,6 @@ print_chunks(const struct xt_sctp_info *einfo, int numeric)
 			}
 		}
 	}
-
-	if (flag)
-		printf(" ");
 out:
 	return;
 }
@@ -435,7 +433,7 @@ sctp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	const struct xt_sctp_info *einfo =
 		(const struct xt_sctp_info *)match->data;
 
-	printf("sctp ");
+	printf(" sctp");
 
 	if (einfo->flags & XT_SCTP_SRC_PORTS) {
 		print_ports("spt", einfo->spts[0], einfo->spts[1],
@@ -453,7 +451,7 @@ sctp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 		/* FIXME: print_chunks() is used in save() where the printing of '!'
 		s taken care of, so we need to do that here as well */
 		if (einfo->invflags & XT_SCTP_CHUNK_TYPES) {
-			printf("! ");
+			printf(" !");
 		}
 		print_chunks(einfo, numeric);
 	}
@@ -466,28 +464,28 @@ static void sctp_save(const void *ip, const struct xt_entry_match *match)
 
 	if (einfo->flags & XT_SCTP_SRC_PORTS) {
 		if (einfo->invflags & XT_SCTP_SRC_PORTS)
-			printf("! ");
+			printf(" !");
 		if (einfo->spts[0] != einfo->spts[1])
-			printf("--sport %u:%u ", 
+			printf(" --sport %u:%u",
 			       einfo->spts[0], einfo->spts[1]);
 		else
-			printf("--sport %u ", einfo->spts[0]);
+			printf(" --sport %u", einfo->spts[0]);
 	}
 
 	if (einfo->flags & XT_SCTP_DEST_PORTS) {
 		if (einfo->invflags & XT_SCTP_DEST_PORTS)
-			printf("! ");
+			printf(" !");
 		if (einfo->dpts[0] != einfo->dpts[1])
-			printf("--dport %u:%u ",
+			printf(" --dport %u:%u",
 			       einfo->dpts[0], einfo->dpts[1]);
 		else
-			printf("--dport %u ", einfo->dpts[0]);
+			printf(" --dport %u", einfo->dpts[0]);
 	}
 
 	if (einfo->flags & XT_SCTP_CHUNK_TYPES) {
 		if (einfo->invflags & XT_SCTP_CHUNK_TYPES)
-			printf("! ");
-		printf("--chunk-types ");
+			printf(" !");
+		printf(" --chunk-types");
 
 		print_chunks(einfo, 0);
 	}

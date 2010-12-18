@@ -205,7 +205,7 @@ static void mark_tg_check(unsigned int flags)
 static void
 print_mark(unsigned long mark)
 {
-	printf("0x%lx ", mark);
+	printf(" 0x%lx", mark);
 }
 
 static void MARK_print_v0(const void *ip,
@@ -213,7 +213,7 @@ static void MARK_print_v0(const void *ip,
 {
 	const struct xt_mark_target_info *markinfo =
 		(const struct xt_mark_target_info *)target->data;
-	printf("MARK set ");
+	printf(" MARK set");
 	print_mark(markinfo->mark);
 }
 
@@ -222,7 +222,7 @@ static void MARK_save_v0(const void *ip, const struct xt_entry_target *target)
 	const struct xt_mark_target_info *markinfo =
 		(const struct xt_mark_target_info *)target->data;
 
-	printf("--set-mark ");
+	printf(" --set-mark");
 	print_mark(markinfo->mark);
 }
 
@@ -234,13 +234,13 @@ static void MARK_print_v1(const void *ip, const struct xt_entry_target *target,
 
 	switch (markinfo->mode) {
 	case XT_MARK_SET:
-		printf("MARK set ");
+		printf(" MARK set");
 		break;
 	case XT_MARK_AND:
-		printf("MARK and ");
+		printf(" MARK and");
 		break;
 	case XT_MARK_OR: 
-		printf("MARK or ");
+		printf(" MARK or");
 		break;
 	}
 	print_mark(markinfo->mark);
@@ -252,15 +252,15 @@ static void mark_tg_print(const void *ip, const struct xt_entry_target *target,
 	const struct xt_mark_tginfo2 *info = (const void *)target->data;
 
 	if (info->mark == 0)
-		printf("MARK and 0x%x ", (unsigned int)(uint32_t)~info->mask);
+		printf(" MARK and 0x%x", (unsigned int)(uint32_t)~info->mask);
 	else if (info->mark == info->mask)
-		printf("MARK or 0x%x ", info->mark);
+		printf(" MARK or 0x%x", info->mark);
 	else if (info->mask == 0)
-		printf("MARK xor 0x%x ", info->mark);
+		printf(" MARK xor 0x%x", info->mark);
 	else if (info->mask == 0xffffffffU)
-		printf("MARK set 0x%x ", info->mark);
+		printf(" MARK set 0x%x", info->mark);
 	else
-		printf("MARK xset 0x%x/0x%x ", info->mark, info->mask);
+		printf(" MARK xset 0x%x/0x%x", info->mark, info->mask);
 }
 
 static void MARK_save_v1(const void *ip, const struct xt_entry_target *target)
@@ -270,13 +270,13 @@ static void MARK_save_v1(const void *ip, const struct xt_entry_target *target)
 
 	switch (markinfo->mode) {
 	case XT_MARK_SET:
-		printf("--set-mark ");
+		printf(" --set-mark");
 		break;
 	case XT_MARK_AND:
-		printf("--and-mark ");
+		printf(" --and-mark");
 		break;
 	case XT_MARK_OR: 
-		printf("--or-mark ");
+		printf(" --or-mark");
 		break;
 	}
 	print_mark(markinfo->mark);
@@ -286,7 +286,7 @@ static void mark_tg_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_mark_tginfo2 *info = (const void *)target->data;
 
-	printf("--set-xmark 0x%x/0x%x ", info->mark, info->mask);
+	printf(" --set-xmark 0x%x/0x%x", info->mark, info->mask);
 }
 
 static struct xtables_target mark_tg_reg[] = {

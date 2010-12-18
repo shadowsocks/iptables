@@ -240,20 +240,19 @@ static void ipv6header_print(const void *ip,
                              const struct xt_entry_match *match, int numeric)
 {
 	const struct ip6t_ipv6header_info *info = (const struct ip6t_ipv6header_info *)match->data;
-	printf("ipv6header ");
+	printf(" ipv6header");
 
         if (info->matchflags || info->invflags) {
-                printf("flags:%s", info->invflags ? "!" : "");
+		printf(" flags:%s", info->invflags ? "!" : "");
                 if (numeric)
-                        printf("0x%02X ", info->matchflags);
+			printf("0x%02X", info->matchflags);
                 else {
                         print_header(info->matchflags);
-                        printf(" ");
                 }
         }
 
 	if (info->modeflag)
-		printf("soft ");
+		printf(" soft");
 }
 
 static void ipv6header_save(const void *ip, const struct xt_entry_match *match)
@@ -261,11 +260,10 @@ static void ipv6header_save(const void *ip, const struct xt_entry_match *match)
 
 	const struct ip6t_ipv6header_info *info = (const struct ip6t_ipv6header_info *)match->data;
 
-	printf("%s--header ", info->invflags ? "! " : "");
+	printf("%s --header ", info->invflags ? " !" : "");
 	print_header(info->matchflags);
-	printf(" ");
 	if (info->modeflag)
-		printf("--soft ");
+		printf(" --soft");
 }
 
 static struct xtables_match ipv6header_mt6_reg = {

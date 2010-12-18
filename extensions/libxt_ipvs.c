@@ -206,7 +206,7 @@ static void ipvs_mt_dump_addr(const union nf_inet_addr *addr,
 
 	if (family == NFPROTO_IPV4) {
 		if (!numeric && addr->ip == 0) {
-			printf("anywhere ");
+			printf(" anywhere");
 			return;
 		}
 		if (numeric)
@@ -214,11 +214,11 @@ static void ipvs_mt_dump_addr(const union nf_inet_addr *addr,
 		else
 			strcpy(buf, xtables_ipaddr_to_anyname(&addr->in));
 		strcat(buf, xtables_ipmask_to_numeric(&mask->in));
-		printf("%s ", buf);
+		printf(" %s", buf);
 	} else if (family == NFPROTO_IPV6) {
 		if (!numeric && addr->ip6[0] == 0 && addr->ip6[1] == 0 &&
 		    addr->ip6[2] == 0 && addr->ip6[3] == 0) {
-			printf("anywhere ");
+			printf(" anywhere");
 			return;
 		}
 		if (numeric)
@@ -226,7 +226,7 @@ static void ipvs_mt_dump_addr(const union nf_inet_addr *addr,
 		else
 			strcpy(buf, xtables_ip6addr_to_anyname(&addr->in6));
 		strcat(buf, xtables_ip6mask_to_numeric(&mask->in6));
-		printf("%s ", buf);
+		printf(" %s", buf);
 	}
 }
 
@@ -235,65 +235,65 @@ static void ipvs_mt_dump(const void *ip, const struct xt_ipvs_mtinfo *data,
 {
 	if (data->bitmask == XT_IPVS_IPVS_PROPERTY) {
 		if (data->invert & XT_IPVS_IPVS_PROPERTY)
-			printf("! ");
-		printf("%sipvs ", prefix);
+			printf(" !");
+		printf(" %sipvs", prefix);
 	}
 
 	if (data->bitmask & XT_IPVS_PROTO) {
 		if (data->invert & XT_IPVS_PROTO)
-			printf("! ");
-		printf("%sproto %u ", prefix, data->l4proto);
+			printf(" !");
+		printf(" %sproto %u", prefix, data->l4proto);
 	}
 
 	if (data->bitmask & XT_IPVS_VADDR) {
 		if (data->invert & XT_IPVS_VADDR)
-			printf("! ");
+			printf(" !");
 
-		printf("%svaddr ", prefix);
+		printf(" %svaddr", prefix);
 		ipvs_mt_dump_addr(&data->vaddr, &data->vmask, family, numeric);
 	}
 
 	if (data->bitmask & XT_IPVS_VPORT) {
 		if (data->invert & XT_IPVS_VPORT)
-			printf("! ");
+			printf(" !");
 
-		printf("%svport %u ", prefix, ntohs(data->vport));
+		printf(" %svport %u", prefix, ntohs(data->vport));
 	}
 
 	if (data->bitmask & XT_IPVS_DIR) {
 		if (data->invert & XT_IPVS_DIR)
-			printf("%svdir REPLY ", prefix);
+			printf(" %svdir REPLY", prefix);
 		else
-			printf("%svdir ORIGINAL ", prefix);
+			printf(" %svdir ORIGINAL", prefix);
 	}
 
 	if (data->bitmask & XT_IPVS_METHOD) {
 		if (data->invert & XT_IPVS_METHOD)
-			printf("! ");
+			printf(" !");
 
-		printf("%svmethod ", prefix);
+		printf(" %svmethod", prefix);
 		switch (data->fwd_method) {
 		case IP_VS_CONN_F_DROUTE:
-			printf("GATE ");
+			printf(" GATE");
 			break;
 		case IP_VS_CONN_F_TUNNEL:
-			printf("IPIP ");
+			printf(" IPIP");
 			break;
 		case IP_VS_CONN_F_MASQ:
-			printf("MASQ ");
+			printf(" MASQ");
 			break;
 		default:
 			/* Hu? */
-			printf("UNKNOWN ");
+			printf(" UNKNOWN");
 			break;
 		}
 	}
 
 	if (data->bitmask & XT_IPVS_VPORTCTL) {
 		if (data->invert & XT_IPVS_VPORTCTL)
-			printf("! ");
+			printf(" !");
 
-		printf("%svportctl %u ", prefix, ntohs(data->vportctl));
+		printf(" %svportctl %u", prefix, ntohs(data->vportctl));
 	}
 }
 

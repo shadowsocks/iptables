@@ -166,6 +166,7 @@ print_options(unsigned int optsnr, uint16_t *optsp)
 {
 	unsigned int i;
 
+	printf(" ");
 	for(i = 0; i < optsnr; i++) {
 		printf("%d", (optsp[i] & 0xFF00) >> 8);
 
@@ -181,22 +182,22 @@ static void dst_print(const void *ip, const struct xt_entry_match *match,
 {
 	const struct ip6t_opts *optinfo = (struct ip6t_opts *)match->data;
 
-	printf("dst ");
+	printf(" dst");
 	if (optinfo->flags & IP6T_OPTS_LEN)
-		printf("length:%s%u ",
+		printf(" length:%s%u",
 			optinfo->invflags & IP6T_OPTS_INV_LEN ? "!" : "",
 			optinfo->hdrlen);
 
 	if (optinfo->flags & IP6T_OPTS_OPTS)
-		printf("opts ");
+		printf(" opts");
 
 	print_options(optinfo->optsnr, (uint16_t *)optinfo->opts);
 
 	if (optinfo->flags & IP6T_OPTS_NSTRICT)
-		printf("not-strict ");
+		printf(" not-strict");
 
 	if (optinfo->invflags & ~IP6T_OPTS_INV_MASK)
-		printf("Unknown invflags: 0x%X ",
+		printf(" Unknown invflags: 0x%X",
 		       optinfo->invflags & ~IP6T_OPTS_INV_MASK);
 }
 
@@ -205,18 +206,18 @@ static void dst_save(const void *ip, const struct xt_entry_match *match)
 	const struct ip6t_opts *optinfo = (struct ip6t_opts *)match->data;
 
 	if (optinfo->flags & IP6T_OPTS_LEN) {
-		printf("%s--dst-len %u ",
-			(optinfo->invflags & IP6T_OPTS_INV_LEN) ? "! " : "", 
+		printf("%s --dst-len %u",
+			(optinfo->invflags & IP6T_OPTS_INV_LEN) ? " !" : "",
 			optinfo->hdrlen);
 	}
 
 	if (optinfo->flags & IP6T_OPTS_OPTS)
-		printf("--dst-opts ");
+		printf(" --dst-opts");
 
 	print_options(optinfo->optsnr, (uint16_t *)optinfo->opts);
 
 	if (optinfo->flags & IP6T_OPTS_NSTRICT)
-		printf("--dst-not-strict ");
+		printf(" --dst-not-strict");
 }
 
 static struct xtables_match dst_mt6_reg = {

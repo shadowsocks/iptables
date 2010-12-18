@@ -163,9 +163,9 @@ static void tos_tg_print_v0(const void *ip,
 {
 	const struct ipt_tos_target_info *info = (const void *)target->data;
 
-	printf("TOS set ");
+	printf(" TOS set ");
 	if (numeric || !tos_try_print_symbolic("", info->tos, 0xFF))
-		printf("0x%02x ", info->tos);
+		printf("0x%02x", info->tos);
 }
 
 static void tos_tg_print(const void *ip, const struct xt_entry_target *target,
@@ -174,21 +174,21 @@ static void tos_tg_print(const void *ip, const struct xt_entry_target *target,
 	const struct xt_tos_target_info *info = (const void *)target->data;
 
 	if (numeric)
-		printf("TOS set 0x%02x/0x%02x ",
+		printf(" TOS set 0x%02x/0x%02x",
 		       info->tos_value, info->tos_mask);
-	else if (tos_try_print_symbolic("TOS set ",
+	else if (tos_try_print_symbolic(" TOS set",
 	    info->tos_value, info->tos_mask))
 		/* already printed by call */
 		return;
 	else if (info->tos_value == 0)
-		printf("TOS and 0x%02x ",
+		printf(" TOS and 0x%02x",
 		       (unsigned int)(uint8_t)~info->tos_mask);
 	else if (info->tos_value == info->tos_mask)
-		printf("TOS or 0x%02x ", info->tos_value);
+		printf(" TOS or 0x%02x", info->tos_value);
 	else if (info->tos_mask == 0)
-		printf("TOS xor 0x%02x ", info->tos_value);
+		printf(" TOS xor 0x%02x", info->tos_value);
 	else
-		printf("TOS set 0x%02x/0x%02x ",
+		printf(" TOS set 0x%02x/0x%02x",
 		       info->tos_value, info->tos_mask);
 }
 
@@ -196,14 +196,14 @@ static void tos_tg_save_v0(const void *ip, const struct xt_entry_target *target)
 {
 	const struct ipt_tos_target_info *info = (const void *)target->data;
 
-	printf("--set-tos 0x%02x ", info->tos);
+	printf(" --set-tos 0x%02x", info->tos);
 }
 
 static void tos_tg_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_tos_target_info *info = (const void *)target->data;
 
-	printf("--set-tos 0x%02x/0x%02x ", info->tos_value, info->tos_mask);
+	printf(" --set-tos 0x%02x/0x%02x", info->tos_value, info->tos_mask);
 }
 
 static struct xtables_target tos_tg_reg[] = {

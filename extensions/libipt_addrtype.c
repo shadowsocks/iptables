@@ -203,8 +203,6 @@ static void print_types(uint16_t mask)
 			printf("%s%s", sep, rtn_names[i]);
 			sep = ",";
 		}
-
-	printf(" ");
 }
 
 static void addrtype_print_v0(const void *ip, const struct xt_entry_match *match,
@@ -213,15 +211,15 @@ static void addrtype_print_v0(const void *ip, const struct xt_entry_match *match
 	const struct ipt_addrtype_info *info = 
 		(struct ipt_addrtype_info *) match->data;
 
-	printf("ADDRTYPE match ");
+	printf(" ADDRTYPE match");
 	if (info->source) {
-		printf("src-type ");
+		printf(" src-type ");
 		if (info->invert_source)
 			printf("!");
 		print_types(info->source);
 	}
 	if (info->dest) {
-		printf("dst-type ");
+		printf(" dst-type");
 		if (info->invert_dest)
 			printf("!");
 		print_types(info->dest);
@@ -234,24 +232,24 @@ static void addrtype_print_v1(const void *ip, const struct xt_entry_match *match
 	const struct ipt_addrtype_info_v1 *info = 
 		(struct ipt_addrtype_info_v1 *) match->data;
 
-	printf("ADDRTYPE match ");
+	printf(" ADDRTYPE match");
 	if (info->source) {
-		printf("src-type ");
+		printf(" src-type ");
 		if (info->flags & IPT_ADDRTYPE_INVERT_SOURCE)
 			printf("!");
 		print_types(info->source);
 	}
 	if (info->dest) {
-		printf("dst-type ");
+		printf(" dst-type ");
 		if (info->flags & IPT_ADDRTYPE_INVERT_DEST)
 			printf("!");
 		print_types(info->dest);
 	}
 	if (info->flags & IPT_ADDRTYPE_LIMIT_IFACE_IN) {
-		printf("limit-in ");
+		printf(" limit-in");
 	}
 	if (info->flags & IPT_ADDRTYPE_LIMIT_IFACE_OUT) {
-		printf("limit-out ");
+		printf(" limit-out");
 	}
 }
 
@@ -262,14 +260,14 @@ static void addrtype_save_v0(const void *ip, const struct xt_entry_match *match)
 
 	if (info->source) {
 		if (info->invert_source)
-			printf("! ");
-		printf("--src-type ");
+			printf(" !");
+		printf(" --src-type ");
 		print_types(info->source);
 	}
 	if (info->dest) {
 		if (info->invert_dest)
-			printf("! ");
-		printf("--dst-type ");
+			printf(" !");
+		printf(" --dst-type ");
 		print_types(info->dest);
 	}
 }
@@ -281,21 +279,21 @@ static void addrtype_save_v1(const void *ip, const struct xt_entry_match *match)
 
 	if (info->source) {
 		if (info->flags & IPT_ADDRTYPE_INVERT_SOURCE)
-			printf("! ");
-		printf("--src-type ");
+			printf(" !");
+		printf(" --src-type ");
 		print_types(info->source);
 	}
 	if (info->dest) {
 		if (info->flags & IPT_ADDRTYPE_INVERT_DEST)
-			printf("! ");
-		printf("--dst-type ");
+			printf(" !");
+		printf(" --dst-type ");
 		print_types(info->dest);
 	}
 	if (info->flags & IPT_ADDRTYPE_LIMIT_IFACE_IN) {
-		printf("--limit-iface-in ");
+		printf(" --limit-iface-in");
 	}
 	if (info->flags & IPT_ADDRTYPE_LIMIT_IFACE_OUT) {
-		printf("--limit-iface-out ");
+		printf(" --limit-iface-out");
 	}
 }
 

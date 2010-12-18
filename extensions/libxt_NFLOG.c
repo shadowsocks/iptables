@@ -111,15 +111,15 @@ static int NFLOG_parse(int c, char **argv, int invert, unsigned int *flags,
 static void nflog_print(const struct xt_nflog_info *info, char *prefix)
 {
 	if (info->prefix[0] != '\0') {
-		printf("%snflog-prefix ", prefix);
+		printf(" %snflog-prefix ", prefix);
 		xtables_save_string(info->prefix);
 	}
 	if (info->group)
-		printf("%snflog-group %u ", prefix, info->group);
+		printf(" %snflog-group %u", prefix, info->group);
 	if (info->len)
-		printf("%snflog-range %u ", prefix, info->len);
+		printf(" %snflog-range %u", prefix, info->len);
 	if (info->threshold != XT_NFLOG_DEFAULT_THRESHOLD)
-		printf("%snflog-threshold %u ", prefix, info->threshold);
+		printf(" %snflog-threshold %u", prefix, info->threshold);
 }
 
 static void NFLOG_print(const void *ip, const struct xt_entry_target *target,

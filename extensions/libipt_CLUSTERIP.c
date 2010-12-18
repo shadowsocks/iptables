@@ -198,11 +198,11 @@ static void CLUSTERIP_print(const void *ip,
 		(const struct ipt_clusterip_tgt_info *)target->data;
 	
 	if (!cipinfo->flags & CLUSTERIP_FLAG_NEW) {
-		printf("CLUSTERIP");
+		printf(" CLUSTERIP");
 		return;
 	}
 
-	printf("CLUSTERIP hashmode=%s clustermac=%s total_nodes=%u local_node=%u hash_init=%u", 
+	printf(" CLUSTERIP hashmode=%s clustermac=%s total_nodes=%u local_node=%u hash_init=%u",
 		hashmode2str(cipinfo->hash_mode),
 		mac2str(cipinfo->clustermac),
 		cipinfo->num_total_nodes,
@@ -220,7 +220,7 @@ static void CLUSTERIP_save(const void *ip, const struct xt_entry_target *target)
 	if (!cipinfo->flags & CLUSTERIP_FLAG_NEW)
 		return;
 
-	printf("--new --hashmode %s --clustermac %s --total-nodes %d --local-node %d --hash-init %u",
+	printf(" --new --hashmode %s --clustermac %s --total-nodes %d --local-node %d --hash-init %u",
 	       hashmode2str(cipinfo->hash_mode),
 	       mac2str(cipinfo->clustermac),
 	       cipinfo->num_total_nodes,

@@ -124,13 +124,12 @@ static void REDIRECT_print(const void *ip, const struct xt_entry_target *target,
 	const struct nf_nat_range *r = &mr->range[0];
 
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
-		printf("redir ports ");
+		printf(" redir ports ");
 		printf("%hu", ntohs(r->min.tcp.port));
 		if (r->max.tcp.port != r->min.tcp.port)
 			printf("-%hu", ntohs(r->max.tcp.port));
-		printf(" ");
 		if (mr->range[0].flags & IP_NAT_RANGE_PROTO_RANDOM)
-			printf("random ");
+			printf(" random");
 	}
 }
 
@@ -140,13 +139,12 @@ static void REDIRECT_save(const void *ip, const struct xt_entry_target *target)
 	const struct nf_nat_range *r = &mr->range[0];
 
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
-		printf("--to-ports ");
+		printf(" --to-ports ");
 		printf("%hu", ntohs(r->min.tcp.port));
 		if (r->max.tcp.port != r->min.tcp.port)
 			printf("-%hu", ntohs(r->max.tcp.port));
-		printf(" ");
 		if (mr->range[0].flags & IP_NAT_RANGE_PROTO_RANDOM)
-			printf("--random ");
+			printf(" --random");
 	}
 }
 

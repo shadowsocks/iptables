@@ -289,13 +289,13 @@ static void
 print_string(const char *str, const unsigned short int len)
 {
 	unsigned int i;
-	printf("\"");
+	printf(" \"");
 	for (i=0; i < len; i++) {
 		if ((unsigned char) str[i] == 0x22)  /* escape any embedded quotes */
 			printf("%c", 0x5c);
 		printf("%c", (unsigned char) str[i]);
 	}
-	printf("\" ");  /* closing space and quote */
+	printf("\"");  /* closing quote */
 }
 
 static void
@@ -308,19 +308,19 @@ string_print(const void *ip, const struct xt_entry_match *match, int numeric)
 				    info->u.v1.flags & XT_STRING_FLAG_INVERT);
 
 	if (is_hex_string(info->pattern, info->patlen)) {
-		printf("STRING match %s", invert ? "!" : "");
+		printf(" STRING match %s", invert ? "!" : "");
 		print_hex_string(info->pattern, info->patlen);
 	} else {
-		printf("STRING match %s", invert ? "!" : "");
+		printf(" STRING match %s", invert ? "!" : "");
 		print_string(info->pattern, info->patlen);
 	}
-	printf("ALGO name %s ", info->algo);
+	printf(" ALGO name %s", info->algo);
 	if (info->from_offset != 0)
-		printf("FROM %u ", info->from_offset);
+		printf(" FROM %u", info->from_offset);
 	if (info->to_offset != 0)
-		printf("TO %u ", info->to_offset);
+		printf(" TO %u", info->to_offset);
 	if (revision > 0 && info->u.v1.flags & XT_STRING_FLAG_IGNORECASE)
-		printf("ICASE ");
+		printf(" ICASE");
 }
 
 static void string_save(const void *ip, const struct xt_entry_match *match)
@@ -332,19 +332,19 @@ static void string_save(const void *ip, const struct xt_entry_match *match)
 				    info->u.v1.flags & XT_STRING_FLAG_INVERT);
 
 	if (is_hex_string(info->pattern, info->patlen)) {
-		printf("%s--hex-string ", (invert) ? "! ": "");
+		printf("%s --hex-string", (invert) ? " !" : "");
 		print_hex_string(info->pattern, info->patlen);
 	} else {
-		printf("%s--string ", (invert) ? "! ": "");
+		printf("%s --string", (invert) ? " !": "");
 		print_string(info->pattern, info->patlen);
 	}
-	printf("--algo %s ", info->algo);
+	printf(" --algo %s", info->algo);
 	if (info->from_offset != 0)
-		printf("--from %u ", info->from_offset);
+		printf(" --from %u", info->from_offset);
 	if (info->to_offset != 0)
-		printf("--to %u ", info->to_offset);
+		printf(" --to %u", info->to_offset);
 	if (revision > 0 && info->u.v1.flags & XT_STRING_FLAG_IGNORECASE)
-		printf("--icase ");
+		printf(" --icase");
 }
 
 

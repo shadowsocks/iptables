@@ -93,17 +93,17 @@ static void HL_save(const void *ip, const struct xt_entry_target *target)
 
 	switch (info->mode) {
 		case IP6T_HL_SET:
-			printf("--hl-set ");
+			printf(" --hl-set");
 			break;
 		case IP6T_HL_DEC:
-			printf("--hl-dec ");
+			printf(" --hl-dec");
 			break;
 
 		case IP6T_HL_INC:
-			printf("--hl-inc ");
+			printf(" --hl-inc");
 			break;
 	}
-	printf("%u ", info->hop_limit);
+	printf(" %u", info->hop_limit);
 }
 
 static void HL_print(const void *ip, const struct xt_entry_target *target,
@@ -112,19 +112,19 @@ static void HL_print(const void *ip, const struct xt_entry_target *target,
 	const struct ip6t_HL_info *info =
 		(struct ip6t_HL_info *) target->data;
 
-	printf("HL ");
+	printf(" HL ");
 	switch (info->mode) {
 		case IP6T_HL_SET:
-			printf("set to ");
+			printf("set to");
 			break;
 		case IP6T_HL_DEC:
-			printf("decrement by ");
+			printf("decrement by");
 			break;
 		case IP6T_HL_INC:
-			printf("increment by ");
+			printf("increment by");
 			break;
 	}
-	printf("%u ", info->hop_limit);
+	printf(" %u", info->hop_limit);
 }
 
 static const struct option HL_opts[] = {

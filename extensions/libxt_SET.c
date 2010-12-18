@@ -115,7 +115,7 @@ print_target_v0(const char *prefix, const struct xt_set_info_v0 *info)
 	if (info->index == IPSET_INVALID_ID)
 		return;
 	get_set_byid(setname, info->index);
-	printf("%s %s", prefix, setname);
+	printf(" %s %s", prefix, setname);
 	for (i = 0; i < IPSET_DIM_MAX; i++) {
 		if (!info->u.flags[i])
 			break;		
@@ -123,7 +123,6 @@ print_target_v0(const char *prefix, const struct xt_set_info_v0 *info)
 		       i == 0 ? " " : ",",
 		       info->u.flags[i] & IPSET_SRC ? "src" : "dst");
 	}
-	printf(" ");
 }
 
 static void
@@ -214,13 +213,12 @@ print_target(const char *prefix, const struct xt_set_info *info)
 	if (info->index == IPSET_INVALID_ID)
 		return;
 	get_set_byid(setname, info->index);
-	printf("%s %s", prefix, setname);
+	printf(" %s %s", prefix, setname);
 	for (i = 1; i <= info->dim; i++) {
 		printf("%s%s",
 		       i == 1 ? " " : ",",
 		       info->flags & (1 << i) ? "src" : "dst");
 	}
-	printf(" ");
 }
 
 static void

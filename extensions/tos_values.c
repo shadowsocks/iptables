@@ -91,7 +91,7 @@ static bool tos_try_print_symbolic(const char *prefix,
 
 	for (symbol = tos_symbol_names; symbol->name != NULL; ++symbol)
 		if (value == symbol->value) {
-			printf("%s%s ", prefix, symbol->name);
+			printf(" %s%s", prefix, symbol->name);
 			return true;
 		}
 

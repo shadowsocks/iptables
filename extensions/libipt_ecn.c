@@ -94,24 +94,22 @@ static void ecn_print(const void *ip, const struct xt_entry_match *match,
 	const struct ipt_ecn_info *einfo =
 		(const struct ipt_ecn_info *)match->data;
 
-	printf("ECN match ");
+	printf(" ECN match");
 
 	if (einfo->operation & IPT_ECN_OP_MATCH_ECE) {
-		if (einfo->invert & IPT_ECN_OP_MATCH_ECE)
-			fputc('!', stdout);
-		printf("ECE ");
+		printf(" %sECE",
+		       (einfo->invert & IPT_ECN_OP_MATCH_ECE) ? "!" : "");
 	}
 
 	if (einfo->operation & IPT_ECN_OP_MATCH_CWR) {
-		if (einfo->invert & IPT_ECN_OP_MATCH_CWR)
-			fputc('!', stdout);
-		printf("CWR ");
+		printf(" %sCWR",
+		       (einfo->invert & IPT_ECN_OP_MATCH_CWR) ? "!" : "");
 	}
 
 	if (einfo->operation & IPT_ECN_OP_MATCH_IP) {
-		if (einfo->invert & IPT_ECN_OP_MATCH_IP)
-			fputc('!', stdout);
-		printf("ECT=%d ", einfo->ip_ect);
+		printf(" %sECT=%d",
+		       (einfo->invert & IPT_ECN_OP_MATCH_IP) ? "!" : "",
+		       einfo->ip_ect);
 	}
 }
 
@@ -122,20 +120,20 @@ static void ecn_save(const void *ip, const struct xt_entry_match *match)
 	
 	if (einfo->operation & IPT_ECN_OP_MATCH_ECE) {
 		if (einfo->invert & IPT_ECN_OP_MATCH_ECE)
-			printf("! ");
-		printf("--ecn-tcp-ece ");
+			printf(" !");
+		printf(" --ecn-tcp-ece");
 	}
 
 	if (einfo->operation & IPT_ECN_OP_MATCH_CWR) {
 		if (einfo->invert & IPT_ECN_OP_MATCH_CWR)
-			printf("! ");
-		printf("--ecn-tcp-cwr ");
+			printf(" !");
+		printf(" --ecn-tcp-cwr");
 	}
 
 	if (einfo->operation & IPT_ECN_OP_MATCH_IP) {
 		if (einfo->invert & IPT_ECN_OP_MATCH_IP)
-			printf("! ");
-		printf("--ecn-ip-ect %d", einfo->ip_ect);
+			printf(" !");
+		printf(" --ecn-ip-ect %d", einfo->ip_ect);
 	}
 }
 

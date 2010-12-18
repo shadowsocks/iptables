@@ -75,11 +75,11 @@ RATEEST_print_time(unsigned int time)
 	double tmp = time;
 
 	if (tmp >= TIME_UNITS_PER_SEC)
-		printf("%.1fs ", tmp/TIME_UNITS_PER_SEC);
+		printf(" %.1fs", tmp / TIME_UNITS_PER_SEC);
 	else if (tmp >= TIME_UNITS_PER_SEC/1000)
-		printf("%.1fms ", tmp/(TIME_UNITS_PER_SEC/1000));
+		printf(" %.1fms", tmp / (TIME_UNITS_PER_SEC / 1000));
 	else
-		printf("%uus ", time);
+		printf(" %uus", time);
 }
 
 static void
@@ -179,10 +179,10 @@ __RATEEST_print(const struct xt_entry_target *target, const char *prefix)
 	local_interval = (TIME_UNITS_PER_SEC << (info->interval + 2)) / 4;
 	local_ewma_log = local_interval * (1 << (info->ewma_log));
 
-	printf("%sname %s ", prefix, info->name);
-	printf("%sinterval ", prefix);
+	printf(" %sname %s", prefix, info->name);
+	printf(" %sinterval", prefix);
 	RATEEST_print_time(local_interval);
-	printf("%sewmalog ", prefix);
+	printf(" %sewmalog", prefix);
 	RATEEST_print_time(local_ewma_log);
 }
 

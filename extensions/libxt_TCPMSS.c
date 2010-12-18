@@ -101,9 +101,9 @@ static void TCPMSS_print(const void *ip, const struct xt_entry_target *target,
 	const struct xt_tcpmss_info *mssinfo =
 		(const struct xt_tcpmss_info *)target->data;
 	if(mssinfo->mss == XT_TCPMSS_CLAMP_PMTU)
-		printf("TCPMSS clamp to PMTU ");
+		printf(" TCPMSS clamp to PMTU");
 	else
-		printf("TCPMSS set %u ", mssinfo->mss);
+		printf(" TCPMSS set %u", mssinfo->mss);
 }
 
 static void TCPMSS_save(const void *ip, const struct xt_entry_target *target)
@@ -112,9 +112,9 @@ static void TCPMSS_save(const void *ip, const struct xt_entry_target *target)
 		(const struct xt_tcpmss_info *)target->data;
 
 	if(mssinfo->mss == XT_TCPMSS_CLAMP_PMTU)
-		printf("--clamp-mss-to-pmtu ");
+		printf(" --clamp-mss-to-pmtu");
 	else
-		printf("--set-mss %u ", mssinfo->mss);
+		printf(" --set-mss %u", mssinfo->mss);
 }
 
 static struct xtables_target tcpmss_target = {

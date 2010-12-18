@@ -69,7 +69,7 @@ CLASSIFY_final_check(unsigned int flags)
 static void
 CLASSIFY_print_class(unsigned int priority, int numeric)
 {
-	printf("%x:%x ", TC_H_MAJ(priority)>>16, TC_H_MIN(priority));
+	printf(" %x:%x", TC_H_MAJ(priority)>>16, TC_H_MIN(priority));
 }
 
 static void
@@ -79,7 +79,7 @@ CLASSIFY_print(const void *ip,
 {
 	const struct xt_classify_target_info *clinfo =
 		(const struct xt_classify_target_info *)target->data;
-	printf("CLASSIFY set ");
+	printf(" CLASSIFY set");
 	CLASSIFY_print_class(clinfo->priority, numeric);
 }
 
@@ -89,7 +89,7 @@ CLASSIFY_save(const void *ip, const struct xt_entry_target *target)
 	const struct xt_classify_target_info *clinfo =
 		(const struct xt_classify_target_info *)target->data;
 
-	printf("--set-class %.4x:%.4x ",
+	printf(" --set-class %.4x:%.4x",
 	       TC_H_MAJ(clinfo->priority)>>16, TC_H_MIN(clinfo->priority));
 }
 

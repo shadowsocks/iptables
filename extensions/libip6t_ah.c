@@ -123,9 +123,9 @@ print_spis(const char *name, uint32_t min, uint32_t max,
 
 	if (min != 0 || max != 0xFFFFFFFF || invert) {
 		if (min == max)
-			printf("%s:%s%u ", name, inv, min);
+			printf("%s:%s%u", name, inv, min);
 		else
-			printf("%ss:%s%u:%u ", name, inv, min, max);
+			printf("%ss:%s%u:%u", name, inv, min, max);
 	}
 }
 
@@ -135,7 +135,7 @@ print_len(const char *name, uint32_t len, int invert)
 	const char *inv = invert ? "!" : "";
 
 	if (len != 0 || invert)
-		printf("%s:%s%u ", name, inv, len);
+		printf("%s:%s%u", name, inv, len);
 }
 
 static void ah_print(const void *ip, const struct xt_entry_match *match,
@@ -143,17 +143,17 @@ static void ah_print(const void *ip, const struct xt_entry_match *match,
 {
 	const struct ip6t_ah *ah = (struct ip6t_ah *)match->data;
 
-	printf("ah ");
+	printf(" ah ");
 	print_spis("spi", ah->spis[0], ah->spis[1],
 		    ah->invflags & IP6T_AH_INV_SPI);
 	print_len("length", ah->hdrlen, 
 		    ah->invflags & IP6T_AH_INV_LEN);
 
 	if (ah->hdrres)
-		printf("reserved ");
+		printf(" reserved");
 
 	if (ah->invflags & ~IP6T_AH_INV_MASK)
-		printf("Unknown invflags: 0x%X ",
+		printf(" Unknown invflags: 0x%X",
 		       ah->invflags & ~IP6T_AH_INV_MASK);
 }
 
@@ -163,26 +163,26 @@ static void ah_save(const void *ip, const struct xt_entry_match *match)
 
 	if (!(ahinfo->spis[0] == 0
 	    && ahinfo->spis[1] == 0xFFFFFFFF)) {
-		printf("%s--ahspi ",
-			(ahinfo->invflags & IP6T_AH_INV_SPI) ? "! " : "");
+		printf("%s --ahspi ",
+			(ahinfo->invflags & IP6T_AH_INV_SPI) ? " !" : "");
 		if (ahinfo->spis[0]
 		    != ahinfo->spis[1])
-			printf("%u:%u ",
+			printf("%u:%u",
 			       ahinfo->spis[0],
 			       ahinfo->spis[1]);
 		else
-			printf("%u ",
+			printf("%u",
 			       ahinfo->spis[0]);
 	}
 
 	if (ahinfo->hdrlen != 0 || (ahinfo->invflags & IP6T_AH_INV_LEN) ) {
-		printf("%s--ahlen %u ", 
-			(ahinfo->invflags & IP6T_AH_INV_LEN) ? "! " : "", 
+		printf("%s --ahlen %u",
+			(ahinfo->invflags & IP6T_AH_INV_LEN) ? " !" : "",
 			ahinfo->hdrlen);
 	}
 
 	if (ahinfo->hdrres != 0 )
-		printf("--ahres ");
+		printf(" --ahres");
 }
 
 static struct xtables_match ah_mt6_reg = {

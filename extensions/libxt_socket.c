@@ -40,14 +40,14 @@ socket_mt_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_socket_mtinfo1 *info = (const void *)match->data;
 
 	if (info->flags & XT_SOCKET_TRANSPARENT)
-		printf("--transparent ");
+		printf(" --transparent");
 }
 
 static void
 socket_mt_print(const void *ip, const struct xt_entry_match *match,
 		int numeric)
 {
-	printf("socket ");
+	printf(" socket");
 	socket_mt_save(ip, match);
 }
 

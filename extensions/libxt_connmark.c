@@ -109,9 +109,9 @@ connmark_parse(int c, char **argv, int invert, unsigned int *flags,
 static void print_mark(unsigned int mark, unsigned int mask)
 {
 	if (mask != 0xffffffffU)
-		printf("0x%x/0x%x ", mark, mask);
+		printf(" 0x%x/0x%x", mark, mask);
 	else
-		printf("0x%x ", mark);
+		printf(" 0x%x", mark);
 }
 
 static void connmark_mt_check(unsigned int flags)
@@ -126,7 +126,7 @@ connmark_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_connmark_info *info = (const void *)match->data;
 
-	printf("CONNMARK match ");
+	printf(" CONNMARK match ");
 	if (info->invert)
 		printf("!");
 	print_mark(info->mark, info->mask);
@@ -137,7 +137,7 @@ connmark_mt_print(const void *ip, const struct xt_entry_match *match, int numeri
 {
 	const struct xt_connmark_mtinfo1 *info = (const void *)match->data;
 
-	printf("connmark match ");
+	printf(" connmark match ");
 	if (info->invert)
 		printf("!");
 	print_mark(info->mark, info->mask);
@@ -148,9 +148,9 @@ static void connmark_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_connmark_info *info = (const void *)match->data;
 
 	if (info->invert)
-		printf("! ");
+		printf(" !");
 
-	printf("--mark ");
+	printf(" --mark");
 	print_mark(info->mark, info->mask);
 }
 
@@ -160,9 +160,9 @@ connmark_mt_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_connmark_mtinfo1 *info = (const void *)match->data;
 
 	if (info->invert)
-		printf("! ");
+		printf(" !");
 
-	printf("--mark ");
+	printf(" --mark");
 	print_mark(info->mark, info->mask);
 }
 

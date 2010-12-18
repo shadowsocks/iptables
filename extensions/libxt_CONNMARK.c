@@ -282,22 +282,20 @@ static void CONNMARK_print(const void *ip,
 		(const struct xt_connmark_target_info *)target->data;
 	switch (markinfo->mode) {
 	case XT_CONNMARK_SET:
-	    printf("CONNMARK set ");
+	    printf(" CONNMARK set ");
 	    print_mark(markinfo->mark);
 	    print_mask("/", markinfo->mask);
-	    printf(" ");
 	    break;
 	case XT_CONNMARK_SAVE:
-	    printf("CONNMARK save ");
+	    printf(" CONNMARK save ");
 	    print_mask("mask ", markinfo->mask);
-	    printf(" ");
 	    break;
 	case XT_CONNMARK_RESTORE:
-	    printf("CONNMARK restore ");
+	    printf(" CONNMARK restore ");
 	    print_mask("mask ", markinfo->mask);
 	    break;
 	default:
-	    printf("ERROR: UNKNOWN CONNMARK MODE ");
+	    printf(" ERROR: UNKNOWN CONNMARK MODE");
 	    break;
 	}
 }
@@ -311,39 +309,39 @@ connmark_tg_print(const void *ip, const struct xt_entry_target *target,
 	switch (info->mode) {
 	case XT_CONNMARK_SET:
 		if (info->ctmark == 0)
-			printf("CONNMARK and 0x%x ",
+			printf(" CONNMARK and 0x%x",
 			       (unsigned int)(uint32_t)~info->ctmask);
 		else if (info->ctmark == info->ctmask)
-			printf("CONNMARK or 0x%x ", info->ctmark);
+			printf(" CONNMARK or 0x%x", info->ctmark);
 		else if (info->ctmask == 0)
-			printf("CONNMARK xor 0x%x ", info->ctmark);
+			printf(" CONNMARK xor 0x%x", info->ctmark);
 		else if (info->ctmask == 0xFFFFFFFFU)
-			printf("CONNMARK set 0x%x ", info->ctmark);
+			printf(" CONNMARK set 0x%x", info->ctmark);
 		else
-			printf("CONNMARK xset 0x%x/0x%x ",
+			printf(" CONNMARK xset 0x%x/0x%x",
 			       info->ctmark, info->ctmask);
 		break;
 	case XT_CONNMARK_SAVE:
 		if (info->nfmask == UINT32_MAX && info->ctmask == UINT32_MAX)
-			printf("CONNMARK save ");
+			printf(" CONNMARK save");
 		else if (info->nfmask == info->ctmask)
-			printf("CONNMARK save mask 0x%x ", info->nfmask);
+			printf(" CONNMARK save mask 0x%x", info->nfmask);
 		else
-			printf("CONNMARK save nfmask 0x%x ctmask ~0x%x ",
+			printf(" CONNMARK save nfmask 0x%x ctmask ~0x%x",
 			       info->nfmask, info->ctmask);
 		break;
 	case XT_CONNMARK_RESTORE:
 		if (info->ctmask == UINT32_MAX && info->nfmask == UINT32_MAX)
-			printf("CONNMARK restore ");
+			printf(" CONNMARK restore");
 		else if (info->ctmask == info->nfmask)
-			printf("CONNMARK restore mask 0x%x ", info->ctmask);
+			printf(" CONNMARK restore mask 0x%x", info->ctmask);
 		else
-			printf("CONNMARK restore ctmask 0x%x nfmask ~0x%x ",
+			printf(" CONNMARK restore ctmask 0x%x nfmask ~0x%x",
 			       info->ctmask, info->nfmask);
 		break;
 
 	default:
-		printf("ERROR: UNKNOWN CONNMARK MODE");
+		printf(" ERROR: UNKNOWN CONNMARK MODE");
 		break;
 	}
 }
@@ -355,21 +353,20 @@ static void CONNMARK_save(const void *ip, const struct xt_entry_target *target)
 
 	switch (markinfo->mode) {
 	case XT_CONNMARK_SET:
-	    printf("--set-mark ");
+	    printf(" --set-mark ");
 	    print_mark(markinfo->mark);
 	    print_mask("/", markinfo->mask);
-	    printf(" ");
 	    break;
 	case XT_CONNMARK_SAVE:
-	    printf("--save-mark ");
+	    printf(" --save-mark ");
 	    print_mask("--mask ", markinfo->mask);
 	    break;
 	case XT_CONNMARK_RESTORE:
-	    printf("--restore-mark ");
+	    printf(" --restore-mark ");
 	    print_mask("--mask ", markinfo->mask);
 	    break;
 	default:
-	    printf("ERROR: UNKNOWN CONNMARK MODE ");
+	    printf(" ERROR: UNKNOWN CONNMARK MODE");
 	    break;
 	}
 }
@@ -389,18 +386,18 @@ connmark_tg_save(const void *ip, const struct xt_entry_target *target)
 
 	switch (info->mode) {
 	case XT_CONNMARK_SET:
-		printf("--set-xmark 0x%x/0x%x ", info->ctmark, info->ctmask);
+		printf(" --set-xmark 0x%x/0x%x", info->ctmark, info->ctmask);
 		break;
 	case XT_CONNMARK_SAVE:
-		printf("--save-mark --nfmask 0x%x --ctmask 0x%x ",
+		printf(" --save-mark --nfmask 0x%x --ctmask 0x%x",
 		       info->nfmask, info->ctmask);
 		break;
 	case XT_CONNMARK_RESTORE:
-		printf("--restore-mark --nfmask 0x%x --ctmask 0x%x ",
+		printf(" --restore-mark --nfmask 0x%x --ctmask 0x%x",
 		       info->nfmask, info->ctmask);
 		break;
 	default:
-		printf("ERROR: UNKNOWN CONNMARK MODE");
+		printf(" ERROR: UNKNOWN CONNMARK MODE");
 		break;
 	}
 }

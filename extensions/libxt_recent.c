@@ -162,26 +162,26 @@ static void recent_print(const void *ip, const struct xt_entry_match *match,
 	const struct xt_recent_mtinfo *info = (const void *)match->data;
 
 	if (info->invert)
-		fputc('!', stdout);
+		printf(" !");
 
-	printf("recent: ");
+	printf(" recent:");
 	if (info->check_set & XT_RECENT_SET)
-		printf("SET ");
+		printf(" SET");
 	if (info->check_set & XT_RECENT_CHECK)
-		printf("CHECK ");
+		printf(" CHECK");
 	if (info->check_set & XT_RECENT_UPDATE)
-		printf("UPDATE ");
+		printf(" UPDATE");
 	if (info->check_set & XT_RECENT_REMOVE)
-		printf("REMOVE ");
-	if(info->seconds) printf("seconds: %d ",info->seconds);
-	if(info->hit_count) printf("hit_count: %d ",info->hit_count);
+		printf(" REMOVE");
+	if(info->seconds) printf(" seconds: %d", info->seconds);
+	if(info->hit_count) printf(" hit_count: %d", info->hit_count);
 	if (info->check_set & XT_RECENT_TTL)
-		printf("TTL-Match ");
-	if(info->name) printf("name: %s ",info->name);
+		printf(" TTL-Match");
+	if(info->name) printf(" name: %s", info->name);
 	if (info->side == XT_RECENT_SOURCE)
-		printf("side: source ");
+		printf(" side: source");
 	if (info->side == XT_RECENT_DEST)
-		printf("side: dest ");
+		printf(" side: dest");
 }
 
 static void recent_save(const void *ip, const struct xt_entry_match *match)
@@ -189,25 +189,25 @@ static void recent_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_recent_mtinfo *info = (const void *)match->data;
 
 	if (info->invert)
-		printf("! ");
+		printf(" !");
 
 	if (info->check_set & XT_RECENT_SET)
-		printf("--set ");
+		printf(" --set");
 	if (info->check_set & XT_RECENT_CHECK)
-		printf("--rcheck ");
+		printf(" --rcheck");
 	if (info->check_set & XT_RECENT_UPDATE)
-		printf("--update ");
+		printf(" --update");
 	if (info->check_set & XT_RECENT_REMOVE)
-		printf("--remove ");
-	if(info->seconds) printf("--seconds %d ",info->seconds);
-	if(info->hit_count) printf("--hitcount %d ",info->hit_count);
+		printf(" --remove");
+	if(info->seconds) printf(" --seconds %d", info->seconds);
+	if(info->hit_count) printf(" --hitcount %d", info->hit_count);
 	if (info->check_set & XT_RECENT_TTL)
-		printf("--rttl ");
-	if(info->name) printf("--name %s ",info->name);
+		printf(" --rttl");
+	if(info->name) printf(" --name %s",info->name);
 	if (info->side == XT_RECENT_SOURCE)
-		printf("--rsource ");
+		printf(" --rsource");
 	if (info->side == XT_RECENT_DEST)
-		printf("--rdest ");
+		printf(" --rdest");
 }
 
 static struct xtables_match recent_mt_reg = {

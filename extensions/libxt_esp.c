@@ -108,9 +108,9 @@ print_spis(const char *name, uint32_t min, uint32_t max,
 
 	if (min != 0 || max != 0xFFFFFFFF || invert) {
 		if (min == max)
-			printf("%s:%s%u ", name, inv, min);
+			printf(" %s:%s%u", name, inv, min);
 		else
-			printf("%ss:%s%u:%u ", name, inv, min, max);
+			printf(" %ss:%s%u:%u", name, inv, min, max);
 	}
 }
 
@@ -119,11 +119,11 @@ esp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_esp *esp = (struct xt_esp *)match->data;
 
-	printf("esp ");
+	printf(" esp");
 	print_spis("spi", esp->spis[0], esp->spis[1],
 		    esp->invflags & XT_ESP_INV_SPI);
 	if (esp->invflags & ~XT_ESP_INV_MASK)
-		printf("Unknown invflags: 0x%X ",
+		printf(" Unknown invflags: 0x%X",
 		       esp->invflags & ~XT_ESP_INV_MASK);
 }
 
@@ -133,15 +133,15 @@ static void esp_save(const void *ip, const struct xt_entry_match *match)
 
 	if (!(espinfo->spis[0] == 0
 	    && espinfo->spis[1] == 0xFFFFFFFF)) {
-		printf("%s--espspi ",
-			(espinfo->invflags & XT_ESP_INV_SPI) ? "! " : "");
+		printf("%s --espspi ",
+			(espinfo->invflags & XT_ESP_INV_SPI) ? " !" : "");
 		if (espinfo->spis[0]
 		    != espinfo->spis[1])
-			printf("%u:%u ",
+			printf("%u:%u",
 			       espinfo->spis[0],
 			       espinfo->spis[1]);
 		else
-			printf("%u ",
+			printf("%u",
 			       espinfo->spis[0]);
 	}
 

@@ -211,7 +211,7 @@ static void print_icmptype(uint8_t type,
 				break;
 
 		if (i != ARRAY_SIZE(icmp_codes)) {
-			printf("%s%s ",
+			printf(" %s%s",
 			       invert ? "!" : "",
 			       icmp_codes[i].name);
 			return;
@@ -219,15 +219,13 @@ static void print_icmptype(uint8_t type,
 	}
 
 	if (invert)
-		printf("!");
+		printf(" !");
 
 	printf("type %u", type);
-	if (code_min == 0 && code_max == 0xFF)
-		printf(" ");
-	else if (code_min == code_max)
-		printf(" code %u ", code_min);
-	else
-		printf(" codes %u-%u ", code_min, code_max);
+	if (code_min == code_max)
+		printf(" code %u", code_min);
+	else if (code_min != 0 || code_max != 0xFF)
+		printf(" codes %u-%u", code_min, code_max);
 }
 
 static void icmp_print(const void *ip, const struct xt_entry_match *match,
@@ -235,13 +233,13 @@ static void icmp_print(const void *ip, const struct xt_entry_match *match,
 {
 	const struct ipt_icmp *icmp = (struct ipt_icmp *)match->data;
 
-	printf("icmp ");
+	printf(" icmp");
 	print_icmptype(icmp->type, icmp->code[0], icmp->code[1],
 		       icmp->invflags & IPT_ICMP_INV,
 		       numeric);
 
 	if (icmp->invflags & ~IPT_ICMP_INV)
-		printf("Unknown invflags: 0x%X ",
+		printf(" Unknown invflags: 0x%X",
 		       icmp->invflags & ~IPT_ICMP_INV);
 }
 
@@ -250,16 +248,15 @@ static void icmp_save(const void *ip, const struct xt_entry_match *match)
 	const struct ipt_icmp *icmp = (struct ipt_icmp *)match->data;
 
 	if (icmp->invflags & IPT_ICMP_INV)
-		printf("! ");
+		printf(" !");
 
 	/* special hack for 'any' case */
 	if (icmp->type == 0xFF) {
-		printf("--icmp-type any ");
+		printf(" --icmp-type any");
 	} else {
-		printf("--icmp-type %u", icmp->type);
+		printf(" --icmp-type %u", icmp->type);
 		if (icmp->code[0] != 0 || icmp->code[1] != 0xFF)
 			printf("/%u", icmp->code[0]);
-		printf(" ");
 	}
 }
 

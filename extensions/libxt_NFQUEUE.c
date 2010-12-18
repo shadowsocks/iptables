@@ -142,7 +142,7 @@ static void NFQUEUE_print(const void *ip,
 {
 	const struct xt_NFQ_info *tinfo =
 		(const struct xt_NFQ_info *)target->data;
-	printf("NFQUEUE num %u", tinfo->queuenum);
+	printf(" NFQUEUE num %u", tinfo->queuenum);
 }
 
 static void NFQUEUE_print_v1(const void *ip,
@@ -153,9 +153,9 @@ static void NFQUEUE_print_v1(const void *ip,
 
 	if (last > 1) {
 		last += tinfo->queuenum - 1;
-		printf("NFQUEUE balance %u:%u", tinfo->queuenum, last);
+		printf(" NFQUEUE balance %u:%u", tinfo->queuenum, last);
 	} else {
-		printf("NFQUEUE num %u", tinfo->queuenum);
+		printf(" NFQUEUE num %u", tinfo->queuenum);
 	}
 }
 
@@ -174,7 +174,7 @@ static void NFQUEUE_save(const void *ip, const struct xt_entry_target *target)
 	const struct xt_NFQ_info *tinfo =
 		(const struct xt_NFQ_info *)target->data;
 
-	printf("--queue-num %u ", tinfo->queuenum);
+	printf(" --queue-num %u", tinfo->queuenum);
 }
 
 static void NFQUEUE_save_v1(const void *ip, const struct xt_entry_target *target)
@@ -184,9 +184,9 @@ static void NFQUEUE_save_v1(const void *ip, const struct xt_entry_target *target
 
 	if (last > 1) {
 		last += tinfo->queuenum - 1;
-		printf("--queue-balance %u:%u ", tinfo->queuenum, last);
+		printf(" --queue-balance %u:%u", tinfo->queuenum, last);
 	} else {
-		printf("--queue-num %u ", tinfo->queuenum);
+		printf(" --queue-num %u", tinfo->queuenum);
 	}
 }
 

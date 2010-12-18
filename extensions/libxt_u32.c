@@ -45,7 +45,7 @@ static void u32_dump(const struct xt_u32 *data)
 	const struct xt_u32_test *ct;
 	unsigned int testind, i;
 
-	putchar('\"');
+	printf(" \"");
 	for (testind = 0; testind < data->ntests; ++testind) {
 		ct = &data->tests[testind];
 
@@ -82,7 +82,7 @@ static void u32_dump(const struct xt_u32 *data)
 				       ct->value[i].max);
 		}
 	}
-	printf("\" ");
+	putchar('\"');
 }
 
 /* string_to_number() is not quite what we need here ... */
@@ -252,9 +252,9 @@ static void u32_print(const void *ip, const struct xt_entry_match *match,
                       int numeric)
 {
 	const struct xt_u32 *data = (const void *)match->data;
-	printf("u32 ");
+	printf(" u32");
 	if (data->invert)
-		printf("! ");
+		printf(" !");
 	u32_dump(data);
 }
 
@@ -262,8 +262,8 @@ static void u32_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_u32 *data = (const void *)match->data;
 	if (data->invert)
-		printf("! ");
-	printf("--u32 ");
+		printf(" !");
+	printf(" --u32");
 	u32_dump(data);
 }
 

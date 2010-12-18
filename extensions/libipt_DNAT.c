@@ -221,14 +221,13 @@ static void DNAT_print(const void *ip, const struct xt_entry_target *target,
 	const struct ipt_natinfo *info = (const void *)target;
 	unsigned int i = 0;
 
-	printf("to:");
+	printf(" to:");
 	for (i = 0; i < info->mr.rangesize; i++) {
 		print_range(&info->mr.range[i]);
-		printf(" ");
 		if (info->mr.range[i].flags & IP_NAT_RANGE_PROTO_RANDOM)
-			printf("random ");
+			printf(" random");
 		if (info->mr.range[i].flags & IP_NAT_RANGE_PERSISTENT)
-			printf("persistent ");
+			printf(" persistent");
 	}
 }
 
@@ -238,13 +237,12 @@ static void DNAT_save(const void *ip, const struct xt_entry_target *target)
 	unsigned int i = 0;
 
 	for (i = 0; i < info->mr.rangesize; i++) {
-		printf("--to-destination ");
+		printf(" --to-destination ");
 		print_range(&info->mr.range[i]);
-		printf(" ");
 		if (info->mr.range[i].flags & IP_NAT_RANGE_PROTO_RANDOM)
-			printf("--random ");
+			printf(" --random");
 		if (info->mr.range[i].flags & IP_NAT_RANGE_PERSISTENT)
-			printf("--persistent ");
+			printf(" --persistent");
 	}
 }
 

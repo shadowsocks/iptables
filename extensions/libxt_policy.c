@@ -330,17 +330,17 @@ static void policy_check(unsigned int flags)
 
 static void print_mode(const char *prefix, uint8_t mode, int numeric)
 {
-	printf("%smode ", prefix);
+	printf(" %smode ", prefix);
 
 	switch (mode) {
 	case XT_POLICY_MODE_TRANSPORT:
-		printf("transport ");
+		printf("transport");
 		break;
 	case XT_POLICY_MODE_TUNNEL:
-		printf("tunnel ");
+		printf("tunnel");
 		break;
 	default:
-		printf("??? ");
+		printf("???");
 		break;
 	}
 }
@@ -349,19 +349,19 @@ static void print_proto(const char *prefix, uint8_t proto, int numeric)
 {
 	struct protoent *p = NULL;
 
-	printf("%sproto ", prefix);
+	printf(" %sproto ", prefix);
 	if (!numeric)
 		p = getprotobynumber(proto);
 	if (p != NULL)
-		printf("%s ", p->p_name);
+		printf("%s", p->p_name);
 	else
-		printf("%u ", proto);
+		printf("%u", proto);
 }
 
 #define PRINT_INVERT(x)		\
 do {				\
 	if (x)			\
-		printf("! ");	\
+		printf(" !");	\
 } while(0)
 
 static void print_entry(const char *prefix, const struct xt_policy_elem *e,
@@ -369,11 +369,11 @@ static void print_entry(const char *prefix, const struct xt_policy_elem *e,
 {
 	if (e->match.reqid) {
 		PRINT_INVERT(e->invert.reqid);
-		printf("%sreqid %u ", prefix, e->reqid);
+		printf(" %sreqid %u", prefix, e->reqid);
 	}
 	if (e->match.spi) {
 		PRINT_INVERT(e->invert.spi);
-		printf("%sspi 0x%x ", prefix, e->spi);
+		printf(" %sspi 0x%x", prefix, e->spi);
 	}
 	if (e->match.proto) {
 		PRINT_INVERT(e->invert.proto);
@@ -386,22 +386,22 @@ static void print_entry(const char *prefix, const struct xt_policy_elem *e,
 	if (e->match.daddr) {
 		PRINT_INVERT(e->invert.daddr);
 		if (family == NFPROTO_IPV6)
-			printf("%stunnel-dst %s%s ", prefix,
+			printf(" %stunnel-dst %s%s", prefix,
 			       xtables_ip6addr_to_numeric(&e->daddr.a6),
 			       xtables_ip6mask_to_numeric(&e->dmask.a6));
 		else
-			printf("%stunnel-dst %s%s ", prefix,
+			printf(" %stunnel-dst %s%s", prefix,
 			       xtables_ipaddr_to_numeric(&e->daddr.a4),
 			       xtables_ipmask_to_numeric(&e->dmask.a4));
 	}
 	if (e->match.saddr) {
 		PRINT_INVERT(e->invert.saddr);
 		if (family == NFPROTO_IPV6)
-			printf("%stunnel-src %s%s ", prefix,
+			printf(" %stunnel-src %s%s", prefix,
 			       xtables_ip6addr_to_numeric(&e->saddr.a6),
 			       xtables_ip6mask_to_numeric(&e->smask.a6));
 		else
-			printf("%stunnel-src %s%s ", prefix,
+			printf(" %stunnel-src %s%s", prefix,
 			       xtables_ipaddr_to_numeric(&e->saddr.a4),
 			       xtables_ipmask_to_numeric(&e->smask.a4));
 	}
@@ -410,17 +410,17 @@ static void print_entry(const char *prefix, const struct xt_policy_elem *e,
 static void print_flags(char *prefix, const struct xt_policy_info *info)
 {
 	if (info->flags & XT_POLICY_MATCH_IN)
-		printf("%sdir in ", prefix);
+		printf(" %sdir in", prefix);
 	else
-		printf("%sdir out ", prefix);
+		printf(" %sdir out", prefix);
 
 	if (info->flags & XT_POLICY_MATCH_NONE)
-		printf("%spol none ", prefix);
+		printf(" %spol none", prefix);
 	else
-		printf("%spol ipsec ", prefix);
+		printf(" %spol ipsec", prefix);
 
 	if (info->flags & XT_POLICY_MATCH_STRICT)
-		printf("%sstrict ", prefix);
+		printf(" %sstrict", prefix);
 }
 
 static void policy4_print(const void *ip, const struct xt_entry_match *match,
@@ -429,11 +429,11 @@ static void policy4_print(const void *ip, const struct xt_entry_match *match,
 	const struct xt_policy_info *info = (void *)match->data;
 	unsigned int i;
 
-	printf("policy match ");
+	printf(" policy match");
 	print_flags("", info);
 	for (i = 0; i < info->len; i++) {
 		if (info->len > 1)
-			printf("[%u] ", i);
+			printf(" [%u]", i);
 		print_entry("", &info->pol[i], numeric, NFPROTO_IPV4);
 	}
 }
@@ -444,11 +444,11 @@ static void policy6_print(const void *ip, const struct xt_entry_match *match,
 	const struct xt_policy_info *info = (void *)match->data;
 	unsigned int i;
 
-	printf("policy match ");
+	printf(" policy match");
 	print_flags("", info);
 	for (i = 0; i < info->len; i++) {
 		if (info->len > 1)
-			printf("[%u] ", i);
+			printf(" [%u]", i);
 		print_entry("", &info->pol[i], numeric, NFPROTO_IPV6);
 	}
 }
@@ -462,7 +462,7 @@ static void policy4_save(const void *ip, const struct xt_entry_match *match)
 	for (i = 0; i < info->len; i++) {
 		print_entry("--", &info->pol[i], false, NFPROTO_IPV4);
 		if (i + 1 < info->len)
-			printf("--next ");
+			printf(" --next");
 	}
 }
 
@@ -475,7 +475,7 @@ static void policy6_save(const void *ip, const struct xt_entry_match *match)
 	for (i = 0; i < info->len; i++) {
 		print_entry("--", &info->pol[i], false, NFPROTO_IPV6);
 		if (i + 1 < info->len)
-			printf("--next ");
+			printf(" --next");
 	}
 }
 

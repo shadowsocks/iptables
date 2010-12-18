@@ -134,24 +134,24 @@ static void print_rate(uint32_t period)
             || rates[i].mult/period < rates[i].mult%period)
 			break;
 
-	printf("%u/%s ", rates[i-1].mult / period, rates[i-1].name);
+	printf(" %u/%s", rates[i-1].mult / period, rates[i-1].name);
 }
 
 static void
 limit_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_rateinfo *r = (const void *)match->data;
-	printf("limit: avg "); print_rate(r->avg);
-	printf("burst %u ", r->burst);
+	printf(" limit: avg"); print_rate(r->avg);
+	printf(" burst %u", r->burst);
 }
 
 static void limit_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_rateinfo *r = (const void *)match->data;
 
-	printf("--limit "); print_rate(r->avg);
+	printf(" --limit"); print_rate(r->avg);
 	if (r->burst != XT_LIMIT_BURST)
-		printf("--limit-burst %u ", r->burst);
+		printf(" --limit-burst %u", r->burst);
 }
 
 static struct xtables_match limit_match = {

@@ -100,8 +100,8 @@ static void idletimer_tg_print(const void *ip,
 	struct idletimer_tg_info *info =
 		(struct idletimer_tg_info *) target->data;
 
-	printf("timeout:%u ", info->timeout);
-	printf("label:%s ", info->label);
+	printf(" timeout:%u", info->timeout);
+	printf(" label:%s", info->label);
 }
 
 static void idletimer_tg_save(const void *ip,
@@ -110,8 +110,8 @@ static void idletimer_tg_save(const void *ip,
 	struct idletimer_tg_info *info =
 		(struct idletimer_tg_info *) target->data;
 
-	printf("--timeout %u ", info->timeout);
-	printf("--label %s ", info->label);
+	printf(" --timeout %u", info->timeout);
+	printf(" --label %s", info->label);
 }
 
 static struct xtables_target idletimer_tg_reg = {

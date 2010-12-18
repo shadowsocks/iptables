@@ -114,7 +114,7 @@ physdev_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_physdev_info *info = (const void *)match->data;
 
-	printf("PHYSDEV match");
+	printf(" PHYSDEV match");
 	if (info->bitmask & XT_PHYSDEV_OP_ISIN)
 		printf("%s --physdev-is-in",
 		       info->invert & XT_PHYSDEV_OP_ISIN ? " !":"");
@@ -131,7 +131,6 @@ physdev_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	if (info->bitmask & XT_PHYSDEV_OP_BRIDGED)
 		printf("%s --physdev-is-bridged",
 		       info->invert & XT_PHYSDEV_OP_BRIDGED ? " !":"");
-	printf(" ");
 }
 
 static void physdev_save(const void *ip, const struct xt_entry_match *match)
@@ -139,23 +138,23 @@ static void physdev_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_physdev_info *info = (const void *)match->data;
 
 	if (info->bitmask & XT_PHYSDEV_OP_ISIN)
-		printf("%s--physdev-is-in ",
-		       (info->invert & XT_PHYSDEV_OP_ISIN) ? "! " : "");
+		printf("%s --physdev-is-in",
+		       (info->invert & XT_PHYSDEV_OP_ISIN) ? " !" : "");
 	if (info->bitmask & XT_PHYSDEV_OP_IN)
-		printf("%s--physdev-in %s ",
-		       (info->invert & XT_PHYSDEV_OP_IN) ? "! " : "",
+		printf("%s --physdev-in %s",
+		       (info->invert & XT_PHYSDEV_OP_IN) ? " !" : "",
 		       info->physindev);
 
 	if (info->bitmask & XT_PHYSDEV_OP_ISOUT)
-		printf("%s--physdev-is-out ",
-		       (info->invert & XT_PHYSDEV_OP_ISOUT) ? "! " : "");
+		printf("%s --physdev-is-out",
+		       (info->invert & XT_PHYSDEV_OP_ISOUT) ? " !" : "");
 	if (info->bitmask & XT_PHYSDEV_OP_OUT)
-		printf("%s--physdev-out %s ",
-		       (info->invert & XT_PHYSDEV_OP_OUT) ? "! " : "",
+		printf("%s --physdev-out %s",
+		       (info->invert & XT_PHYSDEV_OP_OUT) ? " !" : "",
 		       info->physoutdev);
 	if (info->bitmask & XT_PHYSDEV_OP_BRIDGED)
-		printf("%s--physdev-is-bridged ",
-		       (info->invert & XT_PHYSDEV_OP_BRIDGED) ? "! " : "");
+		printf("%s --physdev-is-bridged",
+		       (info->invert & XT_PHYSDEV_OP_BRIDGED) ? " !" : "");
 }
 
 static struct xtables_match physdev_match = {

@@ -1010,7 +1010,7 @@ print_iface(char letter, const char *iface, const unsigned char *mask,
 	if (mask[0] == 0)
 		return;
 
-	printf("%s-%c ", invert ? "! " : "", letter);
+	printf("%s -%c", invert ? " !" : "", letter);
 
 	for (i = 0; i < IFNAMSIZ; i++) {
 		if (mask[i] != 0) {
@@ -1024,8 +1024,6 @@ print_iface(char letter, const char *iface, const unsigned char *mask,
 			break;
 		}
 	}
-
-	printf(" ");
 }
 
 /* The ip6tables looks up the /etc/protocols. */
@@ -1033,23 +1031,23 @@ static void print_proto(uint16_t proto, int invert)
 {
 	if (proto) {
 		unsigned int i;
-		const char *invertstr = invert ? "! " : "";
+		const char *invertstr = invert ? " !" : "";
 
 		const struct protoent *pent = getprotobynumber(proto);
 		if (pent) {
-			printf("%s-p %s ",
+			printf("%s -p %s",
 			       invertstr, pent->p_name);
 			return;
 		}
 
 		for (i = 0; xtables_chain_protos[i].name != NULL; ++i)
 			if (xtables_chain_protos[i].num == proto) {
-				printf("%s-p %s ",
+				printf("%s -p %s",
 				       invertstr, xtables_chain_protos[i].name);
 				return;
 			}
 
-		printf("%s-p %u ", invertstr, proto);
+		printf("%s -p %u", invertstr, proto);
 	}
 }
 
@@ -1060,7 +1058,7 @@ static int print_match_save(const struct ip6t_entry_match *e,
 		xtables_find_match(e->u.user.name, XTF_TRY_LOAD, NULL);
 
 	if (match) {
-		printf("-m %s ", e->u.user.name);
+		printf(" -m %s", e->u.user.name);
 
 		/* some matches don't provide a save function */
 		if (match->save)
@@ -1086,15 +1084,15 @@ static void print_ip(const char *prefix, const struct in6_addr *ip,
 	if (l == 0 && !invert)
 		return;
 
-	printf("%s%s %s",
-		invert ? "! " : "",
+	printf("%s %s %s",
+		invert ? " !" : "",
 		prefix,
 		inet_ntop(AF_INET6, ip, buf, sizeof buf));
 
 	if (l == -1)
-		printf("/%s ", inet_ntop(AF_INET6, mask, buf, sizeof buf));
+		printf("/%s", inet_ntop(AF_INET6, mask, buf, sizeof buf));
 	else
-		printf("/%d ", l);
+		printf("/%d", l);
 }
 
 /* We want this to be readable, so only print out neccessary fields.
@@ -1110,7 +1108,7 @@ void print_rule(const struct ip6t_entry *e,
 		printf("[%llu:%llu] ", (unsigned long long)e->counters.pcnt, (unsigned long long)e->counters.bcnt);
 
 	/* print chain name */
-	printf("-A %s ", chain);
+	printf("-A %s", chain);
 
 	/* Print IP part. */
 	print_ip("-s", &(e->ipv6.src), &(e->ipv6.smsk),
@@ -1131,13 +1129,13 @@ void print_rule(const struct ip6t_entry *e,
 	/* not definied in ipv6
 	 * FIXME: linux/netfilter_ipv6/ip6_tables: IP6T_INV_FRAG why definied? */
 	if (e->ipv6.flags & IPT_F_FRAG)
-		printf("%s-f ",
-		       e->ipv6.invflags & IP6T_INV_FRAG ? "! " : "");
+		printf("%s -f",
+		       e->ipv6.invflags & IP6T_INV_FRAG ? " !" : "");
 #endif
 
 	if (e->ipv6.flags & IP6T_F_TOS)
-		printf("%s-? %d ",
-		       e->ipv6.invflags & IP6T_INV_TOS ? "! " : "",
+		printf("%s -? %d",
+		       e->ipv6.invflags & IP6T_INV_TOS ? " !" : "",
 		       e->ipv6.tos);
 
 	/* Print matchinfo part */
@@ -1147,15 +1145,15 @@ void print_rule(const struct ip6t_entry *e,
 
 	/* print counters for iptables -R */
 	if (counters < 0)
-		printf("-c %llu %llu ", (unsigned long long)e->counters.pcnt, (unsigned long long)e->counters.bcnt);
+		printf(" -c %llu %llu", (unsigned long long)e->counters.pcnt, (unsigned long long)e->counters.bcnt);
 
 	/* Print target name */
 	target_name = ip6tc_get_target(e, h);
 	if (target_name && (*target_name != '\0'))
 #ifdef IP6T_F_GOTO
-		printf("-%c %s ", e->ipv6.flags & IP6T_F_GOTO ? 'g' : 'j', target_name);
+		printf(" -%c %s", e->ipv6.flags & IP6T_F_GOTO ? 'g' : 'j', target_name);
 #else
-		printf("-j %s ", target_name);
+		printf(" -j %s", target_name);
 #endif
 
 	/* Print targinfo part */

@@ -70,7 +70,7 @@ static void audit_print(const void *ip, const struct xt_entry_target *target,
 	const struct xt_audit_info *einfo =
 		(const struct xt_audit_info *)target->data;
 
-	printf("AUDIT ");
+	printf(" AUDIT ");
 
 	switch(einfo->type) {
 	case XT_AUDIT_TYPE_ACCEPT:
@@ -92,13 +92,13 @@ static void audit_save(const void *ip, const struct xt_entry_target *target)
 
 	switch(einfo->type) {
 	case XT_AUDIT_TYPE_ACCEPT:
-		printf("--type=accept");
+		printf(" --type accept");
 		break;
 	case XT_AUDIT_TYPE_DROP:
-		printf("--type=drop");
+		printf(" --type drop");
 		break;
 	case XT_AUDIT_TYPE_REJECT:
-		printf("--type=reject");
+		printf(" --type reject");
 		break;
 	}
 }

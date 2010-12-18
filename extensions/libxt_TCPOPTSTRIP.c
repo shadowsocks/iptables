@@ -163,7 +163,7 @@ tcpoptstrip_tg_print(const void *ip, const struct xt_entry_target *target,
 	const struct xt_tcpoptstrip_target_info *info =
 		(const void *)target->data;
 
-	printf("TCPOPTSTRIP options ");
+	printf(" TCPOPTSTRIP options ");
 	tcpoptstrip_print_list(info, numeric);
 }
 
@@ -173,7 +173,7 @@ tcpoptstrip_tg_save(const void *ip, const struct xt_entry_target *target)
 	const struct xt_tcpoptstrip_target_info *info =
 		(const void *)target->data;
 
-	printf("--strip-options ");
+	printf(" --strip-options ");
 	tcpoptstrip_print_list(info, true);
 }
 

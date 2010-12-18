@@ -126,18 +126,18 @@ static void statistic_check(unsigned int flags)
 static void print_match(const struct xt_statistic_info *info, char *prefix)
 {
 	if (info->flags & XT_STATISTIC_INVERT)
-		printf("! ");
+		printf(" !");
 
 	switch (info->mode) {
 	case XT_STATISTIC_MODE_RANDOM:
-		printf("%smode random %sprobability %f ", prefix, prefix,
+		printf( "%smode random %sprobability %f", prefix, prefix,
 		       1.0 * info->u.random.probability / 0x80000000);
 		break;
 	case XT_STATISTIC_MODE_NTH:
-		printf("%smode nth %severy %u ", prefix, prefix,
+		printf(" %smode nth %severy %u", prefix, prefix,
 		       info->u.nth.every + 1);
 		if (info->u.nth.packet)
-			printf("%spacket %u ", prefix, info->u.nth.packet);
+			printf(" %spacket %u", prefix, info->u.nth.packet);
 		break;
 	}
 }
@@ -147,7 +147,7 @@ statistic_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_statistic_info *info = (const void *)match->data;
 
-	printf("statistic ");
+	printf(" statistic");
 	print_match(info, "");
 }
 

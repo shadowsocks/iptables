@@ -170,6 +170,7 @@ static void print_types(uint8_t min, uint8_t max, int invert, int numeric)
 	const char *inv = invert ? "!" : "";
 
 	if (min != 0 || max != 0xFF || invert) {
+		printf(" ");
 		if (min == max) {
 			printf("%s", inv);
 			print_type(min, numeric);
@@ -179,7 +180,6 @@ static void print_types(uint8_t min, uint8_t max, int invert, int numeric)
 			printf(":");
 			print_type(max, numeric);
 		}
-		printf(" ");
 	}
 }
 
@@ -188,12 +188,12 @@ static void mh_print(const void *ip, const struct xt_entry_match *match,
 {
 	const struct ip6t_mh *mhinfo = (struct ip6t_mh *)match->data;
 
-	printf("mh ");
+	printf(" mh");
 	print_types(mhinfo->types[0], mhinfo->types[1],
 		    mhinfo->invflags & IP6T_MH_INV_TYPE,
 		    numeric);
 	if (mhinfo->invflags & ~IP6T_MH_INV_MASK)
-		printf("Unknown invflags: 0x%X ",
+		printf(" Unknown invflags: 0x%X",
 		       mhinfo->invflags & ~IP6T_MH_INV_MASK);
 }
 
@@ -205,12 +205,12 @@ static void mh_save(const void *ip, const struct xt_entry_match *match)
 		return;
 
 	if (mhinfo->invflags & IP6T_MH_INV_TYPE)
-		printf("! ");
+		printf(" !");
 
 	if (mhinfo->types[0] != mhinfo->types[1])
-		printf("--mh-type %u:%u ", mhinfo->types[0], mhinfo->types[1]);
+		printf(" --mh-type %u:%u", mhinfo->types[0], mhinfo->types[1]);
 	else
-		printf("--mh-type %u ", mhinfo->types[0]);
+		printf(" --mh-type %u", mhinfo->types[0]);
 }
 
 static const struct option mh_opts[] = {

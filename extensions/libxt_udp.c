@@ -124,7 +124,7 @@ print_ports(const char *name, uint16_t min, uint16_t max,
 	const char *inv = invert ? "!" : "";
 
 	if (min != 0 || max != 0xFFFF || invert) {
-		printf("%s", name);
+		printf(" %s", name);
 		if (min == max) {
 			printf(":%s", inv);
 			print_port(min, numeric);
@@ -134,7 +134,6 @@ print_ports(const char *name, uint16_t min, uint16_t max,
 			printf(":");
 			print_port(max, numeric);
 		}
-		printf(" ");
 	}
 }
 
@@ -143,7 +142,7 @@ udp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_udp *udp = (struct xt_udp *)match->data;
 
-	printf("udp ");
+	printf(" udp");
 	print_ports("spt", udp->spts[0], udp->spts[1],
 		    udp->invflags & XT_UDP_INV_SRCPT,
 		    numeric);
@@ -151,7 +150,7 @@ udp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 		    udp->invflags & XT_UDP_INV_DSTPT,
 		    numeric);
 	if (udp->invflags & ~XT_UDP_INV_MASK)
-		printf("Unknown invflags: 0x%X ",
+		printf(" Unknown invflags: 0x%X",
 		       udp->invflags & ~XT_UDP_INV_MASK);
 }
 
@@ -162,28 +161,28 @@ static void udp_save(const void *ip, const struct xt_entry_match *match)
 	if (udpinfo->spts[0] != 0
 	    || udpinfo->spts[1] != 0xFFFF) {
 		if (udpinfo->invflags & XT_UDP_INV_SRCPT)
-			printf("! ");
+			printf(" !");
 		if (udpinfo->spts[0]
 		    != udpinfo->spts[1])
-			printf("--sport %u:%u ",
+			printf(" --sport %u:%u",
 			       udpinfo->spts[0],
 			       udpinfo->spts[1]);
 		else
-			printf("--sport %u ",
+			printf(" --sport %u",
 			       udpinfo->spts[0]);
 	}
 
 	if (udpinfo->dpts[0] != 0
 	    || udpinfo->dpts[1] != 0xFFFF) {
 		if (udpinfo->invflags & XT_UDP_INV_DSTPT)
-			printf("! ");
+			printf(" !");
 		if (udpinfo->dpts[0]
 		    != udpinfo->dpts[1])
-			printf("--dport %u:%u ",
+			printf(" --dport %u:%u",
 			       udpinfo->dpts[0],
 			       udpinfo->dpts[1]);
 		else
-			printf("--dport %u ",
+			printf(" --dport %u",
 			       udpinfo->dpts[0]);
 	}
 }

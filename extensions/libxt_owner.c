@@ -358,8 +358,8 @@ owner_mt_print_item_v0(const struct ipt_owner_info *info, const char *label,
 	if (!(info->match & flag))
 		return;
 	if (info->invert & flag)
-		printf("! ");
-	printf("%s ", label);
+		printf(" !");
+	printf(" %s", label);
 
 	switch (info->match & flag) {
 	case IPT_OWNER_UID:
@@ -367,11 +367,11 @@ owner_mt_print_item_v0(const struct ipt_owner_info *info, const char *label,
 			struct passwd *pwd = getpwuid(info->uid);
 
 			if (pwd != NULL && pwd->pw_name != NULL) {
-				printf("%s ", pwd->pw_name);
+				printf(" %s", pwd->pw_name);
 				break;
 			}
 		}
-		printf("%u ", (unsigned int)info->uid);
+		printf(" %u", (unsigned int)info->uid);
 		break;
 
 	case IPT_OWNER_GID:
@@ -379,24 +379,24 @@ owner_mt_print_item_v0(const struct ipt_owner_info *info, const char *label,
 			struct group *grp = getgrgid(info->gid);
 
 			if (grp != NULL && grp->gr_name != NULL) {
-				printf("%s ", grp->gr_name);
+				printf(" %s", grp->gr_name);
 				break;
 			}
 		}
-		printf("%u ", (unsigned int)info->gid);
+		printf(" %u", (unsigned int)info->gid);
 		break;
 
 	case IPT_OWNER_PID:
-		printf("%u ", (unsigned int)info->pid);
+		printf(" %u", (unsigned int)info->pid);
 		break;
 
 	case IPT_OWNER_SID:
-		printf("%u ", (unsigned int)info->sid);
+		printf(" %u", (unsigned int)info->sid);
 		break;
 
 #ifdef IPT_OWNER_COMM
 	case IPT_OWNER_COMM:
-		printf("%.*s ", (int)sizeof(info->comm), info->comm);
+		printf(" %.*s", (int)sizeof(info->comm), info->comm);
 		break;
 #endif
 	}
@@ -409,8 +409,8 @@ owner_mt6_print_item_v0(const struct ip6t_owner_info *info, const char *label,
 	if (!(info->match & flag))
 		return;
 	if (info->invert & flag)
-		printf("! ");
-	printf("%s ", label);
+		printf(" !");
+	printf(" %s", label);
 
 	switch (info->match & flag) {
 	case IP6T_OWNER_UID:
@@ -418,11 +418,11 @@ owner_mt6_print_item_v0(const struct ip6t_owner_info *info, const char *label,
 			struct passwd *pwd = getpwuid(info->uid);
 
 			if (pwd != NULL && pwd->pw_name != NULL) {
-				printf("%s ", pwd->pw_name);
+				printf(" %s", pwd->pw_name);
 				break;
 			}
 		}
-		printf("%u ", (unsigned int)info->uid);
+		printf(" %u", (unsigned int)info->uid);
 		break;
 
 	case IP6T_OWNER_GID:
@@ -430,19 +430,19 @@ owner_mt6_print_item_v0(const struct ip6t_owner_info *info, const char *label,
 			struct group *grp = getgrgid(info->gid);
 
 			if (grp != NULL && grp->gr_name != NULL) {
-				printf("%s ", grp->gr_name);
+				printf(" %s", grp->gr_name);
 				break;
 			}
 		}
-		printf("%u ", (unsigned int)info->gid);
+		printf(" %u", (unsigned int)info->gid);
 		break;
 
 	case IP6T_OWNER_PID:
-		printf("%u ", (unsigned int)info->pid);
+		printf(" %u", (unsigned int)info->pid);
 		break;
 
 	case IP6T_OWNER_SID:
-		printf("%u ", (unsigned int)info->sid);
+		printf(" %u", (unsigned int)info->sid);
 		break;
 	}
 }
@@ -454,40 +454,40 @@ owner_mt_print_item(const struct xt_owner_match_info *info, const char *label,
 	if (!(info->match & flag))
 		return;
 	if (info->invert & flag)
-		printf("! ");
-	printf("%s ", label);
+		printf(" !");
+	printf(" %s", label);
 
 	switch (info->match & flag) {
 	case XT_OWNER_UID:
 		if (info->uid_min != info->uid_max) {
-			printf("%u-%u ", (unsigned int)info->uid_min,
+			printf(" %u-%u", (unsigned int)info->uid_min,
 			       (unsigned int)info->uid_max);
 			break;
 		} else if (!numeric) {
 			const struct passwd *pwd = getpwuid(info->uid_min);
 
 			if (pwd != NULL && pwd->pw_name != NULL) {
-				printf("%s ", pwd->pw_name);
+				printf(" %s", pwd->pw_name);
 				break;
 			}
 		}
-		printf("%u ", (unsigned int)info->uid_min);
+		printf(" %u", (unsigned int)info->uid_min);
 		break;
 
 	case XT_OWNER_GID:
 		if (info->gid_min != info->gid_max) {
-			printf("%u-%u ", (unsigned int)info->gid_min,
+			printf(" %u-%u", (unsigned int)info->gid_min,
 			       (unsigned int)info->gid_max);
 			break;
 		} else if (!numeric) {
 			const struct group *grp = getgrgid(info->gid_min);
 
 			if (grp != NULL && grp->gr_name != NULL) {
-				printf("%s ", grp->gr_name);
+				printf(" %s", grp->gr_name);
 				break;
 			}
 		}
-		printf("%u ", (unsigned int)info->gid_min);
+		printf(" %u", (unsigned int)info->gid_min);
 		break;
 	}
 }

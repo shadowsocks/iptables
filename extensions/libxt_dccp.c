@@ -216,7 +216,7 @@ print_ports(const char *name, uint16_t min, uint16_t max,
 	const char *inv = invert ? "!" : "";
 
 	if (min != 0 || max != 0xFFFF || invert) {
-		printf("%s", name);
+		printf(" %s", name);
 		if (min == max) {
 			printf(":%s", inv);
 			print_port(min, numeric);
@@ -226,7 +226,6 @@ print_ports(const char *name, uint16_t min, uint16_t max,
 			printf(":");
 			print_port(max, numeric);
 		}
-		printf(" ");
 	}
 }
 
@@ -236,8 +235,9 @@ print_types(uint16_t types, int inverted, int numeric)
 	int have_type = 0;
 
 	if (inverted)
-		printf("! ");
+		printf(" !");
 
+	printf(" ");
 	while (types) {
 		unsigned int i;
 
@@ -261,7 +261,7 @@ static void
 print_option(uint8_t option, int invert, int numeric)
 {
 	if (option || invert)
-		printf("option=%s%u ", invert ? "!" : "", option);
+		printf(" option=%s%u", invert ? "!" : "", option);
 }
 
 static void
@@ -270,7 +270,7 @@ dccp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	const struct xt_dccp_info *einfo =
 		(const struct xt_dccp_info *)match->data;
 
-	printf("dccp ");
+	printf(" dccp");
 
 	if (einfo->flags & XT_DCCP_SRC_PORTS) {
 		print_ports("spt", einfo->spts[0], einfo->spts[1],
@@ -303,31 +303,31 @@ static void dccp_save(const void *ip, const struct xt_entry_match *match)
 
 	if (einfo->flags & XT_DCCP_SRC_PORTS) {
 		if (einfo->invflags & XT_DCCP_SRC_PORTS)
-			printf("! ");
+			printf(" !");
 		if (einfo->spts[0] != einfo->spts[1])
-			printf("--sport %u:%u ", 
+			printf(" --sport %u:%u",
 			       einfo->spts[0], einfo->spts[1]);
 		else
-			printf("--sport %u ", einfo->spts[0]);
+			printf(" --sport %u", einfo->spts[0]);
 	}
 
 	if (einfo->flags & XT_DCCP_DEST_PORTS) {
 		if (einfo->invflags & XT_DCCP_DEST_PORTS)
-			printf("! ");
+			printf(" !");
 		if (einfo->dpts[0] != einfo->dpts[1])
-			printf("--dport %u:%u ",
+			printf(" --dport %u:%u",
 			       einfo->dpts[0], einfo->dpts[1]);
 		else
-			printf("--dport %u ", einfo->dpts[0]);
+			printf(" --dport %u", einfo->dpts[0]);
 	}
 
 	if (einfo->flags & XT_DCCP_TYPE) {
-		printf("--dccp-type ");
+		printf(" --dccp-type");
 		print_types(einfo->typemask, einfo->invflags & XT_DCCP_TYPE,0);
 	}
 
 	if (einfo->flags & XT_DCCP_OPTION) {
-		printf("--dccp-option %s%u ", 
+		printf(" --dccp-option %s%u",
 			einfo->typemask & XT_DCCP_OPTION ? "! " : "",
 			einfo->option);
 	}

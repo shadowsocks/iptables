@@ -97,8 +97,8 @@ print_match_v0(const char *prefix, const struct xt_set_info_v0 *info)
 	char setname[IPSET_MAXNAMELEN];
 
 	get_set_byid(setname, info->index);
-	printf("%s%s %s", 
-	       (info->u.flags[0] & IPSET_MATCH_INV) ? "! " : "",
+	printf("%s %s %s",
+	       (info->u.flags[0] & IPSET_MATCH_INV) ? " !" : "",
 	       prefix,
 	       setname); 
 	for (i = 0; i < IPSET_DIM_MAX; i++) {
@@ -108,7 +108,6 @@ print_match_v0(const char *prefix, const struct xt_set_info_v0 *info)
 		       i == 0 ? " " : ",",
 		       info->u.flags[i] & IPSET_SRC ? "src" : "dst");
 	}
-	printf(" ");
 }
 
 /* Prints out the matchinfo. */
@@ -179,8 +178,8 @@ print_match(const char *prefix, const struct xt_set_info *info)
 	char setname[IPSET_MAXNAMELEN];
 
 	get_set_byid(setname, info->index);
-	printf("%s%s %s", 
-	       (info->flags & IPSET_INV_MATCH) ? "! " : "",
+	printf("%s %s %s",
+	       (info->flags & IPSET_INV_MATCH) ? " !" : "",
 	       prefix,
 	       setname); 
 	for (i = 1; i <= info->dim; i++) {		
@@ -188,7 +187,6 @@ print_match(const char *prefix, const struct xt_set_info *info)
 		       i == 1 ? " " : ",",
 		       info->flags & (1 << i) ? "src" : "dst");
 	}
-	printf(" ");
 }
 
 /* Prints out the matchinfo. */

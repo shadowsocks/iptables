@@ -235,7 +235,7 @@ print_nums(const char *name, uint32_t min, uint32_t max,
 	const char *inv = invert ? "!" : "";
 
 	if (min != 0 || max != 0xFFFFFFFF || invert) {
-		printf("%s", name);
+		printf(" %s", name);
 		if (min == max) {
 			printf(":%s", inv);
 			printf("%u", min);
@@ -245,7 +245,6 @@ print_nums(const char *name, uint32_t min, uint32_t max,
 			printf(":");
 			printf("%u",max);
 		}
-		printf(" ");
 	}
 }
 
@@ -255,7 +254,7 @@ print_addresses(unsigned int addrnr, struct in6_addr *addrp)
 	unsigned int i;
 
 	for(i=0; i<addrnr; i++){
-		printf("%s%c", addr_to_numeric(&(addrp[i])), (i!=addrnr-1)?',':' ');
+		printf("%c%s", (i==0)?' ':',', addr_to_numeric(&(addrp[i])));
 	}
 }
 
@@ -264,24 +263,23 @@ static void rt_print(const void *ip, const struct xt_entry_match *match,
 {
 	const struct ip6t_rt *rtinfo = (struct ip6t_rt *)match->data;
 
-	printf("rt ");
+	printf(" rt");
 	if (rtinfo->flags & IP6T_RT_TYP)
-	    printf("type:%s%d ", rtinfo->invflags & IP6T_RT_INV_TYP ? "!" : "",
+	    printf(" type:%s%d", rtinfo->invflags & IP6T_RT_INV_TYP ? "!" : "",
 		    rtinfo->rt_type);
 	print_nums("segsleft", rtinfo->segsleft[0], rtinfo->segsleft[1],
 		    rtinfo->invflags & IP6T_RT_INV_SGS);
 	if (rtinfo->flags & IP6T_RT_LEN) {
-		printf("length");
+		printf(" length");
 		printf(":%s", rtinfo->invflags & IP6T_RT_INV_LEN ? "!" : "");
 		printf("%u", rtinfo->hdrlen);
-		printf(" ");
 	}
-	if (rtinfo->flags & IP6T_RT_RES) printf("reserved ");
-	if (rtinfo->flags & IP6T_RT_FST) printf("0-addrs ");
+	if (rtinfo->flags & IP6T_RT_RES) printf(" reserved");
+	if (rtinfo->flags & IP6T_RT_FST) printf(" 0-addrs");
 	print_addresses(rtinfo->addrnr, (struct in6_addr *)rtinfo->addrs);
-	if (rtinfo->flags & IP6T_RT_FST_NSTRICT) printf("0-not-strict ");
+	if (rtinfo->flags & IP6T_RT_FST_NSTRICT) printf(" 0-not-strict");
 	if (rtinfo->invflags & ~IP6T_RT_INV_MASK)
-		printf("Unknown invflags: 0x%X ",
+		printf(" Unknown invflags: 0x%X",
 		       rtinfo->invflags & ~IP6T_RT_INV_MASK);
 }
 
@@ -290,35 +288,35 @@ static void rt_save(const void *ip, const struct xt_entry_match *match)
 	const struct ip6t_rt *rtinfo = (struct ip6t_rt *)match->data;
 
 	if (rtinfo->flags & IP6T_RT_TYP) {
-		printf("%s--rt-type %u ", 
-			(rtinfo->invflags & IP6T_RT_INV_TYP) ? "! " : "", 
+		printf("%s --rt-type %u",
+			(rtinfo->invflags & IP6T_RT_INV_TYP) ? " !" : "",
 			rtinfo->rt_type);
 	}
 
 	if (!(rtinfo->segsleft[0] == 0
 	    && rtinfo->segsleft[1] == 0xFFFFFFFF)) {
-		printf("%s--rt-segsleft ",
-			(rtinfo->invflags & IP6T_RT_INV_SGS) ? "! " : "");
+		printf("%s --rt-segsleft ",
+			(rtinfo->invflags & IP6T_RT_INV_SGS) ? " !" : "");
 		if (rtinfo->segsleft[0]
 		    != rtinfo->segsleft[1])
-			printf("%u:%u ",
+			printf("%u:%u",
 			       rtinfo->segsleft[0],
 			       rtinfo->segsleft[1]);
 		else
-			printf("%u ",
+			printf("%u",
 			       rtinfo->segsleft[0]);
 	}
 
 	if (rtinfo->flags & IP6T_RT_LEN) {
-		printf("%s--rt-len %u ",
-			(rtinfo->invflags & IP6T_RT_INV_LEN) ? "! " : "", 
+		printf("%s --rt-len %u",
+			(rtinfo->invflags & IP6T_RT_INV_LEN) ? " !" : "", 
 			rtinfo->hdrlen);
 	}
 
-	if (rtinfo->flags & IP6T_RT_RES) printf("--rt-0-res ");
-	if (rtinfo->flags & IP6T_RT_FST) printf("--rt-0-addrs ");
+	if (rtinfo->flags & IP6T_RT_RES) printf(" --rt-0-res");
+	if (rtinfo->flags & IP6T_RT_FST) printf(" --rt-0-addrs");
 	print_addresses(rtinfo->addrnr, (struct in6_addr *)rtinfo->addrs);
-	if (rtinfo->flags & IP6T_RT_FST_NSTRICT) printf("--rt-0-not-strict ");
+	if (rtinfo->flags & IP6T_RT_FST_NSTRICT) printf(" --rt-0-not-strict");
 
 }
 

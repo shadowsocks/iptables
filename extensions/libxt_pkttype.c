@@ -112,11 +112,11 @@ static void print_pkttype(const struct xt_pkttype_info *info)
 	for (i = 0; i < ARRAY_SIZE(supported_types); ++i)
 		if(supported_types[i].pkttype==info->pkttype)
 		{
-			printf("%s ", supported_types[i].name);
+			printf("%s", supported_types[i].name);
 			return;
 		}
 
-	printf("%d ", info->pkttype);	/* in case we didn't find an entry in named-packtes */
+	printf("%d", info->pkttype);	/* in case we didn't find an entry in named-packtes */
 }
 
 static void pkttype_print(const void *ip, const struct xt_entry_match *match,
@@ -124,7 +124,7 @@ static void pkttype_print(const void *ip, const struct xt_entry_match *match,
 {
 	const struct xt_pkttype_info *info = (const void *)match->data;
 	
-	printf("PKTTYPE %s= ", info->invert?"!":"");
+	printf(" PKTTYPE %s= ", info->invert ? "!" : "");
 	print_pkttype(info);
 }
 
@@ -132,7 +132,7 @@ static void pkttype_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_pkttype_info *info = (const void *)match->data;
 	
-	printf("%s--pkt-type ", info->invert ? "! " : "");
+	printf("%s --pkt-type ", info->invert ? " !" : "");
 	print_pkttype(info);
 }
 

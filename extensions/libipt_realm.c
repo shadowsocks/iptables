@@ -190,14 +190,14 @@ print_realm(unsigned long id, unsigned long mask, int numeric)
 	const char* name = NULL;
 
 	if (mask != 0xffffffff)
-		printf("0x%lx/0x%lx ", id, mask);
+		printf(" 0x%lx/0x%lx", id, mask);
 	else {
 		if (numeric == 0)
 			name = realm_id2name(id);
 		if (name)
-			printf("%s ", name);
+			printf(" %s", name);
 		else
-			printf("0x%lx ", id);
+			printf(" 0x%lx", id);
 	}
 }
 
@@ -207,9 +207,9 @@ static void realm_print(const void *ip, const struct xt_entry_match *match,
 	const struct ipt_realm_info *ri = (const void *)match->data;
 
 	if (ri->invert)
-		printf("! ");
+		printf(" !");
 
-	printf("realm ");
+	printf(" realm");
 	print_realm(ri->id, ri->mask, numeric);
 }
 
@@ -218,9 +218,9 @@ static void realm_save(const void *ip, const struct xt_entry_match *match)
 	const struct ipt_realm_info *ri = (const void *)match->data;
 
 	if (ri->invert)
-		printf("! ");
+		printf(" !");
 
-	printf("--realm ");
+	printf(" --realm");
 	print_realm(ri->id, ri->mask, 0);
 }
 

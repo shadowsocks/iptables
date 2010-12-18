@@ -203,34 +203,34 @@ static void LOG_print(const void *ip, const struct xt_entry_target *target,
 		= (const struct ipt_log_info *)target->data;
 	unsigned int i = 0;
 
-	printf("LOG ");
+	printf(" LOG");
 	if (numeric)
-		printf("flags %u level %u ",
+		printf(" flags %u level %u",
 		       loginfo->logflags, loginfo->level);
 	else {
 		for (i = 0; i < ARRAY_SIZE(ipt_log_names); ++i)
 			if (loginfo->level == ipt_log_names[i].level) {
-				printf("level %s ", ipt_log_names[i].name);
+				printf(" level %s", ipt_log_names[i].name);
 				break;
 			}
 		if (i == ARRAY_SIZE(ipt_log_names))
-			printf("UNKNOWN level %u ", loginfo->level);
+			printf(" UNKNOWN level %u", loginfo->level);
 		if (loginfo->logflags & IPT_LOG_TCPSEQ)
-			printf("tcp-sequence ");
+			printf(" tcp-sequence");
 		if (loginfo->logflags & IPT_LOG_TCPOPT)
-			printf("tcp-options ");
+			printf(" tcp-options");
 		if (loginfo->logflags & IPT_LOG_IPOPT)
-			printf("ip-options ");
+			printf(" ip-options");
 		if (loginfo->logflags & IPT_LOG_UID)
-			printf("uid ");
+			printf(" uid");
 		if (loginfo->logflags & IPT_LOG_MACDECODE)
-			printf("macdecode ");
+			printf(" macdecode");
 		if (loginfo->logflags & ~(IPT_LOG_MASK))
-			printf("unknown-flags ");
+			printf(" unknown-flags");
 	}
 
 	if (strcmp(loginfo->prefix, "") != 0)
-		printf("prefix `%s' ", loginfo->prefix);
+		printf(" prefix \"%s\"", loginfo->prefix);
 }
 
 static void LOG_save(const void *ip, const struct xt_entry_target *target)
@@ -239,23 +239,23 @@ static void LOG_save(const void *ip, const struct xt_entry_target *target)
 		= (const struct ipt_log_info *)target->data;
 
 	if (strcmp(loginfo->prefix, "") != 0) {
-		printf("--log-prefix ");
+		printf(" --log-prefix");
 		xtables_save_string(loginfo->prefix);
 	}
 
 	if (loginfo->level != LOG_DEFAULT_LEVEL)
-		printf("--log-level %d ", loginfo->level);
+		printf(" --log-level %d", loginfo->level);
 
 	if (loginfo->logflags & IPT_LOG_TCPSEQ)
-		printf("--log-tcp-sequence ");
+		printf(" --log-tcp-sequence");
 	if (loginfo->logflags & IPT_LOG_TCPOPT)
-		printf("--log-tcp-options ");
+		printf(" --log-tcp-options");
 	if (loginfo->logflags & IPT_LOG_IPOPT)
-		printf("--log-ip-options ");
+		printf(" --log-ip-options");
 	if (loginfo->logflags & IPT_LOG_UID)
-		printf("--log-uid ");
+		printf(" --log-uid");
 	if (loginfo->logflags & IPT_LOG_MACDECODE)
-		printf("--log-macdecode ");
+		printf(" --log-macdecode");
 }
 
 static struct xtables_target log_tg_reg = {

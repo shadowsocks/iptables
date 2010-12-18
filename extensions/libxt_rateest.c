@@ -320,13 +320,13 @@ rateest_print_rate(uint32_t rate, int numeric)
 	double tmp = (double)rate*8;
 
 	if (numeric)
-		printf("%u ", rate);
+		printf(" %u", rate);
 	else if (tmp >= 1000.0*1000000.0)
-		printf("%.0fMbit ", tmp/1000000.0);
+		printf(" %.0fMbit", tmp/1000000.0);
 	else if (tmp >= 1000.0 * 1000.0)
-		printf("%.0fKbit ", tmp/1000.0);
+		printf(" %.0fKbit", tmp/1000.0);
 	else
-		printf("%.0fbit ", tmp);
+		printf(" %.0fbit", tmp);
 }
 
 static void
@@ -334,17 +334,17 @@ rateest_print_mode(const struct xt_rateest_match_info *info,
                    const char *prefix)
 {
 	if (info->flags & XT_RATEEST_MATCH_INVERT)
-		printf("! ");
+		printf(" !");
 
 	switch (info->mode) {
 	case XT_RATEEST_MATCH_EQ:
-		printf("%seq ", prefix);
+		printf(" %seq", prefix);
 		break;
 	case XT_RATEEST_MATCH_LT:
-		printf("%slt ", prefix);
+		printf(" %slt", prefix);
 		break;
 	case XT_RATEEST_MATCH_GT:
-		printf("%sgt ", prefix);
+		printf(" %sgt", prefix);
 		break;
 	default:
 		exit(1);
@@ -356,14 +356,14 @@ rateest_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_rateest_match_info *info = (const void *)match->data;
 
-	printf("rateest match ");
+	printf(" rateest match ");
 
-	printf("%s ", info->name1);
+	printf("%s", info->name1);
 	if (info->flags & XT_RATEEST_MATCH_DELTA)
-		printf("delta ");
+		printf(" delta");
 
 	if (info->flags & XT_RATEEST_MATCH_BPS) {
-		printf("bps ");
+		printf(" bps");
 		if (info->flags & XT_RATEEST_MATCH_DELTA)
 			rateest_print_rate(info->bps1, numeric);
 		if (info->flags & XT_RATEEST_MATCH_ABS) {
@@ -372,31 +372,31 @@ rateest_print(const void *ip, const struct xt_entry_match *match, int numeric)
 		}
 	}
 	if (info->flags & XT_RATEEST_MATCH_PPS) {
-		printf("pps ");
+		printf(" pps");
 		if (info->flags & XT_RATEEST_MATCH_DELTA)
-			printf("%u ", info->pps1);
+			printf(" %u", info->pps1);
 		if (info->flags & XT_RATEEST_MATCH_ABS) {
 			rateest_print_mode(info, "");
-			printf("%u ", info->pps2);
+			printf(" %u", info->pps2);
 		}
 	}
 
 	if (info->flags & XT_RATEEST_MATCH_REL) {
 		rateest_print_mode(info, "");
 
-		printf("%s ", info->name2);
+		printf(" %s", info->name2);
 		if (info->flags & XT_RATEEST_MATCH_DELTA)
-			printf("delta ");
+			printf(" delta");
 
 		if (info->flags & XT_RATEEST_MATCH_BPS) {
-			printf("bps ");
+			printf(" bps");
 			if (info->flags & XT_RATEEST_MATCH_DELTA)
 				rateest_print_rate(info->bps2, numeric);
 		}
 		if (info->flags & XT_RATEEST_MATCH_PPS) {
-			printf("pps ");
+			printf(" pps");
 			if (info->flags & XT_RATEEST_MATCH_DELTA)
-				printf("%u ", info->pps2);
+				printf(" %u", info->pps2);
 		}
 	}
 }
@@ -407,26 +407,26 @@ rateest_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_rateest_match_info *info = (const void *)match->data;
 
 	if (info->flags & XT_RATEEST_MATCH_REL) {
-		printf("--rateest1 %s ", info->name1);
+		printf(" --rateest1 %s", info->name1);
 		if (info->flags & XT_RATEEST_MATCH_BPS)
-			printf("--rateest-bps ");
+			printf(" --rateest-bps");
 		if (info->flags & XT_RATEEST_MATCH_PPS)
-			printf("--rateest-pps ");
-		rateest_print_mode(info, "--rateest-");
-		printf("--rateest2 %s ", info->name2);
+			printf(" --rateest-pps");
+		rateest_print_mode(info, " --rateest-");
+		printf(" --rateest2 %s", info->name2);
 	} else {
-		printf("--rateest %s ", info->name1);
+		printf(" --rateest %s", info->name1);
 		if (info->flags & XT_RATEEST_MATCH_BPS) {
-			printf("--rateest-bps1 ");
+			printf(" --rateest-bps1");
 			rateest_print_rate(info->bps1, 0);
-			printf("--rateest-bps2 ");
+			printf(" --rateest-bps2");
 			rateest_print_rate(info->bps2, 0);
 			rateest_print_mode(info, "--rateest-");
 		}
 		if (info->flags & XT_RATEEST_MATCH_PPS) {
-			printf("--rateest-pps ");
+			printf(" --rateest-pps");
 			rateest_print_mode(info, "--rateest-");
-			printf("%u ", info->pps2);
+			printf(" %u", info->pps2);
 		}
 	}
 }

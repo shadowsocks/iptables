@@ -186,7 +186,7 @@ static void print_icmpv6type(uint8_t type,
 				break;
 
 		if (i != ARRAY_SIZE(icmpv6_codes)) {
-			printf("%s%s ",
+			printf(" %s%s",
 			       invert ? "!" : "",
 			       icmpv6_codes[i].name);
 			return;
@@ -194,15 +194,13 @@ static void print_icmpv6type(uint8_t type,
 	}
 
 	if (invert)
-		printf("!");
+		printf(" !");
 
 	printf("type %u", type);
-	if (code_min == 0 && code_max == 0xFF)
-		printf(" ");
-	else if (code_min == code_max)
-		printf(" code %u ", code_min);
-	else
-		printf(" codes %u-%u ", code_min, code_max);
+	if (code_min == code_max)
+		printf(" code %u", code_min);
+	else if (code_min != 0 || code_max != 0xFF)
+		printf(" codes %u-%u", code_min, code_max);
 }
 
 static void icmp6_print(const void *ip, const struct xt_entry_match *match,
@@ -210,13 +208,13 @@ static void icmp6_print(const void *ip, const struct xt_entry_match *match,
 {
 	const struct ip6t_icmp *icmpv6 = (struct ip6t_icmp *)match->data;
 
-	printf("ipv6-icmp ");
+	printf(" ipv6-icmp");
 	print_icmpv6type(icmpv6->type, icmpv6->code[0], icmpv6->code[1],
 		       icmpv6->invflags & IP6T_ICMP_INV,
 		       numeric);
 
 	if (icmpv6->invflags & ~IP6T_ICMP_INV)
-		printf("Unknown invflags: 0x%X ",
+		printf(" Unknown invflags: 0x%X",
 		       icmpv6->invflags & ~IP6T_ICMP_INV);
 }
 
@@ -225,12 +223,11 @@ static void icmp6_save(const void *ip, const struct xt_entry_match *match)
 	const struct ip6t_icmp *icmpv6 = (struct ip6t_icmp *)match->data;
 
 	if (icmpv6->invflags & IP6T_ICMP_INV)
-		printf("! ");
+		printf(" !");
 
-	printf("--icmpv6-type %u", icmpv6->type);
+	printf(" --icmpv6-type %u", icmpv6->type);
 	if (icmpv6->code[0] != 0 || icmpv6->code[1] != 0xFF)
 		printf("/%u", icmpv6->code[0]);
-	printf(" ");
 }
 
 static void icmp6_check(unsigned int flags)

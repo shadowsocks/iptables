@@ -86,9 +86,9 @@ mark_parse(int c, char **argv, int invert, unsigned int *flags,
 static void print_mark(unsigned int mark, unsigned int mask)
 {
 	if (mask != 0xffffffffU)
-		printf("0x%x/0x%x ", mark, mask);
+		printf(" 0x%x/0x%x", mark, mask);
 	else
-		printf("0x%x ", mark);
+		printf(" 0x%x", mark);
 }
 
 static void mark_mt_check(unsigned int flags)
@@ -103,9 +103,9 @@ mark_mt_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_mark_mtinfo1 *info = (const void *)match->data;
 
-	printf("mark match ");
+	printf(" mark match");
 	if (info->invert)
-		printf("!");
+		printf(" !");
 	print_mark(info->mark, info->mask);
 }
 
@@ -114,10 +114,10 @@ mark_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_mark_info *info = (const void *)match->data;
 
-	printf("MARK match ");
+	printf(" MARK match");
 
 	if (info->invert)
-		printf("!");
+		printf(" !");
 	
 	print_mark(info->mark, info->mask);
 }
@@ -127,9 +127,9 @@ static void mark_mt_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_mark_mtinfo1 *info = (const void *)match->data;
 
 	if (info->invert)
-		printf("! ");
+		printf(" !");
 
-	printf("--mark ");
+	printf(" --mark");
 	print_mark(info->mark, info->mask);
 }
 
@@ -139,9 +139,9 @@ mark_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_mark_info *info = (const void *)match->data;
 
 	if (info->invert)
-		printf("! ");
+		printf(" !");
 	
-	printf("--mark ");
+	printf(" --mark");
 	print_mark(info->mark, info->mask);
 }
 

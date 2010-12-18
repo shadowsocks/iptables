@@ -92,22 +92,22 @@ static void ttl_print(const void *ip, const struct xt_entry_match *match,
 	const struct ipt_ttl_info *info = 
 		(struct ipt_ttl_info *) match->data;
 
-	printf("TTL match ");
+	printf(" TTL match ");
 	switch (info->mode) {
 		case IPT_TTL_EQ:
-			printf("TTL == ");
+			printf("TTL ==");
 			break;
 		case IPT_TTL_NE:
-			printf("TTL != ");
+			printf("TTL !=");
 			break;
 		case IPT_TTL_LT:
-			printf("TTL < ");
+			printf("TTL <");
 			break;
 		case IPT_TTL_GT:
-			printf("TTL > ");
+			printf("TTL >");
 			break;
 	}
-	printf("%u ", info->ttl);
+	printf(" %u", info->ttl);
 }
 
 static void ttl_save(const void *ip, const struct xt_entry_match *match)
@@ -117,22 +117,22 @@ static void ttl_save(const void *ip, const struct xt_entry_match *match)
 
 	switch (info->mode) {
 		case IPT_TTL_EQ:
-			printf("--ttl-eq ");
+			printf(" --ttl-eq");
 			break;
 		case IPT_TTL_NE:
-			printf("! --ttl-eq ");
+			printf(" ! --ttl-eq");
 			break;
 		case IPT_TTL_LT:
-			printf("--ttl-lt ");
+			printf(" --ttl-lt");
 			break;
 		case IPT_TTL_GT:
-			printf("--ttl-gt ");
+			printf(" --ttl-gt");
 			break;
 		default:
 			/* error */
 			break;
 	}
-	printf("%u ", info->ttl);
+	printf(" %u", info->ttl);
 }
 
 static const struct option ttl_opts[] = {

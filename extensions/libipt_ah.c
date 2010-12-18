@@ -111,7 +111,6 @@ print_spis(const char *name, uint32_t min, uint32_t max,
 			printf(":");
 			printf("%u",max);
 		}
-		printf(" ");
 	}
 }
 
@@ -120,11 +119,11 @@ static void ah_print(const void *ip, const struct xt_entry_match *match,
 {
 	const struct ipt_ah *ah = (struct ipt_ah *)match->data;
 
-	printf("ah ");
+	printf(" ah ");
 	print_spis("spi", ah->spis[0], ah->spis[1],
 		    ah->invflags & IPT_AH_INV_SPI);
 	if (ah->invflags & ~IPT_AH_INV_MASK)
-		printf("Unknown invflags: 0x%X ",
+		printf(" Unknown invflags: 0x%X",
 		       ah->invflags & ~IPT_AH_INV_MASK);
 }
 
@@ -134,15 +133,15 @@ static void ah_save(const void *ip, const struct xt_entry_match *match)
 
 	if (!(ahinfo->spis[0] == 0
 	    && ahinfo->spis[1] == 0xFFFFFFFF)) {
-		printf("%s--ahspi ",
-			(ahinfo->invflags & IPT_AH_INV_SPI) ? "! " : "");
+		printf("%s --ahspi ",
+			(ahinfo->invflags & IPT_AH_INV_SPI) ? " !" : "");
 		if (ahinfo->spis[0]
 		    != ahinfo->spis[1])
-			printf("%u:%u ",
+			printf("%u:%u",
 			       ahinfo->spis[0],
 			       ahinfo->spis[1]);
 		else
-			printf("%u ",
+			printf("%u",
 			       ahinfo->spis[0]);
 	}
 

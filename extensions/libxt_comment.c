@@ -72,7 +72,7 @@ comment_print(const void *ip, const struct xt_entry_match *match, int numeric)
 	struct xt_comment_info *commentinfo = (void *)match->data;
 
 	commentinfo->comment[XT_MAX_COMMENT_LEN-1] = '\0';
-	printf("/* %s */ ", commentinfo->comment);
+	printf(" /* %s */", commentinfo->comment);
 }
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
@@ -82,7 +82,7 @@ comment_save(const void *ip, const struct xt_entry_match *match)
 	struct xt_comment_info *commentinfo = (void *)match->data;
 
 	commentinfo->comment[XT_MAX_COMMENT_LEN-1] = '\0';
-	printf("--comment ");
+	printf(" --comment");
 	xtables_save_string(commentinfo->comment);
 }
 

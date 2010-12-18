@@ -64,7 +64,7 @@ static void print_secmark(const struct xt_secmark_target_info *info)
 {
 	switch (info->mode) {
 	case SECMARK_MODE_SEL:
-		printf("selctx %s ", info->secctx);
+		printf("selctx %s", info->secctx);
 		break;
 	
 	default:
@@ -78,7 +78,7 @@ static void SECMARK_print(const void *ip, const struct xt_entry_target *target,
 	const struct xt_secmark_target_info *info =
 		(struct xt_secmark_target_info*)(target)->data;
 
-	printf("SECMARK ");
+	printf(" SECMARK ");
 	print_secmark(info);
 }
 
@@ -87,7 +87,7 @@ static void SECMARK_save(const void *ip, const struct xt_entry_target *target)
 	const struct xt_secmark_target_info *info =
 		(struct xt_secmark_target_info*)target->data;
 
-	printf("--");
+	printf(" --");
 	print_secmark(info);
 }
 

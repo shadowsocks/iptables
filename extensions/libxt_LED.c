@@ -91,22 +91,22 @@ static void LED_print(const void *ip, const struct xt_entry_target *target,
 	const struct xt_led_info *led = (void *)target->data;
 	const char *id = led->id + strlen("netfilter-"); /* trim off prefix */
 
-	printf("led-trigger-id:\"");
+	printf(" led-trigger-id:\"");
 	/* Escape double quotes and backslashes in the ID */
 	while (*id != '\0') {
 		if (*id == '"' || *id == '\\')
 			printf("\\");
 		printf("%c", *id++);
 	}
-	printf("\" ");
+	printf("\"");
 
 	if (led->delay == -1)
-		printf("led-delay:inf ");
+		printf(" led-delay:inf");
 	else
-		printf("led-delay:%dms ", led->delay);
+		printf(" led-delay:%dms", led->delay);
 
 	if (led->always_blink)
-		printf("led-always-blink ");
+		printf(" led-always-blink");
 }
 
 static void LED_save(const void *ip, const struct xt_entry_target *target)
@@ -114,24 +114,24 @@ static void LED_save(const void *ip, const struct xt_entry_target *target)
 	const struct xt_led_info *led = (void *)target->data;
 	const char *id = led->id + strlen("netfilter-"); /* trim off prefix */
 
-	printf("--led-trigger-id \"");
+	printf(" --led-trigger-id \"");
 	/* Escape double quotes and backslashes in the ID */
 	while (*id != '\0') {
 		if (*id == '"' || *id == '\\')
 			printf("\\");
 		printf("%c", *id++);
 	}
-	printf("\" ");
+	printf("\"");
 
 	/* Only print the delay if it's not zero (the default) */
 	if (led->delay > 0)
-		printf("--led-delay %d ", led->delay);
+		printf(" --led-delay %d", led->delay);
 	else if (led->delay == -1)
-		printf("--led-delay inf ");
+		printf(" --led-delay inf");
 
 	/* Only print always_blink if it's not set to the default */
 	if (led->always_blink)
-		printf("--led-always-blink ");
+		printf(" --led-always-blink");
 }
 
 static struct xtables_target led_tg_reg = {

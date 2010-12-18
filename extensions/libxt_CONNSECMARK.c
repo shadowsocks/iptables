@@ -71,11 +71,11 @@ static void print_connsecmark(const struct xt_connsecmark_target_info *info)
 {
 	switch (info->mode) {
 	case CONNSECMARK_SAVE:
-		printf("save ");
+		printf("save");
 		break;
 		
 	case CONNSECMARK_RESTORE:
-		printf("restore ");
+		printf("restore");
 		break;
 		
 	default:
@@ -90,7 +90,7 @@ CONNSECMARK_print(const void *ip, const struct xt_entry_target *target,
 	const struct xt_connsecmark_target_info *info =
 		(struct xt_connsecmark_target_info*)(target)->data;
 
-	printf("CONNSECMARK ");
+	printf(" CONNSECMARK ");
 	print_connsecmark(info);
 }
 

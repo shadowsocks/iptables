@@ -344,11 +344,11 @@ static void time_print_date(time_t date, const char *command)
 		 * Need a contiguous string (no whitespaces), hence using
 		 * the ISO 8601 "T" variant.
 		 */
-		printf("%s %04u-%02u-%02uT%02u:%02u:%02u ",
+		printf(" %s %04u-%02u-%02uT%02u:%02u:%02u",
 		       command, t->tm_year + 1900, t->tm_mon + 1,
 		       t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
 	else
-		printf("%04u-%02u-%02u %02u:%02u:%02u ",
+		printf(" %04u-%02u-%02u %02u:%02u:%02u",
 		       t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
 		       t->tm_hour, t->tm_min, t->tm_sec);
 }
@@ -357,6 +357,7 @@ static void time_print_monthdays(uint32_t mask, bool human_readable)
 {
 	unsigned int i, nbdays = 0;
 
+	printf(" ");
 	for (i = 1; i <= 31; ++i)
 		if (mask & (1 << i)) {
 			if (nbdays++ > 0)
@@ -378,13 +379,13 @@ static void time_print_monthdays(uint32_t mask, bool human_readable)
 						break;
 				}
 		}
-	printf(" ");
 }
 
 static void time_print_weekdays(unsigned int mask)
 {
 	unsigned int i, nbdays = 0;
 
+	printf(" ");
 	for (i = 1; i <= 7; ++i)
 		if (mask & (1 << i)) {
 			if (nbdays > 0)
@@ -393,7 +394,6 @@ static void time_print_weekdays(unsigned int mask)
 				printf("%s", week_days[i]);
 			++nbdays;
 		}
-	printf(" ");
 }
 
 static inline void divide_time(unsigned int fulltime, unsigned int *hours,
@@ -411,33 +411,33 @@ static void time_print(const void *ip, const struct xt_entry_match *match,
 	const struct xt_time_info *info = (const void *)match->data;
 	unsigned int h, m, s;
 
-	printf("TIME ");
+	printf(" TIME");
 
 	if (info->daytime_start != XT_TIME_MIN_DAYTIME ||
 	    info->daytime_stop != XT_TIME_MAX_DAYTIME) {
 		divide_time(info->daytime_start, &h, &m, &s);
-		printf("from %02u:%02u:%02u ", h, m, s);
+		printf(" from %02u:%02u:%02u", h, m, s);
 		divide_time(info->daytime_stop, &h, &m, &s);
-		printf("to %02u:%02u:%02u ", h, m, s);
+		printf(" to %02u:%02u:%02u", h, m, s);
 	}
 	if (info->weekdays_match != XT_TIME_ALL_WEEKDAYS) {
-		printf("on ");
+		printf(" on");
 		time_print_weekdays(info->weekdays_match);
 	}
 	if (info->monthdays_match != XT_TIME_ALL_MONTHDAYS) {
-		printf("on ");
+		printf(" on");
 		time_print_monthdays(info->monthdays_match, true);
 	}
 	if (info->date_start != 0) {
-		printf("starting from ");
+		printf(" starting from");
 		time_print_date(info->date_start, NULL);
 	}
 	if (info->date_stop != INT_MAX) {
-		printf("until date ");
+		printf(" until date");
 		time_print_date(info->date_stop, NULL);
 	}
 	if (!(info->flags & XT_TIME_LOCAL_TZ))
-		printf("UTC ");
+		printf(" UTC");
 }
 
 static void time_save(const void *ip, const struct xt_entry_match *match)
@@ -448,23 +448,22 @@ static void time_save(const void *ip, const struct xt_entry_match *match)
 	if (info->daytime_start != XT_TIME_MIN_DAYTIME ||
 	    info->daytime_stop != XT_TIME_MAX_DAYTIME) {
 		divide_time(info->daytime_start, &h, &m, &s);
-		printf("--timestart %02u:%02u:%02u ", h, m, s);
+		printf(" --timestart %02u:%02u:%02u", h, m, s);
 		divide_time(info->daytime_stop, &h, &m, &s);
-		printf("--timestop %02u:%02u:%02u ", h, m, s);
+		printf(" --timestop %02u:%02u:%02u", h, m, s);
 	}
 	if (info->monthdays_match != XT_TIME_ALL_MONTHDAYS) {
-		printf("--monthdays ");
+		printf(" --monthdays");
 		time_print_monthdays(info->monthdays_match, false);
 	}
 	if (info->weekdays_match != XT_TIME_ALL_WEEKDAYS) {
-		printf("--weekdays ");
+		printf(" --weekdays");
 		time_print_weekdays(info->weekdays_match);
-		printf(" ");
 	}
 	time_print_date(info->date_start, "--datestart");
 	time_print_date(info->date_stop, "--datestop");
 	if (!(info->flags & XT_TIME_LOCAL_TZ))
-		printf("--utc ");
+		printf(" --utc");
 }
 
 static struct xtables_match time_match = {

@@ -117,7 +117,7 @@ dscp_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_dscp_info *dinfo =
 		(const struct xt_dscp_info *)match->data;
-	printf("DSCP match %s0x%02x", dinfo->invert ? "!" : "", dinfo->dscp);
+	printf(" DSCP match %s0x%02x", dinfo->invert ? "!" : "", dinfo->dscp);
 }
 
 static void dscp_save(const void *ip, const struct xt_entry_match *match)
@@ -125,7 +125,7 @@ static void dscp_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_dscp_info *dinfo =
 		(const struct xt_dscp_info *)match->data;
 
-	printf("%s--dscp 0x%02x ", dinfo->invert ? "! " : "", dinfo->dscp);
+	printf("%s --dscp 0x%02x", dinfo->invert ? " !" : "", dinfo->dscp);
 }
 
 static struct xtables_match dscp_match = {

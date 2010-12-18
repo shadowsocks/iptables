@@ -160,11 +160,11 @@ print_options(unsigned int optsnr, uint16_t *optsp)
 	unsigned int i;
 
 	for(i=0; i<optsnr; i++){
+		printf("%c", (i==0)?' ':',');
 		printf("%d", (optsp[i] & 0xFF00)>>8);
 		if ((optsp[i] & 0x00FF) != 0x00FF){
 			printf(":%d", (optsp[i] & 0x00FF));
 		} 
-		printf("%c", (i!=optsnr-1)?',':' ');
 	}
 }
 
@@ -173,18 +173,17 @@ static void hbh_print(const void *ip, const struct xt_entry_match *match,
 {
 	const struct ip6t_opts *optinfo = (struct ip6t_opts *)match->data;
 
-	printf("hbh ");
+	printf(" hbh");
 	if (optinfo->flags & IP6T_OPTS_LEN) {
-		printf("length");
+		printf(" length");
 		printf(":%s", optinfo->invflags & IP6T_OPTS_INV_LEN ? "!" : "");
 		printf("%u", optinfo->hdrlen);
-		printf(" ");
 	}
-	if (optinfo->flags & IP6T_OPTS_OPTS) printf("opts ");
+	if (optinfo->flags & IP6T_OPTS_OPTS) printf(" opts");
 	print_options(optinfo->optsnr, (uint16_t *)optinfo->opts);
-	if (optinfo->flags & IP6T_OPTS_NSTRICT) printf("not-strict ");
+	if (optinfo->flags & IP6T_OPTS_NSTRICT) printf(" not-strict");
 	if (optinfo->invflags & ~IP6T_OPTS_INV_MASK)
-		printf("Unknown invflags: 0x%X ",
+		printf(" Unknown invflags: 0x%X",
 		       optinfo->invflags & ~IP6T_OPTS_INV_MASK);
 }
 
@@ -193,16 +192,16 @@ static void hbh_save(const void *ip, const struct xt_entry_match *match)
 	const struct ip6t_opts *optinfo = (struct ip6t_opts *)match->data;
 
 	if (optinfo->flags & IP6T_OPTS_LEN) {
-		printf("%s--hbh-len %u ",
-			(optinfo->invflags & IP6T_OPTS_INV_LEN) ? "! " : "", 
+		printf("%s --hbh-len %u",
+			(optinfo->invflags & IP6T_OPTS_INV_LEN) ? " !" : "",
 			optinfo->hdrlen);
 	}
 
 	if (optinfo->flags & IP6T_OPTS_OPTS)
-		printf("--hbh-opts ");
+		printf(" --hbh-opts");
 	print_options(optinfo->optsnr, (uint16_t *)optinfo->opts);
 	if (optinfo->flags & IP6T_OPTS_NSTRICT)
-		printf("--hbh-not-strict ");
+		printf(" --hbh-not-strict");
 }
 
 static struct xtables_match hbh_mt6_reg = {

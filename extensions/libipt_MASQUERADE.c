@@ -114,15 +114,14 @@ MASQUERADE_print(const void *ip, const struct xt_entry_target *target,
 	const struct nf_nat_range *r = &mr->range[0];
 
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
-		printf("masq ports: ");
+		printf(" masq ports: ");
 		printf("%hu", ntohs(r->min.tcp.port));
 		if (r->max.tcp.port != r->min.tcp.port)
 			printf("-%hu", ntohs(r->max.tcp.port));
-		printf(" ");
 	}
 
 	if (r->flags & IP_NAT_RANGE_PROTO_RANDOM)
-		printf("random ");
+		printf(" random");
 }
 
 static void
@@ -132,14 +131,13 @@ MASQUERADE_save(const void *ip, const struct xt_entry_target *target)
 	const struct nf_nat_range *r = &mr->range[0];
 
 	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
-		printf("--to-ports %hu", ntohs(r->min.tcp.port));
+		printf(" --to-ports %hu", ntohs(r->min.tcp.port));
 		if (r->max.tcp.port != r->min.tcp.port)
 			printf("-%hu", ntohs(r->max.tcp.port));
-		printf(" ");
 	}
 
 	if (r->flags & IP_NAT_RANGE_PROTO_RANDOM)
-		printf("--random ");
+		printf(" --random");
 }
 
 static struct xtables_target masquerade_tg_reg = {

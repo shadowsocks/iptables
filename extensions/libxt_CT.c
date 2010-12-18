@@ -87,14 +87,13 @@ static void ct_print_events(const char *pfx, const struct event_tbl *tbl,
 	const char *sep = "";
 	unsigned int i;
 
-	printf("%s ", pfx);
+	printf(" %s ", pfx);
 	for (i = 0; i < size; i++) {
 		if (mask & (1 << tbl[i].event)) {
 			printf("%s%s", sep, tbl[i].name);
 			sep = ",";
 		}
 	}
-	printf(" ");
 }
 
 static int ct_parse(int c, char **argv, int invert, unsigned int *flags,
@@ -138,11 +137,11 @@ static void ct_print(const void *ip, const struct xt_entry_target *target, int n
 	const struct xt_ct_target_info *info =
 		(const struct xt_ct_target_info *)target->data;
 
-	printf("CT ");
+	printf(" CT");
 	if (info->flags & XT_CT_NOTRACK)
-		printf("notrack ");
+		printf(" notrack");
 	if (info->helper[0])
-		printf("helper %s ", info->helper);
+		printf(" helper %s", info->helper);
 	if (info->ct_events)
 		ct_print_events("ctevents", ct_event_tbl,
 				ARRAY_SIZE(ct_event_tbl), info->ct_events);
@@ -159,9 +158,9 @@ static void ct_save(const void *ip, const struct xt_entry_target *target)
 		(const struct xt_ct_target_info *)target->data;
 
 	if (info->flags & XT_CT_NOTRACK)
-		printf("--notrack ");
+		printf(" --notrack");
 	if (info->helper[0])
-		printf("--helper %s ", info->helper);
+		printf(" --helper %s", info->helper);
 	if (info->ct_events)
 		ct_print_events("--ctevents", ct_event_tbl,
 				ARRAY_SIZE(ct_event_tbl), info->ct_events);
@@ -169,7 +168,7 @@ static void ct_save(const void *ip, const struct xt_entry_target *target)
 		ct_print_events("--expevents", exp_event_tbl,
 				ARRAY_SIZE(exp_event_tbl), info->exp_events);
 	if (info->zone)
-		printf("--zone %u ", info->zone);
+		printf(" --zone %u", info->zone);
 }
 
 static struct xtables_target ct_target = {

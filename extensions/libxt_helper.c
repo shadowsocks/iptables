@@ -55,14 +55,14 @@ helper_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_helper_info *info = (const void *)match->data;
 
-	printf("helper match %s\"%s\" ", info->invert ? "! " : "", info->name);
+	printf(" helper match %s\"%s\"", info->invert ? "! " : "", info->name);
 }
 
 static void helper_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_helper_info *info = (const void *)match->data;
 
-	printf("%s--helper ",info->invert ? "! " : "");
+	printf("%s --helper", info->invert ? " !" : "");
 	xtables_save_string(info->name);
 }
 

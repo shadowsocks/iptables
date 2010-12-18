@@ -193,13 +193,13 @@ cluster_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_cluster_match_info *info = (void *)match->data;
 
-	printf("cluster ");
+	printf(" cluster ");
 	if (info->flags & XT_CLUSTER_F_INV)
-		printf("!node_mask=0x%08x ", info->node_mask);
+		printf("!node_mask=0x%08x", info->node_mask);
 	else
-		printf("node_mask=0x%08x ", info->node_mask);
+		printf("node_mask=0x%08x", info->node_mask);
 
-	printf("total_nodes=%u hash_seed=0x%08x ", 
+	printf(" total_nodes=%u hash_seed=0x%08x",
 		info->total_nodes, info->hash_seed);
 }
 
@@ -209,11 +209,11 @@ cluster_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_cluster_match_info *info = (void *)match->data;
 
 	if (info->flags & XT_CLUSTER_F_INV)
-		printf("! --cluster-local-nodemask 0x%08x ", info->node_mask);
+		printf(" ! --cluster-local-nodemask 0x%08x", info->node_mask);
 	else
-		printf("--cluster-local-nodemask 0x%08x ", info->node_mask);
+		printf(" --cluster-local-nodemask 0x%08x", info->node_mask);
 
-	printf("--cluster-total-nodes %u --cluster-hash-seed 0x%08x ",
+	printf(" --cluster-total-nodes %u --cluster-hash-seed 0x%08x",
 		info->total_nodes, info->hash_seed);
 }
 

@@ -114,7 +114,6 @@ static void state_print_state(unsigned int statemask)
 		printf("%sUNTRACKED", sep);
 		sep = ",";
 	}
-	printf(" ");
 }
 
 static void
@@ -124,7 +123,7 @@ state_print(const void *ip,
 {
 	const struct xt_state_info *sinfo = (const void *)match->data;
 
-	printf("state ");
+	printf(" state ");
 	state_print_state(sinfo->statemask);
 }
 
@@ -132,7 +131,7 @@ static void state_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_state_info *sinfo = (const void *)match->data;
 
-	printf("--state ");
+	printf(" --state ");
 	state_print_state(sinfo->statemask);
 }
 

@@ -155,7 +155,7 @@ static void NETMAP_print(const void *ip, const struct xt_entry_target *target,
 
 static void NETMAP_save(const void *ip, const struct xt_entry_target *target)
 {
-	printf("--%s ", NETMAP_opts[0].name);
+	printf(" --%s ", NETMAP_opts[0].name);
 	NETMAP_print(ip, target, 0);
 }
 

@@ -89,22 +89,22 @@ tcpmss_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_tcpmss_match_info *info = (void *)match->data;
 
-	printf("tcpmss match %s", info->invert ? "!" : "");
+	printf(" tcpmss match %s", info->invert ? "!" : "");
 	if (info->mss_min == info->mss_max)
-		printf("%u ", info->mss_min);
+		printf("%u", info->mss_min);
 	else
-		printf("%u:%u ", info->mss_min, info->mss_max);
+		printf("%u:%u", info->mss_min, info->mss_max);
 }
 
 static void tcpmss_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_tcpmss_match_info *info = (void *)match->data;
 
-	printf("%s--mss ", info->invert ? "! " : "");
+	printf("%s --mss ", info->invert ? " !" : "");
 	if (info->mss_min == info->mss_max)
-		printf("%u ", info->mss_min);
+		printf("%u", info->mss_min);
 	else
-		printf("%u:%u ", info->mss_min, info->mss_max);
+		printf("%u:%u", info->mss_min, info->mss_max);
 }
 
 static struct xtables_match tcpmss_match = {

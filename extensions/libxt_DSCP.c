@@ -107,7 +107,7 @@ static void DSCP_check(unsigned int flags)
 static void
 print_dscp(uint8_t dscp, int numeric)
 {
- 	printf("0x%02x ", dscp);
+	printf(" 0x%02x", dscp);
 }
 
 static void DSCP_print(const void *ip, const struct xt_entry_target *target,
@@ -115,7 +115,7 @@ static void DSCP_print(const void *ip, const struct xt_entry_target *target,
 {
 	const struct xt_DSCP_info *dinfo =
 		(const struct xt_DSCP_info *)target->data;
-	printf("DSCP set ");
+	printf(" DSCP set");
 	print_dscp(dinfo->dscp, numeric);
 }
 
@@ -124,7 +124,7 @@ static void DSCP_save(const void *ip, const struct xt_entry_target *target)
 	const struct xt_DSCP_info *dinfo =
 		(const struct xt_DSCP_info *)target->data;
 
-	printf("--set-dscp 0x%02x ", dinfo->dscp);
+	printf(" --set-dscp 0x%02x", dinfo->dscp);
 }
 
 static struct xtables_target dscp_target = {

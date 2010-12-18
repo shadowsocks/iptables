@@ -316,7 +316,7 @@ __multiport_print(const struct xt_entry_match *match, int numeric,
 		= (const struct xt_multiport *)match->data;
 	unsigned int i;
 
-	printf("multiport ");
+	printf(" multiport ");
 
 	switch (multiinfo->flags) {
 	case XT_MULTIPORT_SOURCE:
@@ -340,7 +340,6 @@ __multiport_print(const struct xt_entry_match *match, int numeric,
 		printf("%s", i ? "," : "");
 		print_port(multiinfo->ports[i], proto, numeric);
 	}
-	printf(" ");
 }
 
 static void multiport_print(const void *ip_void,
@@ -364,7 +363,7 @@ static void __multiport_print_v1(const struct xt_entry_match *match,
 		= (const struct xt_multiport_v1 *)match->data;
 	unsigned int i;
 
-	printf("multiport ");
+	printf(" multiport ");
 
 	switch (multiinfo->flags) {
 	case XT_MULTIPORT_SOURCE:
@@ -385,7 +384,7 @@ static void __multiport_print_v1(const struct xt_entry_match *match,
 	}
 
 	if (multiinfo->invert)
-		printf("! ");
+		printf(" !");
 
 	for (i=0; i < multiinfo->count; i++) {
 		printf("%s", i ? "," : "");
@@ -395,7 +394,6 @@ static void __multiport_print_v1(const struct xt_entry_match *match,
 			print_port(multiinfo->ports[++i], proto, numeric);
 		}
 	}
-	printf(" ");
 }
 
 static void multiport_print_v1(const void *ip_void,
@@ -422,15 +420,15 @@ static void __multiport_save(const struct xt_entry_match *match,
 
 	switch (multiinfo->flags) {
 	case XT_MULTIPORT_SOURCE:
-		printf("--sports ");
+		printf(" --sports ");
 		break;
 
 	case XT_MULTIPORT_DESTINATION:
-		printf("--dports ");
+		printf(" --dports ");
 		break;
 
 	case XT_MULTIPORT_EITHER:
-		printf("--ports ");
+		printf(" --ports ");
 		break;
 	}
 
@@ -438,7 +436,6 @@ static void __multiport_save(const struct xt_entry_match *match,
 		printf("%s", i ? "," : "");
 		print_port(multiinfo->ports[i], proto, 1);
 	}
-	printf(" ");
 }
 
 static void multiport_save(const void *ip_void,
@@ -463,19 +460,19 @@ static void __multiport_save_v1(const struct xt_entry_match *match,
 	unsigned int i;
 
 	if (multiinfo->invert)
-		printf("! ");
+		printf(" !");
 
 	switch (multiinfo->flags) {
 	case XT_MULTIPORT_SOURCE:
-		printf("--sports ");
+		printf(" --sports ");
 		break;
 
 	case XT_MULTIPORT_DESTINATION:
-		printf("--dports ");
+		printf(" --dports ");
 		break;
 
 	case XT_MULTIPORT_EITHER:
-		printf("--ports ");
+		printf(" --ports ");
 		break;
 	}
 
@@ -487,7 +484,6 @@ static void __multiport_save_v1(const struct xt_entry_match *match,
 			print_port(multiinfo->ports[++i], proto, 1);
 		}
 	}
-	printf(" ");
 }
 
 static void multiport_save_v1(const void *ip_void,

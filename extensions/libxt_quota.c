@@ -27,7 +27,7 @@ static void
 quota_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_quota_info *q = (const void *)match->data;
-	printf("quota: %llu bytes", (unsigned long long) q->quota);
+	printf(" quota: %llu bytes", (unsigned long long)q->quota);
 }
 
 static void
@@ -37,7 +37,7 @@ quota_save(const void *ip, const struct xt_entry_match *match)
 
 	if (q->flags & XT_QUOTA_INVERT)
 		printf("! ");
-	printf("--quota %llu ", (unsigned long long) q->quota);
+	printf(" --quota %llu", (unsigned long long) q->quota);
 }
 
 /* parse quota option */

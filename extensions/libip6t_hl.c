@@ -96,7 +96,7 @@ static void hl_print(const void *ip, const struct xt_entry_match *match,
 	const struct ip6t_hl_info *info = 
 		(struct ip6t_hl_info *) match->data;
 
-	printf("HL match HL %s %u ", op[info->mode], info->hop_limit);
+	printf(" HL match HL %s %u", op[info->mode], info->hop_limit);
 }
 
 static void hl_save(const void *ip, const struct xt_entry_match *match)
@@ -110,7 +110,7 @@ static void hl_save(const void *ip, const struct xt_entry_match *match)
 	const struct ip6t_hl_info *info =
 		(struct ip6t_hl_info *) match->data;
 
-	printf("%s %u ", op[info->mode], info->hop_limit);
+	printf(" %s %u", op[info->mode], info->hop_limit);
 }
 
 static const struct option hl_opts[] = {

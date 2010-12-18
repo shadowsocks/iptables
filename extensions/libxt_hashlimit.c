@@ -488,13 +488,14 @@ static void print_rate(uint32_t period)
             || rates[i].mult/period < rates[i].mult%period)
 			break;
 
-	printf("%u/%s ", rates[i-1].mult / period, rates[i-1].name);
+	printf(" %u/%s", rates[i-1].mult / period, rates[i-1].name);
 }
 
 static void print_mode(unsigned int mode, char separator)
 {
 	bool prevmode = false;
 
+	putchar(' ');
 	if (mode & XT_HASHLIMIT_HASH_SIP) {
 		fputs("srcip", stdout);
 		prevmode = 1;
@@ -516,54 +517,53 @@ static void print_mode(unsigned int mode, char separator)
 			putchar(separator);
 		fputs("dstport", stdout);
 	}
-	putchar(' ');
 }
 
 static void hashlimit_print(const void *ip,
                             const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_hashlimit_info *r = (const void *)match->data;
-	fputs("limit: avg ", stdout); print_rate(r->cfg.avg);
-	printf("burst %u ", r->cfg.burst);
-	fputs("mode ", stdout);
+	fputs(" limit: avg", stdout); print_rate(r->cfg.avg);
+	printf(" burst %u", r->cfg.burst);
+	fputs(" mode", stdout);
 	print_mode(r->cfg.mode, '-');
 	if (r->cfg.size)
-		printf("htable-size %u ", r->cfg.size);
+		printf(" htable-size %u", r->cfg.size);
 	if (r->cfg.max)
-		printf("htable-max %u ", r->cfg.max);
+		printf(" htable-max %u", r->cfg.max);
 	if (r->cfg.gc_interval != XT_HASHLIMIT_GCINTERVAL)
-		printf("htable-gcinterval %u ", r->cfg.gc_interval);
+		printf(" htable-gcinterval %u", r->cfg.gc_interval);
 	if (r->cfg.expire != XT_HASHLIMIT_EXPIRE)
-		printf("htable-expire %u ", r->cfg.expire);
+		printf(" htable-expire %u", r->cfg.expire);
 }
 
 static void
 hashlimit_mt_print(const struct xt_hashlimit_mtinfo1 *info, unsigned int dmask)
 {
 	if (info->cfg.mode & XT_HASHLIMIT_INVERT)
-		fputs("limit: above ", stdout);
+		fputs(" limit: above", stdout);
 	else
-		fputs("limit: up to ", stdout);
+		fputs(" limit: up to", stdout);
 	print_rate(info->cfg.avg);
-	printf("burst %u ", info->cfg.burst);
+	printf(" burst %u", info->cfg.burst);
 	if (info->cfg.mode & (XT_HASHLIMIT_HASH_SIP | XT_HASHLIMIT_HASH_SPT |
 	    XT_HASHLIMIT_HASH_DIP | XT_HASHLIMIT_HASH_DPT)) {
-		fputs("mode ", stdout);
+		fputs(" mode", stdout);
 		print_mode(info->cfg.mode, '-');
 	}
 	if (info->cfg.size != 0)
-		printf("htable-size %u ", info->cfg.size);
+		printf(" htable-size %u", info->cfg.size);
 	if (info->cfg.max != 0)
-		printf("htable-max %u ", info->cfg.max);
+		printf(" htable-max %u", info->cfg.max);
 	if (info->cfg.gc_interval != XT_HASHLIMIT_GCINTERVAL)
-		printf("htable-gcinterval %u ", info->cfg.gc_interval);
+		printf(" htable-gcinterval %u", info->cfg.gc_interval);
 	if (info->cfg.expire != XT_HASHLIMIT_EXPIRE)
-		printf("htable-expire %u ", info->cfg.expire);
+		printf(" htable-expire %u", info->cfg.expire);
 
 	if (info->cfg.srcmask != dmask)
-		printf("srcmask %u ", info->cfg.srcmask);
+		printf(" srcmask %u", info->cfg.srcmask);
 	if (info->cfg.dstmask != dmask)
-		printf("dstmask %u ", info->cfg.dstmask);
+		printf(" dstmask %u", info->cfg.dstmask);
 }
 
 static void
@@ -588,55 +588,55 @@ static void hashlimit_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_hashlimit_info *r = (const void *)match->data;
 
-	fputs("--hashlimit ", stdout); print_rate(r->cfg.avg);
-	printf("--hashlimit-burst %u ", r->cfg.burst);
+	fputs(" --hashlimit", stdout); print_rate(r->cfg.avg);
+	printf(" --hashlimit-burst %u", r->cfg.burst);
 
-	fputs("--hashlimit-mode ", stdout);
+	fputs(" --hashlimit-mode", stdout);
 	print_mode(r->cfg.mode, ',');
 	
-	printf("--hashlimit-name %s ", r->name);
+	printf(" --hashlimit-name %s", r->name);
 
 	if (r->cfg.size)
-		printf("--hashlimit-htable-size %u ", r->cfg.size);
+		printf(" --hashlimit-htable-size %u", r->cfg.size);
 	if (r->cfg.max)
-		printf("--hashlimit-htable-max %u ", r->cfg.max);
+		printf(" --hashlimit-htable-max %u", r->cfg.max);
 	if (r->cfg.gc_interval != XT_HASHLIMIT_GCINTERVAL)
-		printf("--hashlimit-htable-gcinterval %u ", r->cfg.gc_interval);
+		printf(" --hashlimit-htable-gcinterval %u", r->cfg.gc_interval);
 	if (r->cfg.expire != XT_HASHLIMIT_EXPIRE)
-		printf("--hashlimit-htable-expire %u ", r->cfg.expire);
+		printf(" --hashlimit-htable-expire %u", r->cfg.expire);
 }
 
 static void
 hashlimit_mt_save(const struct xt_hashlimit_mtinfo1 *info, unsigned int dmask)
 {
 	if (info->cfg.mode & XT_HASHLIMIT_INVERT)
-		fputs("--hashlimit-above ", stdout);
+		fputs(" --hashlimit-above", stdout);
 	else
-		fputs("--hashlimit-upto ", stdout);
+		fputs(" --hashlimit-upto", stdout);
 	print_rate(info->cfg.avg);
-	printf("--hashlimit-burst %u ", info->cfg.burst);
+	printf(" --hashlimit-burst %u", info->cfg.burst);
 
 	if (info->cfg.mode & (XT_HASHLIMIT_HASH_SIP | XT_HASHLIMIT_HASH_SPT |
 	    XT_HASHLIMIT_HASH_DIP | XT_HASHLIMIT_HASH_DPT)) {
-		fputs("--hashlimit-mode ", stdout);
+		fputs(" --hashlimit-mode", stdout);
 		print_mode(info->cfg.mode, ',');
 	}
 
-	printf("--hashlimit-name %s ", info->name);
+	printf(" --hashlimit-name %s", info->name);
 
 	if (info->cfg.size != 0)
-		printf("--hashlimit-htable-size %u ", info->cfg.size);
+		printf(" --hashlimit-htable-size %u", info->cfg.size);
 	if (info->cfg.max != 0)
-		printf("--hashlimit-htable-max %u ", info->cfg.max);
+		printf(" --hashlimit-htable-max %u", info->cfg.max);
 	if (info->cfg.gc_interval != XT_HASHLIMIT_GCINTERVAL)
-		printf("--hashlimit-htable-gcinterval %u ", info->cfg.gc_interval);
+		printf(" --hashlimit-htable-gcinterval %u", info->cfg.gc_interval);
 	if (info->cfg.expire != XT_HASHLIMIT_EXPIRE)
-		printf("--hashlimit-htable-expire %u ", info->cfg.expire);
+		printf(" --hashlimit-htable-expire %u", info->cfg.expire);
 
 	if (info->cfg.srcmask != dmask)
-		printf("--hashlimit-srcmask %u ", info->cfg.srcmask);
+		printf(" --hashlimit-srcmask %u", info->cfg.srcmask);
 	if (info->cfg.dstmask != dmask)
-		printf("--hashlimit-dstmask %u ", info->cfg.dstmask);
+		printf(" --hashlimit-dstmask %u", info->cfg.dstmask);
 }
 
 static void

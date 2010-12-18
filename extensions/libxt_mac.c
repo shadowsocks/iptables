@@ -73,10 +73,9 @@ static void print_mac(const unsigned char macaddress[ETH_ALEN])
 {
 	unsigned int i;
 
-	printf("%02X", macaddress[0]);
+	printf(" %02X", macaddress[0]);
 	for (i = 1; i < ETH_ALEN; i++)
 		printf(":%02X", macaddress[i]);
-	printf(" ");
 }
 
 static void mac_check(unsigned int flags)
@@ -90,10 +89,10 @@ static void
 mac_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_mac_info *info = (void *)match->data;
-	printf("MAC ");
+	printf(" MAC");
 
 	if (info->invert)
-		printf("! ");
+		printf(" !");
 	
 	print_mac(info->srcaddr);
 }
@@ -103,9 +102,9 @@ static void mac_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_mac_info *info = (void *)match->data;
 
 	if (info->invert)
-		printf("! ");
+		printf(" !");
 
-	printf("--mac-source ");
+	printf(" --mac-source");
 	print_mac(info->srcaddr);
 }
 

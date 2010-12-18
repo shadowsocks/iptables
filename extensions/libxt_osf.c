@@ -123,14 +123,14 @@ static void osf_print(const void *ip, const struct xt_entry_match *match, int nu
 {
 	const struct xt_osf_info *info = (const struct xt_osf_info*) match->data;
 
-	printf("OS fingerprint match %s%s ", (info->flags & XT_OSF_INVERT) ? "! " : "", info->genre);
+	printf(" OS fingerprint match %s%s", (info->flags & XT_OSF_INVERT) ? "! " : "", info->genre);
 }
 
 static void osf_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_osf_info *info = (const struct xt_osf_info*) match->data;
 
-	printf("--genre %s%s ", (info->flags & XT_OSF_INVERT) ? "! ": "", info->genre);
+	printf(" --genre %s%s", (info->flags & XT_OSF_INVERT) ? "! ": "", info->genre);
 }
 
 static struct xtables_match osf_match = {

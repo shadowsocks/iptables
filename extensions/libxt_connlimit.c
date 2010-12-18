@@ -176,7 +176,7 @@ static void connlimit_print4(const void *ip,
 {
 	const struct xt_connlimit_info *info = (const void *)match->data;
 
-	printf("#conn %s/%u %s %u ",
+	printf(" #conn %s/%u %s %u",
 	       (info->flags & XT_CONNLIMIT_DADDR) ? "dst" : "src",
 	       count_bits4(info->v4_mask),
 	       (info->flags & XT_CONNLIMIT_INVERT) ? "<=" : ">", info->limit);
@@ -187,7 +187,7 @@ static void connlimit_print6(const void *ip,
 {
 	const struct xt_connlimit_info *info = (const void *)match->data;
 
-	printf("#conn %s/%u %s %u ",
+	printf(" #conn %s/%u %s %u",
 	       (info->flags & XT_CONNLIMIT_DADDR) ? "dst" : "src",
 	       count_bits6(info->v6_mask),
 	       (info->flags & XT_CONNLIMIT_INVERT) ? "<=" : ">", info->limit);
@@ -199,15 +199,15 @@ static void connlimit_save4(const void *ip, const struct xt_entry_match *match)
 	const int revision = match->u.user.revision;
 
 	if (info->flags & XT_CONNLIMIT_INVERT)
-		printf("--connlimit-upto %u ", info->limit);
+		printf(" --connlimit-upto %u", info->limit);
 	else
-		printf("--connlimit-above %u ", info->limit);
-	printf("--connlimit-mask %u ", count_bits4(info->v4_mask));
+		printf(" --connlimit-above %u", info->limit);
+	printf(" --connlimit-mask %u", count_bits4(info->v4_mask));
 	if (revision >= 1) {
 		if (info->flags & XT_CONNLIMIT_DADDR)
-			printf("--connlimit-daddr ");
+			printf(" --connlimit-daddr");
 		else
-			printf("--connlimit-saddr ");
+			printf(" --connlimit-saddr");
 	}
 }
 
@@ -217,15 +217,15 @@ static void connlimit_save6(const void *ip, const struct xt_entry_match *match)
 	const int revision = match->u.user.revision;
 
 	if (info->flags & XT_CONNLIMIT_INVERT)
-		printf("--connlimit-upto %u ", info->limit);
+		printf(" --connlimit-upto %u", info->limit);
 	else
-		printf("--connlimit-above %u ", info->limit);
-	printf("--connlimit-mask %u ", count_bits6(info->v6_mask));
+		printf(" --connlimit-above %u", info->limit);
+	printf(" --connlimit-mask %u", count_bits6(info->v6_mask));
 	if (revision >= 1) {
 		if (info->flags & XT_CONNLIMIT_DADDR)
-			printf("--connlimit-daddr ");
+			printf(" --connlimit-daddr");
 		else
-			printf("--connlimit-saddr ");
+			printf(" --connlimit-saddr");
 	}
 }
 

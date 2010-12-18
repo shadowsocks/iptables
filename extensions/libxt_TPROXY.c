@@ -169,7 +169,7 @@ static void tproxy_tg_print(const void *ip, const struct xt_entry_target *target
 			 int numeric)
 {
 	const struct xt_tproxy_target_info *info = (const void *)target->data;
-	printf("TPROXY redirect %s:%u mark 0x%x/0x%x",
+	printf(" TPROXY redirect %s:%u mark 0x%x/0x%x",
 	       xtables_ipaddr_to_numeric((const struct in_addr *)&info->laddr),
 	       ntohs(info->lport), (unsigned int)info->mark_value,
 	       (unsigned int)info->mark_mask);
@@ -182,7 +182,7 @@ tproxy_tg_print4(const void *ip, const struct xt_entry_target *target,
 	const struct xt_tproxy_target_info_v1 *info =
 		(const void *)target->data;
 
-	printf("TPROXY redirect %s:%u mark 0x%x/0x%x",
+	printf(" TPROXY redirect %s:%u mark 0x%x/0x%x",
 	       xtables_ipaddr_to_numeric(&info->laddr.in),
 	       ntohs(info->lport), (unsigned int)info->mark_value,
 	       (unsigned int)info->mark_mask);
@@ -195,7 +195,7 @@ tproxy_tg_print6(const void *ip, const struct xt_entry_target *target,
 	const struct xt_tproxy_target_info_v1 *info =
 		(const void *)target->data;
 
-	printf("TPROXY redirect %s:%u mark 0x%x/0x%x",
+	printf(" TPROXY redirect %s:%u mark 0x%x/0x%x",
 	       xtables_ip6addr_to_numeric(&info->laddr.in6),
 	       ntohs(info->lport), (unsigned int)info->mark_value,
 	       (unsigned int)info->mark_mask);
@@ -205,10 +205,10 @@ static void tproxy_tg_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_tproxy_target_info *info = (const void *)target->data;
 
-	printf("--on-port %u ", ntohs(info->lport));
-	printf("--on-ip %s ",
+	printf(" --on-port %u", ntohs(info->lport));
+	printf(" --on-ip %s",
 	       xtables_ipaddr_to_numeric((const struct in_addr *)&info->laddr));
-	printf("--tproxy-mark 0x%x/0x%x ",
+	printf(" --tproxy-mark 0x%x/0x%x",
 	       (unsigned int)info->mark_value, (unsigned int)info->mark_mask);
 }
 
@@ -218,9 +218,9 @@ tproxy_tg_save4(const void *ip, const struct xt_entry_target *target)
 	const struct xt_tproxy_target_info_v1 *info;
 
 	info = (const void *)target->data;
-	printf("--on-port %u ", ntohs(info->lport));
-	printf("--on-ip %s ", xtables_ipaddr_to_numeric(&info->laddr.in));
-	printf("--tproxy-mark 0x%x/0x%x ",
+	printf(" --on-port %u", ntohs(info->lport));
+	printf(" --on-ip %s", xtables_ipaddr_to_numeric(&info->laddr.in));
+	printf(" --tproxy-mark 0x%x/0x%x",
 	       (unsigned int)info->mark_value, (unsigned int)info->mark_mask);
 }
 
@@ -230,9 +230,9 @@ tproxy_tg_save6(const void *ip, const struct xt_entry_target *target)
 	const struct xt_tproxy_target_info_v1 *info;
 
 	info = (const void *)target->data;
-	printf("--on-port %u ", ntohs(info->lport));
-	printf("--on-ip %s ", xtables_ip6addr_to_numeric(&info->laddr.in6));
-	printf("--tproxy-mark 0x%x/0x%x ",
+	printf(" --on-port %u", ntohs(info->lport));
+	printf(" --on-ip %s", xtables_ip6addr_to_numeric(&info->laddr.in6));
+	printf(" --tproxy-mark 0x%x/0x%x",
 	       (unsigned int)info->mark_value, (unsigned int)info->mark_mask);
 }
 

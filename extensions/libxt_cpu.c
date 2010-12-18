@@ -66,14 +66,14 @@ cpu_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_cpu_info *info = (void *)match->data;
 
-	printf("cpu %s%u ", info->invert ? "! ":"", info->cpu);
+	printf(" cpu %s%u", info->invert ? "! ":"", info->cpu);
 }
 
 static void cpu_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_cpu_info *info = (void *)match->data;
 
-	printf("%s--cpu %u ", info->invert ? "! ":"", info->cpu);
+	printf("%s --cpu %u", info->invert ? " !" : "", info->cpu);
 }
 
 static struct xtables_match cpu_match = {

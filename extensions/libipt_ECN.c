@@ -108,21 +108,21 @@ static void ECN_print(const void *ip, const struct xt_entry_target *target,
 	const struct ipt_ECN_info *einfo =
 		(const struct ipt_ECN_info *)target->data;
 
-	printf("ECN ");
+	printf(" ECN");
 
 	if (einfo->operation == (IPT_ECN_OP_SET_ECE|IPT_ECN_OP_SET_CWR)
 	    && einfo->proto.tcp.ece == 0
 	    && einfo->proto.tcp.cwr == 0)
-		printf("TCP remove ");
+		printf(" TCP remove");
 	else {
 		if (einfo->operation & IPT_ECN_OP_SET_ECE)
-			printf("ECE=%u ", einfo->proto.tcp.ece);
+			printf(" ECE=%u", einfo->proto.tcp.ece);
 
 		if (einfo->operation & IPT_ECN_OP_SET_CWR)
-			printf("CWR=%u ", einfo->proto.tcp.cwr);
+			printf(" CWR=%u", einfo->proto.tcp.cwr);
 
 		if (einfo->operation & IPT_ECN_OP_SET_IP)
-			printf("ECT codepoint=%u ", einfo->ip_ect);
+			printf(" ECT codepoint=%u", einfo->ip_ect);
 	}
 }
 
@@ -134,17 +134,17 @@ static void ECN_save(const void *ip, const struct xt_entry_target *target)
 	if (einfo->operation == (IPT_ECN_OP_SET_ECE|IPT_ECN_OP_SET_CWR)
 	    && einfo->proto.tcp.ece == 0
 	    && einfo->proto.tcp.cwr == 0)
-		printf("--ecn-tcp-remove ");
+		printf(" --ecn-tcp-remove");
 	else {
 
 		if (einfo->operation & IPT_ECN_OP_SET_ECE)
-			printf("--ecn-tcp-ece %d ", einfo->proto.tcp.ece);
+			printf(" --ecn-tcp-ece %d", einfo->proto.tcp.ece);
 
 		if (einfo->operation & IPT_ECN_OP_SET_CWR)
-			printf("--ecn-tcp-cwr %d ", einfo->proto.tcp.cwr);
+			printf(" --ecn-tcp-cwr %d", einfo->proto.tcp.cwr);
 
 		if (einfo->operation & IPT_ECN_OP_SET_IP)
-			printf("--ecn-ip-ect %d ", einfo->ip_ect);
+			printf(" --ecn-ip-ect %d", einfo->ip_ect);
 	}
 }
 

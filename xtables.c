@@ -1641,14 +1641,14 @@ void xtables_save_string(const char *value)
 	length = strcspn(value, no_quote_chars);
 	if (length > 0 && value[length] == 0) {
 		/* no quoting required */
-		fputs(value, stdout);
 		putchar(' ');
+		fputs(value, stdout);
 	} else {
 		/* there is at least one dangerous character in the
 		   value, which we have to quote.  Write double quotes
 		   around the value and escape special characters with
 		   a backslash */
-		putchar('"');
+		printf(" \"");
 
 		for (p = strpbrk(value, escape_chars); p != NULL;
 		     p = strpbrk(value, escape_chars)) {
@@ -1662,7 +1662,7 @@ void xtables_save_string(const char *value)
 		/* print the rest and finish the double quoted
 		   string */
 		fputs(value, stdout);
-		printf("\" ");
+		putchar('\"');
 	}
 }
 

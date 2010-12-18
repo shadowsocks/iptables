@@ -93,17 +93,17 @@ static void TTL_save(const void *ip, const struct xt_entry_target *target)
 
 	switch (info->mode) {
 		case IPT_TTL_SET:
-			printf("--ttl-set ");
+			printf(" --ttl-set");
 			break;
 		case IPT_TTL_DEC:
-			printf("--ttl-dec ");
+			printf(" --ttl-dec");
 			break;
 
 		case IPT_TTL_INC:
-			printf("--ttl-inc ");
+			printf(" --ttl-inc");
 			break;
 	}
-	printf("%u ", info->ttl);
+	printf(" %u", info->ttl);
 }
 
 static void TTL_print(const void *ip, const struct xt_entry_target *target,
@@ -112,19 +112,19 @@ static void TTL_print(const void *ip, const struct xt_entry_target *target,
 	const struct ipt_TTL_info *info =
 		(struct ipt_TTL_info *) target->data;
 
-	printf("TTL ");
+	printf(" TTL ");
 	switch (info->mode) {
 		case IPT_TTL_SET:
-			printf("set to ");
+			printf("set to");
 			break;
 		case IPT_TTL_DEC:
-			printf("decrement by ");
+			printf("decrement by");
 			break;
 		case IPT_TTL_INC:
-			printf("increment by ");
+			printf("increment by");
 			break;
 	}
-	printf("%u ", info->ttl);
+	printf(" %u", info->ttl);
 }
 
 static const struct option TTL_opts[] = {

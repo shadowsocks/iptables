@@ -127,11 +127,11 @@ static void tee_tg_print(const void *ip, const struct xt_entry_target *target,
 	const struct xt_tee_tginfo *info = (const void *)target->data;
 
 	if (numeric)
-		printf("TEE gw:%s ", xtables_ipaddr_to_numeric(&info->gw.in));
+		printf(" TEE gw:%s", xtables_ipaddr_to_numeric(&info->gw.in));
 	else
-		printf("TEE gw:%s ", xtables_ipaddr_to_anyname(&info->gw.in));
+		printf(" TEE gw:%s", xtables_ipaddr_to_anyname(&info->gw.in));
 	if (*info->oif != '\0')
-		printf("oif=%s ", info->oif);
+		printf(" oif=%s", info->oif);
 }
 
 static void tee_tg6_print(const void *ip, const struct xt_entry_target *target,
@@ -140,29 +140,29 @@ static void tee_tg6_print(const void *ip, const struct xt_entry_target *target,
 	const struct xt_tee_tginfo *info = (const void *)target->data;
 
 	if (numeric)
-		printf("TEE gw:%s ", xtables_ip6addr_to_numeric(&info->gw.in6));
+		printf(" TEE gw:%s", xtables_ip6addr_to_numeric(&info->gw.in6));
 	else
-		printf("TEE gw:%s ", xtables_ip6addr_to_anyname(&info->gw.in6));
+		printf(" TEE gw:%s", xtables_ip6addr_to_anyname(&info->gw.in6));
 	if (*info->oif != '\0')
-		printf("oif=%s ", info->oif);
+		printf(" oif=%s", info->oif);
 }
 
 static void tee_tg_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_tee_tginfo *info = (const void *)target->data;
 
-	printf("--gateway %s ", xtables_ipaddr_to_numeric(&info->gw.in));
+	printf(" --gateway %s", xtables_ipaddr_to_numeric(&info->gw.in));
 	if (*info->oif != '\0')
-		printf("--oif %s ", info->oif);
+		printf(" --oif %s", info->oif);
 }
 
 static void tee_tg6_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct xt_tee_tginfo *info = (const void *)target->data;
 
-	printf("--gateway %s ", xtables_ip6addr_to_numeric(&info->gw.in6));
+	printf(" --gateway %s", xtables_ip6addr_to_numeric(&info->gw.in6));
 	if (*info->oif != '\0')
-		printf("--oif %s ", info->oif);
+		printf(" --oif %s", info->oif);
 }
 
 static struct xtables_target tee_tg_reg = {

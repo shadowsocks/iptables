@@ -820,7 +820,7 @@ static void conntrack_mt_check(unsigned int flags)
 static void
 print_state(unsigned int statemask)
 {
-	const char *sep = "";
+	const char *sep = " ";
 
 	if (statemask & XT_CONNTRACK_STATE_INVALID) {
 		printf("%sINVALID", sep);
@@ -850,13 +850,12 @@ print_state(unsigned int statemask)
 		printf("%sDNAT", sep);
 		sep = ",";
 	}
-	printf(" ");
 }
 
 static void
 print_status(unsigned int statusmask)
 {
-	const char *sep = "";
+	const char *sep = " ";
 
 	if (statusmask & IPS_EXPECTED) {
 		printf("%sEXPECTED", sep);
@@ -876,7 +875,6 @@ print_status(unsigned int statusmask)
 	}
 	if (statusmask == 0)
 		printf("%sNONE", sep);
-	printf(" ");
 }
 
 static void
@@ -886,29 +884,29 @@ conntrack_dump_addr(const union nf_inet_addr *addr,
 {
 	if (family == NFPROTO_IPV4) {
 		if (!numeric && addr->ip == 0) {
-			printf("anywhere ");
+			printf(" anywhere");
 			return;
 		}
 		if (numeric)
-			printf("%s%s ",
+			printf(" %s%s",
 			       xtables_ipaddr_to_numeric(&addr->in),
 			       xtables_ipmask_to_numeric(&mask->in));
 		else
-			printf("%s%s ",
+			printf(" %s%s",
 			       xtables_ipaddr_to_anyname(&addr->in),
 			       xtables_ipmask_to_numeric(&mask->in));
 	} else if (family == NFPROTO_IPV6) {
 		if (!numeric && addr->ip6[0] == 0 && addr->ip6[1] == 0 &&
 		    addr->ip6[2] == 0 && addr->ip6[3] == 0) {
-			printf("anywhere ");
+			printf(" anywhere");
 			return;
 		}
 		if (numeric)
-			printf("%s%s ",
+			printf(" %s%s",
 			       xtables_ip6addr_to_numeric(&addr->in6),
 			       xtables_ip6mask_to_numeric(&mask->in6));
 		else
-			printf("%s%s ",
+			printf(" %s%s",
 			       xtables_ip6addr_to_anyname(&addr->in6),
 			       xtables_ip6mask_to_numeric(&mask->in6));
 	}
@@ -921,17 +919,17 @@ print_addr(const struct in_addr *addr, const struct in_addr *mask,
 	char buf[BUFSIZ];
 
 	if (inv)
-	       	printf("! ");
+		printf(" !");
 
 	if (mask->s_addr == 0L && !numeric)
-		printf("%s ", "anywhere");
+		printf(" %s", "anywhere");
 	else {
 		if (numeric)
 			strcpy(buf, xtables_ipaddr_to_numeric(addr));
 		else
 			strcpy(buf, xtables_ipaddr_to_anyname(addr));
 		strcat(buf, xtables_ipmask_to_numeric(mask));
-		printf("%s ", buf);
+		printf(" %s", buf);
 	}
 }
 
@@ -942,22 +940,22 @@ matchinfo_print(const void *ip, const struct xt_entry_match *match, int numeric,
 
 	if(sinfo->flags & XT_CONNTRACK_STATE) {
         	if (sinfo->invflags & XT_CONNTRACK_STATE)
-                	printf("! ");
-		printf("%sctstate ", optpfx);
+			printf(" !");
+		printf(" %sctstate", optpfx);
 		print_state(sinfo->statemask);
 	}
 
 	if(sinfo->flags & XT_CONNTRACK_PROTO) {
         	if (sinfo->invflags & XT_CONNTRACK_PROTO)
-                	printf("! ");
-		printf("%sctproto ", optpfx);
-		printf("%u ", sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum);
+			printf(" !");
+		printf(" %sctproto", optpfx);
+		printf(" %u", sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum);
 	}
 
 	if(sinfo->flags & XT_CONNTRACK_ORIGSRC) {
 		if (sinfo->invflags & XT_CONNTRACK_ORIGSRC)
-			printf("! ");
-		printf("%sctorigsrc ", optpfx);
+			printf(" !");
+		printf(" %sctorigsrc", optpfx);
 
 		print_addr(
 		    (struct in_addr *)&sinfo->tuple[IP_CT_DIR_ORIGINAL].src.ip,
@@ -968,8 +966,8 @@ matchinfo_print(const void *ip, const struct xt_entry_match *match, int numeric,
 
 	if(sinfo->flags & XT_CONNTRACK_ORIGDST) {
 		if (sinfo->invflags & XT_CONNTRACK_ORIGDST)
-			printf("! ");
-		printf("%sctorigdst ", optpfx);
+			printf(" !");
+		printf(" %sctorigdst", optpfx);
 
 		print_addr(
 		    (struct in_addr *)&sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.ip,
@@ -980,8 +978,8 @@ matchinfo_print(const void *ip, const struct xt_entry_match *match, int numeric,
 
 	if(sinfo->flags & XT_CONNTRACK_REPLSRC) {
 		if (sinfo->invflags & XT_CONNTRACK_REPLSRC)
-			printf("! ");
-		printf("%sctreplsrc ", optpfx);
+			printf(" !");
+		printf(" %sctreplsrc", optpfx);
 
 		print_addr(
 		    (struct in_addr *)&sinfo->tuple[IP_CT_DIR_REPLY].src.ip,
@@ -992,8 +990,8 @@ matchinfo_print(const void *ip, const struct xt_entry_match *match, int numeric,
 
 	if(sinfo->flags & XT_CONNTRACK_REPLDST) {
 		if (sinfo->invflags & XT_CONNTRACK_REPLDST)
-			printf("! ");
-		printf("%sctrepldst ", optpfx);
+			printf(" !");
+		printf(" %sctrepldst", optpfx);
 
 		print_addr(
 		    (struct in_addr *)&sinfo->tuple[IP_CT_DIR_REPLY].dst.ip,
@@ -1004,27 +1002,27 @@ matchinfo_print(const void *ip, const struct xt_entry_match *match, int numeric,
 
 	if(sinfo->flags & XT_CONNTRACK_STATUS) {
         	if (sinfo->invflags & XT_CONNTRACK_STATUS)
-                	printf("! ");
-		printf("%sctstatus ", optpfx);
+			printf(" !");
+		printf(" %sctstatus", optpfx);
 		print_status(sinfo->statusmask);
 	}
 
 	if(sinfo->flags & XT_CONNTRACK_EXPIRES) {
         	if (sinfo->invflags & XT_CONNTRACK_EXPIRES)
-                	printf("! ");
-		printf("%sctexpire ", optpfx);
+			printf(" !");
+		printf(" %sctexpire ", optpfx);
 
         	if (sinfo->expires_max == sinfo->expires_min)
-                	printf("%lu ", sinfo->expires_min);
+			printf("%lu", sinfo->expires_min);
         	else
-                	printf("%lu:%lu ", sinfo->expires_min, sinfo->expires_max);
+			printf("%lu:%lu", sinfo->expires_min, sinfo->expires_max);
 	}
 
 	if (sinfo->flags & XT_CONNTRACK_DIRECTION) {
 		if (sinfo->invflags & XT_CONNTRACK_DIRECTION)
-			printf("%sctdir REPLY ", optpfx);
+			printf(" %sctdir REPLY", optpfx);
 		else
-			printf("%sctdir ORIGINAL ", optpfx);
+			printf(" %sctdir ORIGINAL", optpfx);
 	}
 
 }
@@ -1034,9 +1032,9 @@ conntrack_dump_ports(const char *prefix, const char *opt,
 		     u_int16_t port_low, u_int16_t port_high)
 {
 	if (port_high == 0 || port_low == port_high)
-		printf("%s%s %u ", prefix, opt, port_low);
+		printf(" %s%s %u", prefix, opt, port_low);
 	else
-		printf("%s%s %u:%u ", prefix, opt, port_low, port_high);
+		printf(" %s%s %u:%u", prefix, opt, port_low, port_high);
 }
 
 static void
@@ -1045,52 +1043,52 @@ conntrack_dump(const struct xt_conntrack_mtinfo3 *info, const char *prefix,
 {
 	if (info->match_flags & XT_CONNTRACK_STATE) {
 		if (info->invert_flags & XT_CONNTRACK_STATE)
-			printf("! ");
-		printf("%sctstate ", prefix);
+			printf(" !");
+		printf(" %sctstate", prefix);
 		print_state(info->state_mask);
 	}
 
 	if (info->match_flags & XT_CONNTRACK_PROTO) {
 		if (info->invert_flags & XT_CONNTRACK_PROTO)
-			printf("! ");
-		printf("%sctproto %u ", prefix, info->l4proto);
+			printf(" !");
+		printf(" %sctproto %u", prefix, info->l4proto);
 	}
 
 	if (info->match_flags & XT_CONNTRACK_ORIGSRC) {
 		if (info->invert_flags & XT_CONNTRACK_ORIGSRC)
-			printf("! ");
-		printf("%sctorigsrc ", prefix);
+			printf(" !");
+		printf(" %sctorigsrc", prefix);
 		conntrack_dump_addr(&info->origsrc_addr, &info->origsrc_mask,
 		                    family, numeric);
 	}
 
 	if (info->match_flags & XT_CONNTRACK_ORIGDST) {
 		if (info->invert_flags & XT_CONNTRACK_ORIGDST)
-			printf("! ");
-		printf("%sctorigdst ", prefix);
+			printf(" !");
+		printf(" %sctorigdst", prefix);
 		conntrack_dump_addr(&info->origdst_addr, &info->origdst_mask,
 		                    family, numeric);
 	}
 
 	if (info->match_flags & XT_CONNTRACK_REPLSRC) {
 		if (info->invert_flags & XT_CONNTRACK_REPLSRC)
-			printf("! ");
-		printf("%sctreplsrc ", prefix);
+			printf(" !");
+		printf(" %sctreplsrc", prefix);
 		conntrack_dump_addr(&info->replsrc_addr, &info->replsrc_mask,
 		                    family, numeric);
 	}
 
 	if (info->match_flags & XT_CONNTRACK_REPLDST) {
 		if (info->invert_flags & XT_CONNTRACK_REPLDST)
-			printf("! ");
-		printf("%sctrepldst ", prefix);
+			printf(" !");
+		printf(" %sctrepldst", prefix);
 		conntrack_dump_addr(&info->repldst_addr, &info->repldst_mask,
 		                    family, numeric);
 	}
 
 	if (info->match_flags & XT_CONNTRACK_ORIGSRC_PORT) {
 		if (info->invert_flags & XT_CONNTRACK_ORIGSRC_PORT)
-			printf("! ");
+			printf(" !");
 		conntrack_dump_ports(prefix, "ctorigsrcport",
 				     v3 ? info->origsrc_port : ntohs(info->origsrc_port),
 				     v3 ? info->origsrc_port_high : 0);
@@ -1098,7 +1096,7 @@ conntrack_dump(const struct xt_conntrack_mtinfo3 *info, const char *prefix,
 
 	if (info->match_flags & XT_CONNTRACK_ORIGDST_PORT) {
 		if (info->invert_flags & XT_CONNTRACK_ORIGDST_PORT)
-			printf("! ");
+			printf(" !");
 		conntrack_dump_ports(prefix, "ctorigdstport",
 				     v3 ? info->origdst_port : ntohs(info->origdst_port),
 				     v3 ? info->origdst_port_high : 0);
@@ -1106,7 +1104,7 @@ conntrack_dump(const struct xt_conntrack_mtinfo3 *info, const char *prefix,
 
 	if (info->match_flags & XT_CONNTRACK_REPLSRC_PORT) {
 		if (info->invert_flags & XT_CONNTRACK_REPLSRC_PORT)
-			printf("! ");
+			printf(" !");
 		conntrack_dump_ports(prefix, "ctreplsrcport",
 				     v3 ? info->replsrc_port : ntohs(info->replsrc_port),
 				     v3 ? info->replsrc_port_high : 0);
@@ -1114,7 +1112,7 @@ conntrack_dump(const struct xt_conntrack_mtinfo3 *info, const char *prefix,
 
 	if (info->match_flags & XT_CONNTRACK_REPLDST_PORT) {
 		if (info->invert_flags & XT_CONNTRACK_REPLDST_PORT)
-			printf("! ");
+			printf(" !");
 		conntrack_dump_ports(prefix, "ctrepldstport",
 				     v3 ? info->repldst_port : ntohs(info->repldst_port),
 				     v3 ? info->repldst_port_high : 0);
@@ -1122,28 +1120,28 @@ conntrack_dump(const struct xt_conntrack_mtinfo3 *info, const char *prefix,
 
 	if (info->match_flags & XT_CONNTRACK_STATUS) {
 		if (info->invert_flags & XT_CONNTRACK_STATUS)
-			printf("! ");
-		printf("%sctstatus ", prefix);
+			printf(" !");
+		printf(" %sctstatus", prefix);
 		print_status(info->status_mask);
 	}
 
 	if (info->match_flags & XT_CONNTRACK_EXPIRES) {
 		if (info->invert_flags & XT_CONNTRACK_EXPIRES)
-			printf("! ");
-		printf("%sctexpire ", prefix);
+			printf(" !");
+		printf(" %sctexpire ", prefix);
 
 		if (info->expires_max == info->expires_min)
-			printf("%u ", (unsigned int)info->expires_min);
+			printf("%u", (unsigned int)info->expires_min);
 		else
-			printf("%u:%u ", (unsigned int)info->expires_min,
+			printf("%u:%u", (unsigned int)info->expires_min,
 			       (unsigned int)info->expires_max);
 	}
 
 	if (info->match_flags & XT_CONNTRACK_DIRECTION) {
 		if (info->invert_flags & XT_CONNTRACK_DIRECTION)
-			printf("%sctdir REPLY ", prefix);
+			printf(" %sctdir REPLY", prefix);
 		else
-			printf("%sctdir ORIGINAL ", prefix);
+			printf(" %sctdir ORIGINAL", prefix);
 	}
 }
 

@@ -93,22 +93,22 @@ length_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_length_info *info = (void *)match->data;
 
-	printf("length %s", info->invert ? "!" : "");
+	printf(" length %s", info->invert ? "!" : "");
 	if (info->min == info->max)
-		printf("%u ", info->min);
+		printf("%u", info->min);
 	else
-		printf("%u:%u ", info->min, info->max);
+		printf("%u:%u", info->min, info->max);
 }
 
 static void length_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_length_info *info = (void *)match->data;
 
-	printf("%s--length ", info->invert ? "! " : "");
+	printf("%s --length ", info->invert ? " !" : "");
 	if (info->min == info->max)
-		printf("%u ", info->min);
+		printf("%u", info->min);
 	else
-		printf("%u:%u ", info->min, info->max);
+		printf("%u:%u", info->min, info->max);
 }
 
 static struct xtables_match length_match = {
