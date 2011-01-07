@@ -25,10 +25,10 @@ static void NETMAP_help(void)
 	       NETMAP_opts[0].name);
 }
 
-static u_int32_t
+static uint32_t
 bits2netmask(int bits)
 {
-	u_int32_t netmask, bm;
+	uint32_t netmask, bm;
 
 	if (bits >= 32 || bits < 0)
 		return(~0);
@@ -38,9 +38,9 @@ bits2netmask(int bits)
 }
 
 static int
-netmask2bits(u_int32_t netmask)
+netmask2bits(uint32_t netmask)
 {
-	u_int32_t bm;
+	uint32_t bm;
 	int bits;
 
 	netmask = ntohl(netmask);
@@ -66,7 +66,7 @@ parse_to(char *arg, struct nf_nat_range *range)
 {
 	char *slash;
 	const struct in_addr *ip;
-	u_int32_t netmask;
+	uint32_t netmask;
 	unsigned int bits;
 
 	range->flags |= IP_NAT_RANGE_MAP_IPS;

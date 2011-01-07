@@ -214,7 +214,7 @@ int kernel_version;
 #endif
 
 static const char *
-proto_to_name(u_int8_t proto, int nolookup)
+proto_to_name(uint8_t proto, int nolookup)
 {
 	unsigned int i;
 
@@ -472,7 +472,7 @@ parse_target(const char *targetname)
 }
 
 static void
-set_option(unsigned int *options, unsigned int option, u_int8_t *invflg,
+set_option(unsigned int *options, unsigned int option, uint8_t *invflg,
 	   int invert)
 {
 	if (*options & option)
@@ -493,7 +493,7 @@ set_option(unsigned int *options, unsigned int option, u_int8_t *invflg,
 }
 
 static void
-print_num(u_int64_t number, unsigned int format)
+print_num(uint64_t number, unsigned int format)
 {
 	if (format & FMT_KILOMEGAGIGA) {
 		if (number > 99999) {
@@ -599,7 +599,7 @@ print_firewall(const struct ipt_entry *fw,
 {
 	const struct xtables_target *target = NULL;
 	const struct ipt_entry_target *t;
-	u_int8_t flags;
+	uint8_t flags;
 	char buf[BUFSIZ];
 
 	if (!iptc_is_chain(targname, handle))
@@ -1002,7 +1002,7 @@ list_entries(const ipt_chainlabel chain, int rulenum, int verbose, int numeric,
 	return found;
 }
 
-static void print_proto(u_int16_t proto, int invert)
+static void print_proto(uint16_t proto, int invert)
 {
 	if (proto) {
 		unsigned int i;
@@ -1085,10 +1085,10 @@ static int print_match_save(const struct ipt_entry_match *e,
 }
 
 /* print a given ip including mask if neccessary */
-static void print_ip(const char *prefix, u_int32_t ip,
-		     u_int32_t mask, int invert)
+static void print_ip(const char *prefix, uint32_t ip,
+		     uint32_t mask, int invert)
 {
-	u_int32_t bits, hmask = ntohl(mask);
+	uint32_t bits, hmask = ntohl(mask);
 	int i;
 
 	if (!mask && !ip && !invert)

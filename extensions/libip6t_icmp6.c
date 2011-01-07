@@ -11,8 +11,8 @@
 
 struct icmpv6_names {
 	const char *name;
-	u_int8_t type;
-	u_int8_t code_min, code_max;
+	uint8_t type;
+	uint8_t code_min, code_max;
 };
 
 static const struct icmpv6_names icmpv6_codes[] = {
@@ -90,7 +90,7 @@ static const struct option icmp6_opts[] = {
 };
 
 static void
-parse_icmpv6(const char *icmpv6type, u_int8_t *type, u_int8_t code[])
+parse_icmpv6(const char *icmpv6type, uint8_t *type, uint8_t code[])
 {
 	static const unsigned int limit = ARRAY_SIZE(icmpv6_codes);
 	unsigned int match = limit;
@@ -174,8 +174,8 @@ static int icmp6_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void print_icmpv6type(u_int8_t type,
-			   u_int8_t code_min, u_int8_t code_max,
+static void print_icmpv6type(uint8_t type,
+			   uint8_t code_min, uint8_t code_max,
 			   int invert,
 			   int numeric)
 {

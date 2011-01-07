@@ -19,8 +19,8 @@
 
 struct icmp_names {
 	const char *name;
-	u_int8_t type;
-	u_int8_t code_min, code_max;
+	uint8_t type;
+	uint8_t code_min, code_max;
 };
 
 static const struct icmp_names icmp_codes[] = {
@@ -114,7 +114,7 @@ static const struct option icmp_opts[] = {
 };
 
 static void 
-parse_icmp(const char *icmptype, u_int8_t *type, u_int8_t code[])
+parse_icmp(const char *icmptype, uint8_t *type, uint8_t code[])
 {
 	static const unsigned int limit = ARRAY_SIZE(icmp_codes);
 	unsigned int match = limit;
@@ -199,8 +199,8 @@ static int icmp_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static void print_icmptype(u_int8_t type,
-			   u_int8_t code_min, u_int8_t code_max,
+static void print_icmptype(uint8_t type,
+			   uint8_t code_min, uint8_t code_max,
 			   int invert,
 			   int numeric)
 {

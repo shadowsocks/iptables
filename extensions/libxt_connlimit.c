@@ -32,7 +32,7 @@ static void connlimit_init(struct xt_entry_match *match)
 	memset(info->v6_mask, 0xFF, sizeof(info->v6_mask));
 }
 
-static void prefix_to_netmask(u_int32_t *mask, unsigned int prefix_len)
+static void prefix_to_netmask(uint32_t *mask, unsigned int prefix_len)
 {
 	if (prefix_len == 0) {
 		mask[0] = mask[1] = mask[2] = mask[3] = 0;
@@ -124,7 +124,7 @@ static void connlimit_check(unsigned int flags)
 			"You must specify \"--connlimit-above\"");
 }
 
-static unsigned int count_bits4(u_int32_t mask)
+static unsigned int count_bits4(uint32_t mask)
 {
 	unsigned int bits = 0;
 
@@ -134,10 +134,10 @@ static unsigned int count_bits4(u_int32_t mask)
 	return 32 - bits;
 }
 
-static unsigned int count_bits6(const u_int32_t *mask)
+static unsigned int count_bits6(const uint32_t *mask)
 {
 	unsigned int bits = 0, i;
-	u_int32_t tmp[4];
+	uint32_t tmp[4];
 
 	for (i = 0; i < 4; ++i)
 		for (tmp[i] = ~ntohl(mask[i]); tmp[i] != 0; tmp[i] >>= 1)

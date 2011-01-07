@@ -60,7 +60,7 @@ static void addrtype_help_v1(void)
 }
 
 static int
-parse_type(const char *name, size_t len, u_int16_t *mask)
+parse_type(const char *name, size_t len, uint16_t *mask)
 {
 	int i;
 
@@ -74,7 +74,7 @@ parse_type(const char *name, size_t len, u_int16_t *mask)
 	return 0;
 }
 
-static void parse_types(const char *arg, u_int16_t *mask)
+static void parse_types(const char *arg, uint16_t *mask)
 {
 	const char *comma;
 
@@ -197,7 +197,7 @@ static void addrtype_check_v1(unsigned int flags)
 			   "and --limit-iface-out");
 }
 
-static void print_types(u_int16_t mask)
+static void print_types(uint16_t mask)
 {
 	const char *sep = "";
 	int i;

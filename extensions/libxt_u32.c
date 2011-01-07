@@ -85,9 +85,9 @@ static void u32_dump(const struct xt_u32 *data)
 }
 
 /* string_to_number() is not quite what we need here ... */
-static u_int32_t parse_number(char **s, int pos)
+static uint32_t parse_number(char **s, int pos)
 {
-	u_int32_t number;
+	uint32_t number;
 	char *end;
 
 	errno  = 0;

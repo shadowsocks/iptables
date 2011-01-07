@@ -85,7 +85,7 @@ static int ipvs_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 {
 	struct xt_ipvs_mtinfo *data = (void *)(*match)->data;
 	char *p = NULL;
-	u_int8_t op = 0;
+	uint8_t op = 0;
 
 	if ('0' <= c && c <= '6') {
 		static const int ops[] = {

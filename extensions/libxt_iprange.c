@@ -21,7 +21,7 @@ struct ipt_iprange_info {
 	struct ipt_iprange dst;
 
 	/* Flags from above */
-	u_int8_t flags;
+	uint8_t flags;
 };
 
 enum {
@@ -74,7 +74,7 @@ iprange_parse_spec(const char *from, const char *to, union nf_inet_addr *range,
 }
 
 static void iprange_parse_range(char *arg, union nf_inet_addr *range,
-				u_int8_t family, const char *optname)
+				uint8_t family, const char *optname)
 {
 	char *dash;
 

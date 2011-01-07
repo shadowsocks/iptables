@@ -108,7 +108,7 @@ static void DSCP_check(unsigned int flags)
 }
 
 static void
-print_dscp(u_int8_t dscp, int numeric)
+print_dscp(uint8_t dscp, int numeric)
 {
  	printf("0x%02x ", dscp);
 }

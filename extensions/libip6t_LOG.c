@@ -66,7 +66,7 @@ static const struct ip6t_log_names ip6t_log_names[]
     { .name = "warning", .level = LOG_WARNING }
 };
 
-static u_int8_t
+static uint8_t
 parse_level(const char *level)
 {
 	unsigned int lev = -1;

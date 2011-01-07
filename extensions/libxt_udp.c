@@ -30,7 +30,7 @@ static const struct option udp_opts[] = {
 };
 
 static void
-parse_udp_ports(const char *portstring, u_int16_t *ports)
+parse_udp_ports(const char *portstring, uint16_t *ports)
 {
 	char *buffer;
 	char *cp;
@@ -110,7 +110,7 @@ port_to_service(int port)
 }
 
 static void
-print_port(u_int16_t port, int numeric)
+print_port(uint16_t port, int numeric)
 {
 	char *service;
 
@@ -121,7 +121,7 @@ print_port(u_int16_t port, int numeric)
 }
 
 static void
-print_ports(const char *name, u_int16_t min, u_int16_t max,
+print_ports(const char *name, uint16_t min, uint16_t max,
 	    int invert, int numeric)
 {
 	const char *inv = invert ? "!" : "";

@@ -29,7 +29,7 @@ static const struct option dst_opts[] = {
 	XT_GETOPT_TABLEEND,
 };
 
-static u_int32_t
+static uint32_t
 parse_opts_num(const char *idstr, const char *typestr)
 {
 	unsigned long int id;
@@ -54,7 +54,7 @@ parse_opts_num(const char *idstr, const char *typestr)
 }
 
 static int
-parse_options(const char *optsstr, u_int16_t *opts)
+parse_options(const char *optsstr, uint16_t *opts)
 {
         char *buffer, *cp, *next, *range;
         unsigned int i;
@@ -164,7 +164,7 @@ static int dst_parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static void
-print_options(unsigned int optsnr, u_int16_t *optsp)
+print_options(unsigned int optsnr, uint16_t *optsp)
 {
 	unsigned int i;
 
@@ -192,7 +192,7 @@ static void dst_print(const void *ip, const struct xt_entry_match *match,
 	if (optinfo->flags & IP6T_OPTS_OPTS)
 		printf("opts ");
 
-	print_options(optinfo->optsnr, (u_int16_t *)optinfo->opts);
+	print_options(optinfo->optsnr, (uint16_t *)optinfo->opts);
 
 	if (optinfo->flags & IP6T_OPTS_NSTRICT)
 		printf("not-strict ");
@@ -215,7 +215,7 @@ static void dst_save(const void *ip, const struct xt_entry_match *match)
 	if (optinfo->flags & IP6T_OPTS_OPTS)
 		printf("--dst-opts ");
 
-	print_options(optinfo->optsnr, (u_int16_t *)optinfo->opts);
+	print_options(optinfo->optsnr, (uint16_t *)optinfo->opts);
 
 	if (optinfo->flags & IP6T_OPTS_NSTRICT)
 		printf("--dst-not-strict ");

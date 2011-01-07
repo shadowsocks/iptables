@@ -202,11 +202,11 @@ static const unsigned int inverse_for_options[NUMBER_OF_OPT] =
    /etc/protocols */
 struct pprot {
 	const char *name;
-	u_int8_t num;
+	uint8_t num;
 };
 
 static const char *
-proto_to_name(u_int8_t proto, int nolookup)
+proto_to_name(uint8_t proto, int nolookup)
 {
 	unsigned int i;
 
@@ -425,7 +425,7 @@ find_proto(const char *pname, enum xtables_tryload tryload,
 }
 
 /* These are invalid numbers as upper layer protocol */
-static int is_exthdr(u_int16_t proto)
+static int is_exthdr(uint16_t proto)
 {
 	return (proto == IPPROTO_ROUTING ||
 		proto == IPPROTO_FRAGMENT ||
@@ -468,7 +468,7 @@ parse_target(const char *targetname)
 }
 
 static void
-set_option(unsigned int *options, unsigned int option, u_int8_t *invflg,
+set_option(unsigned int *options, unsigned int option, uint8_t *invflg,
 	   int invert)
 {
 	if (*options & option)
@@ -489,7 +489,7 @@ set_option(unsigned int *options, unsigned int option, u_int8_t *invflg,
 }
 
 static void
-print_num(u_int64_t number, unsigned int format)
+print_num(uint64_t number, unsigned int format)
 {
 	if (format & FMT_KILOMEGAGIGA) {
 		if (number > 99999) {
@@ -595,7 +595,7 @@ print_firewall(const struct ip6t_entry *fw,
 {
 	const struct xtables_target *target = NULL;
 	const struct ip6t_entry_target *t;
-	u_int8_t flags;
+	uint8_t flags;
 	char buf[BUFSIZ];
 
 	if (!ip6tc_is_chain(targname, handle))
@@ -1029,7 +1029,7 @@ print_iface(char letter, const char *iface, const unsigned char *mask,
 }
 
 /* The ip6tables looks up the /etc/protocols. */
-static void print_proto(u_int16_t proto, int invert)
+static void print_proto(uint16_t proto, int invert)
 {
 	if (proto) {
 		unsigned int i;

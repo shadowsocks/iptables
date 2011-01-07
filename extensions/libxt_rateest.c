@@ -84,7 +84,7 @@ static const struct rate_suffix {
 };
 
 static int
-rateest_get_rate(u_int32_t *rate, const char *str)
+rateest_get_rate(uint32_t *rate, const char *str)
 {
 	char *p;
 	double bps = strtod(str, &p);
@@ -318,7 +318,7 @@ rateest_final_check(unsigned int flags)
 }
 
 static void
-rateest_print_rate(u_int32_t rate, int numeric)
+rateest_print_rate(uint32_t rate, int numeric)
 {
 	double tmp = (double)rate*8;
 

@@ -55,7 +55,7 @@ static const struct option dccp_opts[] = {
 
 static void
 parse_dccp_ports(const char *portstring, 
-		 u_int16_t *ports)
+		 uint16_t *ports)
 {
 	char *buffer;
 	char *cp;
@@ -93,10 +93,10 @@ static const char *const dccp_pkt_types[] = {
 	[DCCP_PKT_INVALID]	= "INVALID",
 };
 
-static u_int16_t
+static uint16_t
 parse_dccp_types(const char *typestring)
 {
-	u_int16_t typemask = 0;
+	uint16_t typemask = 0;
 	char *ptr, *buffer;
 
 	buffer = strdup(typestring);
@@ -117,7 +117,7 @@ parse_dccp_types(const char *typestring)
 	return typemask;
 }
 
-static u_int8_t parse_dccp_option(char *optstring)
+static uint8_t parse_dccp_option(char *optstring)
 {
 	unsigned int ret;
 
@@ -201,7 +201,7 @@ port_to_service(int port)
 }
 
 static void
-print_port(u_int16_t port, int numeric)
+print_port(uint16_t port, int numeric)
 {
 	char *service;
 
@@ -212,7 +212,7 @@ print_port(u_int16_t port, int numeric)
 }
 
 static void
-print_ports(const char *name, u_int16_t min, u_int16_t max,
+print_ports(const char *name, uint16_t min, uint16_t max,
 	    int invert, int numeric)
 {
 	const char *inv = invert ? "!" : "";
@@ -233,7 +233,7 @@ print_ports(const char *name, u_int16_t min, u_int16_t max,
 }
 
 static void
-print_types(u_int16_t types, int inverted, int numeric)
+print_types(uint16_t types, int inverted, int numeric)
 {
 	int have_type = 0;
 
@@ -260,7 +260,7 @@ print_types(u_int16_t types, int inverted, int numeric)
 }
 
 static void
-print_option(u_int8_t option, int invert, int numeric)
+print_option(uint8_t option, int invert, int numeric)
 {
 	if (option || invert)
 		printf("option=%s%u ", invert ? "!" : "", option);

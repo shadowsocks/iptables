@@ -16,7 +16,7 @@
 #include "tos_values.c"
 
 struct ipt_tos_target_info {
-	u_int8_t tos;
+	uint8_t tos;
 };
 
 enum {
@@ -185,7 +185,7 @@ static void tos_tg_print(const void *ip, const struct xt_entry_target *target,
 		return;
 	else if (info->tos_value == 0)
 		printf("TOS and 0x%02x ",
-		       (unsigned int)(u_int8_t)~info->tos_mask);
+		       (unsigned int)(uint8_t)~info->tos_mask);
 	else if (info->tos_value == info->tos_mask)
 		printf("TOS or 0x%02x ", info->tos_value);
 	else if (info->tos_mask == 0)

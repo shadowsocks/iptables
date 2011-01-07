@@ -32,7 +32,7 @@
 struct xt_connmark_target_info {
 	unsigned long mark;
 	unsigned long mask;
-	u_int8_t mode;
+	uint8_t mode;
 };
 
 enum {
@@ -314,7 +314,7 @@ connmark_tg_print(const void *ip, const struct xt_entry_target *target,
 	case XT_CONNMARK_SET:
 		if (info->ctmark == 0)
 			printf("CONNMARK and 0x%x ",
-			       (unsigned int)(u_int32_t)~info->ctmask);
+			       (unsigned int)(uint32_t)~info->ctmask);
 		else if (info->ctmark == info->ctmask)
 			printf("CONNMARK or 0x%x ", info->ctmark);
 		else if (info->ctmask == 0)

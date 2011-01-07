@@ -22,7 +22,7 @@
 
 struct mh_name {
 	const char *name;
-	u_int8_t type;
+	uint8_t type;
 };
 
 static const struct mh_name mh_names[] = {
@@ -100,7 +100,7 @@ static unsigned int name_to_type(const char *name)
 	}
 }
 
-static void parse_mh_types(const char *mhtype, u_int8_t *types)
+static void parse_mh_types(const char *mhtype, uint8_t *types)
 {
 	char *buffer;
 	char *cp;
@@ -148,7 +148,7 @@ static int mh_parse(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-static const char *type_to_name(u_int8_t type)
+static const char *type_to_name(uint8_t type)
 {
 	unsigned int i;
 
@@ -159,7 +159,7 @@ static const char *type_to_name(u_int8_t type)
 	return NULL;
 }
 
-static void print_type(u_int8_t type, int numeric)
+static void print_type(uint8_t type, int numeric)
 {
 	const char *name;
 	if (numeric || !(name = type_to_name(type)))
@@ -168,7 +168,7 @@ static void print_type(u_int8_t type, int numeric)
 		printf("%s", name);
 }
 
-static void print_types(u_int8_t min, u_int8_t max, int invert, int numeric)
+static void print_types(uint8_t min, uint8_t max, int invert, int numeric)
 {
 	const char *inv = invert ? "!" : "";
 

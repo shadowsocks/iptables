@@ -54,7 +54,7 @@ static const struct option multiport_opts[] = {
 };
 
 static char *
-proto_to_name(u_int8_t proto)
+proto_to_name(uint8_t proto)
 {
 	switch (proto) {
 	case IPPROTO_TCP:
@@ -73,7 +73,7 @@ proto_to_name(u_int8_t proto)
 }
 
 static unsigned int
-parse_multi_ports(const char *portstring, u_int16_t *ports, const char *proto)
+parse_multi_ports(const char *portstring, uint16_t *ports, const char *proto)
 {
 	char *buffer, *cp, *next;
 	unsigned int i;
@@ -99,7 +99,7 @@ parse_multi_ports_v1(const char *portstring,
 {
 	char *buffer, *cp, *next, *range;
 	unsigned int i;
-	u_int16_t m;
+	uint16_t m;
 
 	buffer = strdup(portstring);
 	if (!buffer) xtables_error(OTHER_PROBLEM, "strdup failed");
@@ -133,7 +133,7 @@ parse_multi_ports_v1(const char *portstring,
 }
 
 static const char *
-check_proto(u_int16_t pnum, u_int8_t invflags)
+check_proto(uint16_t pnum, uint8_t invflags)
 {
 	char *proto;
 
@@ -156,8 +156,8 @@ check_proto(u_int16_t pnum, u_int8_t invflags)
    ate an option */
 static int
 __multiport_parse(int c, char **argv, int invert, unsigned int *flags,
-                  struct xt_entry_match **match, u_int16_t pnum,
-                  u_int8_t invflags)
+                  struct xt_entry_match **match, uint16_t pnum,
+                  uint8_t invflags)
 {
 	const char *proto;
 	struct xt_multiport *multiinfo
@@ -223,8 +223,8 @@ multiport_parse6(int c, char **argv, int invert, unsigned int *flags,
 
 static int
 __multiport_parse_v1(int c, char **argv, int invert, unsigned int *flags,
-                     struct xt_entry_match **match, u_int16_t pnum,
-                     u_int8_t invflags)
+                     struct xt_entry_match **match, uint16_t pnum,
+                     uint8_t invflags)
 {
 	const char *proto;
 	struct xt_multiport_v1 *multiinfo
@@ -292,7 +292,7 @@ static void multiport_check(unsigned int flags)
 }
 
 static char *
-port_to_service(int port, u_int8_t proto)
+port_to_service(int port, uint8_t proto)
 {
 	struct servent *service;
 
@@ -303,7 +303,7 @@ port_to_service(int port, u_int8_t proto)
 }
 
 static void
-print_port(u_int16_t port, u_int8_t protocol, int numeric)
+print_port(uint16_t port, uint8_t protocol, int numeric)
 {
 	char *service;
 
@@ -316,7 +316,7 @@ print_port(u_int16_t port, u_int8_t protocol, int numeric)
 /* Prints out the matchinfo. */
 static void
 __multiport_print(const struct xt_entry_match *match, int numeric,
-                  u_int16_t proto)
+                  uint16_t proto)
 {
 	const struct xt_multiport *multiinfo
 		= (const struct xt_multiport *)match->data;
@@ -364,7 +364,7 @@ static void multiport_print6(const void *ip_void,
 }
 
 static void __multiport_print_v1(const struct xt_entry_match *match,
-                                 int numeric, u_int16_t proto)
+                                 int numeric, uint16_t proto)
 {
 	const struct xt_multiport_v1 *multiinfo
 		= (const struct xt_multiport_v1 *)match->data;
@@ -420,7 +420,7 @@ static void multiport_print6_v1(const void *ip_void,
 
 /* Saves the union ipt_matchinfo in parsable form to stdout. */
 static void __multiport_save(const struct xt_entry_match *match,
-                             u_int16_t proto)
+                             uint16_t proto)
 {
 	const struct xt_multiport *multiinfo
 		= (const struct xt_multiport *)match->data;
@@ -462,7 +462,7 @@ static void multiport_save6(const void *ip_void,
 }
 
 static void __multiport_save_v1(const struct xt_entry_match *match,
-                                u_int16_t proto)
+                                uint16_t proto)
 {
 	const struct xt_multiport_v1 *multiinfo
 		= (const struct xt_multiport_v1 *)match->data;

@@ -39,7 +39,7 @@ quota_save(const void *ip, const struct xt_entry_match *match)
 
 /* parse quota option */
 static int
-parse_quota(const char *s, u_int64_t * quota)
+parse_quota(const char *s, uint64_t * quota)
 {
 	*quota = strtoull(s, NULL, 10);
 

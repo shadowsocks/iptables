@@ -220,8 +220,8 @@ unconditional(const struct ipt_ip *ip)
 {
 	unsigned int i;
 
-	for (i = 0; i < sizeof(*ip)/sizeof(u_int32_t); i++)
-		if (((u_int32_t *)ip)[i])
+	for (i = 0; i < sizeof(*ip)/sizeof(uint32_t); i++)
+		if (((uint32_t *)ip)[i])
 			return 0;
 
 	return 1;

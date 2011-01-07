@@ -23,7 +23,7 @@ enum {
 
 struct xt_mark_target_info_v1 {
 	unsigned long mark;
-	u_int8_t mode;
+	uint8_t mode;
 };
 
 enum {
@@ -259,7 +259,7 @@ static void mark_tg_print(const void *ip, const struct xt_entry_target *target,
 	const struct xt_mark_tginfo2 *info = (const void *)target->data;
 
 	if (info->mark == 0)
-		printf("MARK and 0x%x ", (unsigned int)(u_int32_t)~info->mask);
+		printf("MARK and 0x%x ", (unsigned int)(uint32_t)~info->mask);
 	else if (info->mark == info->mask)
 		printf("MARK or 0x%x ", info->mark);
 	else if (info->mask == 0)

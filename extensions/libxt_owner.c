@@ -37,7 +37,7 @@ struct ipt_owner_info {
 	pid_t pid;
 	pid_t sid;
 	char comm[16];
-	u_int8_t match, invert;	/* flags */
+	uint8_t match, invert;	/* flags */
 };
 
 struct ip6t_owner_info {
@@ -46,7 +46,7 @@ struct ip6t_owner_info {
 	pid_t pid;
 	pid_t sid;
 	char comm[16];
-	u_int8_t match, invert;	/* flags */
+	uint8_t match, invert;	/* flags */
 };
 
 /*
@@ -353,7 +353,7 @@ static void owner_mt_check(unsigned int flags)
 
 static void
 owner_mt_print_item_v0(const struct ipt_owner_info *info, const char *label,
-                       u_int8_t flag, bool numeric)
+                       uint8_t flag, bool numeric)
 {
 	if (!(info->match & flag))
 		return;
@@ -404,7 +404,7 @@ owner_mt_print_item_v0(const struct ipt_owner_info *info, const char *label,
 
 static void
 owner_mt6_print_item_v0(const struct ip6t_owner_info *info, const char *label,
-                        u_int8_t flag, bool numeric)
+                        uint8_t flag, bool numeric)
 {
 	if (!(info->match & flag))
 		return;
@@ -449,7 +449,7 @@ owner_mt6_print_item_v0(const struct ip6t_owner_info *info, const char *label,
 
 static void
 owner_mt_print_item(const struct xt_owner_match_info *info, const char *label,
-                    u_int8_t flag, bool numeric)
+                    uint8_t flag, bool numeric)
 {
 	if (!(info->match & flag))
 		return;

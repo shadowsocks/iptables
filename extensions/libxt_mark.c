@@ -11,7 +11,7 @@
 
 struct xt_mark_info {
 	unsigned long mark, mask;
-	u_int8_t invert;
+	uint8_t invert;
 };
 
 enum {

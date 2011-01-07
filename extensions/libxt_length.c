@@ -22,7 +22,7 @@ static const struct option length_opts[] = {
 	XT_GETOPT_TABLEEND,
 };
 
-static u_int16_t
+static uint16_t
 parse_length(const char *s)
 {
 	unsigned int len;

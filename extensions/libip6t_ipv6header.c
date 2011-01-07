@@ -26,12 +26,12 @@ on whether they contain certain headers */
  *    /etc/protocols */
 struct pprot {
 	char *name;
-	u_int8_t num;
+	uint8_t num;
 };
 
 struct numflag {
-	u_int8_t proto;
-	u_int8_t flag;
+	uint8_t proto;
+	uint8_t flag;
 };
 
 static const struct pprot chain_protos[] = {
@@ -68,7 +68,7 @@ static const struct numflag chain_flags[] = {
 };
 
 static char *
-proto_to_name(u_int8_t proto, int nolookup)
+proto_to_name(uint8_t proto, int nolookup)
 {
         unsigned int i;
 
@@ -85,7 +85,7 @@ proto_to_name(u_int8_t proto, int nolookup)
         return NULL;
 }
 
-static u_int16_t
+static uint16_t
 name_to_proto(const char *s)
 {
         unsigned int proto=0;
@@ -217,7 +217,7 @@ static void ipv6header_check(unsigned int flags)
 }
 
 static void
-print_header(u_int8_t flags){
+print_header(uint8_t flags){
         int have_flag = 0;
 
         while (flags) {

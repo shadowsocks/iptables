@@ -330,7 +330,7 @@ static void policy_check(unsigned int flags)
 	}
 }
 
-static void print_mode(const char *prefix, u_int8_t mode, int numeric)
+static void print_mode(const char *prefix, uint8_t mode, int numeric)
 {
 	printf("%smode ", prefix);
 
@@ -347,7 +347,7 @@ static void print_mode(const char *prefix, u_int8_t mode, int numeric)
 	}
 }
 
-static void print_proto(const char *prefix, u_int8_t proto, int numeric)
+static void print_proto(const char *prefix, uint8_t proto, int numeric)
 {
 	struct protoent *p = NULL;
 

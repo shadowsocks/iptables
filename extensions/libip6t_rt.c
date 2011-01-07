@@ -38,7 +38,7 @@ static const struct option rt_opts[] = {
 	XT_GETOPT_TABLEEND,
 };
 
-static u_int32_t
+static uint32_t
 parse_rt_num(const char *idstr, const char *typestr)
 {
 	unsigned long int id;
@@ -63,7 +63,7 @@ parse_rt_num(const char *idstr, const char *typestr)
 }
 
 static void
-parse_rt_segsleft(const char *idstring, u_int32_t *ids)
+parse_rt_segsleft(const char *idstring, uint32_t *ids)
 {
 	char *buffer;
 	char *cp;
@@ -231,7 +231,7 @@ static int rt_parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static void
-print_nums(const char *name, u_int32_t min, u_int32_t max,
+print_nums(const char *name, uint32_t min, uint32_t max,
 	    int invert)
 {
 	const char *inv = invert ? "!" : "";

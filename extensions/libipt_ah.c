@@ -22,7 +22,7 @@ static const struct option ah_opts[] = {
 	XT_GETOPT_TABLEEND,
 };
 
-static u_int32_t
+static uint32_t
 parse_ah_spi(const char *spistr)
 {
 	unsigned long int spi;
@@ -46,7 +46,7 @@ parse_ah_spi(const char *spistr)
 }
 
 static void
-parse_ah_spis(const char *spistring, u_int32_t *spis)
+parse_ah_spis(const char *spistring, uint32_t *spis)
 {
 	char *buffer;
 	char *cp;
@@ -97,7 +97,7 @@ static int ah_parse(int c, char **argv, int invert, unsigned int *flags,
 }
 
 static void
-print_spis(const char *name, u_int32_t min, u_int32_t max,
+print_spis(const char *name, uint32_t min, uint32_t max,
 	    int invert)
 {
 	const char *inv = invert ? "!" : "";

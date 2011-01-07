@@ -16,8 +16,8 @@
 #include "tos_values.c"
 
 struct ipt_tos_info {
-	u_int8_t tos;
-	u_int8_t invert;
+	uint8_t tos;
+	uint8_t invert;
 };
 
 enum {

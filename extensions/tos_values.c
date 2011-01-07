@@ -82,7 +82,7 @@ static bool tos_parse_symbolic(const char *str, struct tos_value_mask *tvm,
 }
 
 static bool tos_try_print_symbolic(const char *prefix,
-    u_int8_t value, u_int8_t mask)
+    uint8_t value, uint8_t mask)
 {
 	const struct tos_symbol_info *symbol;
 

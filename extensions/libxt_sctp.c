@@ -28,7 +28,7 @@
 #endif
 
 static void
-print_chunk(u_int32_t chunknum, int numeric);
+print_chunk(uint32_t chunknum, int numeric);
 
 static void sctp_init(struct xt_entry_match *m)
 {
@@ -66,7 +66,7 @@ static const struct option sctp_opts[] = {
 
 static void
 parse_sctp_ports(const char *portstring, 
-		 u_int16_t *ports)
+		 uint16_t *ports)
 {
 	char *buffer;
 	char *cp;
@@ -315,7 +315,7 @@ port_to_service(int port)
 }
 
 static void
-print_port(u_int16_t port, int numeric)
+print_port(uint16_t port, int numeric)
 {
 	char *service;
 
@@ -326,7 +326,7 @@ print_port(u_int16_t port, int numeric)
 }
 
 static void
-print_ports(const char *name, u_int16_t min, u_int16_t max,
+print_ports(const char *name, uint16_t min, uint16_t max,
 	    int invert, int numeric)
 {
 	const char *inv = invert ? "!" : "";
@@ -347,7 +347,7 @@ print_ports(const char *name, u_int16_t min, u_int16_t max,
 }
 
 static void
-print_chunk_flags(u_int32_t chunknum, u_int8_t chunk_flags, u_int8_t chunk_flags_mask)
+print_chunk_flags(uint32_t chunknum, uint8_t chunk_flags, uint8_t chunk_flags_mask)
 {
 	int i;
 
@@ -370,7 +370,7 @@ print_chunk_flags(u_int32_t chunknum, u_int8_t chunk_flags, u_int8_t chunk_flags
 }
 
 static void
-print_chunk(u_int32_t chunknum, int numeric)
+print_chunk(uint32_t chunknum, int numeric)
 {
 	if (numeric) {
 		printf("0x%04X", chunknum);
@@ -387,7 +387,7 @@ print_chunk(u_int32_t chunknum, int numeric)
 static void
 print_chunks(const struct xt_sctp_info *einfo, int numeric)
 {
-	u_int32_t chunk_match_type = einfo->chunk_match_type;
+	uint32_t chunk_match_type = einfo->chunk_match_type;
 	const struct xt_sctp_flag_info *flag_info = einfo->flag_info;
 	int flag_count = einfo->flag_count;
 	int i, j;

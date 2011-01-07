@@ -95,11 +95,11 @@ static const struct option hashlimit_mt_opts[] = {
 };
 
 static
-int parse_rate(const char *rate, u_int32_t *val)
+int parse_rate(const char *rate, uint32_t *val)
 {
 	const char *delim;
-	u_int32_t r;
-	u_int32_t mult = 1;  /* Seconds by default. */
+	uint32_t r;
+	uint32_t mult = 1;  /* Seconds by default. */
 
 	delim = strchr(rate, '/');
 	if (delim) {
@@ -475,13 +475,13 @@ static void hashlimit_mt_check(unsigned int flags)
 static const struct rates
 {
 	const char *name;
-	u_int32_t mult;
+	uint32_t mult;
 } rates[] = { { "day", XT_HASHLIMIT_SCALE*24*60*60 },
 	      { "hour", XT_HASHLIMIT_SCALE*60*60 },
 	      { "min", XT_HASHLIMIT_SCALE*60 },
 	      { "sec", XT_HASHLIMIT_SCALE } };
 
-static void print_rate(u_int32_t period)
+static void print_rate(uint32_t period)
 {
 	unsigned int i;
 

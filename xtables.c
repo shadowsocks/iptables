@@ -438,7 +438,7 @@ int xtables_service_to_port(const char *name, const char *proto)
 	return -1;
 }
 
-u_int16_t xtables_parse_port(const char *port, const char *proto)
+uint16_t xtables_parse_port(const char *port, const char *proto)
 {
 	unsigned int portnum;
 
@@ -669,7 +669,7 @@ xtables_find_target(const char *name, enum xtables_tryload tryload)
 	return ptr;
 }
 
-static int compatible_revision(const char *name, u_int8_t revision, int opt)
+static int compatible_revision(const char *name, uint8_t revision, int opt)
 {
 	struct xt_get_revision rev;
 	socklen_t s = sizeof(rev);
@@ -717,12 +717,12 @@ static int compatible_revision(const char *name, u_int8_t revision, int opt)
 }
 
 
-static int compatible_match_revision(const char *name, u_int8_t revision)
+static int compatible_match_revision(const char *name, uint8_t revision)
 {
 	return compatible_revision(name, revision, afinfo->so_rev_match);
 }
 
-static int compatible_target_revision(const char *name, u_int8_t revision)
+static int compatible_target_revision(const char *name, uint8_t revision)
 {
 	return compatible_revision(name, revision, afinfo->so_rev_target);
 }
@@ -1688,7 +1688,7 @@ const struct xtables_pprot xtables_chain_protos[] = {
 	{NULL},
 };
 
-u_int16_t
+uint16_t
 xtables_parse_protocol(const char *s)
 {
 	unsigned int proto;

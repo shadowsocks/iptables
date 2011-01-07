@@ -22,7 +22,7 @@ static const struct option tcpmss_opts[] = {
 	XT_GETOPT_TABLEEND,
 };
 
-static u_int16_t
+static uint16_t
 parse_tcp_mssvalue(const char *mssvalue)
 {
 	unsigned int mssvaluenum;
@@ -36,7 +36,7 @@ parse_tcp_mssvalue(const char *mssvalue)
 
 static void
 parse_tcp_mssvalues(const char *mssvaluestring,
-		    u_int16_t *mss_min, u_int16_t *mss_max)
+		    uint16_t *mss_min, uint16_t *mss_max)
 {
 	char *buffer;
 	char *cp;

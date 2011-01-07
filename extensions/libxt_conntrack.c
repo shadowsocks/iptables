@@ -50,9 +50,9 @@ struct xt_conntrack_info {
 	unsigned long expires_min, expires_max;
 
 	/* Flags word */
-	u_int8_t flags;
+	uint8_t flags;
 	/* Inverse flags */
-	u_int8_t invflags;
+	uint8_t invflags;
 };
 
 static void conntrack_mt_help(void)

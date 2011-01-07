@@ -38,7 +38,7 @@ static const struct option tcp_opts[] = {
 };
 
 static void
-parse_tcp_ports(const char *portstring, u_int16_t *ports)
+parse_tcp_ports(const char *portstring, uint16_t *ports)
 {
 	char *buffer;
 	char *cp;
@@ -115,7 +115,7 @@ parse_tcp_flags(struct xt_tcp *tcpinfo,
 }
 
 static void
-parse_tcp_option(const char *option, u_int8_t *result)
+parse_tcp_option(const char *option, uint8_t *result)
 {
 	unsigned int ret;
 
@@ -223,7 +223,7 @@ port_to_service(int port)
 }
 
 static void
-print_port(u_int16_t port, int numeric)
+print_port(uint16_t port, int numeric)
 {
 	char *service;
 
@@ -234,7 +234,7 @@ print_port(u_int16_t port, int numeric)
 }
 
 static void
-print_ports(const char *name, u_int16_t min, u_int16_t max,
+print_ports(const char *name, uint16_t min, uint16_t max,
 	    int invert, int numeric)
 {
 	const char *inv = invert ? "!" : "";
@@ -255,14 +255,14 @@ print_ports(const char *name, u_int16_t min, u_int16_t max,
 }
 
 static void
-print_option(u_int8_t option, int invert, int numeric)
+print_option(uint8_t option, int invert, int numeric)
 {
 	if (option || invert)
 		printf("option=%s%u ", invert ? "!" : "", option);
 }
 
 static void
-print_tcpf(u_int8_t flags)
+print_tcpf(uint8_t flags)
 {
 	int have_flag = 0;
 
@@ -284,7 +284,7 @@ print_tcpf(u_int8_t flags)
 }
 
 static void
-print_flags(u_int8_t mask, u_int8_t cmp, int invert, int numeric)
+print_flags(uint8_t mask, uint8_t cmp, int invert, int numeric)
 {
 	if (mask || invert) {
 		printf("flags:%s", invert ? "!" : "");
