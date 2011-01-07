@@ -1590,6 +1590,10 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 
 
 		case 'i':
+			if (*optarg == '\0')
+				xtables_error(PARAMETER_PROBLEM,
+					"Empty interface is likely to be "
+					"undesired");
 			xtables_check_inverse(optarg, &invert, &optind, argc, argv);
 			set_option(&options, OPT_VIANAMEIN, &fw.ip.invflags,
 				   invert);
@@ -1599,6 +1603,10 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 			break;
 
 		case 'o':
+			if (*optarg == '\0')
+				xtables_error(PARAMETER_PROBLEM,
+					"Empty interface is likely to be "
+					"undesired");
 			xtables_check_inverse(optarg, &invert, &optind, argc, argv);
 			set_option(&options, OPT_VIANAMEOUT, &fw.ip.invflags,
 				   invert);

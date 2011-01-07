@@ -1573,6 +1573,10 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 
 
 		case 'i':
+			if (*optarg == '\0')
+				xtables_error(PARAMETER_PROBLEM,
+					"Empty interface is likely to be "
+					"undesired");
 			xtables_check_inverse(optarg, &invert, &optind, argc, argv);
 			set_option(&options, OPT_VIANAMEIN, &fw.ipv6.invflags,
 				   invert);
@@ -1582,6 +1586,10 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			break;
 
 		case 'o':
+			if (*optarg == '\0')
+				xtables_error(PARAMETER_PROBLEM,
+					"Empty interface is likely to be "
+					"undesired");
 			xtables_check_inverse(optarg, &invert, &optind, argc, argv);
 			set_option(&options, OPT_VIANAMEOUT, &fw.ipv6.invflags,
 				   invert);
