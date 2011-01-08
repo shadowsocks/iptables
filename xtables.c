@@ -95,6 +95,13 @@ struct option *xtables_merge_options(struct option *orig_opts,
 		for (num_old = 0; oldopts[num_old].name; num_old++) ;
 	for (num_new = 0; newopts[num_new].name; num_new++) ;
 
+	/*
+	 * Since @oldopts also has @orig_opts already (and does so at the
+	 * start), skip these entries.
+	 */
+	oldopts += num_oold;
+	num_old -= num_oold;
+
 	merge = malloc(sizeof(*mp) * (num_oold + num_old + num_new + 1));
 	if (merge == NULL)
 		return NULL;
@@ -102,10 +109,6 @@ struct option *xtables_merge_options(struct option *orig_opts,
 	/* Let the base options -[ADI...] have precedence over everything */
 	memcpy(merge, orig_opts, sizeof(*mp) * num_oold);
 	mp = merge + num_oold;
-
-	/* Since @opts also has @orig_opts already, skip the entries */
-	oldopts += num_oold;
-	num_old -= num_oold;
 
 	/* Second, the new options */
 	xt_params->option_offset += 256;
