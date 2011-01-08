@@ -730,6 +730,17 @@ static int compatible_target_revision(const char *name, uint8_t revision)
 	return compatible_revision(name, revision, afinfo->so_rev_target);
 }
 
+static void xtables_check_options(const char *name, const struct option *opt)
+{
+	for (; opt->name != NULL; ++opt)
+		if (opt->val < 0 || opt->val >= XT_OPTION_OFFSET_SCALE) {
+			fprintf(stderr, "%s: Extension %s uses invalid "
+			        "option value %d\n",xt_params->program_name,
+			        name, opt->val);
+			exit(1);
+		}
+}
+
 void xtables_register_match(struct xtables_match *me)
 {
 	struct xtables_match **i, *old;
@@ -759,6 +770,9 @@ void xtables_register_match(struct xtables_match *me)
 			xt_params->program_name, me->name);
 		exit(1);
 	}
+
+	if (me->extra_opts != NULL)
+		xtables_check_options(me->name, me->extra_opts);
 
 	/* ignore not interested match */
 	if (me->family != afinfo->family && me->family != AF_UNSPEC)
@@ -844,6 +858,9 @@ void xtables_register_target(struct xtables_target *me)
 			xt_params->program_name, me->name);
 		exit(1);
 	}
+
+	if (me->extra_opts != NULL)
+		xtables_check_options(me->name, me->extra_opts);
 
 	/* ignore not interested target */
 	if (me->family != afinfo->family && me->family != AF_UNSPEC)
