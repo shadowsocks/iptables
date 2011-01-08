@@ -163,9 +163,9 @@ static void CLUSTERIP_check(unsigned int flags)
 	xtables_error(PARAMETER_PROBLEM, "CLUSTERIP target: Invalid parameter combination\n");
 }
 
-static char *hashmode2str(enum clusterip_hashmode mode)
+static const char *hashmode2str(enum clusterip_hashmode mode)
 {
-	char *retstr;
+	const char *retstr;
 	switch (mode) {
 		case CLUSTERIP_HASHMODE_SIP:
 			retstr = "sourceip";
@@ -183,7 +183,7 @@ static char *hashmode2str(enum clusterip_hashmode mode)
 	return retstr;
 }
 
-static char *mac2str(const uint8_t mac[ETH_ALEN])
+static const char *mac2str(const uint8_t mac[ETH_ALEN])
 {
 	static char buf[ETH_ALEN*3];
 	sprintf(buf, "%02X:%02X:%02X:%02X:%02X:%02X",
