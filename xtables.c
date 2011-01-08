@@ -49,7 +49,7 @@
 #	define IP6T_SO_GET_REVISION_TARGET	69
 #endif
 #include <getopt.h>
-
+#include "xshared.h"
 
 #define NPROTO	255
 
@@ -111,7 +111,7 @@ struct option *xtables_merge_options(struct option *orig_opts,
 	mp = merge + num_oold;
 
 	/* Second, the new options */
-	xt_params->option_offset += 256;
+	xt_params->option_offset += XT_OPTION_OFFSET_SCALE;
 	*option_offset = xt_params->option_offset;
 	memcpy(mp, newopts, sizeof(*mp) * num_new);
 

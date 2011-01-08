@@ -1746,6 +1746,9 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 					if (matchp->completed ||
 					    matchp->match->parse == NULL)
 						continue;
+					if (c < matchp->match->option_offset ||
+					    c >= matchp->match->option_offset + XT_OPTION_OFFSET_SCALE)
+						continue;
 					if (matchp->match->parse(c - matchp->match->option_offset,
 						     argv, invert,
 						     &matchp->match->mflags,
