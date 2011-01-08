@@ -1706,6 +1706,8 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 
 		default:
 			if (target == NULL || target->parse == NULL ||
+			    c < target->option_offset ||
+			    c >= target->option_offset + XT_OPTION_OFFSET_SCALE ||
 			    !target->parse(c - target->option_offset,
 					       argv, invert,
 					       &target->tflags,

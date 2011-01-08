@@ -1738,6 +1738,8 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 
 		default:
 			if (target == NULL || target->parse == NULL ||
+			    c < target->option_offset ||
+			    c >= target->option_offset + XT_OPTION_OFFSET_SCALE ||
 			    !target->parse(c - target->option_offset,
 					       argv, invert,
 					       &target->tflags,
