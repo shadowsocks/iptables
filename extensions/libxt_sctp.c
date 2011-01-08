@@ -394,7 +394,7 @@ print_chunks(const struct xt_sctp_info *einfo, int numeric)
 		case SCTP_CHUNK_MATCH_ANY:	printf("any "); break;
 		case SCTP_CHUNK_MATCH_ALL:	printf("all "); break;
 		case SCTP_CHUNK_MATCH_ONLY:	printf("only "); break;
-		default:	printf("Never reach herer\n"); break;
+		default:	printf("Never reach here\n"); break;
 	}
 
 	if (SCTP_CHUNKMAP_IS_CLEAR(einfo->chunkmap)) {
