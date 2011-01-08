@@ -183,8 +183,6 @@ dccp_parse(int c, char **argv, int invert, unsigned int *flags,
 			einfo->invflags |= XT_DCCP_OPTION;
 		*flags |= XT_DCCP_OPTION;
 		break;
-	default:
-		return 0;
 	}
 	return 1;
 }

@@ -296,9 +296,6 @@ sctp_parse(int c, char **argv, int invert, unsigned int *flags,
 		optind++;
 		*flags |= XT_SCTP_CHUNK_TYPES;
 		break;
-
-	default:
-		return 0;
 	}
 	return 1;
 }

@@ -297,9 +297,6 @@ rateest_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (invert)
 			info->flags |= XT_RATEEST_MATCH_INVERT;
 		break;
-
-	default:
-		return 0;
 	}
 
 	return 1;

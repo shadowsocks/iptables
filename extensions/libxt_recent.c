@@ -138,9 +138,6 @@ static int recent_parse(int c, char **argv, int invert, unsigned int *flags,
 		case 210:
 			info->side = XT_RECENT_DEST;
 			break;
-
-		default:
-			return 0;
 	}
 
 	return 1;

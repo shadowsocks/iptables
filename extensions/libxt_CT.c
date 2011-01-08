@@ -127,8 +127,6 @@ static int ct_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM, "Bad zone value \"%s\"", optarg);
 		info->zone = zone;
 		break;
-	default:
-		return 0;
 	}
 
 	*flags |= c;

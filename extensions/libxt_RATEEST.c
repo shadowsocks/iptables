@@ -130,9 +130,6 @@ RATEEST_parse(int c, char **argv, int invert, unsigned int *flags,
 				   "RATEEST: bad ewmalog value `%s'", optarg);
 
 		break;
-
-	default:
-		return 0;
 	}
 
 	return 1;

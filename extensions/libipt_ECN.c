@@ -90,8 +90,6 @@ static int ECN_parse(int c, char **argv, int invert, unsigned int *flags,
 		einfo->ip_ect = result;
 		*flags |= IPT_ECN_OP_SET_IP;
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

@@ -115,8 +115,6 @@ static int REJECT_parse(int c, char **argv, int invert, unsigned int *flags,
 			fprintf(stderr, "--reject-with echo-reply no longer"
 				" supported\n");
 		xtables_error(PARAMETER_PROBLEM, "unknown reject type \"%s\"", optarg);
-	default:
-		/* Fall through */
 		break;
 	}
 	return 0;

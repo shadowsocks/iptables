@@ -92,9 +92,6 @@ static int DSCP_parse(int c, char **argv, int invert, unsigned int *flags,
 		parse_class(optarg, dinfo);
 		*flags = 1;
 		break;
-
-	default:
-		return 0;
 	}
 
 	return 1;

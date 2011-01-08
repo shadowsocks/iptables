@@ -166,9 +166,6 @@ static int icmp6_parse(int c, char **argv, int invert, unsigned int *flags,
 			icmpv6info->invflags |= IP6T_ICMP_INV;
 		*flags = 1;
 		break;
-
-	default:
-		return 0;
 	}
 
 	return 1;

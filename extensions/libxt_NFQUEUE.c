@@ -70,8 +70,6 @@ NFQUEUE_parse(int c, char **argv, int invert, unsigned int *flags,
 	case 'B':
 		xtables_error(PARAMETER_PROBLEM, "NFQUEUE target: "
 				   "--queue-balance not supported (kernel too old?)");
-	default:
-		return 0;
 	}
 
 	return 1;
@@ -114,8 +112,6 @@ NFQUEUE_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 							firstqueue, lastqueue);
 		info->queues_total = lastqueue - firstqueue + 1;
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

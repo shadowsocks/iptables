@@ -94,9 +94,6 @@ static int REJECT_parse(int c, char **argv, int invert, unsigned int *flags,
 				return 1;
 			}
 		xtables_error(PARAMETER_PROBLEM, "unknown reject type \"%s\"", optarg);
-	default:
-		/* Fall through */
-		break;
 	}
 	return 0;
 }

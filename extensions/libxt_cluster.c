@@ -134,8 +134,6 @@ cluster_parse(int c, char **argv, int invert, unsigned int *flags,
 		info->hash_seed = num;
 		*flags |= 1 << c;
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

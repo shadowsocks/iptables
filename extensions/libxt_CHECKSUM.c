@@ -42,8 +42,6 @@ static int CHECKSUM_parse(int c, char **argv, int invert, unsigned int *flags,
 		einfo->operation = XT_CHECKSUM_OP_FILL;
 		*flags |= XT_CHECKSUM_OP_FILL;
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

@@ -102,10 +102,8 @@ static int MASQUERADE_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '2':
 		mr->range[0].flags |=  IP_NAT_RANGE_PROTO_RANDOM;
 		return 1;
-
-	default:
-		return 0;
 	}
+	return 0;
 }
 
 static void

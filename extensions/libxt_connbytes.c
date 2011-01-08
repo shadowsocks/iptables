@@ -89,8 +89,6 @@ connbytes_parse(int c, char **argv, int invert, unsigned int *flags,
 				   "Unknown --connbytes-mode `%s'", optarg);
 		*flags |= 4;
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

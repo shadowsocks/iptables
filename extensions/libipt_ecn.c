@@ -76,8 +76,6 @@ static int ecn_parse(int c, char **argv, int invert, unsigned int *flags,
 				   "ECN match: Value out of range");
 		einfo->ip_ect = result;
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

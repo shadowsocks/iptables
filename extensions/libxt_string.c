@@ -238,9 +238,6 @@ string_parse(int c, char **argv, int invert, unsigned int *flags,
 		stringinfo->u.v1.flags |= XT_STRING_FLAG_IGNORECASE;
 		*flags |= ICASE;
 		break;
-
-	default:
-		return 0;
 	}
 	return 1;
 }

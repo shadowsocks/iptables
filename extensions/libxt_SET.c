@@ -102,9 +102,6 @@ set_target_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		parse_target_v0(argv, invert, flags,
 				&myinfo->del_set, "del-set");
 		break;
-
-	default:
-		return 0;
 	}
 	return 1;
 }
@@ -204,9 +201,6 @@ set_target_parse(int c, char **argv, int invert, unsigned int *flags,
 		parse_target(argv, invert, flags,
 			     &myinfo->del_set, "del-set");
 		break;
-
-	default:
-		return 0;
 	}
 	return 1;
 }

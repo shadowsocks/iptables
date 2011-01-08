@@ -113,10 +113,8 @@ static int REDIRECT_parse(int c, char **argv, int invert, unsigned int *flags,
 		} else
 			*flags |= IPT_REDIRECT_OPT_RANDOM;
 		return 1;
-
-	default:
-		return 0;
 	}
+	return 0;
 }
 
 static void REDIRECT_print(const void *ip, const struct xt_entry_target *target,

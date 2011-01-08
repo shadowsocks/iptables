@@ -55,9 +55,6 @@ comment_parse(int c, char **argv, int invert, unsigned int *flags,
 		parse_comment(optarg, commentinfo);
 		*flags = 1;
 		break;
-
-	default:
-		return 0;
 	}
 	return 1;
 }

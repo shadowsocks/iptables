@@ -107,8 +107,6 @@ static int osf_parse(int c, char **argv, int invert, unsigned int *flags,
 				xtables_error(PARAMETER_PROBLEM, "Log level parameter is too big");
 			info->flags |= XT_OSF_LOG;
 			break;
-		default:
-			return 0;
 	}
 
 	return 1;

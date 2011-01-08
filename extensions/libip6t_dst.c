@@ -156,8 +156,6 @@ static int dst_parse(int c, char **argv, int invert, unsigned int *flags,
 		optinfo->flags |= IP6T_OPTS_NSTRICT;
 		*flags |= IP6T_OPTS_NSTRICT;
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

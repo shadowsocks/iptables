@@ -145,9 +145,6 @@ static int tos_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 		info->tos_value = bits;
 		info->tos_mask  = 0;
 		break;
-
-	default:
-		return false;
 	}
 
 	*flags |= FLAG_TOS;

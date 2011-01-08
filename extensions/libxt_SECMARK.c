@@ -49,8 +49,6 @@ static int SECMARK_parse(int c, char **argv, int invert, unsigned int *flags,
 		strcpy(info->secctx, optarg);
 		*flags |= SECMARK_MODE_SEL;
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

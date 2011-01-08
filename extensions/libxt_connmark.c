@@ -102,9 +102,6 @@ connmark_parse(int c, char **argv, int invert, unsigned int *flags,
 			markinfo->invert = 1;
 		*flags = 1;
 		break;
-
-	default:
-		return 0;
 	}
 	return 1;
 }

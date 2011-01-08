@@ -298,8 +298,6 @@ hashlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 		strncpy(r->name, optarg, sizeof(r->name));
 		*flags |= PARAM_NAME;
 		break;
-	default:
-		return 0;
 	}
 
 	if (invert)

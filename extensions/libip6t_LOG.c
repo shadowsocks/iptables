@@ -191,9 +191,6 @@ static int LOG_parse(int c, char **argv, int invert, unsigned int *flags,
 		loginfo->logflags |= IP6T_LOG_MACDECODE;
 		*flags |= IP6T_LOG_OPT_MACDECODE;
 		break;
-
-	default:
-		return 0;
 	}
 
 	return 1;

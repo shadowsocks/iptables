@@ -261,8 +261,6 @@ static int policy_parse(int c, char **argv, int invert, unsigned int *flags,
 			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: maximum policy depth reached");
 		break;
-	default:
-		return 0;
 	}
 
 	policy_info = info;

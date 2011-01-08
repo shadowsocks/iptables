@@ -120,9 +120,6 @@ static int SAME_parse(int c, char **argv, int invert, unsigned int *flags,
 		for (count=0; count < mr->rangesize; count++)
 			mr->range[count].flags |= IP_NAT_RANGE_PROTO_RANDOM;
 		break;
-
-	default:
-		return 0;
 	}
 	
 	return 1;

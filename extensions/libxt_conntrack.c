@@ -461,9 +461,6 @@ static int conntrack_parse(int c, char **argv, int invert, unsigned int *flags,
 		}
 		sinfo->flags |= XT_CONNTRACK_EXPIRES;
 		break;
-
-	default:
-		return 0;
 	}
 
 	*flags = sinfo->flags;
@@ -566,9 +563,6 @@ conntrack_mt_parse(int c, bool invert, unsigned int *flags,
 			xtables_param_act(XTF_BAD_VALUE, "conntrack", "--ctdir", optarg);
 		}
 		break;
-
-	default:
-		return false;
 	}
 
 	*flags = info->match_flags;

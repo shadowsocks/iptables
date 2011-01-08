@@ -90,8 +90,6 @@ statistic_parse(int c, char **argv, int invert, unsigned int *flags,
 		info->u.nth.packet = val;
 		*flags |= 0x8;
 		break;
-	default:
-		return 0;
 	}
 	return 1;
 }

@@ -85,9 +85,6 @@ set_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		
 		*flags = 1;
 		break;
-
-	default:
-		return 0;
 	}
 
 	return 1;
@@ -170,9 +167,6 @@ set_parse(int c, char **argv, int invert, unsigned int *flags,
 		
 		*flags = 1;
 		break;
-
-	default:
-		return 0;
 	}
 
 	return 1;

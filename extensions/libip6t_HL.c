@@ -71,10 +71,6 @@ static int HL_parse(int c, char **argv, int invert, unsigned int *flags,
 
 			info->mode = IP6T_HL_INC;
 			break;
-
-		default:
-			return 0;
-
 	}
 	
 	info->hop_limit = value;

@@ -184,10 +184,8 @@ static int DNAT_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '3':
 		info->mr.range[0].flags |= IP_NAT_RANGE_PERSISTENT;
 		return 1;
-
-	default:
-		return 0;
 	}
+	return 0;
 }
 
 static void DNAT_check(unsigned int flags)

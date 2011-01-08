@@ -187,9 +187,6 @@ __multiport_parse(int c, char **argv, int invert, unsigned int *flags,
 						     multiinfo->ports, proto);
 		multiinfo->flags = XT_MULTIPORT_EITHER;
 		break;
-
-	default:
-		return 0;
 	}
 
 	if (invert)
@@ -251,9 +248,6 @@ __multiport_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 		parse_multi_ports_v1(optarg, multiinfo, proto);
 		multiinfo->flags = XT_MULTIPORT_EITHER;
 		break;
-
-	default:
-		return 0;
 	}
 
 	if (invert)

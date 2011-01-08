@@ -94,9 +94,6 @@ physdev_parse(int c, char **argv, int invert, unsigned int *flags,
 		*flags |= XT_PHYSDEV_OP_BRIDGED;
 		info->bitmask |= XT_PHYSDEV_OP_BRIDGED;
 		break;
-
-	default:
-		return 0;
 	}
 
 	return 1;

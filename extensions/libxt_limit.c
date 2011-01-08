@@ -107,9 +107,6 @@ limit_parse(int c, char **argv, int invert, unsigned int *flags,
 				   "bad --limit-burst `%s'", optarg);
 		r->burst = num;
 		break;
-
-	default:
-		return 0;
 	}
 
 	if (invert)

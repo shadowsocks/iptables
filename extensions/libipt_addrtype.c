@@ -122,8 +122,6 @@ addrtype_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 			info->invert_dest = 1;
 		*flags |= IPT_ADDRTYPE_OPT_DSTTYPE;
 		break;
-	default:
-		return 0;
 	}
 	
 	return 1;
@@ -171,8 +169,6 @@ addrtype_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 		info->flags |= IPT_ADDRTYPE_LIMIT_IFACE_OUT;
 		*flags |= IPT_ADDRTYPE_OPT_LIMIT_IFACE_OUT;
 		break;
-	default:
-		return 0;
 	}
 	
 	return 1;

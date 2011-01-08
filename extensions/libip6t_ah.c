@@ -110,8 +110,6 @@ static int ah_parse(int c, char **argv, int invert, unsigned int *flags,
 		ahinfo->hdrres = 1;
 		*flags |= IP6T_AH_RES;
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

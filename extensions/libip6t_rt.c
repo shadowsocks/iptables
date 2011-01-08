@@ -223,8 +223,6 @@ static int rt_parse(int c, char **argv, int invert, unsigned int *flags,
 		rtinfo->flags |= IP6T_RT_FST_NSTRICT;
 		*flags |= IP6T_RT_FST_NSTRICT;
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

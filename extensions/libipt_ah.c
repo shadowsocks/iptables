@@ -89,8 +89,6 @@ static int ah_parse(int c, char **argv, int invert, unsigned int *flags,
 			ahinfo->invflags |= IPT_AH_INV_SPI;
 		*flags |= AH_SPI;
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

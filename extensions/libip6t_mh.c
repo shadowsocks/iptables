@@ -140,9 +140,6 @@ static int mh_parse(int c, char **argv, int invert, unsigned int *flags,
 			mhinfo->invflags |= IP6T_MH_INV_TYPE;
 		*flags |= MH_TYPES;
 		break;
-
-	default:
-		return 0;
 	}
 
 	return 1;

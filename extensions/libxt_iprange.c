@@ -128,9 +128,6 @@ static int iprange_parse(int c, char **argv, int invert, unsigned int *flags,
 		info->dst.min_ip = range[0].ip;
 		info->dst.max_ip = range[1].ip;
 		break;
-
-	default:
-		return 0;
 	}
 	return 1;
 }

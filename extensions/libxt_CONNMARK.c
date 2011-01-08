@@ -147,8 +147,6 @@ CONNMARK_parse(int c, char **argv, int invert, unsigned int *flags,
 		if (*end != '\0' || end == optarg)
 			xtables_error(PARAMETER_PROBLEM, "Bad MASK value \"%s\"", optarg);
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

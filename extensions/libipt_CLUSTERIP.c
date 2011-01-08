@@ -146,8 +146,6 @@ static int CLUSTERIP_parse(int c, char **argv, int invert, unsigned int *flags,
 		cipinfo->hash_initval = num;
 		*flags |= PARAM_HASHINIT;
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

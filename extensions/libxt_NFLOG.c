@@ -103,8 +103,6 @@ static int NFLOG_parse(int c, char **argv, int invert, unsigned int *flags,
 				   "Invalid --nflog-threshold, must be >= 1");
 		info->threshold = n;
 		break;
-	default:
-		return 0;
 	}
 	*flags |= c;
 	return 1;

@@ -141,8 +141,6 @@ static int frag_parse(int c, char **argv, int invert, unsigned int *flags,
 		fraginfo->flags |= IP6T_FRAG_NMF;
 		*flags |= IP6T_FRAG_NMF;
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

@@ -68,9 +68,6 @@ static int ttl_parse(int c, char **argv, int invert, unsigned int *flags,
 			info->mode = IPT_TTL_GT;
 			info->ttl = value;
 			break;
-		default:
-			return 0;
-
 	}
 
 	if (*flags) 

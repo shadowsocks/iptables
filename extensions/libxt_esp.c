@@ -95,8 +95,6 @@ esp_parse(int c, char **argv, int invert, unsigned int *flags,
 			espinfo->invflags |= XT_ESP_INV_SPI;
 		*flags |= ESP_SPI;
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

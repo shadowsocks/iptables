@@ -203,9 +203,6 @@ tcp_parse(int c, char **argv, int invert, unsigned int *flags,
 			tcpinfo->invflags |= XT_TCP_INV_OPTION;
 		*flags |= TCP_OPTION;
 		break;
-
-	default:
-		return 0;
 	}
 
 	return 1;

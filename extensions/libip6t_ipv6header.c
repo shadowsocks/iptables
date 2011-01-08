@@ -204,8 +204,6 @@ ipv6header_parse(int c, char **argv, int invert, unsigned int *flags,
 			info->modeflag |= 0xFF;
 			*flags |= IPV6_HDR_SOFT;
 			break;
-		default:
-			return 0;
 	}
 
 	return 1;

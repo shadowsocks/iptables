@@ -191,9 +191,6 @@ static int icmp_parse(int c, char **argv, int invert, unsigned int *flags,
 			icmpinfo->invflags |= IPT_ICMP_INV;
 		*flags = 1;
 		break;
-
-	default:
-		return 0;
 	}
 
 	return 1;

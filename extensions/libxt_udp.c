@@ -90,9 +90,6 @@ udp_parse(int c, char **argv, int invert, unsigned int *flags,
 			udpinfo->invflags |= XT_UDP_INV_DSTPT;
 		*flags |= UDP_DST_PORTS;
 		break;
-
-	default:
-		return 0;
 	}
 
 	return 1;

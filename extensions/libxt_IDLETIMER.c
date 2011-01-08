@@ -78,9 +78,6 @@ static int idletimer_tg_parse(int c, char **argv, int invert,
 		strcpy(info->label, optarg);
 		*flags |= IDLETIMER_TG_OPT_LABEL;
 		break;
-
-	default:
-		return false;
 	}
 
 	return true;

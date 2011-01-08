@@ -94,8 +94,6 @@ static int connlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 				info->v4_mask = htonl(0xFFFFFFFF << (32 - i));
 		}
 		break;
-	default:
-		return 0;
 	}
 
 	return 1;

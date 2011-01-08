@@ -124,10 +124,8 @@ static int NETMAP_parse(int c, char **argv, int invert, unsigned int *flags,
 		parse_to(optarg, &mr->range[0]);
 		*flags = 1;
 		return 1;
-
-	default:
-		return 0;
 	}
+	return 0;
 }
 
 static void NETMAP_check(unsigned int flags)

@@ -71,9 +71,6 @@ quota_parse(int c, char **argv, int invert, unsigned int *flags,
 			info->flags |= XT_QUOTA_INVERT;
 
 		break;
-
-	default:
-		return 0;
 	}
 	return 1;
 }

@@ -52,9 +52,6 @@ CONNSECMARK_parse(int c, char **argv, int invert, unsigned int *flags,
 		info->mode = CONNSECMARK_RESTORE;
 		*flags |= CONNSECMARK_RESTORE;
 		break;
-
-	default:
-		return 0;
 	}
 
 	return 1;

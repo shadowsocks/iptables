@@ -93,8 +93,6 @@ MARK_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 	case '3':
 		xtables_error(PARAMETER_PROBLEM,
 			   "MARK target: kernel too old for --or-mark");
-	default:
-		return 0;
 	}
 
 	return 1;
@@ -126,8 +124,6 @@ MARK_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 	case '3':
 	        markinfo->mode = XT_MARK_OR;
 		break;
-	default:
-		return 0;
 	}
 
 	if (!xtables_strtoui(optarg, NULL, &mark, 0, UINT32_MAX))
@@ -193,9 +189,6 @@ static int mark_tg_parse(int c, char **argv, int invert, unsigned int *flags,
 		info->mark = value;
 		info->mask = 0;
 		break;
-
-	default:
-		return false;
 	}
 
 	*flags |= F_MARK;

@@ -155,11 +155,6 @@ static int ipvs_mt_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '6': /* --vportctl */
 		data->vportctl = htons(xtables_parse_port(optarg, "tcp"));
 		break;
-
-	default:
-		/* Hu? How did we come here? */
-		assert(false);
-		return 0;
 	}
 
 	if (op & XT_IPVS_ONCE_MASK) {

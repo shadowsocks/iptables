@@ -71,10 +71,6 @@ static int TTL_parse(int c, char **argv, int invert, unsigned int *flags,
 
 			info->mode = IPT_TTL_INC;
 			break;
-
-		default:
-			return 0;
-
 	}
 	
 	info->ttl = value;

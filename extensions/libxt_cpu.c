@@ -49,9 +49,6 @@ cpu_parse(int c, char **argv, int invert, unsigned int *flags,
 			cpuinfo->invert = 1;
 		*flags = 1;
 		break;
-
-	default:
-		return 0;
 	}
 
 	return 1;
