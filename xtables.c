@@ -759,7 +759,7 @@ void xtables_register_match(struct xtables_match *me)
 	}
 
 	if (strlen(me->name) >= XT_EXTENSION_MAXNAMELEN) {
-		fprintf(stderr, "%s: target `%s' has invalid name\n",
+		fprintf(stderr, "%s: match `%s' has invalid name\n",
 			xt_params->program_name, me->name);
 		exit(1);
 	}
