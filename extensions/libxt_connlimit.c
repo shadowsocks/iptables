@@ -9,16 +9,22 @@
 #include <xtables.h>
 #include <linux/netfilter/xt_connlimit.h>
 
+enum {
+	FL_LIMIT = 1 << 0,
+	FL_MASK  = 1 << 1,
+};
+
 static void connlimit_help(void)
 {
 	printf(
 "connlimit match options:\n"
-"[!] --connlimit-above n        match if the number of existing "
-"                               connections is (not) above n\n"
-"    --connlimit-mask n         group hosts using prefix length (default: max len)\n");
+"  --connlimit-upto n     match if the number of existing connections is 0..n\n"
+"  --connlimit-above n    match if the number of existing connections is >n\n"
+"  --connlimit-mask n     group hosts using prefix length (default: max len)\n");
 }
 
 static const struct option connlimit_opts[] = {
+	{.name = "connlimit-upto",  .has_arg = true, .val = 'U'},
 	{.name = "connlimit-above", .has_arg = true, .val = 'A'},
 	{.name = "connlimit-mask",  .has_arg = true, .val = 'M'},
 	XT_GETOPT_TABLEEND,
@@ -61,21 +67,28 @@ static int connlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 	int i;
 
 	switch (c) {
-	case 'A':
-		if (*flags & 0x1)
-			xtables_error(PARAMETER_PROBLEM,
-				"--connlimit-above may be given only once");
-		*flags |= 0x1;
-		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		info->limit   = strtoul(optarg, NULL, 0);
-		info->inverse = invert;
-		break;
-	case 'M':
-		if (*flags & 0x2)
-			xtables_error(PARAMETER_PROBLEM,
-				"--connlimit-mask may be given only once");
-
-		*flags |= 0x2;
+	case 'A': /* --connlimit-above */
+		xtables_param_act(XTF_ONLY_ONCE, "connlimit",
+			"--connlimit-{upto,above}", *flags & FL_LIMIT);
+		*flags |= FL_LIMIT;
+		if (invert)
+			info->inverse = true;
+		info->limit = strtoul(optarg, NULL, 0);
+		return true;
+	case 'U': /* --connlimit-upto */
+		xtables_param_act(XTF_ONLY_ONCE, "connlimit",
+			"--connlimit-{upto,above}", *flags & FL_LIMIT);
+		*flags |= FL_LIMIT;
+		if (!invert)
+			info->inverse = true;
+		info->limit = strtoul(optarg, NULL, 0);
+		return true;
+	case 'M': /* --connlimit-mask */
+		xtables_param_act(XTF_NO_INVERT, "connlimit",
+			"--connlimit-mask", invert);
+		xtables_param_act(XTF_ONLY_ONCE, "connlimit",
+			"--connlimit-mask", *flags & FL_MASK);
+		*flags |= FL_MASK;
 		i = strtoul(optarg, &err, 0);
 		if (family == NFPROTO_IPV6) {
 			if (i > 128 || *err != '\0')
@@ -93,10 +106,9 @@ static int connlimit_parse(int c, char **argv, int invert, unsigned int *flags,
 			else
 				info->v4_mask = htonl(0xFFFFFFFF << (32 - i));
 		}
-		break;
+		return true;
 	}
-
-	return 1;
+	return false;
 }
 
 static int connlimit_parse4(int c, char **argv, int invert,
@@ -164,18 +176,22 @@ static void connlimit_save4(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_connlimit_info *info = (const void *)match->data;
 
-	printf("%s--connlimit-above %u --connlimit-mask %u ",
-	       info->inverse ? "! " : "", info->limit,
-	       count_bits4(info->v4_mask));
+	if (info->inverse)
+		printf("--connlimit-upto %u ", info->limit);
+	else
+		printf("--connlimit-above %u ", info->limit);
+	printf("--connlimit-mask %u ", count_bits4(info->v4_mask));
 }
 
 static void connlimit_save6(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_connlimit_info *info = (const void *)match->data;
 
-	printf("%s--connlimit-above %u --connlimit-mask %u ",
-	       info->inverse ? "! " : "", info->limit,
-	       count_bits6(info->v6_mask));
+	if (info->inverse)
+		printf("--connlimit-upto %u ", info->limit);
+	else
+		printf("--connlimit-above %u ", info->limit);
+	printf("--connlimit-mask %u ", count_bits6(info->v6_mask));
 }
 
 static struct xtables_match connlimit_mt_reg[] = {

@@ -1,8 +1,11 @@
 Allows you to restrict the number of parallel connections to a server per
 client IP address (or client address block).
 .TP
-[\fB!\fP] \fB\-\-connlimit\-above\fP \fIn\fP
-Match if the number of existing connections is (not) above \fIn\fP.
+\fB\-\-connlimit\-upto\fP \fIn\fP
+Match if the number of existing connections is below or equal \fIn\fP.
+.TP
+\fB\-\-connlimit\-above\fP \fIn\fP
+Match if the number of existing connections is above \fIn\fP.
 .TP
 \fB\-\-connlimit\-mask\fP \fIprefix_length\fP
 Group hosts using the prefix length. For IPv4, this must be a number between
@@ -15,7 +18,7 @@ Examples:
 iptables \-A INPUT \-p tcp \-\-syn \-\-dport 23 \-m connlimit \-\-connlimit\-above 2 \-j REJECT
 .TP
 # you can also match the other way around:
-iptables \-A INPUT \-p tcp \-\-syn \-\-dport 23 \-m connlimit ! \-\-connlimit\-above 2 \-j ACCEPT
+iptables \-A INPUT \-p tcp \-\-syn \-\-dport 23 \-m connlimit \-\-connlimit\-upto 2 \-j ACCEPT
 .TP
 # limit the number of parallel HTTP requests to 16 per class C sized \
 network (24 bit netmask)
