@@ -15,7 +15,7 @@ static void connlimit_help(void)
 "connlimit match options:\n"
 "[!] --connlimit-above n        match if the number of existing "
 "                               connections is (not) above n\n"
-"    --connlimit-mask n         group hosts using mask\n");
+"    --connlimit-mask n         group hosts using prefix length (default: max len)\n");
 }
 
 static const struct option connlimit_opts[] = {

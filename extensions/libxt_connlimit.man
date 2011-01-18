@@ -6,7 +6,8 @@ Match if the number of existing connections is (not) above \fIn\fP.
 .TP
 \fB\-\-connlimit\-mask\fP \fIprefix_length\fP
 Group hosts using the prefix length. For IPv4, this must be a number between
-(including) 0 and 32. For IPv6, between 0 and 128.
+(including) 0 and 32. For IPv6, between 0 and 128. If not specified, the
+maximum prefix length for the applicable protocol is used.
 .P
 Examples:
 .TP
