@@ -16,7 +16,7 @@ struct xt_connlimit_info {
 			__be32 v6_mask[4];
 		};
 	};
-	unsigned int limit, inverse;
+	unsigned int limit;
 	union {
 		/* revision 0 */
 		unsigned int inverse;
