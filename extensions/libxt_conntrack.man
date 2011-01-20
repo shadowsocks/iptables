@@ -17,14 +17,15 @@ Layer-4 protocol to match (by number or name)
 [\fB!\fP] \fB\-\-ctrepldst\fP \fIaddress\fP[\fB/\fP\fImask\fP]
 Match against original/reply source/destination address
 .TP
-[\fB!\fP] \fB\-\-ctorigsrcport\fP \fIport\fP
+[\fB!\fP] \fB\-\-ctorigsrcport\fP \fIport\fP[\fB:\fP\fIport\fP]
 .TP
-[\fB!\fP] \fB\-\-ctorigdstport\fP \fIport\fP
+[\fB!\fP] \fB\-\-ctorigdstport\fP \fIport\fP[\fB:\fP\fIport\fP]
 .TP
-[\fB!\fP] \fB\-\-ctreplsrcport\fP \fIport\fP
+[\fB!\fP] \fB\-\-ctreplsrcport\fP \fIport\fP[\fB:\fP\fIport\fP]
 .TP
-[\fB!\fP] \fB\-\-ctrepldstport\fP \fIport\fP
+[\fB!\fP] \fB\-\-ctrepldstport\fP \fIport\fP[\fB:\fP\fIport\fP]
 Match against original/reply source/destination port (TCP/UDP/etc.) or GRE key.
+Matching against port ranges is only supported in kernel versions above 2.6.38.
 .TP
 [\fB!\fP] \fB\-\-ctstatus\fP \fIstatelist\fP
 \fIstatuslist\fP is a comma separated list of the connection statuses to match.
