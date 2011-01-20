@@ -31,9 +31,17 @@ static void NFQUEUE_help_v1(void)
 "  --queue-balance first:last	Balance flows between queues <value> to <value>.\n");
 }
 
+static void NFQUEUE_help_v2(void)
+{
+	NFQUEUE_help_v1();
+	printf(
+"  --queue-bypass		Bypass Queueing if no queue instance exists.\n");
+}
+
 static const struct option NFQUEUE_opts[] = {
 	{.name = "queue-num",     .has_arg = true, .val = 'F'},
 	{.name = "queue-balance", .has_arg = true, .val = 'B'},
+	{.name = "queue-bypass",  .has_arg = false,.val = 'P'},
 	XT_GETOPT_TABLEEND,
 };
 
@@ -117,6 +125,18 @@ NFQUEUE_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
+static int
+NFQUEUE_parse_v2(int c, char **argv, int invert, unsigned int *flags,
+                 const void *entry, struct xt_entry_target **target)
+{
+	if (c == 'P') {
+		struct xt_NFQ_info_v2 *info = (void *)(*target)->data;
+		info->bypass = 1;
+		return 1;
+	}
+	return NFQUEUE_parse_v1(c, argv, invert, flags, entry, target);
+}
+
 static void NFQUEUE_print(const void *ip,
                           const struct xt_entry_target *target, int numeric)
 {
@@ -137,6 +157,16 @@ static void NFQUEUE_print_v1(const void *ip,
 	} else {
 		printf("NFQUEUE num %u", tinfo->queuenum);
 	}
+}
+
+static void NFQUEUE_print_v2(const void *ip,
+                             const struct xt_entry_target *target, int numeric)
+{
+	const struct xt_NFQ_info_v2 *info = (void *) target->data;
+
+	NFQUEUE_print_v1(ip, target, numeric);
+	if (info->bypass)
+		printf(" bypass");
 }
 
 static void NFQUEUE_save(const void *ip, const struct xt_entry_target *target)
@@ -160,13 +190,24 @@ static void NFQUEUE_save_v1(const void *ip, const struct xt_entry_target *target
 	}
 }
 
+static void NFQUEUE_save_v2(const void *ip, const struct xt_entry_target *target)
+{
+	const struct xt_NFQ_info_v2 *info = (void *) target->data;
+
+	NFQUEUE_save_v1(ip, target);
+
+	if (info->bypass)
+		printf("--queue-bypass ");
+}
+
 static void NFQUEUE_init_v1(struct xt_entry_target *t)
 {
 	struct xt_NFQ_info_v1 *tinfo = (void *)t->data;
 	tinfo->queues_total = 1;
 }
 
-static struct xtables_target nfqueue_target = {
+static struct xtables_target nfqueue_targets[] = {
+{
 	.family		= NFPROTO_UNSPEC,
 	.name		= "NFQUEUE",
 	.version	= XTABLES_VERSION,
@@ -177,9 +218,7 @@ static struct xtables_target nfqueue_target = {
 	.print		= NFQUEUE_print,
 	.save		= NFQUEUE_save,
 	.extra_opts	= NFQUEUE_opts
-};
-
-static struct xtables_target nfqueue_target_v1 = {
+},{
 	.family		= NFPROTO_UNSPEC,
 	.revision	= 1,
 	.name		= "NFQUEUE",
@@ -192,10 +231,23 @@ static struct xtables_target nfqueue_target_v1 = {
 	.print		= NFQUEUE_print_v1,
 	.save		= NFQUEUE_save_v1,
 	.extra_opts	= NFQUEUE_opts,
+},{
+	.family		= NFPROTO_UNSPEC,
+	.revision	= 2,
+	.name		= "NFQUEUE",
+	.version	= XTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_NFQ_info_v2)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_NFQ_info_v2)),
+	.help		= NFQUEUE_help_v2,
+	.init		= NFQUEUE_init_v1,
+	.parse		= NFQUEUE_parse_v2,
+	.print		= NFQUEUE_print_v2,
+	.save		= NFQUEUE_save_v2,
+	.extra_opts	= NFQUEUE_opts,
+}
 };
 
 void _init(void)
 {
-	xtables_register_target(&nfqueue_target);
-	xtables_register_target(&nfqueue_target_v1);
+	xtables_register_targets(nfqueue_targets, ARRAY_SIZE(nfqueue_targets));
 }
