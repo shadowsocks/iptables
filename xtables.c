@@ -492,9 +492,11 @@ void xtables_parse_interface(const char *arg, char *vianame,
 }
 
 #ifndef NO_SHARED_LIBS
-static void *load_extension(const char *search_path, const char *prefix,
+static void *load_extension(const char *search_path, const char *af_prefix,
     const char *name, bool is_target)
 {
+	const char *all_prefixes[] = {"libxt_", af_prefix, NULL};
+	const char **prefix;
 	const char *dir = search_path, *next;
 	void *ptr = NULL;
 	struct stat sb;
@@ -504,39 +506,38 @@ static void *load_extension(const char *search_path, const char *prefix,
 		next = strchr(dir, ':');
 		if (next == NULL)
 			next = dir + strlen(dir);
-		snprintf(path, sizeof(path), "%.*s/libxt_%s.so",
-		         (unsigned int)(next - dir), dir, name);
 
-		if (dlopen(path, RTLD_NOW) != NULL) {
-			/* Found library.  If it didn't register itself,
-			   maybe they specified target as match. */
+		for (prefix = all_prefixes; *prefix != NULL; ++prefix) {
+			snprintf(path, sizeof(path), "%.*s/%s%s.so",
+			         (unsigned int)(next - dir), dir,
+			         *prefix, name);
+
+			if (stat(path, &sb) != 0) {
+				if (errno == ENOENT)
+					continue;
+				fprintf(stderr, "%s: %s\n", path,
+					strerror(errno));
+				return NULL;
+			}
+			if (dlopen(path, RTLD_NOW) == NULL) {
+				fprintf(stderr, "%s: %s\n", path, dlerror());
+				break;
+			}
+
 			if (is_target)
 				ptr = xtables_find_target(name, XTF_DONT_LOAD);
 			else
 				ptr = xtables_find_match(name,
 				      XTF_DONT_LOAD, NULL);
-		} else if (stat(path, &sb) == 0) {
-			fprintf(stderr, "%s: %s\n", path, dlerror());
+
+			if (ptr != NULL)
+				return ptr;
+
+			fprintf(stderr, "%s: no \"%s\" extension found for "
+				"this protocol\n", path, name);
+			errno = ENOENT;
+			return NULL;
 		}
-
-		if (ptr != NULL)
-			return ptr;
-
-		snprintf(path, sizeof(path), "%.*s/%s%s.so",
-		         (unsigned int)(next - dir), dir, prefix, name);
-		if (dlopen(path, RTLD_NOW) != NULL) {
-			if (is_target)
-				ptr = xtables_find_target(name, XTF_DONT_LOAD);
-			else
-				ptr = xtables_find_match(name,
-				      XTF_DONT_LOAD, NULL);
-		} else if (stat(path, &sb) == 0) {
-			fprintf(stderr, "%s: %s\n", path, dlerror());
-		}
-
-		if (ptr != NULL)
-			return ptr;
-
 		dir = next + 1;
 	} while (*next != '\0');
 
@@ -591,7 +592,7 @@ xtables_find_match(const char *name, enum xtables_tryload tryload,
 		if (ptr == NULL && tryload == XTF_LOAD_MUST_SUCCEED)
 			xt_params->exit_err(PARAMETER_PROBLEM,
 				   "Couldn't load match `%s':%s\n",
-				   name, dlerror());
+				   name, strerror(errno));
 	}
 #else
 	if (ptr && !ptr->loaded) {
@@ -651,7 +652,7 @@ xtables_find_target(const char *name, enum xtables_tryload tryload)
 		if (ptr == NULL && tryload == XTF_LOAD_MUST_SUCCEED)
 			xt_params->exit_err(PARAMETER_PROBLEM,
 				   "Couldn't load target `%s':%s\n",
-				   name, dlerror());
+				   name, strerror(errno));
 	}
 #else
 	if (ptr && !ptr->loaded) {
