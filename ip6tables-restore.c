@@ -83,9 +83,7 @@ static int parse_counters(char *string, struct ip6t_counters *ctr)
 	unsigned long long pcnt, bcnt;
 	int ret;
 
-	ret = sscanf(string, "[%llu:%llu]",
-		     (unsigned long long *)&pcnt,
-		     (unsigned long long *)&bcnt);
+	ret = sscanf(string, "[%llu:%llu]", &pcnt, &bcnt);
 	ctr->pcnt = pcnt;
 	ctr->bcnt = bcnt;
 	return ret == 2;
