@@ -103,8 +103,11 @@ static int add_argv(char *what) {
 		newargv[newargc] = strdup(what);
 		newargc++;
 		return 1;
-	} else 
+	} else {
+		xtables_error(PARAMETER_PROBLEM,
+			"Parser cannot handle more arguments\n");
 		return 0;
+	}
 }
 
 static void free_argv(void) {
