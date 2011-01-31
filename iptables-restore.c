@@ -370,7 +370,7 @@ main(int argc, char *argv[])
 
 			add_argv(argv[0]);
 			add_argv("-t");
-			add_argv((char *) &curtable);
+			add_argv(curtable);
 
 			if (counters && pcnt && bcnt) {
 				add_argv("--set-counters");
