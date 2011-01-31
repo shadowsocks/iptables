@@ -45,6 +45,7 @@ static void u32_dump(const struct xt_u32 *data)
 	const struct xt_u32_test *ct;
 	unsigned int testind, i;
 
+	putchar('\"');
 	for (testind = 0; testind < data->ntests; ++testind) {
 		ct = &data->tests[testind];
 
@@ -81,7 +82,7 @@ static void u32_dump(const struct xt_u32 *data)
 				       ct->value[i].max);
 		}
 	}
-	printf(" ");
+	printf("\" ");
 }
 
 /* string_to_number() is not quite what we need here ... */
