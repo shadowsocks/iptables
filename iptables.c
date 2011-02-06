@@ -1311,18 +1311,6 @@ get_kernel_version(void) {
 	kernel_version = LINUX_VERSION(x, y, z);
 }
 
-struct iptables_command_state {
-	struct ipt_entry fw;
-	int invert;
-	int c;
-	unsigned int options;
-	struct xtables_rule_match *matches;
-	struct xtables_target *target;
-	char *protocol;
-	int proto_used;
-	char **argv;
-};
-
 static void command_default(struct iptables_command_state *cs)
 {
 	struct xtables_rule_match *matchp;
