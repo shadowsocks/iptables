@@ -90,7 +90,7 @@ cluster_parse(int c, char **argv, int invert, unsigned int *flags,
 				      "`--cluster-local-node'", optarg);
 		}
 		if (invert)
-			info->flags |= (1 << XT_CLUSTER_F_INV);
+			info->flags |= XT_CLUSTER_F_INV;
 
 		info->node_mask = node_mask = (1 << (num - 1));
 		*flags |= 1 << c;
@@ -115,7 +115,7 @@ cluster_parse(int c, char **argv, int invert, unsigned int *flags,
 				      "`--cluster-local-node'", optarg);
 		}
 		if (invert)
-			info->flags |= (1 << XT_CLUSTER_F_INV);
+			info->flags |= XT_CLUSTER_F_INV;
 
 		info->node_mask = node_mask = num;
 		*flags |= 1 << c;
