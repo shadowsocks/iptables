@@ -1297,7 +1297,114 @@ struct iptables_command_state {
 	struct xtables_target *target;
 	char *protocol;
 	int proto_used;
+	char **argv;
 };
+
+static void command_default(struct iptables_command_state *cs)
+{
+	struct xtables_rule_match *matchp;
+	struct xtables_match *m;
+
+	if (cs->target == NULL || cs->target->parse == NULL ||
+	    cs->c < cs->target->option_offset ||
+	    cs->c >= cs->target->option_offset + XT_OPTION_OFFSET_SCALE ||
+	    !cs->target->parse(cs->c - cs->target->option_offset,
+			       cs->argv, cs->invert,
+			       &cs->target->tflags,
+			       &cs->fw, &cs->target->t)) {
+		for (matchp = cs->matches; matchp; matchp = matchp->next) {
+			if (matchp->completed ||
+			    matchp->match->parse == NULL)
+				continue;
+			if (cs->c < matchp->match->option_offset ||
+			    cs->c >= matchp->match->option_offset + XT_OPTION_OFFSET_SCALE)
+				continue;
+			if (matchp->match->parse(cs->c - matchp->match->option_offset,
+				     cs->argv, cs->invert,
+				     &matchp->match->mflags,
+				     &cs->fw,
+				     &matchp->match->m))
+				break;
+		}
+		m = matchp ? matchp->match : NULL;
+
+		/* If you listen carefully, you can
+		   actually hear this code suck. */
+
+		/* some explanations (after four different bugs
+		 * in 3 different releases): If we encounter a
+		 * parameter, that has not been parsed yet,
+		 * it's not an option of an explicitly loaded
+		 * match or a target.  However, we support
+		 * implicit loading of the protocol match
+		 * extension.  '-p tcp' means 'l4 proto 6' and
+		 * at the same time 'load tcp protocol match on
+		 * demand if we specify --dport'.
+		 *
+		 * To make this work, we need to make sure:
+		 * - the parameter has not been parsed by
+		 *   a match (m above)
+		 * - a protocol has been specified
+		 * - the protocol extension has not been
+		 *   loaded yet, or is loaded and unused
+		 *   [think of ip6tables-restore!]
+		 * - the protocol extension can be successively
+		 *   loaded
+		 */
+		if (m == NULL
+		    && cs->protocol
+		    && (!find_proto(cs->protocol, XTF_DONT_LOAD,
+				   cs->options&OPT_NUMERIC, NULL)
+			|| (find_proto(cs->protocol, XTF_DONT_LOAD,
+					cs->options&OPT_NUMERIC, NULL)
+			    && (cs->proto_used == 0))
+		       )
+		    && (m = find_proto(cs->protocol, XTF_TRY_LOAD,
+				       cs->options&OPT_NUMERIC, &cs->matches))) {
+			/* Try loading protocol */
+			size_t size;
+
+			cs->proto_used = 1;
+
+			size = IP6T_ALIGN(sizeof(struct ip6t_entry_match))
+					 + m->size;
+
+			m->m = xtables_calloc(1, size);
+			m->m->u.match_size = size;
+			strcpy(m->m->u.user.name, m->name);
+			m->m->u.user.revision = m->revision;
+			if (m->init != NULL)
+				m->init(m->m);
+
+			opts = xtables_merge_options(ip6tables_globals.orig_opts, opts,
+			    m->extra_opts, &m->option_offset);
+
+			optind--;
+			return;
+		}
+
+		if (!m) {
+			if (cs->c == '?') {
+				if (optopt) {
+					xtables_error(
+					   PARAMETER_PROBLEM,
+					   "option `%s' "
+					   "requires an "
+					   "argument",
+					   cs->argv[optind-1]);
+				} else {
+					xtables_error(
+					   PARAMETER_PROBLEM,
+					   "unknown option "
+					   "`%s'",
+					   cs->argv[optind-1]);
+				}
+			}
+			xtables_error(PARAMETER_PROBLEM,
+				   "Unknown arg `%s'", optarg);
+		}
+	}
+}
 
 int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **handle)
 {
@@ -1321,6 +1428,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 	unsigned long long cnt;
 
 	memset(&cs, 0, sizeof(cs));
+	cs.argv = argv;
 
 	/* re-set optind to 0 in case do_command gets called
 	 * a second time */
@@ -1710,105 +1818,8 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			exit_tryhelp(2);
 
 		default:
-			if (cs.target == NULL || cs.target->parse == NULL ||
-			    cs.c < cs.target->option_offset ||
-			    cs.c >= cs.target->option_offset + XT_OPTION_OFFSET_SCALE ||
-			    !cs.target->parse(cs.c - cs.target->option_offset,
-					       argv, cs.invert,
-					       &cs.target->tflags,
-					       &cs.fw, &cs.target->t)) {
-				for (matchp = cs.matches; matchp; matchp = matchp->next) {
-					if (matchp->completed ||
-					    matchp->match->parse == NULL)
-						continue;
-					if (cs.c < matchp->match->option_offset ||
-					    cs.c >= matchp->match->option_offset + XT_OPTION_OFFSET_SCALE)
-						continue;
-					if (matchp->match->parse(cs.c - matchp->match->option_offset,
-						     argv, cs.invert,
-						     &matchp->match->mflags,
-						     &cs.fw,
-						     &matchp->match->m))
-						break;
-				}
-				m = matchp ? matchp->match : NULL;
-
-				/* If you listen carefully, you can
-				   actually hear this code suck. */
-
-				/* some explanations (after four different bugs
-				 * in 3 different releases): If we encounter a
-				 * parameter, that has not been parsed yet,
-				 * it's not an option of an explicitly loaded
-				 * match or a target.  However, we support
-				 * implicit loading of the protocol match
-				 * extension.  '-p tcp' means 'l4 proto 6' and
-				 * at the same time 'load tcp protocol match on
-				 * demand if we specify --dport'.
-				 *
-				 * To make this work, we need to make sure:
-				 * - the parameter has not been parsed by
-				 *   a match (m above)
-				 * - a protocol has been specified
-				 * - the protocol extension has not been
-				 *   loaded yet, or is loaded and unused
-				 *   [think of ip6tables-restore!]
-				 * - the protocol extension can be successively
-				 *   loaded
-				 */
-				if (m == NULL
-				    && cs.protocol
-				    && (!find_proto(cs.protocol, XTF_DONT_LOAD,
-						   cs.options&OPT_NUMERIC, NULL)
-					|| (find_proto(cs.protocol, XTF_DONT_LOAD,
-							cs.options&OPT_NUMERIC, NULL)
-					    && (cs.proto_used == 0))
-				       )
-				    && (m = find_proto(cs.protocol, XTF_TRY_LOAD,
-						       cs.options&OPT_NUMERIC, &cs.matches))) {
-					/* Try loading protocol */
-					size_t size;
-
-					cs.proto_used = 1;
-
-					size = IP6T_ALIGN(sizeof(struct ip6t_entry_match))
-							 + m->size;
-
-					m->m = xtables_calloc(1, size);
-					m->m->u.match_size = size;
-					strcpy(m->m->u.user.name, m->name);
-					m->m->u.user.revision = m->revision;
-					if (m->init != NULL)
-						m->init(m->m);
-
-					opts = xtables_merge_options(ip6tables_globals.orig_opts, opts,
-					    m->extra_opts, &m->option_offset);
-
-					optind--;
-					continue;
-				}
-
-				if (!m) {
-					if (cs.c == '?') {
-						if (optopt) {
-							xtables_error(
-							   PARAMETER_PROBLEM,
-							   "option `%s' "
-							   "requires an "
-							   "argument",
-							   argv[optind-1]);
-						} else {
-							xtables_error(
-							   PARAMETER_PROBLEM,
-							   "unknown option "
-							   "`%s'",
-							   argv[optind-1]);
-						}
-					}
-					xtables_error(PARAMETER_PROBLEM,
-						   "Unknown arg `%s'", optarg);
-				}
-			}
+			command_default(&cs);
+			break;
 		}
 		cs.invert = FALSE;
 	}
