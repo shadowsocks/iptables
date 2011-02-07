@@ -1328,6 +1328,34 @@ static void command_default(struct iptables_command_state *cs)
 	xtables_error(PARAMETER_PROBLEM, "Unknown arg \"%s\"", optarg);
 }
 
+static void command_jump(struct iptables_command_state *cs)
+{
+	size_t size;
+
+	set_option(&cs->options, OPT_JUMP, &cs->fw.ip.invflags, cs->invert);
+	cs->jumpto = parse_target(optarg);
+	/* TRY_LOAD (may be chain name) */
+	cs->target = xtables_find_target(cs->jumpto, XTF_TRY_LOAD);
+
+	if (cs->target == NULL)
+		return;
+
+	size = IPT_ALIGN(sizeof(struct ipt_entry_target))
+		+ cs->target->size;
+
+	cs->target->t = xtables_calloc(1, size);
+	cs->target->t->u.target_size = size;
+	strcpy(cs->target->t->u.user.name, cs->jumpto);
+	cs->target->t->u.user.revision = cs->target->revision;
+	if (cs->target->init != NULL)
+		cs->target->init(cs->target->t);
+	opts = xtables_merge_options(iptables_globals.orig_opts, opts,
+				     cs->target->extra_opts,
+				     &cs->target->option_offset);
+	if (opts == NULL)
+		xtables_error(OTHER_PROBLEM, "can't alloc memory!");
+}
+
 int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle)
 {
 	struct iptables_command_state cs;
@@ -1346,10 +1374,10 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 	struct xtables_match *m;
 	struct xtables_rule_match *matchp;
 	struct xtables_target *t;
-	const char *jumpto = "";
 	unsigned long long cnt;
 
 	memset(&cs, 0, sizeof(cs));
+	cs.jumpto = "";
 	cs.argv = argv;
 
 	/* re-set optind to 0 in case do_command gets called
@@ -1566,38 +1594,12 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 			set_option(&cs.options, OPT_JUMP, &cs.fw.ip.invflags,
 				   cs.invert);
 			cs.fw.ip.flags |= IPT_F_GOTO;
-			jumpto = parse_target(optarg);
+			cs.jumpto = parse_target(optarg);
 			break;
 #endif
 
 		case 'j':
-			set_option(&cs.options, OPT_JUMP, &cs.fw.ip.invflags,
-				   cs.invert);
-			jumpto = parse_target(optarg);
-			/* TRY_LOAD (may be chain name) */
-			cs.target = xtables_find_target(jumpto, XTF_TRY_LOAD);
-
-			if (cs.target) {
-				size_t size;
-
-				size = IPT_ALIGN(sizeof(struct ipt_entry_target))
-					+ cs.target->size;
-
-				cs.target->t = xtables_calloc(1, size);
-				cs.target->t->u.target_size = size;
-				strcpy(cs.target->t->u.user.name, jumpto);
-				cs.target->t->u.user.revision = cs.target->revision;
-				if (cs.target->init != NULL)
-					cs.target->init(cs.target->t);
-				opts = xtables_merge_options(
-						     iptables_globals.orig_opts,
-						     opts,
-						     cs.target->extra_opts,
-						     &cs.target->option_offset);
-				if (opts == NULL)
-					xtables_error(OTHER_PROBLEM,
-						   "can't alloc memory!");
-			}
+			command_jump(&cs);
 			break;
 
 
@@ -1757,7 +1759,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 
 	if (strcmp(*table, "nat") == 0 &&
 	    ((policy != NULL && strcmp(policy, "DROP") == 0) ||
-	    (jumpto != NULL && strcmp(jumpto, "DROP") == 0)))
+	    (cs.jumpto != NULL && strcmp(cs.jumpto, "DROP") == 0)))
 		xtables_error(PARAMETER_PROBLEM,
 			"\nThe \"nat\" table is not intended for filtering, "
 		        "the use of DROP is therefore inhibited.\n\n");
@@ -1848,10 +1850,10 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 					   chain);
 		}
 
-		if (cs.target && iptc_is_chain(jumpto, *handle)) {
+		if (cs.target && iptc_is_chain(cs.jumpto, *handle)) {
 			fprintf(stderr,
 				"Warning: using chain %s, not extension\n",
-				jumpto);
+				cs.jumpto);
 
 			if (cs.target->t)
 				free(cs.target->t);
@@ -1862,8 +1864,8 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 		/* If they didn't specify a target, or it's a chain
 		   name, use standard. */
 		if (!cs.target
-		    && (strlen(jumpto) == 0
-			|| iptc_is_chain(jumpto, *handle))) {
+		    && (strlen(cs.jumpto) == 0
+			|| iptc_is_chain(cs.jumpto, *handle))) {
 			size_t size;
 
 			cs.target = xtables_find_target(IPT_STANDARD_TARGET,
@@ -1873,8 +1875,8 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 				+ cs.target->size;
 			cs.target->t = xtables_calloc(1, size);
 			cs.target->t->u.target_size = size;
-			strcpy(cs.target->t->u.user.name, jumpto);
-			if (!iptc_is_chain(jumpto, *handle))
+			strcpy(cs.target->t->u.user.name, cs.jumpto);
+			if (!iptc_is_chain(cs.jumpto, *handle))
 				cs.target->t->u.user.revision = cs.target->revision;
 			if (cs.target->init != NULL)
 				cs.target->init(cs.target->t);
@@ -1888,9 +1890,10 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 #ifdef IPT_F_GOTO
 			if (cs.fw.ip.flags & IPT_F_GOTO)
 				xtables_error(PARAMETER_PROBLEM,
-					   "goto '%s' is not a chain\n", jumpto);
+					   "goto '%s' is not a chain\n",
+					   cs.jumpto);
 #endif
-			xtables_find_target(jumpto, XTF_LOAD_MUST_SUCCEED);
+			xtables_find_target(cs.jumpto, XTF_LOAD_MUST_SUCCEED);
 		} else {
 			e = generate_entry(&cs.fw, cs.matches, cs.target->t);
 			free(cs.target->t);

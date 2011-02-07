@@ -1302,6 +1302,33 @@ static void command_default(struct iptables_command_state *cs)
 	xtables_error(PARAMETER_PROBLEM, "Unknown arg \"%s\"", optarg);
 }
 
+static void command_jump(struct iptables_command_state *cs)
+{
+	size_t size;
+
+	set_option(&cs->options, OPT_JUMP, &cs->fw6.ipv6.invflags, cs->invert);
+	cs->jumpto = parse_target(optarg);
+	/* TRY_LOAD (may be chain name) */
+	cs->target = xtables_find_target(cs->jumpto, XTF_TRY_LOAD);
+
+	if (cs->target == NULL)
+		return;
+
+	size = IP6T_ALIGN(sizeof(struct ip6t_entry_target)) + cs->target->size;
+
+	cs->target->t = xtables_calloc(1, size);
+	cs->target->t->u.target_size = size;
+	strcpy(cs->target->t->u.user.name, cs->jumpto);
+	cs->target->t->u.user.revision = cs->target->revision;
+	if (cs->target->init != NULL)
+		cs->target->init(cs->target->t);
+	opts = xtables_merge_options(ip6tables_globals.orig_opts, opts,
+				     cs->target->extra_opts,
+				     &cs->target->option_offset);
+	if (opts == NULL)
+		xtables_error(OTHER_PROBLEM, "can't alloc memory!");
+}
+
 int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **handle)
 {
 	struct iptables_command_state cs;
@@ -1320,10 +1347,10 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 	struct xtables_match *m;
 	struct xtables_rule_match *matchp;
 	struct xtables_target *t;
-	const char *jumpto = "";
 	unsigned long long cnt;
 
 	memset(&cs, 0, sizeof(cs));
+	cs.jumpto = "";
 	cs.argv = argv;
 
 	/* re-set optind to 0 in case do_command gets called
@@ -1548,36 +1575,12 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			set_option(&cs.options, OPT_JUMP, &cs.fw6.ipv6.invflags,
 					cs.invert);
 			cs.fw6.ipv6.flags |= IP6T_F_GOTO;
-			jumpto = parse_target(optarg);
+			cs.jumpto = parse_target(optarg);
 			break;
 #endif
 
 		case 'j':
-			set_option(&cs.options, OPT_JUMP, &cs.fw6.ipv6.invflags,
-				   cs.invert);
-			jumpto = parse_target(optarg);
-			/* TRY_LOAD (may be chain name) */
-			cs.target = xtables_find_target(jumpto, XTF_TRY_LOAD);
-
-			if (cs.target) {
-				size_t size;
-
-				size = IP6T_ALIGN(sizeof(struct ip6t_entry_target))
-					+ cs.target->size;
-
-				cs.target->t = xtables_calloc(1, size);
-				cs.target->t->u.target_size = size;
-				strcpy(cs.target->t->u.user.name, jumpto);
-				cs.target->t->u.user.revision = cs.target->revision;
-				if (cs.target->init != NULL)
-					cs.target->init(cs.target->t);
-				opts = xtables_merge_options(ip6tables_globals.orig_opts, opts,
-						     cs.target->extra_opts,
-						     &cs.target->option_offset);
-				if (opts == NULL)
-					xtables_error(OTHER_PROBLEM,
-						   "can't alloc memory!");
-			}
+			command_jump(&cs);
 			break;
 
 
@@ -1806,10 +1809,10 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 					   chain);
 		}
 
-		if (cs.target && ip6tc_is_chain(jumpto, *handle)) {
+		if (cs.target && ip6tc_is_chain(cs.jumpto, *handle)) {
 			fprintf(stderr,
 				"Warning: using chain %s, not extension\n",
-				jumpto);
+				cs.jumpto);
 
 			if (cs.target->t)
 				free(cs.target->t);
@@ -1820,8 +1823,8 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		/* If they didn't specify a target, or it's a chain
 		   name, use standard. */
 		if (!cs.target
-		    && (strlen(jumpto) == 0
-			|| ip6tc_is_chain(jumpto, *handle))) {
+		    && (strlen(cs.jumpto) == 0
+			|| ip6tc_is_chain(cs.jumpto, *handle))) {
 			size_t size;
 
 			cs.target = xtables_find_target(IP6T_STANDARD_TARGET,
@@ -1831,7 +1834,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				+ cs.target->size;
 			cs.target->t = xtables_calloc(1, size);
 			cs.target->t->u.target_size = size;
-			strcpy(cs.target->t->u.user.name, jumpto);
+			strcpy(cs.target->t->u.user.name, cs.jumpto);
 			if (cs.target->init != NULL)
 				cs.target->init(cs.target->t);
 		}
@@ -1844,9 +1847,10 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 #ifdef IP6T_F_GOTO
 			if (cs.fw6.ipv6.flags & IP6T_F_GOTO)
 				xtables_error(PARAMETER_PROBLEM,
-						"goto '%s' is not a chain\n", jumpto);
+						"goto '%s' is not a chain\n",
+						cs.jumpto);
 #endif
-			xtables_find_target(jumpto, XTF_LOAD_MUST_SUCCEED);
+			xtables_find_target(cs.jumpto, XTF_LOAD_MUST_SUCCEED);
 		} else {
 			e = generate_entry(&cs.fw6, cs.matches, cs.target->t);
 			free(cs.target->t);

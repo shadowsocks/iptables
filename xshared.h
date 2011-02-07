@@ -35,6 +35,7 @@ struct iptables_command_state {
 	struct xtables_target *target;
 	char *protocol;
 	int proto_used;
+	const char *jumpto;
 	char **argv;
 };
 
