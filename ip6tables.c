@@ -1290,15 +1290,12 @@ static void command_default(struct iptables_command_state *cs)
 		return;
 	}
 
-	if (cs->c == '?') {
-		if (optopt)
-			xtables_error(PARAMETER_PROBLEM,
-				"option \"%s\" requires an argument",
-				cs->argv[optind-1]);
-		else
-			xtables_error(PARAMETER_PROBLEM,
-				"unknown option \"%s\"", cs->argv[optind-1]);
-	}
+	if (cs->c == ':')
+		xtables_error(PARAMETER_PROBLEM, "option \"%s\" "
+		              "requires an argument", cs->argv[optind-1]);
+	if (cs->c == '?')
+		xtables_error(PARAMETER_PROBLEM, "unknown option "
+			      "\"%s\"", cs->argv[optind-1]);
 	xtables_error(PARAMETER_PROBLEM, "Unknown arg \"%s\"", optarg);
 }
 
@@ -1396,7 +1393,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 
 	opts = xt_params->orig_opts;
 	while ((cs.c = getopt_long(argc, argv,
-	   "-A:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:bvnt:m:xc:g:",
+	   "-:A:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:bvnt:m:xc:g:",
 					   opts, NULL)) != -1) {
 		switch (cs.c) {
 			/*
