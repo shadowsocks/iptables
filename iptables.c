@@ -93,12 +93,12 @@ static const char cmdflags[] = { 'I', 'D', 'D', 'R', 'A', 'L', 'F', 'Z',
 #define OPT_EXPANDED	0x00040U
 #define OPT_VIANAMEIN	0x00080U
 #define OPT_VIANAMEOUT	0x00100U
-#define OPT_FRAGMENT    0x00200U
-#define OPT_LINENUMBERS 0x00400U
-#define OPT_COUNTERS	0x00800U
+#define OPT_LINENUMBERS 0x00200U
+#define OPT_COUNTERS	0x00400U
+#define OPT_FRAGMENT    0x00800U
 #define NUMBER_OF_OPT	12
 static const char optflags[NUMBER_OF_OPT]
-= { 'n', 's', 'd', 'p', 'j', 'v', 'x', 'i', 'o', 'f', '0', 'c'};
+= { 'n', 's', 'd', 'p', 'j', 'v', 'x', 'i', 'o', '0', 'c', 'f'};
 
 static struct option original_opts[] = {
 	{.name = "append",        .has_arg = 1, .val = 'A'},
@@ -163,19 +163,19 @@ struct xtables_globals iptables_globals = {
 static const char commands_v_options[NUMBER_OF_CMD][NUMBER_OF_OPT] =
 /* Well, it's better than "Re: Linux vs FreeBSD" */
 {
-	/*     -n  -s  -d  -p  -j  -v  -x  -i  -o  -f --line -c */
-/*INSERT*/    {'x',' ',' ',' ',' ',' ','x',' ',' ',' ','x',' '},
-/*DELETE*/    {'x',' ',' ',' ',' ',' ','x',' ',' ',' ','x','x'},
+	/*     -n  -s  -d  -p  -j  -v  -x  -i  -o --line -c -f */
+/*INSERT*/    {'x',' ',' ',' ',' ',' ','x',' ',' ','x',' ',' '},
+/*DELETE*/    {'x',' ',' ',' ',' ',' ','x',' ',' ','x','x',' '},
 /*DELETE_NUM*/{'x','x','x','x','x',' ','x','x','x','x','x','x'},
-/*REPLACE*/   {'x',' ',' ',' ',' ',' ','x',' ',' ',' ','x',' '},
-/*APPEND*/    {'x',' ',' ',' ',' ',' ','x',' ',' ',' ','x',' '},
-/*LIST*/      {' ','x','x','x','x',' ',' ','x','x','x',' ','x'},
+/*REPLACE*/   {'x',' ',' ',' ',' ',' ','x',' ',' ','x',' ',' '},
+/*APPEND*/    {'x',' ',' ',' ',' ',' ','x',' ',' ','x',' ',' '},
+/*LIST*/      {' ','x','x','x','x',' ',' ','x','x',' ','x','x'},
 /*FLUSH*/     {'x','x','x','x','x',' ','x','x','x','x','x','x'},
 /*ZERO*/      {'x','x','x','x','x',' ','x','x','x','x','x','x'},
 /*ZERO_NUM*/  {'x','x','x','x','x',' ','x','x','x','x','x','x'},
 /*NEW_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x','x','x'},
 /*DEL_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x','x','x'},
-/*SET_POLICY*/{'x','x','x','x','x',' ','x','x','x','x','x',' '},
+/*SET_POLICY*/{'x','x','x','x','x',' ','x','x','x','x',' ','x'},
 /*RENAME*/    {'x','x','x','x','x',' ','x','x','x','x','x','x'},
 /*LIST_RULES*/{'x','x','x','x','x',' ','x','x','x','x','x','x'}
 };
