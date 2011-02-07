@@ -1271,76 +1271,61 @@ static void command_default(struct iptables_command_state *cs)
 
 	if (cs->target == NULL || cs->target->parse == NULL ||
 	    cs->c < cs->target->option_offset ||
-	    cs->c >= cs->target->option_offset + XT_OPTION_OFFSET_SCALE ||
-	    !cs->target->parse(cs->c - cs->target->option_offset,
-			       cs->argv, cs->invert,
-			       &cs->target->tflags,
-			       &cs->fw, &cs->target->t)) {
-		for (matchp = cs->matches; matchp; matchp = matchp->next) {
-			if (matchp->completed ||
-			    matchp->match->parse == NULL)
-				continue;
-			if (cs->c < matchp->match->option_offset ||
-			    cs->c >= matchp->match->option_offset + XT_OPTION_OFFSET_SCALE)
-				continue;
-			if (matchp->match->parse(cs->c - matchp->match->option_offset,
-				     cs->argv, cs->invert,
-				     &matchp->match->mflags,
-				     &cs->fw,
-				     &matchp->match->m))
-				break;
-		}
-		m = matchp ? matchp->match : NULL;
-
-		if (m == NULL && (m = load_proto(cs)) != NULL) {
-			/* Try loading protocol */
-			size_t size;
-
-			cs->proto_used = 1;
-
-			size = IPT_ALIGN(sizeof(struct ipt_entry_match))
-					 + m->size;
-
-			m->m = xtables_calloc(1, size);
-			m->m->u.match_size = size;
-			strcpy(m->m->u.user.name, m->name);
-			m->m->u.user.revision = m->revision;
-			if (m->init != NULL)
-				m->init(m->m);
-
-			opts = xtables_merge_options(
-					     iptables_globals.orig_opts,
-					     opts,
-					     m->extra_opts,
-					     &m->option_offset);
-			if (opts == NULL)
-				xtables_error(OTHER_PROBLEM,
-					"can't alloc memory!");
-
-			optind--;
-			return;
-		}
-		if (!m) {
-			if (cs->c == '?') {
-				if (optopt) {
-					xtables_error(
-					   PARAMETER_PROBLEM,
-					   "option `%s' "
-					   "requires an "
-					   "argument",
-					   cs->argv[optind-1]);
-				} else {
-					xtables_error(
-					   PARAMETER_PROBLEM,
-					   "unknown option "
-					   "`%s'",
-					   cs->argv[optind-1]);
-				}
-			}
-			xtables_error(PARAMETER_PROBLEM,
-				   "Unknown arg `%s'", optarg);
-		}
+	    cs->c >= cs->target->option_offset + XT_OPTION_OFFSET_SCALE) {
+		cs->target->parse(cs->c - cs->target->option_offset, cs->argv,
+				  cs->invert, &cs->target->tflags, &cs->fw,
+				  &cs->target->t);
+		return;
 	}
+
+	for (matchp = cs->matches; matchp; matchp = matchp->next) {
+		m = matchp->match;
+
+		if (matchp->completed || m->parse == NULL)
+			continue;
+		if (cs->c < m->option_offset ||
+		    cs->c >= m->option_offset + XT_OPTION_OFFSET_SCALE)
+			continue;
+		m->parse(cs->c - m->option_offset, cs->argv, cs->invert,
+			 &m->mflags, &cs->fw, &m->m);
+		return;
+	}
+
+	/* Try loading protocol */
+	m = load_proto(cs);
+	if (m != NULL) {
+		size_t size;
+
+		cs->proto_used = 1;
+
+		size = IPT_ALIGN(sizeof(struct ipt_entry_match)) + m->size;
+
+		m->m = xtables_calloc(1, size);
+		m->m->u.match_size = size;
+		strcpy(m->m->u.user.name, m->name);
+		m->m->u.user.revision = m->revision;
+		if (m->init != NULL)
+			m->init(m->m);
+
+		opts = xtables_merge_options(iptables_globals.orig_opts, opts,
+					     m->extra_opts, &m->option_offset);
+		if (opts == NULL)
+			xtables_error(OTHER_PROBLEM, "can't alloc memory!");
+
+		optind--;
+		return;
+	}
+
+	if (cs->c == '?') {
+		if (optopt)
+			xtables_error(PARAMETER_PROBLEM,
+				"option \"%s\" requires an argument",
+				cs->argv[optind-1]);
+		else
+			xtables_error(PARAMETER_PROBLEM,
+				"unknown option \"%s\"", cs->argv[optind-1]);
+	}
+	xtables_error(PARAMETER_PROBLEM, "Unknown arg \"%s\"", optarg);
 }
 
 int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle)
