@@ -213,24 +213,6 @@ int kernel_version;
 #endif
 #endif
 
-static const char *
-proto_to_name(uint8_t proto, int nolookup)
-{
-	unsigned int i;
-
-	if (proto && !nolookup) {
-		struct protoent *pent = getprotobynumber(proto);
-		if (pent)
-			return pent->p_name;
-	}
-
-	for (i = 0; xtables_chain_protos[i].name != NULL; ++i)
-		if (xtables_chain_protos[i].num == proto)
-			return xtables_chain_protos[i].name;
-
-	return NULL;
-}
-
 enum {
 	IPT_DOTTED_ADDR = 0,
 	IPT_DOTTED_MASK
@@ -420,23 +402,6 @@ add_command(unsigned int *cmd, const int newcmd, const int othercmds,
 */
 
 /* Christophe Burki wants `-p 6' to imply `-m tcp'.  */
-static struct xtables_match *
-find_proto(const char *pname, enum xtables_tryload tryload,
-	   int nolookup, struct xtables_rule_match **matches)
-{
-	unsigned int proto;
-
-	if (xtables_strtoui(pname, NULL, &proto, 0, UINT8_MAX)) {
-		const char *protoname = proto_to_name(proto, nolookup);
-
-		if (protoname)
-			return xtables_find_match(protoname, tryload, matches);
-	} else
-		return xtables_find_match(pname, tryload, matches);
-
-	return NULL;
-}
-
 /* Can't be zero. */
 static int
 parse_rulenumber(const char *rule)
