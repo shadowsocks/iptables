@@ -49,6 +49,7 @@
 #	define IP6T_SO_GET_REVISION_TARGET	69
 #endif
 #include <getopt.h>
+#include "iptables/internal.h"
 #include "xshared.h"
 
 #define NPROTO	255
@@ -130,24 +131,6 @@ struct option *xtables_merge_options(struct option *orig_opts,
 	return merge;
 }
 
-/**
- * xtables_afinfo - protocol family dependent information
- * @kmod:		kernel module basename (e.g. "ip_tables")
- * @libprefix:		prefix of .so library name (e.g. "libipt_")
- * @family:		nfproto family
- * @ipproto:		used by setsockopt (e.g. IPPROTO_IP)
- * @so_rev_match:	optname to check revision support of match
- * @so_rev_target:	optname to check revision support of target
- */
-struct xtables_afinfo {
-	const char *kmod;
-	const char *libprefix;
-	uint8_t family;
-	uint8_t ipproto;
-	int so_rev_match;
-	int so_rev_target;
-};
-
 static const struct xtables_afinfo afinfo_ipv4 = {
 	.kmod          = "ip_tables",
 	.libprefix     = "libipt_",
@@ -166,7 +149,7 @@ static const struct xtables_afinfo afinfo_ipv6 = {
 	.so_rev_target = IP6T_SO_GET_REVISION_TARGET,
 };
 
-static const struct xtables_afinfo *afinfo;
+const struct xtables_afinfo *afinfo;
 
 /* Search path for Xtables .so files */
 static const char *xtables_libdir;
@@ -785,6 +768,8 @@ void xtables_register_match(struct xtables_match *me)
 		exit(1);
 	}
 
+	if (me->x6_options != NULL)
+		xtables_option_metavalidate(me->name, me->x6_options);
 	if (me->extra_opts != NULL)
 		xtables_check_options(me->name, me->extra_opts);
 
@@ -873,6 +858,8 @@ void xtables_register_target(struct xtables_target *me)
 		exit(1);
 	}
 
+	if (me->x6_options != NULL)
+		xtables_option_metavalidate(me->name, me->x6_options);
 	if (me->extra_opts != NULL)
 		xtables_check_options(me->name, me->extra_opts);
 

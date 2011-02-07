@@ -1279,25 +1279,25 @@ static void command_default(struct iptables_command_state *cs)
 	struct xtables_rule_match *matchp;
 	struct xtables_match *m;
 
-	if (cs->target != NULL && cs->target->parse != NULL &&
+	if (cs->target != NULL &&
+	    (cs->target->parse != NULL || cs->target->x6_parse != NULL) &&
 	    cs->c >= cs->target->option_offset &&
 	    cs->c < cs->target->option_offset + XT_OPTION_OFFSET_SCALE) {
-		cs->target->parse(cs->c - cs->target->option_offset, cs->argv,
-				  cs->invert, &cs->target->tflags, &cs->fw6,
-				  &cs->target->t);
+		xtables_option_tpcall(cs->c, cs->argv, cs->invert,
+				      cs->target, &cs->fw);
 		return;
 	}
 
 	for (matchp = cs->matches; matchp; matchp = matchp->next) {
 		m = matchp->match;
 
-		if (matchp->completed || m->parse == NULL)
+		if (matchp->completed ||
+		    (m->x6_parse == NULL && m->parse == NULL))
 			continue;
 		if (cs->c < matchp->match->option_offset ||
 		    cs->c >= matchp->match->option_offset + XT_OPTION_OFFSET_SCALE)
 			continue;
-		m->parse(cs->c - m->option_offset, cs->argv, cs->invert,
-			 &m->mflags, &cs->fw6, &m->m);
+		xtables_option_mpcall(cs->c, cs->argv, cs->invert, m, &cs->fw);
 		return;
 	}
 
@@ -1317,9 +1317,17 @@ static void command_default(struct iptables_command_state *cs)
 		if (m->init != NULL)
 			m->init(m->m);
 
-		opts = xtables_merge_options(ip6tables_globals.orig_opts, opts,
-					     m->extra_opts, &m->option_offset);
-
+		if (m->x6_options != NULL)
+			opts = xtables_options_xfrm(ip6tables_globals.orig_opts,
+						    opts, m->x6_options,
+						    &m->option_offset);
+		else
+			opts = xtables_merge_options(ip6tables_globals.orig_opts,
+						     opts,
+						     m->extra_opts,
+						     &m->option_offset);
+		if (opts == NULL)
+			xtables_error(OTHER_PROBLEM, "can't alloc memory!");
 		optind--;
 		return;
 	}
@@ -1353,9 +1361,14 @@ static void command_jump(struct iptables_command_state *cs)
 	cs->target->t->u.user.revision = cs->target->revision;
 	if (cs->target->init != NULL)
 		cs->target->init(cs->target->t);
-	opts = xtables_merge_options(ip6tables_globals.orig_opts, opts,
-				     cs->target->extra_opts,
-				     &cs->target->option_offset);
+	if (cs->target->x6_options != NULL)
+		opts = xtables_options_xfrm(ip6tables_globals.orig_opts, opts,
+					    cs->target->x6_options,
+					    &cs->target->option_offset);
+	else
+		opts = xtables_merge_options(ip6tables_globals.orig_opts, opts,
+					     cs->target->extra_opts,
+					     &cs->target->option_offset);
 	if (opts == NULL)
 		xtables_error(OTHER_PROBLEM, "can't alloc memory!");
 }
@@ -1377,8 +1390,13 @@ static void command_match(struct iptables_command_state *cs)
 	m->m->u.user.revision = m->revision;
 	if (m->init != NULL)
 		m->init(m->m);
-	if (m != m->next)
-		/* Merge options for non-cloned matches */
+	if (m == m->next)
+		return;
+	/* Merge options for non-cloned matches */
+	if (m->x6_options != NULL)
+		opts = xtables_options_xfrm(ip6tables_globals.orig_opts, opts,
+					    m->x6_options, &m->option_offset);
+	else if (m->extra_opts != NULL)
 		opts = xtables_merge_options(ip6tables_globals.orig_opts, opts,
 					     m->extra_opts, &m->option_offset);
 }
@@ -1764,10 +1782,18 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		cs.invert = FALSE;
 	}
 
-	for (matchp = cs.matches; matchp; matchp = matchp->next)
+	for (matchp = cs.matches; matchp; matchp = matchp->next) {
+		if (matchp->match->x6_options != NULL)
+			xtables_options_fcheck(matchp->match->name,
+					       matchp->match->mflags,
+					       matchp->match->x6_options);
 		if (matchp->match->final_check != NULL)
 			matchp->match->final_check(matchp->match->mflags);
+	}
 
+	if (cs.target != NULL && cs.target->x6_options != NULL)
+		xtables_options_fcheck(cs.target->name, cs.target->tflags,
+				       cs.target->x6_options);
 	if (cs.target != NULL && cs.target->final_check != NULL)
 		cs.target->final_check(cs.target->tflags);
 

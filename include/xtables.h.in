@@ -10,6 +10,8 @@
 #include <sys/types.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <netinet/in.h>
 #include <net/if.h>
 #include <linux/types.h>
@@ -33,6 +35,73 @@
 #define XTABLES_VERSION_CODE @libxtables_vmajor@
 
 struct in_addr;
+
+/*
+ * .size is here so that there is a somewhat reasonable check
+ * against the chosen .type.
+ */
+#define XTOPT_POINTER(stype, member) \
+	.ptroff = offsetof(stype, member), \
+	.size = sizeof(((stype *)NULL)->member)
+#define XTOPT_TABLEEND {.name = NULL}
+
+/**
+ * %XTTYPE_NONE:	option takes no argument
+ */
+enum xt_option_type {
+	XTTYPE_NONE,
+};
+
+/**
+ * %XTOPT_INVERT:	option is invertible (usable with !)
+ * %XTOPT_MAND:		option is mandatory
+ * %XTOPT_MULTI:	option may be specified multiple times
+ * %XTOPT_PUT:		store value into memory at @ptroff
+ */
+enum xt_option_flags {
+	XTOPT_INVERT = 1 << 0,
+	XTOPT_MAND   = 1 << 1,
+	XTOPT_MULTI  = 1 << 2,
+	XTOPT_PUT    = 1 << 3,
+};
+
+/**
+ * @name:	name of option
+ * @type:	type of input and validation method, see %XTTYPE_*
+ * @id:		unique number (within extension) for option, 0-31
+ * @excl:	bitmask of flags that cannot be used with this option
+ * @also:	bitmask of flags that must be used with this option
+ * @flags:	bitmask of option flags, see %XTOPT_*
+ * @ptroff:	offset into private structure for member
+ * @size:	size of the item pointed to by @ptroff; this is a safeguard
+ */
+struct xt_option_entry {
+	const char *name;
+	enum xt_option_type type;
+	unsigned int id, excl, also, flags;
+	unsigned int ptroff;
+	size_t size;
+};
+
+/**
+ * @arg:	input from command line
+ * @ext_name:	name of extension currently being processed
+ * @entry:	current option being processed
+ * @data:	per-extension data block
+ * @xflags:	options of the extension that have been used
+ * @invert:	whether option was used with !
+ * @val:	parsed result
+ */
+struct xt_option_call {
+	const char *arg, *ext_name;
+	const struct xt_option_entry *entry;
+	void *data;
+	unsigned int xflags;
+	bool invert;
+	union {
+		/* to be filled */
+	} val;
+};
 
 /* Include file for additions: new matches and targets. */
 struct xtables_match
@@ -85,6 +154,10 @@ struct xtables_match
 
 	/* Pointer to list of extra command-line options */
 	const struct option *extra_opts;
+
+	/* New parser */
+	void (*x6_parse)(struct xt_option_call *);
+	const struct xt_option_entry *x6_options;
 
 	/* Ignore these men behind the curtain: */
 	unsigned int option_offset;
@@ -144,6 +217,10 @@ struct xtables_target
 
 	/* Pointer to list of extra command-line options */
 	const struct option *extra_opts;
+
+	/* New parser */
+	void (*x6_parse)(struct xt_option_call *);
+	const struct xt_option_entry *x6_options;
 
 	/* Ignore these men behind the curtain: */
 	unsigned int option_offset;
@@ -291,6 +368,20 @@ extern void xtables_save_string(const char *value);
 
 extern const struct xtables_pprot xtables_chain_protos[];
 extern u_int16_t xtables_parse_protocol(const char *s);
+
+/* xtoptions.c */
+extern void xtables_option_metavalidate(const char *,
+					const struct xt_option_entry *);
+extern struct option *xtables_options_xfrm(struct option *, struct option *,
+					   const struct xt_option_entry *,
+					   unsigned int *);
+extern void xtables_option_parse(struct xt_option_call *);
+extern void xtables_option_tpcall(unsigned int, char **, bool,
+				  struct xtables_target *, void *);
+extern void xtables_option_mpcall(unsigned int, char **, bool,
+				  struct xtables_match *, void *);
+extern void xtables_options_fcheck(const char *, unsigned int,
+				   const struct xt_option_entry *);
 
 #ifdef XTABLES_INTERNAL
 
