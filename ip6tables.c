@@ -1268,39 +1268,7 @@ static void command_default(struct iptables_command_state *cs)
 		}
 		m = matchp ? matchp->match : NULL;
 
-		/* If you listen carefully, you can
-		   actually hear this code suck. */
-
-		/* some explanations (after four different bugs
-		 * in 3 different releases): If we encounter a
-		 * parameter, that has not been parsed yet,
-		 * it's not an option of an explicitly loaded
-		 * match or a target.  However, we support
-		 * implicit loading of the protocol match
-		 * extension.  '-p tcp' means 'l4 proto 6' and
-		 * at the same time 'load tcp protocol match on
-		 * demand if we specify --dport'.
-		 *
-		 * To make this work, we need to make sure:
-		 * - the parameter has not been parsed by
-		 *   a match (m above)
-		 * - a protocol has been specified
-		 * - the protocol extension has not been
-		 *   loaded yet, or is loaded and unused
-		 *   [think of ip6tables-restore!]
-		 * - the protocol extension can be successively
-		 *   loaded
-		 */
-		if (m == NULL
-		    && cs->protocol
-		    && (!find_proto(cs->protocol, XTF_DONT_LOAD,
-				   cs->options&OPT_NUMERIC, NULL)
-			|| (find_proto(cs->protocol, XTF_DONT_LOAD,
-					cs->options&OPT_NUMERIC, NULL)
-			    && (cs->proto_used == 0))
-		       )
-		    && (m = find_proto(cs->protocol, XTF_TRY_LOAD,
-				       cs->options&OPT_NUMERIC, &cs->matches))) {
+		if (m == NULL && (m = load_proto(cs)) != NULL) {
 			/* Try loading protocol */
 			size_t size;
 

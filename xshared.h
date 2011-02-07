@@ -45,7 +45,6 @@ enum {
 extern void print_extension_helps(const struct xtables_target *,
 	const struct xtables_rule_match *);
 extern const char *proto_to_name(uint8_t, int);
-extern struct xtables_match *find_proto(const char *, enum xtables_tryload,
-	int, struct xtables_rule_match **);
+extern struct xtables_match *load_proto(struct iptables_command_state *);
 
 #endif /* IPTABLES_XSHARED_H */

@@ -1,4 +1,5 @@
 #include <netdb.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <xtables.h>
@@ -50,7 +51,7 @@ proto_to_name(uint8_t proto, int nolookup)
 	return NULL;
 }
 
-struct xtables_match *
+static struct xtables_match *
 find_proto(const char *pname, enum xtables_tryload tryload,
 	   int nolookup, struct xtables_rule_match **matches)
 {
@@ -65,4 +66,36 @@ find_proto(const char *pname, enum xtables_tryload tryload,
 		return xtables_find_match(pname, tryload, matches);
 
 	return NULL;
+}
+
+/*
+ * Some explanations (after four different bugs in 3 different releases): If
+ * we encounter a parameter, that has not been parsed yet, it's not an option
+ * of an explicitly loaded match or a target. However, we support implicit
+ * loading of the protocol match extension. '-p tcp' means 'l4 proto 6' and at
+ * the same time 'load tcp protocol match on demand if we specify --dport'.
+ *
+ * To make this work, we need to make sure:
+ * - the parameter has not been parsed by a match (m above)
+ * - a protocol has been specified
+ * - the protocol extension has not been loaded yet, or is loaded and unused
+ *   [think of ip6tables-restore!]
+ * - the protocol extension can be successively loaded
+ */
+static bool should_load_proto(struct iptables_command_state *cs)
+{
+	if (cs->protocol == NULL)
+		return false;
+	if (find_proto(cs->protocol, XTF_DONT_LOAD,
+	    cs->options & OPT_NUMERIC, NULL) != NULL)
+		return true;
+	return cs->proto_used;
+}
+
+struct xtables_match *load_proto(struct iptables_command_state *cs)
+{
+	if (!should_load_proto(cs))
+		return NULL;
+	return find_proto(cs->protocol, XTF_TRY_LOAD,
+			  cs->options & OPT_NUMERIC, &cs->matches);
 }
