@@ -83,21 +83,9 @@
 static const char cmdflags[] = { 'I', 'D', 'D', 'R', 'A', 'L', 'F', 'Z',
 				 'Z', 'N', 'X', 'P', 'E', 'S' };
 
-#define OPT_NONE	0x00000U
-#define OPT_NUMERIC	0x00001U
-#define OPT_SOURCE	0x00002U
-#define OPT_DESTINATION	0x00004U
-#define OPT_PROTOCOL	0x00008U
-#define OPT_JUMP	0x00010U
-#define OPT_VERBOSE	0x00020U
-#define OPT_EXPANDED	0x00040U
-#define OPT_VIANAMEIN	0x00080U
-#define OPT_VIANAMEOUT	0x00100U
-#define OPT_LINENUMBERS 0x00200U
-#define OPT_COUNTERS	0x00400U
 #define OPT_FRAGMENT    0x00800U
-#define NUMBER_OF_OPT	12
-static const char optflags[NUMBER_OF_OPT]
+#define NUMBER_OF_OPT	ARRAY_SIZE(optflags)
+static const char optflags[]
 = { 'n', 's', 'd', 'p', 'j', 'v', 'x', 'i', 'o', '0', 'c', 'f'};
 
 static struct option original_opts[] = {

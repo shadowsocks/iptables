@@ -5,6 +5,21 @@
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv6/ip6_tables.h>
 
+enum {
+	OPT_NONE        = 0,
+	OPT_NUMERIC     = 1 << 0,
+	OPT_SOURCE      = 1 << 1,
+	OPT_DESTINATION = 1 << 2,
+	OPT_PROTOCOL    = 1 << 3,
+	OPT_JUMP        = 1 << 4,
+	OPT_VERBOSE     = 1 << 5,
+	OPT_EXPANDED    = 1 << 6,
+	OPT_VIANAMEIN   = 1 << 7,
+	OPT_VIANAMEOUT  = 1 << 8,
+	OPT_LINENUMBERS = 1 << 9,
+	OPT_COUNTERS    = 1 << 10,
+};
+
 struct xtables_rule_match;
 struct xtables_target;
 
