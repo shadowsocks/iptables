@@ -103,6 +103,17 @@ struct xt_option_call {
 	} val;
 };
 
+/**
+ * @ext_name:	name of extension currently being processed
+ * @data:	per-extension data block
+ * @xflags:	options of the extension that have been used
+ */
+struct xt_fcheck_call {
+	const char *ext_name;
+	void *data;
+	unsigned int xflags;
+};
+
 /* Include file for additions: new matches and targets. */
 struct xtables_match
 {
@@ -157,6 +168,7 @@ struct xtables_match
 
 	/* New parser */
 	void (*x6_parse)(struct xt_option_call *);
+	void (*x6_fcheck)(struct xt_fcheck_call *);
 	const struct xt_option_entry *x6_options;
 
 	/* Ignore these men behind the curtain: */
@@ -220,6 +232,7 @@ struct xtables_target
 
 	/* New parser */
 	void (*x6_parse)(struct xt_option_call *);
+	void (*x6_fcheck)(struct xt_fcheck_call *);
 	const struct xt_option_entry *x6_options;
 
 	/* Ignore these men behind the curtain: */
@@ -380,6 +393,8 @@ extern void xtables_option_tpcall(unsigned int, char **, bool,
 				  struct xtables_target *, void *);
 extern void xtables_option_mpcall(unsigned int, char **, bool,
 				  struct xtables_match *, void *);
+extern void xtables_option_tfcall(struct xtables_target *);
+extern void xtables_option_mfcall(struct xtables_match *);
 extern void xtables_options_fcheck(const char *, unsigned int,
 				   const struct xt_option_entry *);
 

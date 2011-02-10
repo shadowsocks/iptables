@@ -1816,20 +1816,10 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 			"\nThe \"nat\" table is not intended for filtering, "
 		        "the use of DROP is therefore inhibited.\n\n");
 
-	for (matchp = cs.matches; matchp; matchp = matchp->next) {
-		if (matchp->match->x6_options != NULL)
-			xtables_options_fcheck(matchp->match->name,
-					       matchp->match->mflags,
-					       matchp->match->x6_options);
-		if (matchp->match->final_check != NULL)
-			matchp->match->final_check(matchp->match->mflags);
-	}
-
-	if (cs.target != NULL && cs.target->x6_options != NULL)
-		xtables_options_fcheck(cs.target->name, cs.target->tflags,
-				       cs.target->x6_options);
-	if (cs.target != NULL && cs.target->final_check != NULL)
-		cs.target->final_check(cs.target->tflags);
+	for (matchp = cs.matches; matchp; matchp = matchp->next)
+		xtables_option_mfcall(matchp->match);
+	if (cs.target != NULL)
+		xtables_option_tfcall(cs.target);
 
 	/* Fix me: must put inverse options checking here --MN */
 
