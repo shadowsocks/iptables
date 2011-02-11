@@ -1269,9 +1269,9 @@ static void command_default(struct iptables_command_state *cs)
 	struct xtables_rule_match *matchp;
 	struct xtables_match *m;
 
-	if (cs->target == NULL || cs->target->parse == NULL ||
-	    cs->c < cs->target->option_offset ||
-	    cs->c >= cs->target->option_offset + XT_OPTION_OFFSET_SCALE) {
+	if (cs->target != NULL && cs->target->parse != NULL &&
+	    cs->c >= cs->target->option_offset &&
+	    cs->c < cs->target->option_offset + XT_OPTION_OFFSET_SCALE) {
 		cs->target->parse(cs->c - cs->target->option_offset, cs->argv,
 				  cs->invert, &cs->target->tflags, &cs->fw,
 				  &cs->target->t);
