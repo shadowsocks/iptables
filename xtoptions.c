@@ -354,6 +354,53 @@ static void xtopt_parse_onehost(struct xt_option_call *cb)
 		       sizeof(cb->val.inetaddr));
 }
 
+/**
+ * @name:	port name, or number as a string (e.g. "http" or "80")
+ *
+ * Resolve a port name to a number. Returns the port number in integral
+ * form on success, or <0 on error. (errno will not be set.)
+ */
+static int xtables_getportbyname(const char *name)
+{
+	struct addrinfo *res = NULL, *p;
+	int ret;
+
+	ret = getaddrinfo(NULL, name, NULL, &res);
+	if (ret < 0)
+		return -1;
+	ret = -1;
+	for (p = res; p != NULL; p = p->ai_next) {
+		if (p->ai_family == AF_INET6) {
+			ret = ((struct sockaddr_in6 *)p->ai_addr)->sin6_port;
+			break;
+		} else if (p->ai_family == AF_INET) {
+			ret = ((struct sockaddr_in *)p->ai_addr)->sin_port;
+			break;
+		}
+	}
+	freeaddrinfo(res);
+	return ntohs(ret);
+}
+
+/**
+ * Validate and parse a port specification and put the result into @cb.
+ */
+static void xtopt_parse_port(struct xt_option_call *cb)
+{
+	int ret;
+
+	ret = xtables_getportbyname(cb->arg);
+	if (ret < 0)
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"Port \"%s\" does not resolve to anything.\n",
+			cb->arg);
+	cb->val.port = ret;
+	if (cb->entry->type == XTTYPE_PORT_NE)
+		cb->val.port = htons(cb->val.port);
+	if (cb->entry->flags & XTOPT_PUT)
+		*(uint16_t *)XTOPT_MKPTR(cb) = cb->val.port;
+}
+
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT16]      = xtopt_parse_int,
@@ -367,6 +414,8 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_MARKMASK32]  = xtopt_parse_markmask,
 	[XTTYPE_SYSLOGLEVEL] = xtopt_parse_sysloglevel,
 	[XTTYPE_ONEHOST]     = xtopt_parse_onehost,
+	[XTTYPE_PORT]        = xtopt_parse_port,
+	[XTTYPE_PORT_NE]     = xtopt_parse_port,
 };
 
 static const size_t xtopt_psize[] = {
@@ -381,6 +430,8 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_STRING]      = -1,
 	[XTTYPE_SYSLOGLEVEL] = sizeof(uint8_t),
 	[XTTYPE_ONEHOST]     = sizeof(union nf_inet_addr),
+	[XTTYPE_PORT]        = sizeof(uint16_t),
+	[XTTYPE_PORT_NE]     = sizeof(uint16_t),
 };
 
 /**
