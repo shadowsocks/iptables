@@ -297,6 +297,63 @@ static void xtopt_parse_sysloglevel(struct xt_option_call *cb)
 		*(uint8_t *)XTOPT_MKPTR(cb) = num;
 }
 
+static void *xtables_sa_host(const void *sa, unsigned int afproto)
+{
+	if (afproto == AF_INET6)
+		return &((struct sockaddr_in6 *)sa)->sin6_addr;
+	else if (afproto == AF_INET)
+		return &((struct sockaddr_in *)sa)->sin_addr;
+	return (void *)sa;
+}
+
+static socklen_t xtables_sa_hostlen(unsigned int afproto)
+{
+	if (afproto == AF_INET6)
+		return sizeof(struct in6_addr);
+	else if (afproto == AF_INET)
+		return sizeof(struct in_addr);
+	return 0;
+}
+
+/**
+ * Accepts: a hostname (DNS), or a single inetaddr.
+ */
+static void xtopt_parse_onehost(struct xt_option_call *cb)
+{
+	struct addrinfo hints = {.ai_family = afinfo->family};
+	unsigned int adcount = 0;
+	struct addrinfo *res, *p;
+	int ret;
+
+	ret = getaddrinfo(cb->arg, NULL, &hints, &res);
+	if (ret < 0)
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"getaddrinfo: %s\n", gai_strerror(ret));
+
+	for (p = res; p != NULL; p = p->ai_next) {
+		if (adcount == 0) {
+			memset(&cb->val.inetaddr, 0, sizeof(cb->val.inetaddr));
+			memcpy(&cb->val.inetaddr,
+			       xtables_sa_host(p->ai_addr, p->ai_family),
+			       xtables_sa_hostlen(p->ai_family));
+			++adcount;
+			continue;
+		}
+		if (memcmp(&cb->val.inetaddr,
+		    xtables_sa_host(p->ai_addr, p->ai_family),
+		    xtables_sa_hostlen(p->ai_family)) != 0)
+			xt_params->exit_err(PARAMETER_PROBLEM,
+				"%s resolves to more than one address\n",
+				cb->arg);
+	}
+
+	freeaddrinfo(res);
+	if (cb->entry->flags & XTOPT_PUT)
+		/* Validation in xtables_option_metavalidate */
+		memcpy(XTOPT_MKPTR(cb), &cb->val.inetaddr,
+		       sizeof(cb->val.inetaddr));
+}
+
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT16]      = xtopt_parse_int,
@@ -309,6 +366,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_STRING]      = xtopt_parse_string,
 	[XTTYPE_MARKMASK32]  = xtopt_parse_markmask,
 	[XTTYPE_SYSLOGLEVEL] = xtopt_parse_sysloglevel,
+	[XTTYPE_ONEHOST]     = xtopt_parse_onehost,
 };
 
 static const size_t xtopt_psize[] = {
@@ -322,6 +380,7 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_UINT64RC]    = sizeof(uint64_t[2]),
 	[XTTYPE_STRING]      = -1,
 	[XTTYPE_SYSLOGLEVEL] = sizeof(uint8_t),
+	[XTTYPE_ONEHOST]     = sizeof(union nf_inet_addr),
 };
 
 /**

@@ -52,6 +52,7 @@ struct in_addr;
  * %XTTYPE_STRING:	arbitrary string
  * %XTTYPE_MARKMASK32:	32-bit mark with optional mask
  * %XTTYPE_SYSLOGLEVEL:	syslog level by name or number
+ * %XTTYPE_ONEHOST:	one host or address (union nf_inet_addr)
  */
 enum xt_option_type {
 	XTTYPE_NONE,
@@ -66,6 +67,7 @@ enum xt_option_type {
 	XTTYPE_STRING,
 	XTTYPE_MARKMASK32,
 	XTTYPE_SYSLOGLEVEL,
+	XTTYPE_ONEHOST,
 };
 
 /**
@@ -124,6 +126,7 @@ struct xt_option_call {
 		uint16_t u16, u16_range[2];
 		uint32_t u32, u32_range[2];
 		uint64_t u64, u64_range[2];
+		union nf_inet_addr inetaddr;
 		struct {
 			uint32_t mark, mask;
 		};
