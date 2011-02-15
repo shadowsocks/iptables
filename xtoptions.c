@@ -163,16 +163,41 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 	}
 }
 
+static void xtopt_parse_string(struct xt_option_call *cb)
+{
+	const struct xt_option_entry *entry = cb->entry;
+	size_t z = strlen(cb->arg);
+	char *p;
+
+	if (entry->min != 0 && z < entry->min)
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"Argument must have a minimum length of "
+			"%u characters\n", entry->min);
+	if (entry->max != 0 && z > entry->max)
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"Argument must have a maximum length of "
+			"%u characters\n", entry->max);
+	if (!(entry->flags & XTOPT_PUT))
+		return;
+	if (z >= entry->size)
+		z = entry->size - 1;
+	p = XTOPT_MKPTR(cb);
+	strncpy(p, cb->arg, z);
+	p[z] = '\0';
+}
+
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT32]      = xtopt_parse_int,
 	[XTTYPE_UINT32RC]    = xtopt_parse_mint,
+	[XTTYPE_STRING]      = xtopt_parse_string,
 };
 
 static const size_t xtopt_psize[] = {
 	[XTTYPE_UINT8]       = sizeof(uint8_t),
 	[XTTYPE_UINT32]      = sizeof(uint32_t),
 	[XTTYPE_UINT32RC]    = sizeof(uint32_t[2]),
+	[XTTYPE_STRING]      = -1,
 };
 
 /**

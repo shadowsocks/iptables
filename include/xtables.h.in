@@ -49,12 +49,14 @@ struct in_addr;
  * %XTTYPE_NONE:	option takes no argument
  * %XTTYPE_UINT*:	standard integer
  * %XTTYPE_UINT*RC:	colon-separated range of standard integers
+ * %XTTYPE_STRING:	arbitrary string
  */
 enum xt_option_type {
 	XTTYPE_NONE,
 	XTTYPE_UINT8,
 	XTTYPE_UINT32,
 	XTTYPE_UINT32RC,
+	XTTYPE_STRING,
 };
 
 /**
