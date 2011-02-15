@@ -138,17 +138,17 @@ static void ecn_save(const void *ip, const struct xt_entry_match *match)
 }
 
 static struct xtables_match ecn_mt_reg = {
-    .name          = "ecn",
-    .version       = XTABLES_VERSION,
-    .family        = NFPROTO_IPV4,
-    .size          = XT_ALIGN(sizeof(struct ipt_ecn_info)),
-    .userspacesize = XT_ALIGN(sizeof(struct ipt_ecn_info)),
-    .help          = ecn_help,
-    .parse         = ecn_parse,
-    .final_check   = ecn_check,
-    .print         = ecn_print,
-    .save          = ecn_save,
-    .extra_opts    = ecn_opts,
+	.name          = "ecn",
+	.version       = XTABLES_VERSION,
+	.family        = NFPROTO_IPV4,
+	.size          = XT_ALIGN(sizeof(struct ipt_ecn_info)),
+	.userspacesize = XT_ALIGN(sizeof(struct ipt_ecn_info)),
+	.help          = ecn_help,
+	.parse         = ecn_parse,
+	.final_check   = ecn_check,
+	.print         = ecn_print,
+	.save          = ecn_save,
+	.extra_opts    = ecn_opts,
 };
 
 void _init(void)

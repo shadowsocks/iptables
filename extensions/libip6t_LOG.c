@@ -257,17 +257,17 @@ static void LOG_save(const void *ip, const struct xt_entry_target *target)
 }
 
 static struct xtables_target log_tg6_reg = {
-    .name          = "LOG",
-    .version       = XTABLES_VERSION,
-    .family        = NFPROTO_IPV6,
-    .size          = XT_ALIGN(sizeof(struct ip6t_log_info)),
-    .userspacesize = XT_ALIGN(sizeof(struct ip6t_log_info)),
-    .help          = LOG_help,
-    .init          = LOG_init,
-    .parse         = LOG_parse,
-    .print         = LOG_print,
-    .save          = LOG_save,
-    .extra_opts    = LOG_opts,
+	.name          = "LOG",
+	.version       = XTABLES_VERSION,
+	.family        = NFPROTO_IPV6,
+	.size          = XT_ALIGN(sizeof(struct ip6t_log_info)),
+	.userspacesize = XT_ALIGN(sizeof(struct ip6t_log_info)),
+	.help          = LOG_help,
+	.init          = LOG_init,
+	.parse         = LOG_parse,
+	.print         = LOG_print,
+	.save          = LOG_save,
+	.extra_opts    = LOG_opts,
 };
 
 void _init(void)
