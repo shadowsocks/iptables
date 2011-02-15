@@ -17,12 +17,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 #include <arpa/inet.h>
 #include "xtables.h"
 #include "xshared.h"
 
 #define XTOPT_MKPTR(cb) \
 	((void *)((char *)(cb)->data + (cb)->entry->ptroff))
+
+/**
+ * Simple key-value pairs for syslog levels
+ */
+struct syslog_level {
+	char name[8];
+	uint8_t level;
+};
 
 /**
  * Creates getopt options from the x6-style option map, and assigns each a
@@ -251,6 +260,43 @@ static void xtopt_parse_markmask(struct xt_option_call *cb)
 	cb->val.mask = mask;
 }
 
+static int xtopt_sysloglvl_compare(const void *a, const void *b)
+{
+	const char *name = a;
+	const struct syslog_level *entry = b;
+
+	return strcmp(name, entry->name);
+}
+
+static void xtopt_parse_sysloglevel(struct xt_option_call *cb)
+{
+	static const struct syslog_level log_names[] = { /* must be sorted */
+		{"alert",   LOG_ALERT},
+		{"crit",    LOG_CRIT},
+		{"debug",   LOG_DEBUG},
+		{"emerg",   LOG_EMERG},
+		{"error",   LOG_ERR}, /* deprecated */
+		{"info",    LOG_INFO},
+		{"notice",  LOG_NOTICE},
+		{"panic",   LOG_EMERG}, /* deprecated */
+		{"warning", LOG_WARNING},
+	};
+	const struct syslog_level *e;
+	unsigned int num = 0;
+
+	if (!xtables_strtoui(cb->arg, NULL, &num, 0, 7)) {
+		e = bsearch(cb->arg, log_names, ARRAY_SIZE(log_names),
+			    sizeof(*log_names), xtopt_sysloglvl_compare);
+		if (e == NULL)
+			xt_params->exit_err(PARAMETER_PROBLEM,
+				"log level \"%s\" unknown\n", cb->arg);
+		num = e->level;
+	}
+	cb->val.syslog_level = num;
+	if (cb->entry->flags & XTOPT_PUT)
+		*(uint8_t *)XTOPT_MKPTR(cb) = num;
+}
+
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT16]      = xtopt_parse_int,
@@ -262,6 +308,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT64RC]    = xtopt_parse_mint,
 	[XTTYPE_STRING]      = xtopt_parse_string,
 	[XTTYPE_MARKMASK32]  = xtopt_parse_markmask,
+	[XTTYPE_SYSLOGLEVEL] = xtopt_parse_sysloglevel,
 };
 
 static const size_t xtopt_psize[] = {
@@ -274,6 +321,7 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_UINT32RC]    = sizeof(uint32_t[2]),
 	[XTTYPE_UINT64RC]    = sizeof(uint64_t[2]),
 	[XTTYPE_STRING]      = -1,
+	[XTTYPE_SYSLOGLEVEL] = sizeof(uint8_t),
 };
 
 /**
