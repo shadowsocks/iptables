@@ -225,14 +225,14 @@ print_devgroup(unsigned int id, unsigned int mask, int numeric)
 	const char *name = NULL;
 
 	if (mask != 0xffffffff)
-		printf("0x%x/0x%x ", id, mask);
+		printf("0x%x/0x%x", id, mask);
 	else {
 		if (numeric == 0)
 			name = devgroup_id2name(id);
 		if (name)
-			printf("%s ", name);
+			printf("%s", name);
 		else
-			printf("0x%x ", id);
+			printf("0x%x", id);
 	}
 }
 
@@ -241,15 +241,15 @@ static void devgroup_show(const char *pfx, const struct xt_devgroup_info *info,
 {
 	if (info->flags & XT_DEVGROUP_MATCH_SRC) {
 		if (info->flags & XT_DEVGROUP_INVERT_SRC)
-			printf("! ");
-		printf("%ssrc-group ", pfx);
+			printf(" !");
+		printf(" %ssrc-group ", pfx);
 		print_devgroup(info->src_group, info->src_mask, numeric);
 	}
 
 	if (info->flags & XT_DEVGROUP_MATCH_DST) {
 		if (info->flags & XT_DEVGROUP_INVERT_DST)
-			printf("! ");
-		printf("%sdst-group ", pfx);
+			printf(" !");
+		printf(" %sdst-group ", pfx);
 		print_devgroup(info->src_group, info->src_mask, numeric);
 	}
 }
