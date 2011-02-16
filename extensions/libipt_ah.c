@@ -1,13 +1,10 @@
-/* Shared library add-on to iptables to add AH support. */
-#include <stdbool.h>
 #include <stdio.h>
-#include <netdb.h>
-#include <string.h>
-#include <stdlib.h>
-#include <getopt.h>
-#include <errno.h>
 #include <xtables.h>
 #include <linux/netfilter_ipv4/ipt_ah.h>
+
+enum {
+	O_AHSPI = 0,
+};
 
 static void ah_help(void)
 {
@@ -17,52 +14,12 @@ static void ah_help(void)
 "				match spi (range)\n");
 }
 
-static const struct option ah_opts[] = {
-	{.name = "ahspi", .has_arg = true, .val = '1'},
-	XT_GETOPT_TABLEEND,
+static const struct xt_option_entry ah_opts[] = {
+	{.name = "ahspi", .id = O_AHSPI, .type = XTTYPE_UINT32RC,
+	 .flags = XTOPT_INVERT | XTOPT_PUT,
+	 XTOPT_POINTER(struct ipt_ah, spis)},
+	XTOPT_TABLEEND,
 };
-
-static uint32_t
-parse_ah_spi(const char *spistr)
-{
-	unsigned long int spi;
-	char* ep;
-
-	spi =  strtoul(spistr,&ep,0) ;
-
-	if ( spistr == ep ) {
-		xtables_error(PARAMETER_PROBLEM,
-			   "AH no valid digits in spi `%s'", spistr);
-	}
-	if ( spi == ULONG_MAX  && errno == ERANGE ) {
-		xtables_error(PARAMETER_PROBLEM,
-			   "spi `%s' specified too big: would overflow", spistr);
-	}	
-	if ( *spistr != '\0'  && *ep != '\0' ) {
-		xtables_error(PARAMETER_PROBLEM,
-			   "AH error parsing spi `%s'", spistr);
-	}
-	return spi;
-}
-
-static void
-parse_ah_spis(const char *spistring, uint32_t *spis)
-{
-	char *buffer;
-	char *cp;
-
-	buffer = strdup(spistring);
-	if ((cp = strchr(buffer, ':')) == NULL)
-		spis[0] = spis[1] = parse_ah_spi(buffer);
-	else {
-		*cp = '\0';
-		cp++;
-
-		spis[0] = buffer[0] ? parse_ah_spi(buffer) : 0;
-		spis[1] = cp[0] ? parse_ah_spi(cp) : 0xFFFFFFFF;
-	}
-	free(buffer);
-}
 
 static void ah_init(struct xt_entry_match *m)
 {
@@ -71,27 +28,13 @@ static void ah_init(struct xt_entry_match *m)
 	ahinfo->spis[1] = 0xFFFFFFFF;
 }
 
-#define AH_SPI 0x01
-
-static int ah_parse(int c, char **argv, int invert, unsigned int *flags,
-                    const void *entry, struct xt_entry_match **match)
+static void ah_parse(struct xt_option_call *cb)
 {
-	struct ipt_ah *ahinfo = (struct ipt_ah *)(*match)->data;
+	struct ipt_ah *ahinfo = cb->data;
 
-	switch (c) {
-	case '1':
-		if (*flags & AH_SPI)
-			xtables_error(PARAMETER_PROBLEM,
-				   "Only one `--ahspi' allowed");
-		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		parse_ah_spis(optarg, ahinfo->spis);
-		if (invert)
-			ahinfo->invflags |= IPT_AH_INV_SPI;
-		*flags |= AH_SPI;
-		break;
-	}
-
-	return 1;
+	xtables_option_parse(cb);
+	if (cb->invert)
+		ahinfo->invflags |= IPT_AH_INV_SPI;
 }
 
 static void
@@ -155,10 +98,10 @@ static struct xtables_match ah_mt_reg = {
 	.userspacesize 	= XT_ALIGN(sizeof(struct ipt_ah)),
 	.help 		= ah_help,
 	.init 		= ah_init,
-	.parse 		= ah_parse,
 	.print 		= ah_print,
 	.save 		= ah_save,
-	.extra_opts 	= ah_opts,
+	.x6_parse	= ah_parse,
+	.x6_options	= ah_opts,
 };
 
 void
