@@ -47,9 +47,11 @@ struct in_addr;
 
 /**
  * %XTTYPE_NONE:	option takes no argument
+ * %XTTYPE_UINT*:	standard integer
  */
 enum xt_option_type {
 	XTTYPE_NONE,
+	XTTYPE_UINT32,
 };
 
 /**
@@ -99,7 +101,7 @@ struct xt_option_call {
 	unsigned int xflags;
 	bool invert;
 	union {
-		/* to be filled */
+		uint32_t u32;
 	} val;
 };
 

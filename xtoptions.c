@@ -80,12 +80,34 @@ xtables_options_xfrm(struct option *orig_opts, struct option *oldopts,
 	return merge;
 }
 
+/**
+ * Require a simple integer.
+ */
+static void xtopt_parse_int(struct xt_option_call *cb)
+{
+	const struct xt_option_entry *entry = cb->entry;
+	unsigned int lmin = 0, lmax = UINT32_MAX;
+	unsigned int value;
+
+	if (!xtables_strtoui(cb->arg, NULL, &value, lmin, lmax))
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"%s: bad value for option \"--%s\", "
+			"or out of range (%u-%u).\n",
+			cb->ext_name, entry->name, lmin, lmax);
+
+	if (entry->type == XTTYPE_UINT32) {
+		cb->val.u32 = value;
+		if (entry->flags & XTOPT_PUT)
+			*(uint32_t *)XTOPT_MKPTR(cb) = cb->val.u32;
+	}
+}
+
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
-	[XTTYPE_NONE]        = NULL,
+	[XTTYPE_UINT32]      = xtopt_parse_int,
 };
 
 static const size_t xtopt_psize[] = {
-	[XTTYPE_NONE]        = 0,
+	[XTTYPE_UINT32]      = sizeof(uint32_t),
 };
 
 /**
