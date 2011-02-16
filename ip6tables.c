@@ -962,7 +962,7 @@ print_iface(char letter, const char *iface, const unsigned char *mask,
 	if (mask[0] == 0)
 		return;
 
-	printf("%s -%c", invert ? " !" : "", letter);
+	printf("%s -%c ", invert ? " !" : "", letter);
 
 	for (i = 0; i < IFNAMSIZ; i++) {
 		if (mask[i] != 0) {
