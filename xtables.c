@@ -1638,7 +1638,7 @@ void xtables_save_string(const char *value)
 	size_t length;
 	const char *p;
 
-	length = strcspn(value, no_quote_chars);
+	length = strspn(value, no_quote_chars);
 	if (length > 0 && value[length] == 0) {
 		/* no quoting required */
 		putchar(' ');
