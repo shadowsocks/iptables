@@ -15,7 +15,7 @@ static void ah_help(void)
 "ah match options:\n"
 "[!] --ahspi spi[:spi]          match spi (range)\n"
 "[!] --ahlen length             total length of this header\n"
-" --ahres                       check the reserved filed, too\n");
+" --ahres                       check the reserved field too\n");
 }
 
 static const struct option ah_opts[] = {

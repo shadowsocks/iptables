@@ -15,7 +15,7 @@ static void frag_help(void)
 "frag match options:\n"
 "[!] --fragid id[:id]           match the id (range)\n"
 "[!] --fraglen length           total length of this header\n"
-" --fragres                     check the reserved filed, too\n"
+" --fragres                     check the reserved field too\n"
 " --fragfirst                   matches on the first fragment\n"
 " [--fragmore|--fraglast]       there are more fragments or this\n"
 "                               is the last one\n");
