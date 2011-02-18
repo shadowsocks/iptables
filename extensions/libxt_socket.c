@@ -3,15 +3,17 @@
  *
  * Copyright (C) 2007 BalaBit IT Ltd.
  */
-#include <getopt.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <xtables.h>
 #include <linux/netfilter/xt_socket.h>
 
-static const struct option socket_mt_opts[] = {
-	{.name = "transparent", .has_arg = false, .val = 't'},
-	XT_GETOPT_TABLEEND,
+enum {
+	O_TRANSPARENT = 0,
+};
+
+static const struct xt_option_entry socket_mt_opts[] = {
+	{.name = "transparent", .id = O_TRANSPARENT, .type = XTTYPE_NONE},
+	XTOPT_TABLEEND,
 };
 
 static void socket_mt_help(void)
@@ -21,17 +23,16 @@ static void socket_mt_help(void)
 		"  --transparent    Ignore non-transparent sockets\n\n");
 }
 
-static int socket_mt_parse(int c, char **argv, int invert, unsigned int *flags,
-			   const void *entry, struct xt_entry_match **match)
+static void socket_mt_parse(struct xt_option_call *cb)
 {
-	struct xt_socket_mtinfo1 *info = (void *)(*match)->data;
+	struct xt_socket_mtinfo1 *info = cb->data;
 
-	switch (c) {
-	case 't':
+	xtables_option_parse(cb);
+	switch (cb->entry->id) {
+	case O_TRANSPARENT:
 		info->flags |= XT_SOCKET_TRANSPARENT;
-		return true;
+		break;
 	}
-	return false;
 }
 
 static void
@@ -68,10 +69,10 @@ static struct xtables_match socket_mt_reg[] = {
 		.size          = XT_ALIGN(sizeof(struct xt_socket_mtinfo1)),
 		.userspacesize = XT_ALIGN(sizeof(struct xt_socket_mtinfo1)),
 		.help          = socket_mt_help,
-		.parse         = socket_mt_parse,
 		.print         = socket_mt_print,
 		.save          = socket_mt_save,
-		.extra_opts    = socket_mt_opts,
+		.x6_parse      = socket_mt_parse,
+		.x6_options    = socket_mt_opts,
 	},
 };
 
