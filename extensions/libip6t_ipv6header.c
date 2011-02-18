@@ -146,15 +146,6 @@ static const struct option ipv6header_opts[] = {
 	XT_GETOPT_TABLEEND,
 };
 
-static void ipv6header_init(struct xt_entry_match *m)
-{
-	struct ip6t_ipv6header_info *info = (struct ip6t_ipv6header_info *)m->data;
-
-	info->matchflags = 0x00;
-	info->invflags = 0x00;
-	info->modeflag = 0x00;
-}
-
 static unsigned int
 parse_header(const char *flags) {
         unsigned int ret = 0;
@@ -273,7 +264,6 @@ static struct xtables_match ipv6header_mt6_reg = {
 	.size		= XT_ALIGN(sizeof(struct ip6t_ipv6header_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ip6t_ipv6header_info)),
 	.help		= ipv6header_help,
-	.init		= ipv6header_init,
 	.parse		= ipv6header_parse,
 	.final_check	= ipv6header_check,
 	.print		= ipv6header_print,

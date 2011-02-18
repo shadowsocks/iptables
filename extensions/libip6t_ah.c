@@ -73,8 +73,6 @@ static void ah_init(struct xt_entry_match *m)
 	struct ip6t_ah *ahinfo = (struct ip6t_ah *)m->data;
 
 	ahinfo->spis[1] = 0xFFFFFFFF;
-	ahinfo->hdrlen = 0;
-	ahinfo->hdrres = 0;
 }
 
 static int ah_parse(int c, char **argv, int invert, unsigned int *flags,

@@ -100,16 +100,6 @@ parse_options(const char *optsstr, uint16_t *opts)
 	return i;
 }
 
-static void hbh_init(struct xt_entry_match *m)
-{
-	struct ip6t_opts *optinfo = (struct ip6t_opts *)m->data;
-
-	optinfo->hdrlen = 0;
-	optinfo->flags = 0;
-	optinfo->invflags = 0;
-	optinfo->optsnr = 0;
-}
-
 static int hbh_parse(int c, char **argv, int invert, unsigned int *flags,
                      const void *entry, struct xt_entry_match **match)
 {
@@ -211,7 +201,6 @@ static struct xtables_match hbh_mt6_reg = {
 	.size		= XT_ALIGN(sizeof(struct ip6t_opts)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ip6t_opts)),
 	.help		= hbh_help,
-	.init		= hbh_init,
 	.parse		= hbh_parse,
 	.print		= hbh_print,
 	.save		= hbh_save,

@@ -36,7 +36,6 @@ static void NFLOG_init(struct xt_entry_target *t)
 {
 	struct xt_nflog_info *info = (struct xt_nflog_info *)t->data;
 
-	info->group	= 0;
 	info->threshold	= XT_NFLOG_DEFAULT_THRESHOLD;
 }
 

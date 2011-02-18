@@ -26,13 +26,6 @@
 #define DEBUGP(format, fist...) 
 #endif
 
-static void dccp_init(struct xt_entry_match *m)
-{
-	struct xt_dccp_info *einfo = (struct xt_dccp_info *)m->data;
-
-	memset(einfo, 0, sizeof(struct xt_dccp_info));
-}
-
 static void dccp_help(void)
 {
 	printf(
@@ -340,7 +333,6 @@ static struct xtables_match dccp_match = {
 	.size		= XT_ALIGN(sizeof(struct xt_dccp_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_dccp_info)),
 	.help		= dccp_help,
-	.init		= dccp_init,
 	.parse		= dccp_parse,
 	.print		= dccp_print,
 	.save		= dccp_save,

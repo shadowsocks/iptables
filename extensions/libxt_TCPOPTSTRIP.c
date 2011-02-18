@@ -56,14 +56,6 @@ static void tcpoptstrip_tg_help(void)
 		printf("    %-14s    strip \"%s\" option\n", w->name, w->desc);
 }
 
-static void tcpoptstrip_tg_init(struct xt_entry_target *t)
-{
-	struct xt_tcpoptstrip_target_info *info = (void *)t->data;
-
-	/* strictly necessary? play safe for now. */
-	memset(info->strip_bmap, 0, sizeof(info->strip_bmap));
-}
-
 static void parse_list(struct xt_tcpoptstrip_target_info *info, char *arg)
 {
 	unsigned int option;
@@ -184,7 +176,6 @@ static struct xtables_target tcpoptstrip_tg_reg = {
 	.size          = XT_ALIGN(sizeof(struct xt_tcpoptstrip_target_info)),
 	.userspacesize = XT_ALIGN(sizeof(struct xt_tcpoptstrip_target_info)),
 	.help          = tcpoptstrip_tg_help,
-	.init          = tcpoptstrip_tg_init,
 	.parse         = tcpoptstrip_tg_parse,
 	.final_check   = tcpoptstrip_tg_check,
 	.print         = tcpoptstrip_tg_print,

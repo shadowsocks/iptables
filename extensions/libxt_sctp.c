@@ -35,8 +35,6 @@ static void sctp_init(struct xt_entry_match *m)
 	int i;
 	struct xt_sctp_info *einfo = (struct xt_sctp_info *)m->data;
 
-	memset(einfo, 0, sizeof(struct xt_sctp_info));
-
 	for (i = 0; i < XT_NUM_SCTP_FLAGS; i++) {
 		einfo->flag_info[i].chunktype = -1;
 	}

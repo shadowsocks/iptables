@@ -140,13 +140,7 @@ static void rt_init(struct xt_entry_match *m)
 {
 	struct ip6t_rt *rtinfo = (struct ip6t_rt *)m->data;
 
-	rtinfo->rt_type = 0x0L;
-	rtinfo->segsleft[0] = 0x0L;
 	rtinfo->segsleft[1] = 0xFFFFFFFF;
-	rtinfo->hdrlen = 0;
-	rtinfo->flags = 0;
-	rtinfo->invflags = 0;
-	rtinfo->addrnr = 0;
 }
 
 static int rt_parse(int c, char **argv, int invert, unsigned int *flags,

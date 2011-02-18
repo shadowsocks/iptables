@@ -134,7 +134,6 @@ static void hashlimit_init(struct xt_entry_match *m)
 {
 	struct xt_hashlimit_info *r = (struct xt_hashlimit_info *)m->data;
 
-	r->cfg.mode = 0;
 	r->cfg.burst = XT_HASHLIMIT_BURST;
 	r->cfg.gc_interval = XT_HASHLIMIT_GCINTERVAL;
 	r->cfg.expire = XT_HASHLIMIT_EXPIRE;

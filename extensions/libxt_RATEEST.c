@@ -82,13 +82,6 @@ RATEEST_print_time(unsigned int time)
 		printf(" %uus", time);
 }
 
-static void
-RATEEST_init(struct xt_entry_target *target)
-{
-	interval = 0;
-	ewma_log = 0;
-}
-
 static int
 RATEEST_parse(int c, char **argv, int invert, unsigned int *flags,
 	      const void *entry, struct xt_entry_target **target)
@@ -206,7 +199,6 @@ static struct xtables_target rateest_tg_reg = {
 	.size		= XT_ALIGN(sizeof(struct xt_rateest_target_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_rateest_target_info)),
 	.help		= RATEEST_help,
-	.init		= RATEEST_init,
 	.parse		= RATEEST_parse,
 	.final_check	= RATEEST_final_check,
 	.print		= RATEEST_print,

@@ -32,17 +32,6 @@ static const struct option SAME_opts[] = {
 	XT_GETOPT_TABLEEND,
 };
 
-static void SAME_init(struct xt_entry_target *t)
-{
-	struct ipt_same_info *mr = (struct ipt_same_info *)t->data;
-
-	/* Set default to 0 */
-	mr->rangesize = 0;
-	mr->info = 0;
-	mr->ipnum = 0;
-	
-}
-
 /* Parses range of IPs */
 static void
 parse_to(char *arg, struct nf_nat_range *range)
@@ -197,7 +186,6 @@ static struct xtables_target same_tg_reg = {
 	.size		= XT_ALIGN(sizeof(struct ipt_same_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ipt_same_info)),
 	.help		= SAME_help,
-	.init		= SAME_init,
 	.parse		= SAME_parse,
 	.final_check	= SAME_check,
 	.print		= SAME_print,

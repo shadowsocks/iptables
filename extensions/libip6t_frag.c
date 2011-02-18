@@ -78,11 +78,7 @@ static void frag_init(struct xt_entry_match *m)
 {
 	struct ip6t_frag *fraginfo = (struct ip6t_frag *)m->data;
 
-	fraginfo->ids[0] = 0x0L;
 	fraginfo->ids[1] = 0xFFFFFFFF;
-	fraginfo->hdrlen = 0;
-	fraginfo->flags = 0;
-	fraginfo->invflags = 0;
 }
 
 static int frag_parse(int c, char **argv, int invert, unsigned int *flags,
