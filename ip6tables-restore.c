@@ -6,8 +6,6 @@
  *      Harald Welte <laforge@gnumonks.org>
  *      Rusty Russell <rusty@linuxcare.com.au>
  * This code is distributed under the terms of GNU GPL v2
- *
- * $Id$
  */
 
 #include <getopt.h>

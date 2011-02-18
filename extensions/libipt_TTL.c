@@ -1,8 +1,6 @@
 /* Shared library add-on to iptables for the TTL target
  * (C) 2000 by Harald Welte <laforge@gnumonks.org>
  *
- * $Id$
- *
  * This program is distributed under the terms of GNU GPL
  */
 #include <stdbool.h>

@@ -5,8 +5,6 @@
  * This program is distributed under the terms of GNU GPL v2, 1991
  *
  * libipt_ECN.c borrowed heavily from libipt_DSCP.c
- *
- * $Id$
  */
 #include <stdbool.h>
 #include <stdio.h>

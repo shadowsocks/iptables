@@ -4,8 +4,6 @@
  * based on previous code from Rusty Russell <rusty@linuxcare.com.au>
  *
  * This code is distributed under the terms of GNU GPL v2
- *
- * $Id: iptables-xml.c,v 1.4 2006/11/09 12:02:17 azez Exp $
  */
 
 #include <getopt.h>
