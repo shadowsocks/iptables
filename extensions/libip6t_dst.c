@@ -25,7 +25,6 @@ IP6T_OPTS_OPTSNR);
 static const struct option dst_opts[] = {
 	{.name = "dst-len",        .has_arg = true, .val = '1'},
 	{.name = "dst-opts",       .has_arg = true, .val = '2'},
-	{.name = "dst-not-strict", .has_arg = true, .val = '3'},
 	XT_GETOPT_TABLEEND,
 };
 
@@ -135,17 +134,6 @@ static int dst_parse(int c, char **argv, int invert, unsigned int *flags,
 		optinfo->flags |= IP6T_OPTS_OPTS;
 		*flags |= IP6T_OPTS_OPTS;
 		break;
-	case '3':
-		if (*flags & IP6T_OPTS_NSTRICT)
-			xtables_error(PARAMETER_PROBLEM,
-				   "Only one `--dst-not-strict' allowed");
-		if ( !(*flags & IP6T_OPTS_OPTS) )
-			xtables_error(PARAMETER_PROBLEM,
-				   "`--dst-opts ...' required before "
-				   "`--dst-not-strict'");
-		optinfo->flags |= IP6T_OPTS_NSTRICT;
-		*flags |= IP6T_OPTS_NSTRICT;
-		break;
 	}
 
 	return 1;
@@ -183,9 +171,6 @@ static void dst_print(const void *ip, const struct xt_entry_match *match,
 
 	print_options(optinfo->optsnr, (uint16_t *)optinfo->opts);
 
-	if (optinfo->flags & IP6T_OPTS_NSTRICT)
-		printf(" not-strict");
-
 	if (optinfo->invflags & ~IP6T_OPTS_INV_MASK)
 		printf(" Unknown invflags: 0x%X",
 		       optinfo->invflags & ~IP6T_OPTS_INV_MASK);
@@ -205,9 +190,6 @@ static void dst_save(const void *ip, const struct xt_entry_match *match)
 		printf(" --dst-opts");
 
 	print_options(optinfo->optsnr, (uint16_t *)optinfo->opts);
-
-	if (optinfo->flags & IP6T_OPTS_NSTRICT)
-		printf(" --dst-not-strict");
 }
 
 static struct xtables_match dst_mt6_reg = {
