@@ -190,7 +190,7 @@ static int DNAT_parse(int c, char **argv, int invert, unsigned int *flags,
 
 static void DNAT_check(unsigned int flags)
 {
-	if (!flags)
+	if (!(flags & IPT_DNAT_OPT_DEST))
 		xtables_error(PARAMETER_PROBLEM,
 			   "You must specify --to-destination");
 }

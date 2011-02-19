@@ -97,7 +97,7 @@ static void ECN_check(unsigned int flags)
 {
 	if (!flags)
 		xtables_error(PARAMETER_PROBLEM,
-		           "ECN target: Parameter --ecn-tcp-remove is required");
+		           "ECN target: An operation is required");
 }
 
 static void ECN_print(const void *ip, const struct xt_entry_target *target,

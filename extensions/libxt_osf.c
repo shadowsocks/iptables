@@ -114,7 +114,7 @@ static int osf_parse(int c, char **argv, int invert, unsigned int *flags,
 
 static void osf_final_check(unsigned int flags)
 {
-	if (!flags)
+	if (!(flags & XT_OSF_GENRE))
 		xtables_error(PARAMETER_PROBLEM,
 			      "OS fingerprint match: You must specify `--genre'");
 }
