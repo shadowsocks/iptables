@@ -53,7 +53,7 @@ static int ECN_parse(int c, char **argv, int invert, unsigned int *flags,
 		einfo->operation = IPT_ECN_OP_SET_ECE | IPT_ECN_OP_SET_CWR;
 		einfo->proto.tcp.ece = 0;
 		einfo->proto.tcp.cwr = 0;
-		*flags = 1;
+		*flags |= IPT_ECN_OP_SET_ECE | IPT_ECN_OP_SET_CWR;
 		break;
 	case 'G':
 		if (*flags & IPT_ECN_OP_SET_CWR)
