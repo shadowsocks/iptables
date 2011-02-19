@@ -27,7 +27,6 @@ IP6T_OPTS_OPTSNR);
 static const struct option hbh_opts[] = {
 	{.name = "hbh-len",        .has_arg = true, .val = '1'},
 	{.name = "hbh-opts",       .has_arg = true, .val = '2'},
-	{.name = "hbh-not-strict", .has_arg = true, .val = '3'},
 	XT_GETOPT_TABLEEND,
 };
 
@@ -129,16 +128,6 @@ static int hbh_parse(int c, char **argv, int invert, unsigned int *flags,
 		optinfo->flags |= IP6T_OPTS_OPTS;
 		*flags |= IP6T_OPTS_OPTS;
 		break;
-	case '3':
-		if (*flags & IP6T_OPTS_NSTRICT)
-			xtables_error(PARAMETER_PROBLEM,
-				   "Only one `--hbh-not-strict' allowed");
-		if ( !(*flags & IP6T_OPTS_OPTS) )
-			xtables_error(PARAMETER_PROBLEM,
-				   "`--hbh-opts ...' required before `--hbh-not-strict'");
-		optinfo->flags |= IP6T_OPTS_NSTRICT;
-		*flags |= IP6T_OPTS_NSTRICT;
-		break;
 	}
 
 	return 1;
@@ -171,7 +160,6 @@ static void hbh_print(const void *ip, const struct xt_entry_match *match,
 	}
 	if (optinfo->flags & IP6T_OPTS_OPTS) printf(" opts");
 	print_options(optinfo->optsnr, (uint16_t *)optinfo->opts);
-	if (optinfo->flags & IP6T_OPTS_NSTRICT) printf(" not-strict");
 	if (optinfo->invflags & ~IP6T_OPTS_INV_MASK)
 		printf(" Unknown invflags: 0x%X",
 		       optinfo->invflags & ~IP6T_OPTS_INV_MASK);
@@ -190,8 +178,6 @@ static void hbh_save(const void *ip, const struct xt_entry_match *match)
 	if (optinfo->flags & IP6T_OPTS_OPTS)
 		printf(" --hbh-opts");
 	print_options(optinfo->optsnr, (uint16_t *)optinfo->opts);
-	if (optinfo->flags & IP6T_OPTS_NSTRICT)
-		printf(" --hbh-not-strict");
 }
 
 static struct xtables_match hbh_mt6_reg = {
