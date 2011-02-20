@@ -72,10 +72,17 @@ quota_parse(int c, char **argv, int invert, unsigned int *flags,
 
 		if (invert)
 			info->flags |= XT_QUOTA_INVERT;
-
+		*flags |= 1;
 		break;
 	}
 	return 1;
+}
+
+static void quota_check(unsigned int flags)
+{
+	if (flags == 0)
+		xtables_error(PARAMETER_PROBLEM,
+			"quota: the --quota argument must be specified\n");
 }
 
 static struct xtables_match quota_match = {
@@ -86,6 +93,7 @@ static struct xtables_match quota_match = {
 	.userspacesize	= offsetof(struct xt_quota_info, master),
 	.help		= quota_help,
 	.parse		= quota_parse,
+	.final_check	= quota_check,
 	.print		= quota_print,
 	.save		= quota_save,
 	.extra_opts	= quota_opts,
