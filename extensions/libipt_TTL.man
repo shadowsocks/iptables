@@ -3,11 +3,11 @@ how many hops (routers) a packet can traverse until it's time to live is
 exceeded.
 .PP
 Setting or incrementing the TTL field can potentially be very dangerous,
-so it should be avoided at any cost.  
-.PP
-.B Don't ever set or increment the value on packets that leave your local network!
+so it should be avoided at any cost. This target is only valid in
 .B mangle
 table.
+.PP
+.B Don't ever set or increment the value on packets that leave your local network!
 .TP
 \fB\-\-ttl\-set\fP \fIvalue\fP
 Set the TTL value to `value'.
