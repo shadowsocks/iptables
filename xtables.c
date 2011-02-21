@@ -1272,7 +1272,7 @@ void xtables_ipparse_multiple(const char *name, struct in_addr **addrpp,
 		free(addrp);
 	}
 	*naddrs = count;
-	for (i = 0; i < n; ++i)
+	for (i = 0; i < count; ++i)
 		(*addrpp+i)->s_addr &= (*maskpp+i)->s_addr;
 }
 
@@ -1587,7 +1587,7 @@ xtables_ip6parse_multiple(const char *name, struct in6_addr **addrpp,
 		free(addrp);
 	}
 	*naddrs = count;
-	for (i = 0; i < n; ++i)
+	for (i = 0; i < count; ++i)
 		for (j = 0; j < 4; ++j)
 			(*addrpp+i)->s6_addr32[j] &= (*maskpp+i)->s6_addr32[j];
 }
