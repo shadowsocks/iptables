@@ -1420,10 +1420,11 @@ struct in6_addr *xtables_numeric_to_ip6addr(const char *num)
 static struct in6_addr *
 host_to_ip6addr(const char *name, unsigned int *naddr)
 {
-	static struct in6_addr *addr;
+	struct in6_addr *addr;
 	struct addrinfo hints;
-	struct addrinfo *res;
+	struct addrinfo *res, *p;
 	int err;
+	unsigned int i;
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_flags    = AI_CANONNAME;
@@ -1437,20 +1438,20 @@ host_to_ip6addr(const char *name, unsigned int *naddr)
 #endif
 		return NULL;
 	} else {
-		if (res->ai_family != AF_INET6 ||
-		    res->ai_addrlen != sizeof(struct sockaddr_in6))
-			return NULL;
-
+		/* Find length of address chain */
+		for (p = res; p != NULL; p = p->ai_next)
+			++*naddr;
 #ifdef DEBUG
 		fprintf(stderr, "resolved: len=%d  %s ", res->ai_addrlen,
 		        xtables_ip6addr_to_numeric(&((struct sockaddr_in6 *)res->ai_addr)->sin6_addr));
 #endif
-		/* Get the first element of the address-chain */
-		addr = xtables_malloc(sizeof(struct in6_addr));
-		memcpy(addr, &((const struct sockaddr_in6 *)res->ai_addr)->sin6_addr,
-		       sizeof(struct in6_addr));
+		/* Copy each element of the address chain */
+		addr = xtables_calloc(*naddr, sizeof(struct in6_addr));
+		for (i = 0, p = res; p != NULL; p = p->ai_next)
+			memcpy(&addr[i++],
+			       &((const struct sockaddr_in6 *)p->ai_addr)->sin6_addr,
+			       sizeof(struct in6_addr));
 		freeaddrinfo(res);
-		*naddr = 1;
 		return addr;
 	}
 
@@ -1562,12 +1563,6 @@ xtables_ip6parse_multiple(const char *name, struct in6_addr **addrpp,
 			strcpy(buf, "::");
 
 		addrp = ip6parse_hostnetwork(buf, &n);
-		/* ip6parse_hostnetwork only ever returns one IP
-		address (it exits if the resolution fails).
-		Therefore, n will always be 1 here.  Leaving the
-		code below in anyway in case ip6parse_hostnetwork
-		is improved some day to behave like
-		ipparse_hostnetwork: */
 		if (n > 1) {
 			count += n - 1;
 			*addrpp = xtables_realloc(*addrpp,
