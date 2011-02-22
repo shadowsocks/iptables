@@ -1311,8 +1311,13 @@ void xtables_ipparse_any(const char *name, struct in_addr **addrpp,
 		addrp[j++].s_addr &= maskp->s_addr;
 		for (k = 0; k < j - 1; ++k)
 			if (addrp[k].s_addr == addrp[j-1].s_addr) {
-				--*naddrs;
-				--j;
+				/*
+				 * Nuke the dup by copying an address from the
+				 * tail here, and check the current position
+				 * again (--j).
+				 */
+				memcpy(&addrp[--j], &addrp[--*naddrs],
+				       sizeof(struct in_addr));
 				break;
 			}
 	}
@@ -1620,8 +1625,13 @@ void xtables_ip6parse_any(const char *name, struct in6_addr **addrpp,
 		++j;
 		for (k = 0; k < j - 1; ++k)
 			if (IN6_ARE_ADDR_EQUAL(&addrp[k], &addrp[j - 1])) {
-				--*naddrs;
-				--j;
+				/*
+				 * Nuke the dup by copying an address from the
+				 * tail here, and check the current position
+				 * again (--j).
+				 */
+				memcpy(&addrp[--j], &addrp[--*naddrs],
+				       sizeof(struct in_addr));
 				break;
 			}
 	}
