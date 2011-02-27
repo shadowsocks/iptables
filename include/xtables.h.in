@@ -51,6 +51,7 @@ struct in_addr;
  */
 enum xt_option_type {
 	XTTYPE_NONE,
+	XTTYPE_UINT8,
 	XTTYPE_UINT32,
 };
 
@@ -104,6 +105,7 @@ struct xt_option_call {
 	unsigned int xflags;
 	bool invert;
 	union {
+		uint8_t u8;
 		uint32_t u32;
 	} val;
 };

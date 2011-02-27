@@ -89,6 +89,8 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 	unsigned int lmin = 0, lmax = UINT32_MAX;
 	unsigned int value;
 
+	if (entry->type == XTTYPE_UINT8)
+		lmax = UINT8_MAX;
 	if (cb->entry->min != 0)
 		lmin = cb->entry->min;
 	if (cb->entry->max != 0)
@@ -100,7 +102,11 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 			"or out of range (%u-%u).\n",
 			cb->ext_name, entry->name, lmin, lmax);
 
-	if (entry->type == XTTYPE_UINT32) {
+	if (entry->type == XTTYPE_UINT8) {
+		cb->val.u8 = value;
+		if (entry->flags & XTOPT_PUT)
+			*(uint8_t *)XTOPT_MKPTR(cb) = cb->val.u8;
+	} else if (entry->type == XTTYPE_UINT32) {
 		cb->val.u32 = value;
 		if (entry->flags & XTOPT_PUT)
 			*(uint32_t *)XTOPT_MKPTR(cb) = cb->val.u32;
@@ -108,10 +114,12 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 }
 
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
+	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT32]      = xtopt_parse_int,
 };
 
 static const size_t xtopt_psize[] = {
+	[XTTYPE_UINT8]       = sizeof(uint8_t),
 	[XTTYPE_UINT32]      = sizeof(uint32_t),
 };
 
