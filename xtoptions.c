@@ -89,6 +89,11 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 	unsigned int lmin = 0, lmax = UINT32_MAX;
 	unsigned int value;
 
+	if (cb->entry->min != 0)
+		lmin = cb->entry->min;
+	if (cb->entry->max != 0)
+		lmax = cb->entry->max;
+
 	if (!xtables_strtoui(cb->arg, NULL, &value, lmin, lmax))
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"%s: bad value for option \"--%s\", "

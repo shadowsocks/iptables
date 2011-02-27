@@ -76,6 +76,8 @@ enum xt_option_flags {
  * @flags:	bitmask of option flags, see %XTOPT_*
  * @ptroff:	offset into private structure for member
  * @size:	size of the item pointed to by @ptroff; this is a safeguard
+ * @min:	lowest allowed value (for singular integral types)
+ * @max:	highest allowed value (for singular integral types)
  */
 struct xt_option_entry {
 	const char *name;
@@ -83,6 +85,7 @@ struct xt_option_entry {
 	unsigned int id, excl, also, flags;
 	unsigned int ptroff;
 	size_t size;
+	unsigned int min, max;
 };
 
 /**
