@@ -419,3 +419,6 @@ iptables man page written by Herve Eychenne <rv@wallfire.org>.
 .\" .. sexy, too ..
 .\" .. witty, charming, powerful ..
 .\" .. and most of all, modest ..
+.SH VERSION
+.PP
+This manual page applies to ip6tables @PACKAGE_VERSION@.

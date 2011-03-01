@@ -427,3 +427,6 @@ Man page originally written by Herve Eychenne <rv@wallfire.org>.
 .\" .. sexy, too ..
 .\" .. witty, charming, powerful ..
 .\" .. and most of all, modest ..
+.SH VERSION
+.PP
+This manual page applies to iptables @PACKAGE_VERSION@.
