@@ -4,21 +4,17 @@
  * Copyright © CC Computer Consultants GmbH, 2007
  * Jan Engelhardt <jengelh@computergmbh.de>
  */
-#include <getopt.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 #include <xtables.h>
 #include <netinet/tcp.h>
-#include <linux/netfilter/x_tables.h>
 #include <linux/netfilter/xt_TCPOPTSTRIP.h>
 #ifndef TCPOPT_MD5SIG
 #	define TCPOPT_MD5SIG 19
 #endif
 
 enum {
-	FLAG_STRIP = 1 << 0,
+	O_STRIP_OPTION = 0,
 };
 
 struct tcp_optionmap {
@@ -26,9 +22,9 @@ struct tcp_optionmap {
 	const unsigned int option;
 };
 
-static const struct option tcpoptstrip_tg_opts[] = {
-	{.name = "strip-options", .has_arg = true, .val = 's'},
-	XT_GETOPT_TABLEEND,
+static const struct xt_option_entry tcpoptstrip_tg_opts[] = {
+	{.name = "strip-options", .id = O_STRIP_OPTION, .type = XTTYPE_STRING},
+	XTOPT_TABLEEND,
 };
 
 static const struct tcp_optionmap tcp_optionmap[] = {
@@ -56,7 +52,8 @@ static void tcpoptstrip_tg_help(void)
 		printf("    %-14s    strip \"%s\" option\n", w->name, w->desc);
 }
 
-static void parse_list(struct xt_tcpoptstrip_target_info *info, char *arg)
+static void
+parse_list(struct xt_tcpoptstrip_target_info *info, const char *arg)
 {
 	unsigned int option;
 	char *p;
@@ -94,30 +91,12 @@ static void parse_list(struct xt_tcpoptstrip_target_info *info, char *arg)
 	}
 }
 
-static int tcpoptstrip_tg_parse(int c, char **argv, int invert,
-                                unsigned int *flags, const void *entry,
-                                struct xt_entry_target **target)
+static void tcpoptstrip_tg_parse(struct xt_option_call *cb)
 {
-	struct xt_tcpoptstrip_target_info *info = (void *)(*target)->data;
+	struct xt_tcpoptstrip_target_info *info = cb->data;
 
-	switch (c) {
-	case 's':
-		if (*flags & FLAG_STRIP)
-			xtables_error(PARAMETER_PROBLEM,
-			           "You can specify --strip-options only once");
-		parse_list(info, optarg);
-		*flags |= FLAG_STRIP;
-		return true;
-	}
-
-	return false;
-}
-
-static void tcpoptstrip_tg_check(unsigned int flags)
-{
-	if (flags == 0)
-		xtables_error(PARAMETER_PROBLEM,
-		           "TCPOPTSTRIP: --strip-options parameter required");
+	xtables_option_parse(cb);
+	parse_list(info, cb->arg);
 }
 
 static void
@@ -176,11 +155,10 @@ static struct xtables_target tcpoptstrip_tg_reg = {
 	.size          = XT_ALIGN(sizeof(struct xt_tcpoptstrip_target_info)),
 	.userspacesize = XT_ALIGN(sizeof(struct xt_tcpoptstrip_target_info)),
 	.help          = tcpoptstrip_tg_help,
-	.parse         = tcpoptstrip_tg_parse,
-	.final_check   = tcpoptstrip_tg_check,
 	.print         = tcpoptstrip_tg_print,
 	.save          = tcpoptstrip_tg_save,
-	.extra_opts    = tcpoptstrip_tg_opts,
+	.x6_parse      = tcpoptstrip_tg_parse,
+	.x6_options    = tcpoptstrip_tg_opts,
 };
 
 void _init(void)
