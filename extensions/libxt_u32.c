@@ -10,22 +10,21 @@
  * Copyright © CC Computer Consultants GmbH, 2007
  * Contact: <jengelh@computergmbh.de>
  */
-#include <sys/types.h>
 #include <ctype.h>
 #include <errno.h>
-#include <getopt.h>
-#include <netdb.h>
-#include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
-
 #include <xtables.h>
 #include <linux/netfilter/xt_u32.h>
 
-static const struct option u32_opts[] = {
-	{.name = "u32", .has_arg = true, .val = 'u'},
-	XT_GETOPT_TABLEEND,
+enum {
+	O_U32 = 0,
+};
+
+static const struct xt_option_entry u32_opts[] = {
+	{.name = "u32", .id = O_U32, .type = XTTYPE_STRING},
+	XTOPT_TABLEEND,
 };
 
 static void u32_help(void)
@@ -86,7 +85,7 @@ static void u32_dump(const struct xt_u32 *data)
 }
 
 /* string_to_number() is not quite what we need here ... */
-static uint32_t parse_number(char **s, int pos)
+static uint32_t parse_number(const char **s, int pos)
 {
 	uint32_t number;
 	char *end;
@@ -103,20 +102,16 @@ static uint32_t parse_number(char **s, int pos)
 	return number;
 }
 
-static int u32_parse(int c, char **argv, int invert, unsigned int *flags,
-		     const void *entry, struct xt_entry_match **match)
+static void u32_parse(struct xt_option_call *cb)
 {
-	struct xt_u32 *data = (void *)(*match)->data;
+	struct xt_u32 *data = cb->data;
 	unsigned int testind = 0, locind = 0, valind = 0;
 	struct xt_u32_test *ct = &data->tests[testind]; /* current test */
-	char *arg = optarg; /* the argument string */
-	char *start = arg;
+	const char *arg = cb->arg; /* the argument string */
+	const char *start = cb->arg;
 	int state = 0;
 
-	if (c != 'u')
-		return 0;
-
-	data->invert = invert;
+	data->invert = cb->invert;
 
 	/*
 	 * states:
@@ -145,7 +140,7 @@ static int u32_parse(int c, char **argv, int invert, unsigned int *flags,
 				xtables_error(PARAMETER_PROBLEM,
 				           "u32: at char %u: too many \"&&\"s",
 				           (unsigned int)(arg - start));
-			return 1;
+			return;
 		}
 
 		if (state == 0) {
@@ -274,10 +269,10 @@ static struct xtables_match u32_match = {
 	.size          = XT_ALIGN(sizeof(struct xt_u32)),
 	.userspacesize = XT_ALIGN(sizeof(struct xt_u32)),
 	.help          = u32_help,
-	.parse         = u32_parse,
 	.print         = u32_print,
 	.save          = u32_save,
-	.extra_opts    = u32_opts,
+	.x6_parse      = u32_parse,
+	.x6_options    = u32_opts,
 };
 
 void _init(void)
