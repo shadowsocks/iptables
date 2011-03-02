@@ -7,14 +7,15 @@
  * libipt_ecn.c borrowed heavily from libipt_dscp.c
  *
  */
-#include <stdbool.h>
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <getopt.h>
-
 #include <xtables.h>
 #include <linux/netfilter_ipv4/ipt_ecn.h>
+
+enum {
+	O_ECN_TCP_CWR = 0,
+	O_ECN_TCP_ECE,
+	O_ECN_IP_ECT,
+};
 
 static void ecn_help(void)
 {
@@ -25,65 +26,44 @@ static void ecn_help(void)
 "[!] --ecn-ip-ect [0..3]	Match ECN codepoint in IPv4 header\n");
 }
 
-static const struct option ecn_opts[] = {
-	{.name = "ecn-tcp-cwr", .has_arg = false, .val = 'F'},
-	{.name = "ecn-tcp-ece", .has_arg = false, .val = 'G'},
-	{.name = "ecn-ip-ect",  .has_arg = true,  .val = 'H'},
-	XT_GETOPT_TABLEEND,
+static const struct xt_option_entry ecn_opts[] = {
+	{.name = "ecn-tcp-cwr", .id = O_ECN_TCP_CWR, .type = XTTYPE_NONE,
+	 .flags = XTOPT_INVERT},
+	{.name = "ecn-tcp-ece", .id = O_ECN_TCP_ECE, .type = XTTYPE_NONE,
+	 .flags = XTOPT_INVERT},
+	{.name = "ecn-ip-ect", .id = O_ECN_IP_ECT, .type = XTTYPE_UINT8,
+	 .min = 0, .max = 3, .flags = XTOPT_INVERT},
+	XTOPT_TABLEEND,
 };
 
-static int ecn_parse(int c, char **argv, int invert, unsigned int *flags,
-                     const void *entry, struct xt_entry_match **match)
+static void ecn_parse(struct xt_option_call *cb)
 {
-	unsigned int result;
-	struct ipt_ecn_info *einfo
-		= (struct ipt_ecn_info *)(*match)->data;
+	struct ipt_ecn_info *einfo = cb->data;
 
-	switch (c) {
-	case 'F':
-		if (*flags & IPT_ECN_OP_MATCH_CWR)
-			xtables_error(PARAMETER_PROBLEM,
-			           "ECN match: can only use parameter ONCE!");
-		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
+	xtables_option_parse(cb);
+	switch (cb->entry->id) {
+	case O_ECN_TCP_CWR:
 		einfo->operation |= IPT_ECN_OP_MATCH_CWR;
-		if (invert)
+		if (cb->invert)
 			einfo->invert |= IPT_ECN_OP_MATCH_CWR;
-		*flags |= IPT_ECN_OP_MATCH_CWR;
 		break;
-
-	case 'G':
-		if (*flags & IPT_ECN_OP_MATCH_ECE)
-			xtables_error(PARAMETER_PROBLEM,
-				   "ECN match: can only use parameter ONCE!");
-		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
+	case O_ECN_TCP_ECE:
 		einfo->operation |= IPT_ECN_OP_MATCH_ECE;
-		if (invert)
+		if (cb->invert)
 			einfo->invert |= IPT_ECN_OP_MATCH_ECE;
-		*flags |= IPT_ECN_OP_MATCH_ECE;
 		break;
-
-	case 'H':
-		if (*flags & IPT_ECN_OP_MATCH_IP)
-			xtables_error(PARAMETER_PROBLEM,
-				   "ECN match: can only use parameter ONCE!");
-		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		if (invert)
+	case O_ECN_IP_ECT:
+		if (cb->invert)
 			einfo->invert |= IPT_ECN_OP_MATCH_IP;
-		*flags |= IPT_ECN_OP_MATCH_IP;
 		einfo->operation |= IPT_ECN_OP_MATCH_IP;
-		if (!xtables_strtoui(optarg, NULL, &result, 0, 3))
-			xtables_error(PARAMETER_PROBLEM,
-				   "ECN match: Value out of range");
-		einfo->ip_ect = result;
+		einfo->ip_ect = cb->val.u8;
 		break;
 	}
-
-	return 1;
 }
 
-static void ecn_check(unsigned int flags)
+static void ecn_check(struct xt_fcheck_call *cb)
 {
-	if (!flags)
+	if (cb->xflags == 0)
 		xtables_error(PARAMETER_PROBLEM,
 		           "ECN match: some option required");
 }
@@ -144,11 +124,11 @@ static struct xtables_match ecn_mt_reg = {
 	.size          = XT_ALIGN(sizeof(struct ipt_ecn_info)),
 	.userspacesize = XT_ALIGN(sizeof(struct ipt_ecn_info)),
 	.help          = ecn_help,
-	.parse         = ecn_parse,
-	.final_check   = ecn_check,
 	.print         = ecn_print,
 	.save          = ecn_save,
-	.extra_opts    = ecn_opts,
+	.x6_parse      = ecn_parse,
+	.x6_fcheck     = ecn_check,
+	.x6_options    = ecn_opts,
 };
 
 void _init(void)
