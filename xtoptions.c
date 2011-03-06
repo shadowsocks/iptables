@@ -86,11 +86,13 @@ xtables_options_xfrm(struct option *orig_opts, struct option *oldopts,
 static void xtopt_parse_int(struct xt_option_call *cb)
 {
 	const struct xt_option_entry *entry = cb->entry;
-	unsigned int lmin = 0, lmax = UINT32_MAX;
+	unsigned long long lmin = 0, lmax = UINT32_MAX;
 	unsigned int value;
 
 	if (entry->type == XTTYPE_UINT8)
 		lmax = UINT8_MAX;
+	else if (entry->type == XTTYPE_UINT64)
+		lmax = UINT64_MAX;
 	if (cb->entry->min != 0)
 		lmin = cb->entry->min;
 	if (cb->entry->max != 0)
@@ -99,7 +101,7 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 	if (!xtables_strtoui(cb->arg, NULL, &value, lmin, lmax))
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"%s: bad value for option \"--%s\", "
-			"or out of range (%u-%u).\n",
+			"or out of range (%llu-%llu).\n",
 			cb->ext_name, entry->name, lmin, lmax);
 
 	if (entry->type == XTTYPE_UINT8) {
@@ -110,6 +112,10 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 		cb->val.u32 = value;
 		if (entry->flags & XTOPT_PUT)
 			*(uint32_t *)XTOPT_MKPTR(cb) = cb->val.u32;
+	} else if (entry->type == XTTYPE_UINT64) {
+		cb->val.u64 = value;
+		if (entry->flags & XTOPT_PUT)
+			*(uint64_t *)XTOPT_MKPTR(cb) = cb->val.u64;
 	}
 }
 
@@ -217,6 +223,7 @@ static void xtopt_parse_markmask(struct xt_option_call *cb)
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT32]      = xtopt_parse_int,
+	[XTTYPE_UINT64]      = xtopt_parse_int,
 	[XTTYPE_UINT32RC]    = xtopt_parse_mint,
 	[XTTYPE_STRING]      = xtopt_parse_string,
 	[XTTYPE_MARKMASK32]  = xtopt_parse_markmask,
@@ -225,6 +232,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 static const size_t xtopt_psize[] = {
 	[XTTYPE_UINT8]       = sizeof(uint8_t),
 	[XTTYPE_UINT32]      = sizeof(uint32_t),
+	[XTTYPE_UINT64]      = sizeof(uint64_t),
 	[XTTYPE_UINT32RC]    = sizeof(uint32_t[2]),
 	[XTTYPE_STRING]      = -1,
 };
