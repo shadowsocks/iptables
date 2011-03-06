@@ -55,6 +55,7 @@ struct in_addr;
 enum xt_option_type {
 	XTTYPE_NONE,
 	XTTYPE_UINT8,
+	XTTYPE_UINT16,
 	XTTYPE_UINT32,
 	XTTYPE_UINT64,
 	XTTYPE_UINT8RC,
@@ -118,7 +119,7 @@ struct xt_option_call {
 	uint8_t nvals;
 	union {
 		uint8_t u8, u8_range[2];
-		uint16_t u16_range[2];
+		uint16_t u16, u16_range[2];
 		uint32_t u32, u32_range[2];
 		uint64_t u64, u64_range[2];
 		struct {

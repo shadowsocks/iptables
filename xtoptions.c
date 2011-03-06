@@ -92,6 +92,8 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 
 	if (entry->type == XTTYPE_UINT8)
 		lmax = UINT8_MAX;
+	else if (entry->type == XTTYPE_UINT16)
+		lmax = UINT16_MAX;
 	else if (entry->type == XTTYPE_UINT64)
 		lmax = UINT64_MAX;
 	if (cb->entry->min != 0)
@@ -109,6 +111,10 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 		cb->val.u8 = value;
 		if (entry->flags & XTOPT_PUT)
 			*(uint8_t *)XTOPT_MKPTR(cb) = cb->val.u8;
+	} else if (entry->type == XTTYPE_UINT16) {
+		cb->val.u16 = value;
+		if (entry->flags & XTOPT_PUT)
+			*(uint16_t *)XTOPT_MKPTR(cb) = cb->val.u16;
 	} else if (entry->type == XTTYPE_UINT32) {
 		cb->val.u32 = value;
 		if (entry->flags & XTOPT_PUT)
@@ -247,6 +253,7 @@ static void xtopt_parse_markmask(struct xt_option_call *cb)
 
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
+	[XTTYPE_UINT16]      = xtopt_parse_int,
 	[XTTYPE_UINT32]      = xtopt_parse_int,
 	[XTTYPE_UINT64]      = xtopt_parse_int,
 	[XTTYPE_UINT8RC]     = xtopt_parse_mint,
@@ -259,6 +266,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 
 static const size_t xtopt_psize[] = {
 	[XTTYPE_UINT8]       = sizeof(uint8_t),
+	[XTTYPE_UINT16]      = sizeof(uint16_t),
 	[XTTYPE_UINT32]      = sizeof(uint32_t),
 	[XTTYPE_UINT64]      = sizeof(uint64_t),
 	[XTTYPE_UINT8RC]     = sizeof(uint8_t[2]),
