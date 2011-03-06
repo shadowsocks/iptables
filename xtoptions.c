@@ -139,7 +139,9 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 	char *end = "";
 	char sep = ':';
 
-	if (entry->type == XTTYPE_UINT16RC)
+	if (entry->type == XTTYPE_UINT8RC)
+		esize = sizeof(uint8_t);
+	else if (entry->type == XTTYPE_UINT16RC)
 		esize = sizeof(uint16_t);
 	maxiter = entry->size / esize;
 	if (maxiter == 0)
@@ -165,13 +167,17 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 				"characters.\n", cb->ext_name, entry->name);
 		++cb->nvals;
 		if (cb->nvals < ARRAY_SIZE(cb->val.u32_range)) {
-			if (entry->type == XTTYPE_UINT16RC)
+			if (entry->type == XTTYPE_UINT8RC)
+				cb->val.u8_range[cb->nvals] = value;
+			else if (entry->type == XTTYPE_UINT16RC)
 				cb->val.u16_range[cb->nvals] = value;
 			else if (entry->type == XTTYPE_UINT32RC)
 				cb->val.u32_range[cb->nvals] = value;
 		}
 		if (entry->flags & XTOPT_PUT) {
-			if (entry->type == XTTYPE_UINT16RC)
+			if (entry->type == XTTYPE_UINT8RC)
+				*(uint8_t *)put = value;
+			else if (entry->type == XTTYPE_UINT16RC)
 				*(uint16_t *)put = value;
 			else if (entry->type == XTTYPE_UINT32RC)
 				*(uint32_t *)put = value;
@@ -237,6 +243,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT32]      = xtopt_parse_int,
 	[XTTYPE_UINT64]      = xtopt_parse_int,
+	[XTTYPE_UINT8RC]     = xtopt_parse_mint,
 	[XTTYPE_UINT16RC]    = xtopt_parse_mint,
 	[XTTYPE_UINT32RC]    = xtopt_parse_mint,
 	[XTTYPE_STRING]      = xtopt_parse_string,
@@ -247,6 +254,7 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_UINT8]       = sizeof(uint8_t),
 	[XTTYPE_UINT32]      = sizeof(uint32_t),
 	[XTTYPE_UINT64]      = sizeof(uint64_t),
+	[XTTYPE_UINT8RC]     = sizeof(uint8_t[2]),
 	[XTTYPE_UINT16RC]    = sizeof(uint16_t[2]),
 	[XTTYPE_UINT32RC]    = sizeof(uint32_t[2]),
 	[XTTYPE_STRING]      = -1,
