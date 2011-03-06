@@ -133,15 +133,18 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 {
 	const struct xt_option_entry *entry = cb->entry;
 	const char *arg = cb->arg;
-	uint32_t *put = XTOPT_MKPTR(cb);
+	size_t esize = sizeof(uint32_t);
+	char *put = XTOPT_MKPTR(cb);
 	unsigned int maxiter, value;
 	char *end = "";
 	char sep = ':';
 
-	maxiter = entry->size / sizeof(uint32_t);
+	if (entry->type == XTTYPE_UINT16RC)
+		esize = sizeof(uint16_t);
+	maxiter = entry->size / esize;
 	if (maxiter == 0)
 		maxiter = 2; /* ARRAY_SIZE(cb->val.uXX_range) */
-	if (entry->size % sizeof(uint32_t) != 0)
+	if (entry->size % esize != 0)
 		xt_params->exit_err(OTHER_PROBLEM, "%s: memory block does "
 			"not have proper size\n", __func__);
 
@@ -161,10 +164,19 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 				"%s: Argument to \"--%s\" has unexpected "
 				"characters.\n", cb->ext_name, entry->name);
 		++cb->nvals;
-		if (cb->nvals < ARRAY_SIZE(cb->val.u32_range))
-			cb->val.u32_range[cb->nvals] = value;
-		if (entry->flags & XTOPT_PUT)
-			*put++ = value;
+		if (cb->nvals < ARRAY_SIZE(cb->val.u32_range)) {
+			if (entry->type == XTTYPE_UINT16RC)
+				cb->val.u16_range[cb->nvals] = value;
+			else if (entry->type == XTTYPE_UINT32RC)
+				cb->val.u32_range[cb->nvals] = value;
+		}
+		if (entry->flags & XTOPT_PUT) {
+			if (entry->type == XTTYPE_UINT16RC)
+				*(uint16_t *)put = value;
+			else if (entry->type == XTTYPE_UINT32RC)
+				*(uint32_t *)put = value;
+			put += esize;
+		}
 		if (*end == '\0')
 			break;
 	}
@@ -225,6 +237,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT32]      = xtopt_parse_int,
 	[XTTYPE_UINT64]      = xtopt_parse_int,
+	[XTTYPE_UINT16RC]    = xtopt_parse_mint,
 	[XTTYPE_UINT32RC]    = xtopt_parse_mint,
 	[XTTYPE_STRING]      = xtopt_parse_string,
 	[XTTYPE_MARKMASK32]  = xtopt_parse_markmask,
@@ -234,6 +247,7 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_UINT8]       = sizeof(uint8_t),
 	[XTTYPE_UINT32]      = sizeof(uint32_t),
 	[XTTYPE_UINT64]      = sizeof(uint64_t),
+	[XTTYPE_UINT16RC]    = sizeof(uint16_t[2]),
 	[XTTYPE_UINT32RC]    = sizeof(uint32_t[2]),
 	[XTTYPE_STRING]      = -1,
 };
