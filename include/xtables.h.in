@@ -134,6 +134,16 @@ struct xt_fcheck_call {
 	unsigned int xflags;
 };
 
+/**
+ * A "linear"/linked-list based name<->id map, for files similar to
+ * /etc/iproute2/.
+ */
+struct xtables_lmap {
+	char *name;
+	int id;
+	struct xtables_lmap *next;
+};
+
 /* Include file for additions: new matches and targets. */
 struct xtables_match
 {
@@ -417,6 +427,11 @@ extern void xtables_option_tfcall(struct xtables_target *);
 extern void xtables_option_mfcall(struct xtables_match *);
 extern void xtables_options_fcheck(const char *, unsigned int,
 				   const struct xt_option_entry *);
+
+extern struct xtables_lmap *xtables_lmap_init(const char *);
+extern void xtables_lmap_free(struct xtables_lmap *);
+extern int xtables_lmap_name2id(const struct xtables_lmap *, const char *);
+extern const char *xtables_lmap_id2name(const struct xtables_lmap *, int);
 
 #ifdef XTABLES_INTERNAL
 

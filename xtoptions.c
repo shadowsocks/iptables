@@ -7,6 +7,7 @@
  *	published by the Free Software Foundation; either version 2 of
  *	the License, or (at your option) any later version.
  */
+#include <ctype.h>
 #include <errno.h>
 #include <getopt.h>
 #include <limits.h>
@@ -486,4 +487,102 @@ void xtables_option_mfcall(struct xtables_match *m)
 	}
 	if (m->x6_options != NULL)
 		xtables_options_fcheck(m->name, m->mflags, m->x6_options);
+}
+
+struct xtables_lmap *xtables_lmap_init(const char *file)
+{
+	struct xtables_lmap *lmap_head = NULL, *lmap_prev = NULL, *lmap_this;
+	char buf[512];
+	FILE *fp;
+	char *cur, *nxt;
+	int id;
+
+	fp = fopen(file, "re");
+	if (fp == NULL)
+		return NULL;
+
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		cur = buf;
+		while (isspace(*cur))
+			++cur;
+		if (*cur == '#' || *cur == '\n' || *cur == '\0')
+			continue;
+
+		/* iproute2 allows hex and dec format */
+		errno = 0;
+		id = strtoul(cur, &nxt, strncmp(cur, "0x", 2) == 0 ? 16 : 10);
+		if (nxt == cur || errno != 0)
+			continue;
+
+		/* same boundaries as in iproute2 */
+		if (id < 0 || id > 255)
+			continue;
+		cur = nxt;
+
+		if (!isspace(*cur))
+			continue;
+		while (isspace(*cur))
+			++cur;
+		if (*cur == '#' || *cur == '\n' || *cur == '\0')
+			continue;
+		nxt = cur;
+		while (*nxt != '\0' && !isspace(*nxt))
+			++nxt;
+		if (nxt == cur)
+			continue;
+		*nxt = '\0';
+
+		/* found valid data */
+		lmap_this = malloc(sizeof(*lmap_this));
+		if (lmap_this == NULL) {
+			perror("malloc");
+			goto out;
+		}
+		lmap_this->id   = id;
+		lmap_this->name = strdup(cur);
+		if (lmap_this->name == NULL) {
+			free(lmap_this);
+			goto out;
+		}
+		lmap_this->next = NULL;
+
+		if (lmap_prev != NULL)
+			lmap_prev->next = lmap_this;
+		else
+			lmap_head = lmap_this;
+		lmap_prev = lmap_this;
+	}
+
+	fclose(fp);
+	return lmap_head;
+ out:
+	xtables_lmap_free(lmap_head);
+	return NULL;
+}
+
+void xtables_lmap_free(struct xtables_lmap *head)
+{
+	struct xtables_lmap *next;
+
+	for (; head != NULL; head = next) {
+		next = head->next;
+		free(head->name);
+		free(head);
+	}
+}
+
+int xtables_lmap_name2id(const struct xtables_lmap *head, const char *name)
+{
+	for (; head != NULL; head = head->next)
+		if (strcmp(head->name, name) == 0)
+			return head->id;
+	return -1;
+}
+
+const char *xtables_lmap_id2name(const struct xtables_lmap *head, int id)
+{
+	for (; head != NULL; head = head->next)
+		if (head->id == id)
+			return head->name;
+	return NULL;
 }
