@@ -143,6 +143,8 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 		esize = sizeof(uint8_t);
 	else if (entry->type == XTTYPE_UINT16RC)
 		esize = sizeof(uint16_t);
+	else if (entry->type == XTTYPE_UINT64RC)
+		esize = sizeof(uint64_t);
 	maxiter = entry->size / esize;
 	if (maxiter == 0)
 		maxiter = 2; /* ARRAY_SIZE(cb->val.uXX_range) */
@@ -173,6 +175,8 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 				cb->val.u16_range[cb->nvals] = value;
 			else if (entry->type == XTTYPE_UINT32RC)
 				cb->val.u32_range[cb->nvals] = value;
+			else if (entry->type == XTTYPE_UINT64RC)
+				cb->val.u64_range[cb->nvals] = value;
 		}
 		if (entry->flags & XTOPT_PUT) {
 			if (entry->type == XTTYPE_UINT8RC)
@@ -181,6 +185,8 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 				*(uint16_t *)put = value;
 			else if (entry->type == XTTYPE_UINT32RC)
 				*(uint32_t *)put = value;
+			else if (entry->type == XTTYPE_UINT64RC)
+				*(uint64_t *)put = value;
 			put += esize;
 		}
 		if (*end == '\0')
@@ -246,6 +252,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8RC]     = xtopt_parse_mint,
 	[XTTYPE_UINT16RC]    = xtopt_parse_mint,
 	[XTTYPE_UINT32RC]    = xtopt_parse_mint,
+	[XTTYPE_UINT64RC]    = xtopt_parse_mint,
 	[XTTYPE_STRING]      = xtopt_parse_string,
 	[XTTYPE_MARKMASK32]  = xtopt_parse_markmask,
 };
@@ -257,6 +264,7 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_UINT8RC]     = sizeof(uint8_t[2]),
 	[XTTYPE_UINT16RC]    = sizeof(uint16_t[2]),
 	[XTTYPE_UINT32RC]    = sizeof(uint32_t[2]),
+	[XTTYPE_UINT64RC]    = sizeof(uint64_t[2]),
 	[XTTYPE_STRING]      = -1,
 };
 
