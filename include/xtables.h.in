@@ -50,6 +50,7 @@ struct in_addr;
  * %XTTYPE_UINT*:	standard integer
  * %XTTYPE_UINT*RC:	colon-separated range of standard integers
  * %XTTYPE_STRING:	arbitrary string
+ * %XTTYPE_MARKMASK32:	32-bit mark with optional mask
  */
 enum xt_option_type {
 	XTTYPE_NONE,
@@ -57,6 +58,7 @@ enum xt_option_type {
 	XTTYPE_UINT32,
 	XTTYPE_UINT32RC,
 	XTTYPE_STRING,
+	XTTYPE_MARKMASK32,
 };
 
 /**
@@ -113,6 +115,9 @@ struct xt_option_call {
 	union {
 		uint8_t u8;
 		uint32_t u32, u32_range[2];
+		struct {
+			uint32_t mark, mask;
+		};
 	} val;
 };
 
