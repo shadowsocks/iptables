@@ -126,6 +126,10 @@ struct xt_option_call {
 			uint32_t mark, mask;
 		};
 	} val;
+	union {
+		struct xt_entry_match **match;
+		struct xt_entry_target **target;
+	};
 };
 
 /**
