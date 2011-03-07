@@ -1,7 +1,10 @@
 #ifndef IPTABLES_XSHARED_H
 #define IPTABLES_XSHARED_H 1
 
+#include <limits.h>
 #include <stdint.h>
+#include <netinet/in.h>
+#include <net/if.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter_ipv6/ip6_tables.h>
 
@@ -39,6 +42,13 @@ struct iptables_command_state {
 	char **argv;
 };
 
+typedef int (*mainfunc_t)(int, char **);
+
+struct subcommand {
+	const char *name;
+	mainfunc_t main;
+};
+
 enum {
 	XT_OPTION_OFFSET_SCALE = 256,
 };
@@ -47,5 +57,6 @@ extern void print_extension_helps(const struct xtables_target *,
 	const struct xtables_rule_match *);
 extern const char *proto_to_name(uint8_t, int);
 extern struct xtables_match *load_proto(struct iptables_command_state *);
+extern int subcmd_main(int, char **, const struct subcommand *);
 
 #endif /* IPTABLES_XSHARED_H */

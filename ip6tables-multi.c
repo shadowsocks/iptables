@@ -1,45 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <libgen.h>
+#include "xshared.h"
 
 int ip6tables_main(int argc, char **argv);
 int ip6tables_save_main(int argc, char **argv);
 int ip6tables_restore_main(int argc, char **argv);
 
+static const struct subcommand multi6_subcommands[] = {
+	{"ip6tables",         ip6tables_main},
+	{"main",              ip6tables_main},
+	{"ip6tables-save",    ip6tables_save_main},
+	{"save",              ip6tables_save_main},
+	{"ip6tables-restore", ip6tables_restore_main},
+	{"restore",           ip6tables_restore_main},
+	{NULL},
+};
+
 int main(int argc, char **argv)
 {
-	char *progname;
-
-	if (argc < 1) {
-		fprintf(stderr, "ERROR: This should not happen.\n");
-		exit(EXIT_FAILURE);
-	}
-
-	progname = basename(argv[0]);
-	if (strcmp(progname, "ip6tables") == 0)
-		return ip6tables_main(argc, argv);
-	if (strcmp(progname, "ip6tables-save") == 0)
-		return ip6tables_save_main(argc, argv);
-	if (strcmp(progname, "ip6tables-restore") == 0)
-		return ip6tables_restore_main(argc, argv);
-
-	++argv;
-	--argc;
-	if (argc < 1) {
-		fprintf(stderr, "ERROR: No subcommand given.\n");
-		exit(EXIT_FAILURE);
-	}
-
-	progname = basename(argv[0]);
-	if (strcmp(progname, "main") == 0)
-		return ip6tables_main(argc, argv);
-	if (strcmp(progname, "save") == 0)
-		return ip6tables_save_main(argc, argv);
-	if (strcmp(progname, "restore") == 0)
-		return ip6tables_restore_main(argc, argv);
-
-	fprintf(stderr, "ip6tables multi-purpose version: "
-	        "unknown subcommand \"%s\"\n", progname);
-	exit(EXIT_FAILURE);
+	return subcmd_main(argc, argv, multi6_subcommands);
 }

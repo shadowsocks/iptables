@@ -1,7 +1,10 @@
+#include <libgen.h>
 #include <netdb.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <xtables.h>
 #include "xshared.h"
 
@@ -98,4 +101,37 @@ struct xtables_match *load_proto(struct iptables_command_state *cs)
 		return NULL;
 	return find_proto(cs->protocol, XTF_TRY_LOAD,
 			  cs->options & OPT_NUMERIC, &cs->matches);
+}
+
+static mainfunc_t subcmd_get(const char *cmd, const struct subcommand *cb)
+{
+	for (; cb->name != NULL; ++cb)
+		if (strcmp(cb->name, cmd) == 0)
+			return cb->main;
+	return NULL;
+}
+
+int subcmd_main(int argc, char **argv, const struct subcommand *cb)
+{
+	const char *cmd = basename(*argv);
+	mainfunc_t f = subcmd_get(cmd, cb);
+
+	if (f == NULL && argc > 1) {
+		/*
+		 * Unable to find a main method for our command name?
+		 * Let's try again with the first argument!
+		 */
+		++argv;
+		--argc;
+		f = subcmd_get(*argv, cb);
+	}
+
+	/* now we should have a valid function pointer */
+	if (f != NULL)
+		return f(argc, argv);
+
+	fprintf(stderr, "ERROR: No valid subcommand given.\nValid subcommands:\n");
+	for (; cb->name != NULL; ++cb)
+		fprintf(stderr, " * %s\n", cb->name);
+	exit(EXIT_FAILURE);
 }
