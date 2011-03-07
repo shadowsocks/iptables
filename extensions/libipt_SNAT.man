@@ -17,7 +17,7 @@ or
 If no port range is specified, then source ports below 512 will be
 mapped to other ports below 512: those between 512 and 1023 inclusive
 will be mapped to ports below 1024, and other ports will be mapped to
-1024 or above. Where possible, no port alteration will
+1024 or above. Where possible, no port alteration will occur.
 
 In Kernels up to 2.6.10, you can add several \-\-to\-source options. For those
 kernels, if you specify more than one source address, either via an address
