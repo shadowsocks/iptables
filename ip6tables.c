@@ -82,9 +82,10 @@
 #define CMD_RENAME_CHAIN	0x0800U
 #define CMD_LIST_RULES		0x1000U
 #define CMD_ZERO_NUM		0x2000U
-#define NUMBER_OF_CMD	15
+#define CMD_CHECK		0x4000U
+#define NUMBER_OF_CMD	16
 static const char cmdflags[] = { 'I', 'D', 'D', 'R', 'A', 'L', 'F', 'Z',
-				 'Z', 'N', 'X', 'P', 'E', 'S' };
+				 'Z', 'N', 'X', 'P', 'E', 'S', 'C' };
 
 #define NUMBER_OF_OPT	ARRAY_SIZE(optflags)
 static const char optflags[]
@@ -93,6 +94,7 @@ static const char optflags[]
 static struct option original_opts[] = {
 	{.name = "append",        .has_arg = 1, .val = 'A'},
 	{.name = "delete",        .has_arg = 1, .val = 'D'},
+	{.name = "check" ,        .has_arg = 1, .val = 'C'},
 	{.name = "insert",        .has_arg = 1, .val = 'I'},
 	{.name = "replace",       .has_arg = 1, .val = 'R'},
 	{.name = "list",          .has_arg = 2, .val = 'L'},
@@ -165,7 +167,8 @@ static const char commands_v_options[NUMBER_OF_CMD][NUMBER_OF_OPT] =
 /*DEL_CHAIN*/ {'x','x','x','x','x',' ','x','x','x','x','x'},
 /*SET_POLICY*/{'x','x','x','x','x',' ','x','x','x','x',' '},
 /*RENAME*/    {'x','x','x','x','x',' ','x','x','x','x','x'},
-/*LIST_RULES*/{'x','x','x','x','x',' ','x','x','x','x','x'}
+/*LIST_RULES*/{'x','x','x','x','x',' ','x','x','x','x','x'},
+/*CHECK*/     {'x',' ',' ',' ',' ',' ','x',' ',' ','x','x'},
 };
 
 static const unsigned int inverse_for_options[NUMBER_OF_OPT] =
@@ -208,7 +211,7 @@ static void
 exit_printhelp(const struct xtables_rule_match *matches)
 {
 	printf("%s v%s\n\n"
-"Usage: %s -[AD] chain rule-specification [options]\n"
+"Usage: %s -[ACD] chain rule-specification [options]\n"
 "       %s -I chain [rulenum] rule-specification [options]\n"
 "       %s -R chain rulenum rule-specification [options]\n"
 "       %s -D chain rulenum [options]\n"
@@ -226,6 +229,7 @@ exit_printhelp(const struct xtables_rule_match *matches)
 "Commands:\n"
 "Either long or short options are allowed.\n"
 "  --append  -A chain		Append to chain\n"
+"  --check   -C chain		Check for the existence of a rule\n"
 "  --delete  -D chain		Delete matching rule from chain\n"
 "  --delete  -D chain rulenum\n"
 "				Delete rule rulenum (1 = first) from chain\n"
@@ -824,6 +828,36 @@ delete_entry(const ip6t_chainlabel chain,
 	return ret;
 }
 
+static int
+check_entry(const ip6t_chainlabel chain, struct ip6t_entry *fw,
+	    unsigned int nsaddrs, const struct in6_addr *saddrs,
+	    const struct in6_addr *smasks, unsigned int ndaddrs,
+	    const struct in6_addr *daddrs, const struct in6_addr *dmasks,
+	    bool verbose, struct ip6tc_handle *handle,
+	    struct xtables_rule_match *matches,
+	    const struct xtables_target *target)
+{
+	unsigned int i, j;
+	int ret = 1;
+	unsigned char *mask;
+
+	mask = make_delete_mask(matches, target);
+	for (i = 0; i < nsaddrs; i++) {
+		fw->ipv6.src = saddrs[i];
+		fw->ipv6.smsk = smasks[i];
+		for (j = 0; j < ndaddrs; j++) {
+			fw->ipv6.dst = daddrs[j];
+			fw->ipv6.dmsk = dmasks[j];
+			if (verbose)
+				print_firewall_line(fw, handle);
+			ret &= ip6tc_check_entry(chain, fw, mask, handle);
+		}
+	}
+
+	free(mask);
+	return ret;
+}
+
 int
 for_each_chain(int (*fn)(const ip6t_chainlabel, int, struct ip6tc_handle *),
 	       int verbose, int builtinstoo, struct ip6tc_handle *handle)
@@ -1393,7 +1427,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 
 	opts = xt_params->orig_opts;
 	while ((cs.c = getopt_long(argc, argv,
-	   "-:A:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:bvnt:m:xc:g:",
+	   "-:A:C:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:bvnt:m:xc:g:",
 					   opts, NULL)) != -1) {
 		switch (cs.c) {
 			/*
@@ -1402,6 +1436,12 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		case 'A':
 			add_command(&command, CMD_APPEND, CMD_NONE,
 				    cs.invert);
+			chain = optarg;
+			break;
+
+		case 'C':
+			add_command(&command, CMD_CHECK, CMD_NONE,
+			            cs.invert);
 			chain = optarg;
 			break;
 
@@ -1742,7 +1782,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		xtables_error(PARAMETER_PROBLEM,
 			   "nothing appropriate following !");
 
-	if (command & (CMD_REPLACE | CMD_INSERT | CMD_DELETE | CMD_APPEND)) {
+	if (command & (CMD_REPLACE | CMD_INSERT | CMD_DELETE | CMD_APPEND | CMD_CHECK)) {
 		if (!(cs.options & OPT_DESTINATION))
 			dhostnetworkmask = "::0/0";
 		if (!(cs.options & OPT_SOURCE))
@@ -1788,6 +1828,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 
 	if (command == CMD_APPEND
 	    || command == CMD_DELETE
+	    || command == CMD_CHECK
 	    || command == CMD_INSERT
 	    || command == CMD_REPLACE) {
 		if (strcmp(chain, "PREROUTING") == 0
@@ -1875,6 +1916,13 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		break;
 	case CMD_DELETE_NUM:
 		ret = ip6tc_delete_num_entry(chain, rulenum - 1, *handle);
+		break;
+	case CMD_CHECK:
+		ret = check_entry(chain, e,
+				   nsaddrs, saddrs, smasks,
+				   ndaddrs, daddrs, dmasks,
+				   cs.options&OPT_VERBOSE,
+				   *handle, cs.matches, cs.target);
 		break;
 	case CMD_REPLACE:
 		ret = replace_entry(chain, e, rulenum - 1,

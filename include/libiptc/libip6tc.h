@@ -80,6 +80,12 @@ int ip6tc_append_entry(const ip6t_chainlabel chain,
 		       const struct ip6t_entry *e,
 		       struct ip6tc_handle *handle);
 
+/* Check whether a matching rule exists */
+int ip6tc_check_entry(const ip6t_chainlabel chain,
+		       const struct ip6t_entry *origfw,
+		       unsigned char *matchmask,
+		       struct ip6tc_handle *handle);
+
 /* Delete the first rule in `chain' which matches `fw'. */
 int ip6tc_delete_entry(const ip6t_chainlabel chain,
 		       const struct ip6t_entry *origfw,

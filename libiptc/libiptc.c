@@ -31,6 +31,7 @@
  */
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <stdbool.h>
 #include <xtables.h>
 
 #include "linux_list.h"
@@ -1956,12 +1957,11 @@ is_same(const STRUCT_ENTRY *a,
 	const STRUCT_ENTRY *b,
 	unsigned char *matchmask);
 
-/* Delete the first rule in `chain' which matches `fw'. */
-int
-TC_DELETE_ENTRY(const IPT_CHAINLABEL chain,
-		const STRUCT_ENTRY *origfw,
-		unsigned char *matchmask,
-		struct xtc_handle *handle)
+
+/* find the first rule in `chain' which matches `fw' and remove it unless dry_run is set */
+static int delete_entry(const IPT_CHAINLABEL chain, const STRUCT_ENTRY *origfw,
+			unsigned char *matchmask, struct xtc_handle *handle,
+			bool dry_run)
 {
 	struct chain_head *c;
 	struct rule_head *r, *i;
@@ -2005,6 +2005,10 @@ TC_DELETE_ENTRY(const IPT_CHAINLABEL chain,
 		if (!target_same(r, i, mask))
 			continue;
 
+		/* if we are just doing a dry run, we simply skip the rest */
+		if (dry_run)
+			return 1;
+
 		/* If we are about to delete the rule that is the
 		 * current iterator, move rule iterator back.  next
 		 * pointer will then point to real next node */
@@ -2027,6 +2031,20 @@ TC_DELETE_ENTRY(const IPT_CHAINLABEL chain,
 	return 0;
 }
 
+/* check whether a specified rule is present */
+int TC_CHECK_ENTRY(const IPT_CHAINLABEL chain, const STRUCT_ENTRY *origfw,
+		   unsigned char *matchmask, struct xtc_handle *handle)
+{
+	/* do a dry-run delete to find out whether a matching rule exists */
+	return delete_entry(chain, origfw, matchmask, handle, true);
+}
+
+/* Delete the first rule in `chain' which matches `fw'. */
+int TC_DELETE_ENTRY(const IPT_CHAINLABEL chain,	const STRUCT_ENTRY *origfw,
+		    unsigned char *matchmask, struct xtc_handle *handle)
+{
+	return delete_entry(chain, origfw, matchmask, handle, false);
+}
 
 /* Delete the rule in position `rulenum' in `chain'. */
 int

@@ -76,6 +76,7 @@ typedef unsigned int socklen_t;
 #define TC_INSERT_ENTRY		iptc_insert_entry
 #define TC_REPLACE_ENTRY	iptc_replace_entry
 #define TC_APPEND_ENTRY		iptc_append_entry
+#define TC_CHECK_ENTRY		iptc_check_entry
 #define TC_DELETE_ENTRY		iptc_delete_entry
 #define TC_DELETE_NUM_ENTRY	iptc_delete_num_entry
 #define TC_FLUSH_ENTRIES	iptc_flush_entries

@@ -27,8 +27,8 @@
 .SH NAME
 ip6tables \(em IPv6 packet filter administration
 .SH SYNOPSIS
-\fBip6tables\fP [\fB\-t\fP \fItable\fP] {\fB\-A\fP|\fB\-D\fP} \fIchain
-rule-specification\fP [\fIoptions...\fP]
+\fBip6tables\fP [\fB\-t\fP \fItable\fP] {\fB\-A\fP|\fB\-C\fP|\fB\-D\fP}
+\fIchain rule-specification\fP [\fIoptions...\fP]
 .PP
 \fBip6tables\fP [\fB\-t\fP \fItable\fP] \fB\-I\fP \fIchain\fP [\fIrulenum\fP]
 \fIrule-specification\fP [\fIoptions...\fP]
@@ -138,6 +138,12 @@ need to use only enough letters to ensure that
 Append one or more rules to the end of the selected chain.
 When the source and/or destination names resolve to more than one
 address, a rule will be added for each possible address combination.
+.TP
+\fB\-C\fP, \fB\-\-check\fP \fIchain rule-specification\fP
+Check whether a rule matching the specification does exist in the
+selected chain. This command uses the same logic as \fB\-D\fP to
+find a matching entry, but does not alter the existing iptables
+configuration and uses its exit code to indicate success or failure.
 .TP
 \fB\-D\fP, \fB\-\-delete\fP \fIchain rule-specification\fP
 .ns
