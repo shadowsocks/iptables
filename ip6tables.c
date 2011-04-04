@@ -919,11 +919,11 @@ zero_entries(const ip6t_chainlabel chain, int verbose,
 }
 
 int
-delete_chain(const ip6t_chainlabel chain, int verbose,
+delete_chain6(const ip6t_chainlabel chain, int verbose,
 	     struct ip6tc_handle *handle)
 {
 	if (!chain)
-		return for_each_chain6(delete_chain, verbose, 0, handle);
+		return for_each_chain6(delete_chain6, verbose, 0, handle);
 
 	if (verbose)
 		fprintf(stdout, "Deleting chain `%s'\n", chain);
@@ -1978,7 +1978,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 		ret = ip6tc_create_chain(chain, *handle);
 		break;
 	case CMD_DELETE_CHAIN:
-		ret = delete_chain(chain, cs.options&OPT_VERBOSE, *handle);
+		ret = delete_chain6(chain, cs.options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_RENAME_CHAIN:
 		ret = ip6tc_rename_chain(chain, newname,	*handle);
