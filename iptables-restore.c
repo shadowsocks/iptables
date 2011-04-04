@@ -438,13 +438,13 @@ main(int argc, char *argv[])
 				}
 			}
 
-			DEBUGP("calling do_command(%u, argv, &%s, handle):\n",
+			DEBUGP("calling do_command4(%u, argv, &%s, handle):\n",
 				newargc, curtable);
 
 			for (a = 0; a < newargc; a++)
 				DEBUGP("argv[%u]: %s\n", a, newargv[a]);
 
-			ret = do_command(newargc, newargv,
+			ret = do_command4(newargc, newargv,
 					 &newargv[2], &handle);
 
 			free_argv();

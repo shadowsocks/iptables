@@ -62,7 +62,7 @@ main(int argc, char *argv[])
 	init_extensions4();
 #endif
 
-	ret = do_command(argc, argv, &table, &handle);
+	ret = do_command4(argc, argv, &table, &handle);
 	if (ret) {
 		ret = iptc_commit(handle);
 		iptc_free(handle);

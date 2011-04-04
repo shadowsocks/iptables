@@ -7,7 +7,7 @@
 #include <iptables/internal.h>
 
 /* Your shared library should call one of these. */
-extern int do_command(int argc, char *argv[], char **table,
+extern int do_command4(int argc, char *argv[], char **table,
 		      struct iptc_handle **handle);
 extern int delete_chain4(const ipt_chainlabel chain, int verbose,
 			struct iptc_handle *handle);

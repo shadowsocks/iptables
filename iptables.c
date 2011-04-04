@@ -1413,7 +1413,7 @@ static void command_match(struct iptables_command_state *cs)
 	}
 }
 
-int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle)
+int do_command4(int argc, char *argv[], char **table, struct iptc_handle **handle)
 {
 	struct iptables_command_state cs;
 	struct ipt_entry *e = NULL;
@@ -1437,11 +1437,11 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 	cs.jumpto = "";
 	cs.argv = argv;
 
-	/* re-set optind to 0 in case do_command gets called
+	/* re-set optind to 0 in case do_command4 gets called
 	 * a second time */
 	optind = 0;
 
-	/* clear mflags in case do_command gets called a second time
+	/* clear mflags in case do_command4 gets called a second time
 	 * (we clear the global list of all matches for security)*/
 	for (m = xtables_matches; m; m = m->next)
 		m->mflags = 0;

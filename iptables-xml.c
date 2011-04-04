@@ -844,7 +844,7 @@ main(int argc, char *argv[])
 				}
 			}
 
-			DEBUGP("calling do_command(%u, argv, &%s, handle):\n",
+			DEBUGP("calling do_command4(%u, argv, &%s, handle):\n",
 			       newargc, curTable);
 
 			for (a = 0; a < newargc; a++)
