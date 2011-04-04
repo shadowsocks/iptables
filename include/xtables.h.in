@@ -284,7 +284,6 @@ extern void xtables_save_string(const char *value);
 #		undef _init
 #		define _init _INIT
 #	endif
-	extern void init_extensions(void);
 	extern void init_extensions4(void);
 	extern void init_extensions6(void);
 #else
