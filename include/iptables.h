@@ -13,7 +13,7 @@ extern int delete_chain(const ipt_chainlabel chain, int verbose,
 			struct iptc_handle *handle);
 extern int flush_entries(const ipt_chainlabel chain, int verbose, 
 			struct iptc_handle *handle);
-extern int for_each_chain(int (*fn)(const ipt_chainlabel, int, struct iptc_handle *),
+extern int for_each_chain4(int (*fn)(const ipt_chainlabel, int, struct iptc_handle *),
 		int verbose, int builtinstoo, struct iptc_handle *handle);
 extern void print_rule(const struct ipt_entry *e,
 		struct iptc_handle *handle, const char *chain, int counters);

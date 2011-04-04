@@ -862,7 +862,7 @@ check_entry(const ipt_chainlabel chain, struct ipt_entry *fw,
 }
 
 int
-for_each_chain(int (*fn)(const ipt_chainlabel, int, struct iptc_handle *),
+for_each_chain4(int (*fn)(const ipt_chainlabel, int, struct iptc_handle *),
 	       int verbose, int builtinstoo, struct iptc_handle *handle)
 {
         int ret = 1;
@@ -902,7 +902,7 @@ flush_entries(const ipt_chainlabel chain, int verbose,
 	      struct iptc_handle *handle)
 {
 	if (!chain)
-		return for_each_chain(flush_entries, verbose, 1, handle);
+		return for_each_chain4(flush_entries, verbose, 1, handle);
 
 	if (verbose)
 		fprintf(stdout, "Flushing chain `%s'\n", chain);
@@ -914,7 +914,7 @@ zero_entries(const ipt_chainlabel chain, int verbose,
 	     struct iptc_handle *handle)
 {
 	if (!chain)
-		return for_each_chain(zero_entries, verbose, 1, handle);
+		return for_each_chain4(zero_entries, verbose, 1, handle);
 
 	if (verbose)
 		fprintf(stdout, "Zeroing chain `%s'\n", chain);
@@ -926,7 +926,7 @@ delete_chain(const ipt_chainlabel chain, int verbose,
 	     struct iptc_handle *handle)
 {
 	if (!chain)
-		return for_each_chain(delete_chain, verbose, 0, handle);
+		return for_each_chain4(delete_chain, verbose, 0, handle);
 
 	if (verbose)
 		fprintf(stdout, "Deleting chain `%s'\n", chain);
