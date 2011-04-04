@@ -1,9 +1,12 @@
 This module copies security markings from packets to connections
 (if unlabeled), and from connections back to packets (also only
 if unlabeled).  Typically used in conjunction with SECMARK, it is
-only valid in the
+valid in the
+.B security
+table (for backwards compatibility with older kernels, it is also
+valid in the
 .B mangle
-table.
+table).
 .TP
 \fB\-\-save\fP
 If the packet has a security marking, copy it to the connection
