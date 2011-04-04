@@ -174,9 +174,17 @@ static const char *xtables_libdir;
 /* the path to command to load kernel module */
 const char *xtables_modprobe_program;
 
-/* Keeping track of external matches and targets: linked lists.  */
+/* Keep track of matches/targets pending full registration: linked lists. */
+struct xtables_match *xtables_pending_matches;
+struct xtables_target *xtables_pending_targets;
+
+/* Keep track of fully registered external matches/targets: linked lists. */
 struct xtables_match *xtables_matches;
 struct xtables_target *xtables_targets;
+
+/* Fully register a match/target which was previously partially registered. */
+static void xtables_fully_register_pending_match(struct xtables_match *me);
+static void xtables_fully_register_pending_target(struct xtables_target *me);
 
 void xtables_init(void)
 {
@@ -556,6 +564,7 @@ struct xtables_match *
 xtables_find_match(const char *name, enum xtables_tryload tryload,
 		   struct xtables_rule_match **matches)
 {
+	struct xtables_match **dptr;
 	struct xtables_match *ptr;
 	const char *icmp6 = "icmp6";
 
@@ -570,6 +579,18 @@ xtables_find_match(const char *name, enum xtables_tryload tryload,
 	     (strcmp(name,"ipv6-icmp") == 0) ||
 	     (strcmp(name,"icmp6") == 0) )
 		name = icmp6;
+
+	/* Trigger delayed initialization */
+	for (dptr = &xtables_pending_matches; *dptr; ) {
+		if (strcmp(name, (*dptr)->name) == 0) {
+			ptr = *dptr;
+			*dptr = (*dptr)->next;
+			ptr->next = NULL;
+			xtables_fully_register_pending_match(ptr);
+		} else {
+			dptr = &((*dptr)->next);
+		}
+	}
 
 	for (ptr = xtables_matches; ptr; ptr = ptr->next) {
 		if (strcmp(name, ptr->name) == 0) {
@@ -636,6 +657,7 @@ xtables_find_match(const char *name, enum xtables_tryload tryload,
 struct xtables_target *
 xtables_find_target(const char *name, enum xtables_tryload tryload)
 {
+	struct xtables_target **dptr;
 	struct xtables_target *ptr;
 
 	/* Standard target? */
@@ -645,6 +667,18 @@ xtables_find_target(const char *name, enum xtables_tryload tryload)
 	    || strcmp(name, XTC_LABEL_QUEUE) == 0
 	    || strcmp(name, XTC_LABEL_RETURN) == 0)
 		name = "standard";
+
+	/* Trigger delayed initialization */
+	for (dptr = &xtables_pending_targets; *dptr; ) {
+		if (strcmp(name, (*dptr)->name) == 0) {
+			ptr = *dptr;
+			*dptr = (*dptr)->next;
+			ptr->next = NULL;
+			xtables_fully_register_pending_target(ptr);
+		} else {
+			dptr = &((*dptr)->next);
+		}
+	}
 
 	for (ptr = xtables_targets; ptr; ptr = ptr->next) {
 		if (strcmp(name, ptr->name) == 0)
@@ -757,8 +791,6 @@ static void xtables_check_options(const char *name, const struct option *opt)
 
 void xtables_register_match(struct xtables_match *me)
 {
-	struct xtables_match **i, *old;
-
 	if (me->version == NULL) {
 		fprintf(stderr, "%s: match %s<%u> is missing a version\n",
 		        xt_params->program_name, me->name, me->revision);
@@ -791,6 +823,15 @@ void xtables_register_match(struct xtables_match *me)
 	/* ignore not interested match */
 	if (me->family != afinfo->family && me->family != AF_UNSPEC)
 		return;
+
+	/* place on linked list of matches pending full registration */
+	me->next = xtables_pending_matches;
+	xtables_pending_matches = me;
+}
+
+static void xtables_fully_register_pending_match(struct xtables_match *me)
+{
+	struct xtables_match **i, *old;
 
 	old = xtables_find_match(me->name, XTF_DURING_LOAD, NULL);
 	if (old) {
@@ -845,8 +886,6 @@ void xtables_register_matches(struct xtables_match *match, unsigned int n)
 
 void xtables_register_target(struct xtables_target *me)
 {
-	struct xtables_target *old;
-
 	if (me->version == NULL) {
 		fprintf(stderr, "%s: target %s<%u> is missing a version\n",
 		        xt_params->program_name, me->name, me->revision);
@@ -879,6 +918,15 @@ void xtables_register_target(struct xtables_target *me)
 	/* ignore not interested target */
 	if (me->family != afinfo->family && me->family != AF_UNSPEC)
 		return;
+
+	/* place on linked list of targets pending full registration */
+	me->next = xtables_pending_targets;
+	xtables_pending_targets = me;
+}
+
+static void xtables_fully_register_pending_target(struct xtables_target *me)
+{
+	struct xtables_target *old;
 
 	old = xtables_find_target(me->name, XTF_DURING_LOAD);
 	if (old) {
