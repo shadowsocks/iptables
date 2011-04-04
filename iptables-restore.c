@@ -238,7 +238,7 @@ main(int argc, char *argv[])
 
 				DEBUGP("Deleting all user-defined chains "
 				       "of table '%s'\n", table);
-				for_each_chain4(delete_chain, verbose, 0,
+				for_each_chain4(delete_chain4, verbose, 0,
 						handle);
 			}
 

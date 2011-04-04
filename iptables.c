@@ -922,11 +922,11 @@ zero_entries(const ipt_chainlabel chain, int verbose,
 }
 
 int
-delete_chain(const ipt_chainlabel chain, int verbose,
+delete_chain4(const ipt_chainlabel chain, int verbose,
 	     struct iptc_handle *handle)
 {
 	if (!chain)
-		return for_each_chain4(delete_chain, verbose, 0, handle);
+		return for_each_chain4(delete_chain4, verbose, 0, handle);
 
 	if (verbose)
 		fprintf(stdout, "Deleting chain `%s'\n", chain);
@@ -2016,7 +2016,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 		ret = iptc_create_chain(chain, *handle);
 		break;
 	case CMD_DELETE_CHAIN:
-		ret = delete_chain(chain, cs.options&OPT_VERBOSE, *handle);
+		ret = delete_chain4(chain, cs.options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_RENAME_CHAIN:
 		ret = iptc_rename_chain(chain, newname,	*handle);
