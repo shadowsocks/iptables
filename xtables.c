@@ -1336,7 +1336,7 @@ void xtables_ipparse_any(const char *name, struct in_addr **addrpp,
 
 const char *xtables_ip6addr_to_numeric(const struct in6_addr *addrp)
 {
-	/* 0000:0000:0000:0000:0000:000.000.000.000
+	/* 0000:0000:0000:0000:0000:0000:000.000.000.000
 	 * 0000:0000:0000:0000:0000:0000:0000:0000 */
 	static char buf[50+1];
 	return inet_ntop(AF_INET6, addrp, buf, sizeof(buf));
