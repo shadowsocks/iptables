@@ -1083,7 +1083,7 @@ static void print_ip(const char *prefix, const struct in6_addr *ip,
 
 /* We want this to be readable, so only print out neccessary fields.
  * Because that's the kind of world I want to live in.  */
-void print_rule(const struct ip6t_entry *e,
+void print_rule6(const struct ip6t_entry *e,
 		       struct ip6tc_handle *h, const char *chain, int counters)
 {
 	const struct ip6t_entry_target *t;
@@ -1215,7 +1215,7 @@ list_rules(const ip6t_chainlabel chain, int rulenum, int counters,
 		while(e) {
 			num++;
 			if (!rulenum || num == rulenum)
-			    print_rule(e, handle, this, counters);
+			    print_rule6(e, handle, this, counters);
 			e = ip6tc_next_rule(e, handle);
 		}
 		found = 1;

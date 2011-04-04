@@ -109,7 +109,7 @@ static int do_output(const char *tablename)
 			/* Dump out rules */
 			e = ip6tc_first_rule(chain, h);
 			while(e) {
-				print_rule(e, h, chain, show_counters);
+				print_rule6(e, h, chain, show_counters);
 				e = ip6tc_next_rule(e, h);
 			}
 		}
