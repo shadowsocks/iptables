@@ -1101,7 +1101,7 @@ static void print_ip(const char *prefix, uint32_t ip,
 
 /* We want this to be readable, so only print out neccessary fields.
  * Because that's the kind of world I want to live in.  */
-void print_rule(const struct ipt_entry *e,
+void print_rule4(const struct ipt_entry *e,
 		struct iptc_handle *h, const char *chain, int counters)
 {
 	const struct ipt_entry_target *t;
@@ -1224,7 +1224,7 @@ list_rules(const ipt_chainlabel chain, int rulenum, int counters,
 		while(e) {
 			num++;
 			if (!rulenum || num == rulenum)
-			    print_rule(e, handle, this, counters);
+			    print_rule4(e, handle, this, counters);
 			e = iptc_next_rule(e, handle);
 		}
 		found = 1;
