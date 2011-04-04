@@ -143,8 +143,8 @@ initext6.c: .initext6.dd
 	for i in ${initext6_func}; do \
 		echo "extern void lib$${i}_init(void);" >>$@; \
 	done; \
-	echo "void init_extensions(void);" >>$@; \
-	echo "void init_extensions(void)" >>$@; \
+	echo "void init_extensions6(void);" >>$@; \
+	echo "void init_extensions6(void)" >>$@; \
 	echo "{" >>$@; \
 	for i in ${initext6_func}; do \
 		echo " ""lib$${i}_init();" >>$@; \

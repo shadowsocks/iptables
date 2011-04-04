@@ -286,6 +286,7 @@ extern void xtables_save_string(const char *value);
 #	endif
 	extern void init_extensions(void);
 	extern void init_extensions4(void);
+	extern void init_extensions6(void);
 #else
 #	define _init __attribute__((constructor)) _INIT
 #endif
