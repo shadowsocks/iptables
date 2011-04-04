@@ -859,7 +859,7 @@ check_entry(const ip6t_chainlabel chain, struct ip6t_entry *fw,
 }
 
 int
-for_each_chain(int (*fn)(const ip6t_chainlabel, int, struct ip6tc_handle *),
+for_each_chain6(int (*fn)(const ip6t_chainlabel, int, struct ip6tc_handle *),
 	       int verbose, int builtinstoo, struct ip6tc_handle *handle)
 {
 	int ret = 1;
@@ -899,7 +899,7 @@ flush_entries(const ip6t_chainlabel chain, int verbose,
 	      struct ip6tc_handle *handle)
 {
 	if (!chain)
-		return for_each_chain(flush_entries, verbose, 1, handle);
+		return for_each_chain6(flush_entries, verbose, 1, handle);
 
 	if (verbose)
 		fprintf(stdout, "Flushing chain `%s'\n", chain);
@@ -911,7 +911,7 @@ zero_entries(const ip6t_chainlabel chain, int verbose,
 	     struct ip6tc_handle *handle)
 {
 	if (!chain)
-		return for_each_chain(zero_entries, verbose, 1, handle);
+		return for_each_chain6(zero_entries, verbose, 1, handle);
 
 	if (verbose)
 		fprintf(stdout, "Zeroing chain `%s'\n", chain);
@@ -923,7 +923,7 @@ delete_chain(const ip6t_chainlabel chain, int verbose,
 	     struct ip6tc_handle *handle)
 {
 	if (!chain)
-		return for_each_chain(delete_chain, verbose, 0, handle);
+		return for_each_chain6(delete_chain, verbose, 0, handle);
 
 	if (verbose)
 		fprintf(stdout, "Deleting chain `%s'\n", chain);
