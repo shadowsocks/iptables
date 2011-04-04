@@ -895,11 +895,11 @@ for_each_chain6(int (*fn)(const ip6t_chainlabel, int, struct ip6tc_handle *),
 }
 
 int
-flush_entries(const ip6t_chainlabel chain, int verbose,
+flush_entries6(const ip6t_chainlabel chain, int verbose,
 	      struct ip6tc_handle *handle)
 {
 	if (!chain)
-		return for_each_chain6(flush_entries, verbose, 1, handle);
+		return for_each_chain6(flush_entries6, verbose, 1, handle);
 
 	if (verbose)
 		fprintf(stdout, "Flushing chain `%s'\n", chain);
@@ -1937,7 +1937,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				   *handle);
 		break;
 	case CMD_FLUSH:
-		ret = flush_entries(chain, cs.options&OPT_VERBOSE, *handle);
+		ret = flush_entries6(chain, cs.options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_ZERO:
 		ret = zero_entries(chain, cs.options&OPT_VERBOSE, *handle);

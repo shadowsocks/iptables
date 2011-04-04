@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
 			if (noflush == 0) {
 				DEBUGP("Cleaning all chains of table '%s'\n",
 					table);
-				for_each_chain6(flush_entries, verbose, 1,
+				for_each_chain6(flush_entries6, verbose, 1,
 						handle);
 
 				DEBUGP("Deleting all user-defined chains "
