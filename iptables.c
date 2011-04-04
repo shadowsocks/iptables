@@ -898,11 +898,11 @@ for_each_chain4(int (*fn)(const ipt_chainlabel, int, struct iptc_handle *),
 }
 
 int
-flush_entries(const ipt_chainlabel chain, int verbose,
+flush_entries4(const ipt_chainlabel chain, int verbose,
 	      struct iptc_handle *handle)
 {
 	if (!chain)
-		return for_each_chain4(flush_entries, verbose, 1, handle);
+		return for_each_chain4(flush_entries4, verbose, 1, handle);
 
 	if (verbose)
 		fprintf(stdout, "Flushing chain `%s'\n", chain);
@@ -1975,7 +1975,7 @@ int do_command(int argc, char *argv[], char **table, struct iptc_handle **handle
 				   *handle);
 		break;
 	case CMD_FLUSH:
-		ret = flush_entries(chain, cs.options&OPT_VERBOSE, *handle);
+		ret = flush_entries4(chain, cs.options&OPT_VERBOSE, *handle);
 		break;
 	case CMD_ZERO:
 		ret = zero_entries(chain, cs.options&OPT_VERBOSE, *handle);

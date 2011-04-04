@@ -11,7 +11,7 @@ extern int do_command(int argc, char *argv[], char **table,
 		      struct iptc_handle **handle);
 extern int delete_chain(const ipt_chainlabel chain, int verbose,
 			struct iptc_handle *handle);
-extern int flush_entries(const ipt_chainlabel chain, int verbose, 
+extern int flush_entries4(const ipt_chainlabel chain, int verbose, 
 			struct iptc_handle *handle);
 extern int for_each_chain4(int (*fn)(const ipt_chainlabel, int, struct iptc_handle *),
 		int verbose, int builtinstoo, struct iptc_handle *handle);
