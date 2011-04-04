@@ -651,7 +651,7 @@ main(int argc, char *argv[])
 	}
 
 	if (optind == argc - 1) {
-		in = fopen(argv[optind], "r");
+		in = fopen(argv[optind], "re");
 		if (!in) {
 			fprintf(stderr, "Can't open %s: %s", argv[optind],
 				strerror(errno));

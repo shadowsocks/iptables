@@ -300,6 +300,11 @@ static char *get_modprobe(void)
 	procfile = open(PROC_SYS_MODPROBE, O_RDONLY);
 	if (procfile < 0)
 		return NULL;
+	if (fcntl(procfile, F_SETFD, FD_CLOEXEC) == -1) {
+		fprintf(stderr, "Could not set close on exec: %s\n",
+			strerror(errno));
+		exit(1);
+	}
 
 	ret = malloc(PROCFILE_BUFSIZ);
 	if (ret) {
@@ -693,6 +698,12 @@ static int compatible_revision(const char *name, uint8_t revision, int opt)
 			return 1;
 		}
 		fprintf(stderr, "Could not open socket to kernel: %s\n",
+			strerror(errno));
+		exit(1);
+	}
+
+	if (fcntl(sockfd, F_SETFD, FD_CLOEXEC) == -1) {
+		fprintf(stderr, "Could not set close on exec: %s\n",
 			strerror(errno));
 		exit(1);
 	}

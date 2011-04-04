@@ -49,7 +49,7 @@ static void load_realms(void)
 	int id;
 	struct realmname *oldnm = NULL, *newnm = NULL;
 
-	fil = fopen(rfnm, "r");
+	fil = fopen(rfnm, "re");
 	if (!fil) {
 		rdberr = 1;
 		return;

@@ -41,7 +41,7 @@ static int for_each_table(int (*func)(const char *tablename))
 	FILE *procfile = NULL;
 	char tablename[IP6T_TABLE_MAXNAMELEN+1];
 
-	procfile = fopen("/proc/net/ip6_tables_names", "r");
+	procfile = fopen("/proc/net/ip6_tables_names", "re");
 	if (!procfile)
 		return ret;
 
