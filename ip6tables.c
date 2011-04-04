@@ -1407,11 +1407,11 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 	cs.jumpto = "";
 	cs.argv = argv;
 
-	/* re-set optind to 0 in case do_command gets called
+	/* re-set optind to 0 in case do_command6 gets called
 	 * a second time */
 	optind = 0;
 
-	/* clear mflags in case do_command gets called a second time
+	/* clear mflags in case do_command6 gets called a second time
 	 * (we clear the global list of all matches for security)*/
 	for (m = xtables_matches; m; m = m->next)
 		m->mflags = 0;
