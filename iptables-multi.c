@@ -2,11 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "xshared.h"
-
-int iptables_main(int argc, char **argv);
-int iptables_save_main(int argc, char **argv);
-int iptables_restore_main(int argc, char **argv);
-int iptables_xml_main(int argc, char **argv);
+#include "iptables-multi.h"
 
 static const struct subcommand multi4_subcommands[] = {
 	{"iptables",         iptables_main},

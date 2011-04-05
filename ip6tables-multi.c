@@ -2,10 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "xshared.h"
-
-int ip6tables_main(int argc, char **argv);
-int ip6tables_save_main(int argc, char **argv);
-int ip6tables_restore_main(int argc, char **argv);
+#include "ip6tables-multi.h"
 
 static const struct subcommand multi6_subcommands[] = {
 	{"ip6tables",         ip6tables_main},
