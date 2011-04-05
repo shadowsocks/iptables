@@ -57,6 +57,12 @@
 #define PROC_SYS_MODPROBE "/proc/sys/kernel/modprobe"
 #endif
 
+/* we need this for ip6?tables-restore.  ip6?tables-restore.c sets line to the
+ * current line of the input file, in order  to give a more precise error
+ * message.  ip6?tables itself doesn't need this, so it is initialized to the
+ * magic number of -1 */
+int line = -1;
+
 void basic_exit_err(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
 
 struct xtables_globals *xt_params = NULL;

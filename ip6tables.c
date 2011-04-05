@@ -127,12 +127,6 @@ static struct option original_opts[] = {
 	{NULL},
 };
 
-/* we need this for ip6tables-restore. ip6tables-restore.c sets line to the
- * current line of the input file, in order to give a more precise error
- * message. ip6tables itself doesn't need this, so it is initialized to the
- * magic number of -1 */
-int line = -1;
-
 void ip6tables_exit_error(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
 struct xtables_globals ip6tables_globals = {
 	.option_offset = 0,

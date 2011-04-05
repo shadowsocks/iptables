@@ -126,12 +126,6 @@ static struct option original_opts[] = {
 	{NULL},
 };
 
-/* we need this for iptables-restore.  iptables-restore.c sets line to the
- * current line of the input file, in order  to give a more precise error
- * message.  iptables itself doesn't need this, so it is initialized to the
- * magic number of -1 */
-int line = -1;
-
 void iptables_exit_error(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
 
 struct xtables_globals iptables_globals = {
