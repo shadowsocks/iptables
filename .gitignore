@@ -41,14 +41,13 @@ Makefile.in
 
 /ip6tables
 /ip6tables.8
-/ip6tables-multi
 /ip6tables-save
 /ip6tables-restore
 /ip6tables-static
 /iptables
 /iptables.8
-/iptables-multi
 /iptables-save
 /iptables-restore
 /iptables-static
 /iptables-xml
+/xtables-multi

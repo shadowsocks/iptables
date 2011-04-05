@@ -17,7 +17,7 @@ endif
 lib_LTLIBRARIES =
 
 # libiptc
-lib_LTLIBRARIES           += libiptc/libip4tc.la libiptc/libip6tc.la libiptc/libiptc.la
+lib_LTLIBRARIES            += libiptc/libip4tc.la libiptc/libip6tc.la libiptc/libiptc.la
 libiptc_libiptc_la_SOURCES  =
 libiptc_libiptc_la_LIBADD   = libiptc/libip4tc.la libiptc/libip6tc.la
 libiptc_libiptc_la_LDFLAGS  = -version-info 0:0:0 ${libiptc_LDFLAGS2}
@@ -37,43 +37,39 @@ libxtables_la_CFLAGS  = ${AM_CFLAGS} -DNO_SHARED_LIBS=1
 libxtables_la_LIBADD  =
 endif
 
-iptables_multi_SOURCES    = iptables-multi.c iptables-save.c \
-                            iptables-restore.c iptables-xml.c \
-                            iptables-standalone.c iptables.c xshared.c
-iptables_multi_CFLAGS     = ${AM_CFLAGS} -DIPTABLES_MULTI
+xtables_multi_SOURCES  = xtables-multi.c
+xtables_multi_CFLAGS   = ${AM_CFLAGS} -DIPTABLES_MULTI
+xtables_multi_LDFLAGS  = -rdynamic
+xtables_multi_LDADD    = extensions/libext.a
 if ENABLE_STATIC
-iptables_multi_CFLAGS    += -DALL_INCLUSIVE
+xtables_multi_CFLAGS  += -DALL_INCLUSIVE
 endif
-iptables_multi_LDFLAGS    = -rdynamic
-iptables_multi_LDADD      = libiptc/libip4tc.la \
-                            extensions/libext.a extensions/libext4.a \
-                            libxtables.la -lm
-
-ip6tables_multi_SOURCES   = ip6tables-multi.c ip6tables-save.c \
-                            ip6tables-restore.c ip6tables-standalone.c \
-                            ip6tables.c xshared.c
-ip6tables_multi_CFLAGS    = ${AM_CFLAGS} -DIPTABLES_MULTI
-if ENABLE_STATIC
-ip6tables_multi_CFLAGS   += -DALL_INCLUSIVE
+if ENABLE_IPV4
+xtables_multi_SOURCES += iptables-save.c iptables-restore.c iptables-xml.c \
+                         iptables-standalone.c iptables.c
+xtables_multi_CFLAGS  += -DENABLE_IPV4
+xtables_multi_LDADD   += libiptc/libip4tc.la extensions/libext4.a
 endif
-ip6tables_multi_LDFLAGS   = -rdynamic
-ip6tables_multi_LDADD     = libiptc/libip6tc.la \
-                            extensions/libext.a extensions/libext6.a \
-                            libxtables.la -lm
+if ENABLE_IPV6
+xtables_multi_SOURCES += ip6tables-save.c ip6tables-restore.c \
+                          ip6tables-standalone.c ip6tables.c
+xtables_multi_CFLAGS  += -DENABLE_IPV6
+xtables_multi_LDADD   += libiptc/libip6tc.la extensions/libext6.a
+endif
+xtables_multi_SOURCES += xshared.c
+xtables_multi_LDADD   += libxtables.la -lm
 
-sbin_PROGRAMS    =
+sbin_PROGRAMS    = xtables-multi
 man_MANS         = iptables.8 iptables-restore.8 iptables-save.8 \
                    iptables-xml.8 ip6tables.8 ip6tables-restore.8 \
                    ip6tables-save.8
 CLEANFILES       = iptables.8 ip6tables.8
 
 if ENABLE_IPV4
-sbin_PROGRAMS += iptables-multi
 v4_bin_links   = iptables-xml
 v4_sbin_links  = iptables iptables-restore iptables-save
 endif
 if ENABLE_IPV6
-sbin_PROGRAMS += ip6tables-multi
 v6_sbin_links  = ip6tables ip6tables-restore ip6tables-save
 endif
 
