@@ -155,8 +155,8 @@ initext6.c: .initext6.dd
 #
 #	Manual pages
 #
-ex_matches = $(sort $(shell echo $(1) | LC_ALL=POSIX grep -Eo '\b[[:alnum:]_]+\b'))
-ex_targets = $(sort $(shell echo $(1) | LC_ALL=POSIX grep -Eo '\b[[:alnum:]_]+\b'))
+ex_matches = $(sort $(shell echo $(1) | LC_ALL=POSIX grep -Eo '\b[[:lower:][:digit:]_]+\b'))
+ex_targets = $(sort $(shell echo $(1) | LC_ALL=POSIX grep -Eo '\b[[:upper:][:digit:]_]+\b'))
 man_run    = \
 	${AM_VERBOSE_GEN} \
 	for ext in $(1); do \
