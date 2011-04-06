@@ -59,6 +59,7 @@ main(int argc, char *argv[])
 				exit(1);
 	}
 #if defined(ALL_INCLUSIVE) || defined(NO_SHARED_LIBS)
+	init_extensions();
 	init_extensions4();
 #endif
 

@@ -51,11 +51,13 @@ pf6_solibs    := $(patsubst %,libip6t_%.so,${pf6_build_mod})
 #
 # Building blocks
 #
-targets := libext4.a libext6.a matches4.man matches6.man \
+targets := libext.a libext4.a libext6.a \
+           matches4.man matches6.man \
            targets4.man targets6.man
 targets_install :=
-@ENABLE_STATIC_TRUE@ libext4_objs := ${pfx_objs} ${pf4_objs}
-@ENABLE_STATIC_TRUE@ libext6_objs := ${pfx_objs} ${pf6_objs}
+@ENABLE_STATIC_TRUE@ libext_objs := ${pfx_objs}
+@ENABLE_STATIC_TRUE@ libext4_objs := ${pf4_objs}
+@ENABLE_STATIC_TRUE@ libext6_objs := ${pf6_objs}
 @ENABLE_STATIC_FALSE@ targets += ${pfx_solibs} ${pf4_solibs} ${pf6_solibs}
 @ENABLE_STATIC_FALSE@ targets_install += ${pfx_solibs} ${pf4_solibs} ${pf6_solibs}
 
@@ -70,7 +72,7 @@ install: ${targets_install}
 	if test -n "${targets_install}"; then install -pm0755 $^ "${DESTDIR}${xtlibdir}/"; fi;
 
 clean:
-	rm -f *.o *.oo *.so *.a {matches,targets}[46].man initext4.c initext6.c;
+	rm -f *.o *.oo *.so *.a {matches,targets}[46].man initext.c initext4.c initext6.c;
 
 distclean: clean
 	rm -f .*.d .*.dd;
@@ -101,17 +103,26 @@ lib%.oo: ${srcdir}/lib%.c
 lib%.o: ${srcdir}/lib%.c
 	${AM_VERBOSE_CC} ${CC} ${AM_DEPFLAGS} ${AM_CFLAGS} -DNO_SHARED_LIBS=1 -D_INIT=lib$*_init ${CFLAGS} -o $@ -c $<;
 
+libext.a: initext.o ${libext_objs}
+	${AM_VERBOSE_AR} ${AR} crs $@ $^;
+
 libext4.a: initext4.o ${libext4_objs}
 	${AM_VERBOSE_AR} ${AR} crs $@ $^;
 
 libext6.a: initext6.o ${libext6_objs}
 	${AM_VERBOSE_AR} ${AR} crs $@ $^;
 
-initext_func  := $(addprefix xt_,${pfx_build_mod}) $(addprefix ipt_,${pf4_build_mod})
-initext6_func := $(addprefix xt_,${pfx_build_mod}) $(addprefix ip6t_,${pf6_build_mod})
+initext_func  := $(addprefix xt_,${pfx_build_mod})
+initext4_func := $(addprefix ipt_,${pf4_build_mod})
+initext6_func := $(addprefix ip6t_,${pf6_build_mod})
+
+.initext.dd: FORCE
+	@echo "${initext_func}" >$@.tmp; \
+	cmp -s $@ $@.tmp || mv $@.tmp $@; \
+	rm -f $@.tmp;
 
 .initext4.dd: FORCE
-	@echo "${initext_func}" >$@.tmp; \
+	@echo "${initext4_func}" >$@.tmp; \
 	cmp -s $@ $@.tmp || mv $@.tmp $@; \
 	rm -f $@.tmp;
 
@@ -120,17 +131,33 @@ initext6_func := $(addprefix xt_,${pfx_build_mod}) $(addprefix ip6t_,${pf6_build
 	cmp -s $@ $@.tmp || mv $@.tmp $@; \
 	rm -f $@.tmp;
 
-initext4.c: .initext4.dd
+initext.c: .initext.dd
 	${AM_VERBOSE_GEN}
 	@( \
 	echo "" >$@; \
 	for i in ${initext_func}; do \
 		echo "extern void lib$${i}_init(void);" >>$@; \
 	done; \
+	echo "void init_extensions(void);" >>$@; \
+	echo "void init_extensions(void)" >>$@; \
+	echo "{" >>$@; \
+	for i in ${initext_func}; do \
+		echo  " ""lib$${i}_init();" >>$@; \
+	done; \
+	echo "}" >>$@; \
+	);
+
+initext4.c: .initext4.dd
+	${AM_VERBOSE_GEN}
+	@( \
+	echo "" >$@; \
+	for i in ${initext4_func}; do \
+		echo "extern void lib$${i}_init(void);" >>$@; \
+	done; \
 	echo "void init_extensions4(void);" >>$@; \
 	echo "void init_extensions4(void)" >>$@; \
 	echo "{" >>$@; \
-	for i in ${initext_func}; do \
+	for i in ${initext4_func}; do \
 		echo  " ""lib$${i}_init();" >>$@; \
 	done; \
 	echo "}" >>$@; \
@@ -177,14 +204,14 @@ man_run    = \
 		fi; \
 	done >$@;
 
-matches4.man: .initext4.dd $(wildcard ${srcdir}/lib*.man)
+matches4.man: .initext.dd .initext4.dd $(wildcard ${srcdir}/lib*.man)
 	$(call man_run,$(call ex_matches,${pfx_build_mod} ${pf4_build_mod}),ip,NFPROTO_IPV4)
 
-matches6.man: .initext6.dd $(wildcard ${srcdir}/lib*.man)
+matches6.man: .initext.dd .initext6.dd $(wildcard ${srcdir}/lib*.man)
 	$(call man_run,$(call ex_matches,${pfx_build_mod} ${pf6_build_mod}),ip6,NFPROTO_IPV6)
 
-targets4.man: .initext4.dd $(wildcard ${srcdir}/lib*.man)
+targets4.man: .initext.dd .initext4.dd $(wildcard ${srcdir}/lib*.man)
 	$(call man_run,$(call ex_targets,${pfx_build_mod} ${pf4_build_mod}),ip,NFPROTO_IPV4)
 
-targets6.man: .initext6.dd $(wildcard ${srcdir}/lib*.man)
+targets6.man: .initext.dd .initext6.dd $(wildcard ${srcdir}/lib*.man)
 	$(call man_run,$(call ex_targets,${pfx_build_mod} ${pf6_build_mod}),ip6,NFPROTO_IPV6)

@@ -45,7 +45,9 @@ if ENABLE_STATIC
 iptables_multi_CFLAGS    += -DALL_INCLUSIVE
 endif
 iptables_multi_LDFLAGS    = -rdynamic
-iptables_multi_LDADD      = libiptc/libip4tc.la extensions/libext4.a libxtables.la -lm
+iptables_multi_LDADD      = libiptc/libip4tc.la \
+                            extensions/libext.a extensions/libext4.a \
+                            libxtables.la -lm
 
 ip6tables_multi_SOURCES   = ip6tables-multi.c ip6tables-save.c \
                             ip6tables-restore.c ip6tables-standalone.c \
@@ -55,7 +57,9 @@ if ENABLE_STATIC
 ip6tables_multi_CFLAGS   += -DALL_INCLUSIVE
 endif
 ip6tables_multi_LDFLAGS   = -rdynamic
-ip6tables_multi_LDADD     = libiptc/libip6tc.la extensions/libext6.a libxtables.la -lm
+ip6tables_multi_LDADD     = libiptc/libip6tc.la \
+                            extensions/libext.a extensions/libext6.a \
+                            libxtables.la -lm
 
 sbin_PROGRAMS    =
 man_MANS         = iptables.8 iptables-restore.8 iptables-save.8 \
