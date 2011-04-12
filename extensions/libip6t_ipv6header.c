@@ -202,7 +202,9 @@ ipv6header_parse(int c, char **argv, int invert, unsigned int *flags,
 
 static void ipv6header_check(unsigned int flags)
 {
-	if (!flags) xtables_error(PARAMETER_PROBLEM, "ip6t_ipv6header: no options specified");
+	if (!(flags & IPV6_HDR_HEADER))
+		xtables_error(PARAMETER_PROBLEM,
+			"ip6t_ipv6header: no options specified");
 }
 
 static void

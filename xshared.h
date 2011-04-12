@@ -26,6 +26,24 @@ enum {
 struct xtables_rule_match;
 struct xtables_target;
 
+/**
+ * xtables_afinfo - protocol family dependent information
+ * @kmod:		kernel module basename (e.g. "ip_tables")
+ * @libprefix:		prefix of .so library name (e.g. "libipt_")
+ * @family:		nfproto family
+ * @ipproto:		used by setsockopt (e.g. IPPROTO_IP)
+ * @so_rev_match:	optname to check revision support of match
+ * @so_rev_target:	optname to check revision support of target
+ */
+struct xtables_afinfo {
+	const char *kmod;
+	const char *libprefix;
+	uint8_t family;
+	uint8_t ipproto;
+	int so_rev_match;
+	int so_rev_target;
+};
+
 struct iptables_command_state {
 	union {
 		struct ipt_entry fw;
@@ -58,5 +76,7 @@ extern void print_extension_helps(const struct xtables_target *,
 extern const char *proto_to_name(uint8_t, int);
 extern struct xtables_match *load_proto(struct iptables_command_state *);
 extern int subcmd_main(int, char **, const struct subcommand *);
+
+extern const struct xtables_afinfo *afinfo;
 
 #endif /* IPTABLES_XSHARED_H */
