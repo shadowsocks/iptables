@@ -114,7 +114,7 @@ parse_dirs_v0(const char *opt_arg, struct xt_set_info_v0 *info)
 	if (tmp)
 		xtables_error(PARAMETER_PROBLEM,
 			      "Can't be more src/dst options than %i.", 
-			      IPSET_DIM_MAX - 1);
+			      IPSET_DIM_MAX);
 
 	free(saved);
 }
@@ -124,9 +124,8 @@ parse_dirs(const char *opt_arg, struct xt_set_info *info)
 {
 	char *saved = strdup(opt_arg);
 	char *ptr, *tmp = saved;
-	int i = 0;
 	
-	while (i < (IPSET_DIM_MAX - 1) && tmp != NULL) {
+	while (info->dim < IPSET_DIM_MAX && tmp != NULL) {
 		info->dim++;
 		ptr = strsep(&tmp, ",");
 		if (strncmp(ptr, "src", 3) == 0)
@@ -139,7 +138,7 @@ parse_dirs(const char *opt_arg, struct xt_set_info *info)
 	if (tmp)
 		xtables_error(PARAMETER_PROBLEM,
 			      "Can't be more src/dst options than %i.", 
-			      IPSET_DIM_MAX - 1);
+			      IPSET_DIM_MAX);
 
 	free(saved);
 }
