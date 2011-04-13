@@ -1,13 +1,10 @@
-/* Shared library add-on to iptables to add related packet matching support. */
-#include <stdbool.h>
 #include <stdio.h>
-#include <netdb.h>
-#include <string.h>
-#include <stdlib.h>
-#include <getopt.h>
-
 #include <xtables.h>
 #include <linux/netfilter/xt_helper.h>
+
+enum {
+	O_HELPER = 0,
+};
 
 static void helper_help(void)
 {
@@ -16,38 +13,20 @@ static void helper_help(void)
 "[!] --helper string        Match helper identified by string\n");
 }
 
-static const struct option helper_opts[] = {
-	{.name = "helper", .has_arg = true, .val = '1'},
-	XT_GETOPT_TABLEEND,
+static const struct xt_option_entry helper_opts[] = {
+	{.name = "helper", .id = O_HELPER, .type = XTTYPE_STRING,
+	 .flags = XTOPT_MAND | XTOPT_INVERT | XTOPT_PUT,
+	 XTOPT_POINTER(struct xt_helper_info, name)},
+	XTOPT_TABLEEND,
 };
 
-static int
-helper_parse(int c, char **argv, int invert, unsigned int *flags,
-             const void *entry, struct xt_entry_match **match)
+static void helper_parse(struct xt_option_call *cb)
 {
-	struct xt_helper_info *info = (struct xt_helper_info *)(*match)->data;
+	struct xt_helper_info *info = cb->data;
 
-	switch (c) {
-	case '1':
-		if (*flags)
-			xtables_error(PARAMETER_PROBLEM,
-					"helper match: Only use --helper ONCE!");
-		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		strncpy(info->name, optarg, 29);
-		info->name[29] = '\0';
-		if (invert)
-			info->invert = 1;
-		*flags = 1;
-		break;
-	}
-	return 1;
-}
-
-static void helper_check(unsigned int flags)
-{
-	if (!flags)
-		xtables_error(PARAMETER_PROBLEM,
-			   "helper match: You must specify `--helper'");
+	xtables_option_parse(cb);
+	if (cb->invert)
+		info->invert = 1;
 }
 
 static void
@@ -72,11 +51,10 @@ static struct xtables_match helper_match = {
 	.version	= XTABLES_VERSION,
 	.size		= XT_ALIGN(sizeof(struct xt_helper_info)),
 	.help		= helper_help,
-	.parse		= helper_parse,
-	.final_check	= helper_check,
 	.print		= helper_print,
 	.save		= helper_save,
-	.extra_opts	= helper_opts,
+	.x6_parse	= helper_parse,
+	.x6_options	= helper_opts,
 };
 
 void _init(void)

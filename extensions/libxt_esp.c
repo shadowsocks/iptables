@@ -1,15 +1,10 @@
-/* Shared library add-on to iptables to add ESP support. */
-#include <stdbool.h>
 #include <stdio.h>
-#include <netdb.h>
-#include <string.h>
-#include <stdlib.h>
-#include <getopt.h>
-#include <errno.h>
-#include <limits.h>
-
 #include <xtables.h>
 #include <linux/netfilter/xt_esp.h>
+
+enum {
+	O_ESPSPI = 0,
+};
 
 static void esp_help(void)
 {
@@ -19,55 +14,12 @@ static void esp_help(void)
 "				match spi (range)\n");
 }
 
-static const struct option esp_opts[] = {
-	{.name = "espspi", .has_arg = true, .val = '1'},
-	XT_GETOPT_TABLEEND,
+static const struct xt_option_entry esp_opts[] = {
+	{.name = "espspi", .id = O_ESPSPI, .type = XTTYPE_UINT32RC,
+	 .flags = XTOPT_INVERT | XTOPT_PUT,
+	 XTOPT_POINTER(struct xt_esp, spis)},
+	XTOPT_TABLEEND,
 };
-
-static uint32_t
-parse_esp_spi(const char *spistr)
-{
-	unsigned long int spi;
-	char* ep;
-
-	spi =  strtoul(spistr,&ep,0) ;
-
-	if ( spistr == ep ) {
-		xtables_error(PARAMETER_PROBLEM,
-			   "ESP no valid digits in spi `%s'", spistr);
-	}
-	if ( spi == ULONG_MAX  && errno == ERANGE ) {
-		xtables_error(PARAMETER_PROBLEM,
-			   "spi `%s' specified too big: would overflow", spistr);
-	}	
-	if ( *spistr != '\0'  && *ep != '\0' ) {
-		xtables_error(PARAMETER_PROBLEM,
-			   "ESP error parsing spi `%s'", spistr);
-	}
-	return spi;
-}
-
-static void
-parse_esp_spis(const char *spistring, uint32_t *spis)
-{
-	char *buffer;
-	char *cp;
-
-	buffer = strdup(spistring);
-	if ((cp = strchr(buffer, ':')) == NULL)
-		spis[0] = spis[1] = parse_esp_spi(buffer);
-	else {
-		*cp = '\0';
-		cp++;
-
-		spis[0] = buffer[0] ? parse_esp_spi(buffer) : 0;
-		spis[1] = cp[0] ? parse_esp_spi(cp) : 0xFFFFFFFF;
-		if (spis[0] > spis[1])
-			xtables_error(PARAMETER_PROBLEM,
-				   "Invalid ESP spi range: %s", spistring);
-	}
-	free(buffer);
-}
 
 static void esp_init(struct xt_entry_match *m)
 {
@@ -76,28 +28,13 @@ static void esp_init(struct xt_entry_match *m)
 	espinfo->spis[1] = 0xFFFFFFFF;
 }
 
-#define ESP_SPI 0x01
-
-static int
-esp_parse(int c, char **argv, int invert, unsigned int *flags,
-          const void *entry, struct xt_entry_match **match)
+static void esp_parse(struct xt_option_call *cb)
 {
-	struct xt_esp *espinfo = (struct xt_esp *)(*match)->data;
+	struct xt_esp *espinfo = cb->data;
 
-	switch (c) {
-	case '1':
-		if (*flags & ESP_SPI)
-			xtables_error(PARAMETER_PROBLEM,
-				   "Only one `--espspi' allowed");
-		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		parse_esp_spis(optarg, espinfo->spis);
-		if (invert)
-			espinfo->invflags |= XT_ESP_INV_SPI;
-		*flags |= ESP_SPI;
-		break;
-	}
-
-	return 1;
+	xtables_option_parse(cb);
+	if (cb->invert)
+		espinfo->invflags |= XT_ESP_INV_SPI;
 }
 
 static void
@@ -155,10 +92,10 @@ static struct xtables_match esp_match = {
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_esp)),
 	.help		= esp_help,
 	.init		= esp_init,
-	.parse		= esp_parse,
 	.print		= esp_print,
 	.save		= esp_save,
-	.extra_opts	= esp_opts,
+	.x6_parse	= esp_parse,
+	.x6_options	= esp_opts,
 };
 
 void

@@ -5,15 +5,14 @@
  *
  * This program is distributed under the terms of GNU GPL v2, 1991
  */
-
-#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-#include <getopt.h>
-
 #include <xtables.h>
 #include <linux/netfilter/xt_AUDIT.h>
+
+enum {
+	O_AUDIT_TYPE = 0,
+};
 
 static void audit_help(void)
 {
@@ -22,46 +21,26 @@ static void audit_help(void)
 "  --type TYPE		Action type to be recorded.\n");
 }
 
-static const struct option audit_opts[] = {
-	{.name = "type", .has_arg = true, .val = 't'},
-	XT_GETOPT_TABLEEND,
+static const struct xt_option_entry audit_opts[] = {
+	{.name = "type", .id = O_AUDIT_TYPE, .type = XTTYPE_STRING,
+	 .flags = XTOPT_MAND},
+	XTOPT_TABLEEND,
 };
 
-static int audit_parse(int c, char **argv, int invert, unsigned int *flags,
-                     const void *entry, struct xt_entry_target **target)
+static void audit_parse(struct xt_option_call *cb)
 {
-	struct xt_audit_info *einfo
-		= (struct xt_audit_info *)(*target)->data;
+	struct xt_audit_info *einfo = cb->data;
 
-	switch (c) {
-	case 't':
-		if (!strcasecmp(optarg, "accept"))
-			einfo->type = XT_AUDIT_TYPE_ACCEPT;
-		else if (!strcasecmp(optarg, "drop"))
-			einfo->type = XT_AUDIT_TYPE_DROP;
-		else if (!strcasecmp(optarg, "reject"))
-			einfo->type = XT_AUDIT_TYPE_REJECT;
-		else
-			xtables_error(PARAMETER_PROBLEM,
-				   "Bad action type value `%s'", optarg);
-
-		if (*flags)
-			xtables_error(PARAMETER_PROBLEM,
-			           "AUDIT: Can't specify --type twice");
-		*flags = 1;
-		break;
-	default:
-		return 0;
-	}
-
-	return 1;
-}
-
-static void audit_final_check(unsigned int flags)
-{
-	if (!flags)
+	xtables_option_parse(cb);
+	if (strcasecmp(cb->arg, "accept") == 0)
+		einfo->type = XT_AUDIT_TYPE_ACCEPT;
+	else if (strcasecmp(cb->arg, "drop") == 0)
+		einfo->type = XT_AUDIT_TYPE_DROP;
+	else if (strcasecmp(cb->arg, "reject") == 0)
+		einfo->type = XT_AUDIT_TYPE_REJECT;
+	else
 		xtables_error(PARAMETER_PROBLEM,
-		           "AUDIT target: Parameter --type is required");
+			   "Bad action type value \"%s\"", cb->arg);
 }
 
 static void audit_print(const void *ip, const struct xt_entry_target *target,
@@ -110,11 +89,10 @@ static struct xtables_target audit_tg_reg = {
 	.size		= XT_ALIGN(sizeof(struct xt_audit_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_audit_info)),
 	.help		= audit_help,
-	.parse		= audit_parse,
-	.final_check	= audit_final_check,
 	.print		= audit_print,
 	.save		= audit_save,
-	.extra_opts	= audit_opts,
+	.x6_parse	= audit_parse,
+	.x6_options	= audit_opts,
 };
 
 void _init(void)

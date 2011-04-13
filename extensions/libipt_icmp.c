@@ -1,12 +1,8 @@
-/* Shared library add-on to iptables to add ICMP support. */
-#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
-#include <netdb.h>
 #include <string.h>
-#include <stdlib.h>
-#include <getopt.h>
 #include <xtables.h>
-#include <limits.h> /* INT_MAX in ip_tables.h */
+#include <limits.h> /* INT_MAX in ip6_tables.h */
 #include <linux/netfilter_ipv4/ip_tables.h>
 
 /* special hack for icmp-type 'any': 
@@ -16,6 +12,10 @@
  * This is now fixed by initializing the field * to icmp type 0xFF
  * See: https://bugzilla.netfilter.org/cgi-bin/bugzilla/show_bug.cgi?id=37
  */
+
+enum {
+	O_ICMP_TYPE = 0,
+};
 
 struct icmp_names {
 	const char *name;
@@ -108,9 +108,10 @@ static void icmp_help(void)
 	print_icmptypes();
 }
 
-static const struct option icmp_opts[] = {
-	{.name = "icmp-type", .has_arg = true, .val = '1'},
-	XT_GETOPT_TABLEEND,
+static const struct xt_option_entry icmp_opts[] = {
+	{.name = "icmp-type", .id = O_ICMP_TYPE, .type = XTTYPE_STRING,
+	 .flags = XTOPT_MAND | XTOPT_INVERT},
+	XTOPT_TABLEEND,
 };
 
 static void 
@@ -174,26 +175,14 @@ static void icmp_init(struct xt_entry_match *m)
 	icmpinfo->code[1] = 0xFF;
 }
 
-static int icmp_parse(int c, char **argv, int invert, unsigned int *flags,
-                      const void *entry, struct xt_entry_match **match)
+static void icmp_parse(struct xt_option_call *cb)
 {
-	struct ipt_icmp *icmpinfo = (struct ipt_icmp *)(*match)->data;
+	struct ipt_icmp *icmpinfo = cb->data;
 
-	switch (c) {
-	case '1':
-		if (*flags == 1)
-			xtables_error(PARAMETER_PROBLEM,
-				   "icmp match: only use --icmp-type once!");
-		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		parse_icmp(optarg, &icmpinfo->type, 
-			   icmpinfo->code);
-		if (invert)
-			icmpinfo->invflags |= IPT_ICMP_INV;
-		*flags = 1;
-		break;
-	}
-
-	return 1;
+	xtables_option_parse(cb);
+	parse_icmp(cb->arg, &icmpinfo->type, icmpinfo->code);
+	if (cb->invert)
+		icmpinfo->invflags |= IPT_ICMP_INV;
 }
 
 static void print_icmptype(uint8_t type,
@@ -268,10 +257,10 @@ static struct xtables_match icmp_mt_reg = {
 	.userspacesize	= XT_ALIGN(sizeof(struct ipt_icmp)),
 	.help		= icmp_help,
 	.init		= icmp_init,
-	.parse		= icmp_parse,
 	.print		= icmp_print,
 	.save		= icmp_save,
-	.extra_opts	= icmp_opts,
+	.x6_parse	= icmp_parse,
+	.x6_options	= icmp_opts,
 };
 
 void _init(void)

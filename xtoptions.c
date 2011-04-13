@@ -89,6 +89,8 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 	unsigned int lmin = 0, lmax = UINT32_MAX;
 	unsigned int value;
 
+	if (entry->type == XTTYPE_UINT8)
+		lmax = UINT8_MAX;
 	if (cb->entry->min != 0)
 		lmin = cb->entry->min;
 	if (cb->entry->max != 0)
@@ -100,19 +102,102 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 			"or out of range (%u-%u).\n",
 			cb->ext_name, entry->name, lmin, lmax);
 
-	if (entry->type == XTTYPE_UINT32) {
+	if (entry->type == XTTYPE_UINT8) {
+		cb->val.u8 = value;
+		if (entry->flags & XTOPT_PUT)
+			*(uint8_t *)XTOPT_MKPTR(cb) = cb->val.u8;
+	} else if (entry->type == XTTYPE_UINT32) {
 		cb->val.u32 = value;
 		if (entry->flags & XTOPT_PUT)
 			*(uint32_t *)XTOPT_MKPTR(cb) = cb->val.u32;
 	}
 }
 
+/**
+ * Multiple integer parse routine.
+ *
+ * This function is capable of parsing any number of fields. Only the first
+ * two values from the string will be put into @cb however (and as such,
+ * @cb->val.uXX_range is just that large) to cater for the few extensions that
+ * do not have a range[2] field, but {min, max}, and which cannot use
+ * XTOPT_POINTER.
+ */
+static void xtopt_parse_mint(struct xt_option_call *cb)
+{
+	const struct xt_option_entry *entry = cb->entry;
+	const char *arg = cb->arg;
+	uint32_t *put = XTOPT_MKPTR(cb);
+	unsigned int maxiter, value;
+	char *end = "";
+	char sep = ':';
+
+	maxiter = entry->size / sizeof(uint32_t);
+	if (maxiter == 0)
+		maxiter = 2; /* ARRAY_SIZE(cb->val.uXX_range) */
+	if (entry->size % sizeof(uint32_t) != 0)
+		xt_params->exit_err(OTHER_PROBLEM, "%s: memory block does "
+			"not have proper size\n", __func__);
+
+	cb->nvals = 0;
+	for (arg = cb->arg; ; arg = end + 1) {
+		if (cb->nvals == maxiter)
+			xt_params->exit_err(PARAMETER_PROBLEM, "%s: Too many "
+				"components for option \"--%s\" (max: %u)\n",
+				cb->ext_name, entry->name, maxiter);
+		if (!xtables_strtoui(arg, &end, &value, 0, UINT32_MAX))
+			xt_params->exit_err(PARAMETER_PROBLEM,
+				"%s: bad value for option \"--%s\", "
+				"or out of range (0-%u).\n",
+				cb->ext_name, entry->name, UINT32_MAX);
+		if (*end != '\0' && *end != sep)
+			xt_params->exit_err(PARAMETER_PROBLEM,
+				"%s: Argument to \"--%s\" has unexpected "
+				"characters.\n", cb->ext_name, entry->name);
+		++cb->nvals;
+		if (cb->nvals < ARRAY_SIZE(cb->val.u32_range))
+			cb->val.u32_range[cb->nvals] = value;
+		if (entry->flags & XTOPT_PUT)
+			*put++ = value;
+		if (*end == '\0')
+			break;
+	}
+}
+
+static void xtopt_parse_string(struct xt_option_call *cb)
+{
+	const struct xt_option_entry *entry = cb->entry;
+	size_t z = strlen(cb->arg);
+	char *p;
+
+	if (entry->min != 0 && z < entry->min)
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"Argument must have a minimum length of "
+			"%u characters\n", entry->min);
+	if (entry->max != 0 && z > entry->max)
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"Argument must have a maximum length of "
+			"%u characters\n", entry->max);
+	if (!(entry->flags & XTOPT_PUT))
+		return;
+	if (z >= entry->size)
+		z = entry->size - 1;
+	p = XTOPT_MKPTR(cb);
+	strncpy(p, cb->arg, z);
+	p[z] = '\0';
+}
+
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
+	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT32]      = xtopt_parse_int,
+	[XTTYPE_UINT32RC]    = xtopt_parse_mint,
+	[XTTYPE_STRING]      = xtopt_parse_string,
 };
 
 static const size_t xtopt_psize[] = {
+	[XTTYPE_UINT8]       = sizeof(uint8_t),
 	[XTTYPE_UINT32]      = sizeof(uint32_t),
+	[XTTYPE_UINT32RC]    = sizeof(uint32_t[2]),
+	[XTTYPE_STRING]      = -1,
 };
 
 /**
@@ -172,7 +257,8 @@ void xtables_option_metavalidate(const char *name,
 				"%s: entry type of option \"--%s\" cannot be "
 				"combined with XTOPT_PUT\n",
 				name, entry->name);
-		if (xtopt_psize[entry->type] != entry->size)
+		if (xtopt_psize[entry->type] != -1 &&
+		    xtopt_psize[entry->type] != entry->size)
 			xt_params->exit_err(OTHER_PROBLEM,
 				"%s: option \"--%s\" points to a memory block "
 				"of wrong size (expected %zu, got %zu)\n",

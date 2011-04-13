@@ -4,17 +4,33 @@
  * Based on HW's ttl target
  * This program is distributed under the terms of GNU GPL
  */
-
-#include <getopt.h>
-#include <stdbool.h>
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <xtables.h>
-
 #include <linux/netfilter_ipv6/ip6t_HL.h>
 
-#define IP6T_HL_USED	1
+enum {
+	O_HL_SET = 0,
+	O_HL_INC,
+	O_HL_DEC,
+	F_HL_SET = 1 << O_HL_SET,
+	F_HL_INC = 1 << O_HL_INC,
+	F_HL_DEC = 1 << O_HL_DEC,
+	F_ANY    = F_HL_SET | F_HL_INC | F_HL_DEC,
+};
+
+#define s struct ip6t_HL_info
+static const struct xt_option_entry HL_opts[] = {
+	{.name = "ttl-set", .type = XTTYPE_UINT8, .id = O_HL_SET,
+	 .excl = F_ANY, .flags = XTOPT_PUT, XTOPT_POINTER(s, hop_limit)},
+	{.name = "ttl-dec", .type = XTTYPE_UINT8, .id = O_HL_DEC,
+	 .excl = F_ANY, .flags = XTOPT_PUT, XTOPT_POINTER(s, hop_limit),
+	 .min = 1},
+	{.name = "ttl-inc", .type = XTTYPE_UINT8, .id = O_HL_INC,
+	 .excl = F_ANY, .flags = XTOPT_PUT, XTOPT_POINTER(s, hop_limit),
+	 .min = 1},
+	XTOPT_TABLEEND,
+};
+#undef s
 
 static void HL_help(void)
 {
@@ -25,63 +41,27 @@ static void HL_help(void)
 "  --hl-inc value		Increment HL by <value 1-255>\n");
 }
 
-static int HL_parse(int c, char **argv, int invert, unsigned int *flags,
-                    const void *entry, struct xt_entry_target **target)
+static void HL_parse(struct xt_option_call *cb)
 {
-	struct ip6t_HL_info *info = (struct ip6t_HL_info *) (*target)->data;
-	unsigned int value;
+	struct ip6t_HL_info *info = cb->data;
 
-	if (*flags & IP6T_HL_USED) {
-		xtables_error(PARAMETER_PROBLEM,
-				"Can't specify HL option twice");
+	xtables_option_parse(cb);
+	switch (cb->entry->id) {
+	case O_HL_SET:
+		info->mode = IP6T_HL_SET;
+		break;
+	case O_HL_INC:
+		info->mode = IP6T_HL_INC;
+		break;
+	case O_HL_DEC:
+		info->mode = IP6T_HL_DEC;
+		break;
 	}
-
-	if (!optarg) 
-		xtables_error(PARAMETER_PROBLEM,
-				"HL: You must specify a value");
-
-	if (xtables_check_inverse(optarg, &invert, NULL, 0, argv))
-		xtables_error(PARAMETER_PROBLEM,
-				"HL: unexpected `!'");
-	
-	if (!xtables_strtoui(optarg, NULL, &value, 0, UINT8_MAX))
-		xtables_error(PARAMETER_PROBLEM,
-		           "HL: Expected value between 0 and 255");
-
-	switch (c) {
-
-		case '1':
-			info->mode = IP6T_HL_SET;
-			break;
-
-		case '2':
-			if (value == 0) {
-				xtables_error(PARAMETER_PROBLEM,
-					"HL: decreasing by 0?");
-			}
-
-			info->mode = IP6T_HL_DEC;
-			break;
-
-		case '3':
-			if (value == 0) {
-				xtables_error(PARAMETER_PROBLEM,
-					"HL: increasing by 0?");
-			}
-
-			info->mode = IP6T_HL_INC;
-			break;
-	}
-	
-	info->hop_limit = value;
-	*flags |= IP6T_HL_USED;
-
-	return 1;
 }
 
-static void HL_check(unsigned int flags)
+static void HL_check(struct xt_fcheck_call *cb)
 {
-	if (!(flags & IP6T_HL_USED))
+	if (!(cb->xflags & F_ANY))
 		xtables_error(PARAMETER_PROBLEM,
 				"HL: You must specify an action");
 }
@@ -127,13 +107,6 @@ static void HL_print(const void *ip, const struct xt_entry_target *target,
 	printf(" %u", info->hop_limit);
 }
 
-static const struct option HL_opts[] = {
-	{.name = "hl-set", .has_arg = true, .val = '1'},
-	{.name = "hl-dec", .has_arg = true, .val = '2'},
-	{.name = "hl-inc", .has_arg = true, .val = '3'},
-	XT_GETOPT_TABLEEND,
-};
-
 static struct xtables_target hl_tg6_reg = {
 	.name 		= "HL",
 	.version	= XTABLES_VERSION,
@@ -141,11 +114,11 @@ static struct xtables_target hl_tg6_reg = {
 	.size		= XT_ALIGN(sizeof(struct ip6t_HL_info)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ip6t_HL_info)),
 	.help		= HL_help,
-	.parse		= HL_parse,
-	.final_check	= HL_check,
 	.print		= HL_print,
 	.save		= HL_save,
-	.extra_opts	= HL_opts,
+	.x6_parse	= HL_parse,
+	.x6_fcheck	= HL_check,
+	.x6_options	= HL_opts,
 };
 
 void _init(void)
