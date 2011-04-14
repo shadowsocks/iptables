@@ -124,6 +124,8 @@ static struct option original_opts[] = {
 	{.name = "modprobe",      .has_arg = 1, .val = 'M'},
 	{.name = "set-counters",  .has_arg = 1, .val = 'c'},
 	{.name = "goto",          .has_arg = 1, .val = 'g'},
+	{.name = "ipv4",          .has_arg = 0, .val = '4'},
+	{.name = "ipv6",          .has_arg = 0, .val = '6'},
 	{NULL},
 };
 
@@ -248,6 +250,8 @@ exit_printhelp(const struct xtables_rule_match *matches)
 "				Change chain name, (moving any references)\n"
 
 "Options:\n"
+"    --ipv4	-4		Error (line is ignored by ip6tables-restore)\n"
+"    --ipv6	-6		Nothing (line is ignored by iptables-restore)\n"
 "[!] --proto	-p proto	protocol: by number or name, eg. `tcp'\n"
 "[!] --source	-s address[/mask][,...]\n"
 "				source specification\n"
@@ -1439,7 +1443,7 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 
 	opts = xt_params->orig_opts;
 	while ((cs.c = getopt_long(argc, argv,
-	   "-:A:C:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:bvnt:m:xc:g:",
+	   "-:A:C:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:bvnt:m:xc:g:46",
 					   opts, NULL)) != -1) {
 		switch (cs.c) {
 			/*
@@ -1754,6 +1758,17 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 					"-%c byte counter not numeric",
 					opt2char(OPT_COUNTERS));
 			cs.fw6.counters.bcnt = cnt;
+			break;
+
+		case '4':
+			/* This is not the IPv4 iptables */
+			if (line != -1)
+				return 1; /* success: line ignored */
+			fprintf(stderr, "This is the IPv6 version of ip6tables.\n");
+			exit_tryhelp(2);
+
+		case '6':
+			/* This is indeed the IPv6 ip6tables */
 			break;
 
 		case 1: /* non option */

@@ -123,6 +123,8 @@ static struct option original_opts[] = {
 	{.name = "modprobe",      .has_arg = 1, .val = 'M'},
 	{.name = "set-counters",  .has_arg = 1, .val = 'c'},
 	{.name = "goto",          .has_arg = 1, .val = 'g'},
+	{.name = "ipv4",          .has_arg = 0, .val = '4'},
+	{.name = "ipv6",          .has_arg = 0, .val = '6'},
 	{NULL},
 };
 
@@ -261,6 +263,8 @@ exit_printhelp(const struct xtables_rule_match *matches)
 "				Change chain name, (moving any references)\n"
 
 "Options:\n"
+"    --ipv4	-4		Nothing (line is ignored by ip6tables-restore)\n"
+"    --ipv6	-6		Error (line is ignored by iptables-restore)\n"
 "[!] --proto	-p proto	protocol: by number or name, eg. `tcp'\n"
 "[!] --source	-s address[/mask][...]\n"
 "				source specification\n"
@@ -1467,7 +1471,7 @@ int do_command4(int argc, char *argv[], char **table, struct iptc_handle **handl
 
 	opts = xt_params->orig_opts;
 	while ((cs.c = getopt_long(argc, argv,
-	   "-:A:C:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:fbvnt:m:xc:g:",
+	   "-:A:C:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:fbvnt:m:xc:g:46",
 					   opts, NULL)) != -1) {
 		switch (cs.c) {
 			/*
@@ -1782,6 +1786,16 @@ int do_command4(int argc, char *argv[], char **table, struct iptc_handle **handl
 			cs.fw.counters.bcnt = cnt;
 			break;
 
+		case '4':
+			/* This is indeed the IPv4 iptables */
+			break;
+
+		case '6':
+			/* This is not the IPv6 ip6tables */
+			if (line != -1)
+				return 1; /* success: line ignored */
+			fprintf(stderr, "This is the IPv4 version of iptables.\n");
+			exit_tryhelp(2);
 
 		case 1: /* non option */
 			if (optarg[0] == '!' && optarg[1] == '\0') {
