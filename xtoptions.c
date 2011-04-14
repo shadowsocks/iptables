@@ -379,6 +379,8 @@ static int xtables_getportbyname(const char *name)
 		}
 	}
 	freeaddrinfo(res);
+	if (ret < 0)
+		return ret;
 	return ntohs(ret);
 }
 
