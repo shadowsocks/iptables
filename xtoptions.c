@@ -483,6 +483,61 @@ static void xtopt_parse_port(struct xt_option_call *cb)
 		*(uint16_t *)XTOPT_MKPTR(cb) = cb->val.port;
 }
 
+static void xtopt_parse_mport(struct xt_option_call *cb)
+{
+	static const size_t esize = sizeof(uint16_t);
+	const struct xt_option_entry *entry = cb->entry;
+	char *lo_arg, *wp_arg, *arg;
+	unsigned int maxiter;
+	int value;
+
+	wp_arg = lo_arg = strdup(cb->arg);
+	if (lo_arg == NULL)
+		xt_params->exit_err(RESOURCE_PROBLEM, "strdup");
+
+	maxiter = entry->size / esize;
+	if (maxiter == 0)
+		maxiter = 2; /* ARRAY_SIZE(cb->val.port_range) */
+	if (entry->size % esize != 0)
+		xt_params->exit_err(OTHER_PROBLEM, "%s: memory block does "
+			"not have proper size\n", __func__);
+
+	cb->val.port_range[0] = 0;
+	cb->val.port_range[1] = UINT16_MAX;
+	cb->nvals = 0;
+
+	while ((arg = strsep(&wp_arg, ":")) != NULL) {
+		if (cb->nvals == maxiter)
+			xt_params->exit_err(PARAMETER_PROBLEM, "%s: Too many "
+				"components for option \"--%s\" (max: %u)\n",
+				cb->ext_name, entry->name, maxiter);
+		if (*arg == '\0') {
+			++cb->nvals;
+			continue;
+		}
+
+		value = xtables_getportbyname(arg);
+		if (value < 0)
+			xt_params->exit_err(PARAMETER_PROBLEM,
+				"Port \"%s\" does not resolve to "
+				"anything.\n", arg);
+		if (entry->type == XTTYPE_PORTRC_NE)
+			value = htons(value);
+		if (cb->nvals < ARRAY_SIZE(cb->val.port_range))
+			cb->val.port_range[cb->nvals] = value;
+		++cb->nvals;
+	}
+
+	if (cb->nvals == 1) {
+		cb->val.port_range[1] = cb->val.port_range[0];
+		++cb->nvals;
+	}
+	if (entry->flags & XTOPT_PUT)
+		memcpy(XTOPT_MKPTR(cb), cb->val.port_range, sizeof(uint16_t) *
+		       (cb->nvals <= maxiter ? cb->nvals : maxiter));
+	free(lo_arg);
+}
+
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT16]      = xtopt_parse_int,
@@ -499,6 +554,8 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_ONEHOST]     = xtopt_parse_onehost,
 	[XTTYPE_PORT]        = xtopt_parse_port,
 	[XTTYPE_PORT_NE]     = xtopt_parse_port,
+	[XTTYPE_PORTRC]      = xtopt_parse_mport,
+	[XTTYPE_PORTRC_NE]   = xtopt_parse_mport,
 };
 
 static const size_t xtopt_psize[] = {
@@ -515,6 +572,8 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_ONEHOST]     = sizeof(union nf_inet_addr),
 	[XTTYPE_PORT]        = sizeof(uint16_t),
 	[XTTYPE_PORT_NE]     = sizeof(uint16_t),
+	[XTTYPE_PORTRC]      = sizeof(uint16_t[2]),
+	[XTTYPE_PORTRC_NE]   = sizeof(uint16_t[2]),
 };
 
 /**
