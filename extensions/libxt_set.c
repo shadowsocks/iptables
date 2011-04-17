@@ -22,8 +22,10 @@
 #include <linux/netfilter/xt_set.h>
 #include "libxt_set.h"
 
+/* Revision 0 */
+
 static void
-set_help(void)
+set_help_v0(void)
 {
 	printf("set match options:\n"
 	       " [!] --match-set name flags\n"
@@ -32,14 +34,14 @@ set_help(void)
 	       "		 'src' and 'dst' specifications.\n");
 }
 
-static const struct option set_opts[] = {
+static const struct option set_opts_v0[] = {
 	{.name = "match-set", .has_arg = true, .val = '1'},
 	{.name = "set",       .has_arg = true, .val = '2'},
 	XT_GETOPT_TABLEEND,
 };
 
 static void
-set_check(unsigned int flags)
+set_check_v0(unsigned int flags)
 {
 	if (!flags)
 		xtables_error(PARAMETER_PROBLEM,
@@ -127,12 +129,18 @@ set_save_v0(const void *ip, const struct xt_entry_match *match)
 	print_match_v0("--match-set", &info->match_set);
 }
 
+/* Revision 1 */
+
+#define set_help_v1	set_help_v0
+#define set_opts_v1	set_opts_v0
+#define set_check_v1	set_check_v0
+
 static int
-set_parse(int c, char **argv, int invert, unsigned int *flags,
-	  const void *entry, struct xt_entry_match **match)
+set_parse_v1(int c, char **argv, int invert, unsigned int *flags,
+	     const void *entry, struct xt_entry_match **match)
 {
-	struct xt_set_info_match *myinfo = 
-		(struct xt_set_info_match *) (*match)->data;
+	struct xt_set_info_match_v1 *myinfo = 
+		(struct xt_set_info_match_v1 *) (*match)->data;
 	struct xt_set_info *info = &myinfo->match_set;
 
 	switch (c) {
@@ -191,17 +199,17 @@ print_match(const char *prefix, const struct xt_set_info *info)
 
 /* Prints out the matchinfo. */
 static void
-set_print(const void *ip, const struct xt_entry_match *match, int numeric)
+set_print_v1(const void *ip, const struct xt_entry_match *match, int numeric)
 {
-	const struct xt_set_info_match *info = (const void *)match->data;
+	const struct xt_set_info_match_v1 *info = (const void *)match->data;
 
 	print_match("match-set", &info->match_set);
 }
 
 static void
-set_save(const void *ip, const struct xt_entry_match *match)
+set_save_v1(const void *ip, const struct xt_entry_match *match)
 {
-	const struct xt_set_info_match *info = (const void *)match->data;
+	const struct xt_set_info_match_v1 *info = (const void *)match->data;
 
 	print_match("--match-set", &info->match_set);
 }
@@ -214,26 +222,26 @@ static struct xtables_match set_mt_reg[] = {
 		.family		= NFPROTO_IPV4,
 		.size		= XT_ALIGN(sizeof(struct xt_set_info_match_v0)),
 		.userspacesize	= XT_ALIGN(sizeof(struct xt_set_info_match_v0)),
-		.help		= set_help,
+		.help		= set_help_v0,
 		.parse		= set_parse_v0,
-		.final_check	= set_check,
+		.final_check	= set_check_v0,
 		.print		= set_print_v0,
 		.save		= set_save_v0,
-		.extra_opts	= set_opts,
+		.extra_opts	= set_opts_v0,
 	},
 	{
 		.name		= "set",
 		.revision	= 1,
 		.version	= XTABLES_VERSION,
 		.family		= NFPROTO_UNSPEC,
-		.size		= XT_ALIGN(sizeof(struct xt_set_info_match)),
-		.userspacesize	= XT_ALIGN(sizeof(struct xt_set_info_match)),
-		.help		= set_help,
-		.parse		= set_parse,
-		.final_check	= set_check,
-		.print		= set_print,
-		.save		= set_save,
-		.extra_opts	= set_opts,
+		.size		= XT_ALIGN(sizeof(struct xt_set_info_match_v1)),
+		.userspacesize	= XT_ALIGN(sizeof(struct xt_set_info_match_v1)),
+		.help		= set_help_v1,
+		.parse		= set_parse_v1,
+		.final_check	= set_check_v1,
+		.print		= set_print_v1,
+		.save		= set_save_v1,
+		.extra_opts	= set_opts_v1,
 	},
 };
 
