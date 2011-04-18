@@ -7,6 +7,7 @@
  *	published by the Free Software Foundation; either version 2 of
  *	the License, or (at your option) any later version.
  */
+#include <ctype.h>
 #include <errno.h>
 #include <getopt.h>
 #include <limits.h>
@@ -16,12 +17,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 #include <arpa/inet.h>
 #include "xtables.h"
 #include "xshared.h"
 
 #define XTOPT_MKPTR(cb) \
 	((void *)((char *)(cb)->data + (cb)->entry->ptroff))
+
+/**
+ * Simple key-value pairs for syslog levels
+ */
+struct syslog_level {
+	char name[8];
+	uint8_t level;
+};
 
 /**
  * Creates getopt options from the x6-style option map, and assigns each a
@@ -86,11 +96,15 @@ xtables_options_xfrm(struct option *orig_opts, struct option *oldopts,
 static void xtopt_parse_int(struct xt_option_call *cb)
 {
 	const struct xt_option_entry *entry = cb->entry;
-	unsigned int lmin = 0, lmax = UINT32_MAX;
+	unsigned long long lmin = 0, lmax = UINT32_MAX;
 	unsigned int value;
 
 	if (entry->type == XTTYPE_UINT8)
 		lmax = UINT8_MAX;
+	else if (entry->type == XTTYPE_UINT16)
+		lmax = UINT16_MAX;
+	else if (entry->type == XTTYPE_UINT64)
+		lmax = UINT64_MAX;
 	if (cb->entry->min != 0)
 		lmin = cb->entry->min;
 	if (cb->entry->max != 0)
@@ -99,17 +113,25 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 	if (!xtables_strtoui(cb->arg, NULL, &value, lmin, lmax))
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"%s: bad value for option \"--%s\", "
-			"or out of range (%u-%u).\n",
+			"or out of range (%llu-%llu).\n",
 			cb->ext_name, entry->name, lmin, lmax);
 
 	if (entry->type == XTTYPE_UINT8) {
 		cb->val.u8 = value;
 		if (entry->flags & XTOPT_PUT)
 			*(uint8_t *)XTOPT_MKPTR(cb) = cb->val.u8;
+	} else if (entry->type == XTTYPE_UINT16) {
+		cb->val.u16 = value;
+		if (entry->flags & XTOPT_PUT)
+			*(uint16_t *)XTOPT_MKPTR(cb) = cb->val.u16;
 	} else if (entry->type == XTTYPE_UINT32) {
 		cb->val.u32 = value;
 		if (entry->flags & XTOPT_PUT)
 			*(uint32_t *)XTOPT_MKPTR(cb) = cb->val.u32;
+	} else if (entry->type == XTTYPE_UINT64) {
+		cb->val.u64 = value;
+		if (entry->flags & XTOPT_PUT)
+			*(uint64_t *)XTOPT_MKPTR(cb) = cb->val.u64;
 	}
 }
 
@@ -126,15 +148,22 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 {
 	const struct xt_option_entry *entry = cb->entry;
 	const char *arg = cb->arg;
-	uint32_t *put = XTOPT_MKPTR(cb);
+	size_t esize = sizeof(uint32_t);
+	char *put = XTOPT_MKPTR(cb);
 	unsigned int maxiter, value;
 	char *end = "";
 	char sep = ':';
 
-	maxiter = entry->size / sizeof(uint32_t);
+	if (entry->type == XTTYPE_UINT8RC)
+		esize = sizeof(uint8_t);
+	else if (entry->type == XTTYPE_UINT16RC)
+		esize = sizeof(uint16_t);
+	else if (entry->type == XTTYPE_UINT64RC)
+		esize = sizeof(uint64_t);
+	maxiter = entry->size / esize;
 	if (maxiter == 0)
 		maxiter = 2; /* ARRAY_SIZE(cb->val.uXX_range) */
-	if (entry->size % sizeof(uint32_t) != 0)
+	if (entry->size % esize != 0)
 		xt_params->exit_err(OTHER_PROBLEM, "%s: memory block does "
 			"not have proper size\n", __func__);
 
@@ -154,10 +183,27 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 				"%s: Argument to \"--%s\" has unexpected "
 				"characters.\n", cb->ext_name, entry->name);
 		++cb->nvals;
-		if (cb->nvals < ARRAY_SIZE(cb->val.u32_range))
-			cb->val.u32_range[cb->nvals] = value;
-		if (entry->flags & XTOPT_PUT)
-			*put++ = value;
+		if (cb->nvals < ARRAY_SIZE(cb->val.u32_range)) {
+			if (entry->type == XTTYPE_UINT8RC)
+				cb->val.u8_range[cb->nvals] = value;
+			else if (entry->type == XTTYPE_UINT16RC)
+				cb->val.u16_range[cb->nvals] = value;
+			else if (entry->type == XTTYPE_UINT32RC)
+				cb->val.u32_range[cb->nvals] = value;
+			else if (entry->type == XTTYPE_UINT64RC)
+				cb->val.u64_range[cb->nvals] = value;
+		}
+		if (entry->flags & XTOPT_PUT) {
+			if (entry->type == XTTYPE_UINT8RC)
+				*(uint8_t *)put = value;
+			else if (entry->type == XTTYPE_UINT16RC)
+				*(uint16_t *)put = value;
+			else if (entry->type == XTTYPE_UINT32RC)
+				*(uint32_t *)put = value;
+			else if (entry->type == XTTYPE_UINT64RC)
+				*(uint64_t *)put = value;
+			put += esize;
+		}
 		if (*end == '\0')
 			break;
 	}
@@ -186,18 +232,206 @@ static void xtopt_parse_string(struct xt_option_call *cb)
 	p[z] = '\0';
 }
 
+/**
+ * Validate the input for being conformant to "mark[/mask]".
+ */
+static void xtopt_parse_markmask(struct xt_option_call *cb)
+{
+	unsigned int mark = 0, mask = ~0U;
+	char *end;
+
+	if (!xtables_strtoui(cb->arg, &end, &mark, 0, UINT32_MAX))
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"%s: bad mark value for option \"--%s\", "
+			"or out of range.\n",
+			cb->ext_name, cb->entry->name);
+	if (*end == '/' &&
+	    !xtables_strtoui(end + 1, &end, &mask, 0, UINT32_MAX))
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"%s: bad mask value for option \"--%s\", "
+			"or out of range.\n",
+			cb->ext_name, cb->entry->name);
+	if (*end != '\0')
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"%s: trailing garbage after value "
+			"for option \"--%s\".\n",
+			cb->ext_name, cb->entry->name);
+	cb->val.mark = mark;
+	cb->val.mask = mask;
+}
+
+static int xtopt_sysloglvl_compare(const void *a, const void *b)
+{
+	const char *name = a;
+	const struct syslog_level *entry = b;
+
+	return strcmp(name, entry->name);
+}
+
+static void xtopt_parse_sysloglevel(struct xt_option_call *cb)
+{
+	static const struct syslog_level log_names[] = { /* must be sorted */
+		{"alert",   LOG_ALERT},
+		{"crit",    LOG_CRIT},
+		{"debug",   LOG_DEBUG},
+		{"emerg",   LOG_EMERG},
+		{"error",   LOG_ERR}, /* deprecated */
+		{"info",    LOG_INFO},
+		{"notice",  LOG_NOTICE},
+		{"panic",   LOG_EMERG}, /* deprecated */
+		{"warning", LOG_WARNING},
+	};
+	const struct syslog_level *e;
+	unsigned int num = 0;
+
+	if (!xtables_strtoui(cb->arg, NULL, &num, 0, 7)) {
+		e = bsearch(cb->arg, log_names, ARRAY_SIZE(log_names),
+			    sizeof(*log_names), xtopt_sysloglvl_compare);
+		if (e == NULL)
+			xt_params->exit_err(PARAMETER_PROBLEM,
+				"log level \"%s\" unknown\n", cb->arg);
+		num = e->level;
+	}
+	cb->val.syslog_level = num;
+	if (cb->entry->flags & XTOPT_PUT)
+		*(uint8_t *)XTOPT_MKPTR(cb) = num;
+}
+
+static void *xtables_sa_host(const void *sa, unsigned int afproto)
+{
+	if (afproto == AF_INET6)
+		return &((struct sockaddr_in6 *)sa)->sin6_addr;
+	else if (afproto == AF_INET)
+		return &((struct sockaddr_in *)sa)->sin_addr;
+	return (void *)sa;
+}
+
+static socklen_t xtables_sa_hostlen(unsigned int afproto)
+{
+	if (afproto == AF_INET6)
+		return sizeof(struct in6_addr);
+	else if (afproto == AF_INET)
+		return sizeof(struct in_addr);
+	return 0;
+}
+
+/**
+ * Accepts: a hostname (DNS), or a single inetaddr.
+ */
+static void xtopt_parse_onehost(struct xt_option_call *cb)
+{
+	struct addrinfo hints = {.ai_family = afinfo->family};
+	unsigned int adcount = 0;
+	struct addrinfo *res, *p;
+	int ret;
+
+	ret = getaddrinfo(cb->arg, NULL, &hints, &res);
+	if (ret < 0)
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"getaddrinfo: %s\n", gai_strerror(ret));
+
+	for (p = res; p != NULL; p = p->ai_next) {
+		if (adcount == 0) {
+			memset(&cb->val.inetaddr, 0, sizeof(cb->val.inetaddr));
+			memcpy(&cb->val.inetaddr,
+			       xtables_sa_host(p->ai_addr, p->ai_family),
+			       xtables_sa_hostlen(p->ai_family));
+			++adcount;
+			continue;
+		}
+		if (memcmp(&cb->val.inetaddr,
+		    xtables_sa_host(p->ai_addr, p->ai_family),
+		    xtables_sa_hostlen(p->ai_family)) != 0)
+			xt_params->exit_err(PARAMETER_PROBLEM,
+				"%s resolves to more than one address\n",
+				cb->arg);
+	}
+
+	freeaddrinfo(res);
+	if (cb->entry->flags & XTOPT_PUT)
+		/* Validation in xtables_option_metavalidate */
+		memcpy(XTOPT_MKPTR(cb), &cb->val.inetaddr,
+		       sizeof(cb->val.inetaddr));
+}
+
+/**
+ * @name:	port name, or number as a string (e.g. "http" or "80")
+ *
+ * Resolve a port name to a number. Returns the port number in integral
+ * form on success, or <0 on error. (errno will not be set.)
+ */
+static int xtables_getportbyname(const char *name)
+{
+	struct addrinfo *res = NULL, *p;
+	int ret;
+
+	ret = getaddrinfo(NULL, name, NULL, &res);
+	if (ret < 0)
+		return -1;
+	ret = -1;
+	for (p = res; p != NULL; p = p->ai_next) {
+		if (p->ai_family == AF_INET6) {
+			ret = ((struct sockaddr_in6 *)p->ai_addr)->sin6_port;
+			break;
+		} else if (p->ai_family == AF_INET) {
+			ret = ((struct sockaddr_in *)p->ai_addr)->sin_port;
+			break;
+		}
+	}
+	freeaddrinfo(res);
+	return ntohs(ret);
+}
+
+/**
+ * Validate and parse a port specification and put the result into @cb.
+ */
+static void xtopt_parse_port(struct xt_option_call *cb)
+{
+	int ret;
+
+	ret = xtables_getportbyname(cb->arg);
+	if (ret < 0)
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"Port \"%s\" does not resolve to anything.\n",
+			cb->arg);
+	cb->val.port = ret;
+	if (cb->entry->type == XTTYPE_PORT_NE)
+		cb->val.port = htons(cb->val.port);
+	if (cb->entry->flags & XTOPT_PUT)
+		*(uint16_t *)XTOPT_MKPTR(cb) = cb->val.port;
+}
+
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
+	[XTTYPE_UINT16]      = xtopt_parse_int,
 	[XTTYPE_UINT32]      = xtopt_parse_int,
+	[XTTYPE_UINT64]      = xtopt_parse_int,
+	[XTTYPE_UINT8RC]     = xtopt_parse_mint,
+	[XTTYPE_UINT16RC]    = xtopt_parse_mint,
 	[XTTYPE_UINT32RC]    = xtopt_parse_mint,
+	[XTTYPE_UINT64RC]    = xtopt_parse_mint,
 	[XTTYPE_STRING]      = xtopt_parse_string,
+	[XTTYPE_MARKMASK32]  = xtopt_parse_markmask,
+	[XTTYPE_SYSLOGLEVEL] = xtopt_parse_sysloglevel,
+	[XTTYPE_ONEHOST]     = xtopt_parse_onehost,
+	[XTTYPE_PORT]        = xtopt_parse_port,
+	[XTTYPE_PORT_NE]     = xtopt_parse_port,
 };
 
 static const size_t xtopt_psize[] = {
 	[XTTYPE_UINT8]       = sizeof(uint8_t),
+	[XTTYPE_UINT16]      = sizeof(uint16_t),
 	[XTTYPE_UINT32]      = sizeof(uint32_t),
+	[XTTYPE_UINT64]      = sizeof(uint64_t),
+	[XTTYPE_UINT8RC]     = sizeof(uint8_t[2]),
+	[XTTYPE_UINT16RC]    = sizeof(uint16_t[2]),
 	[XTTYPE_UINT32RC]    = sizeof(uint32_t[2]),
+	[XTTYPE_UINT64RC]    = sizeof(uint64_t[2]),
 	[XTTYPE_STRING]      = -1,
+	[XTTYPE_SYSLOGLEVEL] = sizeof(uint8_t),
+	[XTTYPE_ONEHOST]     = sizeof(union nf_inet_addr),
+	[XTTYPE_PORT]        = sizeof(uint16_t),
+	[XTTYPE_PORT_NE]     = sizeof(uint16_t),
 };
 
 /**
@@ -308,6 +542,7 @@ void xtables_option_tpcall(unsigned int c, char **argv, bool invert,
 	cb.ext_name = t->name;
 	cb.data     = t->t->data;
 	cb.xflags   = t->tflags;
+	cb.target   = &t->t;
 	t->x6_parse(&cb);
 	t->tflags = cb.xflags;
 }
@@ -341,6 +576,7 @@ void xtables_option_mpcall(unsigned int c, char **argv, bool invert,
 	cb.ext_name = m->name;
 	cb.data     = m->m->data;
 	cb.xflags   = m->mflags;
+	cb.match    = &m->m;
 	m->x6_parse(&cb);
 	m->mflags = cb.xflags;
 }
@@ -449,4 +685,102 @@ void xtables_option_mfcall(struct xtables_match *m)
 	}
 	if (m->x6_options != NULL)
 		xtables_options_fcheck(m->name, m->mflags, m->x6_options);
+}
+
+struct xtables_lmap *xtables_lmap_init(const char *file)
+{
+	struct xtables_lmap *lmap_head = NULL, *lmap_prev = NULL, *lmap_this;
+	char buf[512];
+	FILE *fp;
+	char *cur, *nxt;
+	int id;
+
+	fp = fopen(file, "re");
+	if (fp == NULL)
+		return NULL;
+
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		cur = buf;
+		while (isspace(*cur))
+			++cur;
+		if (*cur == '#' || *cur == '\n' || *cur == '\0')
+			continue;
+
+		/* iproute2 allows hex and dec format */
+		errno = 0;
+		id = strtoul(cur, &nxt, strncmp(cur, "0x", 2) == 0 ? 16 : 10);
+		if (nxt == cur || errno != 0)
+			continue;
+
+		/* same boundaries as in iproute2 */
+		if (id < 0 || id > 255)
+			continue;
+		cur = nxt;
+
+		if (!isspace(*cur))
+			continue;
+		while (isspace(*cur))
+			++cur;
+		if (*cur == '#' || *cur == '\n' || *cur == '\0')
+			continue;
+		nxt = cur;
+		while (*nxt != '\0' && !isspace(*nxt))
+			++nxt;
+		if (nxt == cur)
+			continue;
+		*nxt = '\0';
+
+		/* found valid data */
+		lmap_this = malloc(sizeof(*lmap_this));
+		if (lmap_this == NULL) {
+			perror("malloc");
+			goto out;
+		}
+		lmap_this->id   = id;
+		lmap_this->name = strdup(cur);
+		if (lmap_this->name == NULL) {
+			free(lmap_this);
+			goto out;
+		}
+		lmap_this->next = NULL;
+
+		if (lmap_prev != NULL)
+			lmap_prev->next = lmap_this;
+		else
+			lmap_head = lmap_this;
+		lmap_prev = lmap_this;
+	}
+
+	fclose(fp);
+	return lmap_head;
+ out:
+	xtables_lmap_free(lmap_head);
+	return NULL;
+}
+
+void xtables_lmap_free(struct xtables_lmap *head)
+{
+	struct xtables_lmap *next;
+
+	for (; head != NULL; head = next) {
+		next = head->next;
+		free(head->name);
+		free(head);
+	}
+}
+
+int xtables_lmap_name2id(const struct xtables_lmap *head, const char *name)
+{
+	for (; head != NULL; head = head->next)
+		if (strcmp(head->name, name) == 0)
+			return head->id;
+	return -1;
+}
+
+const char *xtables_lmap_id2name(const struct xtables_lmap *head, int id)
+{
+	for (; head != NULL; head = head->next)
+		if (head->id == id)
+			return head->name;
+	return NULL;
 }

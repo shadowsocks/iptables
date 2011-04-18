@@ -1,11 +1,5 @@
-/* Shared library add-on to iptables to add NFMARK matching support. */
 #include <stdbool.h>
 #include <stdio.h>
-#include <netdb.h>
-#include <string.h>
-#include <stdlib.h>
-#include <getopt.h>
-
 #include <xtables.h>
 #include <linux/netfilter/xt_mark.h>
 
@@ -15,7 +9,7 @@ struct xt_mark_info {
 };
 
 enum {
-	F_MARK = 1 << 0,
+	O_MARK = 0,
 };
 
 static void mark_mt_help(void)
@@ -25,62 +19,32 @@ static void mark_mt_help(void)
 "[!] --mark value[/mask]    Match nfmark value with optional mask\n");
 }
 
-static const struct option mark_mt_opts[] = {
-	{.name = "mark", .has_arg = true, .val = '1'},
-	XT_GETOPT_TABLEEND,
+static const struct xt_option_entry mark_mt_opts[] = {
+	{.name = "mark", .id = O_MARK, .type = XTTYPE_MARKMASK32,
+	 .flags = XTOPT_MAND | XTOPT_INVERT},
+	XTOPT_TABLEEND,
 };
 
-static int mark_mt_parse(int c, char **argv, int invert, unsigned int *flags,
-                         const void *entry, struct xt_entry_match **match)
+static void mark_mt_parse(struct xt_option_call *cb)
 {
-	struct xt_mark_mtinfo1 *info = (void *)(*match)->data;
-	unsigned int mark, mask = UINT32_MAX;
-	char *end;
+	struct xt_mark_mtinfo1 *info = cb->data;
 
-	switch (c) {
-	case '1': /* --mark */
-		xtables_param_act(XTF_ONLY_ONCE, "mark", "--mark", *flags & F_MARK);
-		if (!xtables_strtoui(optarg, &end, &mark, 0, UINT32_MAX))
-			xtables_param_act(XTF_BAD_VALUE, "mark", "--mark", optarg);
-		if (*end == '/')
-			if (!xtables_strtoui(end + 1, &end, &mask, 0, UINT32_MAX))
-				xtables_param_act(XTF_BAD_VALUE, "mark", "--mark", optarg);
-		if (*end != '\0')
-			xtables_param_act(XTF_BAD_VALUE, "mark", "--mark", optarg);
-
-		if (invert)
-			info->invert = true;
-		info->mark = mark;
-		info->mask = mask;
-		*flags    |= F_MARK;
-		return true;
-	}
-	return false;
+	xtables_option_parse(cb);
+	if (cb->invert)
+		info->invert = true;
+	info->mark = cb->val.mark;
+	info->mask = cb->val.mask;
 }
 
-static int
-mark_parse(int c, char **argv, int invert, unsigned int *flags,
-           const void *entry, struct xt_entry_match **match)
+static void mark_parse(struct xt_option_call *cb)
 {
-	struct xt_mark_info *markinfo = (struct xt_mark_info *)(*match)->data;
+	struct xt_mark_info *markinfo = cb->data;
 
-	switch (c) {
-		char *end;
-	case '1':
-		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
-		markinfo->mark = strtoul(optarg, &end, 0);
-		if (*end == '/') {
-			markinfo->mask = strtoul(end+1, &end, 0);
-		} else
-			markinfo->mask = 0xffffffff;
-		if (*end != '\0' || end == optarg)
-			xtables_error(PARAMETER_PROBLEM, "Bad MARK value \"%s\"", optarg);
-		if (invert)
-			markinfo->invert = 1;
-		*flags = 1;
-		break;
-	}
-	return 1;
+	xtables_option_parse(cb);
+	if (cb->invert)
+		markinfo->invert = 1;
+	markinfo->mark = cb->val.mark;
+	markinfo->mask = cb->val.mask;
 }
 
 static void print_mark(unsigned int mark, unsigned int mask)
@@ -89,13 +53,6 @@ static void print_mark(unsigned int mark, unsigned int mask)
 		printf(" 0x%x/0x%x", mark, mask);
 	else
 		printf(" 0x%x", mark);
-}
-
-static void mark_mt_check(unsigned int flags)
-{
-	if (flags == 0)
-		xtables_error(PARAMETER_PROBLEM,
-			   "mark match: The --mark option is required");
 }
 
 static void
@@ -154,11 +111,10 @@ static struct xtables_match mark_mt_reg[] = {
 		.size          = XT_ALIGN(sizeof(struct xt_mark_info)),
 		.userspacesize = XT_ALIGN(sizeof(struct xt_mark_info)),
 		.help          = mark_mt_help,
-		.parse         = mark_parse,
-		.final_check   = mark_mt_check,
 		.print         = mark_print,
 		.save          = mark_save,
-		.extra_opts    = mark_mt_opts,
+		.x6_parse      = mark_parse,
+		.x6_options    = mark_mt_opts,
 	},
 	{
 		.version       = XTABLES_VERSION,
@@ -168,11 +124,10 @@ static struct xtables_match mark_mt_reg[] = {
 		.size          = XT_ALIGN(sizeof(struct xt_mark_mtinfo1)),
 		.userspacesize = XT_ALIGN(sizeof(struct xt_mark_mtinfo1)),
 		.help          = mark_mt_help,
-		.parse         = mark_mt_parse,
-		.final_check   = mark_mt_check,
 		.print         = mark_mt_print,
 		.save          = mark_mt_save,
-		.extra_opts    = mark_mt_opts,
+		.x6_parse      = mark_mt_parse,
+		.x6_options    = mark_mt_opts,
 	},
 };
 

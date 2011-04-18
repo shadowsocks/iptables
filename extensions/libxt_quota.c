@@ -3,18 +3,18 @@
  *
  * Sam Johnston <samj@samj.net>
  */
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <getopt.h>
 #include <xtables.h>
-
 #include <linux/netfilter/xt_quota.h>
 
-static const struct option quota_opts[] = {
-	{.name = "quota", .has_arg = true, .val = '1'},
-	XT_GETOPT_TABLEEND,
+enum {
+	O_QUOTA = 0,
+};
+
+static const struct xt_option_entry quota_opts[] = {
+	{.name = "quota", .id = O_QUOTA, .type = XTTYPE_UINT64,
+	 .flags = XTOPT_MAND | XTOPT_INVERT},
+	XTOPT_TABLEEND,
 };
 
 static void quota_help(void)
@@ -40,49 +40,13 @@ quota_save(const void *ip, const struct xt_entry_match *match)
 	printf(" --quota %llu", (unsigned long long) q->quota);
 }
 
-/* parse quota option */
-static int
-parse_quota(const char *s, uint64_t * quota)
+static void quota_parse(struct xt_option_call *cb)
 {
-	*quota = strtoull(s, NULL, 10);
+	struct xt_quota_info *info = cb->data;
 
-#ifdef DEBUG_XT_QUOTA
-	printf("Quota: %llu\n", *quota);
-#endif
-
-	if (*quota == UINT64_MAX)
-		xtables_error(PARAMETER_PROBLEM, "quota invalid: '%s'\n", s);
-	else
-		return 1;
-}
-
-static int
-quota_parse(int c, char **argv, int invert, unsigned int *flags,
-	    const void *entry, struct xt_entry_match **match)
-{
-	struct xt_quota_info *info = (struct xt_quota_info *) (*match)->data;
-
-	switch (c) {
-	case '1':
-		if (xtables_check_inverse(optarg, &invert, NULL, 0, argv))
-			xtables_error(PARAMETER_PROBLEM, "quota: unexpected '!'");
-		if (!parse_quota(optarg, &info->quota))
-			xtables_error(PARAMETER_PROBLEM,
-				   "bad quota: '%s'", optarg);
-
-		if (invert)
-			info->flags |= XT_QUOTA_INVERT;
-		*flags |= 1;
-		break;
-	}
-	return 1;
-}
-
-static void quota_check(unsigned int flags)
-{
-	if (flags == 0)
-		xtables_error(PARAMETER_PROBLEM,
-			"quota: the --quota argument must be specified\n");
+	xtables_option_parse(cb);
+	if (cb->invert)
+		info->flags |= XT_QUOTA_INVERT;
 }
 
 static struct xtables_match quota_match = {
@@ -92,11 +56,10 @@ static struct xtables_match quota_match = {
 	.size		= XT_ALIGN(sizeof (struct xt_quota_info)),
 	.userspacesize	= offsetof(struct xt_quota_info, master),
 	.help		= quota_help,
-	.parse		= quota_parse,
-	.final_check	= quota_check,
 	.print		= quota_print,
 	.save		= quota_save,
-	.extra_opts	= quota_opts,
+	.x6_parse	= quota_parse,
+	.x6_options	= quota_opts,
 };
 
 void

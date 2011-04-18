@@ -50,13 +50,28 @@ struct in_addr;
  * %XTTYPE_UINT*:	standard integer
  * %XTTYPE_UINT*RC:	colon-separated range of standard integers
  * %XTTYPE_STRING:	arbitrary string
+ * %XTTYPE_MARKMASK32:	32-bit mark with optional mask
+ * %XTTYPE_SYSLOGLEVEL:	syslog level by name or number
+ * %XTTYPE_ONEHOST:	one host or address (union nf_inet_addr)
+ * %XTTYPE_PORT:	16-bit port name or number
+ * %XTTYPE_PORT_NE:	16-bit port name or number, stored as network-endian
  */
 enum xt_option_type {
 	XTTYPE_NONE,
 	XTTYPE_UINT8,
+	XTTYPE_UINT16,
 	XTTYPE_UINT32,
+	XTTYPE_UINT64,
+	XTTYPE_UINT8RC,
+	XTTYPE_UINT16RC,
 	XTTYPE_UINT32RC,
+	XTTYPE_UINT64RC,
 	XTTYPE_STRING,
+	XTTYPE_MARKMASK32,
+	XTTYPE_SYSLOGLEVEL,
+	XTTYPE_ONEHOST,
+	XTTYPE_PORT,
+	XTTYPE_PORT_NE,
 };
 
 /**
@@ -111,9 +126,19 @@ struct xt_option_call {
 	bool invert;
 	uint8_t nvals;
 	union {
-		uint8_t u8;
+		uint8_t u8, u8_range[2], syslog_level;
+		uint16_t u16, u16_range[2], port;
 		uint32_t u32, u32_range[2];
+		uint64_t u64, u64_range[2];
+		union nf_inet_addr inetaddr;
+		struct {
+			uint32_t mark, mask;
+		};
 	} val;
+	union {
+		struct xt_entry_match **match;
+		struct xt_entry_target **target;
+	};
 };
 
 /**
@@ -125,6 +150,16 @@ struct xt_fcheck_call {
 	const char *ext_name;
 	void *data;
 	unsigned int xflags;
+};
+
+/**
+ * A "linear"/linked-list based name<->id map, for files similar to
+ * /etc/iproute2/.
+ */
+struct xtables_lmap {
+	char *name;
+	int id;
+	struct xtables_lmap *next;
 };
 
 /* Include file for additions: new matches and targets. */
@@ -411,6 +446,11 @@ extern void xtables_option_tfcall(struct xtables_target *);
 extern void xtables_option_mfcall(struct xtables_match *);
 extern void xtables_options_fcheck(const char *, unsigned int,
 				   const struct xt_option_entry *);
+
+extern struct xtables_lmap *xtables_lmap_init(const char *);
+extern void xtables_lmap_free(struct xtables_lmap *);
+extern int xtables_lmap_name2id(const struct xtables_lmap *, const char *);
+extern const char *xtables_lmap_id2name(const struct xtables_lmap *, int);
 
 #ifdef XTABLES_INTERNAL
 
