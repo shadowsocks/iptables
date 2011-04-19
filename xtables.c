@@ -27,9 +27,11 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/statfs.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <arpa/inet.h>
+#include <linux/magic.h> /* for PROC_SUPER_MAGIC */
 
 #include <xtables.h>
 #include <limits.h> /* INT_MAX in ip_tables.h/ip6_tables.h */
@@ -139,6 +141,7 @@ struct option *xtables_merge_options(struct option *orig_opts,
 
 static const struct xtables_afinfo afinfo_ipv4 = {
 	.kmod          = "ip_tables",
+	.proc_exists   = "/proc/net/ip_tables_names",
 	.libprefix     = "libipt_",
 	.family	       = NFPROTO_IPV4,
 	.ipproto       = IPPROTO_IP,
@@ -148,6 +151,7 @@ static const struct xtables_afinfo afinfo_ipv4 = {
 
 static const struct xtables_afinfo afinfo_ipv6 = {
 	.kmod          = "ip6_tables",
+	.proc_exists   = "/proc/net/ip6_tables_names",
 	.libprefix     = "libip6t_",
 	.family        = NFPROTO_IPV6,
 	.ipproto       = IPPROTO_IPV6,
@@ -369,15 +373,39 @@ int xtables_insmod(const char *modname, const char *modprobe, bool quiet)
 	return -1;
 }
 
+/* return true if a given file exists within procfs */
+static bool proc_file_exists(const char *filename)
+{
+	struct stat s;
+	struct statfs f;
+
+	if (lstat(filename, &s))
+		return false;
+	if (!S_ISREG(s.st_mode))
+		return false;
+	if (statfs(filename, &f))
+		return false;
+	if (f.f_type != PROC_SUPER_MAGIC)
+		return false;
+	return true;
+}
+
 int xtables_load_ko(const char *modprobe, bool quiet)
 {
 	static bool loaded = false;
-	static int ret = -1;
+	int ret;
 
-	if (!loaded) {
-		ret = xtables_insmod(afinfo->kmod, modprobe, quiet);
-		loaded = (ret == 0);
-	}
+	if (loaded)
+		return 0;
+
+	if (proc_file_exists(afinfo->proc_exists)) {
+		loaded = true;
+		return 0;
+	};
+
+	ret = xtables_insmod(afinfo->kmod, modprobe, quiet);
+	if (ret == 0)
+		loaded = true;
 
 	return ret;
 }
