@@ -19,8 +19,12 @@
 #include <string.h>
 #include <syslog.h>
 #include <arpa/inet.h>
+#include <netinet/ip.h>
 #include "xtables.h"
 #include "xshared.h"
+#ifndef IPTOS_NORMALSVC
+#	define IPTOS_NORMALSVC 0
+#endif
 
 #define XTOPT_MKPTR(cb) \
 	((void *)((char *)(cb)->data + (cb)->entry->ptroff))
@@ -31,6 +35,10 @@
 struct syslog_level {
 	char name[8];
 	uint8_t level;
+};
+
+struct tos_value_mask {
+	uint8_t value, mask;
 };
 
 /**
@@ -232,6 +240,78 @@ static void xtopt_parse_string(struct xt_option_call *cb)
 	p[z] = '\0';
 }
 
+static const struct tos_symbol_info {
+	unsigned char value;
+	const char *name;
+} tos_symbol_names[] = {
+	{IPTOS_LOWDELAY,    "Minimize-Delay"},
+	{IPTOS_THROUGHPUT,  "Maximize-Throughput"},
+	{IPTOS_RELIABILITY, "Maximize-Reliability"},
+	{IPTOS_MINCOST,     "Minimize-Cost"},
+	{IPTOS_NORMALSVC,   "Normal-Service"},
+	{},
+};
+
+/*
+ * tos_parse_numeric - parse a string like "15/255"
+ *
+ * @str:	input string
+ * @tvm:	(value/mask) tuple
+ * @max:	maximum allowed value (must be pow(2,some_int)-1)
+ */
+static bool tos_parse_numeric(const char *str, struct xt_option_call *cb,
+                              unsigned int max)
+{
+	unsigned int value;
+	char *end;
+
+	xtables_strtoui(str, &end, &value, 0, max);
+	cb->val.tos_value = value;
+	cb->val.tos_mask  = max;
+
+	if (*end == '/') {
+		const char *p = end + 1;
+
+		if (!xtables_strtoui(p, &end, &value, 0, max))
+			xtables_error(PARAMETER_PROBLEM, "Illegal value: \"%s\"",
+			           str);
+		cb->val.tos_mask = value;
+	}
+
+	if (*end != '\0')
+		xtables_error(PARAMETER_PROBLEM, "Illegal value: \"%s\"", str);
+	return true;
+}
+
+/**
+ * @str:	input string
+ * @tvm:	(value/mask) tuple
+ * @def_mask:	mask to force when a symbolic name is used
+ */
+static void xtopt_parse_tosmask(struct xt_option_call *cb)
+{
+	const struct tos_symbol_info *symbol;
+	char *tmp;
+
+	if (xtables_strtoui(cb->arg, &tmp, NULL, 0, UINT8_MAX)) {
+		tos_parse_numeric(cb->arg, cb, UINT8_MAX);
+		return;
+	}
+	/*
+	 * This is our way we deal with different defaults
+	 * for different revisions.
+	 */
+	cb->val.tos_mask = cb->entry->max;
+	for (symbol = tos_symbol_names; symbol->name != NULL; ++symbol)
+		if (strcasecmp(cb->arg, symbol->name) == 0) {
+			cb->val.tos_value = symbol->value;
+			return;
+		}
+
+	xtables_error(PARAMETER_PROBLEM, "Symbolic name \"%s\" is unknown",
+		      cb->arg);
+}
+
 /**
  * Validate the input for being conformant to "mark[/mask]".
  */
@@ -413,6 +493,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT32RC]    = xtopt_parse_mint,
 	[XTTYPE_UINT64RC]    = xtopt_parse_mint,
 	[XTTYPE_STRING]      = xtopt_parse_string,
+	[XTTYPE_TOSMASK]     = xtopt_parse_tosmask,
 	[XTTYPE_MARKMASK32]  = xtopt_parse_markmask,
 	[XTTYPE_SYSLOGLEVEL] = xtopt_parse_sysloglevel,
 	[XTTYPE_ONEHOST]     = xtopt_parse_onehost,
