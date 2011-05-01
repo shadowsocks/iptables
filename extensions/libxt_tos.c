@@ -26,13 +26,13 @@ enum {
 
 static const struct xt_option_entry tos_mt_opts_v0[] = {
 	{.name = "tos", .id = O_TOS, .type = XTTYPE_TOSMASK,
-	 .flags = XTOPT_MAND, .max = 0xFF},
+	 .flags = XTOPT_INVERT | XTOPT_MAND, .max = 0xFF},
 	XTOPT_TABLEEND,
 };
 
 static const struct xt_option_entry tos_mt_opts[] = {
 	{.name = "tos", .id = O_TOS, .type = XTTYPE_TOSMASK,
-	 .flags = XTOPT_MAND, .max = 0x3F},
+	 .flags = XTOPT_INVERT | XTOPT_MAND, .max = 0x3F},
 	XTOPT_TABLEEND,
 };
 
