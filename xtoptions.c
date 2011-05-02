@@ -190,7 +190,6 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 			xt_params->exit_err(PARAMETER_PROBLEM,
 				"%s: Argument to \"--%s\" has unexpected "
 				"characters.\n", cb->ext_name, entry->name);
-		++cb->nvals;
 		if (cb->nvals < ARRAY_SIZE(cb->val.u32_range)) {
 			if (entry->type == XTTYPE_UINT8RC)
 				cb->val.u8_range[cb->nvals] = value;
@@ -201,6 +200,7 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 			else if (entry->type == XTTYPE_UINT64RC)
 				cb->val.u64_range[cb->nvals] = value;
 		}
+		++cb->nvals;
 		if (entry->flags & XTOPT_PUT) {
 			if (entry->type == XTTYPE_UINT8RC)
 				*(uint8_t *)put = value;
