@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <netdb.h>
@@ -62,11 +63,11 @@ statistic_parse(int c, char **argv, int invert, unsigned int *flags,
 	case '2':
 		if (*flags & 0x2)
 			xtables_error(PARAMETER_PROBLEM, "double --probability");
-		prob = atof(optarg);
+		prob = strtod(optarg, NULL);
 		if (prob < 0 || prob > 1)
 			xtables_error(PARAMETER_PROBLEM,
 				   "--probability must be between 0 and 1");
-		info->u.random.probability = 0x80000000 * prob;
+		info->u.random.probability = lround(0x80000000 * prob);
 		*flags |= 0x2;
 		break;
 	case '3':
@@ -127,7 +128,7 @@ static void print_match(const struct xt_statistic_info *info, char *prefix)
 {
 	switch (info->mode) {
 	case XT_STATISTIC_MODE_RANDOM:
-		printf(" %smode random%s %sprobability %f", prefix,
+		printf(" %smode random%s %sprobability %.11f", prefix,
 		       (info->flags & XT_STATISTIC_INVERT) ? " !" : "",
 		       prefix,
 		       1.0 * info->u.random.probability / 0x80000000);
