@@ -561,6 +561,47 @@ static void xtopt_parse_mport(struct xt_option_call *cb)
 	free(lo_arg);
 }
 
+static void xtopt_parse_plenmask(struct xt_option_call *cb)
+{
+	const struct xt_option_entry *entry = cb->entry;
+	uint32_t *mask = cb->val.inetmask.all;
+	unsigned int prefix_len = 128;
+	uint8_t max = 128;
+
+	if (afinfo->family == NFPROTO_IPV6)
+		max = 128;
+	else if (afinfo->family == NFPROTO_IPV4)
+		max = 32;
+
+	if (!xtables_strtoui(cb->arg, NULL, &prefix_len, 0, max))
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"%s: bad value for option \"--%s\", "
+			"or out of range (%u-%u).\n",
+			cb->ext_name, entry->name, 0, max);
+
+	memset(mask, 0xFF, sizeof(union nf_inet_addr));
+	if (prefix_len == 0) {
+		mask[0] = mask[1] = mask[2] = mask[3] = 0;
+	} else if (prefix_len <= 32) {
+		mask[0] <<= 32 - prefix_len;
+		mask[1] = mask[2] = mask[3] = 0;
+	} else if (prefix_len <= 64) {
+		mask[1] <<= 32 - (prefix_len - 32);
+		mask[2] = mask[3] = 0;
+	} else if (prefix_len <= 96) {
+		mask[2] <<= 32 - (prefix_len - 64);
+		mask[3] = 0;
+	} else if (prefix_len <= 128) {
+		mask[3] <<= 32 - (prefix_len - 96);
+	}
+	mask[0] = htonl(mask[0]);
+	mask[1] = htonl(mask[1]);
+	mask[2] = htonl(mask[2]);
+	mask[3] = htonl(mask[3]);
+	if (entry->flags & XTOPT_PUT)
+		memcpy(XTOPT_MKPTR(cb), mask, sizeof(union nf_inet_addr));
+}
+
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT16]      = xtopt_parse_int,
@@ -580,6 +621,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_PORT_NE]     = xtopt_parse_port,
 	[XTTYPE_PORTRC]      = xtopt_parse_mport,
 	[XTTYPE_PORTRC_NE]   = xtopt_parse_mport,
+	[XTTYPE_PLENMASK]    = xtopt_parse_plenmask,
 };
 
 static const size_t xtopt_psize[] = {
@@ -599,6 +641,7 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_PORT_NE]     = sizeof(uint16_t),
 	[XTTYPE_PORTRC]      = sizeof(uint16_t[2]),
 	[XTTYPE_PORTRC_NE]   = sizeof(uint16_t[2]),
+	[XTTYPE_PLENMASK]    = sizeof(union nf_inet_addr),
 };
 
 /**
