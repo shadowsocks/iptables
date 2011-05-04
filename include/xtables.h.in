@@ -46,6 +46,12 @@ struct in_addr;
 #define XTOPT_TABLEEND {.name = NULL}
 
 /**
+ * Select the format the input has to conform to, as well as the target type
+ * (area pointed to with XTOPT_POINTER). Note that the storing is not always
+ * uniform. @cb->val will be populated with as much as there is space, i.e.
+ * exactly 2 items for ranges, but the target area can receive more values
+ * (e.g. in case of ranges), or less values (e.g. %XTTYPE_HOSTMASK).
+ *
  * %XTTYPE_NONE:	option takes no argument
  * %XTTYPE_UINT*:	standard integer
  * %XTTYPE_UINT*RC:	colon-separated range of standard integers
@@ -54,12 +60,12 @@ struct in_addr;
  * %XTTYPE_TOSMASK:	8-bit TOS value with optional mask
  * %XTTYPE_MARKMASK32:	32-bit mark with optional mask
  * %XTTYPE_SYSLOGLEVEL:	syslog level by name or number
- * %XTTYPE_ONEHOST:	one host or address (union nf_inet_addr)
+ * %XTTYPE_HOST:	one host or address (ptr: union nf_inet_addr)
  * %XTTYPE_PORT:	16-bit port name or number
  * %XTTYPE_PORT_NE:	16-bit port name or number, stored as network-endian
  * %XTTYPE_PORTRC:	colon-separated port range (names acceptable)
  * %XTTYPE_PORTRC_NE:	same as %XTTYPE_PORTRC, stored in network-endian
- * %XTTYPE_PLENMASK:	prefix len stored as union nf_inet_addr
+ * %XTTYPE_PLENMASK:	prefix length (ptr: union nf_inet_addr)
  */
 enum xt_option_type {
 	XTTYPE_NONE,
@@ -76,7 +82,7 @@ enum xt_option_type {
 	XTTYPE_TOSMASK,
 	XTTYPE_MARKMASK32,
 	XTTYPE_SYSLOGLEVEL,
-	XTTYPE_ONEHOST,
+	XTTYPE_HOST,
 	XTTYPE_PORT,
 	XTTYPE_PORT_NE,
 	XTTYPE_PORTRC,
@@ -141,7 +147,10 @@ struct xt_option_call {
 		uint32_t u32, u32_range[2];
 		uint64_t u64, u64_range[2];
 		double dbl;
-		union nf_inet_addr inetaddr, inetmask;
+		struct {
+			union nf_inet_addr haddr, hmask;
+			uint8_t hlen;
+		};
 		struct {
 			uint8_t tos_value, tos_mask;
 		};

@@ -22,7 +22,7 @@ enum {
 static const struct xt_option_entry tproxy_tg0_opts[] = {
 	{.name = "on-port", .id = P_PORT, .type = XTTYPE_PORT_NE,
 	 .flags = XTOPT_MAND | XTOPT_PUT, XTOPT_POINTER(s, lport)},
-	{.name = "on-ip", .id = P_ADDR, .type = XTTYPE_ONEHOST},
+	{.name = "on-ip", .id = P_ADDR, .type = XTTYPE_HOST},
 	{.name = "tproxy-mark", .id = P_MARK, .type = XTTYPE_MARKMASK32},
 	XTOPT_TABLEEND,
 };
@@ -31,7 +31,7 @@ static const struct xt_option_entry tproxy_tg0_opts[] = {
 static const struct xt_option_entry tproxy_tg1_opts[] = {
 	{.name = "on-port", .id = P_PORT, .type = XTTYPE_PORT_NE,
 	 .flags = XTOPT_MAND | XTOPT_PUT, XTOPT_POINTER(s, lport)},
-	{.name = "on-ip", .id = P_ADDR, .type = XTTYPE_ONEHOST,
+	{.name = "on-ip", .id = P_ADDR, .type = XTTYPE_HOST,
 	 .flags = XTOPT_PUT, XTOPT_POINTER(s, laddr)},
 	{.name = "tproxy-mark", .id = P_MARK, .type = XTTYPE_MARKMASK32},
 	XTOPT_TABLEEND,
@@ -129,7 +129,7 @@ static void tproxy_tg0_parse(struct xt_option_call *cb)
 		info->mark_mask  = cb->val.mask;
 		break;
 	case P_ADDR:
-		info->laddr = cb->val.inetaddr.ip;
+		info->laddr = cb->val.haddr.ip;
 		break;
 	}
 }

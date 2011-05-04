@@ -419,9 +419,11 @@ static socklen_t xtables_sa_hostlen(unsigned int afproto)
 }
 
 /**
- * Accepts: a hostname (DNS), or a single inetaddr.
+ * Accepts: a hostname (DNS), or a single inetaddr - without any mask. The
+ * result is stored in @cb->val.haddr. Additionally, @cb->val.hmask and
+ * @cb->val.hlen are set for completeness to the appropriate values.
  */
-static void xtopt_parse_onehost(struct xt_option_call *cb)
+static void xtopt_parse_host(struct xt_option_call *cb)
 {
 	struct addrinfo hints = {.ai_family = afinfo->family};
 	unsigned int adcount = 0;
@@ -433,16 +435,19 @@ static void xtopt_parse_onehost(struct xt_option_call *cb)
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"getaddrinfo: %s\n", gai_strerror(ret));
 
+	memset(&cb->val.hmask, 0xFF, sizeof(cb->val.hmask));
+	cb->val.hlen = (afinfo->family == NFPROTO_IPV4) ? 32 : 128;
+
 	for (p = res; p != NULL; p = p->ai_next) {
 		if (adcount == 0) {
-			memset(&cb->val.inetaddr, 0, sizeof(cb->val.inetaddr));
-			memcpy(&cb->val.inetaddr,
+			memset(&cb->val.haddr, 0, sizeof(cb->val.haddr));
+			memcpy(&cb->val.haddr,
 			       xtables_sa_host(p->ai_addr, p->ai_family),
 			       xtables_sa_hostlen(p->ai_family));
 			++adcount;
 			continue;
 		}
-		if (memcmp(&cb->val.inetaddr,
+		if (memcmp(&cb->val.haddr,
 		    xtables_sa_host(p->ai_addr, p->ai_family),
 		    xtables_sa_hostlen(p->ai_family)) != 0)
 			xt_params->exit_err(PARAMETER_PROBLEM,
@@ -453,8 +458,8 @@ static void xtopt_parse_onehost(struct xt_option_call *cb)
 	freeaddrinfo(res);
 	if (cb->entry->flags & XTOPT_PUT)
 		/* Validation in xtables_option_metavalidate */
-		memcpy(XTOPT_MKPTR(cb), &cb->val.inetaddr,
-		       sizeof(cb->val.inetaddr));
+		memcpy(XTOPT_MKPTR(cb), &cb->val.haddr,
+		       sizeof(cb->val.haddr));
 }
 
 /**
@@ -488,7 +493,8 @@ static int xtables_getportbyname(const char *name)
 }
 
 /**
- * Validate and parse a port specification and put the result into @cb.
+ * Validate and parse a port specification and put the result into
+ * @cb->val.port.
  */
 static void xtopt_parse_port(struct xt_option_call *cb)
 {
@@ -561,25 +567,27 @@ static void xtopt_parse_mport(struct xt_option_call *cb)
 	free(lo_arg);
 }
 
+/**
+ * Parse an integer and ensure it is within the address family's prefix length
+ * limits. The result is stored in @cb->val.hmask and @cb->val.hlen. If
+ * %XTOPT_PUT is used, hmask will be copied to the pointed-to area.
+ */
 static void xtopt_parse_plenmask(struct xt_option_call *cb)
 {
 	const struct xt_option_entry *entry = cb->entry;
-	uint32_t *mask = cb->val.inetmask.all;
+	uint32_t *mask = cb->val.hmask.all;
 	unsigned int prefix_len = 128;
-	uint8_t max = 128;
 
-	if (afinfo->family == NFPROTO_IPV6)
-		max = 128;
-	else if (afinfo->family == NFPROTO_IPV4)
-		max = 32;
-
-	if (!xtables_strtoui(cb->arg, NULL, &prefix_len, 0, max))
+	cb->val.hlen = (afinfo->family == NFPROTO_IPV4) ? 32 : 128;
+	if (!xtables_strtoui(cb->arg, NULL, &prefix_len, 0, cb->val.hlen))
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"%s: bad value for option \"--%s\", "
 			"or out of range (%u-%u).\n",
-			cb->ext_name, entry->name, 0, max);
+			cb->ext_name, entry->name, 0, cb->val.hlen);
 
+	cb->val.hlen = prefix_len;
 	memset(mask, 0xFF, sizeof(union nf_inet_addr));
+	/* This shifting is AF-independent. */
 	if (prefix_len == 0) {
 		mask[0] = mask[1] = mask[2] = mask[3] = 0;
 	} else if (prefix_len <= 32) {
@@ -616,7 +624,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_TOSMASK]     = xtopt_parse_tosmask,
 	[XTTYPE_MARKMASK32]  = xtopt_parse_markmask,
 	[XTTYPE_SYSLOGLEVEL] = xtopt_parse_sysloglevel,
-	[XTTYPE_ONEHOST]     = xtopt_parse_onehost,
+	[XTTYPE_HOST]        = xtopt_parse_host,
 	[XTTYPE_PORT]        = xtopt_parse_port,
 	[XTTYPE_PORT_NE]     = xtopt_parse_port,
 	[XTTYPE_PORTRC]      = xtopt_parse_mport,
@@ -625,6 +633,10 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 };
 
 static const size_t xtopt_psize[] = {
+	/*
+	 * All types not listed here, and thus essentially being initialized to
+	 * zero have zero on purpose.
+	 */
 	[XTTYPE_UINT8]       = sizeof(uint8_t),
 	[XTTYPE_UINT16]      = sizeof(uint16_t),
 	[XTTYPE_UINT32]      = sizeof(uint32_t),
@@ -636,7 +648,7 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_DOUBLE]      = sizeof(double),
 	[XTTYPE_STRING]      = -1,
 	[XTTYPE_SYSLOGLEVEL] = sizeof(uint8_t),
-	[XTTYPE_ONEHOST]     = sizeof(union nf_inet_addr),
+	[XTTYPE_HOST]        = sizeof(union nf_inet_addr),
 	[XTTYPE_PORT]        = sizeof(uint16_t),
 	[XTTYPE_PORT_NE]     = sizeof(uint16_t),
 	[XTTYPE_PORTRC]      = sizeof(uint16_t[2]),

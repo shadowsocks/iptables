@@ -31,7 +31,7 @@ enum {
 
 #define s struct xt_tee_tginfo
 static const struct xt_option_entry tee_tg_opts[] = {
-	{.name = "gateway", .id = O_GATEWAY, .type = XTTYPE_ONEHOST,
+	{.name = "gateway", .id = O_GATEWAY, .type = XTTYPE_HOST,
 	 .flags = XTOPT_MAND | XTOPT_PUT, XTOPT_POINTER(s, gw)},
 	{.name = "oif", .id = O_OIF, .type = XTTYPE_STRING,
 	 .flags = XTOPT_PUT, XTOPT_POINTER(s, oif)},
