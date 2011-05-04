@@ -65,6 +65,7 @@ struct in_addr;
  * %XTTYPE_PORT_NE:	16-bit port name or number, stored as network-endian
  * %XTTYPE_PORTRC:	colon-separated port range (names acceptable)
  * %XTTYPE_PORTRC_NE:	same as %XTTYPE_PORTRC, stored in network-endian
+ * %XTTYPE_PLEN:	prefix length
  * %XTTYPE_PLENMASK:	prefix length (ptr: union nf_inet_addr)
  */
 enum xt_option_type {
@@ -87,6 +88,7 @@ enum xt_option_type {
 	XTTYPE_PORT_NE,
 	XTTYPE_PORTRC,
 	XTTYPE_PORTRC_NE,
+	XTTYPE_PLEN,
 	XTTYPE_PLENMASK,
 };
 

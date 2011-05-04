@@ -569,14 +569,12 @@ static void xtopt_parse_mport(struct xt_option_call *cb)
 
 /**
  * Parse an integer and ensure it is within the address family's prefix length
- * limits. The result is stored in @cb->val.hmask and @cb->val.hlen. If
- * %XTOPT_PUT is used, hmask will be copied to the pointed-to area.
+ * limits. The result is stored in @cb->val.hlen.
  */
-static void xtopt_parse_plenmask(struct xt_option_call *cb)
+static void xtopt_parse_plen(struct xt_option_call *cb)
 {
 	const struct xt_option_entry *entry = cb->entry;
-	uint32_t *mask = cb->val.hmask.all;
-	unsigned int prefix_len = 128;
+	unsigned int prefix_len = 128; /* happiness is a warm gcc */
 
 	cb->val.hlen = (afinfo->family == NFPROTO_IPV4) ? 32 : 128;
 	if (!xtables_strtoui(cb->arg, NULL, &prefix_len, 0, cb->val.hlen))
@@ -586,21 +584,35 @@ static void xtopt_parse_plenmask(struct xt_option_call *cb)
 			cb->ext_name, entry->name, 0, cb->val.hlen);
 
 	cb->val.hlen = prefix_len;
+}
+
+/**
+ * Reuse xtopt_parse_plen for testing the integer. Afterwards convert this to
+ * a bitmask, and make it available through @cb->val.hmask (hlen remains
+ * valid). If %XTOPT_PUT is used, hmask will be copied to the target area.
+ */
+static void xtopt_parse_plenmask(struct xt_option_call *cb)
+{
+	const struct xt_option_entry *entry = cb->entry;
+	uint32_t *mask = cb->val.hmask.all;
+
+	xtopt_parse_plen(cb);
+
 	memset(mask, 0xFF, sizeof(union nf_inet_addr));
 	/* This shifting is AF-independent. */
-	if (prefix_len == 0) {
+	if (cb->val.hlen == 0) {
 		mask[0] = mask[1] = mask[2] = mask[3] = 0;
-	} else if (prefix_len <= 32) {
-		mask[0] <<= 32 - prefix_len;
+	} else if (cb->val.hlen <= 32) {
+		mask[0] <<= 32 - cb->val.hlen;
 		mask[1] = mask[2] = mask[3] = 0;
-	} else if (prefix_len <= 64) {
-		mask[1] <<= 32 - (prefix_len - 32);
+	} else if (cb->val.hlen <= 64) {
+		mask[1] <<= 32 - (cb->val.hlen - 32);
 		mask[2] = mask[3] = 0;
-	} else if (prefix_len <= 96) {
-		mask[2] <<= 32 - (prefix_len - 64);
+	} else if (cb->val.hlen <= 96) {
+		mask[2] <<= 32 - (cb->val.hlen - 64);
 		mask[3] = 0;
-	} else if (prefix_len <= 128) {
-		mask[3] <<= 32 - (prefix_len - 96);
+	} else if (cb->val.hlen <= 128) {
+		mask[3] <<= 32 - (cb->val.hlen - 96);
 	}
 	mask[0] = htonl(mask[0]);
 	mask[1] = htonl(mask[1]);
@@ -629,6 +641,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_PORT_NE]     = xtopt_parse_port,
 	[XTTYPE_PORTRC]      = xtopt_parse_mport,
 	[XTTYPE_PORTRC_NE]   = xtopt_parse_mport,
+	[XTTYPE_PLEN]        = xtopt_parse_plen,
 	[XTTYPE_PLENMASK]    = xtopt_parse_plenmask,
 };
 
