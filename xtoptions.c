@@ -622,6 +622,33 @@ static void xtopt_parse_plenmask(struct xt_option_call *cb)
 		memcpy(XTOPT_MKPTR(cb), mask, sizeof(union nf_inet_addr));
 }
 
+static void xtopt_parse_hostmask(struct xt_option_call *cb)
+{
+	const char *orig_arg = cb->arg;
+	char *work, *p;
+
+	if (strchr(cb->arg, '/') == NULL) {
+		xtopt_parse_host(cb);
+		return;
+	}
+	work = strdup(orig_arg);
+	if (work == NULL)
+		xt_params->exit_err(PARAMETER_PROBLEM, "strdup");
+	p = strchr(work, '/'); /* by def this can't be NULL now */
+	*p++ = '\0';
+	/*
+	 * Because xtopt_parse_host and xtopt_parse_plenmask would store
+	 * different things in the same target area, XTTYPE_HOSTMASK must
+	 * disallow XTOPT_PUT, which it does by forcing its absence,
+	 * cf. not being listed in xtopt_psize.
+	 */
+	cb->arg = work;
+	xtopt_parse_host(cb);
+	cb->arg = p;
+	xtopt_parse_plenmask(cb);
+	cb->arg = orig_arg;
+}
+
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT16]      = xtopt_parse_int,
@@ -637,6 +664,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_MARKMASK32]  = xtopt_parse_markmask,
 	[XTTYPE_SYSLOGLEVEL] = xtopt_parse_sysloglevel,
 	[XTTYPE_HOST]        = xtopt_parse_host,
+	[XTTYPE_HOSTMASK]    = xtopt_parse_hostmask,
 	[XTTYPE_PORT]        = xtopt_parse_port,
 	[XTTYPE_PORT_NE]     = xtopt_parse_port,
 	[XTTYPE_PORTRC]      = xtopt_parse_mport,
@@ -662,6 +690,7 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_STRING]      = -1,
 	[XTTYPE_SYSLOGLEVEL] = sizeof(uint8_t),
 	[XTTYPE_HOST]        = sizeof(union nf_inet_addr),
+	[XTTYPE_HOSTMASK]    = sizeof(union nf_inet_addr),
 	[XTTYPE_PORT]        = sizeof(uint16_t),
 	[XTTYPE_PORT_NE]     = sizeof(uint16_t),
 	[XTTYPE_PORTRC]      = sizeof(uint16_t[2]),

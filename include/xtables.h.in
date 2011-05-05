@@ -61,6 +61,8 @@ struct in_addr;
  * %XTTYPE_MARKMASK32:	32-bit mark with optional mask
  * %XTTYPE_SYSLOGLEVEL:	syslog level by name or number
  * %XTTYPE_HOST:	one host or address (ptr: union nf_inet_addr)
+ * %XTTYPE_HOSTMASK:	one host or address, with an optional prefix length
+ * 			(ptr: union nf_inet_addr; only host portion is stored)
  * %XTTYPE_PORT:	16-bit port name or number
  * %XTTYPE_PORT_NE:	16-bit port name or number, stored as network-endian
  * %XTTYPE_PORTRC:	colon-separated port range (names acceptable)
@@ -84,6 +86,7 @@ enum xt_option_type {
 	XTTYPE_MARKMASK32,
 	XTTYPE_SYSLOGLEVEL,
 	XTTYPE_HOST,
+	XTTYPE_HOSTMASK,
 	XTTYPE_PORT,
 	XTTYPE_PORT_NE,
 	XTTYPE_PORTRC,
