@@ -708,7 +708,8 @@ void xtables_option_metavalidate(const char *name,
 				name, entry->id);
 		if (!(entry->flags & XTOPT_PUT))
 			continue;
-		if (entry->type >= ARRAY_SIZE(xtopt_psize))
+		if (entry->type >= ARRAY_SIZE(xtopt_psize) ||
+		    xtopt_psize[entry->type] == 0)
 			xt_params->exit_err(OTHER_PROBLEM,
 				"%s: entry type of option \"--%s\" cannot be "
 				"combined with XTOPT_PUT\n",
