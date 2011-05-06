@@ -111,6 +111,7 @@ static void u32_parse(struct xt_option_call *cb)
 	const char *start = cb->arg;
 	int state = 0;
 
+	xtables_option_parse(cb);
 	data->invert = cb->invert;
 
 	/*
