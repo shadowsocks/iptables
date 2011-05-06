@@ -163,10 +163,12 @@ struct xt_option_call {
 			uint32_t mark, mask;
 		};
 	} val;
+	/* Wished for a world where the ones below were gone: */
 	union {
 		struct xt_entry_match **match;
 		struct xt_entry_target **target;
 	};
+	void *xt_entry;
 };
 
 /**

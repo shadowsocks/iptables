@@ -808,6 +808,7 @@ void xtables_option_tpcall(unsigned int c, char **argv, bool invert,
 	cb.data     = t->t->data;
 	cb.xflags   = t->tflags;
 	cb.target   = &t->t;
+	cb.xt_entry = fw;
 	t->x6_parse(&cb);
 	t->tflags = cb.xflags;
 }
@@ -842,6 +843,7 @@ void xtables_option_mpcall(unsigned int c, char **argv, bool invert,
 	cb.data     = m->m->data;
 	cb.xflags   = m->mflags;
 	cb.match    = &m->m;
+	cb.xt_entry = fw;
 	m->x6_parse(&cb);
 	m->mflags = cb.xflags;
 }
