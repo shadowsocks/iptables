@@ -81,11 +81,11 @@ parse_rt_segsleft(const char *idstring, uint32_t *ids)
 	free(buffer);
 }
 
-static char *
+static const char *
 addr_to_numeric(const struct in6_addr *addrp)
 {
 	static char buf[50+1];
-	return (char *)inet_ntop(AF_INET6, addrp, buf, sizeof(buf));
+	return inet_ntop(AF_INET6, addrp, buf, sizeof(buf));
 }
 
 static struct in6_addr *

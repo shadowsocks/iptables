@@ -61,13 +61,13 @@ static const struct numflag chain_flags[] = {
 	{ IPPROTO_RAW, MASK_PROTO },
 };
 
-static char *
+static const char *
 proto_to_name(uint8_t proto, int nolookup)
 {
         unsigned int i;
 
         if (proto && !nolookup) {
-                struct protoent *pent = getprotobynumber(proto);
+		const struct protoent *pent = getprotobynumber(proto);
                 if (pent)
                         return pent->p_name;
         }
@@ -83,7 +83,7 @@ static uint16_t
 name_to_proto(const char *s)
 {
         unsigned int proto=0;
-        struct protoent *pent;
+	const struct protoent *pent;
 
         if ((pent = getprotobyname(s)))
         	proto = pent->p_proto;
