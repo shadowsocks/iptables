@@ -80,7 +80,7 @@ static const struct rate_suffix {
 	{ "GBps",	8000000000. },
 	{ "TiBps",	8.*1024.*1024.*1024.*1024. },
 	{ "TBps",	8000000000000. },
-	XT_GETOPT_TABLEEND,
+	{NULL},
 };
 
 static int

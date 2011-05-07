@@ -346,7 +346,7 @@ struct xtables_globals
 	void (*exit_err)(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
 };
 
-#define XT_GETOPT_TABLEEND {NULL}
+#define XT_GETOPT_TABLEEND {.name = NULL, .has_arg = false}
 
 #ifdef __cplusplus
 extern "C" {

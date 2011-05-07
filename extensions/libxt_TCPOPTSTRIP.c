@@ -34,7 +34,7 @@ static const struct tcp_optionmap tcp_optionmap[] = {
 	{"sack",           "Selective ACK",        TCPOPT_SACK},
 	{"timestamp",      "Timestamp",            TCPOPT_TIMESTAMP},
 	{"md5",            "MD5 signature",        TCPOPT_MD5SIG},
-	XT_GETOPT_TABLEEND,
+	{NULL},
 };
 
 static void tcpoptstrip_tg_help(void)
