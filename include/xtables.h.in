@@ -63,6 +63,7 @@ struct in_addr;
  * %XTTYPE_HOST:	one host or address (ptr: union nf_inet_addr)
  * %XTTYPE_HOSTMASK:	one host or address, with an optional prefix length
  * 			(ptr: union nf_inet_addr; only host portion is stored)
+ * %XTTYPE_PROTOCOL:	protocol number/name from /etc/protocols (ptr: uint8_t)
  * %XTTYPE_PORT:	16-bit port name or number
  * %XTTYPE_PORT_NE:	16-bit port name or number, stored as network-endian
  * %XTTYPE_PORTRC:	colon-separated port range (names acceptable)
@@ -87,6 +88,7 @@ enum xt_option_type {
 	XTTYPE_SYSLOGLEVEL,
 	XTTYPE_HOST,
 	XTTYPE_HOSTMASK,
+	XTTYPE_PROTOCOL,
 	XTTYPE_PORT,
 	XTTYPE_PORT_NE,
 	XTTYPE_PORTRC,
@@ -147,7 +149,7 @@ struct xt_option_call {
 	bool invert;
 	uint8_t nvals;
 	union {
-		uint8_t u8, u8_range[2], syslog_level;
+		uint8_t u8, u8_range[2], syslog_level, protocol;
 		uint16_t u16, u16_range[2], port, port_range[2];
 		uint32_t u32, u32_range[2];
 		uint64_t u64, u64_range[2];

@@ -493,6 +493,29 @@ static int xtables_getportbyname(const char *name)
 }
 
 /**
+ * Validate and parse a protocol specification (number or name) by use of
+ * /etc/protocols and put the result into @cb->val.protocol.
+ */
+static void xtopt_parse_protocol(struct xt_option_call *cb)
+{
+	const struct protoent *entry;
+	unsigned int value = -1;
+
+	if (xtables_strtoui(cb->arg, NULL, &value, 0, UINT8_MAX)) {
+		cb->val.protocol = value;
+		return;
+	}
+	entry = getprotobyname(cb->arg);
+	if (entry == NULL)
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"Protocol \"%s\" does not resolve to anything.\n",
+			cb->arg);
+	cb->val.protocol = entry->p_proto;
+	if (cb->entry->flags & XTOPT_PUT)
+		*(uint8_t *)XTOPT_MKPTR(cb) = cb->val.protocol;
+}
+
+/**
  * Validate and parse a port specification and put the result into
  * @cb->val.port.
  */
@@ -665,6 +688,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_SYSLOGLEVEL] = xtopt_parse_sysloglevel,
 	[XTTYPE_HOST]        = xtopt_parse_host,
 	[XTTYPE_HOSTMASK]    = xtopt_parse_hostmask,
+	[XTTYPE_PROTOCOL]    = xtopt_parse_protocol,
 	[XTTYPE_PORT]        = xtopt_parse_port,
 	[XTTYPE_PORT_NE]     = xtopt_parse_port,
 	[XTTYPE_PORTRC]      = xtopt_parse_mport,
@@ -691,6 +715,7 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_SYSLOGLEVEL] = sizeof(uint8_t),
 	[XTTYPE_HOST]        = sizeof(union nf_inet_addr),
 	[XTTYPE_HOSTMASK]    = sizeof(union nf_inet_addr),
+	[XTTYPE_PROTOCOL]    = sizeof(uint8_t),
 	[XTTYPE_PORT]        = sizeof(uint16_t),
 	[XTTYPE_PORT_NE]     = sizeof(uint16_t),
 	[XTTYPE_PORTRC]      = sizeof(uint16_t[2]),
