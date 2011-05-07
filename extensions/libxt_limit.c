@@ -3,19 +3,20 @@
  * Jérôme de Vivie   <devivie@info.enserb.u-bordeaux.fr>
  * Hervé Eychenne    <rv@wallfire.org>
  */
-#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <getopt.h>
 #include <xtables.h>
-#include <stddef.h>
 #include <linux/netfilter/x_tables.h>
-/* For 64bit kernel / 32bit userspace */
 #include <linux/netfilter/xt_limit.h>
 
 #define XT_LIMIT_AVG	"3/hour"
 #define XT_LIMIT_BURST	5
+
+enum {
+	O_LIMIT = 0,
+	O_BURST,
+};
 
 static void limit_help(void)
 {
@@ -28,10 +29,12 @@ static void limit_help(void)
 XT_LIMIT_BURST);
 }
 
-static const struct option limit_opts[] = {
-	{.name = "limit",       .has_arg = true, .val = '%'},
-	{.name = "limit-burst", .has_arg = true, .val = '$'},
-	XT_GETOPT_TABLEEND,
+static const struct xt_option_entry limit_opts[] = {
+	{.name = "limit", .id = O_LIMIT, .type = XTTYPE_STRING},
+	{.name = "limit-burst", .id = O_BURST, .type = XTTYPE_UINT32,
+	 .flags = XTOPT_PUT, XTOPT_POINTER(struct xt_rateinfo, burst),
+	 .min = 0, .max = 10000},
+	XTOPT_TABLEEND,
 };
 
 static
@@ -85,35 +88,21 @@ static void limit_init(struct xt_entry_match *m)
 			   "Sorry: burst too large for that avg rate.\n");
 */
 
-static int
-limit_parse(int c, char **argv, int invert, unsigned int *flags,
-            const void *entry, struct xt_entry_match **match)
+static void limit_parse(struct xt_option_call *cb)
 {
-	struct xt_rateinfo *r = (struct xt_rateinfo *)(*match)->data;
-	unsigned int num;
+	struct xt_rateinfo *r = cb->data;
 
-	switch(c) {
-	case '%':
-		if (xtables_check_inverse(optarg, &invert, &optind, 0, argv)) break;
-		if (!parse_rate(optarg, &r->avg))
+	xtables_option_parse(cb);
+	switch (cb->entry->id) {
+	case O_LIMIT:
+		if (!parse_rate(cb->arg, &r->avg))
 			xtables_error(PARAMETER_PROBLEM,
-				   "bad rate `%s'", optarg);
-		break;
-
-	case '$':
-		if (xtables_check_inverse(optarg, &invert, &optind, 0, argv)) break;
-		if (!xtables_strtoui(optarg, NULL, &num, 0, 10000))
-			xtables_error(PARAMETER_PROBLEM,
-				   "bad --limit-burst `%s'", optarg);
-		r->burst = num;
+				   "bad rate \"%s\"'", cb->arg);
 		break;
 	}
-
-	if (invert)
+	if (cb->invert)
 		xtables_error(PARAMETER_PROBLEM,
 			   "limit does not support invert");
-
-	return 1;
 }
 
 static const struct rates
@@ -162,10 +151,10 @@ static struct xtables_match limit_match = {
 	.userspacesize	= offsetof(struct xt_rateinfo, prev),
 	.help		= limit_help,
 	.init		= limit_init,
-	.parse		= limit_parse,
+	.x6_parse	= limit_parse,
 	.print		= limit_print,
 	.save		= limit_save,
-	.extra_opts	= limit_opts,
+	.x6_options	= limit_opts,
 };
 
 void _init(void)
