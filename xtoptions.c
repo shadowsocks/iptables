@@ -672,6 +672,30 @@ static void xtopt_parse_hostmask(struct xt_option_call *cb)
 	cb->arg = orig_arg;
 }
 
+static void xtopt_parse_ethermac(struct xt_option_call *cb)
+{
+	const char *arg = cb->arg;
+	unsigned int i;
+	char *end;
+
+	for (i = 0; i < ARRAY_SIZE(cb->val.ethermac) - 1; ++i) {
+		cb->val.ethermac[i] = strtoul(arg, &end, 16);
+		if (cb->val.ethermac[i] > UINT8_MAX || *end != ':')
+			goto out;
+		arg = end + 1;
+	}
+	i = ARRAY_SIZE(cb->val.ethermac) - 1;
+	cb->val.ethermac[i] = strtoul(arg, &end, 16);
+	if (cb->val.ethermac[i] > UINT8_MAX || *end != '\0')
+		goto out;
+	if (cb->entry->flags & XTOPT_PUT)
+		memcpy(XTOPT_MKPTR(cb), cb->val.ethermac,
+		       sizeof(cb->val.ethermac));
+	return;
+ out:
+	xt_params->exit_err(PARAMETER_PROBLEM, "ether");
+}
+
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT16]      = xtopt_parse_int,
@@ -695,6 +719,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_PORTRC_NE]   = xtopt_parse_mport,
 	[XTTYPE_PLEN]        = xtopt_parse_plen,
 	[XTTYPE_PLENMASK]    = xtopt_parse_plenmask,
+	[XTTYPE_ETHERMAC]    = xtopt_parse_ethermac,
 };
 
 static const size_t xtopt_psize[] = {
@@ -721,6 +746,7 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_PORTRC]      = sizeof(uint16_t[2]),
 	[XTTYPE_PORTRC_NE]   = sizeof(uint16_t[2]),
 	[XTTYPE_PLENMASK]    = sizeof(union nf_inet_addr),
+	[XTTYPE_ETHERMAC]    = sizeof(uint8_t[6]),
 };
 
 /**
