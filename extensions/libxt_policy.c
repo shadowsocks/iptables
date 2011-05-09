@@ -347,7 +347,7 @@ static void print_mode(const char *prefix, uint8_t mode, int numeric)
 
 static void print_proto(const char *prefix, uint8_t proto, int numeric)
 {
-	struct protoent *p = NULL;
+	const struct protoent *p = NULL;
 
 	printf(" %sproto ", prefix);
 	if (!numeric)
@@ -407,7 +407,7 @@ static void print_entry(const char *prefix, const struct xt_policy_elem *e,
 	}
 }
 
-static void print_flags(char *prefix, const struct xt_policy_info *info)
+static void print_flags(const char *prefix, const struct xt_policy_info *info)
 {
 	if (info->flags & XT_POLICY_MATCH_IN)
 		printf(" %sdir in", prefix);

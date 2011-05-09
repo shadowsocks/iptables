@@ -144,6 +144,29 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 }
 
 /**
+ * Require a simple floating point number.
+ */
+static void xtopt_parse_float(struct xt_option_call *cb)
+{
+	const struct xt_option_entry *entry = cb->entry;
+	double value;
+	char *end;
+
+	value = strtod(cb->arg, &end);
+	if (end == cb->arg || *end != '\0' ||
+	    (entry->min != entry->max &&
+	    (value < entry->min || value > entry->max)))
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"%s: bad value for option \"--%s\", "
+			"or out of range (%u-%u).\n",
+			cb->ext_name, entry->name, entry->min, entry->max);
+
+	cb->val.dbl = value;
+	if (entry->flags & XTOPT_PUT)
+		*(double *)XTOPT_MKPTR(cb) = cb->val.dbl;
+}
+
+/**
  * Multiple integer parse routine.
  *
  * This function is capable of parsing any number of fields. Only the first
@@ -190,7 +213,6 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 			xt_params->exit_err(PARAMETER_PROBLEM,
 				"%s: Argument to \"--%s\" has unexpected "
 				"characters.\n", cb->ext_name, entry->name);
-		++cb->nvals;
 		if (cb->nvals < ARRAY_SIZE(cb->val.u32_range)) {
 			if (entry->type == XTTYPE_UINT8RC)
 				cb->val.u8_range[cb->nvals] = value;
@@ -201,6 +223,7 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 			else if (entry->type == XTTYPE_UINT64RC)
 				cb->val.u64_range[cb->nvals] = value;
 		}
+		++cb->nvals;
 		if (entry->flags & XTOPT_PUT) {
 			if (entry->type == XTTYPE_UINT8RC)
 				*(uint8_t *)put = value;
@@ -547,6 +570,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT16RC]    = xtopt_parse_mint,
 	[XTTYPE_UINT32RC]    = xtopt_parse_mint,
 	[XTTYPE_UINT64RC]    = xtopt_parse_mint,
+	[XTTYPE_DOUBLE]      = xtopt_parse_float,
 	[XTTYPE_STRING]      = xtopt_parse_string,
 	[XTTYPE_TOSMASK]     = xtopt_parse_tosmask,
 	[XTTYPE_MARKMASK32]  = xtopt_parse_markmask,
@@ -567,6 +591,7 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_UINT16RC]    = sizeof(uint16_t[2]),
 	[XTTYPE_UINT32RC]    = sizeof(uint32_t[2]),
 	[XTTYPE_UINT64RC]    = sizeof(uint64_t[2]),
+	[XTTYPE_DOUBLE]      = sizeof(double),
 	[XTTYPE_STRING]      = -1,
 	[XTTYPE_SYSLOGLEVEL] = sizeof(uint8_t),
 	[XTTYPE_ONEHOST]     = sizeof(union nf_inet_addr),

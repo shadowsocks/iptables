@@ -53,7 +53,7 @@ static const struct option multiport_opts[] = {
 	XT_GETOPT_TABLEEND,
 };
 
-static char *
+static const char *
 proto_to_name(uint8_t proto)
 {
 	switch (proto) {
@@ -135,7 +135,7 @@ parse_multi_ports_v1(const char *portstring,
 static const char *
 check_proto(uint16_t pnum, uint8_t invflags)
 {
-	char *proto;
+	const char *proto;
 
 	if (invflags & XT_INV_PROTO)
 		xtables_error(PARAMETER_PROBLEM,
@@ -285,10 +285,10 @@ static void multiport_check(unsigned int flags)
 		xtables_error(PARAMETER_PROBLEM, "multiport expection an option");
 }
 
-static char *
+static const char *
 port_to_service(int port, uint8_t proto)
 {
-	struct servent *service;
+	const struct servent *service;
 
 	if ((service = getservbyport(htons(port), proto_to_name(proto))))
 		return service->s_name;
@@ -299,7 +299,7 @@ port_to_service(int port, uint8_t proto)
 static void
 print_port(uint16_t port, uint8_t protocol, int numeric)
 {
-	char *service;
+	const char *service;
 
 	if (numeric || (service = port_to_service(port, protocol)) == NULL)
 		printf("%u", port);

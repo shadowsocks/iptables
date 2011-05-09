@@ -126,10 +126,10 @@ static void dccp_parse(struct xt_option_call *cb)
 	}
 }
 
-static char *
+static const char *
 port_to_service(int port)
 {
-	struct servent *service;
+	const struct servent *service;
 
 	if ((service = getservbyport(htons(port), "dccp")))
 		return service->s_name;
@@ -140,7 +140,7 @@ port_to_service(int port)
 static void
 print_port(uint16_t port, int numeric)
 {
-	char *service;
+	const char *service;
 
 	if (numeric || (service = port_to_service(port)) == NULL)
 		printf("%u", port);

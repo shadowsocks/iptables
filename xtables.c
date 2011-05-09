@@ -742,10 +742,10 @@ static int compatible_revision(const char *name, uint8_t revision, int opt)
 		if (errno == EPERM) {
 			/* revision 0 is always supported. */
 			if (revision != 0)
-				fprintf(stderr, "Could not determine whether "
+				fprintf(stderr, "%s: Could not determine whether "
 						"revision %u is supported, "
 						"assuming it is.\n",
-					revision);
+					name, revision);
 			return 1;
 		}
 		fprintf(stderr, "Could not open socket to kernel: %s\n",
