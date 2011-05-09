@@ -26,7 +26,7 @@ static void DNAT_help(void)
 {
 	printf(
 "DNAT target options:\n"
-" --to-destination <ipaddr>[-<ipaddr>][:port-port]\n"
+" --to-destination [<ipaddr>[-<ipaddr>]][:port[-port]]\n"
 "				Address to map destination to.\n"
 "[--random] [--persistent]\n");
 }
