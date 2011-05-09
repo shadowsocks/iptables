@@ -15,15 +15,6 @@
 extern "C" {
 #endif
 
-#ifndef IPT_MIN_ALIGN
-/* ipt_entry has pointers and u_int64_t's in it, so if you align to
-   it, you'll also align to any crazy matches and targets someone
-   might write */
-#define IPT_MIN_ALIGN (__alignof__(struct ipt_entry))
-#endif
-
-#define IPT_ALIGN(s) (((s) + ((IPT_MIN_ALIGN)-1)) & ~((IPT_MIN_ALIGN)-1))
-
 struct iptc_handle;
 
 typedef char ipt_chainlabel[32];

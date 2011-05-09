@@ -112,7 +112,7 @@ typedef unsigned int socklen_t;
 #define LABEL_DROP		IPTC_LABEL_DROP
 #define LABEL_QUEUE		IPTC_LABEL_QUEUE
 
-#define ALIGN			IPT_ALIGN
+#define ALIGN			XT_ALIGN
 #define RETURN			IPT_RETURN
 
 #include "libiptc.c"
@@ -209,7 +209,7 @@ is_same(const STRUCT_ENTRY *a, const STRUCT_ENTRY *b, unsigned char *matchmask)
 	mptr = matchmask + sizeof(STRUCT_ENTRY);
 	if (IPT_MATCH_ITERATE(a, match_different, a->elems, b->elems, &mptr))
 		return NULL;
-	mptr += IPT_ALIGN(sizeof(struct ipt_entry_target));
+	mptr += XT_ALIGN(sizeof(struct ipt_entry_target));
 
 	return mptr;
 }

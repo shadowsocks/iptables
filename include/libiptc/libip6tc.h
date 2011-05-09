@@ -11,11 +11,6 @@
 #endif
 #include <linux/netfilter_ipv6/ip6_tables.h>
 
-#ifndef IP6T_MIN_ALIGN
-#define IP6T_MIN_ALIGN (__alignof__(struct ip6t_entry))
-#endif
-#define IP6T_ALIGN(s) (((s) + (IP6T_MIN_ALIGN-1)) & ~(IP6T_MIN_ALIGN-1))
-
 struct ip6tc_handle;
 
 typedef char ip6t_chainlabel[32];
