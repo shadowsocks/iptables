@@ -26,7 +26,7 @@ static void SNAT_help(void)
 {
 	printf(
 "SNAT target options:\n"
-" --to-source <ipaddr>[-<ipaddr>][:port-port]\n"
+" --to-source [<ipaddr>[-<ipaddr>]][:port[-port]]\n"
 "				Address to map source to.\n"
 "[--random] [--persistent]\n");
 }
