@@ -419,9 +419,11 @@ static socklen_t xtables_sa_hostlen(unsigned int afproto)
 }
 
 /**
- * Accepts: a hostname (DNS), or a single inetaddr.
+ * Accepts: a hostname (DNS), or a single inetaddr - without any mask. The
+ * result is stored in @cb->val.haddr. Additionally, @cb->val.hmask and
+ * @cb->val.hlen are set for completeness to the appropriate values.
  */
-static void xtopt_parse_onehost(struct xt_option_call *cb)
+static void xtopt_parse_host(struct xt_option_call *cb)
 {
 	struct addrinfo hints = {.ai_family = afinfo->family};
 	unsigned int adcount = 0;
@@ -433,16 +435,19 @@ static void xtopt_parse_onehost(struct xt_option_call *cb)
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"getaddrinfo: %s\n", gai_strerror(ret));
 
+	memset(&cb->val.hmask, 0xFF, sizeof(cb->val.hmask));
+	cb->val.hlen = (afinfo->family == NFPROTO_IPV4) ? 32 : 128;
+
 	for (p = res; p != NULL; p = p->ai_next) {
 		if (adcount == 0) {
-			memset(&cb->val.inetaddr, 0, sizeof(cb->val.inetaddr));
-			memcpy(&cb->val.inetaddr,
+			memset(&cb->val.haddr, 0, sizeof(cb->val.haddr));
+			memcpy(&cb->val.haddr,
 			       xtables_sa_host(p->ai_addr, p->ai_family),
 			       xtables_sa_hostlen(p->ai_family));
 			++adcount;
 			continue;
 		}
-		if (memcmp(&cb->val.inetaddr,
+		if (memcmp(&cb->val.haddr,
 		    xtables_sa_host(p->ai_addr, p->ai_family),
 		    xtables_sa_hostlen(p->ai_family)) != 0)
 			xt_params->exit_err(PARAMETER_PROBLEM,
@@ -453,8 +458,8 @@ static void xtopt_parse_onehost(struct xt_option_call *cb)
 	freeaddrinfo(res);
 	if (cb->entry->flags & XTOPT_PUT)
 		/* Validation in xtables_option_metavalidate */
-		memcpy(XTOPT_MKPTR(cb), &cb->val.inetaddr,
-		       sizeof(cb->val.inetaddr));
+		memcpy(XTOPT_MKPTR(cb), &cb->val.haddr,
+		       sizeof(cb->val.haddr));
 }
 
 /**
@@ -488,7 +493,31 @@ static int xtables_getportbyname(const char *name)
 }
 
 /**
- * Validate and parse a port specification and put the result into @cb.
+ * Validate and parse a protocol specification (number or name) by use of
+ * /etc/protocols and put the result into @cb->val.protocol.
+ */
+static void xtopt_parse_protocol(struct xt_option_call *cb)
+{
+	const struct protoent *entry;
+	unsigned int value = -1;
+
+	if (xtables_strtoui(cb->arg, NULL, &value, 0, UINT8_MAX)) {
+		cb->val.protocol = value;
+		return;
+	}
+	entry = getprotobyname(cb->arg);
+	if (entry == NULL)
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"Protocol \"%s\" does not resolve to anything.\n",
+			cb->arg);
+	cb->val.protocol = entry->p_proto;
+	if (cb->entry->flags & XTOPT_PUT)
+		*(uint8_t *)XTOPT_MKPTR(cb) = cb->val.protocol;
+}
+
+/**
+ * Validate and parse a port specification and put the result into
+ * @cb->val.port.
  */
 static void xtopt_parse_port(struct xt_option_call *cb)
 {
@@ -561,6 +590,88 @@ static void xtopt_parse_mport(struct xt_option_call *cb)
 	free(lo_arg);
 }
 
+/**
+ * Parse an integer and ensure it is within the address family's prefix length
+ * limits. The result is stored in @cb->val.hlen.
+ */
+static void xtopt_parse_plen(struct xt_option_call *cb)
+{
+	const struct xt_option_entry *entry = cb->entry;
+	unsigned int prefix_len = 128; /* happiness is a warm gcc */
+
+	cb->val.hlen = (afinfo->family == NFPROTO_IPV4) ? 32 : 128;
+	if (!xtables_strtoui(cb->arg, NULL, &prefix_len, 0, cb->val.hlen))
+		xt_params->exit_err(PARAMETER_PROBLEM,
+			"%s: bad value for option \"--%s\", "
+			"or out of range (%u-%u).\n",
+			cb->ext_name, entry->name, 0, cb->val.hlen);
+
+	cb->val.hlen = prefix_len;
+}
+
+/**
+ * Reuse xtopt_parse_plen for testing the integer. Afterwards convert this to
+ * a bitmask, and make it available through @cb->val.hmask (hlen remains
+ * valid). If %XTOPT_PUT is used, hmask will be copied to the target area.
+ */
+static void xtopt_parse_plenmask(struct xt_option_call *cb)
+{
+	const struct xt_option_entry *entry = cb->entry;
+	uint32_t *mask = cb->val.hmask.all;
+
+	xtopt_parse_plen(cb);
+
+	memset(mask, 0xFF, sizeof(union nf_inet_addr));
+	/* This shifting is AF-independent. */
+	if (cb->val.hlen == 0) {
+		mask[0] = mask[1] = mask[2] = mask[3] = 0;
+	} else if (cb->val.hlen <= 32) {
+		mask[0] <<= 32 - cb->val.hlen;
+		mask[1] = mask[2] = mask[3] = 0;
+	} else if (cb->val.hlen <= 64) {
+		mask[1] <<= 32 - (cb->val.hlen - 32);
+		mask[2] = mask[3] = 0;
+	} else if (cb->val.hlen <= 96) {
+		mask[2] <<= 32 - (cb->val.hlen - 64);
+		mask[3] = 0;
+	} else if (cb->val.hlen <= 128) {
+		mask[3] <<= 32 - (cb->val.hlen - 96);
+	}
+	mask[0] = htonl(mask[0]);
+	mask[1] = htonl(mask[1]);
+	mask[2] = htonl(mask[2]);
+	mask[3] = htonl(mask[3]);
+	if (entry->flags & XTOPT_PUT)
+		memcpy(XTOPT_MKPTR(cb), mask, sizeof(union nf_inet_addr));
+}
+
+static void xtopt_parse_hostmask(struct xt_option_call *cb)
+{
+	const char *orig_arg = cb->arg;
+	char *work, *p;
+
+	if (strchr(cb->arg, '/') == NULL) {
+		xtopt_parse_host(cb);
+		return;
+	}
+	work = strdup(orig_arg);
+	if (work == NULL)
+		xt_params->exit_err(PARAMETER_PROBLEM, "strdup");
+	p = strchr(work, '/'); /* by def this can't be NULL now */
+	*p++ = '\0';
+	/*
+	 * Because xtopt_parse_host and xtopt_parse_plenmask would store
+	 * different things in the same target area, XTTYPE_HOSTMASK must
+	 * disallow XTOPT_PUT, which it does by forcing its absence,
+	 * cf. not being listed in xtopt_psize.
+	 */
+	cb->arg = work;
+	xtopt_parse_host(cb);
+	cb->arg = p;
+	xtopt_parse_plenmask(cb);
+	cb->arg = orig_arg;
+}
+
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT16]      = xtopt_parse_int,
@@ -575,14 +686,22 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_TOSMASK]     = xtopt_parse_tosmask,
 	[XTTYPE_MARKMASK32]  = xtopt_parse_markmask,
 	[XTTYPE_SYSLOGLEVEL] = xtopt_parse_sysloglevel,
-	[XTTYPE_ONEHOST]     = xtopt_parse_onehost,
+	[XTTYPE_HOST]        = xtopt_parse_host,
+	[XTTYPE_HOSTMASK]    = xtopt_parse_hostmask,
+	[XTTYPE_PROTOCOL]    = xtopt_parse_protocol,
 	[XTTYPE_PORT]        = xtopt_parse_port,
 	[XTTYPE_PORT_NE]     = xtopt_parse_port,
 	[XTTYPE_PORTRC]      = xtopt_parse_mport,
 	[XTTYPE_PORTRC_NE]   = xtopt_parse_mport,
+	[XTTYPE_PLEN]        = xtopt_parse_plen,
+	[XTTYPE_PLENMASK]    = xtopt_parse_plenmask,
 };
 
 static const size_t xtopt_psize[] = {
+	/*
+	 * All types not listed here, and thus essentially being initialized to
+	 * zero have zero on purpose.
+	 */
 	[XTTYPE_UINT8]       = sizeof(uint8_t),
 	[XTTYPE_UINT16]      = sizeof(uint16_t),
 	[XTTYPE_UINT32]      = sizeof(uint32_t),
@@ -594,11 +713,14 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_DOUBLE]      = sizeof(double),
 	[XTTYPE_STRING]      = -1,
 	[XTTYPE_SYSLOGLEVEL] = sizeof(uint8_t),
-	[XTTYPE_ONEHOST]     = sizeof(union nf_inet_addr),
+	[XTTYPE_HOST]        = sizeof(union nf_inet_addr),
+	[XTTYPE_HOSTMASK]    = sizeof(union nf_inet_addr),
+	[XTTYPE_PROTOCOL]    = sizeof(uint8_t),
 	[XTTYPE_PORT]        = sizeof(uint16_t),
 	[XTTYPE_PORT_NE]     = sizeof(uint16_t),
 	[XTTYPE_PORTRC]      = sizeof(uint16_t[2]),
 	[XTTYPE_PORTRC_NE]   = sizeof(uint16_t[2]),
+	[XTTYPE_PLENMASK]    = sizeof(union nf_inet_addr),
 };
 
 /**
@@ -653,7 +775,8 @@ void xtables_option_metavalidate(const char *name,
 				name, entry->id);
 		if (!(entry->flags & XTOPT_PUT))
 			continue;
-		if (entry->type >= ARRAY_SIZE(xtopt_psize))
+		if (entry->type >= ARRAY_SIZE(xtopt_psize) ||
+		    xtopt_psize[entry->type] == 0)
 			xt_params->exit_err(OTHER_PROBLEM,
 				"%s: entry type of option \"--%s\" cannot be "
 				"combined with XTOPT_PUT\n",
@@ -710,6 +833,7 @@ void xtables_option_tpcall(unsigned int c, char **argv, bool invert,
 	cb.data     = t->t->data;
 	cb.xflags   = t->tflags;
 	cb.target   = &t->t;
+	cb.xt_entry = fw;
 	t->x6_parse(&cb);
 	t->tflags = cb.xflags;
 }
@@ -744,6 +868,7 @@ void xtables_option_mpcall(unsigned int c, char **argv, bool invert,
 	cb.data     = m->m->data;
 	cb.xflags   = m->mflags;
 	cb.match    = &m->m;
+	cb.xt_entry = fw;
 	m->x6_parse(&cb);
 	m->mflags = cb.xflags;
 }
