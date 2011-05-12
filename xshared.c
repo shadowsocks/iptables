@@ -1,3 +1,4 @@
+#include <getopt.h>
 #include <libgen.h>
 #include <netdb.h>
 #include <stdbool.h>
@@ -101,6 +102,75 @@ struct xtables_match *load_proto(struct iptables_command_state *cs)
 		return NULL;
 	return find_proto(cs->protocol, XTF_TRY_LOAD,
 			  cs->options & OPT_NUMERIC, &cs->matches);
+}
+
+void command_default(struct iptables_command_state *cs,
+		     struct xtables_globals *gl)
+{
+	struct xtables_rule_match *matchp;
+	struct xtables_match *m;
+
+	if (cs->target != NULL &&
+	    (cs->target->parse != NULL || cs->target->x6_parse != NULL) &&
+	    cs->c >= cs->target->option_offset &&
+	    cs->c < cs->target->option_offset + XT_OPTION_OFFSET_SCALE) {
+		xtables_option_tpcall(cs->c, cs->argv, cs->invert,
+				      cs->target, &cs->fw);
+		return;
+	}
+
+	for (matchp = cs->matches; matchp; matchp = matchp->next) {
+		m = matchp->match;
+
+		if (matchp->completed ||
+		    (m->x6_parse == NULL && m->parse == NULL))
+			continue;
+		if (cs->c < matchp->match->option_offset ||
+		    cs->c >= matchp->match->option_offset + XT_OPTION_OFFSET_SCALE)
+			continue;
+		xtables_option_mpcall(cs->c, cs->argv, cs->invert, m, &cs->fw);
+		return;
+	}
+
+	/* Try loading protocol */
+	m = load_proto(cs);
+	if (m != NULL) {
+		size_t size;
+
+		cs->proto_used = 1;
+
+		size = XT_ALIGN(sizeof(struct ip6t_entry_match)) + m->size;
+
+		m->m = xtables_calloc(1, size);
+		m->m->u.match_size = size;
+		strcpy(m->m->u.user.name, m->name);
+		m->m->u.user.revision = m->revision;
+		if (m->init != NULL)
+			m->init(m->m);
+
+		if (m->x6_options != NULL)
+			gl->opts = xtables_options_xfrm(gl->orig_opts,
+							gl->opts,
+							m->x6_options,
+							&m->option_offset);
+		else
+			gl->opts = xtables_merge_options(gl->orig_opts,
+							 gl->opts,
+							 m->extra_opts,
+							 &m->option_offset);
+		if (gl->opts == NULL)
+			xtables_error(OTHER_PROBLEM, "can't alloc memory!");
+		optind--;
+		return;
+	}
+
+	if (cs->c == ':')
+		xtables_error(PARAMETER_PROBLEM, "option \"%s\" "
+		              "requires an argument", cs->argv[optind-1]);
+	if (cs->c == '?')
+		xtables_error(PARAMETER_PROBLEM, "unknown option "
+			      "\"%s\"", cs->argv[optind-1]);
+	xtables_error(PARAMETER_PROBLEM, "Unknown arg \"%s\"", optarg);
 }
 
 static mainfunc_t subcmd_get(const char *cmd, const struct subcommand *cb)

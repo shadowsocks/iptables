@@ -23,6 +23,7 @@ enum {
 	OPT_COUNTERS    = 1 << 10,
 };
 
+struct xtables_globals;
 struct xtables_rule_match;
 struct xtables_target;
 
@@ -76,6 +77,8 @@ enum {
 extern void print_extension_helps(const struct xtables_target *,
 	const struct xtables_rule_match *);
 extern const char *proto_to_name(uint8_t, int);
+extern void command_default(struct iptables_command_state *,
+	struct xtables_globals *);
 extern struct xtables_match *load_proto(struct iptables_command_state *);
 extern int subcmd_main(int, char **, const struct subcommand *);
 
