@@ -16,7 +16,8 @@ enum {
 	O_MODE,
 	O_TUNNELSRC,
 	O_TUNNELDST,
-	O_NEXT
+	O_NEXT,
+	F_STRICT = 1 << O_STRICT,
 };
 
 static void policy_help(void)
@@ -28,6 +29,7 @@ static void policy_help(void)
 "  --pol none|ipsec		match policy\n"
 "  --strict 			match entire policy instead of single element\n"
 "				at any position\n"
+"These options may be used repeatedly, to describe policy elements:\n"
 "[!] --reqid reqid		match reqid\n"
 "[!] --spi spi			match SPI\n"
 "[!] --proto proto		match protocol (ah/esp/ipcomp)\n"
@@ -42,13 +44,20 @@ static const struct xt_option_entry policy_opts[] = {
 	 .flags = XTOPT_INVERT},
 	{.name = "pol", .id = O_POLICY, .type = XTTYPE_STRING},
 	{.name = "strict", .id = O_STRICT, .type = XTTYPE_NONE},
-	{.name = "reqid", .id = O_REQID, .type = XTTYPE_UINT32},
-	{.name = "spi", .id = O_SPI, .type = XTTYPE_UINT32},
-	{.name = "tunnel-src", .id = O_TUNNELSRC, .type = XTTYPE_HOSTMASK},
-	{.name = "tunnel-dst", .id = O_TUNNELDST, .type = XTTYPE_HOSTMASK},
-	{.name = "proto", .id = O_PROTO, .type = XTTYPE_STRING},
-	{.name = "mode", .id = O_MODE, .type = XTTYPE_STRING},
-	{.name = "next", .id = O_NEXT, .type = XTTYPE_NONE},
+	{.name = "reqid", .id = O_REQID, .type = XTTYPE_UINT32,
+	 .flags = XTOPT_MULTI | XTOPT_INVERT},
+	{.name = "spi", .id = O_SPI, .type = XTTYPE_UINT32,
+	 .flags = XTOPT_MULTI | XTOPT_INVERT},
+	{.name = "tunnel-src", .id = O_TUNNELSRC, .type = XTTYPE_HOSTMASK,
+	 .flags = XTOPT_MULTI | XTOPT_INVERT},
+	{.name = "tunnel-dst", .id = O_TUNNELDST, .type = XTTYPE_HOSTMASK,
+	 .flags = XTOPT_MULTI | XTOPT_INVERT},
+	{.name = "proto", .id = O_PROTO, .type = XTTYPE_STRING,
+	 .flags = XTOPT_MULTI | XTOPT_INVERT},
+	{.name = "mode", .id = O_MODE, .type = XTTYPE_STRING,
+	 .flags = XTOPT_MULTI | XTOPT_INVERT},
+	{.name = "next", .id = O_NEXT, .type = XTTYPE_NONE,
+	 .flags = XTOPT_MULTI, .also = F_STRICT},
 	XTOPT_TABLEEND,
 };
 
@@ -183,9 +192,14 @@ static void policy_check(struct xt_fcheck_call *cb)
 	} else
 		info->len++;	/* increase len by 1, no --next after last element */
 
+	/*
+	 * This is already represented with O_NEXT requiring F_STRICT in the
+	 * options table, but will keep this code as a comment for reference.
+	 *
 	if (!(info->flags & XT_POLICY_MATCH_STRICT) && info->len > 1)
 		xtables_error(PARAMETER_PROBLEM,
 		           "policy match: multiple elements but no --strict");
+	 */
 
 	for (i = 0; i < info->len; i++) {
 		e = &info->pol[i];
@@ -194,7 +208,10 @@ static void policy_check(struct xt_fcheck_call *cb)
 		    !(e->match.reqid || e->match.spi || e->match.saddr ||
 		      e->match.daddr || e->match.proto || e->match.mode))
 			xtables_error(PARAMETER_PROBLEM,
-			           "policy match: empty policy element");
+				"policy match: empty policy element %u. "
+				"--strict is in effect, but at least one of "
+				"reqid, spi, tunnel-src, tunnel-dst, proto or "
+				"mode is required.", i);
 
 		if ((e->match.saddr || e->match.daddr)
 		    && ((e->mode == XT_POLICY_MODE_TUNNEL && e->invert.mode) ||

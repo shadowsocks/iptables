@@ -13,11 +13,16 @@ is valid in the
 chains.
 .TP
 \fB\-\-pol\fP {\fBnone\fP|\fBipsec\fP}
-Matches if the packet is subject to IPsec processing.
+Matches if the packet is subject to IPsec processing. \fB\-\-pol none\fP
+cannot be combined with \fB\-\-strict\fP.
 .TP
 \fB\-\-strict\fP
 Selects whether to match the exact policy or match if any rule of
 the policy matches the given policy.
+.PP
+For each policy element that is to be described, one can use one or more of
+the following options. When \fB\-\-strict\fP is in effect, at least one must be
+used per element.
 .TP
 [\fB!\fP] \fB\-\-reqid\fP \fIid\fP
 Matches the reqid of the policy rule. The reqid can be specified with
