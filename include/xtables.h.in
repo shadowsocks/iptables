@@ -70,6 +70,7 @@ struct in_addr;
  * %XTTYPE_PORTRC_NE:	same as %XTTYPE_PORTRC, stored in network-endian
  * %XTTYPE_PLEN:	prefix length
  * %XTTYPE_PLENMASK:	prefix length (ptr: union nf_inet_addr)
+ * %XTTYPE_ETHERMAC:	Ethernet MAC address in hex form
  */
 enum xt_option_type {
 	XTTYPE_NONE,
@@ -95,6 +96,7 @@ enum xt_option_type {
 	XTTYPE_PORTRC_NE,
 	XTTYPE_PLEN,
 	XTTYPE_PLENMASK,
+	XTTYPE_ETHERMAC,
 };
 
 /**
@@ -164,6 +166,7 @@ struct xt_option_call {
 		struct {
 			uint32_t mark, mask;
 		};
+		uint8_t ethermac[6];
 	} val;
 	/* Wished for a world where the ones below were gone: */
 	union {
