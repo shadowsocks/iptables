@@ -498,19 +498,7 @@ static int xtables_getportbyname(const char *name)
  */
 static void xtopt_parse_protocol(struct xt_option_call *cb)
 {
-	const struct protoent *entry;
-	unsigned int value = -1;
-
-	if (xtables_strtoui(cb->arg, NULL, &value, 0, UINT8_MAX)) {
-		cb->val.protocol = value;
-		return;
-	}
-	entry = getprotobyname(cb->arg);
-	if (entry == NULL)
-		xt_params->exit_err(PARAMETER_PROBLEM,
-			"Protocol \"%s\" does not resolve to anything.\n",
-			cb->arg);
-	cb->val.protocol = entry->p_proto;
+	cb->val.protocol = xtables_parse_protocol(cb->arg);
 	if (cb->entry->flags & XTOPT_PUT)
 		*(uint8_t *)XTOPT_MKPTR(cb) = cb->val.protocol;
 }

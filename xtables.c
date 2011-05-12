@@ -1797,37 +1797,30 @@ const struct xtables_pprot xtables_chain_protos[] = {
 uint16_t
 xtables_parse_protocol(const char *s)
 {
-	unsigned int proto;
+	const struct protoent *pent;
+	unsigned int proto, i;
 
-	if (!xtables_strtoui(s, NULL, &proto, 0, UINT8_MAX)) {
-		struct protoent *pent;
+	if (xtables_strtoui(s, NULL, &proto, 0, UINT8_MAX))
+		return proto;
 
-		/* first deal with the special case of 'all' to prevent
-		 * people from being able to redefine 'all' in nsswitch
-		 * and/or provoke expensive [not working] ldap/nis/...
-		 * lookups */
-		if (!strcmp(s, "all"))
-			return 0;
+	/* first deal with the special case of 'all' to prevent
+	 * people from being able to redefine 'all' in nsswitch
+	 * and/or provoke expensive [not working] ldap/nis/...
+	 * lookups */
+	if (strcmp(s, "all") == 0)
+		return 0;
 
-		if ((pent = getprotobyname(s)))
-			proto = pent->p_proto;
-		else {
-			unsigned int i;
-			for (i = 0; i < ARRAY_SIZE(xtables_chain_protos); ++i) {
-				if (xtables_chain_protos[i].name == NULL)
-					continue;
+	pent = getprotobyname(s);
+	if (pent != NULL)
+		return pent->p_proto;
 
-				if (strcmp(s, xtables_chain_protos[i].name) == 0) {
-					proto = xtables_chain_protos[i].num;
-					break;
-				}
-			}
-			if (i == ARRAY_SIZE(xtables_chain_protos))
-				xt_params->exit_err(PARAMETER_PROBLEM,
-					   "unknown protocol `%s' specified",
-					   s);
-		}
+	for (i = 0; i < ARRAY_SIZE(xtables_chain_protos); ++i) {
+		if (xtables_chain_protos[i].name == NULL)
+			continue;
+		if (strcmp(s, xtables_chain_protos[i].name) == 0)
+			return xtables_chain_protos[i].num;
 	}
-
-	return proto;
+	xt_params->exit_err(PARAMETER_PROBLEM,
+		"unknown protocol \"%s\" specified", s);
+	return -1;
 }
