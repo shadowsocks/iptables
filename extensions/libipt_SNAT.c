@@ -169,7 +169,7 @@ static void SNAT_parse(struct xt_option_call *cb)
 				get_kernel_version();
 			if (kernel_version > LINUX_VERSION(2, 6, 10))
 				xtables_error(PARAMETER_PROBLEM,
-					   "Multiple --to-source not supported");
+					   "SNAT: Multiple --to-source not supported");
 		}
 		*cb->target = parse_to(cb->arg, portok, info);
 		/* WTF do we need this for?? */
