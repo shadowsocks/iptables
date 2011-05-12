@@ -480,32 +480,28 @@ static void conntrack_mt_parse(struct xt_option_call *cb, uint8_t rev)
 		break;
 	case O_CTORIGSRCPORT:
 		info->origsrc_port = cb->val.port_range[0];
-		info->origsrc_port = (cb->nvals == 2) ? cb->val.port_range[1] :
-		                     cb->val.port_range[0];
+		info->origsrc_port_high = cb->val.port_range[cb->nvals >= 2];
 		info->match_flags |= XT_CONNTRACK_ORIGSRC_PORT;
 		if (cb->invert)
 			info->invert_flags |= XT_CONNTRACK_ORIGSRC_PORT;
 		break;
 	case O_CTORIGDSTPORT:
 		info->origdst_port = cb->val.port_range[0];
-		info->origdst_port = (cb->nvals == 2) ? cb->val.port_range[1] :
-		                     cb->val.port_range[0];
+		info->origdst_port_high = cb->val.port_range[cb->nvals >= 2];
 		info->match_flags |= XT_CONNTRACK_ORIGDST_PORT;
 		if (cb->invert)
 			info->invert_flags |= XT_CONNTRACK_ORIGDST_PORT;
 		break;
 	case O_CTREPLSRCPORT:
 		info->replsrc_port = cb->val.port_range[0];
-		info->replsrc_port = (cb->nvals == 2) ? cb->val.port_range[1] :
-		                     cb->val.port_range[0];
+		info->replsrc_port_high = cb->val.port_range[cb->nvals >= 2];
 		info->match_flags |= XT_CONNTRACK_REPLSRC_PORT;
 		if (cb->invert)
 			info->invert_flags |= XT_CONNTRACK_REPLSRC_PORT;
 		break;
 	case O_CTREPLDSTPORT:
 		info->repldst_port = cb->val.port_range[0];
-		info->repldst_port = (cb->nvals == 2) ? cb->val.port_range[1] :
-		                     cb->val.port_range[0];
+		info->repldst_port_high = cb->val.port_range[cb->nvals >= 2];
 		info->match_flags |= XT_CONNTRACK_REPLDST_PORT;
 		if (cb->invert)
 			info->invert_flags |= XT_CONNTRACK_REPLDST_PORT;
