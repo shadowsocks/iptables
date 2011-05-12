@@ -39,7 +39,7 @@ static const struct xt_option_entry rt_opts[] = {
 	 .flags = XTOPT_INVERT | XTOPT_PUT, XTOPT_POINTER(s, hdrlen)},
 	{.name = "rt-0-res", .id = O_RT0RES, .type = XTTYPE_NONE},
 	{.name = "rt-0-addrs", .id = O_RT0ADDRS, .type = XTTYPE_STRING},
-	{.name = "rt-0-not-strict", .id = O_RT0NSTRICT, .type = XTTYPE_STRING},
+	{.name = "rt-0-not-strict", .id = O_RT0NSTRICT, .type = XTTYPE_NONE},
 	XTOPT_TABLEEND,
 };
 #undef s
