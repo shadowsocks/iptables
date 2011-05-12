@@ -12,8 +12,10 @@ enum {
 	O_TO_SRC = 0,
 	O_RANDOM,
 	O_PERSISTENT,
-	F_TO_SRC = 1 << O_TO_SRC,
-	F_RANDOM = 1 << O_RANDOM,
+	O_X_TO_SRC,
+	F_TO_SRC   = 1 << O_TO_SRC,
+	F_RANDOM   = 1 << O_RANDOM,
+	F_X_TO_SRC = 1 << O_X_TO_SRC,
 };
 
 /* Source NAT data consists of a multi-range, indicating where to map
@@ -164,7 +166,7 @@ static void SNAT_parse(struct xt_option_call *cb)
 	xtables_option_parse(cb);
 	switch (cb->entry->id) {
 	case O_TO_SRC:
-		if (cb->xflags & F_TO_SRC) {
+		if (cb->xflags & F_X_TO_SRC) {
 			if (!kernel_version)
 				get_kernel_version();
 			if (kernel_version > LINUX_VERSION(2, 6, 10))
@@ -175,6 +177,7 @@ static void SNAT_parse(struct xt_option_call *cb)
 		/* WTF do we need this for?? */
 		if (cb->xflags & F_RANDOM)
 			info->mr.range[0].flags |= IP_NAT_RANGE_PROTO_RANDOM;
+		cb->xflags |= F_X_TO_SRC;
 		break;
 	case O_RANDOM:
 		if (cb->xflags & F_TO_SRC)
