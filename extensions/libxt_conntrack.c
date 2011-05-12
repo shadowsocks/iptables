@@ -545,7 +545,7 @@ static void conntrack1_mt_parse(struct xt_option_call *cb)
 	    up.replsrc_port != up.replsrc_port_high ||
 	    up.repldst_port != up.repldst_port_high)
 		xtables_error(PARAMETER_PROBLEM,
-			"connlimit rev 1 does not support port ranges");
+			"conntrack rev 1 does not support port ranges");
 	cinfo_transform(info, &up);
 	cb->data = info;
 }
@@ -567,7 +567,7 @@ static void conntrack2_mt_parse(struct xt_option_call *cb)
 	    up.replsrc_port != up.replsrc_port_high ||
 	    up.repldst_port != up.repldst_port_high)
 		xtables_error(PARAMETER_PROBLEM,
-			"connlimit rev 2 does not support port ranges");
+			"conntrack rev 2 does not support port ranges");
 	memcpy(info, &up, sizeof(*info));
 	cb->data = info;
 #undef cinfo2_transform
