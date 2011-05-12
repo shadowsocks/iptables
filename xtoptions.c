@@ -949,6 +949,9 @@ void xtables_options_fcheck(const char *name, unsigned int xflags,
 			xt_params->exit_err(PARAMETER_PROBLEM,
 				"%s: option \"--%s\" must be specified\n",
 				name, entry->name);
+		if (!(xflags & (1 << entry->id)))
+			/* Not required, not specified, thus skip. */
+			continue;
 
 		for (i = 0; i < CHAR_BIT * sizeof(entry->id); ++i) {
 			if (entry->id == i)
