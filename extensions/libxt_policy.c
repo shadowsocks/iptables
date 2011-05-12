@@ -52,7 +52,7 @@ static const struct xt_option_entry policy_opts[] = {
 	 .flags = XTOPT_MULTI | XTOPT_INVERT},
 	{.name = "tunnel-dst", .id = O_TUNNELDST, .type = XTTYPE_HOSTMASK,
 	 .flags = XTOPT_MULTI | XTOPT_INVERT},
-	{.name = "proto", .id = O_PROTO, .type = XTTYPE_STRING,
+	{.name = "proto", .id = O_PROTO, .type = XTTYPE_PROTOCOL,
 	 .flags = XTOPT_MULTI | XTOPT_INVERT},
 	{.name = "mode", .id = O_MODE, .type = XTTYPE_STRING,
 	 .flags = XTOPT_MULTI | XTOPT_INVERT},
@@ -143,7 +143,7 @@ static void policy_parse(struct xt_option_call *cb)
 		if (e->match.proto)
 			xtables_error(PARAMETER_PROBLEM,
 			           "policy match: double --proto option");
-		e->proto = xtables_parse_protocol(cb->arg);
+		e->proto = cb->val.protocol;
 		if (e->proto != IPPROTO_AH && e->proto != IPPROTO_ESP &&
 		    e->proto != IPPROTO_COMP)
 			xtables_error(PARAMETER_PROBLEM,
