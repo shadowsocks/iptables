@@ -534,6 +534,10 @@ static void conntrack1_mt_parse(struct xt_option_call *cb)
 
 	memset(&up, 0, sizeof(up));
 	cinfo_transform(&up, info);
+	up.origsrc_port_high = up.origsrc_port;
+	up.origdst_port_high = up.origdst_port;
+	up.replsrc_port_high = up.replsrc_port;
+	up.repldst_port_high = up.repldst_port;
 	cb->data = &up;
 	conntrack_mt_parse(cb, 3);
 	if (up.origsrc_port != up.origsrc_port_high ||
@@ -556,6 +560,10 @@ static void conntrack2_mt_parse(struct xt_option_call *cb)
 
 	memset(&up, 0, sizeof(up));
 	memcpy(&up, info, sizeof(*info));
+	up.origsrc_port_high = up.origsrc_port;
+	up.origdst_port_high = up.origdst_port;
+	up.replsrc_port_high = up.replsrc_port;
+	up.repldst_port_high = up.repldst_port;
 	cb->data = &up;
 	conntrack_mt_parse(cb, 3);
 	if (up.origsrc_port != up.origsrc_port_high ||
