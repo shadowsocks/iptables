@@ -509,6 +509,7 @@ static void xtopt_parse_protocol(struct xt_option_call *cb)
  */
 static void xtopt_parse_port(struct xt_option_call *cb)
 {
+	const struct xt_option_entry *entry = cb->entry;
 	int ret;
 
 	ret = xtables_getportbyname(cb->arg);
@@ -516,10 +517,10 @@ static void xtopt_parse_port(struct xt_option_call *cb)
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"Port \"%s\" does not resolve to anything.\n",
 			cb->arg);
+	if (entry->flags & XTOPT_NBO)
+		ret = htons(ret);
 	cb->val.port = ret;
-	if (cb->entry->type == XTTYPE_PORT_NE)
-		cb->val.port = htons(cb->val.port);
-	if (cb->entry->flags & XTOPT_PUT)
+	if (entry->flags & XTOPT_PUT)
 		*(uint16_t *)XTOPT_MKPTR(cb) = cb->val.port;
 }
 
@@ -561,7 +562,7 @@ static void xtopt_parse_mport(struct xt_option_call *cb)
 			xt_params->exit_err(PARAMETER_PROBLEM,
 				"Port \"%s\" does not resolve to "
 				"anything.\n", arg);
-		if (entry->type == XTTYPE_PORTRC_NE)
+		if (entry->flags & XTOPT_NBO)
 			value = htons(value);
 		if (cb->nvals < ARRAY_SIZE(cb->val.port_range))
 			cb->val.port_range[cb->nvals] = value;
@@ -702,9 +703,7 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_HOSTMASK]    = xtopt_parse_hostmask,
 	[XTTYPE_PROTOCOL]    = xtopt_parse_protocol,
 	[XTTYPE_PORT]        = xtopt_parse_port,
-	[XTTYPE_PORT_NE]     = xtopt_parse_port,
 	[XTTYPE_PORTRC]      = xtopt_parse_mport,
-	[XTTYPE_PORTRC_NE]   = xtopt_parse_mport,
 	[XTTYPE_PLEN]        = xtopt_parse_plen,
 	[XTTYPE_PLENMASK]    = xtopt_parse_plenmask,
 	[XTTYPE_ETHERMAC]    = xtopt_parse_ethermac,
@@ -730,9 +729,7 @@ static const size_t xtopt_psize[] = {
 	[XTTYPE_HOSTMASK]    = sizeof(union nf_inet_addr),
 	[XTTYPE_PROTOCOL]    = sizeof(uint8_t),
 	[XTTYPE_PORT]        = sizeof(uint16_t),
-	[XTTYPE_PORT_NE]     = sizeof(uint16_t),
 	[XTTYPE_PORTRC]      = sizeof(uint16_t[2]),
-	[XTTYPE_PORTRC_NE]   = sizeof(uint16_t[2]),
 	[XTTYPE_PLENMASK]    = sizeof(union nf_inet_addr),
 	[XTTYPE_ETHERMAC]    = sizeof(uint8_t[6]),
 };
