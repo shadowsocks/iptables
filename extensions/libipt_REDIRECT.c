@@ -23,8 +23,7 @@ static void REDIRECT_help(void)
 }
 
 static const struct xt_option_entry REDIRECT_opts[] = {
-	{.name = "to-ports", .id = O_TO_PORTS, .type = XTTYPE_STRING,
-	 .flags = XTOPT_MAND},
+	{.name = "to-ports", .id = O_TO_PORTS, .type = XTTYPE_STRING},
 	{.name = "random", .id = O_RANDOM, .type = XTTYPE_NONE},
 	XTOPT_TABLEEND,
 };
