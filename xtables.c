@@ -426,7 +426,7 @@ int xtables_load_ko(const char *modprobe, bool quiet)
  * Returns true/false whether number was accepted. On failure, *value has
  * undefined contents.
  */
-bool xtables_strtoul(const char *s, char **end, unsigned long *value,
+bool xtables_strtoul(const char *s, char **end, unsigned long long *value,
                      unsigned long min, unsigned long max)
 {
 	unsigned long v;
@@ -454,7 +454,7 @@ bool xtables_strtoul(const char *s, char **end, unsigned long *value,
 bool xtables_strtoui(const char *s, char **end, unsigned int *value,
                      unsigned int min, unsigned int max)
 {
-	unsigned long v;
+	unsigned long long v;
 	bool ret;
 
 	ret = xtables_strtoul(s, end, &v, min, max);
