@@ -15,7 +15,7 @@
  *	along with this program; if not, write to the Free Software
  *	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
+#include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <netdb.h>
@@ -430,11 +430,16 @@ bool xtables_strtoul(const char *s, char **end, unsigned long long *value,
                      unsigned long min, unsigned long max)
 {
 	unsigned long v;
+	const char *p;
 	char *my_end;
 
 	errno = 0;
+	/* Since strtoul allows leading minus, we have to check for ourself. */
+	for (p = s; isspace(*p); ++p)
+		;
+	if (*p == '-')
+		return false;
 	v = strtoul(s, &my_end, 0);
-
 	if (my_end == s)
 		return false;
 	if (end != NULL)
