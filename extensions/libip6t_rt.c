@@ -31,8 +31,8 @@ IP6T_RT_HOPS);
 
 #define s struct ip6t_rt
 static const struct xt_option_entry rt_opts[] = {
-	{.name = "rt-type", .id = O_RT_TYPE, .type = XTTYPE_UINT32RC,
-	 .flags = XTOPT_INVERT},
+	{.name = "rt-type", .id = O_RT_TYPE, .type = XTTYPE_UINT32,
+	 .flags = XTOPT_INVERT | XTOPT_PUT, XTOPT_POINTER(s, rt_type)},
 	{.name = "rt-segsleft", .id = O_RT_SEGSLEFT, .type = XTTYPE_UINT32RC,
 	 .flags = XTOPT_INVERT | XTOPT_PUT, XTOPT_POINTER(s, segsleft)},
 	{.name = "rt-len", .id = O_RT_LEN, .type = XTTYPE_UINT32,
