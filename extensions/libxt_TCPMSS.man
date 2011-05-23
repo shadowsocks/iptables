@@ -11,19 +11,13 @@ packets.  The symptoms of this
 problem are that everything works fine from your Linux
 firewall/router, but machines behind it can never exchange large
 packets:
-.PD 0
-.RS 0.1i
-.TP 0.3i
-1)
+.IP 1. 4
 Web browsers connect, then hang with no data received.
-.TP
-2)
+.IP 2. 4
 Small mail works fine, but large emails hang.
-.TP
-3)
+.IP 3. 4
 ssh works fine, but scp hangs after initial handshaking.
-.RE
-.PD
+.PP
 Workaround: activate this option and add a rule to your firewall
 configuration like:
 .IP
