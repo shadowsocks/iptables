@@ -136,6 +136,12 @@ static time_t time_parse_date(const char *s, bool end)
 	tm.tm_min  = minute;
 	tm.tm_sec  = second;
 	tm.tm_isdst = 0;
+	/*
+	 * Offsetting, if any, is done by xt_time.ko,
+	 * so we have to disable it here in userspace.
+	 */
+	setenv("TZ", "UTC", true);
+	tzset();
 	ret = mktime(&tm);
 	if (ret >= 0)
 		return ret;
@@ -289,7 +295,7 @@ static void time_print_date(time_t date, const char *command)
 	if (date == 0 || date == LONG_MAX)
 		return;
 
-	t = localtime(&date);
+	t = gmtime(&date);
 	if (command != NULL)
 		/*
 		 * Need a contiguous string (no whitespaces), hence using
