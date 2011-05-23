@@ -26,8 +26,10 @@ enum {
 	O_WEEKDAYS,
 	O_LOCAL_TZ,
 	O_UTC,
+	O_KERNEL_TZ,
 	F_LOCAL_TZ  = 1 << O_LOCAL_TZ,
 	F_UTC       = 1 << O_UTC,
+	F_KERNEL_TZ = 1 << O_KERNEL_TZ,
 };
 
 static const char *const week_days[] = {
@@ -46,7 +48,9 @@ static const struct xt_option_entry time_opts[] = {
 	{.name = "localtz", .id = O_LOCAL_TZ, .type = XTTYPE_NONE,
 	 .excl = F_UTC},
 	{.name = "utc", .id = O_UTC, .type = XTTYPE_NONE,
-	 .excl = F_LOCAL_TZ},
+	 .excl = F_LOCAL_TZ | F_KERNEL_TZ},
+	{.name = "kerneltz", .id = O_KERNEL_TZ, .type = XTTYPE_NONE,
+	 .excl = F_UTC},
 	XTOPT_TABLEEND,
 };
 
@@ -63,7 +67,7 @@ static void time_help(void)
 "[!] --weekdays value     List of weekdays on which to match, sep. by comma\n"
 "                         (Possible days: Mon,Tue,Wed,Thu,Fri,Sat,Sun or 1 to 7\n"
 "                         Defaults to all weekdays.)\n"
-"    --localtz/--utc      Time is interpreted as UTC/local time\n");
+"    --kerneltz           Work with the kernel timezone instead of UTC\n");
 }
 
 static void time_init(struct xt_entry_match *m)
@@ -79,9 +83,6 @@ static void time_init(struct xt_entry_match *m)
 	/* ...and have no date-begin or date-end boundary */
 	info->date_start = 0;
 	info->date_stop  = INT_MAX;
-
-	/* local time is default */
-	info->flags |= XT_TIME_LOCAL_TZ;
 }
 
 static time_t time_parse_date(const char *s, bool end)
@@ -273,6 +274,12 @@ static void time_parse(struct xt_option_call *cb)
 		info->daytime_stop = time_parse_minutes(cb->arg);
 		break;
 	case O_LOCAL_TZ:
+		fprintf(stderr, "WARNING: --localtz is being replaced by "
+		        "--kerneltz, since \"local\" is ambiguous. Note the "
+		        "kernel timezone has caveats - "
+		        "see manpage for details.\n");
+		/* fallthrough */
+	case O_KERNEL_TZ:
 		info->flags |= XT_TIME_LOCAL_TZ;
 		break;
 	case O_MONTHDAYS:
@@ -284,9 +291,6 @@ static void time_parse(struct xt_option_call *cb)
 		info->weekdays_match = time_parse_weekdays(cb->arg);
 		if (cb->invert)
 			info->weekdays_match ^= XT_TIME_ALL_WEEKDAYS;
-		break;
-	case O_UTC:
-		info->flags &= ~XT_TIME_LOCAL_TZ;
 		break;
 	}
 }
@@ -423,8 +427,8 @@ static void time_save(const void *ip, const struct xt_entry_match *match)
 	}
 	time_print_date(info->date_start, "--datestart");
 	time_print_date(info->date_stop, "--datestop");
-	if (!(info->flags & XT_TIME_LOCAL_TZ))
-		printf(" --utc");
+	if (info->flags & XT_TIME_LOCAL_TZ)
+		printf(" --kerneltz");
 }
 
 static struct xtables_match time_match = {
