@@ -70,6 +70,7 @@ static void devgroup_parse(struct xt_option_call *cb)
 			info->src_group = id;
 			info->src_mask  = 0xffffffff;
 		}
+		info->flags |= XT_DEVGROUP_MATCH_SRC;
 		if (cb->invert)
 			info->flags |= XT_DEVGROUP_INVERT_SRC;
 		break;
@@ -93,6 +94,7 @@ static void devgroup_parse(struct xt_option_call *cb)
 			info->dst_group = id;
 			info->dst_mask  = 0xffffffff;
 		}
+		info->flags |= XT_DEVGROUP_MATCH_DST;
 		if (cb->invert)
 			info->flags |= XT_DEVGROUP_INVERT_DST;
 		break;
