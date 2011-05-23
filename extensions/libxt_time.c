@@ -26,6 +26,8 @@ enum {
 	O_WEEKDAYS,
 	O_LOCAL_TZ,
 	O_UTC,
+	F_LOCAL_TZ  = 1 << O_LOCAL_TZ,
+	F_UTC       = 1 << O_UTC,
 };
 
 static const char *const week_days[] = {
@@ -41,8 +43,10 @@ static const struct xt_option_entry time_opts[] = {
 	 .flags = XTOPT_INVERT},
 	{.name = "monthdays", .id = O_MONTHDAYS, .type = XTTYPE_STRING,
 	 .flags = XTOPT_INVERT},
-	{.name = "localtz", .id = O_LOCAL_TZ, .type = XTTYPE_NONE},
-	{.name = "utc", .id = O_UTC, .type = XTTYPE_NONE},
+	{.name = "localtz", .id = O_LOCAL_TZ, .type = XTTYPE_NONE,
+	 .excl = F_UTC},
+	{.name = "utc", .id = O_UTC, .type = XTTYPE_NONE,
+	 .excl = F_LOCAL_TZ},
 	XTOPT_TABLEEND,
 };
 
