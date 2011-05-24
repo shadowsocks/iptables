@@ -98,21 +98,35 @@ xtables_options_xfrm(struct option *orig_opts, struct option *oldopts,
 	return merge;
 }
 
+static uintmax_t xtopt_max_by_type(enum xt_option_type type)
+{
+	switch (type) {
+	case XTTYPE_UINT8:
+	case XTTYPE_UINT8RC:
+		return UINT8_MAX;
+	case XTTYPE_UINT16:
+	case XTTYPE_UINT16RC:
+		return UINT16_MAX;
+	case XTTYPE_UINT32:
+	case XTTYPE_UINT32RC:
+		return UINT32_MAX;
+	case XTTYPE_UINT64:
+	case XTTYPE_UINT64RC:
+		return UINT64_MAX;
+	default:
+		return 0;
+	}
+}
+
 /**
  * Require a simple integer.
  */
 static void xtopt_parse_int(struct xt_option_call *cb)
 {
 	const struct xt_option_entry *entry = cb->entry;
-	uintmax_t lmin = 0, lmax = UINT32_MAX;
+	uintmax_t lmin = 0, lmax = xtopt_max_by_type(entry->type);
 	uintmax_t value;
 
-	if (entry->type == XTTYPE_UINT8)
-		lmax = UINT8_MAX;
-	else if (entry->type == XTTYPE_UINT16)
-		lmax = UINT16_MAX;
-	else if (entry->type == XTTYPE_UINT64)
-		lmax = UINT64_MAX;
 	if (cb->entry->min != 0)
 		lmin = cb->entry->min;
 	if (cb->entry->max != 0)
@@ -180,8 +194,10 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 	const struct xt_option_entry *entry = cb->entry;
 	const char *arg = cb->arg;
 	size_t esize = sizeof(uint32_t);
+	uintmax_t lmax = xtopt_max_by_type(entry->type);
 	char *put = XTOPT_MKPTR(cb);
-	unsigned int maxiter, value;
+	unsigned int maxiter;
+	uintmax_t value;
 	char *end = "";
 	char sep = ':';
 
@@ -204,11 +220,11 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 			xt_params->exit_err(PARAMETER_PROBLEM, "%s: Too many "
 				"components for option \"--%s\" (max: %u)\n",
 				cb->ext_name, entry->name, maxiter);
-		if (!xtables_strtoui(arg, &end, &value, 0, UINT32_MAX))
+		if (!xtables_strtoul(arg, &end, &value, 0, lmax))
 			xt_params->exit_err(PARAMETER_PROBLEM,
 				"%s: bad value for option \"--%s\" near "
-				"\"%s\", or out of range (0-%u).\n",
-				cb->ext_name, entry->name, arg, UINT32_MAX);
+				"\"%s\", or out of range (0-%ju).\n",
+				cb->ext_name, entry->name, arg, lmax);
 		if (*end != '\0' && *end != sep)
 			xt_params->exit_err(PARAMETER_PROBLEM,
 				"%s: Argument to \"--%s\" has unexpected "
