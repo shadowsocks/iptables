@@ -81,13 +81,10 @@ static void NFQUEUE_parse_v2(struct xt_option_call *cb)
 {
 	struct xt_NFQ_info_v2 *info = cb->data;
 
-	xtables_option_parse(cb);
+	NFQUEUE_parse_v1(cb);
 	switch (cb->entry->id) {
 	case O_QUEUE_BYPASS:
 		info->bypass = 1;
-		break;
-	default:
-		NFQUEUE_parse_v1(cb);
 		break;
 	}
 }
