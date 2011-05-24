@@ -104,8 +104,8 @@ xtables_options_xfrm(struct option *orig_opts, struct option *oldopts,
 static void xtopt_parse_int(struct xt_option_call *cb)
 {
 	const struct xt_option_entry *entry = cb->entry;
-	unsigned long long lmin = 0, lmax = UINT32_MAX;
-	unsigned long long value;
+	uintmax_t lmin = 0, lmax = UINT32_MAX;
+	uintmax_t value;
 
 	if (entry->type == XTTYPE_UINT8)
 		lmax = UINT8_MAX;
@@ -121,7 +121,7 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 	if (!xtables_strtoul(cb->arg, NULL, &value, lmin, lmax))
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"%s: bad value for option \"--%s\", "
-			"or out of range (%llu-%llu).\n",
+			"or out of range (%ju-%ju).\n",
 			cb->ext_name, entry->name, lmin, lmax);
 
 	if (entry->type == XTTYPE_UINT8) {
