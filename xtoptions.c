@@ -206,13 +206,14 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 				cb->ext_name, entry->name, maxiter);
 		if (!xtables_strtoui(arg, &end, &value, 0, UINT32_MAX))
 			xt_params->exit_err(PARAMETER_PROBLEM,
-				"%s: bad value for option \"--%s\", "
-				"or out of range (0-%u).\n",
-				cb->ext_name, entry->name, UINT32_MAX);
+				"%s: bad value for option \"--%s\" near "
+				"\"%s\", or out of range (0-%u).\n",
+				cb->ext_name, entry->name, arg, UINT32_MAX);
 		if (*end != '\0' && *end != sep)
 			xt_params->exit_err(PARAMETER_PROBLEM,
 				"%s: Argument to \"--%s\" has unexpected "
-				"characters.\n", cb->ext_name, entry->name);
+				"characters near \"%s\".\n",
+				cb->ext_name, entry->name, end);
 		if (cb->nvals < ARRAY_SIZE(cb->val.u32_range)) {
 			if (entry->type == XTTYPE_UINT8RC)
 				cb->val.u8_range[cb->nvals] = value;
