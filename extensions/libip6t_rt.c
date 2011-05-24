@@ -99,13 +99,6 @@ parse_addresses(const char *addrstr, struct in6_addr *addrp)
 	return i;
 }
 
-static void rt_init(struct xt_entry_match *m)
-{
-	struct ip6t_rt *rtinfo = (struct ip6t_rt *)m->data;
-
-	rtinfo->segsleft[1] = 0xFFFFFFFF;
-}
-
 static void rt_parse(struct xt_option_call *cb)
 {
 	struct ip6t_rt *rtinfo = cb->data;
@@ -118,6 +111,8 @@ static void rt_parse(struct xt_option_call *cb)
 		rtinfo->flags |= IP6T_RT_TYP;
 		break;
 	case O_RT_SEGSLEFT:
+		if (cb->nvals == 1)
+			rtinfo->segsleft[1] = rtinfo->segsleft[0];
 		if (cb->invert)
 			rtinfo->invflags |= IP6T_RT_INV_SGS;
 		rtinfo->flags |= IP6T_RT_SGS;
@@ -250,7 +245,6 @@ static struct xtables_match rt_mt6_reg = {
 	.size		= XT_ALIGN(sizeof(struct ip6t_rt)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ip6t_rt)),
 	.help		= rt_help,
-	.init		= rt_init,
 	.x6_parse	= rt_parse,
 	.print		= rt_print,
 	.save		= rt_save,

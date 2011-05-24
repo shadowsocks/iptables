@@ -291,69 +291,6 @@ conntrack_ps_statuses(struct xt_conntrack_mtinfo3 *info, const char *arg)
 		xtables_error(PARAMETER_PROBLEM, "Bad ctstatus \"%s\"", arg);
 }
 
-static unsigned long
-parse_expire(const char *s)
-{
-	unsigned int len;
-
-	if (!xtables_strtoui(s, NULL, &len, 0, UINT32_MAX))
-		xtables_error(PARAMETER_PROBLEM, "expire value invalid: \"%s\"\n", s);
-	else
-		return len;
-}
-
-/* If a single value is provided, min and max are both set to the value */
-static void
-parse_expires(const char *s, struct xt_conntrack_info *sinfo)
-{
-	char *buffer;
-	char *cp;
-
-	buffer = strdup(s);
-	if ((cp = strchr(buffer, ':')) == NULL)
-		sinfo->expires_min = sinfo->expires_max =
-			parse_expire(buffer);
-	else {
-		*cp = '\0';
-		cp++;
-
-		sinfo->expires_min = buffer[0] ? parse_expire(buffer) : 0;
-		sinfo->expires_max = cp[0]
-			? parse_expire(cp)
-			: (unsigned long)-1;
-	}
-	free(buffer);
-
-	if (sinfo->expires_min > sinfo->expires_max)
-		xtables_error(PARAMETER_PROBLEM,
-		           "expire min. range value `%lu' greater than max. "
-		           "range value `%lu'", sinfo->expires_min, sinfo->expires_max);
-}
-
-static void
-conntrack_ps_expires(struct xt_conntrack_mtinfo3 *info, const char *s)
-{
-	unsigned int min, max;
-	char *end;
-
-	if (!xtables_strtoui(s, &end, &min, 0, UINT32_MAX))
-		xtables_param_act(XTF_BAD_VALUE, "conntrack", "--expires", s);
-	max = min;
-	if (*end == ':')
-		if (!xtables_strtoui(end + 1, &end, &max, 0, UINT32_MAX))
-			xtables_param_act(XTF_BAD_VALUE, "conntrack", "--expires", s);
-	if (*end != '\0')
-		xtables_param_act(XTF_BAD_VALUE, "conntrack", "--expires", s);
-
-	if (min > max)
-		xtables_error(PARAMETER_PROBLEM,
-		           "expire min. range value \"%u\" greater than max. "
-		           "range value \"%u\"", min, max);
-
-	info->expires_min = min;
-	info->expires_max = max;
-}
-
 static void conntrack_parse(struct xt_option_call *cb)
 {
 	struct xt_conntrack_info *sinfo = cb->data;
@@ -408,7 +345,10 @@ static void conntrack_parse(struct xt_option_call *cb)
 		sinfo->flags |= XT_CONNTRACK_STATUS;
 		break;
 	case O_CTEXPIRE:
-		parse_expires(cb->arg, sinfo);
+		sinfo->expires_min = cb->val.u32_range[0];
+		sinfo->expires_max = cb->val.u32_range[0];
+		if (cb->nvals >= 2)
+			sinfo->expires_max = cb->val.u32_range[1];
 		if (cb->invert)
 			sinfo->invflags |= XT_CONNTRACK_EXPIRES;
 		sinfo->flags |= XT_CONNTRACK_EXPIRES;
@@ -473,7 +413,10 @@ static void conntrack_mt_parse(struct xt_option_call *cb, uint8_t rev)
 			info->invert_flags |= XT_CONNTRACK_STATUS;
 		break;
 	case O_CTEXPIRE:
-		conntrack_ps_expires(info, cb->arg);
+		info->expires_min = cb->val.u32_range[0];
+		info->expires_max = cb->val.u32_range[0];
+		if (cb->nvals >= 2)
+			info->expires_max = cb->val.u32_range[1];
 		info->match_flags |= XT_CONNTRACK_EXPIRES;
 		if (cb->invert)
 			info->invert_flags |= XT_CONNTRACK_EXPIRES;

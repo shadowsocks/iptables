@@ -21,18 +21,13 @@ static const struct xt_option_entry esp_opts[] = {
 	XTOPT_TABLEEND,
 };
 
-static void esp_init(struct xt_entry_match *m)
-{
-	struct xt_esp *espinfo = (struct xt_esp *)m->data;
-
-	espinfo->spis[1] = 0xFFFFFFFF;
-}
-
 static void esp_parse(struct xt_option_call *cb)
 {
 	struct xt_esp *espinfo = cb->data;
 
 	xtables_option_parse(cb);
+	if (cb->nvals == 1)
+		espinfo->spis[1] = espinfo->spis[0];
 	if (cb->invert)
 		espinfo->invflags |= XT_ESP_INV_SPI;
 }
@@ -91,7 +86,6 @@ static struct xtables_match esp_match = {
 	.size		= XT_ALIGN(sizeof(struct xt_esp)),
 	.userspacesize	= XT_ALIGN(sizeof(struct xt_esp)),
 	.help		= esp_help,
-	.init		= esp_init,
 	.print		= esp_print,
 	.save		= esp_save,
 	.x6_parse	= esp_parse,

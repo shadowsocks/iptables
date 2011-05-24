@@ -284,7 +284,7 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 	const struct xt_option_entry *entry = cb->entry;
 	const char *arg = cb->arg;
 	size_t esize = xtopt_esize_by_type(entry->type);
-	uintmax_t lmax = xtopt_max_by_type(entry->type);
+	const uintmax_t lmax = xtopt_max_by_type(entry->type);
 	void *put = XTOPT_MKPTR(cb);
 	unsigned int maxiter;
 	uintmax_t value;
@@ -293,27 +293,33 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 
 	maxiter = entry->size / esize;
 	if (maxiter == 0)
-		maxiter = 2; /* ARRAY_SIZE(cb->val.uXX_range) */
+		maxiter = ARRAY_SIZE(cb->val.u32_range);
 	if (entry->size % esize != 0)
 		xt_params->exit_err(OTHER_PROBLEM, "%s: memory block does "
 			"not have proper size\n", __func__);
 
 	cb->nvals = 0;
-	for (arg = cb->arg; ; arg = end + 1) {
+	for (arg = cb->arg, end = (char *)arg; ; arg = end + 1) {
 		if (cb->nvals == maxiter)
 			xt_params->exit_err(PARAMETER_PROBLEM, "%s: Too many "
 				"components for option \"--%s\" (max: %u)\n",
 				cb->ext_name, entry->name, maxiter);
-		if (!xtables_strtoul(arg, &end, &value, 0, lmax))
-			xt_params->exit_err(PARAMETER_PROBLEM,
-				"%s: bad value for option \"--%s\" near "
-				"\"%s\", or out of range (0-%ju).\n",
-				cb->ext_name, entry->name, arg, lmax);
-		if (*end != '\0' && *end != sep)
-			xt_params->exit_err(PARAMETER_PROBLEM,
-				"%s: Argument to \"--%s\" has unexpected "
-				"characters near \"%s\".\n",
-				cb->ext_name, entry->name, end);
+		if (*arg == '\0' || *arg == sep) {
+			/* Default range components when field not spec'd. */
+			end = (char *)arg;
+			value = (cb->nvals == 1) ? lmax : 0;
+		} else {
+			if (!xtables_strtoul(arg, &end, &value, 0, lmax))
+				xt_params->exit_err(PARAMETER_PROBLEM,
+					"%s: bad value for option \"--%s\" near "
+					"\"%s\", or out of range (0-%ju).\n",
+					cb->ext_name, entry->name, arg, lmax);
+			if (*end != '\0' && *end != sep)
+				xt_params->exit_err(PARAMETER_PROBLEM,
+					"%s: Argument to \"--%s\" has "
+					"unexpected characters near \"%s\".\n",
+					cb->ext_name, entry->name, end);
+		}
 		xtopt_mint_value_to_cb(cb, value);
 		++cb->nvals;
 		xtopt_mint_value_to_ptr(cb, &put, value);
