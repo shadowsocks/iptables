@@ -23,7 +23,8 @@ enum {
 };
 
 static const struct xt_option_entry u32_opts[] = {
-	{.name = "u32", .id = O_U32, .type = XTTYPE_STRING},
+	{.name = "u32", .id = O_U32, .type = XTTYPE_STRING,
+	 .flags = XTOPT_MAND},
 	XTOPT_TABLEEND,
 };
 

@@ -26,6 +26,10 @@ enum {
 	O_WEEKDAYS,
 	O_LOCAL_TZ,
 	O_UTC,
+	O_KERNEL_TZ,
+	F_LOCAL_TZ  = 1 << O_LOCAL_TZ,
+	F_UTC       = 1 << O_UTC,
+	F_KERNEL_TZ = 1 << O_KERNEL_TZ,
 };
 
 static const char *const week_days[] = {
@@ -41,8 +45,12 @@ static const struct xt_option_entry time_opts[] = {
 	 .flags = XTOPT_INVERT},
 	{.name = "monthdays", .id = O_MONTHDAYS, .type = XTTYPE_STRING,
 	 .flags = XTOPT_INVERT},
-	{.name = "localtz", .id = O_LOCAL_TZ, .type = XTTYPE_NONE},
-	{.name = "utc", .id = O_UTC, .type = XTTYPE_NONE},
+	{.name = "localtz", .id = O_LOCAL_TZ, .type = XTTYPE_NONE,
+	 .excl = F_UTC},
+	{.name = "utc", .id = O_UTC, .type = XTTYPE_NONE,
+	 .excl = F_LOCAL_TZ | F_KERNEL_TZ},
+	{.name = "kerneltz", .id = O_KERNEL_TZ, .type = XTTYPE_NONE,
+	 .excl = F_UTC},
 	XTOPT_TABLEEND,
 };
 
@@ -59,7 +67,7 @@ static void time_help(void)
 "[!] --weekdays value     List of weekdays on which to match, sep. by comma\n"
 "                         (Possible days: Mon,Tue,Wed,Thu,Fri,Sat,Sun or 1 to 7\n"
 "                         Defaults to all weekdays.)\n"
-"    --localtz/--utc      Time is interpreted as UTC/local time\n");
+"    --kerneltz           Work with the kernel timezone instead of UTC\n");
 }
 
 static void time_init(struct xt_entry_match *m)
@@ -75,9 +83,6 @@ static void time_init(struct xt_entry_match *m)
 	/* ...and have no date-begin or date-end boundary */
 	info->date_start = 0;
 	info->date_stop  = INT_MAX;
-
-	/* local time is default */
-	info->flags |= XT_TIME_LOCAL_TZ;
 }
 
 static time_t time_parse_date(const char *s, bool end)
@@ -136,6 +141,12 @@ static time_t time_parse_date(const char *s, bool end)
 	tm.tm_min  = minute;
 	tm.tm_sec  = second;
 	tm.tm_isdst = 0;
+	/*
+	 * Offsetting, if any, is done by xt_time.ko,
+	 * so we have to disable it here in userspace.
+	 */
+	setenv("TZ", "UTC", true);
+	tzset();
 	ret = mktime(&tm);
 	if (ret >= 0)
 		return ret;
@@ -263,6 +274,12 @@ static void time_parse(struct xt_option_call *cb)
 		info->daytime_stop = time_parse_minutes(cb->arg);
 		break;
 	case O_LOCAL_TZ:
+		fprintf(stderr, "WARNING: --localtz is being replaced by "
+		        "--kerneltz, since \"local\" is ambiguous. Note the "
+		        "kernel timezone has caveats - "
+		        "see manpage for details.\n");
+		/* fallthrough */
+	case O_KERNEL_TZ:
 		info->flags |= XT_TIME_LOCAL_TZ;
 		break;
 	case O_MONTHDAYS:
@@ -275,9 +292,6 @@ static void time_parse(struct xt_option_call *cb)
 		if (cb->invert)
 			info->weekdays_match ^= XT_TIME_ALL_WEEKDAYS;
 		break;
-	case O_UTC:
-		info->flags &= ~XT_TIME_LOCAL_TZ;
-		break;
 	}
 }
 
@@ -289,7 +303,7 @@ static void time_print_date(time_t date, const char *command)
 	if (date == 0 || date == LONG_MAX)
 		return;
 
-	t = localtime(&date);
+	t = gmtime(&date);
 	if (command != NULL)
 		/*
 		 * Need a contiguous string (no whitespaces), hence using
@@ -413,8 +427,8 @@ static void time_save(const void *ip, const struct xt_entry_match *match)
 	}
 	time_print_date(info->date_start, "--datestart");
 	time_print_date(info->date_stop, "--datestop");
-	if (!(info->flags & XT_TIME_LOCAL_TZ))
-		printf(" --utc");
+	if (info->flags & XT_TIME_LOCAL_TZ)
+		printf(" --kerneltz");
 }
 
 static struct xtables_match time_match = {

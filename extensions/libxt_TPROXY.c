@@ -20,8 +20,8 @@ enum {
 
 #define s struct xt_tproxy_target_info
 static const struct xt_option_entry tproxy_tg0_opts[] = {
-	{.name = "on-port", .id = P_PORT, .type = XTTYPE_PORT_NE,
-	 .flags = XTOPT_MAND | XTOPT_PUT, XTOPT_POINTER(s, lport)},
+	{.name = "on-port", .id = P_PORT, .type = XTTYPE_PORT,
+	 .flags = XTOPT_MAND | XTOPT_NBO | XTOPT_PUT, XTOPT_POINTER(s, lport)},
 	{.name = "on-ip", .id = P_ADDR, .type = XTTYPE_HOST},
 	{.name = "tproxy-mark", .id = P_MARK, .type = XTTYPE_MARKMASK32},
 	XTOPT_TABLEEND,
@@ -29,8 +29,8 @@ static const struct xt_option_entry tproxy_tg0_opts[] = {
 #undef s
 #define s struct xt_tproxy_target_info_v1
 static const struct xt_option_entry tproxy_tg1_opts[] = {
-	{.name = "on-port", .id = P_PORT, .type = XTTYPE_PORT_NE,
-	 .flags = XTOPT_MAND | XTOPT_PUT, XTOPT_POINTER(s, lport)},
+	{.name = "on-port", .id = P_PORT, .type = XTTYPE_PORT,
+	 .flags = XTOPT_MAND | XTOPT_NBO | XTOPT_PUT, XTOPT_POINTER(s, lport)},
 	{.name = "on-ip", .id = P_ADDR, .type = XTTYPE_HOST,
 	 .flags = XTOPT_PUT, XTOPT_POINTER(s, laddr)},
 	{.name = "tproxy-mark", .id = P_MARK, .type = XTTYPE_MARKMASK32},

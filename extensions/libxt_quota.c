@@ -13,7 +13,8 @@ enum {
 
 static const struct xt_option_entry quota_opts[] = {
 	{.name = "quota", .id = O_QUOTA, .type = XTTYPE_UINT64,
-	 .flags = XTOPT_MAND | XTOPT_INVERT},
+	 .flags = XTOPT_MAND | XTOPT_INVERT | XTOPT_PUT,
+	 XTOPT_POINTER(struct xt_quota_info, quota)},
 	XTOPT_TABLEEND,
 };
 

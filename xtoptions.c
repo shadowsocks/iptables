@@ -41,6 +41,31 @@ struct tos_value_mask {
 	uint8_t value, mask;
 };
 
+static const size_t xtopt_psize[] = {
+	/*
+	 * All types not listed here, and thus essentially being initialized to
+	 * zero have zero on purpose.
+	 */
+	[XTTYPE_UINT8]       = sizeof(uint8_t),
+	[XTTYPE_UINT16]      = sizeof(uint16_t),
+	[XTTYPE_UINT32]      = sizeof(uint32_t),
+	[XTTYPE_UINT64]      = sizeof(uint64_t),
+	[XTTYPE_UINT8RC]     = sizeof(uint8_t[2]),
+	[XTTYPE_UINT16RC]    = sizeof(uint16_t[2]),
+	[XTTYPE_UINT32RC]    = sizeof(uint32_t[2]),
+	[XTTYPE_UINT64RC]    = sizeof(uint64_t[2]),
+	[XTTYPE_DOUBLE]      = sizeof(double),
+	[XTTYPE_STRING]      = -1,
+	[XTTYPE_SYSLOGLEVEL] = sizeof(uint8_t),
+	[XTTYPE_HOST]        = sizeof(union nf_inet_addr),
+	[XTTYPE_HOSTMASK]    = sizeof(union nf_inet_addr),
+	[XTTYPE_PROTOCOL]    = sizeof(uint8_t),
+	[XTTYPE_PORT]        = sizeof(uint16_t),
+	[XTTYPE_PORTRC]      = sizeof(uint16_t[2]),
+	[XTTYPE_PLENMASK]    = sizeof(union nf_inet_addr),
+	[XTTYPE_ETHERMAC]    = sizeof(uint8_t[6]),
+};
+
 /**
  * Creates getopt options from the x6-style option map, and assigns each a
  * getopt id.
@@ -99,29 +124,66 @@ xtables_options_xfrm(struct option *orig_opts, struct option *oldopts,
 }
 
 /**
+ * Give the upper limit for a certain type.
+ */
+static uintmax_t xtopt_max_by_type(enum xt_option_type type)
+{
+	switch (type) {
+	case XTTYPE_UINT8:
+	case XTTYPE_UINT8RC:
+		return UINT8_MAX;
+	case XTTYPE_UINT16:
+	case XTTYPE_UINT16RC:
+		return UINT16_MAX;
+	case XTTYPE_UINT32:
+	case XTTYPE_UINT32RC:
+		return UINT32_MAX;
+	case XTTYPE_UINT64:
+	case XTTYPE_UINT64RC:
+		return UINT64_MAX;
+	default:
+		return 0;
+	}
+}
+
+/**
+ * Return the size of a single entity based upon a type - predominantly an
+ * XTTYPE_UINT*RC type.
+ */
+static size_t xtopt_esize_by_type(enum xt_option_type type)
+{
+	switch (type) {
+	case XTTYPE_UINT8RC:
+		return xtopt_psize[XTTYPE_UINT8];
+	case XTTYPE_UINT16RC:
+		return xtopt_psize[XTTYPE_UINT16];
+	case XTTYPE_UINT32RC:
+		return xtopt_psize[XTTYPE_UINT32];
+	case XTTYPE_UINT64RC:
+		return xtopt_psize[XTTYPE_UINT64];
+	default:
+		return xtopt_psize[type];
+	}
+}
+
+/**
  * Require a simple integer.
  */
 static void xtopt_parse_int(struct xt_option_call *cb)
 {
 	const struct xt_option_entry *entry = cb->entry;
-	unsigned long long lmin = 0, lmax = UINT32_MAX;
-	unsigned int value;
+	uintmax_t lmin = 0, lmax = xtopt_max_by_type(entry->type);
+	uintmax_t value;
 
-	if (entry->type == XTTYPE_UINT8)
-		lmax = UINT8_MAX;
-	else if (entry->type == XTTYPE_UINT16)
-		lmax = UINT16_MAX;
-	else if (entry->type == XTTYPE_UINT64)
-		lmax = UINT64_MAX;
 	if (cb->entry->min != 0)
 		lmin = cb->entry->min;
 	if (cb->entry->max != 0)
 		lmax = cb->entry->max;
 
-	if (!xtables_strtoui(cb->arg, NULL, &value, lmin, lmax))
+	if (!xtables_strtoul(cb->arg, NULL, &value, lmin, lmax))
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"%s: bad value for option \"--%s\", "
-			"or out of range (%llu-%llu).\n",
+			"or out of range (%ju-%ju).\n",
 			cb->ext_name, entry->name, lmin, lmax);
 
 	if (entry->type == XTTYPE_UINT8) {
@@ -167,6 +229,48 @@ static void xtopt_parse_float(struct xt_option_call *cb)
 }
 
 /**
+ * Copy the parsed value to the appropriate entry in cb->val.
+ */
+static void xtopt_mint_value_to_cb(struct xt_option_call *cb, uintmax_t value)
+{
+	const struct xt_option_entry *entry = cb->entry;
+
+	if (cb->nvals >= ARRAY_SIZE(cb->val.u32_range))
+		return;
+	if (entry->type == XTTYPE_UINT8RC)
+		cb->val.u8_range[cb->nvals] = value;
+	else if (entry->type == XTTYPE_UINT16RC)
+		cb->val.u16_range[cb->nvals] = value;
+	else if (entry->type == XTTYPE_UINT32RC)
+		cb->val.u32_range[cb->nvals] = value;
+	else if (entry->type == XTTYPE_UINT64RC)
+		cb->val.u64_range[cb->nvals] = value;
+}
+
+/**
+ * Copy the parsed value to the data area, using appropriate type access.
+ */
+static void xtopt_mint_value_to_ptr(struct xt_option_call *cb, void **datap,
+				    uintmax_t value)
+{
+	const struct xt_option_entry *entry = cb->entry;
+	void *data = *datap;
+
+	if (!(entry->flags & XTOPT_PUT))
+		return;
+	if (entry->type == XTTYPE_UINT8RC)
+		*(uint8_t *)data = value;
+	else if (entry->type == XTTYPE_UINT16RC)
+		*(uint16_t *)data = value;
+	else if (entry->type == XTTYPE_UINT32RC)
+		*(uint32_t *)data = value;
+	else if (entry->type == XTTYPE_UINT64RC)
+		*(uint64_t *)data = value;
+	data += xtopt_esize_by_type(entry->type);
+	*datap = data;
+}
+
+/**
  * Multiple integer parse routine.
  *
  * This function is capable of parsing any number of fields. Only the first
@@ -179,62 +283,46 @@ static void xtopt_parse_mint(struct xt_option_call *cb)
 {
 	const struct xt_option_entry *entry = cb->entry;
 	const char *arg = cb->arg;
-	size_t esize = sizeof(uint32_t);
-	char *put = XTOPT_MKPTR(cb);
-	unsigned int maxiter, value;
+	size_t esize = xtopt_esize_by_type(entry->type);
+	const uintmax_t lmax = xtopt_max_by_type(entry->type);
+	void *put = XTOPT_MKPTR(cb);
+	unsigned int maxiter;
+	uintmax_t value;
 	char *end = "";
 	char sep = ':';
 
-	if (entry->type == XTTYPE_UINT8RC)
-		esize = sizeof(uint8_t);
-	else if (entry->type == XTTYPE_UINT16RC)
-		esize = sizeof(uint16_t);
-	else if (entry->type == XTTYPE_UINT64RC)
-		esize = sizeof(uint64_t);
 	maxiter = entry->size / esize;
 	if (maxiter == 0)
-		maxiter = 2; /* ARRAY_SIZE(cb->val.uXX_range) */
+		maxiter = ARRAY_SIZE(cb->val.u32_range);
 	if (entry->size % esize != 0)
 		xt_params->exit_err(OTHER_PROBLEM, "%s: memory block does "
 			"not have proper size\n", __func__);
 
 	cb->nvals = 0;
-	for (arg = cb->arg; ; arg = end + 1) {
+	for (arg = cb->arg, end = (char *)arg; ; arg = end + 1) {
 		if (cb->nvals == maxiter)
 			xt_params->exit_err(PARAMETER_PROBLEM, "%s: Too many "
 				"components for option \"--%s\" (max: %u)\n",
 				cb->ext_name, entry->name, maxiter);
-		if (!xtables_strtoui(arg, &end, &value, 0, UINT32_MAX))
-			xt_params->exit_err(PARAMETER_PROBLEM,
-				"%s: bad value for option \"--%s\", "
-				"or out of range (0-%u).\n",
-				cb->ext_name, entry->name, UINT32_MAX);
-		if (*end != '\0' && *end != sep)
-			xt_params->exit_err(PARAMETER_PROBLEM,
-				"%s: Argument to \"--%s\" has unexpected "
-				"characters.\n", cb->ext_name, entry->name);
-		if (cb->nvals < ARRAY_SIZE(cb->val.u32_range)) {
-			if (entry->type == XTTYPE_UINT8RC)
-				cb->val.u8_range[cb->nvals] = value;
-			else if (entry->type == XTTYPE_UINT16RC)
-				cb->val.u16_range[cb->nvals] = value;
-			else if (entry->type == XTTYPE_UINT32RC)
-				cb->val.u32_range[cb->nvals] = value;
-			else if (entry->type == XTTYPE_UINT64RC)
-				cb->val.u64_range[cb->nvals] = value;
+		if (*arg == '\0' || *arg == sep) {
+			/* Default range components when field not spec'd. */
+			end = (char *)arg;
+			value = (cb->nvals == 1) ? lmax : 0;
+		} else {
+			if (!xtables_strtoul(arg, &end, &value, 0, lmax))
+				xt_params->exit_err(PARAMETER_PROBLEM,
+					"%s: bad value for option \"--%s\" near "
+					"\"%s\", or out of range (0-%ju).\n",
+					cb->ext_name, entry->name, arg, lmax);
+			if (*end != '\0' && *end != sep)
+				xt_params->exit_err(PARAMETER_PROBLEM,
+					"%s: Argument to \"--%s\" has "
+					"unexpected characters near \"%s\".\n",
+					cb->ext_name, entry->name, end);
 		}
+		xtopt_mint_value_to_cb(cb, value);
 		++cb->nvals;
-		if (entry->flags & XTOPT_PUT) {
-			if (entry->type == XTTYPE_UINT8RC)
-				*(uint8_t *)put = value;
-			else if (entry->type == XTTYPE_UINT16RC)
-				*(uint16_t *)put = value;
-			else if (entry->type == XTTYPE_UINT32RC)
-				*(uint32_t *)put = value;
-			else if (entry->type == XTTYPE_UINT64RC)
-				*(uint64_t *)put = value;
-			put += esize;
-		}
+		xtopt_mint_value_to_ptr(cb, &put, value);
 		if (*end == '\0')
 			break;
 	}
@@ -509,6 +597,7 @@ static void xtopt_parse_protocol(struct xt_option_call *cb)
  */
 static void xtopt_parse_port(struct xt_option_call *cb)
 {
+	const struct xt_option_entry *entry = cb->entry;
 	int ret;
 
 	ret = xtables_getportbyname(cb->arg);
@@ -516,10 +605,10 @@ static void xtopt_parse_port(struct xt_option_call *cb)
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"Port \"%s\" does not resolve to anything.\n",
 			cb->arg);
+	if (entry->flags & XTOPT_NBO)
+		ret = htons(ret);
 	cb->val.port = ret;
-	if (cb->entry->type == XTTYPE_PORT_NE)
-		cb->val.port = htons(cb->val.port);
-	if (cb->entry->flags & XTOPT_PUT)
+	if (entry->flags & XTOPT_PUT)
 		*(uint16_t *)XTOPT_MKPTR(cb) = cb->val.port;
 }
 
@@ -561,7 +650,7 @@ static void xtopt_parse_mport(struct xt_option_call *cb)
 			xt_params->exit_err(PARAMETER_PROBLEM,
 				"Port \"%s\" does not resolve to "
 				"anything.\n", arg);
-		if (entry->type == XTTYPE_PORTRC_NE)
+		if (entry->flags & XTOPT_NBO)
 			value = htons(value);
 		if (cb->nvals < ARRAY_SIZE(cb->val.port_range))
 			cb->val.port_range[cb->nvals] = value;
@@ -702,39 +791,10 @@ static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_HOSTMASK]    = xtopt_parse_hostmask,
 	[XTTYPE_PROTOCOL]    = xtopt_parse_protocol,
 	[XTTYPE_PORT]        = xtopt_parse_port,
-	[XTTYPE_PORT_NE]     = xtopt_parse_port,
 	[XTTYPE_PORTRC]      = xtopt_parse_mport,
-	[XTTYPE_PORTRC_NE]   = xtopt_parse_mport,
 	[XTTYPE_PLEN]        = xtopt_parse_plen,
 	[XTTYPE_PLENMASK]    = xtopt_parse_plenmask,
 	[XTTYPE_ETHERMAC]    = xtopt_parse_ethermac,
-};
-
-static const size_t xtopt_psize[] = {
-	/*
-	 * All types not listed here, and thus essentially being initialized to
-	 * zero have zero on purpose.
-	 */
-	[XTTYPE_UINT8]       = sizeof(uint8_t),
-	[XTTYPE_UINT16]      = sizeof(uint16_t),
-	[XTTYPE_UINT32]      = sizeof(uint32_t),
-	[XTTYPE_UINT64]      = sizeof(uint64_t),
-	[XTTYPE_UINT8RC]     = sizeof(uint8_t[2]),
-	[XTTYPE_UINT16RC]    = sizeof(uint16_t[2]),
-	[XTTYPE_UINT32RC]    = sizeof(uint32_t[2]),
-	[XTTYPE_UINT64RC]    = sizeof(uint64_t[2]),
-	[XTTYPE_DOUBLE]      = sizeof(double),
-	[XTTYPE_STRING]      = -1,
-	[XTTYPE_SYSLOGLEVEL] = sizeof(uint8_t),
-	[XTTYPE_HOST]        = sizeof(union nf_inet_addr),
-	[XTTYPE_HOSTMASK]    = sizeof(union nf_inet_addr),
-	[XTTYPE_PROTOCOL]    = sizeof(uint8_t),
-	[XTTYPE_PORT]        = sizeof(uint16_t),
-	[XTTYPE_PORT_NE]     = sizeof(uint16_t),
-	[XTTYPE_PORTRC]      = sizeof(uint16_t[2]),
-	[XTTYPE_PORTRC_NE]   = sizeof(uint16_t[2]),
-	[XTTYPE_PLENMASK]    = sizeof(union nf_inet_addr),
-	[XTTYPE_ETHERMAC]    = sizeof(uint8_t[6]),
 };
 
 /**

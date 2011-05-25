@@ -246,12 +246,11 @@ add, delete, insert, replace and append commands).
 [\fB!\fP] \fB\-p\fP, \fB\-\-protocol\fP \fIprotocol\fP
 The protocol of the rule or of the packet to check.
 The specified protocol can be one of \fBtcp\fP, \fBudp\fP, \fBudplite\fP,
-\fBicmp\fP, \fBesp\fP, \fBah\fP, \fBsctp\fP or \fBall\fP,
+\fBicmp\fP, \fBesp\fP, \fBah\fP, \fBsctp\fP or the special keyword "\fBall\fP",
 or it can be a numeric value, representing one of these protocols or a
 different one.  A protocol name from /etc/protocols is also allowed.
 A "!" argument before the protocol inverts the
-test.  The number zero is equivalent to \fBall\fP.
-Protocol \fBall\fP
+test.  The number zero is equivalent to \fBall\fP. "\fBall\fP"
 will match with all protocols and is taken as default when this
 option is omitted.
 .TP

@@ -31,8 +31,8 @@ IP6T_RT_HOPS);
 
 #define s struct ip6t_rt
 static const struct xt_option_entry rt_opts[] = {
-	{.name = "rt-type", .id = O_RT_TYPE, .type = XTTYPE_UINT32RC,
-	 .flags = XTOPT_INVERT},
+	{.name = "rt-type", .id = O_RT_TYPE, .type = XTTYPE_UINT32,
+	 .flags = XTOPT_INVERT | XTOPT_PUT, XTOPT_POINTER(s, rt_type)},
 	{.name = "rt-segsleft", .id = O_RT_SEGSLEFT, .type = XTTYPE_UINT32RC,
 	 .flags = XTOPT_INVERT | XTOPT_PUT, XTOPT_POINTER(s, segsleft)},
 	{.name = "rt-len", .id = O_RT_LEN, .type = XTTYPE_UINT32,
@@ -99,13 +99,6 @@ parse_addresses(const char *addrstr, struct in6_addr *addrp)
 	return i;
 }
 
-static void rt_init(struct xt_entry_match *m)
-{
-	struct ip6t_rt *rtinfo = (struct ip6t_rt *)m->data;
-
-	rtinfo->segsleft[1] = 0xFFFFFFFF;
-}
-
 static void rt_parse(struct xt_option_call *cb)
 {
 	struct ip6t_rt *rtinfo = cb->data;
@@ -118,6 +111,8 @@ static void rt_parse(struct xt_option_call *cb)
 		rtinfo->flags |= IP6T_RT_TYP;
 		break;
 	case O_RT_SEGSLEFT:
+		if (cb->nvals == 1)
+			rtinfo->segsleft[1] = rtinfo->segsleft[0];
 		if (cb->invert)
 			rtinfo->invflags |= IP6T_RT_INV_SGS;
 		rtinfo->flags |= IP6T_RT_SGS;
@@ -250,7 +245,6 @@ static struct xtables_match rt_mt6_reg = {
 	.size		= XT_ALIGN(sizeof(struct ip6t_rt)),
 	.userspacesize	= XT_ALIGN(sizeof(struct ip6t_rt)),
 	.help		= rt_help,
-	.init		= rt_init,
 	.x6_parse	= rt_parse,
 	.print		= rt_print,
 	.save		= rt_save,

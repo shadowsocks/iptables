@@ -32,12 +32,14 @@ static const struct xt_option_entry ipvs_mt_opts[] = {
 	{.name = "vaddr", .id = O_VADDR, .type = XTTYPE_HOSTMASK,
 	 .flags = XTOPT_INVERT},
 	{.name = "vport", .id = O_VPORT, .type = XTTYPE_PORT,
-	 .flags = XTOPT_INVERT | XTOPT_PUT, XTOPT_POINTER(s, vport)},
+	 .flags = XTOPT_NBO | XTOPT_INVERT | XTOPT_PUT,
+	 XTOPT_POINTER(s, vport)},
 	{.name = "vdir", .id = O_VDIR, .type = XTTYPE_STRING},
 	{.name = "vmethod", .id = O_VMETHOD, .type = XTTYPE_STRING,
 	 .flags = XTOPT_INVERT},
 	{.name = "vportctl", .id = O_VPORTCTL, .type = XTTYPE_PORT,
-	 .flags = XTOPT_INVERT | XTOPT_PUT, XTOPT_POINTER(s, vportctl)},
+	 .flags = XTOPT_NBO | XTOPT_INVERT | XTOPT_PUT,
+	 XTOPT_POINTER(s, vportctl)},
 	XTOPT_TABLEEND,
 };
 #undef s

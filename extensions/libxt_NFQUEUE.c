@@ -13,6 +13,8 @@ enum {
 	O_QUEUE_NUM = 0,
 	O_QUEUE_BALANCE,
 	O_QUEUE_BYPASS,
+	F_QUEUE_NUM     = 1 << O_QUEUE_NUM,
+	F_QUEUE_BALANCE = 1 << O_QUEUE_BALANCE,
 };
 
 static void NFQUEUE_help(void)
@@ -41,9 +43,10 @@ static void NFQUEUE_help_v2(void)
 #define s struct xt_NFQ_info
 static const struct xt_option_entry NFQUEUE_opts[] = {
 	{.name = "queue-num", .id = O_QUEUE_NUM, .type = XTTYPE_UINT16,
-	 .flags = XTOPT_PUT, XTOPT_POINTER(s, queuenum)},
+	 .flags = XTOPT_PUT, XTOPT_POINTER(s, queuenum),
+	 .excl = F_QUEUE_BALANCE},
 	{.name = "queue-balance", .id = O_QUEUE_BALANCE,
-	 .type = XTTYPE_UINT16RC},
+	 .type = XTTYPE_UINT16RC, .excl = F_QUEUE_NUM},
 	{.name = "queue-bypass", .id = O_QUEUE_BYPASS, .type = XTTYPE_NONE},
 	XTOPT_TABLEEND,
 };
@@ -81,13 +84,10 @@ static void NFQUEUE_parse_v2(struct xt_option_call *cb)
 {
 	struct xt_NFQ_info_v2 *info = cb->data;
 
-	xtables_option_parse(cb);
+	NFQUEUE_parse_v1(cb);
 	switch (cb->entry->id) {
 	case O_QUEUE_BYPASS:
 		info->bypass = 1;
-		break;
-	default:
-		NFQUEUE_parse_v1(cb);
 		break;
 	}
 }

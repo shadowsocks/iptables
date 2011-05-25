@@ -26,7 +26,9 @@ static void length_parse(struct xt_option_call *cb)
 
 	xtables_option_parse(cb);
 	info->min = cb->val.u16_range[0];
-	info->max = (cb->nvals == 2) ? cb->val.u16_range[1] : UINT16_MAX;
+	info->max = cb->val.u16_range[0];
+	if (cb->nvals >= 2)
+		info->max = cb->val.u16_range[1];
 	if (cb->invert)
 		info->invert = 1;
 }
