@@ -65,8 +65,8 @@ man_MANS         = iptables.8 iptables-restore.8 iptables-save.8 \
                    ip6tables-save.8
 CLEANFILES       = iptables.8 ip6tables.8
 
+vx_bin_links   = iptables-xml
 if ENABLE_IPV4
-v4_bin_links   = iptables-xml
 v4_sbin_links  = iptables iptables-restore iptables-save
 endif
 if ENABLE_IPV6
@@ -96,6 +96,6 @@ config.status: extensions/GNUmakefile.in \
 install-exec-hook:
 	-if test -z "${DESTDIR}"; then /sbin/ldconfig; fi;
 	${INSTALL} -dm0755 "${DESTDIR}${bindir}";
-	for i in ${v4_bin_links}; do ${LN_S} -f "${sbindir}/xtables-multi" "${DESTDIR}${bindir}/$$i"; done;
+	for i in ${vx_bin_links}; do ${LN_S} -f "${sbindir}/xtables-multi" "${DESTDIR}${bindir}/$$i"; done;
 	for i in ${v4_sbin_links}; do ${LN_S} -f xtables-multi "${DESTDIR}${sbindir}/$$i"; done;
 	for i in ${v6_sbin_links}; do ${LN_S} -f xtables-multi "${DESTDIR}${sbindir}/$$i"; done;
