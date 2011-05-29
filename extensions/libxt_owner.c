@@ -125,8 +125,10 @@ static const struct xt_option_entry owner_mt6_opts_v0[] = {
 #undef s
 
 static const struct xt_option_entry owner_mt_opts[] = {
-	{.name = "uid-owner", .id = O_USER, .type = XTTYPE_STRING},
-	{.name = "gid-owner", .id = O_GROUP, .type = XTTYPE_STRING},
+	{.name = "uid-owner", .id = O_USER, .type = XTTYPE_STRING,
+	 .flags = XTOPT_INVERT},
+	{.name = "gid-owner", .id = O_GROUP, .type = XTTYPE_STRING,
+	 .flags = XTOPT_INVERT},
 	{.name = "socket-exists", .id = O_SOCK_EXISTS, .type = XTTYPE_NONE},
 	XTOPT_TABLEEND,
 };
