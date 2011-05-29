@@ -373,7 +373,6 @@ do_rule_part(char *leveltag1, char *leveltag2, int part, int argc,
 {
 	int arg = 1;		// ignore leading -A
 	char invert_next = 0;
-	char *thisChain = NULL;
 	char *spacer = "";	// space when needed to assemble arguments
 	char *level1 = NULL;
 	char *level2 = NULL;
@@ -396,8 +395,6 @@ do_rule_part(char *leveltag1, char *leveltag2, int part, int argc,
 			xmlAttrS("type", (TAG)); \
 		} else printf("%s<%s ", (leveli ## LEVEL), (level ## LEVEL)); \
 	} while(0)
-
-	thisChain = argv[arg++];
 
 	if (part == 1) {	/* skip */
 		/* use argvattr to tell which arguments were quoted 
