@@ -61,7 +61,7 @@ xtables_multi_LDADD   += libxtables.la -lm
 
 sbin_PROGRAMS    = xtables-multi
 man_MANS         = iptables.8 iptables-restore.8 iptables-save.8 \
-                   iptables-xml.8 ip6tables.8 ip6tables-restore.8 \
+                   iptables-xml.1 ip6tables.8 ip6tables-restore.8 \
                    ip6tables-save.8
 CLEANFILES       = iptables.8 ip6tables.8
 
