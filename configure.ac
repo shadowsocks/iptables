@@ -88,18 +88,18 @@ regular_CFLAGS="-Wall -Waggregate-return -Wmissing-declarations \
 	-Winline -pipe";
 regular_CPPFLAGS="${largefile_cppflags} -D_REENTRANT \
 	-DXTABLES_LIBDIR=\\\"\${xtlibdir}\\\" -DXTABLES_INTERNAL";
-kinclude_CFLAGS="";
+kinclude_CPPFLAGS="";
 if [[ -n "$kbuilddir" ]]; then
-	kinclude_CFLAGS="$kinclude_CFLAGS -I $kbuilddir/include";
+	kinclude_CPPFLAGS="$kinclude_CPPFLAGS -I$kbuilddir/include";
 fi;
 if [[ -n "$ksourcedir" ]]; then
-	kinclude_CFLAGS="$kinclude_CFLAGS -I $ksourcedir/include";
+	kinclude_CPPFLAGS="$kinclude_CPPFLAGS -I$ksourcedir/include";
 fi;
 pkgdatadir='${datadir}/xtables';
 
 AC_SUBST([regular_CFLAGS])
 AC_SUBST([regular_CPPFLAGS])
-AC_SUBST([kinclude_CFLAGS])
+AC_SUBST([kinclude_CPPFLAGS])
 AC_SUBST([kbuilddir])
 AC_SUBST([ksourcedir])
 AC_SUBST([xtlibdir])
