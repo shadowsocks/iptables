@@ -4,6 +4,7 @@ ACLOCAL_AMFLAGS  = -I m4
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
 AM_CFLAGS        = ${regular_CFLAGS} -I${top_builddir}/include -I${top_srcdir}/include ${kinclude_CFLAGS}
+AM_CPPFLAGS      = ${regular_CPPFLAGS}
 SUBDIRS          = extensions
 if ENABLE_DEVEL
 SUBDIRS         += include

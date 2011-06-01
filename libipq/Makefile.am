@@ -1,6 +1,7 @@
 # -*- Makefile -*-
 
 AM_CFLAGS = ${regular_CFLAGS} -I${top_builddir}/include -I${top_srcdir}/include
+AM_CPPFLAGS = ${regular_CPPFLAGS}
 
 libipq_la_SOURCES = libipq.c
 lib_LTLIBRARIES   = libipq.la
