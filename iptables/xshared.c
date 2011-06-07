@@ -104,8 +104,8 @@ struct xtables_match *load_proto(struct iptables_command_state *cs)
 			  cs->options & OPT_NUMERIC, &cs->matches);
 }
 
-void command_default(struct iptables_command_state *cs,
-		     struct xtables_globals *gl)
+int command_default(struct iptables_command_state *cs,
+		    struct xtables_globals *gl)
 {
 	struct xtables_rule_match *matchp;
 	struct xtables_match *m;
@@ -116,7 +116,7 @@ void command_default(struct iptables_command_state *cs,
 	    cs->c < cs->target->option_offset + XT_OPTION_OFFSET_SCALE) {
 		xtables_option_tpcall(cs->c, cs->argv, cs->invert,
 				      cs->target, &cs->fw);
-		return;
+		return 0;
 	}
 
 	for (matchp = cs->matches; matchp; matchp = matchp->next) {
@@ -129,7 +129,7 @@ void command_default(struct iptables_command_state *cs,
 		    cs->c >= matchp->match->option_offset + XT_OPTION_OFFSET_SCALE)
 			continue;
 		xtables_option_mpcall(cs->c, cs->argv, cs->invert, m, &cs->fw);
-		return;
+		return 0;
 	}
 
 	/* Try loading protocol */
@@ -161,7 +161,8 @@ void command_default(struct iptables_command_state *cs,
 		if (gl->opts == NULL)
 			xtables_error(OTHER_PROBLEM, "can't alloc memory!");
 		optind--;
-		return;
+		/* Indicate to rerun getopt *immediately* */
+ 		return 1;
 	}
 
 	if (cs->c == ':')
@@ -171,6 +172,7 @@ void command_default(struct iptables_command_state *cs,
 		xtables_error(PARAMETER_PROBLEM, "unknown option "
 			      "\"%s\"", cs->argv[optind-1]);
 	xtables_error(PARAMETER_PROBLEM, "Unknown arg \"%s\"", optarg);
+	return 0;
 }
 
 static mainfunc_t subcmd_get(const char *cmd, const struct subcommand *cb)

@@ -38,6 +38,8 @@
 -A INPUT -p tcp -m recent --rcheck --name DEFAULT --rsource
 -A INPUT -p tcp -m socket --transparent
 -A INPUT -p tcp -m string --string "foobar" --algo kmp --from 1 --to 2 --icase
+-A INPUT -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN
+-A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN
 -A INPUT -p tcp -m tos --tos 0xff/0x01
 -A INPUT -p tcp -m u32 --u32 "0x0=0x0" -m u32 --u32 "0x0=0x0"
 -A INPUT -p tcp -m hbh -m hbh -m hl --hl-eq 1 -m ipv6header --header hop-by-hop --soft

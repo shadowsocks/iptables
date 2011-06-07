@@ -1716,7 +1716,13 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			exit_tryhelp(2);
 
 		default:
-			command_default(&cs, &ip6tables_globals);
+			if (command_default(&cs, &ip6tables_globals) == 1)
+				/*
+				 * If new options were loaded, we must retry
+				 * getopt immediately and not allow
+				 * cs.invert=FALSE to be executed.
+				 */
+				continue;
 			break;
 		}
 		cs.invert = FALSE;

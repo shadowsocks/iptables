@@ -1743,7 +1743,9 @@ int do_command4(int argc, char *argv[], char **table, struct iptc_handle **handl
 			exit_tryhelp(2);
 
 		default:
-			command_default(&cs, &iptables_globals);
+			if (command_default(&cs, &iptables_globals) == 1)
+				/* cf. ip6tables.c */
+				continue;
 			break;
 		}
 		cs.invert = FALSE;
