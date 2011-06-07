@@ -5,7 +5,7 @@ AUTOMAKE_OPTIONS = foreign subdir-objects
 
 AM_CFLAGS        = ${regular_CFLAGS}
 AM_CPPFLAGS      = ${regular_CPPFLAGS} -I${top_builddir}/include -I${top_srcdir}/include ${kinclude_CPPFLAGS}
-SUBDIRS          = extensions
+SUBDIRS          = extensions libiptc
 if ENABLE_DEVEL
 SUBDIRS         += include
 endif
@@ -15,19 +15,8 @@ endif
 if HAVE_LIBNFNETLINK
 SUBDIRS         += utils
 endif
-lib_LTLIBRARIES =
 
-# libiptc
-lib_LTLIBRARIES            += libiptc/libip4tc.la libiptc/libip6tc.la libiptc/libiptc.la
-libiptc_libiptc_la_SOURCES  =
-libiptc_libiptc_la_LIBADD   = libiptc/libip4tc.la libiptc/libip6tc.la
-libiptc_libiptc_la_LDFLAGS  = -version-info 0:0:0 ${libiptc_LDFLAGS2}
-libiptc_libip4tc_la_SOURCES = libiptc/libip4tc.c
-libiptc_libip4tc_la_LDFLAGS = -version-info 0:0:0
-libiptc_libip6tc_la_SOURCES = libiptc/libip6tc.c
-libiptc_libip6tc_la_LDFLAGS = -version-info 0:0:0 ${libiptc_LDFLAGS2}
-
-lib_LTLIBRARIES      += libxtables.la
+lib_LTLIBRARIES       = libxtables.la
 libxtables_la_SOURCES = xtables.c xtoptions.c
 libxtables_la_LDFLAGS = -version-info ${libxtables_vcurrent}:0:${libxtables_vage}
 if ENABLE_SHARED
@@ -80,7 +69,7 @@ iptables.8: ${srcdir}/iptables.8.in extensions/matches4.man extensions/targets4.
 ip6tables.8: ${srcdir}/ip6tables.8.in extensions/matches6.man extensions/targets6.man
 	${AM_VERBOSE_GEN} sed -e 's/@PACKAGE_AND_VERSION@/${PACKAGE} ${PACKAGE_VERSION}/g' -e '/@MATCH@/ r extensions/matches6.man' -e '/@TARGET@/ r extensions/targets6.man' $< >$@;
 
-pkgconfig_DATA = libiptc.pc xtables.pc
+pkgconfig_DATA = xtables.pc
 
 .PHONY: tarball
 tarball:

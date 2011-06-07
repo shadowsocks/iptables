@@ -111,6 +111,6 @@ libxtables_vmajor=$(($libxtables_vcurrent - $libxtables_vage));
 AC_SUBST([libxtables_vmajor])
 
 AC_CONFIG_FILES([Makefile extensions/GNUmakefile include/Makefile
-	libipq/Makefile utils/Makefile
-	include/xtables.h include/iptables/internal.h libiptc.pc xtables.pc])
+	libipq/Makefile libiptc/Makefile libiptc/libiptc.pc utils/Makefile
+	include/xtables.h include/iptables/internal.h xtables.pc])
 AC_OUTPUT
