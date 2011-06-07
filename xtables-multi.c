@@ -3,6 +3,8 @@
 #include <string.h>
 #include "xshared.h"
 
+#include "xtables-multi.h"
+
 #ifdef ENABLE_IPV4
 #include "iptables-multi.h"
 #endif
@@ -19,9 +21,9 @@ static const struct subcommand multi_subcommands[] = {
 	{"save4",               iptables_save_main},
 	{"iptables-restore",    iptables_restore_main},
 	{"restore4",            iptables_restore_main},
-	{"iptables-xml",        iptables_xml_main},
-	{"xml4",                iptables_xml_main},
 #endif
+	{"iptables-xml",        iptables_xml_main},
+	{"xml",                 iptables_xml_main},
 #ifdef ENABLE_IPV6
 	{"ip6tables",           ip6tables_main},
 	{"main6",               ip6tables_main},

@@ -38,7 +38,7 @@ libxtables_la_CFLAGS  = ${AM_CFLAGS} -DNO_SHARED_LIBS=1
 libxtables_la_LIBADD  =
 endif
 
-xtables_multi_SOURCES  = xtables-multi.c
+xtables_multi_SOURCES  = xtables-multi.c iptables-xml.c
 xtables_multi_CFLAGS   = ${AM_CFLAGS} -DIPTABLES_MULTI
 xtables_multi_LDFLAGS  = -rdynamic
 xtables_multi_LDADD    = extensions/libext.a
@@ -46,7 +46,7 @@ if ENABLE_STATIC
 xtables_multi_CFLAGS  += -DALL_INCLUSIVE
 endif
 if ENABLE_IPV4
-xtables_multi_SOURCES += iptables-save.c iptables-restore.c iptables-xml.c \
+xtables_multi_SOURCES += iptables-save.c iptables-restore.c \
                          iptables-standalone.c iptables.c
 xtables_multi_CFLAGS  += -DENABLE_IPV4
 xtables_multi_LDADD   += libiptc/libip4tc.la extensions/libext4.a

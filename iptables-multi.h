@@ -4,6 +4,5 @@
 extern int iptables_main(int, char **);
 extern int iptables_save_main(int, char **);
 extern int iptables_restore_main(int, char **);
-extern int iptables_xml_main(int, char **);
 
 #endif /* _IPTABLES_MULTI_H */
