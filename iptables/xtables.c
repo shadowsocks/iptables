@@ -362,6 +362,7 @@ int xtables_insmod(const char *modname, const char *modprobe, bool quiet)
 		/* not usually reached */
 		exit(1);
 	case -1:
+		free(buf);
 		return -1;
 
 	default: /* parent */
