@@ -460,7 +460,6 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	if (in != NULL)
-		fclose(in);
+	fclose(in);
 	return 0;
 }
