@@ -1042,8 +1042,10 @@ void xtables_param_act(unsigned int status, const char *p1, ...)
 	case XTF_ONLY_ONCE:
 		p2 = va_arg(args, const char *);
 		b  = va_arg(args, unsigned int);
-		if (!b)
+		if (!b) {
+			va_end(args);
 			return;
+		}
 		xt_params->exit_err(PARAMETER_PROBLEM,
 		           "%s: \"%s\" option may only be specified once",
 		           p1, p2);
@@ -1051,8 +1053,10 @@ void xtables_param_act(unsigned int status, const char *p1, ...)
 	case XTF_NO_INVERT:
 		p2 = va_arg(args, const char *);
 		b  = va_arg(args, unsigned int);
-		if (!b)
+		if (!b) {
+			va_end(args);
 			return;
+		}
 		xt_params->exit_err(PARAMETER_PROBLEM,
 		           "%s: \"%s\" option cannot be inverted", p1, p2);
 		break;
@@ -1065,8 +1069,10 @@ void xtables_param_act(unsigned int status, const char *p1, ...)
 		break;
 	case XTF_ONE_ACTION:
 		b = va_arg(args, unsigned int);
-		if (!b)
+		if (!b) {
+			va_end(args);
 			return;
+		}
 		xt_params->exit_err(PARAMETER_PROBLEM,
 		           "%s: At most one action is possible", p1);
 		break;
