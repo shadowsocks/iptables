@@ -146,6 +146,8 @@
 -A matches
 -A matches -m rt --rt-segsleft 5:4294967295
 -A matches
+-A ntarg -j LOG --log-tcp-sequence --log-tcp-options --log-ip-options
+-A ntarg
 -A ntarg -j NFQUEUE --queue-num 1
 -A ntarg
 -A ntarg -j NFQUEUE --queue-balance 8:99
