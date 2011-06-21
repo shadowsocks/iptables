@@ -7,9 +7,10 @@
 #include <linux/netfilter/x_tables.h>
 #include <linux/netfilter/xt_RATEEST.h>
 
-/* hack to pass raw values to final_check */
-static unsigned int interval;
-static unsigned int ewma_log;
+struct rateest_tg_udata {
+	unsigned int interval;
+	unsigned int ewma_log;
+};
 
 static void
 RATEEST_help(void)
@@ -85,16 +86,18 @@ RATEEST_print_time(unsigned int time)
 
 static void RATEEST_parse(struct xt_option_call *cb)
 {
+	struct rateest_tg_udata *udata = cb->udata;
+
 	xtables_option_parse(cb);
 	switch (cb->entry->id) {
 	case O_INTERVAL:
-		if (RATEEST_get_time(&interval, cb->arg) < 0)
+		if (RATEEST_get_time(&udata->interval, cb->arg) < 0)
 			xtables_error(PARAMETER_PROBLEM,
 				   "RATEEST: bad interval value \"%s\"",
 				   cb->arg);
 		break;
 	case O_EWMALOG:
-		if (RATEEST_get_time(&ewma_log, cb->arg) < 0)
+		if (RATEEST_get_time(&udata->ewma_log, cb->arg) < 0)
 			xtables_error(PARAMETER_PROBLEM,
 				   "RATEEST: bad ewmalog value \"%s\"",
 				   cb->arg);
@@ -105,9 +108,10 @@ static void RATEEST_parse(struct xt_option_call *cb)
 static void RATEEST_final_check(struct xt_fcheck_call *cb)
 {
 	struct xt_rateest_target_info *info = cb->data;
+	struct rateest_tg_udata *udata = cb->udata;
 
 	for (info->interval = 0; info->interval <= 5; info->interval++) {
-		if (interval <= (1 << info->interval) * (TIME_UNITS_PER_SEC / 4))
+		if (udata->interval <= (1 << info->interval) * (TIME_UNITS_PER_SEC / 4))
 			break;
 	}
 
@@ -118,7 +122,7 @@ static void RATEEST_final_check(struct xt_fcheck_call *cb)
 
 	for (info->ewma_log = 1; info->ewma_log < 32; info->ewma_log++) {
 		double w = 1.0 - 1.0 / (1 << info->ewma_log);
-		if (interval / (-log(w)) > ewma_log)
+		if (udata->interval / (-log(w)) > udata->ewma_log)
 			break;
 	}
 	info->ewma_log--;
@@ -170,6 +174,7 @@ static struct xtables_target rateest_tg_reg = {
 	.print		= RATEEST_print,
 	.save		= RATEEST_save,
 	.x6_options	= RATEEST_opts,
+	.udata_size	= sizeof(struct rateest_tg_udata),
 };
 
 void _init(void)
