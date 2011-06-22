@@ -23,7 +23,7 @@ state_help(void)
 
 static const struct xt_option_entry state_opts[] = {
 	{.name = "state", .id = O_STATE, .type = XTTYPE_STRING,
-	 .flags = XTOPT_MAND},
+	 .flags = XTOPT_MAND | XTOPT_INVERT},
 	XTOPT_TABLEEND,
 };
 
