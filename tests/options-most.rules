@@ -87,6 +87,11 @@
 -A matches
 -A matches -p esp -m esp --espspi 5:4294967295
 -A matches
+-A matches -m hashlimit --hashlimit-upto 1/sec --hashlimit-burst 1 --hashlimit-name mini1
+-A matches -m hashlimit --hashlimit-upto 1/min --hashlimit-burst 1 --hashlimit-name mini2
+-A matches -m hashlimit --hashlimit-upto 1/hour --hashlimit-burst 1 --hashlimit-name mini3
+-A matches -m hashlimit --hashlimit-upto 1/day --hashlimit-burst 1 --hashlimit-name mini4
+-A matches
 -A matches -m ipvs --vaddr fe80::/64 --vport 1 --vdir REPLY --vmethod GATE --vportctl 21
 -A matches
 -A matches -m length --length 1
