@@ -20,12 +20,12 @@ enum {
 
 #define s struct ip6t_HL_info
 static const struct xt_option_entry HL_opts[] = {
-	{.name = "ttl-set", .type = XTTYPE_UINT8, .id = O_HL_SET,
+	{.name = "hl-set", .type = XTTYPE_UINT8, .id = O_HL_SET,
 	 .excl = F_ANY, .flags = XTOPT_PUT, XTOPT_POINTER(s, hop_limit)},
-	{.name = "ttl-dec", .type = XTTYPE_UINT8, .id = O_HL_DEC,
+	{.name = "hl-dec", .type = XTTYPE_UINT8, .id = O_HL_DEC,
 	 .excl = F_ANY, .flags = XTOPT_PUT, XTOPT_POINTER(s, hop_limit),
 	 .min = 1},
-	{.name = "ttl-inc", .type = XTTYPE_UINT8, .id = O_HL_INC,
+	{.name = "hl-inc", .type = XTTYPE_UINT8, .id = O_HL_INC,
 	 .excl = F_ANY, .flags = XTOPT_PUT, XTOPT_POINTER(s, hop_limit),
 	 .min = 1},
 	XTOPT_TABLEEND,
