@@ -15,6 +15,7 @@
  *	along with this program; if not, write to the Free Software
  *	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
+#include "config.h"
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -32,7 +33,11 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <arpa/inet.h>
-#include <linux/magic.h> /* for PROC_SUPER_MAGIC */
+#if defined(HAVE_LINUX_MAGIC_H)
+#	include <linux/magic.h> /* for PROC_SUPER_MAGIC */
+#elif defined(HAVE_LINUX_PROC_FS_H)
+#	include <linux/proc_fs.h>	/* Linux 2.4 */
+#endif
 
 #include <xtables.h>
 #include <limits.h> /* INT_MAX in ip_tables.h/ip6_tables.h */
