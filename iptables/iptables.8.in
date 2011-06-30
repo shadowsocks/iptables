@@ -332,7 +332,8 @@ byte counters are also listed, with the suffix 'K', 'M' or 'G' for
 1000, 1,000,000 and 1,000,000,000 multipliers respectively (but see
 the \fB\-x\fP flag to change this).
 For appending, insertion, deletion and replacement, this causes
-detailed information on the rule or rules to be printed.
+detailed information on the rule or rules to be printed. \fB\-v\fP may be
+specified multiple times to possibly emit more detailed debug statements.
 .TP
 \fB\-n\fP, \fB\-\-numeric\fP
 Numeric output.
