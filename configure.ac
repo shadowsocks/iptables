@@ -2,7 +2,7 @@
 AC_INIT([iptables], [1.4.11.1])
 
 # See libtool.info "Libtool's versioning system"
-libxtables_vcurrent=6
+libxtables_vcurrent=7
 libxtables_vage=0
 
 AC_CONFIG_HEADERS([config.h])
@@ -59,12 +59,10 @@ AC_SUBST([libiptc_LDFLAGS2])
 
 blacklist_modules="";
 
-AC_CHECK_HEADER([linux/dccp.h])
+AC_CHECK_HEADERS([linux/dccp.h linux/ip_vs.h linux/magic.h linux/proc_fs.h])
 if test "$ac_cv_header_linux_dccp_h" != "yes"; then
 	blacklist_modules="$blacklist_modules dccp";
 fi;
-
-AC_CHECK_HEADER([linux/ip_vs.h])
 if test "$ac_cv_header_linux_ip_vs_h" != "yes"; then
 	blacklist_modules="$blacklist_modules ipvs";
 fi;

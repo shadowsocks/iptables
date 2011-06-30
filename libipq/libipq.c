@@ -231,7 +231,6 @@ struct ipq_handle *ipq_create_handle(uint32_t flags, uint32_t protocol)
         
 	if (h->fd == -1) {
 		ipq_errno = IPQ_ERR_SOCKET;
-		close(h->fd);
 		free(h);
 		return NULL;
 	}

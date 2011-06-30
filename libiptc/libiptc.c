@@ -403,7 +403,7 @@ __iptcc_bsearch_chain_index(const char *name, unsigned int offset,
 		}
 		debug("jump back to pos:%d (end:%d)\n", pos, end);
 		goto loop;
-	} else if (res > 0 ){ /* Not far enough, jump forward */
+	} else { /* res > 0; Not far enough, jump forward */
 
 		/* Exit case: Last element of array */
 		if (pos == handle->chain_index_sz-1) {
@@ -430,8 +430,6 @@ __iptcc_bsearch_chain_index(const char *name, unsigned int offset,
 		debug("jump forward to pos:%d (end:%d)\n", pos, end);
 		goto loop;
 	}
-
-	return list_pos;
 }
 
 /* Wrapper for string chain name based bsearch */

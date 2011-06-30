@@ -908,6 +908,7 @@ void xtables_option_tpcall(unsigned int c, char **argv, bool invert,
 	cb.xflags   = t->tflags;
 	cb.target   = &t->t;
 	cb.xt_entry = fw;
+	cb.udata    = t->udata;
 	t->x6_parse(&cb);
 	t->tflags = cb.xflags;
 }
@@ -943,6 +944,7 @@ void xtables_option_mpcall(unsigned int c, char **argv, bool invert,
 	cb.xflags   = m->mflags;
 	cb.match    = &m->m;
 	cb.xt_entry = fw;
+	cb.udata    = m->udata;
 	m->x6_parse(&cb);
 	m->mflags = cb.xflags;
 }
@@ -1028,6 +1030,7 @@ void xtables_option_tfcall(struct xtables_target *t)
 		cb.ext_name = t->name;
 		cb.data     = t->t->data;
 		cb.xflags   = t->tflags;
+		cb.udata    = t->udata;
 		t->x6_fcheck(&cb);
 	} else if (t->final_check != NULL) {
 		t->final_check(t->tflags);
@@ -1048,6 +1051,7 @@ void xtables_option_mfcall(struct xtables_match *m)
 		cb.ext_name = m->name;
 		cb.data     = m->m->data;
 		cb.xflags   = m->mflags;
+		cb.udata    = m->udata;
 		m->x6_fcheck(&cb);
 	} else if (m->final_check != NULL) {
 		m->final_check(m->mflags);

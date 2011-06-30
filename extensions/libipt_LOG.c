@@ -87,19 +87,19 @@ static void LOG_parse(struct xt_option_call *cb)
 				   "Newlines not allowed in --log-prefix");
 		break;
 	case O_LOG_TCPSEQ:
-		info->logflags = IPT_LOG_TCPSEQ;
+		info->logflags |= IPT_LOG_TCPSEQ;
 		break;
 	case O_LOG_TCPOPTS:
-		info->logflags = IPT_LOG_TCPOPT;
+		info->logflags |= IPT_LOG_TCPOPT;
 		break;
 	case O_LOG_IPOPTS:
-		info->logflags = IPT_LOG_IPOPT;
+		info->logflags |= IPT_LOG_IPOPT;
 		break;
 	case O_LOG_UID:
-		info->logflags = IPT_LOG_UID;
+		info->logflags |= IPT_LOG_UID;
 		break;
 	case O_LOG_MAC:
-		info->logflags = IPT_LOG_MACDECODE;
+		info->logflags |= IPT_LOG_MACDECODE;
 		break;
 	}
 }

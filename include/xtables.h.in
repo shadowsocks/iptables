@@ -137,11 +137,13 @@ struct xt_option_entry {
  * @arg:	input from command line
  * @ext_name:	name of extension currently being processed
  * @entry:	current option being processed
- * @data:	per-extension data block
+ * @data:	per-extension kernel data block
  * @xflags:	options of the extension that have been used
  * @invert:	whether option was used with !
  * @nvals:	number of results in uXX_multi
  * @val:	parsed result
+ * @udata:	per-extension private scratch area
+ * 		(cf. xtables_{match,target}->udata_size)
  */
 struct xt_option_call {
 	const char *arg, *ext_name;
@@ -174,16 +176,19 @@ struct xt_option_call {
 		struct xt_entry_target **target;
 	};
 	void *xt_entry;
+	void *udata;
 };
 
 /**
  * @ext_name:	name of extension currently being processed
- * @data:	per-extension data block
+ * @data:	per-extension (kernel) data block
+ * @udata:	per-extension private scratch area
+ * 		(cf. xtables_{match,target}->udata_size)
  * @xflags:	options of the extension that have been used
  */
 struct xt_fcheck_call {
 	const char *ext_name;
-	void *data;
+	void *data, *udata;
 	unsigned int xflags;
 };
 
@@ -254,7 +259,11 @@ struct xtables_match
 	void (*x6_fcheck)(struct xt_fcheck_call *);
 	const struct xt_option_entry *x6_options;
 
+	/* Size of per-extension instance extra "global" scratch space */
+	size_t udata_size;
+
 	/* Ignore these men behind the curtain: */
+	void *udata;
 	unsigned int option_offset;
 	struct xt_entry_match *m;
 	unsigned int mflags;
@@ -318,7 +327,10 @@ struct xtables_target
 	void (*x6_fcheck)(struct xt_fcheck_call *);
 	const struct xt_option_entry *x6_options;
 
+	size_t udata_size;
+
 	/* Ignore these men behind the curtain: */
+	void *udata;
 	unsigned int option_offset;
 	struct xt_entry_target *t;
 	unsigned int tflags;

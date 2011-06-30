@@ -1315,8 +1315,8 @@ static void command_jump(struct iptables_command_state *cs)
 	cs->target->t->u.target_size = size;
 	strcpy(cs->target->t->u.user.name, cs->jumpto);
 	cs->target->t->u.user.revision = cs->target->revision;
-	if (cs->target->init != NULL)
-		cs->target->init(cs->target->t);
+	xs_init_target(cs->target);
+
 	if (cs->target->x6_options != NULL)
 		opts = xtables_options_xfrm(iptables_globals.orig_opts, opts,
 					    cs->target->x6_options,
@@ -1344,8 +1344,7 @@ static void command_match(struct iptables_command_state *cs)
 	m->m->u.match_size = size;
 	strcpy(m->m->u.user.name, m->name);
 	m->m->u.user.revision = m->revision;
-	if (m->init != NULL)
-		m->init(m->m);
+	xs_init_match(m);
 	if (m == m->next)
 		return;
 	/* Merge options for non-cloned matches */
@@ -1871,8 +1870,7 @@ int do_command4(int argc, char *argv[], char **table, struct iptc_handle **handl
 			strcpy(cs.target->t->u.user.name, cs.jumpto);
 			if (!iptc_is_chain(cs.jumpto, *handle))
 				cs.target->t->u.user.revision = cs.target->revision;
-			if (cs.target->init != NULL)
-				cs.target->init(cs.target->t);
+			xs_init_target(cs.target);
 		}
 
 		if (!cs.target) {

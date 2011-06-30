@@ -15,6 +15,7 @@
  *	along with this program; if not, write to the Free Software
  *	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
+#include "config.h"
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -32,7 +33,11 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <arpa/inet.h>
-#include <linux/magic.h> /* for PROC_SUPER_MAGIC */
+#if defined(HAVE_LINUX_MAGIC_H)
+#	include <linux/magic.h> /* for PROC_SUPER_MAGIC */
+#elif defined(HAVE_LINUX_PROC_FS_H)
+#	include <linux/proc_fs.h>	/* Linux 2.4 */
+#endif
 
 #include <xtables.h>
 #include <limits.h> /* INT_MAX in ip_tables.h/ip6_tables.h */
@@ -362,6 +367,7 @@ int xtables_insmod(const char *modname, const char *modprobe, bool quiet)
 		/* not usually reached */
 		exit(1);
 	case -1:
+		free(buf);
 		return -1;
 
 	default: /* parent */
@@ -1042,8 +1048,10 @@ void xtables_param_act(unsigned int status, const char *p1, ...)
 	case XTF_ONLY_ONCE:
 		p2 = va_arg(args, const char *);
 		b  = va_arg(args, unsigned int);
-		if (!b)
+		if (!b) {
+			va_end(args);
 			return;
+		}
 		xt_params->exit_err(PARAMETER_PROBLEM,
 		           "%s: \"%s\" option may only be specified once",
 		           p1, p2);
@@ -1051,8 +1059,10 @@ void xtables_param_act(unsigned int status, const char *p1, ...)
 	case XTF_NO_INVERT:
 		p2 = va_arg(args, const char *);
 		b  = va_arg(args, unsigned int);
-		if (!b)
+		if (!b) {
+			va_end(args);
 			return;
+		}
 		xt_params->exit_err(PARAMETER_PROBLEM,
 		           "%s: \"%s\" option cannot be inverted", p1, p2);
 		break;
@@ -1065,8 +1075,10 @@ void xtables_param_act(unsigned int status, const char *p1, ...)
 		break;
 	case XTF_ONE_ACTION:
 		b = va_arg(args, unsigned int);
-		if (!b)
+		if (!b) {
+			va_end(args);
 			return;
+		}
 		xt_params->exit_err(PARAMETER_PROBLEM,
 		           "%s: At most one action is possible", p1);
 		break;
