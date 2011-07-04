@@ -366,9 +366,6 @@ module.  You can specify multiple extended match modules in one line,
 and you can use the \fB\-h\fP or \fB\-\-help\fP
 options after the module has been specified to receive help specific
 to that module.
-.PP
-The following are included in the base package, and most of these can
-be preceded by a "\fB!\fP" to invert the sense of the match.
 .\" @MATCH@
 .SH TARGET EXTENSIONS
 ip6tables can use extended target modules: the following are included
