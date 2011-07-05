@@ -178,9 +178,9 @@ static const int inverse_for_options[NUMBER_OF_OPT] =
 /* -x */ 0,
 /* -i */ IPT_INV_VIA_IN,
 /* -o */ IPT_INV_VIA_OUT,
-/* -f */ IPT_INV_FRAG,
 /*--line*/ 0,
 /* -c */ 0,
+/* -f */ IPT_INV_FRAG,
 };
 
 #define opts iptables_globals.opts
