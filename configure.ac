@@ -30,7 +30,7 @@ AC_ARG_WITH([xtlibdir],
 	AS_HELP_STRING([--with-xtlibdir=PATH],
 	[Path where to install Xtables extensions [[LIBEXECDIR/xtables]]]),
 	[xtlibdir="$withval"],
-	[xtlibdir="${libexecdir}/xtables"])
+	[xtlibdir="${libdir}/xtables"])
 AC_ARG_ENABLE([ipv4],
 	AS_HELP_STRING([--disable-ipv4], [Do not build iptables]),
 	[enable_ipv4="$enableval"], [enable_ipv4="yes"])
