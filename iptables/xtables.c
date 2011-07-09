@@ -1314,6 +1314,8 @@ void xtables_ipparse_multiple(const char *name, struct in_addr **addrpp,
 	loop = name;
 
 	for (i = 0; i < count; ++i) {
+		while (isspace(*loop))
+			++loop;
 		next = strchr(loop, ',');
 		if (next != NULL)
 			len = next - loop;
@@ -1628,6 +1630,8 @@ xtables_ip6parse_multiple(const char *name, struct in6_addr **addrpp,
 	loop = name;
 
 	for (i = 0; i < count /*NB: count can grow*/; ++i) {
+		while (isspace(*loop))
+			++loop;
 		next = strchr(loop, ',');
 		if (next != NULL)
 			len = next - loop;
