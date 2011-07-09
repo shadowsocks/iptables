@@ -64,8 +64,6 @@ set_parse_v0(int c, char **argv, int invert, unsigned int *flags,
 		if (info->u.flags[0])
 			xtables_error(PARAMETER_PROBLEM,
 				      "--match-set can be specified only once");
-
-		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 		if (invert)
 			info->u.flags[0] |= IPSET_MATCH_INV;
 
@@ -151,8 +149,6 @@ set_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 		if (info->dim)
 			xtables_error(PARAMETER_PROBLEM,
 				      "--match-set can be specified only once");
-
-		xtables_check_inverse(optarg, &invert, &optind, 0, argv);
 		if (invert)
 			info->flags |= IPSET_INV_MATCH;
 

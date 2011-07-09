@@ -67,10 +67,6 @@ parse_target_v0(char **argv, int invert, unsigned int *flags,
 		xtables_error(PARAMETER_PROBLEM,
 			      "--%s can be specified only once", what);
 
-	if (xtables_check_inverse(optarg, &invert, NULL, 0, argv))
-		xtables_error(PARAMETER_PROBLEM,
-			      "Unexpected `!' after --%s", what);
-
 	if (!argv[optind]
 	    || argv[optind][0] == '-' || argv[optind][0] == '!')
 		xtables_error(PARAMETER_PROBLEM,
@@ -173,11 +169,6 @@ parse_target(char **argv, int invert, struct xt_set_info *info,
 	if (info->dim)
 		xtables_error(PARAMETER_PROBLEM,
 			      "--%s can be specified only once", what);
-
-	if (xtables_check_inverse(optarg, &invert, NULL, 0, argv))
-		xtables_error(PARAMETER_PROBLEM,
-			      "Unexpected `!' after --%s", what);
-
 	if (!argv[optind]
 	    || argv[optind][0] == '-' || argv[optind][0] == '!')
 		xtables_error(PARAMETER_PROBLEM,
