@@ -632,6 +632,7 @@ xtables_find_match(const char *name, enum xtables_tryload tryload,
 			/* Second and subsequent clones */
 			clone = xtables_malloc(sizeof(struct xtables_match));
 			memcpy(clone, ptr, sizeof(struct xtables_match));
+			clone->udata = NULL;
 			clone->mflags = 0;
 			/* This is a clone: */
 			clone->next = clone;
