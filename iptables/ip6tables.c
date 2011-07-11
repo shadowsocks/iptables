@@ -1536,7 +1536,6 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			 * Option selection
 			 */
 		case 'p':
-			xtables_check_inverse(optarg, &cs.invert, &optind, argc, argv);
 			set_option(&cs.options, OPT_PROTOCOL, &cs.fw6.ipv6.invflags,
 				   cs.invert);
 
@@ -1562,14 +1561,12 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 			break;
 
 		case 's':
-			xtables_check_inverse(optarg, &cs.invert, &optind, argc, argv);
 			set_option(&cs.options, OPT_SOURCE, &cs.fw6.ipv6.invflags,
 				   cs.invert);
 			shostnetworkmask = optarg;
 			break;
 
 		case 'd':
-			xtables_check_inverse(optarg, &cs.invert, &optind, argc, argv);
 			set_option(&cs.options, OPT_DESTINATION, &cs.fw6.ipv6.invflags,
 				   cs.invert);
 			dhostnetworkmask = optarg;
@@ -1594,7 +1591,6 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				xtables_error(PARAMETER_PROBLEM,
 					"Empty interface is likely to be "
 					"undesired");
-			xtables_check_inverse(optarg, &cs.invert, &optind, argc, argv);
 			set_option(&cs.options, OPT_VIANAMEIN, &cs.fw6.ipv6.invflags,
 				   cs.invert);
 			xtables_parse_interface(optarg,
@@ -1607,7 +1603,6 @@ int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **hand
 				xtables_error(PARAMETER_PROBLEM,
 					"Empty interface is likely to be "
 					"undesired");
-			xtables_check_inverse(optarg, &cs.invert, &optind, argc, argv);
 			set_option(&cs.options, OPT_VIANAMEOUT, &cs.fw6.ipv6.invflags,
 				   cs.invert);
 			xtables_parse_interface(optarg,
