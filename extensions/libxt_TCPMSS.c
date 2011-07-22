@@ -2,10 +2,10 @@
  *
  * Copyright (c) 2000 Marc Boucher
 */
+#include "config.h"
 #include <stdio.h>
 #include <xtables.h>
 #include <netinet/ip.h>
-#include <netinet/ip6.h>
 #include <linux/netfilter/xt_TCPMSS.h>
 
 enum {
@@ -34,7 +34,7 @@ static void TCPMSS_help(void)
 
 static void TCPMSS_help6(void)
 {
-	__TCPMSS_help(sizeof(struct ip6_hdr));
+	__TCPMSS_help(SIZEOF_STRUCT_IP6_HDR);
 }
 
 static const struct xt_option_entry TCPMSS4_opts[] = {
@@ -47,7 +47,7 @@ static const struct xt_option_entry TCPMSS4_opts[] = {
 
 static const struct xt_option_entry TCPMSS6_opts[] = {
 	{.name = "set-mss", .id = O_SET_MSS, .type = XTTYPE_UINT16,
-	 .min = 0, .max = UINT16_MAX - sizeof(struct ip6_hdr),
+	 .min = 0, .max = UINT16_MAX - SIZEOF_STRUCT_IP6_HDR,
 	 .flags = XTOPT_PUT, XTOPT_POINTER(struct xt_tcpmss_info, mss)},
 	{.name = "clamp-mss-to-pmtu", .id = O_CLAMP_MSS, .type = XTTYPE_NONE},
 	XTOPT_TABLEEND,
