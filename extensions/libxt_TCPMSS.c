@@ -91,36 +91,36 @@ static void TCPMSS_save(const void *ip, const struct xt_entry_target *target)
 		printf(" --set-mss %u", mssinfo->mss);
 }
 
-static struct xtables_target tcpmss_target = {
-	.family		= NFPROTO_IPV4,
-	.name		= "TCPMSS",
-	.version	= XTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
-	.help		= TCPMSS_help,
-	.print		= TCPMSS_print,
-	.save		= TCPMSS_save,
-	.x6_parse	= TCPMSS_parse,
-	.x6_fcheck	= TCPMSS_check,
-	.x6_options	= TCPMSS4_opts,
-};
-
-static struct xtables_target tcpmss_target6 = {
-	.family		= NFPROTO_IPV6,
-	.name		= "TCPMSS",
-	.version	= XTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_tcpmss_info)),
-	.help		= TCPMSS_help6,
-	.print		= TCPMSS_print,
-	.save		= TCPMSS_save,
-	.x6_parse	= TCPMSS_parse,
-	.x6_fcheck	= TCPMSS_check,
-	.x6_options	= TCPMSS6_opts,
+static struct xtables_target tcpmss_tg_reg[] = {
+	{
+		.family        = NFPROTO_IPV4,
+		.name          = "TCPMSS",
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_tcpmss_info)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_tcpmss_info)),
+		.help          = TCPMSS_help,
+		.print         = TCPMSS_print,
+		.save          = TCPMSS_save,
+		.x6_parse      = TCPMSS_parse,
+		.x6_fcheck     = TCPMSS_check,
+		.x6_options    = TCPMSS4_opts,
+	},
+	{
+		.family        = NFPROTO_IPV6,
+		.name          = "TCPMSS",
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_tcpmss_info)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_tcpmss_info)),
+		.help          = TCPMSS_help6,
+		.print         = TCPMSS_print,
+		.save          = TCPMSS_save,
+		.x6_parse      = TCPMSS_parse,
+		.x6_fcheck     = TCPMSS_check,
+		.x6_options    = TCPMSS6_opts,
+	},
 };
 
 void _init(void)
 {
-	xtables_register_target(&tcpmss_target);
-	xtables_register_target(&tcpmss_target6);
+	xtables_register_targets(tcpmss_tg_reg, ARRAY_SIZE(tcpmss_tg_reg));
 }
