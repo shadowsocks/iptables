@@ -20,6 +20,7 @@
  *             updated to work with slightly modified
  *             ipt_string_info.
  */
+#define _GNU_SOURCE 1 /* strnlen for older glibcs */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
