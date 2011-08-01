@@ -37,6 +37,8 @@
 #	include <linux/magic.h> /* for PROC_SUPER_MAGIC */
 #elif defined(HAVE_LINUX_PROC_FS_H)
 #	include <linux/proc_fs.h>	/* Linux 2.4 */
+#else
+#	define PROC_SUPER_MAGIC	0x9fa0
 #endif
 
 #include <xtables.h>
