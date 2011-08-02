@@ -28,9 +28,9 @@ Binary XOR the TOS value with \fIbits\fP. (Mnemonic for \fB\-\-set\-tos\fP
 \fIbits\fP\fB/0\fP. See NOTE below.)
 .PP
 NOTE: In Linux kernels up to and including 2.6.38, with the exception of
-longterm releases 2.6.32.42 (or later) and 2.6.33.15 (or later), there is a bug
-whereby IPv6 TOS mangling does not behave as documented and differs from the
-IPv4 version. The TOS mask indicates the bits one wants to zero out, so it needs
-to be inverted before applying it to the original TOS field. However, the
+longterm releases 2.6.32 (>=.42), 2.6.33 (>=.15), and 2.6.35 (>=.14), there is
+a bug whereby IPv6 TOS mangling does not behave as documented and differs from
+the IPv4 version. The TOS mask indicates the bits one wants to zero out, so it
+needs to be inverted before applying it to the original TOS field. However, the
 aformentioned kernels forgo the inversion which breaks --set-tos and its
 mnemonics.
