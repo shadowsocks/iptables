@@ -92,36 +92,36 @@ static void tee_tg6_save(const void *ip, const struct xt_entry_target *target)
 		printf(" --oif %s", info->oif);
 }
 
-static struct xtables_target tee_tg_reg = {
-	.name          = "TEE",
-	.version       = XTABLES_VERSION,
-	.revision      = 1,
-	.family        = NFPROTO_IPV4,
-	.size          = XT_ALIGN(sizeof(struct xt_tee_tginfo)),
-	.userspacesize = XT_ALIGN(sizeof(struct xt_tee_tginfo)),
-	.help          = tee_tg_help,
-	.print         = tee_tg_print,
-	.save          = tee_tg_save,
-	.x6_parse      = xtables_option_parse,
-	.x6_options    = tee_tg_opts,
-};
-
-static struct xtables_target tee_tg6_reg = {
-	.name          = "TEE",
-	.version       = XTABLES_VERSION,
-	.revision      = 1,
-	.family        = NFPROTO_IPV6,
-	.size          = XT_ALIGN(sizeof(struct xt_tee_tginfo)),
-	.userspacesize = XT_ALIGN(sizeof(struct xt_tee_tginfo)),
-	.help          = tee_tg_help,
-	.print         = tee_tg6_print,
-	.save          = tee_tg6_save,
-	.x6_parse      = xtables_option_parse,
-	.x6_options    = tee_tg_opts,
+static struct xtables_target tee_tg_reg[] = {
+	{
+		.name          = "TEE",
+		.version       = XTABLES_VERSION,
+		.revision      = 1,
+		.family        = NFPROTO_IPV4,
+		.size          = XT_ALIGN(sizeof(struct xt_tee_tginfo)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_tee_tginfo)),
+		.help          = tee_tg_help,
+		.print         = tee_tg_print,
+		.save          = tee_tg_save,
+		.x6_parse      = xtables_option_parse,
+		.x6_options    = tee_tg_opts,
+	},
+	{
+		.name          = "TEE",
+		.version       = XTABLES_VERSION,
+		.revision      = 1,
+		.family        = NFPROTO_IPV6,
+		.size          = XT_ALIGN(sizeof(struct xt_tee_tginfo)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_tee_tginfo)),
+		.help          = tee_tg_help,
+		.print         = tee_tg6_print,
+		.save          = tee_tg6_save,
+		.x6_parse      = xtables_option_parse,
+		.x6_options    = tee_tg_opts,
+	},
 };
 
 void _init(void)
 {
-	xtables_register_target(&tee_tg_reg);
-	xtables_register_target(&tee_tg6_reg);
+	xtables_register_targets(tee_tg_reg, ARRAY_SIZE(tee_tg_reg));
 }

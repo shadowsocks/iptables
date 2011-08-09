@@ -757,13 +757,13 @@ static void xtopt_parse_ethermac(struct xt_option_call *cb)
 
 	for (i = 0; i < ARRAY_SIZE(cb->val.ethermac) - 1; ++i) {
 		cb->val.ethermac[i] = strtoul(arg, &end, 16);
-		if (cb->val.ethermac[i] > UINT8_MAX || *end != ':')
+		if (*end != ':' || end - arg > 2)
 			goto out;
 		arg = end + 1;
 	}
 	i = ARRAY_SIZE(cb->val.ethermac) - 1;
 	cb->val.ethermac[i] = strtoul(arg, &end, 16);
-	if (cb->val.ethermac[i] > UINT8_MAX || *end != '\0')
+	if (*end != '\0' || end - arg > 2)
 		goto out;
 	if (cb->entry->flags & XTOPT_PUT)
 		memcpy(XTOPT_MKPTR(cb), cb->val.ethermac,

@@ -68,6 +68,7 @@ if test "$ac_cv_header_linux_ip_vs_h" != "yes"; then
 fi;
 
 AC_SUBST([blacklist_modules])
+AC_CHECK_SIZEOF([struct ip6_hdr], [], [#include <netinet/ip6.h>])
 
 AM_CONDITIONAL([ENABLE_STATIC], [test "$enable_static" = "yes"])
 AM_CONDITIONAL([ENABLE_SHARED], [test "$enable_shared" = "yes"])
@@ -110,6 +111,7 @@ AC_SUBST([libxtables_vmajor])
 
 AC_CONFIG_FILES([Makefile extensions/GNUmakefile include/Makefile
 	iptables/Makefile iptables/xtables.pc
-	libipq/Makefile libiptc/Makefile libiptc/libiptc.pc utils/Makefile
+	libipq/Makefile libipq/libipq.pc
+	libiptc/Makefile libiptc/libiptc.pc utils/Makefile
 	include/xtables.h include/iptables/internal.h])
 AC_OUTPUT
