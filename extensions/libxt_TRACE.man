@@ -1,4 +1,4 @@
-This target marks packes so that the kernel will log every rule which match 
+This target marks packets so that the kernel will log every rule which match 
 the packets as those traverse the tables, chains, rules.
 .PP
 A logging backend, such as ip(6)t_LOG or nfnetlink_log, must be loaded for this
