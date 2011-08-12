@@ -37,6 +37,7 @@
 -A INPUT -p tcp -m recent --rcheck --name DEFAULT --rsource
 -A INPUT -p tcp -m socket --transparent
 -A INPUT -p tcp -m string --string "foobar" --algo kmp --from 1 --to 2 --icase
+-A INPUT -p tcp -m string --hex-string "|00|" --algo kmp --from 1 --to 2 --icase
 -A INPUT -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN
 -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN
 -A INPUT -p tcp -m tos --tos 0xff/0x01

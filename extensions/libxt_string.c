@@ -229,7 +229,7 @@ print_hex_string(const char *str, const unsigned short int len)
 {
 	unsigned int i;
 	/* start hex block */
-	printf("\"|");
+	printf(" \"|");
 	for (i=0; i < len; i++) {
 		/* see if we need to prepend a zero */
 		if ((unsigned char) str[i] <= 0x0F)
@@ -238,7 +238,7 @@ print_hex_string(const char *str, const unsigned short int len)
 			printf("%x", (unsigned char) str[i]);
 	}
 	/* close hex block */
-	printf("|\" ");
+	printf("|\"");
 }
 
 static void
