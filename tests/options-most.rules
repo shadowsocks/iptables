@@ -40,7 +40,7 @@
 -A INPUT -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN
 -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN
 -A INPUT -p tcp -m tos --tos 0xff/0x01
--A INPUT -p tcp -m u32 --u32 "0x0=0x0" -m u32 --u32 "0x0=0x0"
+-A INPUT -p tcp -m u32 ! --u32 "0x0=0x0" -m u32 ! --u32 "0x0=0x0"
 -A INPUT -p tcp -m hbh -m hbh -m hl --hl-eq 1 -m ipv6header --header hop-by-hop --soft
 -A INPUT -m ipv6header --header hop-by-hop --soft -m rt --rt-type 2 --rt-segsleft 2 --rt-len 5 -m rt --rt-type 0 --rt-segsleft 2 --rt-len 5 --rt-0-res --rt-0-addrs ::1 --rt-0-not-strict -m rt --rt-type 0 --rt-segsleft 2 --rt-len 5 --rt-0-res --rt-0-addrs ::1,::2 --rt-0-not-strict
 -A INPUT -p tcp -m cpu --cpu 1 -m tcp --sport 1:2 --dport 1:2 --tcp-option 1 --tcp-flags FIN,SYN,RST,ACK SYN -m cpu --cpu 1
