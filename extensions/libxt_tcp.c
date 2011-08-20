@@ -357,9 +357,7 @@ static void tcp_save(const void *ip, const struct xt_entry_match *match)
 		if (tcpinfo->invflags & XT_TCP_INV_FLAGS)
 			printf(" !");
 		printf(" --tcp-flags ");
-		if (tcpinfo->flg_mask != 0xFF) {
-			print_tcpf(tcpinfo->flg_mask);
-		}
+		print_tcpf(tcpinfo->flg_mask);
 		printf(" ");
 		print_tcpf(tcpinfo->flg_cmp);
 	}
