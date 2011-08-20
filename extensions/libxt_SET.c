@@ -143,9 +143,6 @@ set_target_save_v0(const void *ip, const struct xt_entry_target *target)
 }
 
 /* Revision 1 */
-
-#define set_target_help_v1	set_target_help_v0
-
 static void
 set_target_init_v1(struct xt_entry_target *target)
 {
@@ -204,8 +201,6 @@ set_target_parse_v1(int c, char **argv, int invert, unsigned int *flags,
 	return 1;
 }
 
-#define set_target_check_v1	set_target_check_v0
-
 static void
 print_target(const char *prefix, const struct xt_set_info *info)
 {
@@ -241,8 +236,6 @@ set_target_save_v1(const void *ip, const struct xt_entry_target *target)
 	print_target("--add-set", &info->add_set);
 	print_target("--del-set", &info->del_set);
 }
-
-#define set_target_opts_v1	set_target_opts_v0
 
 /* Revision 2 */
 
@@ -376,13 +369,13 @@ static struct xtables_target set_tg_reg[] = {
 		.family		= NFPROTO_UNSPEC,
 		.size		= XT_ALIGN(sizeof(struct xt_set_info_target_v1)),
 		.userspacesize	= XT_ALIGN(sizeof(struct xt_set_info_target_v1)),
-		.help		= set_target_help_v1,
+		.help		= set_target_help_v0,
 		.init		= set_target_init_v1,
 		.parse		= set_target_parse_v1,
-		.final_check	= set_target_check_v1,
+		.final_check	= set_target_check_v0,
 		.print		= set_target_print_v1,
 		.save		= set_target_save_v1,
-		.extra_opts	= set_target_opts_v1,
+		.extra_opts	= set_target_opts_v0,
 	},
 	{
 		.name		= "SET",
