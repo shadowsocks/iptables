@@ -18,6 +18,5 @@ found in the specified set.
 The option \fB\-\-match\-set\fP can be replaced by \fB\-\-set\fP if that does 
 not clash with an option of other extensions.
 .PP
-Use of -m set requires that ipset kernel support is provided. As standard
-kernels do not ship this currently, the ipset or Xtables-addons package needs
-to be installed.
+Use of -m set requires that ipset kernel support is provided, which, for
+standard kernels, is the case since Linux 2.6.39.

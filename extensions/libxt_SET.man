@@ -21,6 +21,5 @@ one from the set definition
 when adding entry if it already exists, reset the timeout value
 to the specified one or to the default from the set definition
 .PP
-Use of -j SET requires that ipset kernel support is provided. As standard
-kernels do not ship this currently, the ipset or Xtables-addons package needs
-to be installed.
+Use of -j SET requires that ipset kernel support is provided, which, for
+standard kernels, is the case since Linux 2.6.39.
