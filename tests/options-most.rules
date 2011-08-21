@@ -94,6 +94,8 @@
 -A matches -m hashlimit --hashlimit-upto 1/hour --hashlimit-burst 1 --hashlimit-name mini3
 -A matches -m hashlimit --hashlimit-upto 1/day --hashlimit-burst 1 --hashlimit-name mini4
 -A matches
+-A matches -m hbh ! --hbh-len 5
+-A matches
 -A matches -m ipvs --vaddr fe80::/64 --vport 1 --vdir REPLY --vmethod GATE --vportctl 21
 -A matches
 -A matches -m length --length 1
