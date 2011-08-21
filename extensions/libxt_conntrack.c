@@ -93,8 +93,7 @@ static const struct xt_option_entry conntrack_mt_opts_v0[] = {
 	{.name = "ctstate", .id = O_CTSTATE, .type = XTTYPE_STRING,
 	 .flags = XTOPT_INVERT},
 	{.name = "ctproto", .id = O_CTPROTO, .type = XTTYPE_PROTOCOL,
-	 .flags = XTOPT_INVERT,
-	 XTOPT_POINTER(s, tuple[IP_CT_DIR_ORIGINAL].dst.protonum)},
+	 .flags = XTOPT_INVERT},
 	{.name = "ctorigsrc", .id = O_CTORIGSRC, .type = XTTYPE_HOST,
 	 .flags = XTOPT_INVERT},
 	{.name = "ctorigdst", .id = O_CTORIGDST, .type = XTTYPE_HOST,
@@ -117,7 +116,7 @@ static const struct xt_option_entry conntrack2_mt_opts[] = {
 	{.name = "ctstate", .id = O_CTSTATE, .type = XTTYPE_STRING,
 	 .flags = XTOPT_INVERT},
 	{.name = "ctproto", .id = O_CTPROTO, .type = XTTYPE_PROTOCOL,
-	 .flags = XTOPT_INVERT, XTOPT_POINTER(s, l4proto)},
+	 .flags = XTOPT_INVERT},
 	{.name = "ctorigsrc", .id = O_CTORIGSRC, .type = XTTYPE_HOSTMASK,
 	 .flags = XTOPT_INVERT},
 	{.name = "ctorigdst", .id = O_CTORIGDST, .type = XTTYPE_HOSTMASK,
@@ -149,7 +148,7 @@ static const struct xt_option_entry conntrack3_mt_opts[] = {
 	{.name = "ctstate", .id = O_CTSTATE, .type = XTTYPE_STRING,
 	 .flags = XTOPT_INVERT},
 	{.name = "ctproto", .id = O_CTPROTO, .type = XTTYPE_PROTOCOL,
-	 .flags = XTOPT_INVERT, XTOPT_POINTER(s, l4proto)},
+	 .flags = XTOPT_INVERT},
 	{.name = "ctorigsrc", .id = O_CTORIGSRC, .type = XTTYPE_HOSTMASK,
 	 .flags = XTOPT_INVERT},
 	{.name = "ctorigdst", .id = O_CTORIGDST, .type = XTTYPE_HOSTMASK,
@@ -336,6 +335,7 @@ static void conntrack_parse(struct xt_option_call *cb)
 			sinfo->invflags |= XT_CONNTRACK_STATE;
 		break;
 	case O_CTPROTO:
+		sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum = cb->val.protocol;
 		if (cb->invert)
 			sinfo->invflags |= XT_CONNTRACK_PROTO;
 		if (sinfo->tuple[IP_CT_DIR_ORIGINAL].dst.protonum == 0
@@ -400,6 +400,7 @@ static void conntrack_mt_parse(struct xt_option_call *cb, uint8_t rev)
 			info->invert_flags |= XT_CONNTRACK_STATE;
 		break;
 	case O_CTPROTO:
+		info->l4proto = cb->val.protocol;
 		if (info->l4proto == 0 && (info->invert_flags & XT_INV_PROTO))
 			xtables_error(PARAMETER_PROBLEM, "conntrack: rule would "
 			           "never match protocol");
