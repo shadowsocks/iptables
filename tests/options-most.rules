@@ -79,6 +79,8 @@
 -A matches
 -A matches -m conntrack ! --ctstate NEW ! --ctproto tcp ! --ctorigsrc ::1/127 ! --ctorigdst ::2/127 ! --ctreplsrc ::2/127 ! --ctrepldst ::2/127 ! --ctorigsrcport 3 ! --ctorigdstport 4 ! --ctreplsrcport 5 ! --ctrepldstport 6 ! --ctstatus ASSURED ! --ctexpire 8:9
 -A matches
+-A matches -m dst ! --dst-len 12
+-A matches
 -A matches -p esp -m esp --espspi 1
 -A matches
 -A matches -p esp -m esp --espspi :2
