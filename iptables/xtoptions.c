@@ -847,8 +847,14 @@ void xtables_option_metavalidate(const char *name,
 			xt_params->exit_err(OTHER_PROBLEM,
 				"Extension %s uses invalid ID %u\n",
 				name, entry->id);
-		if (!(entry->flags & XTOPT_PUT))
+		if (!(entry->flags & XTOPT_PUT)) {
+			if (entry->ptroff != 0)
+				xt_params->exit_err(OTHER_PROBLEM,
+					"%s: ptroff for \"--%s\" is non-"
+					"zero but no XTOPT_PUT is specified. "
+					"Oversight?", name, entry->name);
 			continue;
+		}
 		if (entry->type >= ARRAY_SIZE(xtopt_psize) ||
 		    xtopt_psize[entry->type] == 0)
 			xt_params->exit_err(OTHER_PROBLEM,
