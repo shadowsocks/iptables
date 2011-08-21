@@ -262,7 +262,7 @@ static void dccp_save(const void *ip, const struct xt_entry_match *match)
 	}
 
 	if (einfo->flags & XT_DCCP_TYPE) {
-		printf("%s --dccp-type",
+		printf("%s --dccp-types",
 		       einfo->invflags & XT_DCCP_TYPE ? " !" : "");
 		print_types(einfo->typemask, false, 0);
 	}
