@@ -57,6 +57,7 @@
 -A INPUT -p mobility
 -A INPUT -p mobility -m mh --mh-type 3
 -A OUTPUT -m owner --socket-exists --uid-owner 1-2 --gid-owner 2-3
+-A OUTPUT -m owner ! --socket-exists ! --uid-owner 0 ! --gid-owner 0
 -A matches -m connbytes --connbytes 1 --connbytes-mode bytes --connbytes-dir both
 -A matches
 -A matches -m connbytes --connbytes :2 --connbytes-mode bytes --connbytes-dir both
