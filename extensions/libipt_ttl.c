@@ -20,7 +20,7 @@ static void ttl_help(void)
 {
 	printf(
 "ttl match options:\n"
-"  --ttl-eq value	Match time to live value\n"
+"[!] --ttl-eq value	Match time to live value\n"
 "  --ttl-lt value	Match TTL < value\n"
 "  --ttl-gt value	Match TTL > value\n");
 }
