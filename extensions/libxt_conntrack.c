@@ -143,8 +143,8 @@ static const struct xt_option_entry conntrack2_mt_opts[] = {
 };
 #undef s
 
-#define s struct xt_conntrack_mtinfo3 /* for v1-v3 */
-/* We exploit the fact that v1-v3 share the same layout */
+#define s struct xt_conntrack_mtinfo3
+/* Difference from v2 is the non-NBO form. */
 static const struct xt_option_entry conntrack3_mt_opts[] = {
 	{.name = "ctstate", .id = O_CTSTATE, .type = XTTYPE_STRING,
 	 .flags = XTOPT_INVERT},
