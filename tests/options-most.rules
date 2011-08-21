@@ -111,6 +111,8 @@
 -A matches
 -A matches -m length --length 5:65535
 -A matches
+-A matches -m physdev ! --physdev-is-in ! --physdev-is-out ! --physdev-is-bridged
+-A matches
 -A matches -p tcp -m tcpmss --mss 1
 -A matches
 -A matches -p tcp -m tcpmss --mss :2
