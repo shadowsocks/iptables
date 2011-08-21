@@ -315,7 +315,7 @@ static void hashlimit_check(struct xt_fcheck_call *cb)
 		xtables_error(PARAMETER_PROBLEM,
 				"You have to specify --hashlimit");
 	if (!(cb->xflags & F_HTABLE_EXPIRE))
-		info->cfg.expire = udata->mult;
+		info->cfg.expire = udata->mult * 1000; /* from s to msec */
 }
 
 static void hashlimit_mt_check(struct xt_fcheck_call *cb)
@@ -327,7 +327,7 @@ static void hashlimit_mt_check(struct xt_fcheck_call *cb)
 		xtables_error(PARAMETER_PROBLEM,
 				"You have to specify --hashlimit");
 	if (!(cb->xflags & F_HTABLE_EXPIRE))
-		info->cfg.expire = udata->mult;
+		info->cfg.expire = udata->mult * 1000; /* from s to msec */
 }
 
 static const struct rates
