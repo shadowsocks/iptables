@@ -89,7 +89,7 @@ static void hashlimit_mt_help(void)
 #define s struct xt_hashlimit_info
 static const struct xt_option_entry hashlimit_opts[] = {
 	{.name = "hashlimit", .id = O_UPTO, .excl = F_ABOVE,
-	 .type = XTTYPE_STRING, .flags = XTOPT_INVERT},
+	 .type = XTTYPE_STRING},
 	{.name = "hashlimit-burst", .id = O_BURST, .type = XTTYPE_UINT32,
 	 .min = 1, .max = 10000, .flags = XTOPT_PUT,
 	 XTOPT_POINTER(s, cfg.burst)},
@@ -251,18 +251,9 @@ static void hashlimit_parse(struct xt_option_call *cb)
 	xtables_option_parse(cb);
 	switch (cb->entry->id) {
 	case O_UPTO:
-		if (cb->invert)
-			info->cfg.mode |= XT_HASHLIMIT_INVERT;
 		if (!parse_rate(cb->arg, &info->cfg.avg, cb->udata))
 			xtables_param_act(XTF_BAD_VALUE, "hashlimit",
 			          "--hashlimit-upto", cb->arg);
-		break;
-	case O_ABOVE:
-		if (!cb->invert)
-			info->cfg.mode |= XT_HASHLIMIT_INVERT;
-		if (!parse_rate(cb->arg, &info->cfg.avg, cb->udata))
-			xtables_param_act(XTF_BAD_VALUE, "hashlimit",
-			          "--hashlimit-above", cb->arg);
 		break;
 	case O_MODE:
 		if (parse_mode(&info->cfg.mode, cb->arg) < 0)
@@ -529,7 +520,7 @@ static struct xtables_match hashlimit_mt_reg[] = {
 		.x6_fcheck     = hashlimit_check,
 		.print         = hashlimit_print,
 		.save          = hashlimit_save,
-		.x6_options    = hashlimit_mt_opts,
+		.x6_options    = hashlimit_opts,
 		.udata_size    = sizeof(struct hashlimit_mt_udata),
 	},
 	{
