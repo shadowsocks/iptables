@@ -46,6 +46,7 @@
 -A INPUT -m ipv6header --header hop-by-hop --soft -m rt --rt-type 2 --rt-segsleft 2 --rt-len 5 -m rt --rt-type 0 --rt-segsleft 2 --rt-len 5 --rt-0-res --rt-0-addrs ::1 --rt-0-not-strict -m rt --rt-type 0 --rt-segsleft 2 --rt-len 5 --rt-0-res --rt-0-addrs ::1,::2 --rt-0-not-strict
 -A INPUT -p tcp -m cpu --cpu 1 -m tcp --sport 1:2 --dport 1:2 --tcp-option 1 --tcp-flags FIN,SYN,RST,ACK SYN -m cpu --cpu 1
 -A INPUT -p dccp -m cpu --cpu 1 -m dccp --sport 1:2 --dport 3:4 -m cpu --cpu 1
+-A INPUT -p dccp -m dccp ! --sport 1:2 ! --dport 3:4 ! --dccp-types REQUEST,RESPONSE ! --dccp-option 1
 -A INPUT -p udp -m cpu --cpu 1 -m udp --sport 1:2 --dport 3:4 -m cpu --cpu 1
 -A INPUT -p sctp -m cpu --cpu 1 -m sctp --sport 1:2 --dport 3:4 --chunk-types all INIT,SACK -m cpu --cpu 1
 -A INPUT -p esp -m esp --espspi 1:2

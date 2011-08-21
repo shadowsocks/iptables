@@ -50,9 +50,10 @@ static const struct xt_option_entry dccp_opts[] = {
 	 .flags = XTOPT_INVERT | XTOPT_PUT, XTOPT_POINTER(s, dpts)},
 	{.name = "dport", .id = O_DEST_PORT, .type = XTTYPE_PORTRC,
 	 .flags = XTOPT_INVERT | XTOPT_PUT, XTOPT_POINTER(s, dpts)},
-	{.name = "dccp-types", .id = O_DCCP_TYPES, .type = XTTYPE_STRING},
+	{.name = "dccp-types", .id = O_DCCP_TYPES, .type = XTTYPE_STRING,
+	 .flags = XTOPT_INVERT},
 	{.name = "dccp-option", .id = O_DCCP_OPTION, .type = XTTYPE_UINT8,
-	 .min = 1, .max = UINT8_MAX, .flags = XTOPT_PUT,
+	 .min = 1, .max = UINT8_MAX, .flags = XTOPT_INVERT | XTOPT_PUT,
 	 XTOPT_POINTER(s, option)},
 	XTOPT_TABLEEND,
 };
