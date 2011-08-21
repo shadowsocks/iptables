@@ -37,7 +37,10 @@ static void dccp_help(void)
 "[!] --source-port port[:port]                          match source port(s)\n"
 " --sport ...\n"
 "[!] --destination-port port[:port]                     match destination port(s)\n"
-" --dport ...\n");
+" --dport ...\n"
+"[!] --dccp-types type[,...]                            match when packet is one of the given types\n"
+"[!] --dccp-option option                               match if option (by number!) is set\n"
+);
 }
 
 #define s struct xt_dccp_info

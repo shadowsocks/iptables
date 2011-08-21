@@ -9,4 +9,4 @@ list of packet types.  Packet types are:
 .BR "REQUEST RESPONSE DATA ACK DATAACK CLOSEREQ CLOSE RESET SYNC SYNCACK INVALID" .
 .TP
 [\fB!\fP] \fB\-\-dccp\-option\fP \fInumber\fP
-Match if DCP option set.
+Match if DCCP option set.
