@@ -262,13 +262,14 @@ static void dccp_save(const void *ip, const struct xt_entry_match *match)
 	}
 
 	if (einfo->flags & XT_DCCP_TYPE) {
-		printf(" --dccp-type");
-		print_types(einfo->typemask, einfo->invflags & XT_DCCP_TYPE,0);
+		printf("%s --dccp-type",
+		       einfo->invflags & XT_DCCP_TYPE ? " !" : "");
+		print_types(einfo->typemask, false, 0);
 	}
 
 	if (einfo->flags & XT_DCCP_OPTION) {
-		printf(" --dccp-option %s%u",
-			einfo->typemask & XT_DCCP_OPTION ? "! " : "",
+		printf("%s --dccp-option %u",
+			einfo->typemask & XT_DCCP_OPTION ? " !" : "",
 			einfo->option);
 	}
 }
