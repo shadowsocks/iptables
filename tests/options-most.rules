@@ -20,8 +20,8 @@
 -A INPUT -p tcp -m connmark --mark 0x99
 -A INPUT -p tcp -m conntrack --ctstate INVALID --ctproto 6 --ctorigsrc fe80::/64 --ctorigdst fe80::/64 --ctreplsrc fe80::/64 --ctrepldst fe80::/64 --ctorigsrcport 12 --ctorigdstport 13 --ctreplsrcport 14 --ctrepldstport 15 --ctstatus EXPECTED --ctexpire 1:2 --ctdir REPLY
 -A INPUT -p tcp -m cpu --cpu 2
--A INPUT -p tcp -m dscp --dscp 0x04
--A INPUT -p tcp -m dscp --dscp 0x00
+-A INPUT -p tcp -m dscp --dscp 0x04 -m dscp ! --dscp 0x04
+-A INPUT -p tcp -m dscp --dscp 0x00 -m dscp ! --dscp 0x00
 -A INPUT -p tcp -m hashlimit --hashlimit-upto 1/sec --hashlimit-burst 5 --hashlimit-mode srcip,dstip --hashlimit-name f1 --hashlimit-htable-size 64 --hashlimit-htable-max 128 --hashlimit-htable-gcinterval 60 --hashlimit-htable-expire 120 --hashlimit-srcmask 24 --hashlimit-dstmask 24
 -A INPUT -p tcp -m hashlimit --hashlimit-above 5/sec --hashlimit-burst 5 --hashlimit-name f1
 -A INPUT -p tcp -m helper --helper ftp
