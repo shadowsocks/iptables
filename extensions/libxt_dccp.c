@@ -272,7 +272,7 @@ static void dccp_save(const void *ip, const struct xt_entry_match *match)
 
 	if (einfo->flags & XT_DCCP_OPTION) {
 		printf("%s --dccp-option %u",
-			einfo->typemask & XT_DCCP_OPTION ? " !" : "",
+			einfo->invflags & XT_DCCP_OPTION ? " !" : "",
 			einfo->option);
 	}
 }
