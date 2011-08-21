@@ -50,6 +50,22 @@ static void frag_parse(struct xt_option_call *cb)
 	case O_FRAGID:
 		if (cb->nvals == 1)
 			fraginfo->ids[1] = fraginfo->ids[0];
+		if (cb->invert)
+			fraginfo->invflags |= IP6T_FRAG_INV_IDS;
+		/*
+		 * Note however that IP6T_FRAG_IDS is not tested by anything,
+		 * so it is merely here for completeness.
+		 */
+		fraginfo->flags |= IP6T_FRAG_IDS;
+		break;
+	case O_FRAGLEN:
+		/*
+		 * As of Linux 3.0, the kernel does not check for
+		 * fraglen at all.
+		 */
+		if (cb->invert)
+			fraginfo->invflags |= IP6T_FRAG_INV_LEN;
+		fraginfo->flags |= IP6T_FRAG_LEN;
 		break;
 	case O_FRAGRES:
 		fraginfo->flags |= IP6T_FRAG_RES;

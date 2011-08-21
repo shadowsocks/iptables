@@ -144,6 +144,8 @@
 -A matches
 -A matches -m frag --fragid 5:4294967295
 -A matches
+-A matches -m frag ! --fragid 9:10 ! --fraglen 12
+-A matches
 -A matches -m rt --rt-segsleft 1
 -A matches
 -A matches -m rt --rt-segsleft :2
