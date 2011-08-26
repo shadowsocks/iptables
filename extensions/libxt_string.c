@@ -242,7 +242,7 @@ print_string(const char *str, const unsigned short int len)
 	unsigned int i;
 	printf(" \"");
 	for (i=0; i < len; i++) {
-		if (str[i] == '\"')  /* escape any embedded quotes */
+		if (str[i] == '\"' || str[i] == '\\')
 			putchar('\\');
 		printf("%c", (unsigned char) str[i]);
 	}

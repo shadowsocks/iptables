@@ -128,6 +128,10 @@
 -A matches
 -A matches -m statistic --mode nth ! --every 5 --packet 2
 -A matches
+-A matches -m string --hex-string "action=|5C22|http|3A|" --algo bm
+-A matches
+-A matches -m string --hex-string "action=|5C|http|3A|" --algo bm
+-A matches
 -A matches -m time --timestart 01:02:03 --timestop 04:05:06 --monthdays 1,2,3,4,5 --weekdays Mon,Fri,Sun --datestart 2001-02-03T04:05:06 --datestop 2012-09-08T09:06:05 --localtz
 -A matches
 -A matches -m time --timestart 01:02:03 --timestop 04:05:06 --monthdays 1,2,3,4,5 --weekdays Mon,Fri,Sun --datestart 2001-02-03T04:05:06 --datestop 2012-09-08T09:06:05 --kerneltz
