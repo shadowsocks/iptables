@@ -23,10 +23,6 @@
 #define DEBUGP(x, args...)
 #endif
 
-#ifndef IPTABLES_MULTI
-int line = 0;
-#endif
-
 struct xtables_globals iptables_xml_globals = {
 	.option_offset = 0,
 	.program_version = IPTABLES_VERSION,
@@ -617,13 +613,8 @@ do_rule(char *pcnt, char *bcnt, int argc, char *argv[], int argvattr[])
 	do_rule_part(NULL, NULL, 1, argc, argv, argvattr);
 }
 
-#ifdef IPTABLES_MULTI
 int
 iptables_xml_main(int argc, char *argv[])
-#else
-int
-main(int argc, char *argv[])
-#endif
 {
 	char buffer[10240];
 	int c;

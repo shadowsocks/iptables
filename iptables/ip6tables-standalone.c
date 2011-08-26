@@ -37,13 +37,8 @@
 #include <ip6tables.h>
 #include "ip6tables-multi.h"
 
-#ifdef IPTABLES_MULTI
 int
 ip6tables_main(int argc, char *argv[])
-#else
-int
-main(int argc, char *argv[])
-#endif
 {
 	int ret;
 	char *table = "filter";

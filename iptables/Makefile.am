@@ -15,7 +15,7 @@ libxtables_la_LIBADD  =
 endif
 
 xtables_multi_SOURCES  = xtables-multi.c iptables-xml.c
-xtables_multi_CFLAGS   = ${AM_CFLAGS} -DIPTABLES_MULTI
+xtables_multi_CFLAGS   = ${AM_CFLAGS}
 xtables_multi_LDFLAGS  = -rdynamic
 xtables_multi_LDADD    = ../extensions/libext.a
 if ENABLE_STATIC
