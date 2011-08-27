@@ -172,7 +172,7 @@ static const unsigned int inverse_for_options[NUMBER_OF_OPT] =
 /* -n */ 0,
 /* -s */ IP6T_INV_SRCIP,
 /* -d */ IP6T_INV_DSTIP,
-/* -p */ IP6T_INV_PROTO,
+/* -p */ XT_INV_PROTO,
 /* -j */ 0,
 /* -v */ 0,
 /* -x */ 0,
@@ -471,7 +471,7 @@ print_num(uint64_t number, unsigned int format)
 static void
 print_header(unsigned int format, const char *chain, struct xtc_handle *handle)
 {
-	struct ip6t_counters counters;
+	struct xt_counters counters;
 	const char *pol = ip6tc_get_policy(chain, &counters, handle);
 	printf("Chain %s", chain);
 	if (pol) {
@@ -519,7 +519,7 @@ print_header(unsigned int format, const char *chain, struct xtc_handle *handle)
 
 
 static int
-print_match(const struct ip6t_entry_match *m,
+print_match(const struct xt_entry_match *m,
 	    const struct ip6t_ip6 *ip,
 	    int numeric)
 {
@@ -548,13 +548,13 @@ print_firewall(const struct ip6t_entry *fw,
 	       struct xtc_handle *const handle)
 {
 	const struct xtables_target *target = NULL;
-	const struct ip6t_entry_target *t;
+	const struct xt_entry_target *t;
 	char buf[BUFSIZ];
 
 	if (!ip6tc_is_chain(targname, handle))
 		target = xtables_find_target(targname, XTF_TRY_LOAD);
 	else
-		target = xtables_find_target(IP6T_STANDARD_TARGET,
+		target = xtables_find_target(XT_STANDARD_TARGET,
 		         XTF_LOAD_MUST_SUCCEED);
 
 	t = ip6t_get_target((struct ip6t_entry *)fw);
@@ -570,7 +570,7 @@ print_firewall(const struct ip6t_entry *fw,
 	if (!(format & FMT_NOTARGET))
 		printf(FMT("%-9s ", "%s "), targname);
 
-	fputc(fw->ipv6.invflags & IP6T_INV_PROTO ? '!' : ' ', stdout);
+	fputc(fw->ipv6.invflags & XT_INV_PROTO ? '!' : ' ', stdout);
 	{
 		const char *pname = proto_to_name(fw->ipv6.proto, format&FMT_NUMERIC);
 		if (pname)
@@ -669,7 +669,7 @@ static void
 print_firewall_line(const struct ip6t_entry *fw,
 		    struct xtc_handle *const h)
 {
-	struct ip6t_entry_target *t;
+	struct xt_entry_target *t;
 
 	t = ip6t_get_target((struct ip6t_entry *)fw);
 	print_firewall(fw, t->u.user.name, 0, FMT_PRINT_RULE, h);
@@ -766,10 +766,10 @@ make_delete_mask(const struct xtables_rule_match *matches,
 
 	size = sizeof(struct ip6t_entry);
 	for (matchp = matches; matchp; matchp = matchp->next)
-		size += XT_ALIGN(sizeof(struct ip6t_entry_match)) + matchp->match->size;
+		size += XT_ALIGN(sizeof(struct xt_entry_match)) + matchp->match->size;
 
 	mask = xtables_calloc(1, size
-			 + XT_ALIGN(sizeof(struct ip6t_entry_target))
+			 + XT_ALIGN(sizeof(struct xt_entry_target))
 			 + target->size);
 
 	memset(mask, 0xFF, sizeof(struct ip6t_entry));
@@ -777,13 +777,13 @@ make_delete_mask(const struct xtables_rule_match *matches,
 
 	for (matchp = matches; matchp; matchp = matchp->next) {
 		memset(mptr, 0xFF,
-		       XT_ALIGN(sizeof(struct ip6t_entry_match))
+		       XT_ALIGN(sizeof(struct xt_entry_match))
 		       + matchp->match->userspacesize);
-		mptr += XT_ALIGN(sizeof(struct ip6t_entry_match)) + matchp->match->size;
+		mptr += XT_ALIGN(sizeof(struct xt_entry_match)) + matchp->match->size;
 	}
 
 	memset(mptr, 0xFF,
-	       XT_ALIGN(sizeof(struct ip6t_entry_target))
+	       XT_ALIGN(sizeof(struct xt_entry_target))
 	       + target->userspacesize);
 
 	return mask;
@@ -1033,7 +1033,7 @@ static void print_proto(uint16_t proto, int invert)
 	}
 }
 
-static int print_match_save(const struct ip6t_entry_match *e,
+static int print_match_save(const struct xt_entry_match *e,
 			const struct ip6t_ip6 *ip)
 {
 	const struct xtables_match *match =
@@ -1082,7 +1082,7 @@ static void print_ip(const char *prefix, const struct in6_addr *ip,
 void print_rule6(const struct ip6t_entry *e,
 		       struct xtc_handle *h, const char *chain, int counters)
 {
-	const struct ip6t_entry_target *t;
+	const struct xt_entry_target *t;
 	const char *target_name;
 
 	/* print counters for iptables-save */
@@ -1105,7 +1105,7 @@ void print_rule6(const struct ip6t_entry *e,
 	print_iface('o', e->ipv6.outiface, e->ipv6.outiface_mask,
 		    e->ipv6.invflags & IP6T_INV_VIA_OUT);
 
-	print_proto(e->ipv6.proto, e->ipv6.invflags & IP6T_INV_PROTO);
+	print_proto(e->ipv6.proto, e->ipv6.invflags & XT_INV_PROTO);
 
 #if 0
 	/* not definied in ipv6
@@ -1153,11 +1153,11 @@ void print_rule6(const struct ip6t_entry *e,
 		if (target->save)
 			target->save(&e->ipv6, t);
 		else {
-			/* If the target size is greater than ip6t_entry_target
+			/* If the target size is greater than xt_entry_target
 			 * there is something to be saved, we just don't know
 			 * how to print it */
 			if (t->u.target_size !=
-			    sizeof(struct ip6t_entry_target)) {
+			    sizeof(struct xt_entry_target)) {
 				fprintf(stderr, "Target `%s' is missing "
 						"save function\n",
 					t->u.user.name);
@@ -1187,7 +1187,7 @@ list_rules(const xt_chainlabel chain, int rulenum, int counters,
 			continue;
 
 		if (ip6tc_builtin(this, handle)) {
-			struct ip6t_counters count;
+			struct xt_counters count;
 			printf("-P %s %s", this, ip6tc_get_policy(this, &count, handle));
 			if (counters)
 			    printf(" -c %llu %llu", (unsigned long long)count.pcnt, (unsigned long long)count.bcnt);
@@ -1224,7 +1224,7 @@ list_rules(const xt_chainlabel chain, int rulenum, int counters,
 static struct ip6t_entry *
 generate_entry(const struct ip6t_entry *fw,
 	       struct xtables_rule_match *matches,
-	       struct ip6t_entry_target *target)
+	       struct xt_entry_target *target)
 {
 	unsigned int size;
 	struct xtables_rule_match *matchp;
@@ -1282,7 +1282,7 @@ static void command_jump(struct iptables_command_state *cs)
 	if (cs->target == NULL)
 		return;
 
-	size = XT_ALIGN(sizeof(struct ip6t_entry_target)) + cs->target->size;
+	size = XT_ALIGN(sizeof(struct xt_entry_target)) + cs->target->size;
 
 	cs->target->t = xtables_calloc(1, size);
 	cs->target->t->u.target_size = size;
@@ -1311,7 +1311,7 @@ static void command_match(struct iptables_command_state *cs)
 			   "unexpected ! flag before --match");
 
 	m = xtables_find_match(optarg, XTF_LOAD_MUST_SUCCEED, &cs->matches);
-	size = XT_ALIGN(sizeof(struct ip6t_entry_match)) + m->size;
+	size = XT_ALIGN(sizeof(struct xt_entry_match)) + m->size;
 	m->m = xtables_calloc(1, size);
 	m->m->u.match_size = size;
 	strcpy(m->m->u.user.name, m->name);
@@ -1548,12 +1548,12 @@ int do_command6(int argc, char *argv[], char **table, struct xtc_handle **handle
 			cs.fw6.ipv6.flags |= IP6T_F_PROTO;
 
 			if (cs.fw6.ipv6.proto == 0
-			    && (cs.fw6.ipv6.invflags & IP6T_INV_PROTO))
+			    && (cs.fw6.ipv6.invflags & XT_INV_PROTO))
 				xtables_error(PARAMETER_PROBLEM,
 					   "rule would never match protocol");
 
 			if (is_exthdr(cs.fw6.ipv6.proto)
-			    && (cs.fw6.ipv6.invflags & IP6T_INV_PROTO) == 0)
+			    && (cs.fw6.ipv6.invflags & XT_INV_PROTO) == 0)
 				fprintf(stderr,
 					"Warning: never matched protocol: %s. "
 					"use extension match instead.\n",
@@ -1824,10 +1824,10 @@ int do_command6(int argc, char *argv[], char **table, struct xtc_handle **handle
 			|| ip6tc_is_chain(cs.jumpto, *handle))) {
 			size_t size;
 
-			cs.target = xtables_find_target(IP6T_STANDARD_TARGET,
+			cs.target = xtables_find_target(XT_STANDARD_TARGET,
 					XTF_LOAD_MUST_SUCCEED);
 
-			size = sizeof(struct ip6t_entry_target)
+			size = sizeof(struct xt_entry_target)
 				+ cs.target->size;
 			cs.target->t = xtables_calloc(1, size);
 			cs.target->t->u.target_size = size;

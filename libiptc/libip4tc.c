@@ -37,23 +37,23 @@ typedef unsigned int socklen_t;
 #define HOOK_LOCAL_OUT		NF_IP_LOCAL_OUT
 #define HOOK_POST_ROUTING	NF_IP_POST_ROUTING
 
-#define STRUCT_ENTRY_TARGET	struct ipt_entry_target
+#define STRUCT_ENTRY_TARGET	struct xt_entry_target
 #define STRUCT_ENTRY		struct ipt_entry
-#define STRUCT_ENTRY_MATCH	struct ipt_entry_match
+#define STRUCT_ENTRY_MATCH	struct xt_entry_match
 #define STRUCT_GETINFO		struct ipt_getinfo
 #define STRUCT_GET_ENTRIES	struct ipt_get_entries
-#define STRUCT_COUNTERS		struct ipt_counters
-#define STRUCT_COUNTERS_INFO	struct ipt_counters_info
-#define STRUCT_STANDARD_TARGET	struct ipt_standard_target
+#define STRUCT_COUNTERS		struct xt_counters
+#define STRUCT_COUNTERS_INFO	struct xt_counters_info
+#define STRUCT_STANDARD_TARGET	struct xt_standard_target
 #define STRUCT_REPLACE		struct ipt_replace
 
 #define ENTRY_ITERATE		IPT_ENTRY_ITERATE
-#define TABLE_MAXNAMELEN	IPT_TABLE_MAXNAMELEN
-#define FUNCTION_MAXNAMELEN	IPT_FUNCTION_MAXNAMELEN
+#define TABLE_MAXNAMELEN	XT_TABLE_MAXNAMELEN
+#define FUNCTION_MAXNAMELEN	XT_FUNCTION_MAXNAMELEN
 
 #define GET_TARGET		ipt_get_target
 
-#define ERROR_TARGET		IPT_ERROR_TARGET
+#define ERROR_TARGET		XT_ERROR_TARGET
 #define NUMHOOKS		NF_IP_NUMHOOKS
 
 #define IPT_CHAINLABEL		xt_chainlabel
@@ -100,14 +100,14 @@ typedef unsigned int socklen_t;
 #define SO_GET_ENTRIES		IPT_SO_GET_ENTRIES
 #define SO_GET_VERSION		IPT_SO_GET_VERSION
 
-#define STANDARD_TARGET		IPT_STANDARD_TARGET
+#define STANDARD_TARGET		XT_STANDARD_TARGET
 #define LABEL_RETURN		IPTC_LABEL_RETURN
 #define LABEL_ACCEPT		IPTC_LABEL_ACCEPT
 #define LABEL_DROP		IPTC_LABEL_DROP
 #define LABEL_QUEUE		IPTC_LABEL_QUEUE
 
 #define ALIGN			XT_ALIGN
-#define RETURN			IPT_RETURN
+#define RETURN			XT_RETURN
 
 #include "libiptc.c"
 
@@ -160,7 +160,7 @@ dump_entry(struct ipt_entry *e, struct xtc_handle *const handle)
 			       : "UNKNOWN");
 		else
 			printf("verdict=%u\n", pos);
-	} else if (strcmp(t->u.user.name, IPT_ERROR_TARGET) == 0)
+	} else if (strcmp(t->u.user.name, XT_ERROR_TARGET) == 0)
 		printf("error=`%s'\n", t->data);
 
 	printf("\n");
@@ -203,7 +203,7 @@ is_same(const STRUCT_ENTRY *a, const STRUCT_ENTRY *b, unsigned char *matchmask)
 	mptr = matchmask + sizeof(STRUCT_ENTRY);
 	if (IPT_MATCH_ITERATE(a, match_different, a->elems, b->elems, &mptr))
 		return NULL;
-	mptr += XT_ALIGN(sizeof(struct ipt_entry_target));
+	mptr += XT_ALIGN(sizeof(struct xt_entry_target));
 
 	return mptr;
 }
@@ -271,14 +271,14 @@ check_entry(const STRUCT_ENTRY *e, unsigned int *i, unsigned int *off,
 
 			idx = iptcb_entry2index(h, te);
 			assert(strcmp(GET_TARGET(te)->u.user.name,
-				      IPT_ERROR_TARGET)
+				      XT_ERROR_TARGET)
 			       != 0);
 			assert(te != e);
 
 			/* Prior node must be error node, or this node. */
 			assert(t->verdict == iptcb_entry2offset(h, e)+e->next_offset
 			       || strcmp(GET_TARGET(index2entry(h, idx-1))
-					 ->u.user.name, IPT_ERROR_TARGET)
+					 ->u.user.name, XT_ERROR_TARGET)
 			       == 0);
 		}
 
@@ -288,7 +288,7 @@ check_entry(const STRUCT_ENTRY *e, unsigned int *i, unsigned int *off,
 			*was_return = 1;
 		else
 			*was_return = 0;
-	} else if (strcmp(t->target.u.user.name, IPT_ERROR_TARGET) == 0) {
+	} else if (strcmp(t->target.u.user.name, XT_ERROR_TARGET) == 0) {
 		assert(t->target.u.target_size
 		       == ALIGN(sizeof(struct ipt_error_target)));
 
@@ -301,7 +301,7 @@ check_entry(const STRUCT_ENTRY *e, unsigned int *i, unsigned int *off,
 	else *was_return = 0;
 
 	if (*off == user_offset)
-		assert(strcmp(t->target.u.user.name, IPT_ERROR_TARGET) == 0);
+		assert(strcmp(t->target.u.user.name, XT_ERROR_TARGET) == 0);
 
 	(*off) += e->next_offset;
 	(*i)++;

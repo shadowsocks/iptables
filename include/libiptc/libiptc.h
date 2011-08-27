@@ -54,7 +54,7 @@ int iptc_builtin(const char *chain, struct xtc_handle *const handle);
 
 /* Get the policy of a given built-in chain */
 const char *iptc_get_policy(const char *chain,
-			    struct ipt_counters *counter,
+			    struct xt_counters *counter,
 			    struct xtc_handle *handle);
 
 /* These functions return TRUE for OK or 0 and set errno.  If errno ==
@@ -127,7 +127,7 @@ int iptc_rename_chain(const xt_chainlabel oldname,
 /* Sets the policy on a built-in chain. */
 int iptc_set_policy(const xt_chainlabel chain,
 		    const xt_chainlabel policy,
-		    struct ipt_counters *counters,
+		    struct xt_counters *counters,
 		    struct xtc_handle *handle);
 
 /* Get the number of references to this chain */
@@ -136,7 +136,7 @@ int iptc_get_references(unsigned int *ref,
 			struct xtc_handle *handle);
 
 /* read packet and byte counters for a specific rule */
-struct ipt_counters *iptc_read_counter(const xt_chainlabel chain,
+struct xt_counters *iptc_read_counter(const xt_chainlabel chain,
 				       unsigned int rulenum,
 				       struct xtc_handle *handle);
 
@@ -148,7 +148,7 @@ int iptc_zero_counter(const xt_chainlabel chain,
 /* set packet and byte counters for a specific rule */
 int iptc_set_counter(const xt_chainlabel chain,
 		     unsigned int rulenum,
-		     struct ipt_counters *counters,
+		     struct xt_counters *counters,
 		     struct xtc_handle *handle);
 
 /* Makes the actual changes. */

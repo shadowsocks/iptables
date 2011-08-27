@@ -36,7 +36,7 @@ static int for_each_table(int (*func)(const char *tablename))
 {
 	int ret = 1;
 	FILE *procfile = NULL;
-	char tablename[IPT_TABLE_MAXNAMELEN+1];
+	char tablename[XT_TABLE_MAXNAMELEN+1];
 
 	procfile = fopen("/proc/net/ip_tables_names", "re");
 	if (!procfile)
@@ -87,7 +87,7 @@ static int do_output(const char *tablename)
 
 		printf(":%s ", chain);
 		if (iptc_builtin(chain, h)) {
-			struct ipt_counters count;
+			struct xt_counters count;
 			printf("%s ",
 			       iptc_get_policy(chain, &count, h));
 			printf("[%llu:%llu]\n", (unsigned long long)count.pcnt, (unsigned long long)count.bcnt);

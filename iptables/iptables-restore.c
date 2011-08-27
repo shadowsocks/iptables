@@ -76,7 +76,7 @@ static struct xtc_handle *create_handle(const char *tablename)
 	return handle;
 }
 
-static int parse_counters(char *string, struct ipt_counters *ctr)
+static int parse_counters(char *string, struct xt_counters *ctr)
 {
 	unsigned long long pcnt, bcnt;
 	int ret;
@@ -119,7 +119,7 @@ iptables_restore_main(int argc, char *argv[])
 	struct xtc_handle *handle = NULL;
 	char buffer[10240];
 	int c;
-	char curtable[IPT_TABLE_MAXNAMELEN + 1];
+	char curtable[XT_TABLE_MAXNAMELEN + 1];
 	FILE *in;
 	int in_table = 0, testing = 0;
 	const char *tablename = NULL;
@@ -217,8 +217,8 @@ iptables_restore_main(int argc, char *argv[])
 					prog_name, line);
 				exit(1);
 			}
-			strncpy(curtable, table, IPT_TABLE_MAXNAMELEN);
-			curtable[IPT_TABLE_MAXNAMELEN] = '\0';
+			strncpy(curtable, table, XT_TABLE_MAXNAMELEN);
+			curtable[XT_TABLE_MAXNAMELEN] = '\0';
 
 			if (tablename && (strcmp(tablename, table) != 0))
 				continue;
@@ -288,7 +288,7 @@ iptables_restore_main(int argc, char *argv[])
 			}
 
 			if (strcmp(policy, "-") != 0) {
-				struct ipt_counters count;
+				struct xt_counters count;
 
 				if (counters) {
 					char *ctrs;
@@ -300,8 +300,7 @@ iptables_restore_main(int argc, char *argv[])
 							   "for chain '%s'\n", chain);
 
 				} else {
-					memset(&count, 0,
-					       sizeof(struct ipt_counters));
+					memset(&count, 0, sizeof(count));
 				}
 
 				DEBUGP("Setting policy of chain %s to %s\n",

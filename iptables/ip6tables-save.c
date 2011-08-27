@@ -38,7 +38,7 @@ static int for_each_table(int (*func)(const char *tablename))
 {
 	int ret = 1;
 	FILE *procfile = NULL;
-	char tablename[IP6T_TABLE_MAXNAMELEN+1];
+	char tablename[XT_TABLE_MAXNAMELEN+1];
 
 	procfile = fopen("/proc/net/ip6_tables_names", "re");
 	if (!procfile)
@@ -89,7 +89,7 @@ static int do_output(const char *tablename)
 
 		printf(":%s ", chain);
 		if (ip6tc_builtin(chain, h)) {
-			struct ip6t_counters count;
+			struct xt_counters count;
 			printf("%s ",
 			       ip6tc_get_policy(chain, &count, h));
 			printf("[%llu:%llu]\n", (unsigned long long)count.pcnt, (unsigned long long)count.bcnt);
