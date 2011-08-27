@@ -33,6 +33,7 @@
 #include <sys/socket.h>
 #include <stdbool.h>
 #include <xtables.h>
+#include <libiptc/xtcshared.h>
 
 #include "linux_list.h"
 
@@ -2731,3 +2732,14 @@ TC_STRERROR(int err)
 
 	return strerror(err);
 }
+
+const struct xtc_ops TC_OPS = {
+	.commit        = TC_COMMIT,
+	.free          = TC_FREE,
+	.builtin       = TC_BUILTIN,
+	.is_chain      = TC_IS_CHAIN,
+	.flush_entries = TC_FLUSH_ENTRIES,
+	.create_chain  = TC_CREATE_CHAIN,
+	.set_policy    = TC_SET_POLICY,
+	.strerror      = TC_STRERROR,
+};

@@ -88,6 +88,7 @@ typedef unsigned int socklen_t;
 #define TC_STRERROR		ip6tc_strerror
 #define TC_NUM_RULES		ip6tc_num_rules
 #define TC_GET_RULE		ip6tc_get_rule
+#define TC_OPS			ip6tc_ops
 
 #define TC_AF			AF_INET6
 #define TC_IPPROTO		IPPROTO_IPV6

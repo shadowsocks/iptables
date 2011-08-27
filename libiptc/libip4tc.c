@@ -90,6 +90,7 @@ typedef unsigned int socklen_t;
 #define TC_STRERROR		iptc_strerror
 #define TC_NUM_RULES		iptc_num_rules
 #define TC_GET_RULE		iptc_get_rule
+#define TC_OPS			iptc_ops
 
 #define TC_AF			AF_INET
 #define TC_IPPROTO		IPPROTO_IP

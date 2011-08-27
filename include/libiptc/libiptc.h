@@ -162,6 +162,8 @@ const char *iptc_strerror(int err);
 
 extern void dump_entries(struct xtc_handle *const);
 
+extern const struct xtc_ops iptc_ops;
+
 #ifdef __cplusplus
 }
 #endif
