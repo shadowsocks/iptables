@@ -515,15 +515,13 @@ void xtables_parse_interface(const char *arg, char *vianame,
 
 	strcpy(vianame, arg);
 	if (vialen == 0)
-		memset(mask, 0, IFNAMSIZ);
+		return;
 	else if (vianame[vialen - 1] == '+') {
 		memset(mask, 0xFF, vialen - 1);
-		memset(mask + vialen - 1, 0, IFNAMSIZ - vialen + 1);
 		/* Don't remove `+' here! -HW */
 	} else {
 		/* Include nul-terminator in match */
 		memset(mask, 0xFF, vialen + 1);
-		memset(mask + vialen + 1, 0, IFNAMSIZ - vialen - 1);
 		for (i = 0; vianame[i]; i++) {
 			if (vianame[i] == '/' ||
 			    vianame[i] == ' ') {
