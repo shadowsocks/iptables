@@ -676,7 +676,7 @@ print_firewall_line(const struct ip6t_entry *fw,
 }
 
 static int
-append_entry(const ip6t_chainlabel chain,
+append_entry(const xt_chainlabel chain,
 	     struct ip6t_entry *fw,
 	     unsigned int nsaddrs,
 	     const struct in6_addr saddrs[],
@@ -706,7 +706,7 @@ append_entry(const ip6t_chainlabel chain,
 }
 
 static int
-replace_entry(const ip6t_chainlabel chain,
+replace_entry(const xt_chainlabel chain,
 	      struct ip6t_entry *fw,
 	      unsigned int rulenum,
 	      const struct in6_addr *saddr, const struct in6_addr *smask,
@@ -725,7 +725,7 @@ replace_entry(const ip6t_chainlabel chain,
 }
 
 static int
-insert_entry(const ip6t_chainlabel chain,
+insert_entry(const xt_chainlabel chain,
 	     struct ip6t_entry *fw,
 	     unsigned int rulenum,
 	     unsigned int nsaddrs,
@@ -790,7 +790,7 @@ make_delete_mask(const struct xtables_rule_match *matches,
 }
 
 static int
-delete_entry(const ip6t_chainlabel chain,
+delete_entry(const xt_chainlabel chain,
 	     struct ip6t_entry *fw,
 	     unsigned int nsaddrs,
 	     const struct in6_addr saddrs[],
@@ -825,7 +825,7 @@ delete_entry(const ip6t_chainlabel chain,
 }
 
 static int
-check_entry(const ip6t_chainlabel chain, struct ip6t_entry *fw,
+check_entry(const xt_chainlabel chain, struct ip6t_entry *fw,
 	    unsigned int nsaddrs, const struct in6_addr *saddrs,
 	    const struct in6_addr *smasks, unsigned int ndaddrs,
 	    const struct in6_addr *daddrs, const struct in6_addr *dmasks,
@@ -855,7 +855,7 @@ check_entry(const ip6t_chainlabel chain, struct ip6t_entry *fw,
 }
 
 int
-for_each_chain6(int (*fn)(const ip6t_chainlabel, int, struct ip6tc_handle *),
+for_each_chain6(int (*fn)(const xt_chainlabel, int, struct ip6tc_handle *),
 	       int verbose, int builtinstoo, struct ip6tc_handle *handle)
 {
 	int ret = 1;
@@ -869,21 +869,21 @@ for_each_chain6(int (*fn)(const ip6t_chainlabel, int, struct ip6tc_handle *),
 		chain = ip6tc_next_chain(handle);
 	}
 
-	chains = xtables_malloc(sizeof(ip6t_chainlabel) * chaincount);
+	chains = xtables_malloc(sizeof(xt_chainlabel) * chaincount);
 	i = 0;
 	chain = ip6tc_first_chain(handle);
 	while (chain) {
-		strcpy(chains + i*sizeof(ip6t_chainlabel), chain);
+		strcpy(chains + i*sizeof(xt_chainlabel), chain);
 		i++;
 		chain = ip6tc_next_chain(handle);
 	}
 
 	for (i = 0; i < chaincount; i++) {
 		if (!builtinstoo
-		    && ip6tc_builtin(chains + i*sizeof(ip6t_chainlabel),
+		    && ip6tc_builtin(chains + i*sizeof(xt_chainlabel),
 				    handle) == 1)
 			continue;
-		ret &= fn(chains + i*sizeof(ip6t_chainlabel), verbose, handle);
+		ret &= fn(chains + i*sizeof(xt_chainlabel), verbose, handle);
 	}
 
 	free(chains);
@@ -891,7 +891,7 @@ for_each_chain6(int (*fn)(const ip6t_chainlabel, int, struct ip6tc_handle *),
 }
 
 int
-flush_entries6(const ip6t_chainlabel chain, int verbose,
+flush_entries6(const xt_chainlabel chain, int verbose,
 	      struct ip6tc_handle *handle)
 {
 	if (!chain)
@@ -903,7 +903,7 @@ flush_entries6(const ip6t_chainlabel chain, int verbose,
 }
 
 static int
-zero_entries(const ip6t_chainlabel chain, int verbose,
+zero_entries(const xt_chainlabel chain, int verbose,
 	     struct ip6tc_handle *handle)
 {
 	if (!chain)
@@ -915,7 +915,7 @@ zero_entries(const ip6t_chainlabel chain, int verbose,
 }
 
 int
-delete_chain6(const ip6t_chainlabel chain, int verbose,
+delete_chain6(const xt_chainlabel chain, int verbose,
 	     struct ip6tc_handle *handle)
 {
 	if (!chain)
@@ -927,7 +927,7 @@ delete_chain6(const ip6t_chainlabel chain, int verbose,
 }
 
 static int
-list_entries(const ip6t_chainlabel chain, int rulenum, int verbose, int numeric,
+list_entries(const xt_chainlabel chain, int rulenum, int verbose, int numeric,
 	     int expanded, int linenumbers, struct ip6tc_handle *handle)
 {
 	int found = 0;
@@ -1169,7 +1169,7 @@ void print_rule6(const struct ip6t_entry *e,
 }
 
 static int
-list_rules(const ip6t_chainlabel chain, int rulenum, int counters,
+list_rules(const xt_chainlabel chain, int rulenum, int counters,
 	     struct ip6tc_handle *handle)
 {
 	const char *this = NULL;

@@ -678,7 +678,7 @@ print_firewall_line(const struct ipt_entry *fw,
 }
 
 static int
-append_entry(const ipt_chainlabel chain,
+append_entry(const xt_chainlabel chain,
 	     struct ipt_entry *fw,
 	     unsigned int nsaddrs,
 	     const struct in_addr saddrs[],
@@ -708,7 +708,7 @@ append_entry(const ipt_chainlabel chain,
 }
 
 static int
-replace_entry(const ipt_chainlabel chain,
+replace_entry(const xt_chainlabel chain,
 	      struct ipt_entry *fw,
 	      unsigned int rulenum,
 	      const struct in_addr *saddr, const struct in_addr *smask,
@@ -727,7 +727,7 @@ replace_entry(const ipt_chainlabel chain,
 }
 
 static int
-insert_entry(const ipt_chainlabel chain,
+insert_entry(const xt_chainlabel chain,
 	     struct ipt_entry *fw,
 	     unsigned int rulenum,
 	     unsigned int nsaddrs,
@@ -792,7 +792,7 @@ make_delete_mask(const struct xtables_rule_match *matches,
 }
 
 static int
-delete_entry(const ipt_chainlabel chain,
+delete_entry(const xt_chainlabel chain,
 	     struct ipt_entry *fw,
 	     unsigned int nsaddrs,
 	     const struct in_addr saddrs[],
@@ -827,7 +827,7 @@ delete_entry(const ipt_chainlabel chain,
 }
 
 static int
-check_entry(const ipt_chainlabel chain, struct ipt_entry *fw,
+check_entry(const xt_chainlabel chain, struct ipt_entry *fw,
 	    unsigned int nsaddrs, const struct in_addr *saddrs,
 	    const struct in_addr *smasks, unsigned int ndaddrs,
 	    const struct in_addr *daddrs, const struct in_addr *dmasks,
@@ -857,7 +857,7 @@ check_entry(const ipt_chainlabel chain, struct ipt_entry *fw,
 }
 
 int
-for_each_chain4(int (*fn)(const ipt_chainlabel, int, struct iptc_handle *),
+for_each_chain4(int (*fn)(const xt_chainlabel, int, struct iptc_handle *),
 	       int verbose, int builtinstoo, struct iptc_handle *handle)
 {
         int ret = 1;
@@ -871,21 +871,21 @@ for_each_chain4(int (*fn)(const ipt_chainlabel, int, struct iptc_handle *),
 		chain = iptc_next_chain(handle);
         }
 
-	chains = xtables_malloc(sizeof(ipt_chainlabel) * chaincount);
+	chains = xtables_malloc(sizeof(xt_chainlabel) * chaincount);
 	i = 0;
 	chain = iptc_first_chain(handle);
 	while (chain) {
-		strcpy(chains + i*sizeof(ipt_chainlabel), chain);
+		strcpy(chains + i*sizeof(xt_chainlabel), chain);
 		i++;
 		chain = iptc_next_chain(handle);
         }
 
 	for (i = 0; i < chaincount; i++) {
 		if (!builtinstoo
-		    && iptc_builtin(chains + i*sizeof(ipt_chainlabel),
+		    && iptc_builtin(chains + i*sizeof(xt_chainlabel),
 				    handle) == 1)
 			continue;
-	        ret &= fn(chains + i*sizeof(ipt_chainlabel), verbose, handle);
+	        ret &= fn(chains + i*sizeof(xt_chainlabel), verbose, handle);
 	}
 
 	free(chains);
@@ -893,7 +893,7 @@ for_each_chain4(int (*fn)(const ipt_chainlabel, int, struct iptc_handle *),
 }
 
 int
-flush_entries4(const ipt_chainlabel chain, int verbose,
+flush_entries4(const xt_chainlabel chain, int verbose,
 	      struct iptc_handle *handle)
 {
 	if (!chain)
@@ -905,7 +905,7 @@ flush_entries4(const ipt_chainlabel chain, int verbose,
 }
 
 static int
-zero_entries(const ipt_chainlabel chain, int verbose,
+zero_entries(const xt_chainlabel chain, int verbose,
 	     struct iptc_handle *handle)
 {
 	if (!chain)
@@ -917,7 +917,7 @@ zero_entries(const ipt_chainlabel chain, int verbose,
 }
 
 int
-delete_chain4(const ipt_chainlabel chain, int verbose,
+delete_chain4(const xt_chainlabel chain, int verbose,
 	     struct iptc_handle *handle)
 {
 	if (!chain)
@@ -929,7 +929,7 @@ delete_chain4(const ipt_chainlabel chain, int verbose,
 }
 
 static int
-list_entries(const ipt_chainlabel chain, int rulenum, int verbose, int numeric,
+list_entries(const xt_chainlabel chain, int rulenum, int verbose, int numeric,
 	     int expanded, int linenumbers, struct iptc_handle *handle)
 {
 	int found = 0;
@@ -1177,7 +1177,7 @@ void print_rule4(const struct ipt_entry *e,
 }
 
 static int
-list_rules(const ipt_chainlabel chain, int rulenum, int counters,
+list_rules(const xt_chainlabel chain, int rulenum, int counters,
 	     struct iptc_handle *handle)
 {
 	const char *this = NULL;

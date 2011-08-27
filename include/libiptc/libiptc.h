@@ -63,91 +63,91 @@ const char *iptc_get_policy(const char *chain,
 /* Rule numbers start at 1 for the first rule. */
 
 /* Insert the entry `e' in chain `chain' into position `rulenum'. */
-int iptc_insert_entry(const ipt_chainlabel chain,
+int iptc_insert_entry(const xt_chainlabel chain,
 		      const struct ipt_entry *e,
 		      unsigned int rulenum,
 		      struct iptc_handle *handle);
 
 /* Atomically replace rule `rulenum' in `chain' with `e'. */
-int iptc_replace_entry(const ipt_chainlabel chain,
+int iptc_replace_entry(const xt_chainlabel chain,
 		       const struct ipt_entry *e,
 		       unsigned int rulenum,
 		       struct iptc_handle *handle);
 
 /* Append entry `e' to chain `chain'.  Equivalent to insert with
    rulenum = length of chain. */
-int iptc_append_entry(const ipt_chainlabel chain,
+int iptc_append_entry(const xt_chainlabel chain,
 		      const struct ipt_entry *e,
 		      struct iptc_handle *handle);
 
 /* Check whether a mathching rule exists */
-int iptc_check_entry(const ipt_chainlabel chain,
+int iptc_check_entry(const xt_chainlabel chain,
 		      const struct ipt_entry *origfw,
 		      unsigned char *matchmask,
 		      struct iptc_handle *handle);
 
 /* Delete the first rule in `chain' which matches `e', subject to
    matchmask (array of length == origfw) */
-int iptc_delete_entry(const ipt_chainlabel chain,
+int iptc_delete_entry(const xt_chainlabel chain,
 		      const struct ipt_entry *origfw,
 		      unsigned char *matchmask,
 		      struct iptc_handle *handle);
 
 /* Delete the rule in position `rulenum' in `chain'. */
-int iptc_delete_num_entry(const ipt_chainlabel chain,
+int iptc_delete_num_entry(const xt_chainlabel chain,
 			  unsigned int rulenum,
 			  struct iptc_handle *handle);
 
 /* Check the packet `e' on chain `chain'.  Returns the verdict, or
    NULL and sets errno. */
-const char *iptc_check_packet(const ipt_chainlabel chain,
+const char *iptc_check_packet(const xt_chainlabel chain,
 			      struct ipt_entry *entry,
 			      struct iptc_handle *handle);
 
 /* Flushes the entries in the given chain (ie. empties chain). */
-int iptc_flush_entries(const ipt_chainlabel chain,
+int iptc_flush_entries(const xt_chainlabel chain,
 		       struct iptc_handle *handle);
 
 /* Zeroes the counters in a chain. */
-int iptc_zero_entries(const ipt_chainlabel chain,
+int iptc_zero_entries(const xt_chainlabel chain,
 		      struct iptc_handle *handle);
 
 /* Creates a new chain. */
-int iptc_create_chain(const ipt_chainlabel chain,
+int iptc_create_chain(const xt_chainlabel chain,
 		      struct iptc_handle *handle);
 
 /* Deletes a chain. */
-int iptc_delete_chain(const ipt_chainlabel chain,
+int iptc_delete_chain(const xt_chainlabel chain,
 		      struct iptc_handle *handle);
 
 /* Renames a chain. */
-int iptc_rename_chain(const ipt_chainlabel oldname,
-		      const ipt_chainlabel newname,
+int iptc_rename_chain(const xt_chainlabel oldname,
+		      const xt_chainlabel newname,
 		      struct iptc_handle *handle);
 
 /* Sets the policy on a built-in chain. */
-int iptc_set_policy(const ipt_chainlabel chain,
-		    const ipt_chainlabel policy,
+int iptc_set_policy(const xt_chainlabel chain,
+		    const xt_chainlabel policy,
 		    struct ipt_counters *counters,
 		    struct iptc_handle *handle);
 
 /* Get the number of references to this chain */
 int iptc_get_references(unsigned int *ref,
-			const ipt_chainlabel chain,
+			const xt_chainlabel chain,
 			struct iptc_handle *handle);
 
 /* read packet and byte counters for a specific rule */
-struct ipt_counters *iptc_read_counter(const ipt_chainlabel chain,
+struct ipt_counters *iptc_read_counter(const xt_chainlabel chain,
 				       unsigned int rulenum,
 				       struct iptc_handle *handle);
 
 /* zero packet and byte counters for a specific rule */
-int iptc_zero_counter(const ipt_chainlabel chain,
+int iptc_zero_counter(const xt_chainlabel chain,
 		      unsigned int rulenum,
 		      struct iptc_handle *handle);
 
 /* set packet and byte counters for a specific rule */
-int iptc_set_counter(const ipt_chainlabel chain,
+int iptc_set_counter(const xt_chainlabel chain,
 		     unsigned int rulenum,
 		     struct ipt_counters *counters,
 		     struct iptc_handle *handle);

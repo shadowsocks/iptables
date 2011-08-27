@@ -59,89 +59,89 @@ const char *ip6tc_get_policy(const char *chain,
 /* Rule numbers start at 1 for the first rule. */
 
 /* Insert the entry `fw' in chain `chain' into position `rulenum'. */
-int ip6tc_insert_entry(const ip6t_chainlabel chain,
+int ip6tc_insert_entry(const xt_chainlabel chain,
 		       const struct ip6t_entry *e,
 		       unsigned int rulenum,
 		       struct ip6tc_handle *handle);
 
 /* Atomically replace rule `rulenum' in `chain' with `fw'. */
-int ip6tc_replace_entry(const ip6t_chainlabel chain,
+int ip6tc_replace_entry(const xt_chainlabel chain,
 			const struct ip6t_entry *e,
 			unsigned int rulenum,
 			struct ip6tc_handle *handle);
 
 /* Append entry `fw' to chain `chain'. Equivalent to insert with
    rulenum = length of chain. */
-int ip6tc_append_entry(const ip6t_chainlabel chain,
+int ip6tc_append_entry(const xt_chainlabel chain,
 		       const struct ip6t_entry *e,
 		       struct ip6tc_handle *handle);
 
 /* Check whether a matching rule exists */
-int ip6tc_check_entry(const ip6t_chainlabel chain,
+int ip6tc_check_entry(const xt_chainlabel chain,
 		       const struct ip6t_entry *origfw,
 		       unsigned char *matchmask,
 		       struct ip6tc_handle *handle);
 
 /* Delete the first rule in `chain' which matches `fw'. */
-int ip6tc_delete_entry(const ip6t_chainlabel chain,
+int ip6tc_delete_entry(const xt_chainlabel chain,
 		       const struct ip6t_entry *origfw,
 		       unsigned char *matchmask,
 		       struct ip6tc_handle *handle);
 
 /* Delete the rule in position `rulenum' in `chain'. */
-int ip6tc_delete_num_entry(const ip6t_chainlabel chain,
+int ip6tc_delete_num_entry(const xt_chainlabel chain,
 			   unsigned int rulenum,
 			   struct ip6tc_handle *handle);
 
 /* Check the packet `fw' on chain `chain'. Returns the verdict, or
    NULL and sets errno. */
-const char *ip6tc_check_packet(const ip6t_chainlabel chain,
+const char *ip6tc_check_packet(const xt_chainlabel chain,
 			       struct ip6t_entry *,
 			       struct ip6tc_handle *handle);
 
 /* Flushes the entries in the given chain (ie. empties chain). */
-int ip6tc_flush_entries(const ip6t_chainlabel chain,
+int ip6tc_flush_entries(const xt_chainlabel chain,
 			struct ip6tc_handle *handle);
 
 /* Zeroes the counters in a chain. */
-int ip6tc_zero_entries(const ip6t_chainlabel chain,
+int ip6tc_zero_entries(const xt_chainlabel chain,
 		       struct ip6tc_handle *handle);
 
 /* Creates a new chain. */
-int ip6tc_create_chain(const ip6t_chainlabel chain,
+int ip6tc_create_chain(const xt_chainlabel chain,
 		       struct ip6tc_handle *handle);
 
 /* Deletes a chain. */
-int ip6tc_delete_chain(const ip6t_chainlabel chain,
+int ip6tc_delete_chain(const xt_chainlabel chain,
 		       struct ip6tc_handle *handle);
 
 /* Renames a chain. */
-int ip6tc_rename_chain(const ip6t_chainlabel oldname,
-		       const ip6t_chainlabel newname,
+int ip6tc_rename_chain(const xt_chainlabel oldname,
+		       const xt_chainlabel newname,
 		       struct ip6tc_handle *handle);
 
 /* Sets the policy on a built-in chain. */
-int ip6tc_set_policy(const ip6t_chainlabel chain,
-		     const ip6t_chainlabel policy,
+int ip6tc_set_policy(const xt_chainlabel chain,
+		     const xt_chainlabel policy,
 		     struct ip6t_counters *counters,
 		     struct ip6tc_handle *handle);
 
 /* Get the number of references to this chain */
-int ip6tc_get_references(unsigned int *ref, const ip6t_chainlabel chain,
+int ip6tc_get_references(unsigned int *ref, const xt_chainlabel chain,
 			 struct ip6tc_handle *handle);
 
 /* read packet and byte counters for a specific rule */
-struct ip6t_counters *ip6tc_read_counter(const ip6t_chainlabel chain,
+struct ip6t_counters *ip6tc_read_counter(const xt_chainlabel chain,
 					unsigned int rulenum,
 					struct ip6tc_handle *handle);
 
 /* zero packet and byte counters for a specific rule */
-int ip6tc_zero_counter(const ip6t_chainlabel chain,
+int ip6tc_zero_counter(const xt_chainlabel chain,
 		       unsigned int rulenum,
 		       struct ip6tc_handle *handle);
 
 /* set packet and byte counters for a specific rule */
-int ip6tc_set_counter(const ip6t_chainlabel chain,
+int ip6tc_set_counter(const xt_chainlabel chain,
 		      unsigned int rulenum,
 		      struct ip6t_counters *counters,
 		      struct ip6tc_handle *handle);

@@ -57,7 +57,7 @@ typedef unsigned int socklen_t;
 #define ERROR_TARGET		IP6T_ERROR_TARGET
 #define NUMHOOKS		NF_IP6_NUMHOOKS
 
-#define IPT_CHAINLABEL		ip6t_chainlabel
+#define IPT_CHAINLABEL		xt_chainlabel
 
 #define TC_DUMP_ENTRIES		dump_entries6
 #define TC_IS_CHAIN		ip6tc_is_chain
