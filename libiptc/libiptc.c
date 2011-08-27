@@ -121,8 +121,7 @@ struct chain_head
 	unsigned int foot_offset;	/* offset in rule blob */
 };
 
-STRUCT_TC_HANDLE
-{
+struct xtc_handle {
 	int sockfd;
 	int changed;			 /* Have changes been made? */
 
@@ -1270,7 +1269,7 @@ alloc_handle(const char *tablename, unsigned int size, unsigned int num_rules)
 {
 	struct xtc_handle *h;
 
-	h = malloc(sizeof(STRUCT_TC_HANDLE));
+	h = malloc(sizeof(*h));
 	if (!h) {
 		errno = ENOMEM;
 		return NULL;

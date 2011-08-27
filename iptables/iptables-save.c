@@ -58,7 +58,7 @@ static int for_each_table(int (*func)(const char *tablename))
 
 static int do_output(const char *tablename)
 {
-	struct iptc_handle *h;
+	struct xtc_handle *h;
 	const char *chain = NULL;
 
 	if (!tablename)

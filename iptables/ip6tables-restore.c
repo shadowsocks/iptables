@@ -56,9 +56,9 @@ static void print_usage(const char *name, const char *version)
 	exit(1);
 }
 
-static struct ip6tc_handle *create_handle(const char *tablename)
+static struct xtc_handle *create_handle(const char *tablename)
 {
-	struct ip6tc_handle *handle;
+	struct xtc_handle *handle;
 
 	handle = ip6tc_init(tablename);
 
@@ -116,7 +116,7 @@ static void free_argv(void) {
 
 int ip6tables_restore_main(int argc, char *argv[])
 {
-	struct ip6tc_handle *handle = NULL;
+	struct xtc_handle *handle = NULL;
 	char buffer[10240];
 	int c;
 	char curtable[IP6T_TABLE_MAXNAMELEN + 1];

@@ -469,7 +469,7 @@ print_num(uint64_t number, unsigned int format)
 
 
 static void
-print_header(unsigned int format, const char *chain, struct ip6tc_handle *handle)
+print_header(unsigned int format, const char *chain, struct xtc_handle *handle)
 {
 	struct ip6t_counters counters;
 	const char *pol = ip6tc_get_policy(chain, &counters, handle);
@@ -545,7 +545,7 @@ print_firewall(const struct ip6t_entry *fw,
 	       const char *targname,
 	       unsigned int num,
 	       unsigned int format,
-	       struct ip6tc_handle *const handle)
+	       struct xtc_handle *const handle)
 {
 	const struct xtables_target *target = NULL;
 	const struct ip6t_entry_target *t;
@@ -667,7 +667,7 @@ print_firewall(const struct ip6t_entry *fw,
 
 static void
 print_firewall_line(const struct ip6t_entry *fw,
-		    struct ip6tc_handle *const h)
+		    struct xtc_handle *const h)
 {
 	struct ip6t_entry_target *t;
 
@@ -685,7 +685,7 @@ append_entry(const xt_chainlabel chain,
 	     const struct in6_addr daddrs[],
 	     const struct in6_addr dmasks[],
 	     int verbose,
-	     struct ip6tc_handle *handle)
+	     struct xtc_handle *handle)
 {
 	unsigned int i, j;
 	int ret = 1;
@@ -712,7 +712,7 @@ replace_entry(const xt_chainlabel chain,
 	      const struct in6_addr *saddr, const struct in6_addr *smask,
 	      const struct in6_addr *daddr, const struct in6_addr *dmask,
 	      int verbose,
-	      struct ip6tc_handle *handle)
+	      struct xtc_handle *handle)
 {
 	fw->ipv6.src = *saddr;
 	fw->ipv6.dst = *daddr;
@@ -735,7 +735,7 @@ insert_entry(const xt_chainlabel chain,
 	     const struct in6_addr daddrs[],
 	     const struct in6_addr dmasks[],
 	     int verbose,
-	     struct ip6tc_handle *handle)
+	     struct xtc_handle *handle)
 {
 	unsigned int i, j;
 	int ret = 1;
@@ -799,7 +799,7 @@ delete_entry(const xt_chainlabel chain,
 	     const struct in6_addr daddrs[],
 	     const struct in6_addr dmasks[],
 	     int verbose,
-	     struct ip6tc_handle *handle,
+	     struct xtc_handle *handle,
 	     struct xtables_rule_match *matches,
 	     const struct xtables_target *target)
 {
@@ -829,7 +829,7 @@ check_entry(const xt_chainlabel chain, struct ip6t_entry *fw,
 	    unsigned int nsaddrs, const struct in6_addr *saddrs,
 	    const struct in6_addr *smasks, unsigned int ndaddrs,
 	    const struct in6_addr *daddrs, const struct in6_addr *dmasks,
-	    bool verbose, struct ip6tc_handle *handle,
+	    bool verbose, struct xtc_handle *handle,
 	    struct xtables_rule_match *matches,
 	    const struct xtables_target *target)
 {
@@ -855,8 +855,8 @@ check_entry(const xt_chainlabel chain, struct ip6t_entry *fw,
 }
 
 int
-for_each_chain6(int (*fn)(const xt_chainlabel, int, struct ip6tc_handle *),
-	       int verbose, int builtinstoo, struct ip6tc_handle *handle)
+for_each_chain6(int (*fn)(const xt_chainlabel, int, struct xtc_handle *),
+	       int verbose, int builtinstoo, struct xtc_handle *handle)
 {
 	int ret = 1;
 	const char *chain;
@@ -892,7 +892,7 @@ for_each_chain6(int (*fn)(const xt_chainlabel, int, struct ip6tc_handle *),
 
 int
 flush_entries6(const xt_chainlabel chain, int verbose,
-	      struct ip6tc_handle *handle)
+	      struct xtc_handle *handle)
 {
 	if (!chain)
 		return for_each_chain6(flush_entries6, verbose, 1, handle);
@@ -904,7 +904,7 @@ flush_entries6(const xt_chainlabel chain, int verbose,
 
 static int
 zero_entries(const xt_chainlabel chain, int verbose,
-	     struct ip6tc_handle *handle)
+	     struct xtc_handle *handle)
 {
 	if (!chain)
 		return for_each_chain6(zero_entries, verbose, 1, handle);
@@ -916,7 +916,7 @@ zero_entries(const xt_chainlabel chain, int verbose,
 
 int
 delete_chain6(const xt_chainlabel chain, int verbose,
-	     struct ip6tc_handle *handle)
+	     struct xtc_handle *handle)
 {
 	if (!chain)
 		return for_each_chain6(delete_chain6, verbose, 0, handle);
@@ -928,7 +928,7 @@ delete_chain6(const xt_chainlabel chain, int verbose,
 
 static int
 list_entries(const xt_chainlabel chain, int rulenum, int verbose, int numeric,
-	     int expanded, int linenumbers, struct ip6tc_handle *handle)
+	     int expanded, int linenumbers, struct xtc_handle *handle)
 {
 	int found = 0;
 	unsigned int format;
@@ -1080,7 +1080,7 @@ static void print_ip(const char *prefix, const struct in6_addr *ip,
 /* We want this to be readable, so only print out neccessary fields.
  * Because that's the kind of world I want to live in.  */
 void print_rule6(const struct ip6t_entry *e,
-		       struct ip6tc_handle *h, const char *chain, int counters)
+		       struct xtc_handle *h, const char *chain, int counters)
 {
 	const struct ip6t_entry_target *t;
 	const char *target_name;
@@ -1170,7 +1170,7 @@ void print_rule6(const struct ip6t_entry *e,
 
 static int
 list_rules(const xt_chainlabel chain, int rulenum, int counters,
-	     struct ip6tc_handle *handle)
+	     struct xtc_handle *handle)
 {
 	const char *this = NULL;
 	int found = 0;
@@ -1328,7 +1328,7 @@ static void command_match(struct iptables_command_state *cs)
 					     m->extra_opts, &m->option_offset);
 }
 
-int do_command6(int argc, char *argv[], char **table, struct ip6tc_handle **handle)
+int do_command6(int argc, char *argv[], char **table, struct xtc_handle **handle)
 {
 	struct iptables_command_state cs;
 	struct ip6t_entry *e = NULL;

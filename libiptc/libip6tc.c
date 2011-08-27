@@ -45,9 +45,6 @@ typedef unsigned int socklen_t;
 #define STRUCT_STANDARD_TARGET	struct ip6t_standard_target
 #define STRUCT_REPLACE		struct ip6t_replace
 
-#define STRUCT_TC_HANDLE	struct ip6tc_handle
-#define xtc_handle		ip6tc_handle
-
 #define ENTRY_ITERATE		IP6T_ENTRY_ITERATE
 #define TABLE_MAXNAMELEN	IP6T_TABLE_MAXNAMELEN
 #define FUNCTION_MAXNAMELEN	IP6T_FUNCTION_MAXNAMELEN
@@ -131,7 +128,7 @@ ipv6_prefix_length(const struct in6_addr *a)
 }
 
 static int
-dump_entry(struct ip6t_entry *e, struct ip6tc_handle *const handle)
+dump_entry(struct ip6t_entry *e, struct xtc_handle *const handle)
 {
 	size_t i;
 	char buf[40];

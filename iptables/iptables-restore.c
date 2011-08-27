@@ -56,9 +56,9 @@ static void print_usage(const char *name, const char *version)
 	exit(1);
 }
 
-static struct iptc_handle *create_handle(const char *tablename)
+static struct xtc_handle *create_handle(const char *tablename)
 {
-	struct iptc_handle *handle;
+	struct xtc_handle *handle;
 
 	handle = iptc_init(tablename);
 
@@ -116,7 +116,7 @@ static void free_argv(void) {
 int
 iptables_restore_main(int argc, char *argv[])
 {
-	struct iptc_handle *handle = NULL;
+	struct xtc_handle *handle = NULL;
 	char buffer[10240];
 	int c;
 	char curtable[IPT_TABLE_MAXNAMELEN + 1];
