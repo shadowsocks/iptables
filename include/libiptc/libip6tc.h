@@ -10,10 +10,11 @@
 #	include <limits.h> /* INT_MAX in ip6_tables.h */
 #endif
 #include <linux/netfilter_ipv6/ip6_tables.h>
+#include <libiptc/xtcshared.h>
 
 struct ip6tc_handle;
 
-typedef char ip6t_chainlabel[32];
+#define ip6t_chainlabel xt_chainlabel
 
 #define IP6TC_LABEL_ACCEPT "ACCEPT"
 #define IP6TC_LABEL_DROP "DROP"

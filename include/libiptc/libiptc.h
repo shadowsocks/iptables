@@ -10,6 +10,7 @@
 #	include <limits.h> /* INT_MAX in ip_tables.h */
 #endif
 #include <linux/netfilter_ipv4/ip_tables.h>
+#include <libiptc/xtcshared.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,7 +18,7 @@ extern "C" {
 
 struct iptc_handle;
 
-typedef char ipt_chainlabel[32];
+#define ipt_chainlabel xt_chainlabel
 
 #define IPTC_LABEL_ACCEPT  "ACCEPT"
 #define IPTC_LABEL_DROP    "DROP"
