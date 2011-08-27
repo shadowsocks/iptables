@@ -36,9 +36,6 @@ typedef unsigned int socklen_t;
 #define HOOK_FORWARD		NF_IP_FORWARD
 #define HOOK_LOCAL_OUT		NF_IP_LOCAL_OUT
 #define HOOK_POST_ROUTING	NF_IP_POST_ROUTING
-#ifdef NF_IP_DROPPING
-#define HOOK_DROPPING		NF_IP_DROPPING
-#endif
 
 #define STRUCT_ENTRY_TARGET	struct ipt_entry_target
 #define STRUCT_ENTRY		struct ipt_entry
@@ -426,15 +423,6 @@ do_check(struct iptc_handle *h, unsigned int line)
 		assert(h->info.hook_entry[NF_IP_LOCAL_OUT] == n);
 
 		user_offset = h->info.hook_entry[NF_IP_LOCAL_OUT];
-
-#ifdef NF_IP_DROPPING
-	} else if (strcmp(h->info.name, "drop") == 0) {
-		assert(h->info.valid_hooks == (1 << NF_IP_DROPPING));
-
-		/* Hook should be first */
-		assert(h->info.hook_entry[NF_IP_DROPPING] == 0);
-		user_offset = 0;
-#endif
 	} else {
 		fprintf(stderr, "Unknown table `%s'\n", h->info.name);
 		abort();

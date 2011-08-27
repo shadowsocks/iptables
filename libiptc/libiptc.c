@@ -61,9 +61,6 @@ static const char *hooknames[] = {
 	[HOOK_FORWARD]		= "FORWARD",
 	[HOOK_LOCAL_OUT]	= "OUTPUT",
 	[HOOK_POST_ROUTING]	= "POSTROUTING",
-#ifdef HOOK_DROPPING
-	[HOOK_DROPPING]		= "DROPPING"
-#endif
 };
 
 /* Convenience structures */
