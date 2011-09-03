@@ -68,7 +68,16 @@ targets_install :=
 
 .PHONY: all install clean distclean FORCE
 
-all: ${targets}
+all: ${targets} check
+
+check: ${targets}
+	@echo "  CHECK    unknown symbols in .so files"; \
+	. ../iptables/libxtables.la; \
+	for i in "" lib*.so; do \
+		[ -z "$$i" ] && continue; \
+		LD_PRELOAD="$$dlname" LD_LIBRARY_PATH=../iptables/.libs \
+			ldd -r $$i 2>&1 >/dev/null; \
+	done;
 
 install: ${targets_install}
 	@mkdir -p "${DESTDIR}${xtlibdir}";
