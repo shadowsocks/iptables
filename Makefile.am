@@ -3,7 +3,7 @@
 ACLOCAL_AMFLAGS  = -I m4
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
-SUBDIRS          = extensions libiptc iptables
+SUBDIRS          = libiptc iptables
 if ENABLE_DEVEL
 SUBDIRS         += include
 endif
@@ -13,6 +13,7 @@ endif
 if HAVE_LIBNFNETLINK
 SUBDIRS         += utils
 endif
+SUBDIRS         += extensions
 
 .PHONY: tarball
 tarball:

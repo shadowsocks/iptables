@@ -21,7 +21,6 @@ endif
 
 xtables_multi_SOURCES  = xtables-multi.c iptables-xml.c
 xtables_multi_CFLAGS   = ${AM_CFLAGS}
-xtables_multi_LDFLAGS  = -rdynamic
 xtables_multi_LDADD    = ../extensions/libext.a
 if ENABLE_STATIC
 xtables_multi_CFLAGS  += -DALL_INCLUSIVE
