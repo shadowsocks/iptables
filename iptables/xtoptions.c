@@ -826,6 +826,12 @@ void xtables_option_parse(struct xt_option_call *cb)
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"%s: option \"--%s\" requires an argument.\n",
 			cb->ext_name, entry->name);
+	/*
+	 * Fill in fallback value for "nvals", in case an extension (as it
+	 * happened with libxt_conntrack.2) tries to read it, despite not using
+	 * a *RC option type.
+	 */
+	cb->nvals = 1;
 	if (entry->type <= ARRAY_SIZE(xtopt_subparse) &&
 	    xtopt_subparse[entry->type] != NULL)
 		xtopt_subparse[entry->type](cb);
