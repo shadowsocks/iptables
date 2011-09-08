@@ -31,6 +31,7 @@
 #include <sys/stat.h>
 #include <sys/statfs.h>
 #include <sys/types.h>
+#include <sys/utsname.h>
 #include <sys/wait.h>
 #include <arpa/inet.h>
 #if defined(HAVE_LINUX_MAGIC_H)
@@ -1811,4 +1812,21 @@ xtables_parse_protocol(const char *s)
 	xt_params->exit_err(PARAMETER_PROBLEM,
 		"unknown protocol \"%s\" specified", s);
 	return -1;
+}
+
+int kernel_version;
+
+void get_kernel_version(void)
+{
+	static struct utsname uts;
+	int x = 0, y = 0, z = 0;
+
+	if (uname(&uts) == -1) {
+		fprintf(stderr, "Unable to retrieve kernel version.\n");
+		xtables_free_opts(1);
+		exit(1);
+	}
+
+	sscanf(uts.release, "%d.%d.%d", &x, &y, &z);
+	kernel_version = LINUX_VERSION(x, y, z);
 }
