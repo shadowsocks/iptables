@@ -73,8 +73,8 @@ all: ${targets} check
 check: ${targets}
 	@echo "  CHECK    unknown symbols in .so files"; \
 	. ../libxtables/libxtables.la; \
-	for i in "" lib*.so; do \
-		[ -z "$$i" ] && continue; \
+	for i in lib*.so; do \
+		[ "$$i" = "lib*.so" ] && continue; \
 		LD_PRELOAD="$$dlname" LD_LIBRARY_PATH=../libxtables/.libs \
 			ldd -r $$i 2>&1 >/dev/null; \
 	done;
