@@ -1139,6 +1139,7 @@ struct xtables_lmap *xtables_lmap_init(const char *file)
 	fclose(fp);
 	return lmap_head;
  out:
+	fclose(fp);
 	xtables_lmap_free(lmap_head);
 	return NULL;
 }
