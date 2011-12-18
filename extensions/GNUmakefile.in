@@ -1,26 +1,26 @@
 # -*- Makefile -*-
 
-top_builddir := @top_builddir@
-builddir     := @builddir@
-top_srcdir  := @top_srcdir@
-srcdir      := @srcdir@
-ksourcedir  := @ksourcedir@
-prefix      := @prefix@
-exec_prefix := @exec_prefix@
-libdir      := @libdir@
-libexecdir  := @libexecdir@
-xtlibdir    := @xtlibdir@
+top_builddir = @top_builddir@
+builddir     = @builddir@
+top_srcdir   = @top_srcdir@
+srcdir       = @srcdir@
+ksourcedir   = @ksourcedir@
+prefix       = @prefix@
+exec_prefix  = @exec_prefix@
+libdir       = @libdir@
+libexecdir   = @libexecdir@
+xtlibdir     = @xtlibdir@
 
-CC             := @CC@
-CCLD           := ${CC}
-CFLAGS         := @CFLAGS@
-CPPFLAGS       := @CPPFLAGS@
-LDFLAGS        := @LDFLAGS@
-regular_CFLAGS := @regular_CFLAGS@
-regular_CPPFLAGS := @regular_CPPFLAGS@
-kinclude_CPPFLAGS := @kinclude_CPPFLAGS@
+CC                 = @CC@
+CCLD               = ${CC}
+CFLAGS             = @CFLAGS@
+CPPFLAGS           = @CPPFLAGS@
+LDFLAGS            = @LDFLAGS@
+regular_CFLAGS     = @regular_CFLAGS@
+regular_CPPFLAGS   = @regular_CPPFLAGS@
+kinclude_CPPFLAGS  = @kinclude_CPPFLAGS@
 
-AM_CFLAGS      := ${regular_CFLAGS}
+AM_CFLAGS       = ${regular_CFLAGS}
 AM_CPPFLAGS     = ${regular_CPPFLAGS} -I${top_builddir}/include -I${top_builddir} -I${top_srcdir}/include ${kinclude_CPPFLAGS}
 AM_DEPFLAGS     = -Wp,-MMD,$(@D)/.$(@F).d,-MT,$@
 
