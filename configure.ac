@@ -5,6 +5,7 @@ AC_INIT([iptables], [1.4.12.1])
 libxtables_vcurrent=7
 libxtables_vage=0
 
+AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_INSTALL
