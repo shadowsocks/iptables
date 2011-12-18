@@ -112,6 +112,8 @@ AC_SUBST([libxtables_vmajor])
 AC_CONFIG_FILES([Makefile extensions/GNUmakefile include/Makefile
 	iptables/Makefile iptables/xtables.pc
 	libipq/Makefile libipq/libipq.pc
-	libiptc/Makefile libiptc/libiptc.pc libxtables/Makefile utils/Makefile
+	libiptc/Makefile libiptc/libiptc.pc
+	libiptc/libip4tc.pc libiptc/libip6tc.pc
+	libxtables/Makefile utils/Makefile
 	include/xtables.h include/iptables/internal.h])
 AC_OUTPUT
