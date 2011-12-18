@@ -1,9 +1,6 @@
-.*.d
-.*.dd
 *.a
 *.la
 *.lo
-*.oo
 *.so
 *.o
 .deps/
@@ -11,12 +8,6 @@
 .libs/
 Makefile
 Makefile.in
-
-/extensions/GNUmakefile
-/extensions/initext.c
-/extensions/initext?.c
-/extensions/matches?.man
-/extensions/targets?.man
 
 /include/xtables.h
 /include/iptables/internal.h
