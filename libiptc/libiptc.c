@@ -33,6 +33,7 @@
 #include <sys/socket.h>
 #include <stdbool.h>
 #include <xtables.h>
+#include <libiptc/xtcshared.h>
 
 #include "linux_list.h"
 
@@ -61,18 +62,9 @@ static const char *hooknames[] = {
 	[HOOK_FORWARD]		= "FORWARD",
 	[HOOK_LOCAL_OUT]	= "OUTPUT",
 	[HOOK_POST_ROUTING]	= "POSTROUTING",
-#ifdef HOOK_DROPPING
-	[HOOK_DROPPING]		= "DROPPING"
-#endif
 };
 
 /* Convenience structures */
-struct ipt_error_target
-{
-	STRUCT_ENTRY_TARGET t;
-	char error[TABLE_MAXNAMELEN];
-};
-
 struct chain_head;
 struct rule_head;
 
@@ -130,8 +122,7 @@ struct chain_head
 	unsigned int foot_offset;	/* offset in rule blob */
 };
 
-STRUCT_TC_HANDLE
-{
+struct xtc_handle {
 	int sockfd;
 	int changed;			 /* Have changes been made? */
 
@@ -1092,10 +1083,10 @@ static int parse_table(struct xtc_handle *h)
 /* Convenience structures */
 struct iptcb_chain_start{
 	STRUCT_ENTRY e;
-	struct ipt_error_target name;
+	struct xt_error_target name;
 };
 #define IPTCB_CHAIN_START_SIZE	(sizeof(STRUCT_ENTRY) +			\
-				 ALIGN(sizeof(struct ipt_error_target)))
+				 ALIGN(sizeof(struct xt_error_target)))
 
 struct iptcb_chain_foot {
 	STRUCT_ENTRY e;
@@ -1106,10 +1097,10 @@ struct iptcb_chain_foot {
 
 struct iptcb_chain_error {
 	STRUCT_ENTRY entry;
-	struct ipt_error_target target;
+	struct xt_error_target target;
 };
 #define IPTCB_CHAIN_ERROR_SIZE	(sizeof(STRUCT_ENTRY) +			\
-				 ALIGN(sizeof(struct ipt_error_target)))
+				 ALIGN(sizeof(struct xt_error_target)))
 
 
 
@@ -1152,10 +1143,10 @@ static int iptcc_compile_chain(struct xtc_handle *h, STRUCT_REPLACE *repl, struc
 		head = (void *)repl->entries + c->head_offset;
 		head->e.target_offset = sizeof(STRUCT_ENTRY);
 		head->e.next_offset = IPTCB_CHAIN_START_SIZE;
-		strcpy(head->name.t.u.user.name, ERROR_TARGET);
-		head->name.t.u.target_size =
-				ALIGN(sizeof(struct ipt_error_target));
-		strcpy(head->name.error, c->name);
+		strcpy(head->name.target.u.user.name, ERROR_TARGET);
+		head->name.target.u.target_size =
+				ALIGN(sizeof(struct xt_error_target));
+		strcpy(head->name.errorname, c->name);
 	} else {
 		repl->hook_entry[c->hooknum-1] = c->head_offset;
 		repl->underflow[c->hooknum-1] = c->foot_offset;
@@ -1198,7 +1189,7 @@ static int iptcc_compile_chain_offsets(struct xtc_handle *h, struct chain_head *
 	if (!iptcc_is_builtin(c))  {
 		/* Chain has header */
 		*offset += sizeof(STRUCT_ENTRY)
-			     + ALIGN(sizeof(struct ipt_error_target));
+			     + ALIGN(sizeof(struct xt_error_target));
 		(*num)++;
 	}
 
@@ -1238,7 +1229,7 @@ static int iptcc_compile_table_prep(struct xtc_handle *h, unsigned int *size)
 	/* Append one error rule at end of chain */
 	num++;
 	offset += sizeof(STRUCT_ENTRY)
-		  + ALIGN(sizeof(struct ipt_error_target));
+		  + ALIGN(sizeof(struct xt_error_target));
 
 	/* ruleset size is now in offset */
 	*size = offset;
@@ -1261,10 +1252,10 @@ static int iptcc_compile_table(struct xtc_handle *h, STRUCT_REPLACE *repl)
 	error = (void *)repl->entries + repl->size - IPTCB_CHAIN_ERROR_SIZE;
 	error->entry.target_offset = sizeof(STRUCT_ENTRY);
 	error->entry.next_offset = IPTCB_CHAIN_ERROR_SIZE;
-	error->target.t.u.user.target_size =
-		ALIGN(sizeof(struct ipt_error_target));
-	strcpy((char *)&error->target.t.u.user.name, ERROR_TARGET);
-	strcpy((char *)&error->target.error, "ERROR");
+	error->target.target.u.user.target_size =
+		ALIGN(sizeof(struct xt_error_target));
+	strcpy((char *)&error->target.target.u.user.name, ERROR_TARGET);
+	strcpy((char *)&error->target.errorname, "ERROR");
 
 	return 1;
 }
@@ -1279,7 +1270,7 @@ alloc_handle(const char *tablename, unsigned int size, unsigned int num_rules)
 {
 	struct xtc_handle *h;
 
-	h = malloc(sizeof(STRUCT_TC_HANDLE));
+	h = malloc(sizeof(*h));
 	if (!h) {
 		errno = ENOMEM;
 		return NULL;
@@ -2741,3 +2732,14 @@ TC_STRERROR(int err)
 
 	return strerror(err);
 }
+
+const struct xtc_ops TC_OPS = {
+	.commit        = TC_COMMIT,
+	.free          = TC_FREE,
+	.builtin       = TC_BUILTIN,
+	.is_chain      = TC_IS_CHAIN,
+	.flush_entries = TC_FLUSH_ENTRIES,
+	.create_chain  = TC_CREATE_CHAIN,
+	.set_policy    = TC_SET_POLICY,
+	.strerror      = TC_STRERROR,
+};
