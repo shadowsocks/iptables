@@ -74,7 +74,8 @@ int iptc_replace_entry(const xt_chainlabel chain,
 		       struct xtc_handle *handle);
 
 /* Append entry `e' to chain `chain'.  Equivalent to insert with
-   rulenum = length of chain. */
+   rulenum = length of chain. Returns the position the entry was
+   inserted or 0 if an error occurs */
 int iptc_append_entry(const xt_chainlabel chain,
 		      const struct ipt_entry *e,
 		      struct xtc_handle *handle);
