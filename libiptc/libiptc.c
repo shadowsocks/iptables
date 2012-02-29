@@ -1836,8 +1836,7 @@ TC_REPLACE_ENTRY(const IPT_CHAINLABEL chain,
 }
 
 /* Append entry `fw' to chain `chain'.  Equivalent to insert with
-   rulenum = length of chain. Returns the position the entry was
-   inserted or 0 if an error occurs */
+   rulenum = length of chain. */
 int
 TC_APPEND_ENTRY(const IPT_CHAINLABEL chain,
 		const STRUCT_ENTRY *e,
@@ -1873,7 +1872,7 @@ TC_APPEND_ENTRY(const IPT_CHAINLABEL chain,
 
 	set_changed(handle);
 
-	return c->num_rules;
+	return 1;
 }
 
 static inline int
