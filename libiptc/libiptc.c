@@ -1993,8 +1993,10 @@ static int delete_entry(const IPT_CHAINLABEL chain, const STRUCT_ENTRY *origfw,
 			continue;
 
 		/* if we are just doing a dry run, we simply skip the rest */
-		if (dry_run)
+		if (dry_run){
+			free(r);
 			return 1;
+		}
 
 		/* If we are about to delete the rule that is the
 		 * current iterator, move rule iterator back.  next
