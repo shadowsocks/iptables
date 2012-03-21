@@ -29,6 +29,8 @@
  * 	- performance work: speedup initial ruleset parsing.
  * 	- sponsored by ComX Networks A/S (http://www.comx.dk/)
  */
+#include <unistd.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <stdbool.h>
@@ -1315,6 +1317,12 @@ TC_INIT(const char *tablename)
 	sockfd = socket(TC_AF, SOCK_RAW, IPPROTO_RAW);
 	if (sockfd < 0)
 		return NULL;
+
+	if (fcntl(sockfd, F_SETFD, FD_CLOEXEC) == -1) {
+		fprintf(stderr, "Could not set close on exec: %s\n",
+			strerror(errno));
+		abort();
+	}
 
 retry:
 	s = sizeof(info);
