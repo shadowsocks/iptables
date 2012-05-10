@@ -97,7 +97,7 @@ static int add_argv(char *what) {
 	DEBUGP("add_argv: %s\n", what);
 	if (what && newargc + 1 < ARRAY_SIZE(newargv)) {
 		newargv[newargc] = strdup(what);
-		newargc++;
+		newargv[++newargc] = NULL;
 		return 1;
 	} else {
 		xtables_error(PARAMETER_PROBLEM,
