@@ -416,8 +416,10 @@ int ip6tables_restore_main(int argc, char *argv[])
 					if (!strncmp(param_buffer, "-t", 2)
                                             || !strncmp(param_buffer, "--table", 8)) {
 						xtables_error(PARAMETER_PROBLEM,
-						   "Line %u seems to have a "
-						   "-t table option.\n", line);
+						   "The -t option (seen in "
+						   "line %u) cannot be used "
+						   "in ip6tables-restore.\n",
+						   line);
 						exit(1);
 					}
 
