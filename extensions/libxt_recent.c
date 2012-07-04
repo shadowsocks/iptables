@@ -131,8 +131,6 @@ static void recent_parse(struct xt_option_call *cb)
 
 static void recent_check(struct xt_fcheck_call *cb)
 {
-	struct xt_recent_mtinfo *info = cb->data;
-
 	if (!(cb->xflags & F_ANY_OP))
 		xtables_error(PARAMETER_PROBLEM,
 			"recent: you must specify one of `--set', `--rcheck' "
