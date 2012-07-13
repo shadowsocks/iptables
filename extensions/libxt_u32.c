@@ -88,17 +88,13 @@ static void u32_dump(const struct xt_u32 *data)
 /* string_to_number() is not quite what we need here ... */
 static uint32_t parse_number(const char **s, int pos)
 {
-	uint32_t number;
+	unsigned int number;
 	char *end;
 
-	errno  = 0;
-	number = strtoul(*s, &end, 0);
-	if (end == *s)
+	if (!xtables_strtoui(*s, &end, &number, 0, UINT32_MAX) ||
+	    end == *s)
 		xtables_error(PARAMETER_PROBLEM,
-			   "u32: at char %d: expected number", pos);
-	if (errno != 0)
-		xtables_error(PARAMETER_PROBLEM,
-			   "u32: at char %d: error reading number", pos);
+			"u32: at char %d: not a number or out of range", pos);
 	*s = end;
 	return number;
 }
