@@ -42,58 +42,48 @@ static void devgroup_init(struct xt_entry_match *match)
 		fprintf(stderr, "Warning: %s: %s\n", file, strerror(errno));
 }
 
+static void devgroup_parse_groupspec(const char *arg, unsigned int *group,
+				     unsigned int *mask)
+{
+	char *end;
+
+	*group = strtoul(arg, &end, 0);
+	if (end != arg && (*end == '/' || *end == '\0')) {
+		if (*end == '/')
+			*mask = strtoul(end + 1, &end, 0);
+		else
+			*mask = ~0U;
+		if (*end != '\0' || end == arg)
+			xtables_error(PARAMETER_PROBLEM,
+				      "Bad group value \"%s\"", arg);
+	} else {
+		*group = xtables_lmap_name2id(devgroups, arg);
+		if (*group == -1)
+			xtables_error(PARAMETER_PROBLEM,
+				      "Device group \"%s\" not found", arg);
+		*mask = ~0U;
+	}
+}
+
 static void devgroup_parse(struct xt_option_call *cb)
 {
 	struct xt_devgroup_info *info = cb->data;
-	unsigned int id;
-	char *end;
+	unsigned int id, mask;
 
 	xtables_option_parse(cb);
 	switch (cb->entry->id) {
 	case O_SRC_GROUP:
-		info->src_group = strtoul(cb->arg, &end, 0);
-		if (end != cb->arg && (*end == '/' || *end == '\0')) {
-			if (*end == '/')
-				info->src_mask = strtoul(end+1, &end, 0);
-			else
-				info->src_mask = 0xffffffff;
-			if (*end != '\0' || end == cb->arg)
-				xtables_error(PARAMETER_PROBLEM,
-					      "Bad src-group value `%s'",
-					      cb->arg);
-		} else {
-			id = xtables_lmap_name2id(devgroups, cb->arg);
-			if (id == -1)
-				xtables_error(PARAMETER_PROBLEM,
-					      "Device group `%s' not found",
-					      cb->arg);
-			info->src_group = id;
-			info->src_mask  = 0xffffffff;
-		}
+		devgroup_parse_groupspec(cb->arg, &id, &mask);
+		info->src_group = id;
+		info->src_mask  = mask;
 		info->flags |= XT_DEVGROUP_MATCH_SRC;
 		if (cb->invert)
 			info->flags |= XT_DEVGROUP_INVERT_SRC;
 		break;
 	case O_DST_GROUP:
-		info->dst_group = strtoul(cb->arg, &end, 0);
-		if (end != cb->arg && (*end == '/' || *end == '\0')) {
-			if (*end == '/')
-				info->dst_mask = strtoul(end+1, &end, 0);
-			else
-				info->dst_mask = 0xffffffff;
-			if (*end != '\0' || end == cb->arg)
-				xtables_error(PARAMETER_PROBLEM,
-					      "Bad dst-group value `%s'",
-					      cb->arg);
-		} else {
-			id = xtables_lmap_name2id(devgroups, cb->arg);
-			if (id == -1)
-				xtables_error(PARAMETER_PROBLEM,
-					      "Device group `%s' not found",
-					      cb->arg);
-			info->dst_group = id;
-			info->dst_mask  = 0xffffffff;
-		}
+		devgroup_parse_groupspec(cb->arg, &id, &mask);
+		info->dst_group = id;
+		info->dst_mask  = mask;
 		info->flags |= XT_DEVGROUP_MATCH_DST;
 		if (cb->invert)
 			info->flags |= XT_DEVGROUP_INVERT_DST;
