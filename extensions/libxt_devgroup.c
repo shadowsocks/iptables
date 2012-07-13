@@ -46,14 +46,16 @@ static void devgroup_parse_groupspec(const char *arg, unsigned int *group,
 				     unsigned int *mask)
 {
 	char *end;
+	bool ok;
 
-	*group = strtoul(arg, &end, 0);
-	if (end != arg && (*end == '/' || *end == '\0')) {
+	ok = xtables_strtoui(arg, &end, group, 0, UINT32_MAX);
+	if (ok && (*end == '/' || *end == '\0')) {
 		if (*end == '/')
-			*mask = strtoul(end + 1, &end, 0);
+			ok = xtables_strtoui(end + 1, NULL, mask,
+			                     0, UINT32_MAX);
 		else
 			*mask = ~0U;
-		if (*end != '\0' || end == arg)
+		if (!ok)
 			xtables_error(PARAMETER_PROBLEM,
 				      "Bad group value \"%s\"", arg);
 	} else {
