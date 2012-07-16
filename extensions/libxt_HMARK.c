@@ -282,15 +282,15 @@ static void HMARK_check(struct xt_fcheck_call *cb)
 
 static void HMARK_print(const struct xt_hmark_info *info)
 {
-	if (info->flags & XT_HMARK_FLAG(XT_HMARK_SPORT))
+	if (info->flags & XT_HMARK_FLAG(XT_HMARK_SPORT_MASK))
 		printf("sport-mask 0x%x ", htons(info->port_mask.p16.src));
-	if (info->flags & XT_HMARK_FLAG(XT_HMARK_DPORT))
+	if (info->flags & XT_HMARK_FLAG(XT_HMARK_DPORT_MASK))
 		printf("dport-mask 0x%x ", htons(info->port_mask.p16.dst));
 	if (info->flags & XT_HMARK_FLAG(XT_HMARK_SPI))
 		printf("spi-mask 0x%x ", htonl(info->port_mask.v32));
-	if (info->flags & XT_HMARK_FLAG(XT_HMARK_SPORT_MASK))
+	if (info->flags & XT_HMARK_FLAG(XT_HMARK_SPORT))
 		printf("sport-set 0x%x ", htons(info->port_set.p16.src));
-	if (info->flags & XT_HMARK_FLAG(XT_HMARK_DPORT_MASK))
+	if (info->flags & XT_HMARK_FLAG(XT_HMARK_DPORT))
 		printf("dport-set 0x%x ", htons(info->port_set.p16.dst));
 	if (info->flags & XT_HMARK_FLAG(XT_HMARK_SPI_MASK))
 		printf("spi-set 0x%x ", htonl(info->port_set.v32));
@@ -335,11 +335,11 @@ static void HMARK_ip4_print(const void *ip,
 	if (info->flags & XT_HMARK_FLAG(XT_HMARK_CT))
 		printf("ct, ");
 	if (info->flags & XT_HMARK_FLAG(XT_HMARK_SADDR_MASK))
-		printf("src-prefix %s ",
-		       xtables_ipmask_to_numeric(&info->src_mask.in) + 1);
+		printf("src-prefix %u ",
+		       xtables_ipmask_to_cidr(&info->src_mask.in));
 	if (info->flags & XT_HMARK_FLAG(XT_HMARK_DADDR_MASK))
-		printf("dst-prefix %s ",
-		       xtables_ipmask_to_numeric(&info->dst_mask.in) + 1);
+		printf("dst-prefix %u ",
+		       xtables_ipmask_to_cidr(&info->dst_mask.in));
 	HMARK_print(info);
 }
 
