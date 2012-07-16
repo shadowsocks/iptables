@@ -53,8 +53,8 @@ A 32 bit random custom value to feed hash calculation.
 \fIExamples:\fP
 .PP
 iptables \-t mangle \-A PREROUTING \-m state \-\-state NEW
- \-j HMARK \-\-hmark-tuple ct \-\-hmark-offset 10000 \-\-hmark\-mod 10
-\-\-hmark\-rnd 0xfeedcafe
+ \-j HMARK \-\-hmark-tuple ct,src,dst,proto \-\-hmark-offset 10000
+\-\-hmark\-mod 10 \-\-hmark\-rnd 0xfeedcafe
 .PP
 iptables \-t mangle \-A PREROUTING -j HMARK \-\-hmark\-offset 10000
 \-\-hmark-tuple src,dst,proto \-\-hmark-mod 10 \-\-hmark\-rnd 0xdeafbeef
