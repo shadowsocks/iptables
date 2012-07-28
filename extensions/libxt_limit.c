@@ -3,6 +3,7 @@
  * Jérôme de Vivie   <devivie@info.enserb.u-bordeaux.fr>
  * Hervé Eychenne    <rv@wallfire.org>
  */
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -64,12 +65,13 @@ int parse_rate(const char *rate, uint32_t *val)
 	if (!r)
 		return 0;
 
-	/* This would get mapped to infinite (1/day is minimum they
-           can specify, so we're ok at that end). */
-	if (r / mult > XT_LIMIT_SCALE)
-		xtables_error(PARAMETER_PROBLEM, "Rate too fast \"%s\"\n", rate);
-
 	*val = XT_LIMIT_SCALE * mult / r;
+	if (*val == 0)
+		/*
+		 * The rate maps to infinity. (1/day is the minimum they can
+		 * specify, so we are ok at that end).
+		 */
+		xtables_error(PARAMETER_PROBLEM, "Rate too fast \"%s\"\n", rate);
 	return 1;
 }
 
@@ -117,6 +119,11 @@ static const struct rates
 static void print_rate(uint32_t period)
 {
 	unsigned int i;
+
+	if (period == 0) {
+		printf(" %f", INFINITY);
+		return;
+	}
 
 	for (i = 1; i < ARRAY_SIZE(rates); ++i)
 		if (period > rates[i].mult

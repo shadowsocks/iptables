@@ -10,6 +10,7 @@
  * 
  * Error corections by nmalykh@bilim.com (22.01.2005)
  */
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -250,12 +251,13 @@ int parse_rate(const char *rate, uint32_t *val, struct hashlimit_mt_udata *ud)
 	if (!r)
 		return 0;
 
-	/* This would get mapped to infinite (1/day is minimum they
-           can specify, so we're ok at that end). */
-	if (r / ud->mult > XT_HASHLIMIT_SCALE)
-		xtables_error(PARAMETER_PROBLEM, "Rate too fast \"%s\"\n", rate);
-
 	*val = XT_HASHLIMIT_SCALE * ud->mult / r;
+	if (*val == 0)
+		/*
+		 * The rate maps to infinity. (1/day is the minimum they can
+		 * specify, so we are ok at that end).
+		 */
+		xtables_error(PARAMETER_PROBLEM, "Rate too fast \"%s\"\n", rate);
 	return 1;
 }
 
@@ -433,6 +435,11 @@ static const struct rates
 static uint32_t print_rate(uint32_t period)
 {
 	unsigned int i;
+
+	if (period == 0) {
+		printf(" %f", INFINITY);
+		return 0;
+	}
 
 	for (i = 1; i < ARRAY_SIZE(rates); ++i)
 		if (period > rates[i].mult
