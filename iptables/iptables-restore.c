@@ -113,70 +113,6 @@ static void free_argv(void) {
 		free(newargv[i]);
 }
 
-static void add_param_to_argv(char *parsestart)
-{
-	int quote_open = 0, escaped = 0, param_len = 0;
-	char param_buffer[1024], *curchar;
-
-	/* After fighting with strtok enough, here's now
-	 * a 'real' parser. According to Rusty I'm now no
-	 * longer a real hacker, but I can live with that */
-
-	for (curchar = parsestart; *curchar; curchar++) {
-		if (quote_open) {
-			if (escaped) {
-				param_buffer[param_len++] = *curchar;
-				escaped = 0;
-				continue;
-			} else if (*curchar == '\\') {
-				escaped = 1;
-				continue;
-			} else if (*curchar == '"') {
-				quote_open = 0;
-				*curchar = ' ';
-			} else {
-				param_buffer[param_len++] = *curchar;
-				continue;
-			}
-		} else {
-			if (*curchar == '"') {
-				quote_open = 1;
-				continue;
-			}
-		}
-
-		if (*curchar == ' '
-		    || *curchar == '\t'
-		    || * curchar == '\n') {
-			if (!param_len) {
-				/* two spaces? */
-				continue;
-			}
-
-			param_buffer[param_len] = '\0';
-
-			/* check if table name specified */
-			if (!strncmp(param_buffer, "-t", 2)
-			    || !strncmp(param_buffer, "--table", 8)) {
-				xtables_error(PARAMETER_PROBLEM,
-				   "Line %u seems to have a "
-				   "-t table option.\n", line);
-				exit(1);
-			}
-
-			add_argv(param_buffer);
-			param_len = 0;
-		} else {
-			/* regular character, copy to buffer */
-			param_buffer[param_len++] = *curchar;
-
-			if (param_len >= sizeof(param_buffer))
-				xtables_error(PARAMETER_PROBLEM,
-				   "Parameter too long!");
-		}
-	}
-}
-
 int
 iptables_restore_main(int argc, char *argv[])
 {
@@ -389,6 +325,11 @@ iptables_restore_main(int argc, char *argv[])
 			char *bcnt = NULL;
 			char *parsestart;
 
+			/* the parser */
+			char *curchar;
+			int quote_open, escaped;
+			size_t param_len;
+
 			/* reset the newargv */
 			newargc = 0;
 
@@ -429,7 +370,69 @@ iptables_restore_main(int argc, char *argv[])
 				add_argv((char *) bcnt);
 			}
 
-			add_param_to_argv(parsestart);
+			/* After fighting with strtok enough, here's now
+			 * a 'real' parser. According to Rusty I'm now no
+			 * longer a real hacker, but I can live with that */
+
+			quote_open = 0;
+			escaped = 0;
+			param_len = 0;
+
+			for (curchar = parsestart; *curchar; curchar++) {
+				char param_buffer[1024];
+
+				if (quote_open) {
+					if (escaped) {
+						param_buffer[param_len++] = *curchar;
+						escaped = 0;
+						continue;
+					} else if (*curchar == '\\') {
+						escaped = 1;
+						continue;
+					} else if (*curchar == '"') {
+						quote_open = 0;
+						*curchar = ' ';
+					} else {
+						param_buffer[param_len++] = *curchar;
+						continue;
+					}
+				} else {
+					if (*curchar == '"') {
+						quote_open = 1;
+						continue;
+					}
+				}
+
+				if (*curchar == ' '
+				    || *curchar == '\t'
+				    || * curchar == '\n') {
+					if (!param_len) {
+						/* two spaces? */
+						continue;
+					}
+
+					param_buffer[param_len] = '\0';
+
+					/* check if table name specified */
+					if (!strncmp(param_buffer, "-t", 2)
+					    || !strncmp(param_buffer, "--table", 8)) {
+						xtables_error(PARAMETER_PROBLEM,
+						   "Line %u seems to have a "
+						   "-t table option.\n", line);
+						exit(1);
+					}
+
+					add_argv(param_buffer);
+					param_len = 0;
+				} else {
+					/* regular character, copy to buffer */
+					param_buffer[param_len++] = *curchar;
+
+					if (param_len >= sizeof(param_buffer))
+						xtables_error(PARAMETER_PROBLEM,
+						   "Parameter too long!");
+				}
+			}
 
 			DEBUGP("calling do_command4(%u, argv, &%s, handle):\n",
 				newargc, curtable);
