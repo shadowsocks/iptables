@@ -41,6 +41,13 @@ static const struct xt_option_entry frag_opts[] = {
 };
 #undef s
 
+static void frag_init(struct xt_entry_match *m)
+{
+	struct ip6t_frag *fraginfo = (void *)m->data;
+
+	fraginfo->ids[1] = ~0U;
+}
+
 static void frag_parse(struct xt_option_call *cb)
 {
 	struct ip6t_frag *fraginfo = cb->data;
@@ -173,6 +180,7 @@ static struct xtables_match frag_mt6_reg = {
 	.size          = XT_ALIGN(sizeof(struct ip6t_frag)),
 	.userspacesize = XT_ALIGN(sizeof(struct ip6t_frag)),
 	.help          = frag_help,
+	.init          = frag_init,
 	.print         = frag_print,
 	.save          = frag_save,
 	.x6_parse      = frag_parse,
