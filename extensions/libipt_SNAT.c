@@ -6,7 +6,7 @@
 #include <iptables.h>
 #include <limits.h> /* INT_MAX in ip_tables.h */
 #include <linux/netfilter_ipv4/ip_tables.h>
-#include <net/netfilter/nf_nat.h>
+#include <linux/netfilter/nf_nat.h>
 
 enum {
 	O_TO_SRC = 0,
@@ -23,7 +23,7 @@ enum {
 struct ipt_natinfo
 {
 	struct xt_entry_target t;
-	struct nf_nat_multi_range mr;
+	struct nf_nat_ipv4_multi_range_compat mr;
 };
 
 static void SNAT_help(void)
@@ -44,7 +44,7 @@ static const struct xt_option_entry SNAT_opts[] = {
 };
 
 static struct ipt_natinfo *
-append_range(struct ipt_natinfo *info, const struct nf_nat_range *range)
+append_range(struct ipt_natinfo *info, const struct nf_nat_ipv4_range *range)
 {
 	unsigned int size;
 
@@ -66,7 +66,7 @@ append_range(struct ipt_natinfo *info, const struct nf_nat_range *range)
 static struct xt_entry_target *
 parse_to(const char *orig_arg, int portok, struct ipt_natinfo *info)
 {
-	struct nf_nat_range range;
+	struct nf_nat_ipv4_range range;
 	char *arg, *colon, *dash, *error;
 	const struct in_addr *ip;
 
@@ -83,7 +83,7 @@ parse_to(const char *orig_arg, int portok, struct ipt_natinfo *info)
 			xtables_error(PARAMETER_PROBLEM,
 				   "Need TCP, UDP, SCTP or DCCP with port specification");
 
-		range.flags |= IP_NAT_RANGE_PROTO_SPECIFIED;
+		range.flags |= NF_NAT_RANGE_PROTO_SPECIFIED;
 
 		port = atoi(colon+1);
 		if (port <= 0 || port > 65535)
@@ -122,7 +122,7 @@ parse_to(const char *orig_arg, int portok, struct ipt_natinfo *info)
 		*colon = '\0';
 	}
 
-	range.flags |= IP_NAT_RANGE_MAP_IPS;
+	range.flags |= NF_NAT_RANGE_MAP_IPS;
 	dash = strchr(arg, '-');
 	if (colon && dash && dash > colon)
 		dash = NULL;
@@ -177,7 +177,7 @@ static void SNAT_parse(struct xt_option_call *cb)
 		cb->xflags |= F_X_TO_SRC;
 		break;
 	case O_PERSISTENT:
-		info->mr.range[0].flags |= IP_NAT_RANGE_PERSISTENT;
+		info->mr.range[0].flags |= NF_NAT_RANGE_PERSISTENT;
 		break;
 	}
 }
@@ -185,15 +185,15 @@ static void SNAT_parse(struct xt_option_call *cb)
 static void SNAT_fcheck(struct xt_fcheck_call *cb)
 {
 	static const unsigned int f = F_TO_SRC | F_RANDOM;
-	struct nf_nat_multi_range *mr = cb->data;
+	struct nf_nat_ipv4_multi_range_compat *mr = cb->data;
 
 	if ((cb->xflags & f) == f)
-		mr->range[0].flags |= IP_NAT_RANGE_PROTO_RANDOM;
+		mr->range[0].flags |= NF_NAT_RANGE_PROTO_RANDOM;
 }
 
-static void print_range(const struct nf_nat_range *r)
+static void print_range(const struct nf_nat_ipv4_range *r)
 {
-	if (r->flags & IP_NAT_RANGE_MAP_IPS) {
+	if (r->flags & NF_NAT_RANGE_MAP_IPS) {
 		struct in_addr a;
 
 		a.s_addr = r->min_ip;
@@ -203,7 +203,7 @@ static void print_range(const struct nf_nat_range *r)
 			printf("-%s", xtables_ipaddr_to_numeric(&a));
 		}
 	}
-	if (r->flags & IP_NAT_RANGE_PROTO_SPECIFIED) {
+	if (r->flags & NF_NAT_RANGE_PROTO_SPECIFIED) {
 		printf(":");
 		printf("%hu", ntohs(r->min.tcp.port));
 		if (r->max.tcp.port != r->min.tcp.port)
@@ -220,9 +220,9 @@ static void SNAT_print(const void *ip, const struct xt_entry_target *target,
 	printf(" to:");
 	for (i = 0; i < info->mr.rangesize; i++) {
 		print_range(&info->mr.range[i]);
-		if (info->mr.range[i].flags & IP_NAT_RANGE_PROTO_RANDOM)
+		if (info->mr.range[i].flags & NF_NAT_RANGE_PROTO_RANDOM)
 			printf(" random");
-		if (info->mr.range[i].flags & IP_NAT_RANGE_PERSISTENT)
+		if (info->mr.range[i].flags & NF_NAT_RANGE_PERSISTENT)
 			printf(" persistent");
 	}
 }
@@ -235,9 +235,9 @@ static void SNAT_save(const void *ip, const struct xt_entry_target *target)
 	for (i = 0; i < info->mr.rangesize; i++) {
 		printf(" --to-source ");
 		print_range(&info->mr.range[i]);
-		if (info->mr.range[i].flags & IP_NAT_RANGE_PROTO_RANDOM)
+		if (info->mr.range[i].flags & NF_NAT_RANGE_PROTO_RANDOM)
 			printf(" --random");
-		if (info->mr.range[i].flags & IP_NAT_RANGE_PERSISTENT)
+		if (info->mr.range[i].flags & NF_NAT_RANGE_PERSISTENT)
 			printf(" --persistent");
 	}
 }
@@ -246,8 +246,8 @@ static struct xtables_target snat_tg_reg = {
 	.name		= "SNAT",
 	.version	= XTABLES_VERSION,
 	.family		= NFPROTO_IPV4,
-	.size		= XT_ALIGN(sizeof(struct nf_nat_multi_range)),
-	.userspacesize	= XT_ALIGN(sizeof(struct nf_nat_multi_range)),
+	.size		= XT_ALIGN(sizeof(struct nf_nat_ipv4_multi_range_compat)),
+	.userspacesize	= XT_ALIGN(sizeof(struct nf_nat_ipv4_multi_range_compat)),
 	.help		= SNAT_help,
 	.x6_parse	= SNAT_parse,
 	.x6_fcheck	= SNAT_fcheck,
