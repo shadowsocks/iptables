@@ -31,8 +31,7 @@
 #define IPPROTO_UDPLITE	136
 #endif
 
-#define XTABLES_VERSION "libxtables.so.@libxtables_vmajor@"
-#define XTABLES_VERSION_CODE @libxtables_vmajor@
+#include <xtables-version.h>
 
 struct in_addr;
 

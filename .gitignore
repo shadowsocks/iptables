@@ -9,7 +9,7 @@
 Makefile
 Makefile.in
 
-/include/xtables.h
+/include/xtables-version.h
 /include/iptables/internal.h
 
 /aclocal.m4
