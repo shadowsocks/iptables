@@ -282,6 +282,9 @@ struct xtables_target
 
 	const char *name;
 
+	/* Real target behind this, if any. */
+	const char *real_name;
+
 	/* Revision of target (0 by default). */
 	u_int8_t revision;
 

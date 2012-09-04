@@ -1295,8 +1295,14 @@ static void command_jump(struct iptables_command_state *cs)
 
 	cs->target->t = xtables_calloc(1, size);
 	cs->target->t->u.target_size = size;
-	strcpy(cs->target->t->u.user.name, cs->jumpto);
+	strcpy(cs->target->t->u.user.name, cs->target->real_name);
 	cs->target->t->u.user.revision = cs->target->revision;
+	if (cs->target->real_name != cs->target->name)
+		/* Alias support for userspace side */
+		fprintf(stderr, "WARNING: The %s target is obsolete. "
+		        "Use %s instead.\n",
+		        cs->jumpto, cs->target->real_name);
+
 	xs_init_target(cs->target);
 
 	if (cs->target->x6_options != NULL)

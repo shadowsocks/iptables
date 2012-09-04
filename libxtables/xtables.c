@@ -872,9 +872,18 @@ void xtables_register_match(struct xtables_match *me)
  * preferred.
  */
 static int
-xtables_mt_prefer(unsigned int a_rev, unsigned int a_fam,
-		  unsigned int b_rev, unsigned int b_fam)
+xtables_mt_prefer(bool a_alias, unsigned int a_rev, unsigned int a_fam,
+		  bool b_alias, unsigned int b_rev, unsigned int b_fam)
 {
+	/*
+	 * Alias ranks higher than no alias.
+	 * (We want the new action to be used whenever possible.)
+	 */
+	if (!a_alias && b_alias)
+		return -1;
+	if (a_alias && !b_alias)
+		return 1;
+
 	/* Higher revision ranks higher. */
 	if (a_rev < b_rev)
 		return -1;
@@ -894,14 +903,21 @@ xtables_mt_prefer(unsigned int a_rev, unsigned int a_fam,
 static int xtables_match_prefer(const struct xtables_match *a,
 				const struct xtables_match *b)
 {
-	return xtables_mt_prefer(a->revision, a->family,
-				 b->revision, b->family);
+	return xtables_mt_prefer(false, a->revision, a->family,
+				 false, b->revision, b->family);
 }
 
 static int xtables_target_prefer(const struct xtables_target *a,
 				 const struct xtables_target *b)
 {
-	return xtables_mt_prefer(a->revision, a->family,
+	/*
+	 * Note that if x->real_name==NULL, it will be set to x->name in
+	 * xtables_register_*; the direct pointer comparison here is therefore
+	 * legitimate to detect an alias.
+	 */
+	return xtables_mt_prefer(a->name != a->real_name,
+				 a->revision, a->family,
+				 b->name != b->real_name,
 				 b->revision, b->family);
 }
 
@@ -985,6 +1001,8 @@ void xtables_register_target(struct xtables_target *me)
 		exit(1);
 	}
 
+	if (me->real_name == NULL)
+		me->real_name = me->name;
 	if (me->x6_options != NULL)
 		xtables_option_metavalidate(me->name, me->x6_options);
 	if (me->extra_opts != NULL)
@@ -1018,11 +1036,11 @@ static void xtables_fully_register_pending_target(struct xtables_target *me)
 
 		/* Now we have two (or more) options, check compatibility. */
 		if (compare > 0 &&
-		    compatible_target_revision(old->name, old->revision))
+		    compatible_target_revision(old->real_name, old->revision))
 			return;
 
 		/* See if new target can be used. */
-		if (!compatible_target_revision(me->name, me->revision))
+		if (!compatible_target_revision(me->real_name, me->revision))
 			return;
 
 		/* Delete old one. */
