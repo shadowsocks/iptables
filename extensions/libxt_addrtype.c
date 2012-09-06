@@ -60,7 +60,7 @@ static void addrtype_help_v1(void)
 " [!] --src-type type[,...]      Match source address type\n"
 " [!] --dst-type type[,...]      Match destination address type\n"
 "     --limit-iface-in           Match only on the packet's incoming device\n"
-"     --limit-iface-out          Match only on the packet's incoming device\n"
+"     --limit-iface-out          Match only on the packet's outgoing device\n"
 "\n"
 "Valid types:           \n");
 	addrtype_help_types();
