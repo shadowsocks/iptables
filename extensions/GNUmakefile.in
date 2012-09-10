@@ -77,9 +77,9 @@ install: ${targets_install}
 
 clean:
 	rm -f *.o *.oo *.so *.a {matches,targets}[46].man initext.c initext4.c initext6.c;
+	rm -f .*.d .*.dd;
 
 distclean: clean
-	rm -f .*.d .*.dd;
 
 init%.o: init%.c
 	${AM_VERBOSE_CC} ${CC} ${AM_CPPFLAGS} ${AM_DEPFLAGS} ${AM_CFLAGS} -D_INIT=$*_init ${CFLAGS} -o $@ -c $<;
