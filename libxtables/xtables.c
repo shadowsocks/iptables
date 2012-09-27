@@ -743,7 +743,7 @@ xtables_find_target(const char *name, enum xtables_tryload tryload)
 	return ptr;
 }
 
-static int compatible_revision(const char *name, uint8_t revision, int opt)
+int xtables_compatible_revision(const char *name, uint8_t revision, int opt)
 {
 	struct xt_get_revision rev;
 	socklen_t s = sizeof(rev);
@@ -799,12 +799,12 @@ static int compatible_revision(const char *name, uint8_t revision, int opt)
 
 static int compatible_match_revision(const char *name, uint8_t revision)
 {
-	return compatible_revision(name, revision, afinfo->so_rev_match);
+	return xt_params->compat_rev(name, revision, afinfo->so_rev_match);
 }
 
 static int compatible_target_revision(const char *name, uint8_t revision)
 {
-	return compatible_revision(name, revision, afinfo->so_rev_target);
+	return xt_params->compat_rev(name, revision, afinfo->so_rev_target);
 }
 
 static void xtables_check_options(const char *name, const struct option *opt)

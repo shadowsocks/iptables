@@ -58,6 +58,7 @@ struct iptables_command_state {
 	unsigned int options;
 	struct xtables_rule_match *matches;
 	struct xtables_target *target;
+	struct xt_counters counters;
 	char *protocol;
 	int proto_used;
 	const char *jumpto;

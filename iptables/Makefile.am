@@ -1,7 +1,8 @@
 # -*- Makefile -*-
 
 AM_CFLAGS        = ${regular_CFLAGS}
-AM_CPPFLAGS      = ${regular_CPPFLAGS} -I${top_builddir}/include -I${top_srcdir}/include ${kinclude_CPPFLAGS}
+AM_CPPFLAGS      = ${regular_CPPFLAGS} -I${top_builddir}/include -I${top_srcdir}/include ${kinclude_CPPFLAGS} ${libmnl_CPPFLAGS} ${libnftables_CPPFLAGS}
+AM_YFLAGS = -d
 
 xtables_multi_SOURCES  = xtables-multi.c iptables-xml.c
 xtables_multi_CFLAGS   = ${AM_CFLAGS}
@@ -24,11 +25,27 @@ endif
 xtables_multi_SOURCES += xshared.c
 xtables_multi_LDADD   += ../libxtables/libxtables.la -lm
 
+if ENABLE_NFTABLES
+if HAVE_LIBMNL
+if HAVE_LIBNFTABLES
+xtables_multi_SOURCES += xtables-save.c xtables-restore.c \
+			 xtables-standalone.c xtables.c nft.c \
+			 xtables-config-parser.y xtables-config-syntax.l \
+			 xtables-config.c
+xtables_multi_LDADD   += -lmnl -lnftables
+xtables_multi_CFLAGS  += -DENABLE_NFTABLES
+# yacc and lex generate dirty code
+xtables_multi-xtables-config-parser.o xtables_multi-xtables-config-syntax.o: AM_CFLAGS += -Wno-missing-prototypes -Wno-missing-declarations -Wno-implicit-function-declaration -Wno-nested-externs -Wno-undef -Wno-redundant-decls
+endif
+endif
+endif
+
 sbin_PROGRAMS    = xtables-multi
 man_MANS         = iptables.8 iptables-restore.8 iptables-save.8 \
                    iptables-xml.1 ip6tables.8 ip6tables-restore.8 \
                    ip6tables-save.8 iptables-extensions.8
-CLEANFILES       = iptables.8
+CLEANFILES       = iptables.8 \
+		   xtables-config-parser.c xtables-config-syntax.c
 
 vx_bin_links   = iptables-xml
 if ENABLE_IPV4
@@ -36,6 +53,9 @@ v4_sbin_links  = iptables iptables-restore iptables-save
 endif
 if ENABLE_IPV6
 v6_sbin_links  = ip6tables ip6tables-restore ip6tables-save
+endif
+if ENABLE_NFTABLES
+x_sbin_links  = xtables xtables-restore xtables-save xtables-config
 endif
 
 iptables-extensions.8: iptables-extensions.8.tmpl ../extensions/matches.man ../extensions/targets.man
@@ -52,3 +72,4 @@ install-exec-hook:
 	for i in ${vx_bin_links}; do ${LN_S} -f "${sbindir}/xtables-multi" "${DESTDIR}${bindir}/$$i"; done;
 	for i in ${v4_sbin_links}; do ${LN_S} -f xtables-multi "${DESTDIR}${sbindir}/$$i"; done;
 	for i in ${v6_sbin_links}; do ${LN_S} -f xtables-multi "${DESTDIR}${sbindir}/$$i"; done;
+	for i in ${x_sbin_links}; do ${LN_S} -f xtables-multi "${DESTDIR}${sbindir}/$$i"; done;

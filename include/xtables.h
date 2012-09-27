@@ -401,6 +401,7 @@ struct xtables_globals
 	struct option *orig_opts;
 	struct option *opts;
 	void (*exit_err)(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
+	int (*compat_rev)(const char *name, uint8_t rev, int opt);
 };
 
 #define XT_GETOPT_TABLEEND {.name = NULL, .has_arg = false}
@@ -432,6 +433,8 @@ extern struct xtables_match *xtables_find_match(const char *name,
 	enum xtables_tryload, struct xtables_rule_match **match);
 extern struct xtables_target *xtables_find_target(const char *name,
 	enum xtables_tryload);
+extern int xtables_compatible_revision(const char *name, uint8_t revision,
+				       int opt);
 
 extern void xtables_rule_matches_free(struct xtables_rule_match **matches);
 
