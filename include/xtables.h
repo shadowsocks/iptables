@@ -213,6 +213,7 @@ struct xtables_match
 	struct xtables_match *next;
 
 	const char *name;
+	const char *real_name;
 
 	/* Revision of match (0 by default). */
 	u_int8_t revision;

@@ -848,6 +848,8 @@ void xtables_register_match(struct xtables_match *me)
 		exit(1);
 	}
 
+	if (me->real_name == NULL)
+		me->real_name = me->name;
 	if (me->x6_options != NULL)
 		xtables_option_metavalidate(me->name, me->x6_options);
 	if (me->extra_opts != NULL)
@@ -903,8 +905,10 @@ xtables_mt_prefer(bool a_alias, unsigned int a_rev, unsigned int a_fam,
 static int xtables_match_prefer(const struct xtables_match *a,
 				const struct xtables_match *b)
 {
-	return xtables_mt_prefer(false, a->revision, a->family,
-				 false, b->revision, b->family);
+	return xtables_mt_prefer(a->name != a->real_name,
+				 a->revision, a->family,
+				 b->name != b->real_name,
+				 b->revision, b->family);
 }
 
 static int xtables_target_prefer(const struct xtables_target *a,
@@ -938,11 +942,11 @@ static void xtables_fully_register_pending_match(struct xtables_match *me)
 
 		/* Now we have two (or more) options, check compatibility. */
 		if (compare > 0 &&
-		    compatible_match_revision(old->name, old->revision))
+		    compatible_match_revision(old->real_name, old->revision))
 			return;
 
 		/* See if new match can be used. */
-		if (!compatible_match_revision(me->name, me->revision))
+		if (!compatible_match_revision(me->real_name, me->revision))
 			return;
 
 		/* Delete old one. */
