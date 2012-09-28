@@ -5,6 +5,7 @@
 /ip6tables-static
 /iptables
 /iptables.8
+/iptables-extensions.8
 /iptables-save
 /iptables-restore
 /iptables-static

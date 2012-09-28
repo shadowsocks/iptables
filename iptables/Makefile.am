@@ -27,7 +27,7 @@ xtables_multi_LDADD   += ../libxtables/libxtables.la -lm
 sbin_PROGRAMS    = xtables-multi
 man_MANS         = iptables.8 iptables-restore.8 iptables-save.8 \
                    iptables-xml.1 ip6tables.8 ip6tables-restore.8 \
-                   ip6tables-save.8
+                   ip6tables-save.8 iptables-extensions.8
 CLEANFILES       = iptables.8 ip6tables.8
 
 vx_bin_links   = iptables-xml
@@ -38,11 +38,17 @@ if ENABLE_IPV6
 v6_sbin_links  = ip6tables ip6tables-restore ip6tables-save
 endif
 
-iptables.8: ${srcdir}/iptables.8.in ../extensions/matches4.man ../extensions/targets4.man
-	${AM_VERBOSE_GEN} sed -e 's/@PACKAGE_AND_VERSION@/${PACKAGE} ${PACKAGE_VERSION}/g' -e '/@MATCH@/ r ../extensions/matches4.man' -e '/@TARGET@/ r ../extensions/targets4.man' $< >$@;
+iptables.8: ${srcdir}/iptables.8.in
+	${AM_VERBOSE_GEN} sed -e 's/@PACKAGE_AND_VERSION@/${PACKAGE} ${PACKAGE_VERSION}/g' $< >$@;
 
-ip6tables.8: ${srcdir}/ip6tables.8.in ../extensions/matches6.man ../extensions/targets6.man
-	${AM_VERBOSE_GEN} sed -e 's/@PACKAGE_AND_VERSION@/${PACKAGE} ${PACKAGE_VERSION}/g' -e '/@MATCH@/ r ../extensions/matches6.man' -e '/@TARGET@/ r ../extensions/targets6.man' $< >$@;
+ip6tables.8: ${srcdir}/ip6tables.8.in
+	${AM_VERBOSE_GEN} sed -e 's/@PACKAGE_AND_VERSION@/${PACKAGE} ${PACKAGE_VERSION}/g' $< >$@;
+
+iptables-extensions.8: ${srcdir}/iptables-extensions.8.in ../extensions/matches.man ../extensions/targets.man
+	${AM_VERBOSE_GEN} sed -e \
+		's/@PACKAGE_AND_VERSION@/${PACKAGE} ${PACKAGE_VERSION}/g' \
+		-e '/@MATCH@/ r ../extensions/matches.man' \
+		-e '/@TARGET@/ r ../extensions/targets.man' $< >$@;
 
 pkgconfig_DATA = xtables.pc
 

@@ -355,25 +355,10 @@ corresponding to that rule's position in the chain.
 \fB\-\-modprobe=\fP\fIcommand\fP
 When adding or inserting rules into a chain, use \fIcommand\fP
 to load any necessary modules (targets, match extensions, etc).
-.SH MATCH EXTENSIONS
+.SH MATCH AND TARGET EXTENSIONS
 .PP
-iptables can use extended packet matching modules
-with the \fB\-m\fP or \fB\-\-match\fP
-options, followed by the matching module name; after these, various
-extra command line options become available, depending on the specific
-module.  You can specify multiple extended match modules in one line,
-and you can use the \fB\-h\fP or \fB\-\-help\fP
-options after the module has been specified to receive help specific
-to that module.
-.PP
-If the \fB\-p\fP or \fB\-\-protocol\fP was specified and if and only if an
-unknown option is encountered, iptables will try load a match module of the
-same name as the protocol, to try making the option available.
-.\" @MATCH@
-.SH TARGET EXTENSIONS
-iptables can use extended target modules: the following are included
-in the standard distribution.
-.\" @TARGET@
+iptables can use extended packet matching and target modules.
+A list of these is available in the \fBiptables\-extensions\fP(8) manpage.
 .SH DIAGNOSTICS
 Various error messages are printed to standard error.  The exit code
 is 0 for correct functioning.  Errors which appear to be caused by
@@ -410,6 +395,7 @@ There are several other changes in iptables.
 .SH SEE ALSO
 \fBiptables\-save\fP(8),
 \fBiptables\-restore\fP(8),
+\fBiptables\-extensions\fP(8),
 \fBip6tables\fP(8),
 \fBip6tables\-save\fP(8),
 \fBip6tables\-restore\fP(8),

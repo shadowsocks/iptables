@@ -5,5 +5,5 @@
 /GNUmakefile
 /initext.c
 /initext?.c
-/matches?.man
-/targets?.man
+/matches.man
+/targets.man
