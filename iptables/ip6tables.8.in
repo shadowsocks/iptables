@@ -390,6 +390,7 @@ There are several other changes in ip6tables.
 \fBip6tables\-save\fP(8),
 \fBip6tables\-restore\fP(8),
 \fBiptables\fP(8),
+\fBiptables\-apply\fP(8),
 \fBiptables\-extensions\fP(8),
 \fBiptables\-save\fP(8),
 \fBiptables\-restore\fP(8),

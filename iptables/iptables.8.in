@@ -393,6 +393,7 @@ seen previously.  So the following options are handled differently:
 .fi
 There are several other changes in iptables.
 .SH SEE ALSO
+\fBiptables\-apply\fP(8),
 \fBiptables\-save\fP(8),
 \fBiptables\-restore\fP(8),
 \fBiptables\-extensions\fP(8),
