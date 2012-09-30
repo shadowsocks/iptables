@@ -42,23 +42,23 @@ specified at all, matches packets in both directions.
 States for \fB\-\-ctstate\fP:
 .TP
 \fBINVALID\fP
-meaning that the packet is associated with no known connection
+The packet is associated with no known connection.
 .TP
 \fBNEW\fP
-meaning that the packet has started a new connection, or otherwise associated
-with a connection which has not seen packets in both directions, and
+The packet has started a new connection, or otherwise associated
+with a connection which has not seen packets in both directions.
 .TP
 \fBESTABLISHED\fP
-meaning that the packet is associated with a connection which has seen packets
-in both directions,
+The packet is associated with a connection which has seen packets
+in both directions.
 .TP
 \fBRELATED\fP
-meaning that the packet is starting a new connection, but is associated with an
+The packet is starting a new connection, but is associated with an
 existing connection, such as an FTP data transfer, or an ICMP error.
 .TP
 \fBUNTRACKED\fP
-meaning that the packet is not tracked at all, which happens if you use
-the NOTRACK target in raw table.
+The packet is not tracked at all, which happens if you explicitly untrack it
+by using \-j CT \-\-notrack in the raw table.
 .TP
 \fBSNAT\fP
 A virtual state, matching if the original source address differs from the reply
@@ -74,7 +74,7 @@ Statuses for \fB\-\-ctstatus\fP:
 None of the below.
 .TP
 \fBEXPECTED\fP
-This is an expected connection (i.e. a conntrack helper set it up)
+This is an expected connection (i.e. a conntrack helper set it up).
 .TP
 \fBSEEN_REPLY\fP
 Conntrack has seen packets in both directions.

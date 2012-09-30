@@ -52,7 +52,7 @@ A 32 bit random custom value to feed hash calculation.
 .PP
 \fIExamples:\fP
 .PP
-iptables \-t mangle \-A PREROUTING \-m state \-\-state NEW
+iptables \-t mangle \-A PREROUTING \-m conntrack \-\-ctstate NEW
  \-j HMARK \-\-hmark-tuple ct,src,dst,proto \-\-hmark-offset 10000
 \-\-hmark\-mod 10 \-\-hmark\-rnd 0xfeedcafe
 .PP

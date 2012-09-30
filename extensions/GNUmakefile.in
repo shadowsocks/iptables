@@ -56,9 +56,7 @@ pf6_solibs    := $(patsubst %,libip6t_%.so,${pf6_build_mod})
 #
 # Building blocks
 #
-targets := libext.a libext4.a libext6.a \
-           matches4.man matches6.man \
-           targets4.man targets6.man
+targets := libext.a libext4.a libext6.a matches.man targets.man
 targets_install :=
 @ENABLE_STATIC_TRUE@ libext_objs := ${pfx_objs}
 @ENABLE_STATIC_TRUE@ libext4_objs := ${pf4_objs}
@@ -77,7 +75,7 @@ install: ${targets_install}
 	if test -n "${targets_install}"; then install -pm0755 $^ "${DESTDIR}${xtlibdir}/"; fi;
 
 clean:
-	rm -f *.o *.oo *.so *.a {matches,targets}[46].man initext.c initext4.c initext6.c;
+	rm -f *.o *.oo *.so *.a {matches,targets}.man initext.c initext4.c initext6.c;
 	rm -f .*.d .*.dd;
 
 distclean: clean
@@ -202,30 +200,27 @@ man_run    = \
 	${AM_VERBOSE_GEN} \
 	for ext in $(sort ${1}); do \
 		f="${srcdir}/libxt_$$ext.man"; \
-		cf="${srcdir}/libxt_$$ext.c"; \
-		if [ -f "$$f" ] && grep -Eq "$(3)|NFPROTO_UNSPEC" "$$cf"; then \
-			echo -e "\t+ $$f" >&2; \
-			echo ".SS $$ext"; \
-			cat "$$f" || exit $$?; \
-			continue; \
-		fi; \
-		f="${srcdir}/lib$(2)t_$$ext.man"; \
 		if [ -f "$$f" ]; then \
 			echo -e "\t+ $$f" >&2; \
 			echo ".SS $$ext"; \
 			cat "$$f" || exit $$?; \
-			continue; \
+		fi; \
+		f="${srcdir}/libip6t_$$ext.man"; \
+		if [ -f "$$f" ]; then \
+			echo -e "\t+ $$f" >&2; \
+			echo ".SS $$ext (IPv6-specific)"; \
+			cat "$$f" || exit $$?; \
+		fi; \
+		f="${srcdir}/libipt_$$ext.man"; \
+		if [ -f "$$f" ]; then \
+			echo -e "\t+ $$f" >&2; \
+			echo ".SS $$ext (IPv4-specific)"; \
+			cat "$$f" || exit $$?; \
 		fi; \
 	done >$@;
 
-matches4.man: .initext.dd .initext4.dd $(wildcard ${srcdir}/lib*.man)
-	$(call man_run,$(call ex_matches,${pfx_build_mod} ${pf4_build_mod}),ip,NFPROTO_IPV4)
+matches.man: .initext.dd .initext4.dd .initext6.dd $(wildcard ${srcdir}/lib*.man)
+	$(call man_run,$(call ex_matches,${pfx_build_mod} ${pf4_build_mod} ${pf6_build_mod}))
 
-matches6.man: .initext.dd .initext6.dd $(wildcard ${srcdir}/lib*.man)
-	$(call man_run,$(call ex_matches,${pfx_build_mod} ${pf6_build_mod}),ip6,NFPROTO_IPV6)
-
-targets4.man: .initext.dd .initext4.dd $(wildcard ${srcdir}/lib*.man)
-	$(call man_run,$(call ex_targets,${pfx_build_mod} ${pf4_build_mod}),ip,NFPROTO_IPV4)
-
-targets6.man: .initext.dd .initext6.dd $(wildcard ${srcdir}/lib*.man)
-	$(call man_run,$(call ex_targets,${pfx_build_mod} ${pf6_build_mod}),ip6,NFPROTO_IPV6)
+targets.man: .initext.dd .initext4.dd .initext6.dd $(wildcard ${srcdir}/lib*.man)
+	$(call man_run,$(call ex_targets,${pfx_build_mod} ${pf4_build_mod} ${pf6_build_mod}))
