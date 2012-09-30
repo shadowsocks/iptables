@@ -1286,8 +1286,13 @@ static void command_jump(struct iptables_command_state *cs)
 
 	cs->target->t = xtables_calloc(1, size);
 	cs->target->t->u.target_size = size;
-	strcpy(cs->target->t->u.user.name, cs->jumpto);
+	strcpy(cs->target->t->u.user.name, cs->target->real_name);
 	cs->target->t->u.user.revision = cs->target->revision;
+	if (cs->target->real_name != cs->target->name)
+		fprintf(stderr, "WARNING: The %s target is obsolete. "
+		        "Use %s instead.\n",
+		        cs->jumpto, cs->target->real_name);
+
 	xs_init_target(cs->target);
 	if (cs->target->x6_options != NULL)
 		opts = xtables_options_xfrm(ip6tables_globals.orig_opts, opts,
@@ -1314,8 +1319,12 @@ static void command_match(struct iptables_command_state *cs)
 	size = XT_ALIGN(sizeof(struct xt_entry_match)) + m->size;
 	m->m = xtables_calloc(1, size);
 	m->m->u.match_size = size;
-	strcpy(m->m->u.user.name, m->name);
+	strcpy(m->m->u.user.name, m->real_name);
 	m->m->u.user.revision = m->revision;
+	if (m->real_name != m->name)
+		fprintf(stderr, "WARNING: The %s match is obsolete. "
+		        "Use %s instead.\n", m->name, m->real_name);
+
 	xs_init_match(m);
 	if (m == m->next)
 		return;

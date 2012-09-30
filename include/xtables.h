@@ -31,8 +31,7 @@
 #define IPPROTO_UDPLITE	136
 #endif
 
-#define XTABLES_VERSION "libxtables.so.@libxtables_vmajor@"
-#define XTABLES_VERSION_CODE @libxtables_vmajor@
+#include <xtables-version.h>
 
 struct in_addr;
 
@@ -214,6 +213,7 @@ struct xtables_match
 	struct xtables_match *next;
 
 	const char *name;
+	const char *real_name;
 
 	/* Revision of match (0 by default). */
 	u_int8_t revision;
@@ -282,6 +282,9 @@ struct xtables_target
 
 
 	const char *name;
+
+	/* Real target behind this, if any. */
+	const char *real_name;
 
 	/* Revision of target (0 by default). */
 	u_int8_t revision;

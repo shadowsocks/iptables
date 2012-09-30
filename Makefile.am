@@ -27,4 +27,4 @@ tarball:
 	rm -Rf /tmp/${PACKAGE_TARNAME}-${PACKAGE_VERSION};
 
 config.status: extensions/GNUmakefile.in \
-	include/xtables.h.in include/iptables/internal.h.in
+	include/xtables-version.h.in include/iptables/internal.h.in

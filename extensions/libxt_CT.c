@@ -248,6 +248,20 @@ static void ct_save_v1(const void *ip, const struct xt_entry_target *target)
 		printf(" --zone %u", info->zone);
 }
 
+static void notrack_ct0_tg_init(struct xt_entry_target *target)
+{
+	struct xt_ct_target_info *info = (void *)target->data;
+
+	info->flags = XT_CT_NOTRACK;
+}
+
+static void notrack_ct1_tg_init(struct xt_entry_target *target)
+{
+	struct xt_ct_target_info_v1 *info = (void *)target->data;
+
+	info->flags = XT_CT_NOTRACK;
+}
+
 static struct xtables_target ct_target_reg[] = {
 	{
 		.family		= NFPROTO_UNSPEC,
@@ -273,6 +287,32 @@ static struct xtables_target ct_target_reg[] = {
 		.save		= ct_save_v1,
 		.x6_parse	= ct_parse_v1,
 		.x6_options	= ct_opts_v1,
+	},
+	{
+		.family        = NFPROTO_UNSPEC,
+		.name          = "NOTRACK",
+		.real_name     = "CT",
+		.revision      = 0,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_ct_target_info)),
+		.userspacesize = offsetof(struct xt_ct_target_info, ct),
+		.init          = notrack_ct0_tg_init,
+	},
+	{
+		.family        = NFPROTO_UNSPEC,
+		.name          = "NOTRACK",
+		.real_name     = "CT",
+		.revision      = 1,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_ct_target_info_v1)),
+		.userspacesize = offsetof(struct xt_ct_target_info_v1, ct),
+		.init          = notrack_ct1_tg_init,
+	},
+	{
+		.family        = NFPROTO_UNSPEC,
+		.name          = "NOTRACK",
+		.revision      = 0,
+		.version       = XTABLES_VERSION,
 	},
 };
 

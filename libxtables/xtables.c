@@ -848,6 +848,8 @@ void xtables_register_match(struct xtables_match *me)
 		exit(1);
 	}
 
+	if (me->real_name == NULL)
+		me->real_name = me->name;
 	if (me->x6_options != NULL)
 		xtables_option_metavalidate(me->name, me->x6_options);
 	if (me->extra_opts != NULL)
@@ -862,14 +864,76 @@ void xtables_register_match(struct xtables_match *me)
 	xtables_pending_matches = me;
 }
 
+/**
+ * Compare two actions for their preference
+ * @a:	one action
+ * @b: 	another
+ *
+ * Like strcmp, returns a negative number if @a is less preferred than @b,
+ * positive number if @a is more preferred than @b, or zero if equally
+ * preferred.
+ */
+static int
+xtables_mt_prefer(bool a_alias, unsigned int a_rev, unsigned int a_fam,
+		  bool b_alias, unsigned int b_rev, unsigned int b_fam)
+{
+	/*
+	 * Alias ranks higher than no alias.
+	 * (We want the new action to be used whenever possible.)
+	 */
+	if (!a_alias && b_alias)
+		return -1;
+	if (a_alias && !b_alias)
+		return 1;
+
+	/* Higher revision ranks higher. */
+	if (a_rev < b_rev)
+		return -1;
+	if (a_rev > b_rev)
+		return 1;
+
+	/* NFPROTO_<specific> ranks higher than NFPROTO_UNSPEC. */
+	if (a_fam == NFPROTO_UNSPEC && b_fam != NFPROTO_UNSPEC)
+		return -1;
+	if (a_fam != NFPROTO_UNSPEC && b_fam == NFPROTO_UNSPEC)
+		return 1;
+
+	/* Must be the same thing. */
+	return 0;
+}
+
+static int xtables_match_prefer(const struct xtables_match *a,
+				const struct xtables_match *b)
+{
+	return xtables_mt_prefer(a->name != a->real_name,
+				 a->revision, a->family,
+				 b->name != b->real_name,
+				 b->revision, b->family);
+}
+
+static int xtables_target_prefer(const struct xtables_target *a,
+				 const struct xtables_target *b)
+{
+	/*
+	 * Note that if x->real_name==NULL, it will be set to x->name in
+	 * xtables_register_*; the direct pointer comparison here is therefore
+	 * legitimate to detect an alias.
+	 */
+	return xtables_mt_prefer(a->name != a->real_name,
+				 a->revision, a->family,
+				 b->name != b->real_name,
+				 b->revision, b->family);
+}
+
 static void xtables_fully_register_pending_match(struct xtables_match *me)
 {
 	struct xtables_match **i, *old;
+	int compare;
 
 	old = xtables_find_match(me->name, XTF_DURING_LOAD, NULL);
 	if (old) {
-		if (old->revision == me->revision &&
-		    old->family == me->family) {
+		compare = xtables_match_prefer(old, me);
+		if (compare == 0) {
 			fprintf(stderr,
 				"%s: match `%s' already registered.\n",
 				xt_params->program_name, me->name);
@@ -877,16 +941,12 @@ static void xtables_fully_register_pending_match(struct xtables_match *me)
 		}
 
 		/* Now we have two (or more) options, check compatibility. */
-		if (compatible_match_revision(old->name, old->revision)
-		    && old->revision > me->revision)
+		if (compare > 0 &&
+		    compatible_match_revision(old->real_name, old->revision))
 			return;
 
 		/* See if new match can be used. */
-		if (!compatible_match_revision(me->name, me->revision))
-			return;
-
-		/* Prefer !AF_UNSPEC over AF_UNSPEC for same revision. */
-		if (old->revision == me->revision && me->family == AF_UNSPEC)
+		if (!compatible_match_revision(me->real_name, me->revision))
 			return;
 
 		/* Delete old one. */
@@ -945,6 +1005,8 @@ void xtables_register_target(struct xtables_target *me)
 		exit(1);
 	}
 
+	if (me->real_name == NULL)
+		me->real_name = me->name;
 	if (me->x6_options != NULL)
 		xtables_option_metavalidate(me->name, me->x6_options);
 	if (me->extra_opts != NULL)
@@ -962,13 +1024,14 @@ void xtables_register_target(struct xtables_target *me)
 static void xtables_fully_register_pending_target(struct xtables_target *me)
 {
 	struct xtables_target *old;
+	int compare;
 
 	old = xtables_find_target(me->name, XTF_DURING_LOAD);
 	if (old) {
 		struct xtables_target **i;
 
-		if (old->revision == me->revision &&
-		    old->family == me->family) {
+		compare = xtables_target_prefer(old, me);
+		if (compare == 0) {
 			fprintf(stderr,
 				"%s: target `%s' already registered.\n",
 				xt_params->program_name, me->name);
@@ -976,16 +1039,12 @@ static void xtables_fully_register_pending_target(struct xtables_target *me)
 		}
 
 		/* Now we have two (or more) options, check compatibility. */
-		if (compatible_target_revision(old->name, old->revision)
-		    && old->revision > me->revision)
+		if (compare > 0 &&
+		    compatible_target_revision(old->real_name, old->revision))
 			return;
 
 		/* See if new target can be used. */
-		if (!compatible_target_revision(me->name, me->revision))
-			return;
-
-		/* Prefer !AF_UNSPEC over AF_UNSPEC for same revision. */
-		if (old->revision == me->revision && me->family == AF_UNSPEC)
+		if (!compatible_target_revision(me->real_name, me->revision))
 			return;
 
 		/* Delete old one. */
