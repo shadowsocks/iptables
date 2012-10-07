@@ -848,8 +848,6 @@ void xtables_register_match(struct xtables_match *me)
 		exit(1);
 	}
 
-	if (me->real_name == NULL)
-		me->real_name = me->name;
 	if (me->x6_options != NULL)
 		xtables_option_metavalidate(me->name, me->x6_options);
 	if (me->extra_opts != NULL)
@@ -905,9 +903,9 @@ xtables_mt_prefer(bool a_alias, unsigned int a_rev, unsigned int a_fam,
 static int xtables_match_prefer(const struct xtables_match *a,
 				const struct xtables_match *b)
 {
-	return xtables_mt_prefer(a->name != a->real_name,
+	return xtables_mt_prefer(a->real_name != NULL,
 				 a->revision, a->family,
-				 b->name != b->real_name,
+				 b->real_name != NULL,
 				 b->revision, b->family);
 }
 
@@ -919,15 +917,16 @@ static int xtables_target_prefer(const struct xtables_target *a,
 	 * xtables_register_*; the direct pointer comparison here is therefore
 	 * legitimate to detect an alias.
 	 */
-	return xtables_mt_prefer(a->name != a->real_name,
+	return xtables_mt_prefer(a->real_name != NULL,
 				 a->revision, a->family,
-				 b->name != b->real_name,
+				 b->real_name != NULL,
 				 b->revision, b->family);
 }
 
 static void xtables_fully_register_pending_match(struct xtables_match *me)
 {
 	struct xtables_match **i, *old;
+	const char *rn;
 	int compare;
 
 	old = xtables_find_match(me->name, XTF_DURING_LOAD, NULL);
@@ -941,12 +940,14 @@ static void xtables_fully_register_pending_match(struct xtables_match *me)
 		}
 
 		/* Now we have two (or more) options, check compatibility. */
+		rn = (old->real_name != NULL) ? old->real_name : old->name;
 		if (compare > 0 &&
-		    compatible_match_revision(old->real_name, old->revision))
+		    compatible_match_revision(rn, old->revision))
 			return;
 
 		/* See if new match can be used. */
-		if (!compatible_match_revision(me->real_name, me->revision))
+		rn = (me->real_name != NULL) ? me->real_name : me->name;
+		if (!compatible_match_revision(rn, me->revision))
 			return;
 
 		/* Delete old one. */
@@ -1005,8 +1006,6 @@ void xtables_register_target(struct xtables_target *me)
 		exit(1);
 	}
 
-	if (me->real_name == NULL)
-		me->real_name = me->name;
 	if (me->x6_options != NULL)
 		xtables_option_metavalidate(me->name, me->x6_options);
 	if (me->extra_opts != NULL)
@@ -1024,6 +1023,7 @@ void xtables_register_target(struct xtables_target *me)
 static void xtables_fully_register_pending_target(struct xtables_target *me)
 {
 	struct xtables_target *old;
+	const char *rn;
 	int compare;
 
 	old = xtables_find_target(me->name, XTF_DURING_LOAD);
@@ -1039,12 +1039,14 @@ static void xtables_fully_register_pending_target(struct xtables_target *me)
 		}
 
 		/* Now we have two (or more) options, check compatibility. */
+		rn = (old->real_name != NULL) ? old->real_name : old->name;
 		if (compare > 0 &&
-		    compatible_target_revision(old->real_name, old->revision))
+		    compatible_target_revision(rn, old->revision))
 			return;
 
 		/* See if new target can be used. */
-		if (!compatible_target_revision(me->real_name, me->revision))
+		rn = (me->real_name != NULL) ? me->real_name : me->name;
+		if (!compatible_target_revision(rn, me->revision))
 			return;
 
 		/* Delete old one. */
