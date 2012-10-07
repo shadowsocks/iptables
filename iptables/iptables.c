@@ -1295,7 +1295,10 @@ static void command_jump(struct iptables_command_state *cs)
 
 	cs->target->t = xtables_calloc(1, size);
 	cs->target->t->u.target_size = size;
-	strcpy(cs->target->t->u.user.name, cs->target->real_name);
+	if (cs->target->real_name != NULL)
+		strcpy(cs->target->t->u.user.name, cs->jumpto);
+	else
+		strcpy(cs->target->t->u.user.name, cs->target->real_name);
 	cs->target->t->u.user.revision = cs->target->revision;
 	if (cs->target->real_name != cs->target->name)
 		/* Alias support for userspace side */
