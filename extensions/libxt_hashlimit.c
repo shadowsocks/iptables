@@ -10,6 +10,8 @@
  * 
  * Error corections by nmalykh@bilim.com (22.01.2005)
  */
+#define _BSD_SOURCE 1
+#define _ISOC99_SOURCE 1
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
