@@ -1,9 +1,16 @@
+/*
+ * Copyright (c) 2011 Patrick McHardy <kaber@trash.net>
+ *
+ * Based on Rusty Russell's IPv4 REDIRECT target. Development of IPv6 NAT
+ * funded by Astaro.
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <xtables.h>
 #include <limits.h> /* INT_MAX in ip_tables.h */
-#include <linux/netfilter_ipv4/ip_tables.h>
+#include <linux/netfilter_ipv6/ip6_tables.h>
 #include <linux/netfilter/nf_nat.h>
 
 enum {
@@ -28,22 +35,14 @@ static const struct xt_option_entry REDIRECT_opts[] = {
 	XTOPT_TABLEEND,
 };
 
-static void REDIRECT_init(struct xt_entry_target *t)
-{
-	struct nf_nat_ipv4_multi_range_compat *mr = (struct nf_nat_ipv4_multi_range_compat *)t->data;
-
-	/* Actually, it's 0, but it's ignored at the moment. */
-	mr->rangesize = 1;
-}
-
 /* Parses ports */
 static void
-parse_ports(const char *arg, struct nf_nat_ipv4_multi_range_compat *mr)
+parse_ports(const char *arg, struct nf_nat_range *range)
 {
 	char *end = "";
 	unsigned int port, maxport;
 
-	mr->range[0].flags |= NF_NAT_RANGE_PROTO_SPECIFIED;
+	range->flags |= NF_NAT_RANGE_PROTO_SPECIFIED;
 
 	if (!xtables_strtoui(arg, &end, &port, 0, UINT16_MAX) &&
 	    (port = xtables_service_to_port(arg, NULL)) == (unsigned)-1)
@@ -51,8 +50,8 @@ parse_ports(const char *arg, struct nf_nat_ipv4_multi_range_compat *mr)
 
 	switch (*end) {
 	case '\0':
-		mr->range[0].min.tcp.port
-			= mr->range[0].max.tcp.port
+		range->min_proto.tcp.port
+			= range->max_proto.tcp.port
 			= htons(port);
 		return;
 	case '-':
@@ -63,8 +62,8 @@ parse_ports(const char *arg, struct nf_nat_ipv4_multi_range_compat *mr)
 		if (maxport < port)
 			break;
 
-		mr->range[0].min.tcp.port = htons(port);
-		mr->range[0].max.tcp.port = htons(maxport);
+		range->min_proto.tcp.port = htons(port);
+		range->max_proto.tcp.port = htons(maxport);
 		return;
 	default:
 		break;
@@ -74,15 +73,15 @@ parse_ports(const char *arg, struct nf_nat_ipv4_multi_range_compat *mr)
 
 static void REDIRECT_parse(struct xt_option_call *cb)
 {
-	const struct ipt_entry *entry = cb->xt_entry;
-	struct nf_nat_ipv4_multi_range_compat *mr = (void *)(*cb->target)->data;
+	const struct ip6t_entry *entry = cb->xt_entry;
+	struct nf_nat_range *range = (void *)(*cb->target)->data;
 	int portok;
 
-	if (entry->ip.proto == IPPROTO_TCP
-	    || entry->ip.proto == IPPROTO_UDP
-	    || entry->ip.proto == IPPROTO_SCTP
-	    || entry->ip.proto == IPPROTO_DCCP
-	    || entry->ip.proto == IPPROTO_ICMP)
+	if (entry->ipv6.proto == IPPROTO_TCP
+	    || entry->ipv6.proto == IPPROTO_UDP
+	    || entry->ipv6.proto == IPPROTO_SCTP
+	    || entry->ipv6.proto == IPPROTO_DCCP
+	    || entry->ipv6.proto == IPPROTO_ICMP)
 		portok = 1;
 	else
 		portok = 0;
@@ -93,13 +92,13 @@ static void REDIRECT_parse(struct xt_option_call *cb)
 		if (!portok)
 			xtables_error(PARAMETER_PROBLEM,
 				   "Need TCP, UDP, SCTP or DCCP with port specification");
-		parse_ports(cb->arg, mr);
+		parse_ports(cb->arg, range);
 		if (cb->xflags & F_RANDOM)
-			mr->range[0].flags |= NF_NAT_RANGE_PROTO_RANDOM;
+			range->flags |= NF_NAT_RANGE_PROTO_RANDOM;
 		break;
 	case O_RANDOM:
 		if (cb->xflags & F_TO_PORTS)
-			mr->range[0].flags |= NF_NAT_RANGE_PROTO_RANDOM;
+			range->flags |= NF_NAT_RANGE_PROTO_RANDOM;
 		break;
 	}
 }
@@ -107,30 +106,28 @@ static void REDIRECT_parse(struct xt_option_call *cb)
 static void REDIRECT_print(const void *ip, const struct xt_entry_target *target,
                            int numeric)
 {
-	const struct nf_nat_ipv4_multi_range_compat *mr = (const void *)target->data;
-	const struct nf_nat_ipv4_range *r = &mr->range[0];
+	const struct nf_nat_range *range = (const void *)target->data;
 
-	if (r->flags & NF_NAT_RANGE_PROTO_SPECIFIED) {
+	if (range->flags & NF_NAT_RANGE_PROTO_SPECIFIED) {
 		printf(" redir ports ");
-		printf("%hu", ntohs(r->min.tcp.port));
-		if (r->max.tcp.port != r->min.tcp.port)
-			printf("-%hu", ntohs(r->max.tcp.port));
-		if (mr->range[0].flags & NF_NAT_RANGE_PROTO_RANDOM)
+		printf("%hu", ntohs(range->min_proto.tcp.port));
+		if (range->max_proto.tcp.port != range->min_proto.tcp.port)
+			printf("-%hu", ntohs(range->max_proto.tcp.port));
+		if (range->flags & NF_NAT_RANGE_PROTO_RANDOM)
 			printf(" random");
 	}
 }
 
 static void REDIRECT_save(const void *ip, const struct xt_entry_target *target)
 {
-	const struct nf_nat_ipv4_multi_range_compat *mr = (const void *)target->data;
-	const struct nf_nat_ipv4_range *r = &mr->range[0];
+	const struct nf_nat_range *range = (const void *)target->data;
 
-	if (r->flags & NF_NAT_RANGE_PROTO_SPECIFIED) {
+	if (range->flags & NF_NAT_RANGE_PROTO_SPECIFIED) {
 		printf(" --to-ports ");
-		printf("%hu", ntohs(r->min.tcp.port));
-		if (r->max.tcp.port != r->min.tcp.port)
-			printf("-%hu", ntohs(r->max.tcp.port));
-		if (mr->range[0].flags & NF_NAT_RANGE_PROTO_RANDOM)
+		printf("%hu", ntohs(range->min_proto.tcp.port));
+		if (range->max_proto.tcp.port != range->min_proto.tcp.port)
+			printf("-%hu", ntohs(range->max_proto.tcp.port));
+		if (range->flags & NF_NAT_RANGE_PROTO_RANDOM)
 			printf(" --random");
 	}
 }
@@ -138,12 +135,11 @@ static void REDIRECT_save(const void *ip, const struct xt_entry_target *target)
 static struct xtables_target redirect_tg_reg = {
 	.name		= "REDIRECT",
 	.version	= XTABLES_VERSION,
-	.family		= NFPROTO_IPV4,
-	.size		= XT_ALIGN(sizeof(struct nf_nat_ipv4_multi_range_compat)),
-	.userspacesize	= XT_ALIGN(sizeof(struct nf_nat_ipv4_multi_range_compat)),
+	.family		= NFPROTO_IPV6,
+	.size		= XT_ALIGN(sizeof(struct nf_nat_range)),
+	.userspacesize	= XT_ALIGN(sizeof(struct nf_nat_range)),
 	.help		= REDIRECT_help,
-	.init		= REDIRECT_init,
- 	.x6_parse	= REDIRECT_parse,
+	.x6_parse	= REDIRECT_parse,
 	.print		= REDIRECT_print,
 	.save		= REDIRECT_save,
 	.x6_options	= REDIRECT_opts,

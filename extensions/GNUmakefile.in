@@ -101,9 +101,9 @@ libxt_state.so: libxt_conntrack.so
 	ln -fs $< $@
 
 # Need the LIBADDs in iptables/Makefile.am too for libxtables_la_LIBADD
+ip6t_NETMAP_LIBADD  = -lip6tc
 xt_RATEEST_LIBADD   = -lm
 xt_statistic_LIBADD = -lm
-
 
 #
 #	Static bits
