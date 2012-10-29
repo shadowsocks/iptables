@@ -82,15 +82,16 @@ static int mnl_talk(struct nft_handle *h, struct nlmsghdr *nlh,
 	return 0;
 }
 
-static void nft_table_builtin_add(struct nft_handle *h, const char *table)
+static int nft_table_builtin_add(struct nft_handle *h, const char *table)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	struct nft_table *t;
+	int ret;
 
 	t = nft_table_alloc();
 	if (t == NULL)
-		return;
+		return -1;
 
 	nft_table_attr_set(t, NFT_TABLE_ATTR_NAME, (char *)table);
 
@@ -99,10 +100,12 @@ static void nft_table_builtin_add(struct nft_handle *h, const char *table)
 	nft_table_nlmsg_build_payload(nlh, t);
 	nft_table_free(t);
 
-	if (mnl_talk(h, nlh, NULL, NULL) < 0) {
+	ret = mnl_talk(h, nlh, NULL, NULL);
+	if (ret < 0) {
 		if (errno != EEXIST)
 			perror("mnl-talk:nft_table_init_one");
 	}
+	return ret;
 }
 
 #define FILTER		0
@@ -111,93 +114,93 @@ static void nft_table_builtin_add(struct nft_handle *h, const char *table)
 #define SECURITY	3
 #define TABLES_MAX	4
 
+struct builtin_chain {
+	const char *name;
+	uint32_t hook;
+};
+
 static struct builtin_table {
 	const char *name;
 	uint32_t prio;
+	struct builtin_chain chains[NF_INET_NUMHOOKS];
 } tables[TABLES_MAX] = {
 	[RAW] = {
 		.name	= "raw",
 		.prio	= -300,	/* NF_IP_PRI_RAW */
+		.chains = {
+			{
+				.name	= "PREROUTING",
+				.hook	= NF_INET_PRE_ROUTING,
+			},
+			{
+				.name	= "OUTPUT",
+				.hook	= NF_INET_LOCAL_OUT,
+			},
+		},
 	},
 	[MANGLE] = {
 		.name	= "mangle",
 		.prio	= -150,	/* NF_IP_PRI_MANGLE */
+		.chains = {
+			{
+				.name	= "PREROUTING",
+				.hook	= NF_INET_PRE_ROUTING,
+			},
+			{
+				.name	= "INPUT",
+				.hook	= NF_INET_LOCAL_IN,
+			},
+			{
+				.name	= "FORWARD",
+				.hook	= NF_INET_FORWARD,
+			},
+			{
+				.name	= "OUTPUT",
+				.hook	= NF_INET_LOCAL_OUT,
+			},
+			{
+				.name	= "POSTROUTING",
+				.hook	= NF_INET_POST_ROUTING,
+			},
+		},
 	},
 	[FILTER] = {
 		.name	= "filter",
 		.prio	= 0,	/* NF_IP_PRI_FILTER */
+		.chains = {
+			{
+				.name	= "INPUT",
+				.hook	= NF_INET_LOCAL_IN,
+			},
+			{
+				.name	= "FORWARD",
+				.hook	= NF_INET_FORWARD,
+			},
+			{
+				.name	= "OUTPUT",
+				.hook	= NF_INET_LOCAL_OUT,
+			},
+		},
 	},
 	[SECURITY] = {
 		.name	= "security",
 		.prio	= 150,	/* NF_IP_PRI_SECURITY */
+		.chains = {
+			{
+				.name	= "INPUT",
+				.hook	= NF_INET_LOCAL_IN,
+			},
+			{
+				.name	= "FORWARD",
+				.hook	= NF_INET_FORWARD,
+			},
+			{
+				.name	= "OUTPUT",
+				.hook	= NF_INET_LOCAL_OUT,
+			},
+		},
 	},
 	/* nat already registered by nf_tables */
-};
-
-static struct builtin_chain {
-	const char *name;
-	uint32_t hook;
-} chains[TABLES_MAX][NF_IP_NUMHOOKS] = {
-	[FILTER] = {
-		{
-			.name	= "INPUT",
-			.hook	= NF_INET_LOCAL_IN,
-		},
-		{
-			.name	= "FORWARD",
-			.hook	= NF_INET_FORWARD,
-		},
-		{
-			.name	= "OUTPUT",
-			.hook	= NF_INET_LOCAL_OUT,
-		},
-	},
-	[MANGLE] = {
-		{
-			.name	= "PREROUTING",
-			.hook	= NF_INET_PRE_ROUTING,
-		},
-		{
-			.name	= "INPUT",
-			.hook	= NF_INET_LOCAL_IN,
-		},
-		{
-			.name	= "FORWARD",
-			.hook	= NF_INET_FORWARD,
-		},
-		{
-			.name	= "OUTPUT",
-			.hook	= NF_INET_LOCAL_OUT,
-		},
-		{
-			.name	= "POSTROUTING",
-			.hook	= NF_INET_POST_ROUTING,
-		},
-	},
-	[RAW] = {
-		{
-			.name	= "PREROUTING",
-			.hook	= NF_INET_PRE_ROUTING,
-		},
-		{
-			.name	= "OUTPUT",
-			.hook	= NF_INET_LOCAL_OUT,
-		},
-	},
-	[SECURITY] = {
-		{
-			.name	= "INPUT",
-			.hook	= NF_INET_LOCAL_IN,
-		},
-		{
-			.name	= "FORWARD",
-			.hook	= NF_INET_FORWARD,
-		},
-		{
-			.name	= "OUTPUT",
-			.hook	= NF_INET_LOCAL_OUT,
-		},
-	},
 };
 
 static struct nft_chain *
@@ -261,23 +264,40 @@ static struct builtin_table *nft_table_builtin_find(const char *table)
 
 /* find if built-in chain already exists */
 static struct builtin_chain *
-nft_chain_builtin_find(const char *table, const char *chain)
+nft_chain_builtin_find(struct builtin_table *t, const char *chain)
 {
-	int i, j;
+	int i;
 	bool found = false;
 
-	for (i=0; i<TABLES_MAX; i++) {
-		for (j=0; j<NF_IP_NUMHOOKS; j++) {
-			if (strcmp(tables[i].name, table) != 0 ||
-			    strcmp(chains[i][j].name, chain) != 0)
-				continue;
+	for (i=0; i<NF_IP_NUMHOOKS && t->chains[i].name != NULL; i++) {
+		if (strcmp(t->chains[i].name, chain) != 0)
+			continue;
 
-			found = true;
-			goto out;
-		}
+		found = true;
+		break;
 	}
-out:
-	return found ? &chains[i][j] : NULL;
+	return found ? &t->chains[i] : NULL;
+}
+
+static void
+__nft_chain_builtin_init(struct nft_handle *h,
+			 struct builtin_table *table, const char *chain,
+			 int policy)
+{
+	int i, default_policy;
+
+	/* Initialize all built-in chains. Exception, for e one received as
+	 * parameter, set the default policy as requested.
+	 */
+	for (i=0; i<NF_IP_NUMHOOKS && table->chains[i].name != NULL; i++) {
+		if (chain && strcmp(table->chains[i].name, chain) == 0)
+			default_policy = policy;
+		else
+			default_policy = NF_ACCEPT;
+
+		nft_chain_builtin_add(h, table, &table->chains[i],
+					default_policy);
+	}
 }
 
 static int
@@ -286,22 +306,18 @@ nft_chain_builtin_init(struct nft_handle *h, const char *table,
 {
 	int ret = 0;
 	struct builtin_table *t;
-	struct builtin_chain *c;
 
 	t = nft_table_builtin_find(table);
 	if (t == NULL) {
 		ret = -1;
 		goto out;
 	}
-	nft_table_builtin_add(h, table);
-
-	c = nft_chain_builtin_find(table, chain);
-	if (c == NULL) {
-		ret = -1;
-		goto out;
+	if (nft_table_builtin_add(h, table) < 0) {
+		/* Built-in table already initialized, skip. */
+		if (errno == EEXIST)
+			goto out;
 	}
-	/* If it already exists, it does not modify it */
-	nft_chain_builtin_add(h, t, c, policy);
+	__nft_chain_builtin_init(h, t, chain, policy);
 out:
 	return ret;
 }
@@ -371,16 +387,16 @@ __nft_chain_set(struct nft_handle *h, const char *table,
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	struct nft_chain *c;
-	int ret;
 	struct builtin_table *_t;
 	struct builtin_chain *_c;
+	int ret;
 
 	_t = nft_table_builtin_find(table);
 	/* if this built-in table does not exists, create it */
 	if (_t != NULL)
 		nft_table_builtin_add(h, table);
 
-	_c = nft_chain_builtin_find(table, chain);
+	_c = nft_chain_builtin_find(_t, chain);
 	if (_c != NULL) {
 		/* This is a built-in chain */
 		c = nft_chain_builtin_alloc(_t, _c, policy);
@@ -610,7 +626,7 @@ nft_rule_add(struct nft_handle *h, const char *chain, const char *table,
 	uint32_t op;
 	int flags = append ? NLM_F_APPEND : 0;
 
-	/* If built-in chain does not exists, create it */
+	/* If built-in chains don't exist for this table, create them */
 	nft_chain_builtin_init(h, table, chain, NF_ACCEPT);
 
 	nft_fn = nft_rule_add;
@@ -1363,6 +1379,9 @@ int nft_chain_user_add(struct nft_handle *h, const char *chain, const char *tabl
 	struct nlmsghdr *nlh;
 	struct nft_chain *c;
 	int ret;
+
+	/* If built-in chains don't exist for this table, create them */
+	nft_chain_builtin_init(h, table, NULL, NF_ACCEPT);
 
 	c = nft_chain_alloc();
 	if (c == NULL) {
