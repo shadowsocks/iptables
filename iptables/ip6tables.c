@@ -52,21 +52,6 @@
 #define FALSE 0
 #endif
 
-#define FMT_NUMERIC	0x0001
-#define FMT_NOCOUNTS	0x0002
-#define FMT_KILOMEGAGIGA 0x0004
-#define FMT_OPTIONS	0x0008
-#define FMT_NOTABLE	0x0010
-#define FMT_NOTARGET	0x0020
-#define FMT_VIA		0x0040
-#define FMT_NONEWLINE	0x0080
-#define FMT_LINENUMBERS 0x0100
-
-#define FMT_PRINT_RULE (FMT_NOCOUNTS | FMT_OPTIONS | FMT_VIA \
-			| FMT_NUMERIC | FMT_NOTABLE)
-#define FMT(tab,notab) ((format) & FMT_NOTABLE ? (notab) : (tab))
-
-
 #define CMD_NONE		0x0000U
 #define CMD_INSERT		0x0001U
 #define CMD_DELETE		0x0002U
@@ -442,31 +427,6 @@ set_option(unsigned int *options, unsigned int option, uint8_t *invflg,
 	}
 }
 
-static void
-print_num(uint64_t number, unsigned int format)
-{
-	if (format & FMT_KILOMEGAGIGA) {
-		if (number > 99999) {
-			number = (number + 500) / 1000;
-			if (number > 9999) {
-				number = (number + 500) / 1000;
-				if (number > 9999) {
-					number = (number + 500) / 1000;
-					if (number > 9999) {
-						number = (number + 500) / 1000;
-						printf(FMT("%4lluT ","%lluT "), (unsigned long long)number);
-					}
-					else printf(FMT("%4lluG ","%lluG "), (unsigned long long)number);
-				}
-				else printf(FMT("%4lluM ","%lluM "), (unsigned long long)number);
-			} else
-				printf(FMT("%4lluK ","%lluK "), (unsigned long long)number);
-		} else
-			printf(FMT("%5llu ","%llu "), (unsigned long long)number);
-	} else
-		printf(FMT("%8llu ","%llu "), (unsigned long long)number);
-}
-
 
 static void
 print_header(unsigned int format, const char *chain, struct xtc_handle *handle)
@@ -478,9 +438,9 @@ print_header(unsigned int format, const char *chain, struct xtc_handle *handle)
 		printf(" (policy %s", pol);
 		if (!(format & FMT_NOCOUNTS)) {
 			fputc(' ', stdout);
-			print_num(counters.pcnt, (format|FMT_NOTABLE));
+			xtables_print_num(counters.pcnt, (format|FMT_NOTABLE));
 			fputs("packets, ", stdout);
-			print_num(counters.bcnt, (format|FMT_NOTABLE));
+			xtables_print_num(counters.bcnt, (format|FMT_NOTABLE));
 			fputs("bytes", stdout);
 		}
 		printf(")\n");
@@ -563,8 +523,8 @@ print_firewall(const struct ip6t_entry *fw,
 		printf(FMT("%-4u ", "%u "), num);
 
 	if (!(format & FMT_NOCOUNTS)) {
-		print_num(fw->counters.pcnt, format);
-		print_num(fw->counters.bcnt, format);
+		xtables_print_num(fw->counters.pcnt, format);
+		xtables_print_num(fw->counters.bcnt, format);
 	}
 
 	if (!(format & FMT_NOTARGET))

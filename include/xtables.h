@@ -469,6 +469,22 @@ extern void xtables_ip6parse_multiple(const char *, struct in6_addr **,
  */
 extern void xtables_save_string(const char *value);
 
+#define FMT_NUMERIC		0x0001
+#define FMT_NOCOUNTS		0x0002
+#define FMT_KILOMEGAGIGA	0x0004
+#define FMT_OPTIONS		0x0008
+#define FMT_NOTABLE		0x0010
+#define FMT_NOTARGET		0x0020
+#define FMT_VIA			0x0040
+#define FMT_NONEWLINE		0x0080
+#define FMT_LINENUMBERS		0x0100
+
+#define FMT_PRINT_RULE (FMT_NOCOUNTS | FMT_OPTIONS | FMT_VIA \
+                        | FMT_NUMERIC | FMT_NOTABLE)
+#define FMT(tab,notab) ((format) & FMT_NOTABLE ? (notab) : (tab))
+
+extern void xtables_print_num(uint64_t number, unsigned int format);
+
 #if defined(ALL_INCLUSIVE) || defined(NO_SHARED_LIBS)
 #	ifdef _INIT
 #		undef _init
