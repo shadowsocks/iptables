@@ -580,6 +580,24 @@ static void add_payload(struct nft_rule *r, int offset, int len)
 	nft_rule_add_expr(r, expr);
 }
 
+/* bitwise operation is = sreg & mask ^ xor */
+static void add_bitwise_u16(struct nft_rule *r, int mask, int xor)
+{
+	struct nft_rule_expr *expr;
+
+	expr = nft_rule_expr_alloc("bitwise");
+	if (expr == NULL)
+		return;
+
+	nft_rule_expr_set_u32(expr, NFT_EXPR_BITWISE_SREG, NFT_REG_1);
+	nft_rule_expr_set_u32(expr, NFT_EXPR_BITWISE_DREG, NFT_REG_1);
+	nft_rule_expr_set_u32(expr, NFT_EXPR_BITWISE_LEN, sizeof(uint16_t));
+	nft_rule_expr_set(expr, NFT_EXPR_BITWISE_MASK, &mask, sizeof(uint16_t));
+	nft_rule_expr_set(expr, NFT_EXPR_BITWISE_XOR, &xor, sizeof(uint16_t));
+
+	nft_rule_add_expr(r, expr);
+}
+
 static void add_cmp_ptr(struct nft_rule *r, uint32_t op, void *data, size_t len)
 {
 	struct nft_rule_expr *expr;
@@ -593,6 +611,11 @@ static void add_cmp_ptr(struct nft_rule *r, uint32_t op, void *data, size_t len)
 	nft_rule_expr_set(expr, NFT_EXPR_CMP_DATA, data, len);
 
 	nft_rule_add_expr(r, expr);
+}
+
+static void add_cmp_u16(struct nft_rule *r, uint16_t val, uint32_t op)
+{
+	add_cmp_ptr(r, op, &val, sizeof(val));
 }
 
 static void add_cmp_u32(struct nft_rule *r, uint32_t val, uint32_t op)
@@ -698,6 +721,19 @@ nft_rule_add(struct nft_handle *h, const char *chain, const char *table,
 			op = NFT_CMP_EQ;
 
 		add_cmp_u32(r, cs->fw.ip.proto, op);
+	}
+	if (cs->fw.ip.flags & IPT_F_FRAG) {
+		add_payload(r, offsetof(struct iphdr, frag_off), 2);
+		/* get the 13 bits that contain the fragment offset */
+		add_bitwise_u16(r, 0x1fff, !0x1fff);
+
+		/* if offset is non-zero, this is a fragment */
+		if (cs->fw.ip.invflags & IPT_INV_FRAG)
+			op = NFT_CMP_EQ;
+		else
+			op = NFT_CMP_NEQ;
+
+		add_cmp_u16(r, 0, op);
 	}
 
 	for (matchp = cs->matches; matchp; matchp = matchp->next)
@@ -970,6 +1006,50 @@ get_cmp_data(struct nft_rule_expr_iter *iter, void *data, size_t dlen, bool *inv
 		*inv = false;
 }
 
+static void get_frag(struct nft_rule_expr_iter *iter, bool *inv)
+{
+	struct nft_rule_expr *e;
+	const char *name;
+	uint8_t op;
+
+	e = nft_rule_expr_iter_next(iter);
+	if (e == NULL)
+		return;
+
+	/* we assume correct mask and xor */
+	name = nft_rule_expr_get_str(e, NFT_RULE_EXPR_ATTR_NAME);
+	if (strcmp(name, "bitwise") != 0) {
+		DEBUGP("skipping no bitwise after payload\n");
+		return;
+	}
+
+	/* Now check for cmp */
+	e = nft_rule_expr_iter_next(iter);
+	if (e == NULL)
+		return;
+
+	/* we assume correct data */
+	name = nft_rule_expr_get_str(e, NFT_RULE_EXPR_ATTR_NAME);
+	if (strcmp(name, "cmp") != 0) {
+		DEBUGP("skipping no cmp after payload\n");
+		return;
+	}
+
+	op = nft_rule_expr_get_u8(e, NFT_EXPR_CMP_OP);
+	if (op == NFT_CMP_EQ)
+		*inv = true;
+	else
+		*inv = false;
+}
+
+static void print_frag(bool inv)
+{
+	if (inv)
+		printf("! -f ");
+	else
+		printf("-f ");
+}
+
 static void print_proto(uint16_t proto, int invert)
 {
 	const struct protoent *pent = getprotobynumber(proto);
@@ -1044,6 +1124,10 @@ nft_print_payload(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter)
 	case offsetof(struct iphdr, protocol):
 		get_cmp_data(iter, &proto, sizeof(proto), &inv);
 		print_proto(proto, inv);
+		break;
+	case offsetof(struct iphdr, frag_off):
+		get_frag(iter, &inv);
+		print_frag(inv);
 		break;
 	default:
 		DEBUGP("unknown payload offset %d\n", offset);
@@ -1802,6 +1886,12 @@ nft_parse_payload(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 		cs->fw.ip.proto = proto;
 		if (inv)
 			cs->fw.ip.invflags |= IPT_INV_PROTO;
+		break;
+	case offsetof(struct iphdr, frag_off):
+		cs->fw.ip.flags |= IPT_F_FRAG;
+		get_frag(iter, &inv);
+		if (inv)
+			cs->fw.ip.invflags |= IPT_INV_FRAG;
 		break;
 	default:
 		DEBUGP("unknown payload offset %d\n", offset);
