@@ -186,22 +186,6 @@ static const int inverse_for_options[NUMBER_OF_OPT] =
 #define prog_name iptables_globals.program_name
 #define prog_vers iptables_globals.program_version
 
-/* Primitive headers... */
-/* defined in netinet/in.h */
-#if 0
-#ifndef IPPROTO_ESP
-#define IPPROTO_ESP 50
-#endif
-#ifndef IPPROTO_AH
-#define IPPROTO_AH 51
-#endif
-#endif
-
-enum {
-	IPT_DOTTED_ADDR = 0,
-	IPT_DOTTED_MASK
-};
-
 static void __attribute__((noreturn))
 exit_tryhelp(int status)
 {
