@@ -2237,10 +2237,10 @@ __nft_rule_check(struct nft_handle *h, const char *chain, const char *table,
 
 		if (rulenum >= 0) {
 			/* Delete by rule number case */
-			if (rule_ctr != rulenum) {
-				rule_ctr++;
+			if (rule_ctr != rulenum)
 				goto next;
-			}
+			found = true;
+			break;
 		} else {
 			/* Delete by matching rule case */
 			DEBUGP("comparing with... ");
@@ -2272,6 +2272,7 @@ __nft_rule_check(struct nft_handle *h, const char *chain, const char *table,
 			break;
 		}
 next:
+		rule_ctr++;
 		r = nft_rule_list_iter_next(iter);
 	}
 
