@@ -1576,14 +1576,37 @@ err:
 int nft_chain_user_rename(struct nft_handle *h,const char *chain,
 			  const char *table, const char *newname)
 {
+	char buf[MNL_SOCKET_BUFFER_SIZE];
+	struct nlmsghdr *nlh;
+	struct nft_chain *c;
 	int ret;
 
-	/* XXX need new operation in nf_tables to support this */
-	ret = nft_chain_user_del(h, chain, table);
-	if (ret < 0)
-		return ret;
+	/* If built-in chains don't exist for this table, create them */
+	nft_chain_builtin_init(h, table, NULL, NF_ACCEPT);
 
-	return nft_chain_user_add(h, newname, table);
+	c = nft_chain_alloc();
+	if (c == NULL) {
+		DEBUGP("cannot allocate chain\n");
+		return -1;
+	}
+
+	nft_chain_attr_set(c, NFT_CHAIN_ATTR_TABLE, (char *)table);
+	nft_chain_attr_set(c, NFT_CHAIN_ATTR_NAME, (char *)chain);
+	nft_chain_attr_set(c, NFT_CHAIN_ATTR_NEW_NAME, (char *)newname);
+
+	nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_NEWCHAIN, AF_INET,
+					NLM_F_ACK|NLM_F_REPLACE, h->seq);
+	nft_chain_nlmsg_build_payload(nlh, c);
+	nft_chain_free(c);
+
+	ret = mnl_talk(h, nlh, NULL, NULL);
+	if (ret < 0) {
+		if (errno != EEXIST)
+			perror("mnl_talk:nft_chain_rename");
+	}
+
+	/* the core expects 1 for success and 0 for error */
+	return ret == 0 ? 1 : 0;
 }
 
 static int nft_table_list_cb(const struct nlmsghdr *nlh, void *data)
