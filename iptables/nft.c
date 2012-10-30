@@ -639,7 +639,8 @@ static void add_counters(struct nft_rule *r, uint64_t packets, uint64_t bytes)
 
 int
 nft_rule_add(struct nft_handle *h, const char *chain, const char *table,
-	     struct iptables_command_state *cs, bool append, bool verbose)
+	     struct iptables_command_state *cs,
+	     bool append, uint16_t handle, bool verbose)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
@@ -764,8 +765,16 @@ nft_rule_add(struct nft_handle *h, const char *chain, const char *table,
 	}
 
 	/* NLM_F_CREATE autoloads the built-in table if it does not exists */
-	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE, AF_INET,
-					NLM_F_ACK|NLM_F_CREATE|flags, h->seq);
+	flags |= NLM_F_ACK|NLM_F_CREATE;
+
+	if (handle > 0) {
+		nft_rule_attr_set(r, NFT_RULE_ATTR_HANDLE, &handle);
+		flags |= NLM_F_REPLACE;
+	}
+
+	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE,
+				       AF_INET, flags, h->seq);
+
 	nft_rule_nlmsg_build_payload(nlh, r);
 
 	nft_rule_print_debug(r, nlh);
@@ -2327,17 +2336,16 @@ int nft_rule_replace(struct nft_handle *h, const char *chain,
 		     const char *table, struct iptables_command_state *cs,
 		     int rulenum, bool verbose)
 {
-	int ret;
+	int handle;
 
 	nft_fn = nft_rule_replace;
 
-	ret = __nft_rule_check(h, chain, table,
-			       NULL, false, true, rulenum, verbose);
-	if (ret < 0)
-		return ret;
+	handle = __nft_rule_check(h, chain, table,
+				  NULL, false, true, rulenum, verbose);
+	if (handle < 0)
+		return handle;
 
-	/* XXX needs to be inserted in position, this is appending */
-	return nft_rule_add(h, chain, table, cs, true, verbose);
+	return nft_rule_add(h, chain, table, cs, true, handle, verbose);
 }
 
 /*

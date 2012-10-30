@@ -448,7 +448,8 @@ add_entry(const char *chain,
 			cs->fw.ip.dst.s_addr = daddrs[j].s_addr;
 			cs->fw.ip.dmsk.s_addr = dmasks[j].s_addr;
 
-			ret = nft_rule_add(h, chain, table, cs, append, verbose);
+			ret = nft_rule_add(h, chain, table,
+					   cs, append, 0, verbose);
 		}
 	}
 
