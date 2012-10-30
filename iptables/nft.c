@@ -2200,7 +2200,7 @@ __nft_rule_del(struct nft_handle *h, struct nft_rule *r)
 static int
 __nft_rule_check(struct nft_handle *h, const char *chain, const char *table,
 		 struct iptables_command_state *cs,
-		 bool delete, int rulenum, bool verbose)
+		 bool delete, bool replace, int rulenum, bool verbose)
 {
 	struct nft_rule_list *list;
 	struct nft_rule_list_iter *iter;
@@ -2282,7 +2282,8 @@ next:
 		if (delete) {
 			DEBUGP("deleting rule\n");
 			__nft_rule_del(h, r);
-		}
+		} else if (replace)
+			ret = nft_rule_attr_get_u16(r, NFT_RULE_ATTR_HANDLE);
 	}
 
 	nft_rule_list_iter_destroy(iter);
@@ -2300,7 +2301,7 @@ int nft_rule_check(struct nft_handle *h, const char *chain,
 {
 	nft_fn = nft_rule_check;
 
-	return __nft_rule_check(h, chain, table, e, false, -1, verbose);
+	return __nft_rule_check(h, chain, table, e, false, false, -1, verbose);
 }
 
 int nft_rule_delete(struct nft_handle *h, const char *chain,
@@ -2309,7 +2310,7 @@ int nft_rule_delete(struct nft_handle *h, const char *chain,
 {
 	nft_fn = nft_rule_delete;
 
-	return __nft_rule_check(h, chain, table, e, true, -1, verbose);
+	return __nft_rule_check(h, chain, table, e, true, false, -1, verbose);
 }
 
 int nft_rule_delete_num(struct nft_handle *h, const char *chain,
@@ -2318,7 +2319,8 @@ int nft_rule_delete_num(struct nft_handle *h, const char *chain,
 {
 	nft_fn = nft_rule_delete_num;
 
-	return __nft_rule_check(h, chain, table, NULL, true, rulenum, verbose);
+	return __nft_rule_check(h, chain, table,
+				NULL, true, false, rulenum, verbose);
 }
 
 int nft_rule_replace(struct nft_handle *h, const char *chain,
@@ -2329,7 +2331,8 @@ int nft_rule_replace(struct nft_handle *h, const char *chain,
 
 	nft_fn = nft_rule_replace;
 
-	ret = __nft_rule_check(h, chain, table, NULL, true, rulenum, verbose);
+	ret = __nft_rule_check(h, chain, table,
+			       NULL, false, true, rulenum, verbose);
 	if (ret < 0)
 		return ret;
 
