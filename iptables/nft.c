@@ -2757,11 +2757,7 @@ int nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 		print_header(format, chain_name, policy_name[policy], &ctrs,
 			     basechain, refs);
 
-		/* this is a base chain */
-		if (nft_chain_attr_get(c, NFT_CHAIN_ATTR_HOOKNUM)) {
-			__nft_rule_list(h, c, table, rulenum, format,
-					print_firewall);
-		}
+		__nft_rule_list(h, c, table, rulenum, format, print_firewall);
 next:
 		c = nft_chain_list_iter_next(iter);
 	}
