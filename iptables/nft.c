@@ -86,10 +86,12 @@ static int mnl_talk(struct nft_handle *h, struct nlmsghdr *nlh,
 #define MANGLE		1
 #define RAW		2
 #define SECURITY	3
-#define TABLES_MAX	4
+#define NAT		4
+#define TABLES_MAX	5
 
 struct builtin_chain {
 	const char *name;
+	const char *type;
 	uint32_t prio;
 	uint32_t hook;
 };
@@ -103,11 +105,13 @@ static struct builtin_table {
 		.chains = {
 			{
 				.name	= "PREROUTING",
+				.type	= "filter",
 				.prio	= -300,	/* NF_IP_PRI_RAW */
 				.hook	= NF_INET_PRE_ROUTING,
 			},
 			{
 				.name	= "OUTPUT",
+				.type	= "filter",
 				.prio	= -300,	/* NF_IP_PRI_RAW */
 				.hook	= NF_INET_LOCAL_OUT,
 			},
@@ -118,26 +122,31 @@ static struct builtin_table {
 		.chains = {
 			{
 				.name	= "PREROUTING",
+				.type	= "filter",
 				.prio	= -150,	/* NF_IP_PRI_MANGLE */
 				.hook	= NF_INET_PRE_ROUTING,
 			},
 			{
 				.name	= "INPUT",
+				.type	= "filter",
 				.prio	= -150,	/* NF_IP_PRI_MANGLE */
 				.hook	= NF_INET_LOCAL_IN,
 			},
 			{
 				.name	= "FORWARD",
+				.type	= "filter",
 				.prio	= -150,	/* NF_IP_PRI_MANGLE */
 				.hook	= NF_INET_FORWARD,
 			},
 			{
 				.name	= "OUTPUT",
+				.type	= "route",
 				.prio	= -150,	/* NF_IP_PRI_MANGLE */
 				.hook	= NF_INET_LOCAL_OUT,
 			},
 			{
 				.name	= "POSTROUTING",
+				.type	= "filter",
 				.prio	= -150,	/* NF_IP_PRI_MANGLE */
 				.hook	= NF_INET_POST_ROUTING,
 			},
@@ -148,16 +157,19 @@ static struct builtin_table {
 		.chains = {
 			{
 				.name	= "INPUT",
+				.type	= "filter",
 				.prio	= 0,	/* NF_IP_PRI_FILTER */
 				.hook	= NF_INET_LOCAL_IN,
 			},
 			{
 				.name	= "FORWARD",
+				.type	= "filter",
 				.prio	= 0,	/* NF_IP_PRI_FILTER */
 				.hook	= NF_INET_FORWARD,
 			},
 			{
 				.name	= "OUTPUT",
+				.type	= "filter",
 				.prio	= 0,	/* NF_IP_PRI_FILTER */
 				.hook	= NF_INET_LOCAL_OUT,
 			},
@@ -168,22 +180,53 @@ static struct builtin_table {
 		.chains = {
 			{
 				.name	= "INPUT",
+				.type	= "filter",
 				.prio	= 150,	/* NF_IP_PRI_SECURITY */
 				.hook	= NF_INET_LOCAL_IN,
 			},
 			{
 				.name	= "FORWARD",
+				.type	= "filter",
 				.prio	= 150,	/* NF_IP_PRI_SECURITY */
 				.hook	= NF_INET_FORWARD,
 			},
 			{
 				.name	= "OUTPUT",
+				.type	= "filter",
 				.prio	= 150,	/* NF_IP_PRI_SECURITY */
 				.hook	= NF_INET_LOCAL_OUT,
 			},
 		},
 	},
-	/* nat already registered by nf_tables */
+	[NAT] = {
+		.name	= "nat",
+		.chains = {
+			{
+				.name	= "OUTPUT",
+				.type	= "nat",
+				.prio	= -100, /* NF_IP_PRI_NAT_DST */
+				.hook	= NF_INET_LOCAL_OUT,
+			},
+			{
+				.name	= "INPUT",
+				.type	= "nat",
+				.prio	= 100, /* NF_IP_PRI_NAT_SRC */
+				.hook	= NF_INET_LOCAL_IN,
+			},
+			{
+				.name	= "PREROUTING",
+				.type	= "nat",
+				.prio	= -100, /* NF_IP_PRI_NAT_DST */
+				.hook	= NF_INET_PRE_ROUTING,
+			},
+			{
+				.name	= "POSTROUTING",
+				.type	= "nat",
+				.prio	= 100, /* NF_IP_PRI_NAT_SRC */
+				.hook	= NF_INET_POST_ROUTING,
+			},
+		},
+	},
 };
 
 static int nft_table_builtin_add(struct nft_handle *h, struct builtin_table *_t)
@@ -227,6 +270,7 @@ nft_chain_builtin_alloc(struct builtin_table *table,
 	nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_HOOKNUM, chain->hook);
 	nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_PRIO, chain->prio);
 	nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_POLICY, policy);
+	nft_chain_attr_set(c, NFT_CHAIN_ATTR_TYPE, (char *)chain->type);
 
 	return c;
 }
@@ -243,8 +287,10 @@ nft_chain_builtin_add(struct nft_handle *h, struct builtin_table *table,
 	if (c == NULL)
 		return;
 
+	/* NLM_F_CREATE requests module autoloading */
 	nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_NEWCHAIN, AF_INET,
-					NLM_F_ACK|NLM_F_EXCL, h->seq);
+					NLM_F_ACK|NLM_F_EXCL|NLM_F_CREATE,
+					h->seq);
 	nft_chain_nlmsg_build_payload(nlh, c);
 	nft_chain_free(c);
 
