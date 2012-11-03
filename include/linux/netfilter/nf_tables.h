@@ -400,22 +400,4 @@ enum nft_nat_attributes {
 };
 #define NFTA_NAT_MAX		(__NFTA_NAT_MAX - 1)
 
-enum nft_target_attributes {
-	NFTA_TARGET_UNSPEC,
-	NFTA_TARGET_NAME,
-	NFTA_TARGET_REV,
-	NFTA_TARGET_INFO,
-	__NFTA_TARGET_MAX
-};
-#define NFTA_TARGET_MAX		(__NFTA_TARGET_MAX - 1)
-
-enum nft_match_attributes {
-	NFTA_MATCH_UNSPEC,
-	NFTA_MATCH_NAME,
-	NFTA_MATCH_REV,
-	NFTA_MATCH_INFO,
-	__NFTA_MATCH_MAX
-};
-#define NFTA_MATCH_MAX		(__NFTA_MATCH_MAX - 1)
-
 #endif /* _LINUX_NF_TABLES_H */
