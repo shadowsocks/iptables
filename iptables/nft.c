@@ -2215,23 +2215,32 @@ __nft_rule_del(struct nft_handle *h, struct nft_rule *r)
 		perror("mnl_talk:nft_rule_del");
 }
 
-static int
-__nft_rule_check(struct nft_handle *h, const char *chain, const char *table,
-		 struct iptables_command_state *cs,
-		 bool delete, bool replace, int rulenum, bool verbose)
+static struct nft_rule_list *nft_rule_list_create(struct nft_handle *h)
 {
 	struct nft_rule_list *list;
-	struct nft_rule_list_iter *iter;
-	struct nft_rule *r;
-	int ret = 0;
-	int rule_ctr = 0;
-	bool found = false;
 
 	list = nft_rule_list_get(h);
 	if (list == NULL) {
 		DEBUGP("cannot retrieve rule list from kernel\n");
-		return 0;
+		return NULL;
 	}
+
+	return list;
+}
+
+static void nft_rule_list_destroy(struct nft_rule_list *list)
+{
+	nft_rule_list_free(list);
+}
+
+static struct nft_rule *
+nft_rule_find(struct nft_rule_list *list, const char *chain, const char *table,
+	      struct iptables_command_state *cs, int rulenum)
+{
+	struct nft_rule *r;
+	struct nft_rule_list_iter *iter;
+	int rule_ctr = 0;
+	bool found = false;
 
 	iter = nft_rule_list_iter_create(list);
 	if (iter == NULL) {
@@ -2294,67 +2303,124 @@ next:
 		r = nft_rule_list_iter_next(iter);
 	}
 
-	if (found) {
-		ret = 1;
-
-		if (delete) {
-			DEBUGP("deleting rule\n");
-			__nft_rule_del(h, r);
-		} else if (replace)
-			ret = nft_rule_attr_get_u16(r, NFT_RULE_ATTR_HANDLE);
-	}
-
 	nft_rule_list_iter_destroy(iter);
-	nft_rule_list_free(list);
 
-	if (ret == 0)
-		errno = ENOENT;
-
-	return ret;
+	return found ? r : NULL;
 }
 
 int nft_rule_check(struct nft_handle *h, const char *chain,
 		   const char *table, struct iptables_command_state *e,
 		   bool verbose)
 {
+	struct nft_rule_list *list;
+	int ret;
+
 	nft_fn = nft_rule_check;
 
-	return __nft_rule_check(h, chain, table, e, false, false, -1, verbose);
+	list = nft_rule_list_create(h);
+	if (list == NULL) {
+		DEBUGP("cannot allocate rule list\n");
+		return 0;
+	}
+
+	ret = nft_rule_find(list, chain, table, e, -1) ? 1 : 0;
+	if (ret == 0)
+		errno = ENOENT;
+
+	nft_rule_list_destroy(list);
+
+	return ret;
 }
 
 int nft_rule_delete(struct nft_handle *h, const char *chain,
-		    const char *table, struct iptables_command_state *e,
+		    const char *table, struct iptables_command_state *cs,
 		    bool verbose)
 {
+	int ret = 0;
+	struct nft_rule *r;
+	struct nft_rule_list *list;
+
 	nft_fn = nft_rule_delete;
 
-	return __nft_rule_check(h, chain, table, e, true, false, -1, verbose);
+	list = nft_rule_list_create(h);
+	if (list == NULL) {
+		DEBUGP("cannot allocate rule list\n");
+		return 0;
+	}
+
+	r = nft_rule_find(list, chain, table, cs, -1);
+	if (r != NULL) {
+		ret = 1;
+
+		DEBUGP("deleting rule\n");
+		__nft_rule_del(h, r);
+	} else
+		errno = ENOENT;
+
+	nft_rule_list_destroy(list);
+
+	return ret;
 }
 
 int nft_rule_delete_num(struct nft_handle *h, const char *chain,
-			const char *table, int rulenum,
-			bool verbose)
+			const char *table, int rulenum, bool verbose)
 {
+	int ret = 0;
+	struct nft_rule *r;
+	struct nft_rule_list *list;
+
 	nft_fn = nft_rule_delete_num;
 
-	return __nft_rule_check(h, chain, table,
-				NULL, true, false, rulenum, verbose);
+	list = nft_rule_list_create(h);
+	if (list == NULL) {
+		DEBUGP("cannot allocate rule list\n");
+		return 0;
+	}
+
+	r = nft_rule_find(list, chain, table, NULL, rulenum);
+	if (r != NULL) {
+		ret = 1;
+
+		DEBUGP("deleting rule by number %d\n", rulenum);
+		__nft_rule_del(h, r);
+	} else
+		errno = ENOENT;
+
+	nft_rule_list_destroy(list);
+
+	return ret;
 }
 
 int nft_rule_replace(struct nft_handle *h, const char *chain,
 		     const char *table, struct iptables_command_state *cs,
 		     int rulenum, bool verbose)
 {
-	int handle;
+	int ret = 0;
+	struct nft_rule *r;
+	struct nft_rule_list *list;
 
 	nft_fn = nft_rule_replace;
 
-	handle = __nft_rule_check(h, chain, table,
-				  NULL, false, true, rulenum, verbose);
-	if (handle < 0)
-		return handle;
+	list = nft_rule_list_create(h);
+	if (list == NULL) {
+		DEBUGP("cannot allocate rule list\n");
+		return 0;
+	}
 
-	return nft_rule_add(h, chain, table, cs, true, handle, verbose);
+	r = nft_rule_find(list, chain, table, cs, rulenum);
+	if (r != NULL) {
+		DEBUGP("replacing rule with handle=%u\n",
+			nft_rule_attr_get_u16(r, NFT_RULE_ATTR_HANDLE));
+
+		ret = nft_rule_add(h, chain, table, cs, true,
+				   nft_rule_attr_get_u16(r, NFT_RULE_ATTR_HANDLE),
+				   verbose);
+	} else
+		errno = ENOENT;
+
+	nft_rule_list_destroy(list);
+
+	return ret;
 }
 
 /*
