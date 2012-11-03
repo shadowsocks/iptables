@@ -649,7 +649,7 @@ static void add_counters(struct nft_rule *r, uint64_t packets, uint64_t bytes)
 int
 nft_rule_add(struct nft_handle *h, const char *chain, const char *table,
 	     struct iptables_command_state *cs,
-	     bool append, uint16_t handle, bool verbose)
+	     bool append, uint64_t handle, bool verbose)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
@@ -2409,11 +2409,12 @@ int nft_rule_replace(struct nft_handle *h, const char *chain,
 
 	r = nft_rule_find(list, chain, table, cs, rulenum);
 	if (r != NULL) {
-		DEBUGP("replacing rule with handle=%u\n",
-			nft_rule_attr_get_u16(r, NFT_RULE_ATTR_HANDLE));
+		DEBUGP("replacing rule with handle=%llu\n",
+			(unsigned long long)
+			nft_rule_attr_get_u64(r, NFT_RULE_ATTR_HANDLE));
 
 		ret = nft_rule_add(h, chain, table, cs, true,
-				   nft_rule_attr_get_u16(r, NFT_RULE_ATTR_HANDLE),
+				   nft_rule_attr_get_u64(r, NFT_RULE_ATTR_HANDLE),
 				   verbose);
 	} else
 		errno = ENOENT;
