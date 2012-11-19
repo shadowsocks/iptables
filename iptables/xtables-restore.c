@@ -243,11 +243,16 @@ xtables_restore_main(int argc, char *argv[])
 				fputs(buffer, stdout);
 			continue;
 		} else if ((strcmp(buffer, "COMMIT\n") == 0) && (in_table)) {
-			/* FIXME commit/testing operation not supported */
 			if (!testing) {
+				if (nft_table_wake_dormant(&h, curtable) < 0) {
+					fprintf(stderr, "Failed to wake up "
+						"dormant table `%s'\n",
+						curtable);
+				}
 				DEBUGP("Calling commit\n");
 				ret = 1;
 			} else {
+				/* FIXME -t needs to be fixed */
 				DEBUGP("Not calling commit, testing\n");
 				ret = 1;
 			}
@@ -270,6 +275,7 @@ xtables_restore_main(int argc, char *argv[])
 			if (tablename && (strcmp(tablename, table) != 0))
 				continue;
 
+			nft_table_set_dormant(&h, table);
 			if (noflush == 0) {
 				DEBUGP("Cleaning all chains of table '%s'\n",
 					table);

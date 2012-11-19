@@ -20,6 +20,8 @@ struct nft_table;
 int nft_table_add(struct nft_handle *h, const struct nft_table *t);
 int nft_for_each_table(struct nft_handle *h, int (*func)(struct nft_handle *h, const char *tablename, bool counters), bool counters);
 bool nft_table_find(struct nft_handle *h, const char *tablename);
+int nft_table_set_dormant(struct nft_handle *h, const char *table);
+int nft_table_wake_dormant(struct nft_handle *h, const char *table);
 
 /*
  * Operations with chains.
