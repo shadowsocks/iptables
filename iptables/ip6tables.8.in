@@ -240,6 +240,15 @@ Give a (currently very brief) description of the command syntax.
 The following parameters make up a rule specification (as used in the
 add, delete, insert, replace and append commands).
 .TP
+\fB\-4\fP, \fB\-\-ipv4\fP
+If a rule using the \fB\-4\fP option is inserted with (and only with)
+ip6tables-restore, it will be silently ignored. Any other uses will throw an
+error. This option allows to put both IPv4 and IPv6 rules in a single rule file
+for use with both iptables-restore and ip6tables-restore.
+.TP
+\fB\-6\fP, \fB\-\-ipv6\fP
+This option has no effect in ip6tables and ip6tables-restore.
+.TP
 [\fB!\fP] \fB\-p\fP, \fB\-\-protocol\fP \fIprotocol\fP
 The protocol of the rule or of the packet to check.
 The specified protocol can be one of \fBtcp\fP, \fBudp\fP, \fBudplite\fP,
