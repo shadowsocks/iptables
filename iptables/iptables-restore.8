@@ -21,7 +21,7 @@
 .SH NAME
 iptables-restore \(em Restore IP Tables
 .SH SYNOPSIS
-\fBiptables\-restore\fP [\fB\-cntv\fP] [\fB\-M\fP \fImodprobe\fP]
+\fBiptables\-restore\fP [\fB\-chntv\fP] [\fB\-M\fP \fImodprobe\fP]
 [\fB\-T\fP \fIname\fP]
 .SH DESCRIPTION
 .PP
@@ -31,6 +31,9 @@ I/O redirection provided by your shell to read from a file
 .TP
 \fB\-c\fR, \fB\-\-counters\fR
 restore the values of all packet and byte counters
+.TP
+\fB\-h\fP, \fB\-\-help\fP
+Print a short option summary.
 .TP
 \fB\-n\fR, \fB\-\-noflush\fR 
 don't flush the previous contents of the table. If not specified, 
