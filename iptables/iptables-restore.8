@@ -21,7 +21,8 @@
 .SH NAME
 iptables-restore \(em Restore IP Tables
 .SH SYNOPSIS
-\fBiptables\-restore\fP [\fB\-cntv\fP] [\fB\-T\fP \fIname\fP]
+\fBiptables\-restore\fP [\fB\-cntv\fP] [\fB\-M\fP \fImodprobe\fP]
+[\fB\-T\fP \fIname\fP]
 .SH DESCRIPTION
 .PP
 .B iptables-restore
@@ -41,6 +42,10 @@ Only parse and construct the ruleset, but do not commit it.
 .TP
 \fB\-v\fP, \fB\-\-verbose\fP
 Print additional debug info during ruleset processing.
+.TP
+\fB\-M\fP, \fB\-\-modprobe\fP \fImodprobe_program\fP
+Specify the path to the modprobe program. By default, iptables-restore will
+inspect /proc/sys/kernel/modprobe to determine the executable's path.
 .TP
 \fB\-T\fP, \fB\-\-table\fP \fIname\fP
 Restore only the named table even if the input stream contains other ones.
