@@ -281,6 +281,13 @@ See the description of the \fB\-s\fP
 (source) flag for a detailed description of the syntax.  The flag
 \fB\-\-dst\fP is an alias for this option.
 .TP
+\fB\-m\fP, \fB\-\-match\fP \fImatch\fP
+Specifies a match to use, that is, an extension module that tests for a
+specific property. The set of matches make up the condition under which a
+target is invoked. Matches are evaluated first to last as specified on the
+command line and work in short-circuit fashion, i.e. if one extension yields
+false, evaluation will stop.
+.TP
 \fB\-j\fP, \fB\-\-jump\fP \fItarget\fP
 This specifies the target of the rule; i.e., what to do if the packet
 matches it.  The target can be a user-defined chain (other than the
