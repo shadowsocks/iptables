@@ -1686,17 +1686,66 @@ err:
 	return ret == 0 ? 1 : 0;
 }
 
+static struct nft_chain *
+nft_chain_find(struct nft_handle *h, const char *table, const char *chain)
+{
+	struct nft_chain_list *list;
+	struct nft_chain_list_iter *iter;
+	struct nft_chain *c;
+
+	list = nft_chain_list_get(h);
+	if (list == NULL) {
+		DEBUGP("cannot allocate chain list\n");
+		return NULL;
+	}
+
+	iter = nft_chain_list_iter_create(list);
+	if (iter == NULL) {
+		DEBUGP("cannot allocate rule list iterator\n");
+		return NULL;
+	}
+
+	c = nft_chain_list_iter_next(iter);
+	while (c != NULL) {
+		const char *table_name =
+			nft_chain_attr_get_str(c, NFT_CHAIN_ATTR_TABLE);
+		const char *chain_name =
+			nft_chain_attr_get_str(c, NFT_CHAIN_ATTR_NAME);
+
+		if (strcmp(table, table_name) != 0)
+			goto next;
+
+		if (strcmp(chain, chain_name) != 0)
+			goto next;
+
+		return c;
+next:
+		c = nft_chain_list_iter_next(iter);
+	}
+	return NULL;
+}
+
 int nft_chain_user_rename(struct nft_handle *h,const char *chain,
 			  const char *table, const char *newname)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
 	struct nft_chain *c;
+	uint64_t handle;
 	int ret;
 
 	/* If built-in chains don't exist for this table, create them */
 	nft_chain_builtin_init(h, table, NULL, NF_ACCEPT);
 
+	/* Find the old chain to be renamed */
+	c = nft_chain_find(h, table, chain);
+	if (c == NULL) {
+		errno = ENOENT;
+		return -1;
+	}
+	handle = nft_chain_attr_get_u64(c, NFT_CHAIN_ATTR_HANDLE);
+
+	/* Now prepare the new name for the chain */
 	c = nft_chain_alloc();
 	if (c == NULL) {
 		DEBUGP("cannot allocate chain\n");
@@ -1704,11 +1753,11 @@ int nft_chain_user_rename(struct nft_handle *h,const char *chain,
 	}
 
 	nft_chain_attr_set(c, NFT_CHAIN_ATTR_TABLE, (char *)table);
-	nft_chain_attr_set(c, NFT_CHAIN_ATTR_NAME, (char *)chain);
-	nft_chain_attr_set(c, NFT_CHAIN_ATTR_NEW_NAME, (char *)newname);
+	nft_chain_attr_set(c, NFT_CHAIN_ATTR_NAME, (char *)newname);
+	nft_chain_attr_set_u64(c, NFT_CHAIN_ATTR_HANDLE, handle);
 
 	nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_NEWCHAIN, AF_INET,
-					NLM_F_ACK|NLM_F_REPLACE, h->seq);
+					NLM_F_ACK, h->seq);
 	nft_chain_nlmsg_build_payload(nlh, c);
 	nft_chain_free(c);
 
