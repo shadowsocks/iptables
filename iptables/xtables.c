@@ -623,11 +623,11 @@ static void command_jump(struct iptables_command_state *cs)
 	xs_init_target(cs->target);
 
 	if (cs->target->x6_options != NULL)
-		opts = xtables_options_xfrm(iptables_globals.orig_opts, opts,
+		opts = xtables_options_xfrm(xtables_globals.orig_opts, opts,
 					    cs->target->x6_options,
 					    &cs->target->option_offset);
 	else
-		opts = xtables_merge_options(iptables_globals.orig_opts, opts,
+		opts = xtables_merge_options(xtables_globals.orig_opts, opts,
 					     cs->target->extra_opts,
 					     &cs->target->option_offset);
 	if (opts == NULL)
@@ -661,10 +661,10 @@ static void command_match(struct iptables_command_state *cs)
 		return;
 	/* Merge options for non-cloned matches */
 	if (m->x6_options != NULL)
-		opts = xtables_options_xfrm(iptables_globals.orig_opts, opts,
+		opts = xtables_options_xfrm(xtables_globals.orig_opts, opts,
 					    m->x6_options, &m->option_offset);
 	else if (m->extra_opts != NULL)
-		opts = xtables_merge_options(iptables_globals.orig_opts, opts,
+		opts = xtables_merge_options(xtables_globals.orig_opts, opts,
 					     m->extra_opts, &m->option_offset);
 	if (opts == NULL)
 		xtables_error(OTHER_PROBLEM, "can't alloc memory!");
@@ -1048,7 +1048,7 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 			exit_tryhelp(2);
 
 		default:
-			if (command_default(&cs, &iptables_globals) == 1)
+			if (command_default(&cs, &xtables_globals) == 1)
 				/* cf. ip6tables.c */
 				continue;
 			break;
