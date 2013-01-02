@@ -8,7 +8,7 @@ enum {
 	O_DST_PFX	= 1 << 1,
 };
 
-static const struct xt_option_entry SNPT_options[] = {
+static const struct xt_option_entry DNPT_options[] = {
 	{ .name = "src-pfx", .id = O_SRC_PFX, .type = XTTYPE_HOSTMASK,
 	  .flags = XTOPT_MAND },
 	{ .name = "dst-pfx", .id = O_DST_PFX, .type = XTTYPE_HOSTMASK,
@@ -16,16 +16,16 @@ static const struct xt_option_entry SNPT_options[] = {
 	{ }
 };
 
-static void SNPT_help(void)
+static void DNPT_help(void)
 {
-	printf("SNPT target options:"
+	printf("DNPT target options:"
 	       "\n"
 	       " --src-pfx prefix/length\n"
 	       " --dst-pfx prefix/length\n"
 	       "\n");
 }
 
-static void SNPT_parse(struct xt_option_call *cb)
+static void DNPT_parse(struct xt_option_call *cb)
 {
 	struct ip6t_npt_tginfo *npt = cb->data;
 
@@ -42,7 +42,7 @@ static void SNPT_parse(struct xt_option_call *cb)
 	}
 }
 
-static void SNPT_print(const void *ip, const struct xt_entry_target *target,
+static void DNPT_print(const void *ip, const struct xt_entry_target *target,
 		       int numeric)
 {
 	const struct ip6t_npt_tginfo *npt = (const void *)target->data;
@@ -59,10 +59,10 @@ static struct xtables_target snpt_tg_reg = {
 	.family		= NFPROTO_IPV6,
 	.size		= XT_ALIGN(sizeof(struct ip6t_npt_tginfo)),
 	.userspacesize	= offsetof(struct ip6t_npt_tginfo, adjustment),
-	.help		= SNPT_help,
-	.x6_parse	= SNPT_parse,
-	.print		= SNPT_print,
-	.x6_options	= SNPT_options,
+	.help		= DNPT_help,
+	.x6_parse	= DNPT_parse,
+	.print		= DNPT_print,
+	.x6_options	= DNPT_options,
 };
 
 void _init(void)
