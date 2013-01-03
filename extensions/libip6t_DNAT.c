@@ -54,8 +54,13 @@ parse_to(const char *orig_arg, int portok, struct nf_nat_range *range)
 		xtables_error(RESOURCE_PROBLEM, "strdup");
 
 	start = strchr(arg, '[');
-	if (start == NULL)
+	if (start == NULL) {
 		start = arg;
+		/* Lets assume one colon is port information. Otherwise its an IPv6 address */
+		colon = strchr(arg, ':');
+		if (colon && strchr(colon+1, ':'))
+			colon = NULL;
+	}
 	else {
 		start++;
 		end = strchr(start, ']');
@@ -105,8 +110,8 @@ parse_to(const char *orig_arg, int portok, struct nf_nat_range *range)
 			range->min_proto.tcp.port = htons(port);
 			range->max_proto.tcp.port = htons(maxport);
 		}
-		/* Starts with a colon? No IP info...*/
-		if (colon == arg) {
+		/* Starts with colon or [] colon? No IP info...*/
+		if (colon == arg || colon == arg+2) {
 			free(arg);
 			return;
 		}
