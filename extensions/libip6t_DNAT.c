@@ -29,13 +29,13 @@ static void DNAT_help(void)
 {
 	printf(
 "DNAT target options:\n"
-" --to-dest [<ipaddr>[-<ipaddr>]][:port[-port]]\n"
-"				Address to map source to.\n"
+" --to-destination [<ipaddr>[-<ipaddr>]][:port[-port]]\n"
+"				Address to map destination to.\n"
 "[--random] [--persistent]\n");
 }
 
 static const struct xt_option_entry DNAT_opts[] = {
-	{.name = "to-dest", .id = O_TO_DEST, .type = XTTYPE_STRING,
+	{.name = "to-destination", .id = O_TO_DEST, .type = XTTYPE_STRING,
 	 .flags = XTOPT_MAND | XTOPT_MULTI},
 	{.name = "random", .id = O_RANDOM, .type = XTTYPE_NONE},
 	{.name = "persistent", .id = O_PERSISTENT, .type = XTTYPE_NONE},
@@ -167,7 +167,7 @@ static void DNAT_parse(struct xt_option_call *cb)
 				get_kernel_version();
 			if (kernel_version > LINUX_VERSION(2, 6, 10))
 				xtables_error(PARAMETER_PROBLEM,
-					   "DNAT: Multiple --to-source not supported");
+					   "DNAT: Multiple --to-destination not supported");
 		}
 		parse_to(cb->arg, portok, range);
 		break;
@@ -223,7 +223,7 @@ static void DNAT_save(const void *ip, const struct xt_entry_target *target)
 {
 	const struct nf_nat_range *range = (const void *)target->data;
 
-	printf(" --to-source ");
+	printf(" --to-destination ");
 	print_range(range);
 	if (range->flags & NF_NAT_RANGE_PROTO_RANDOM)
 		printf(" --random");
