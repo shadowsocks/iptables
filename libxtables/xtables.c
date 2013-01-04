@@ -1075,6 +1075,28 @@ void xtables_register_targets(struct xtables_target *target, unsigned int n)
 	} while (n > 0);
 }
 
+/* receives a list of xtables_rule_match, release them */
+void xtables_rule_matches_free(struct xtables_rule_match **matches)
+{
+	struct xtables_rule_match *matchp, *tmp;
+
+	for (matchp = *matches; matchp;) {
+		tmp = matchp->next;
+		if (matchp->match->m) {
+			free(matchp->match->m);
+			matchp->match->m = NULL;
+		}
+		if (matchp->match == matchp->match->next) {
+			free(matchp->match);
+			matchp->match = NULL;
+		}
+		free(matchp);
+		matchp = tmp;
+	}
+
+	*matches = NULL;
+}
+
 /**
  * xtables_param_act - act on condition
  * @status:	a constant from enum xtables_exittype

@@ -417,6 +417,8 @@ extern struct xtables_match *xtables_find_match(const char *name,
 extern struct xtables_target *xtables_find_target(const char *name,
 	enum xtables_tryload);
 
+extern void xtables_rule_matches_free(struct xtables_rule_match **matches);
+
 /* Your shared library should call one of these. */
 extern void xtables_register_match(struct xtables_match *me);
 extern void xtables_register_matches(struct xtables_match *, unsigned int);

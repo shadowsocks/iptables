@@ -1241,27 +1241,6 @@ generate_entry(const struct ipt_entry *fw,
 	return e;
 }
 
-static void clear_rule_matches(struct xtables_rule_match **matches)
-{
-	struct xtables_rule_match *matchp, *tmp;
-
-	for (matchp = *matches; matchp;) {
-		tmp = matchp->next;
-		if (matchp->match->m) {
-			free(matchp->match->m);
-			matchp->match->m = NULL;
-		}
-		if (matchp->match == matchp->match->next) {
-			free(matchp->match);
-			matchp->match = NULL;
-		}
-		free(matchp);
-		matchp = tmp;
-	}
-
-	*matches = NULL;
-}
-
 static void command_jump(struct iptables_command_state *cs)
 {
 	size_t size;
@@ -1963,7 +1942,7 @@ int do_command4(int argc, char *argv[], char **table, struct xtc_handle **handle
 	if (verbose > 1)
 		dump_entries(*handle);
 
-	clear_rule_matches(&cs.matches);
+	xtables_rule_matches_free(&cs.matches);
 
 	if (e != NULL) {
 		free(e);
