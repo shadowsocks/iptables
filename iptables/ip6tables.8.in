@@ -106,6 +106,13 @@ the built-in chains \fBINPUT\fP (for packets destined to local sockets),
 \fBFORWARD\fP (for packets being routed through the box), and
 \fBOUTPUT\fP (for locally-generated packets).
 .TP
+\fBnat\fP:
+This table is consulted when a packet that creates a new
+connection is encountered.  It consists of three built-ins: \fBPREROUTING\fP
+(for altering packets as soon as they come in), \fBOUTPUT\fP
+(for altering locally-generated packets before routing), and \fBPOSTROUTING\fP
+(for altering packets as they are about to go out). Available since kernel 3.7.
+.TP
 \fBmangle\fP:
 This table is used for specialized packet alteration.  Until kernel
 2.4.17 it had two built-in chains: \fBPREROUTING\fP
