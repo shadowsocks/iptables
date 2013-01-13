@@ -76,7 +76,9 @@ int
 xtables_save_main(int argc, char *argv[])
 {
 	const char *tablename = NULL;
-	struct nft_handle h;
+	struct nft_handle h = {
+		.family	= AF_INET,	/* default to AF_INET */
+	};
 	int c;
 
 	xtables_globals.program_name = "xtables-save";

@@ -4,6 +4,7 @@
 #include "xshared.h"
 
 struct nft_handle {
+	int			family;
 	struct mnl_socket	*nl;
 	uint32_t		portid;
 	uint32_t		seq;

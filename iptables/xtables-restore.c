@@ -161,7 +161,9 @@ static void add_param_to_argv(char *parsestart)
 int
 xtables_restore_main(int argc, char *argv[])
 {
-	struct nft_handle h;
+	struct nft_handle h = {
+		.family = AF_INET,	/* default to IPv4 */
+	};
 	char buffer[10240];
 	int c;
 	char curtable[XT_TABLE_MAXNAMELEN + 1];
