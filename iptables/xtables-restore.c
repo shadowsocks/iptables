@@ -331,20 +331,29 @@ xtables_restore_main(int argc, char *argv[])
 							   "for chain '%s'\n", chain);
 
 				}
-
+				if (nft_chain_set(&h, curtable, chain, policy, &count) < 0) {
+					xtables_error(OTHER_PROBLEM,
+						      "Can't set policy `%s'"
+						      " on `%s' line %u: %s\n",
+						      policy, chain, line,
+						      ops->strerror(errno));
+				}
 				DEBUGP("Setting policy of chain %s to %s\n",
-					chain, policy);
-			}
+				       chain, policy);
+				ret = 1;
 
-			if (nft_chain_set(&h, curtable, chain, policy, &count) < 0) {
-				xtables_error(OTHER_PROBLEM,
-					"Can't set policy `%s'"
-					" on `%s' line %u: %s\n",
-					policy, chain, line,
-					ops->strerror(errno));
-			}
+			} else {
+				if (nft_chain_user_add(&h, chain, curtable) < 0) {
+					if (errno == EEXIST)
+						continue;
 
-			ret = 1;
+					xtables_error(PARAMETER_PROBLEM,
+						      "cannot create chain "
+						      "'%s' (%s)\n", chain,
+						      strerror(errno));
+				}
+				continue;
+			}
 
 		} else if (in_table) {
 			int a;
