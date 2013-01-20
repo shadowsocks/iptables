@@ -164,6 +164,7 @@ xtables_restore_main(int argc, char *argv[])
 {
 	struct nft_handle h = {
 		.family = AF_INET,	/* default to IPv4 */
+		.commit	= true,
 	};
 	char buffer[10240];
 	int c;
@@ -253,10 +254,14 @@ xtables_restore_main(int argc, char *argv[])
 			continue;
 		} else if ((strcmp(buffer, "COMMIT\n") == 0) && (in_table)) {
 			if (!testing) {
-				if (nft_table_wake_dormant(&h, curtable) < 0) {
-					fprintf(stderr, "Failed to wake up "
-						"dormant table `%s'\n",
-						curtable);
+				/* Commit per table, although we support
+				 * global commit at once, stick by now to
+				 * the existing behaviour.
+				 */
+				if (nft_commit(&h)) {
+					fprintf(stderr, "Failed to commit "
+							"table %s\n",
+							curtable);
 				}
 				DEBUGP("Calling commit\n");
 				ret = 1;
@@ -288,7 +293,6 @@ xtables_restore_main(int argc, char *argv[])
 			if (tablename && (strcmp(tablename, table) != 0))
 				continue;
 
-			nft_table_set_dormant(&h, table);
 			if (noflush == 0) {
 				DEBUGP("Cleaning all chains of table '%s'\n",
 					table);
@@ -426,6 +430,14 @@ xtables_restore_main(int argc, char *argv[])
 				DEBUGP("argv[%u]: %s\n", a, newargv[a]);
 
 			ret = do_commandx(&h, newargc, newargv, &newargv[2]);
+			if (ret < 0) {
+				ret = nft_abort(&h);
+				if (ret < 0) {
+					fprintf(stderr, "failed to abort "
+							"commit operation\n");
+				}
+				exit(1);
+			}
 
 			free_argv();
 			fflush(stdout);

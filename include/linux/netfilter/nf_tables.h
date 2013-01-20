@@ -35,6 +35,8 @@ enum nf_tables_msg_types {
 	NFT_MSG_NEWSETELEM,
 	NFT_MSG_GETSETELEM,
 	NFT_MSG_DELSETELEM,
+	NFT_MSG_COMMIT,
+	NFT_MSG_ABORT,
 	NFT_MSG_MAX,
 };
 
@@ -83,12 +85,18 @@ enum nft_chain_attributes {
 };
 #define NFTA_CHAIN_MAX		(__NFTA_CHAIN_MAX - 1)
 
+enum {
+	NFT_RULE_F_COMMIT	= (1 << 0),
+	NFT_RULE_F_MASK		= NFT_RULE_F_COMMIT,
+};
+
 enum nft_rule_attributes {
 	NFTA_RULE_UNSPEC,
 	NFTA_RULE_TABLE,
 	NFTA_RULE_CHAIN,
 	NFTA_RULE_HANDLE,
 	NFTA_RULE_EXPRESSIONS,
+	NFTA_RULE_FLAGS,
 	__NFTA_RULE_MAX
 };
 #define NFTA_RULE_MAX		(__NFTA_RULE_MAX - 1)

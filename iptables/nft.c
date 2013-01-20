@@ -946,6 +946,10 @@ nft_rule_add(struct nft_handle *h, const char *chain, const char *table,
 		flags |= NLM_F_REPLACE;
 	}
 
+	if (h->commit) {
+		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS,
+				      NFT_RULE_F_COMMIT);
+	}
 	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE,
 				       h->family, flags, h->seq);
 
@@ -1625,6 +1629,11 @@ __nft_rule_flush(struct nft_handle *h, const char *table, const char *chain)
 
 	nft_rule_attr_set(r, NFT_RULE_ATTR_TABLE, (char *)table);
 	nft_rule_attr_set(r, NFT_RULE_ATTR_CHAIN, (char *)chain);
+
+	if (h->commit) {
+		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS,
+					 NFT_RULE_F_COMMIT);
+	}
 
 	/* Delete all rules in this table + chain */
 	nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_DELRULE, h->family,
@@ -2773,6 +2782,10 @@ int nft_rule_delete(struct nft_handle *h, const char *chain,
 	if (r != NULL) {
 		ret = 1;
 
+		if (h->commit) {
+			nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS,
+						 NFT_RULE_F_COMMIT);
+		}
 		DEBUGP("deleting rule\n");
 		__nft_rule_del(h, r);
 	} else
@@ -2802,6 +2815,10 @@ int nft_rule_delete_num(struct nft_handle *h, const char *chain,
 	if (r != NULL) {
 		ret = 1;
 
+		if (h->commit) {
+			nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS,
+						 NFT_RULE_F_COMMIT);
+		}
 		DEBUGP("deleting rule by number %d\n", rulenum);
 		__nft_rule_del(h, r);
 	} else
@@ -2834,6 +2851,10 @@ int nft_rule_replace(struct nft_handle *h, const char *chain,
 			(unsigned long long)
 			nft_rule_attr_get_u64(r, NFT_RULE_ATTR_HANDLE));
 
+		if (h->commit) {
+			nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS,
+						 NFT_RULE_F_COMMIT);
+		}
 		ret = nft_rule_add(h, chain, table, cs, true,
 				   nft_rule_attr_get_u64(r, NFT_RULE_ATTR_HANDLE),
 				   verbose);
@@ -3433,6 +3454,41 @@ next:
 	nft_chain_list_free(list);
 
 	return 1;
+}
+
+static int nft_action(struct nft_handle *h, int type)
+{
+	char buf[MNL_SOCKET_BUFFER_SIZE];
+	struct nlmsghdr *nlh;
+	uint32_t seq;
+	int ret;
+
+	nlh = mnl_nlmsg_put_header(buf);
+	nlh->nlmsg_type = (NFNL_SUBSYS_NFTABLES<< 8) | type;
+	nlh->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK;
+	nlh->nlmsg_seq = seq = time(NULL);
+
+	struct nfgenmsg *nfg = mnl_nlmsg_put_extra_header(nlh, sizeof(*nfg));
+	nfg->nfgen_family = AF_INET;
+	nfg->version = NFNETLINK_V0;
+	nfg->res_id = 0;
+
+	ret = mnl_talk(h, nlh, NULL, NULL);
+	if (ret < 0) {
+		if (errno != EEXIST)
+			perror("mnl-talk:nft_commit");
+	}
+	return ret;
+}
+
+int nft_commit(struct nft_handle *h)
+{
+	return nft_action(h, NFT_MSG_COMMIT);
+}
+
+int nft_abort(struct nft_handle *h)
+{
+	return nft_action(h, NFT_MSG_ABORT);
 }
 
 int nft_compatible_revision(const char *name, uint8_t rev, int opt)

@@ -46,6 +46,8 @@ xtables_main(int argc, char *argv[])
 	char *table = "filter";
 	struct nft_handle h;
 
+	memset(&h, 0, sizeof(h));
+
 	iptables_globals.program_name = "xtables";
 	ret = xtables_init_all(&xtables_globals, NFPROTO_IPV4);
 	if (ret < 0) {

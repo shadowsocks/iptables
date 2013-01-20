@@ -8,6 +8,7 @@ struct nft_handle {
 	struct mnl_socket	*nl;
 	uint32_t		portid;
 	uint32_t		seq;
+	bool			commit;
 };
 
 int nft_init(struct nft_handle *h);
@@ -54,6 +55,12 @@ int nft_rule_list(struct nft_handle *h, const char *chain, const char *table, in
 int nft_rule_list_save(struct nft_handle *h, const char *chain, const char *table, int rulenum, int counters);
 int nft_rule_save(struct nft_handle *h, const char *table, bool counters);
 int nft_rule_flush(struct nft_handle *h, const char *chain, const char *table);
+
+/*
+ * global commit and abort
+ */
+int nft_commit(struct nft_handle *h);
+int nft_abort(struct nft_handle *h);
 
 /*
  * revision compatibility.
