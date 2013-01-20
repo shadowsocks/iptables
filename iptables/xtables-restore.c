@@ -266,14 +266,20 @@ xtables_restore_main(int argc, char *argv[])
 				DEBUGP("Calling commit\n");
 				ret = 1;
 			} else {
-				/* FIXME -t needs to be fixed */
+				if (nft_abort(&h)) {
+					xtables_error(OTHER_PROBLEM,
+						      "Failed to abort "
+						      "commit in table %s\n",
+						      curtable);
+				}
 				DEBUGP("Not calling commit, testing\n");
 				ret = 1;
 			}
 			in_table = 0;
 
 			/* Purge out unused chains in this table */
-			nft_table_purge_chains(&h, curtable, chain_list);
+			if (!testing)
+				nft_table_purge_chains(&h, curtable, chain_list);
 
 		} else if ((buffer[0] == '*') && (!in_table)) {
 			/* New table */
