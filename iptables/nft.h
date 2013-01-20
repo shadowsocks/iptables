@@ -17,12 +17,14 @@ void nft_fini(struct nft_handle *h);
  * Operations with tables.
  */
 struct nft_table;
+struct nft_chain_list;
 
 int nft_table_add(struct nft_handle *h, const struct nft_table *t);
 int nft_for_each_table(struct nft_handle *h, int (*func)(struct nft_handle *h, const char *tablename, bool counters), bool counters);
 bool nft_table_find(struct nft_handle *h, const char *tablename);
 int nft_table_set_dormant(struct nft_handle *h, const char *table);
 int nft_table_wake_dormant(struct nft_handle *h, const char *table);
+int nft_table_purge_chains(struct nft_handle *h, const char *table, struct nft_chain_list *list);
 
 /*
  * Operations with chains.
@@ -32,6 +34,7 @@ struct nft_chain;
 int nft_chain_add(struct nft_handle *h, const struct nft_chain *c);
 int nft_chain_set(struct nft_handle *h, const char *table, const char *chain, const char *policy, const struct xt_counters *counters);
 struct nft_chain_list *nft_chain_dump(struct nft_handle *h);
+struct nft_chain *nft_chain_list_find(struct nft_handle *h, struct nft_chain_list *list, const char *table, const char *chain);
 int nft_chain_save(struct nft_handle *h, struct nft_chain_list *list, const char *table);
 int nft_chain_user_add(struct nft_handle *h, const char *chain, const char *table);
 int nft_chain_user_del(struct nft_handle *h, const char *chain, const char *table);

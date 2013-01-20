@@ -1801,18 +1801,12 @@ err:
 	return ret == 0 ? 1 : 0;
 }
 
-static struct nft_chain *
-nft_chain_find(struct nft_handle *h, const char *table, const char *chain)
+struct nft_chain *
+nft_chain_list_find(struct nft_handle *h, struct nft_chain_list *list,
+		    const char *table, const char *chain)
 {
-	struct nft_chain_list *list;
 	struct nft_chain_list_iter *iter;
 	struct nft_chain *c;
-
-	list = nft_chain_list_get(h);
-	if (list == NULL) {
-		DEBUGP("cannot allocate chain list\n");
-		return NULL;
-	}
 
 	iter = nft_chain_list_iter_create(list);
 	if (iter == NULL) {
@@ -1833,11 +1827,27 @@ nft_chain_find(struct nft_handle *h, const char *table, const char *chain)
 		if (strcmp(chain, chain_name) != 0)
 			goto next;
 
+		nft_chain_list_iter_destroy(iter);
 		return c;
 next:
 		c = nft_chain_list_iter_next(iter);
 	}
+	nft_chain_list_iter_destroy(iter);
 	return NULL;
+}
+
+static struct nft_chain *
+nft_chain_find(struct nft_handle *h, const char *table, const char *chain)
+{
+	struct nft_chain_list *list;
+
+	list = nft_chain_list_get(h);
+	if (list == NULL) {
+		DEBUGP("cannot allocate chain list\n");
+		return NULL;
+	}
+
+	return nft_chain_list_find(h, list, table, chain);
 }
 
 int nft_chain_user_rename(struct nft_handle *h,const char *chain,
@@ -2004,6 +2014,41 @@ int nft_for_each_table(struct nft_handle *h,
 err:
 	/* the core expects 1 for success and 0 for error */
 	return ret == 0 ? 1 : 0;
+}
+
+int nft_table_purge_chains(struct nft_handle *h, const char *this_table,
+			   struct nft_chain_list *chain_list)
+{
+	struct nft_chain_list_iter *iter;
+	struct nft_chain *chain_obj;
+
+	iter = nft_chain_list_iter_create(chain_list);
+	if (iter == NULL) {
+		DEBUGP("cannot allocate rule list iterator\n");
+		return 0;
+	}
+
+	chain_obj = nft_chain_list_iter_next(iter);
+	while (chain_obj != NULL) {
+		const char *table =
+			nft_chain_attr_get_str(chain_obj, NFT_CHAIN_ATTR_TABLE);
+
+		if (strcmp(this_table, table) != 0)
+			goto next;
+
+		if (nft_chain_builtin(chain_obj))
+			goto next;
+
+		if ( __nft_chain_del(h, chain_obj) < 0) {
+			if (errno != EBUSY)
+				return -1;
+		}
+next:
+		chain_obj = nft_chain_list_iter_next(iter);
+	}
+	nft_chain_list_iter_destroy(iter);
+
+	return 0;
 }
 
 static inline int

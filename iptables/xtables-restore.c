@@ -16,6 +16,7 @@
 #include "libiptc/libiptc.h"
 #include "xtables-multi.h"
 #include "nft.h"
+#include <libnftables/chain.h>
 
 #ifdef DEBUG
 #define DEBUGP(x, args...) fprintf(stderr, x, ## args)
@@ -171,6 +172,8 @@ xtables_restore_main(int argc, char *argv[])
 	int in_table = 0, testing = 0;
 	const char *tablename = NULL;
 	const struct xtc_ops *ops = &iptc_ops;
+	struct nft_chain_list *chain_list;
+	struct nft_chain *chain_obj;
 
 	line = 0;
 
@@ -233,6 +236,10 @@ xtables_restore_main(int argc, char *argv[])
 	}
 	else in = stdin;
 
+	chain_list = nft_chain_dump(&h);
+	if (chain_list == NULL)
+		xtables_error(OTHER_PROBLEM, "cannot retrieve chain list\n");
+
 	/* Grab standard input. */
 	while (fgets(buffer, sizeof(buffer), in)) {
 		int ret = 0;
@@ -259,6 +266,10 @@ xtables_restore_main(int argc, char *argv[])
 				ret = 1;
 			}
 			in_table = 0;
+
+			/* Purge out unused chains in this table */
+			nft_table_purge_chains(&h, curtable, chain_list);
+
 		} else if ((buffer[0] == '*') && (!in_table)) {
 			/* New table */
 			char *table;
@@ -282,10 +293,6 @@ xtables_restore_main(int argc, char *argv[])
 				DEBUGP("Cleaning all chains of table '%s'\n",
 					table);
 				nft_rule_flush(&h, NULL, table);
-
-				DEBUGP("Deleting all user-defined chains "
-				       "of table '%s'\n", table);
-				nft_chain_user_del(&h, NULL, table);
 			}
 
 			ret = 1;
@@ -304,6 +311,14 @@ xtables_restore_main(int argc, char *argv[])
 					   xt_params->program_name, line);
 				exit(1);
 			}
+
+			chain_obj = nft_chain_list_find(&h, chain_list,
+							curtable, chain);
+			/* This chain has been found, delete from list. Later
+			 * on, unvisited chains will be purged out.
+			 */
+			if (chain_obj != NULL)
+				nft_chain_list_del(chain_obj);
 
 			if (strlen(chain) >= XT_EXTENSION_MAXNAMELEN)
 				xtables_error(PARAMETER_PROBLEM,
