@@ -62,4 +62,7 @@ int nft_compatible_revision(const char *name, uint8_t rev, int opt);
  */
 const char *nft_strerror(int err);
 
+/* For xtables.c */
+int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table);
+
 #endif
