@@ -800,6 +800,13 @@ static void add_addr(struct nft_rule *r, int offset,
 	add_cmp_ptr(r, op, data, len);
 }
 
+static void add_compat(struct nft_rule *r, uint32_t proto, bool inv)
+{
+	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_COMPAT_PROTO, proto);
+	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_COMPAT_FLAGS,
+			      inv ? NFT_RULE_COMPAT_F_INV : 0);
+}
+
 static void add_proto(struct nft_rule *r, int offset, size_t len,
 		      uint32_t proto, int invflags)
 {
@@ -813,6 +820,7 @@ static void add_proto(struct nft_rule *r, int offset, size_t len,
 		op = NFT_CMP_EQ;
 
 	add_cmp_u32(r, proto, op);
+	add_compat(r, proto, invflags & XT_INV_PROTO);
 }
 
 int
