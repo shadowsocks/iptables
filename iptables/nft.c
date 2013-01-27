@@ -1006,7 +1006,8 @@ static void nft_match_save(struct nft_rule_expr *expr)
 		printf("-m %s", match->name);
 
 	/* FIXME missing parameter */
-	match->save(NULL, emu);
+	if (match->save)
+		match->save(NULL, emu);
 
 	printf(" ");
 
@@ -1049,7 +1050,8 @@ static void nft_target_save(struct nft_rule_expr *expr)
 		printf("-j %s", target->name);
 
 	/* FIXME missing parameter */
-	target->save(NULL, emu);
+	if (target->save)
+		target->save(NULL, emu);
 
 	free(emu);
 }
