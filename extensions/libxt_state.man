@@ -1,4 +1,4 @@
-The "state" module is an obsolete version of "conntrack".
+The "state" extension is a subset of the "conntrack" module.
 "state" allows access to the connection tracking state for this packet.
 .TP
 [\fB!\fP] \fB\-\-state\fP \fIstate\fP

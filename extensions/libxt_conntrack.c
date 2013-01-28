@@ -801,7 +801,9 @@ conntrack_dump(const struct xt_conntrack_mtinfo3 *info, const char *prefix,
 	if (info->match_flags & XT_CONNTRACK_STATE) {
 		if (info->invert_flags & XT_CONNTRACK_STATE)
 			printf(" !");
-		printf(" %sctstate", prefix);
+		printf(" %s%s", prefix,
+			info->match_flags & XT_CONNTRACK_STATE_ALIAS
+				? "state" : "ctstate");
 		print_state(info->state_mask);
 	}
 
@@ -900,6 +902,15 @@ conntrack_dump(const struct xt_conntrack_mtinfo3 *info, const char *prefix,
 		else
 			printf(" %sctdir ORIGINAL", prefix);
 	}
+}
+
+static const char *
+conntrack_print_name_alias(const struct xt_entry_match *match)
+{
+	struct xt_conntrack_mtinfo1 *info = (void *)match->data;
+
+	return info->match_flags & XT_CONNTRACK_STATE_ALIAS
+		? "state" : "conntrack";
 }
 
 static void conntrack_print(const void *ip, const struct xt_entry_match *match,
@@ -1083,7 +1094,7 @@ static void state_ct1_parse(struct xt_option_call *cb)
 	struct xt_conntrack_mtinfo1 *sinfo = cb->data;
 
 	xtables_option_parse(cb);
-	sinfo->match_flags = XT_CONNTRACK_STATE;
+	sinfo->match_flags = XT_CONNTRACK_STATE | XT_CONNTRACK_STATE_ALIAS;
 	sinfo->state_mask = state_parse_states(cb->arg);
 	if (cb->invert)
 		sinfo->invert_flags |= XT_CONNTRACK_STATE;
@@ -1094,7 +1105,7 @@ static void state_ct23_parse(struct xt_option_call *cb)
 	struct xt_conntrack_mtinfo3 *sinfo = cb->data;
 
 	xtables_option_parse(cb);
-	sinfo->match_flags = XT_CONNTRACK_STATE;
+	sinfo->match_flags = XT_CONNTRACK_STATE | XT_CONNTRACK_STATE_ALIAS;
 	sinfo->state_mask = state_parse_states(cb->arg);
 	if (cb->invert)
 		sinfo->invert_flags |= XT_CONNTRACK_STATE;
@@ -1158,6 +1169,7 @@ static struct xtables_match conntrack_mt_reg[] = {
 		.x6_fcheck     = conntrack_mt_check,
 		.print         = conntrack_print,
 		.save          = conntrack_save,
+		.alias	       = conntrack_print_name_alias,
 		.x6_options    = conntrack_mt_opts_v0,
 	},
 	{
@@ -1172,6 +1184,7 @@ static struct xtables_match conntrack_mt_reg[] = {
 		.x6_fcheck     = conntrack_mt_check,
 		.print         = conntrack1_mt4_print,
 		.save          = conntrack1_mt4_save,
+		.alias	       = conntrack_print_name_alias,
 		.x6_options    = conntrack2_mt_opts,
 	},
 	{
@@ -1186,6 +1199,7 @@ static struct xtables_match conntrack_mt_reg[] = {
 		.x6_fcheck     = conntrack_mt_check,
 		.print         = conntrack1_mt6_print,
 		.save          = conntrack1_mt6_save,
+		.alias	       = conntrack_print_name_alias,
 		.x6_options    = conntrack2_mt_opts,
 	},
 	{
@@ -1200,6 +1214,7 @@ static struct xtables_match conntrack_mt_reg[] = {
 		.x6_fcheck     = conntrack_mt_check,
 		.print         = conntrack2_mt_print,
 		.save          = conntrack2_mt_save,
+		.alias	       = conntrack_print_name_alias,
 		.x6_options    = conntrack2_mt_opts,
 	},
 	{
@@ -1214,6 +1229,7 @@ static struct xtables_match conntrack_mt_reg[] = {
 		.x6_fcheck     = conntrack_mt_check,
 		.print         = conntrack2_mt6_print,
 		.save          = conntrack2_mt6_save,
+		.alias	       = conntrack_print_name_alias,
 		.x6_options    = conntrack2_mt_opts,
 	},
 	{
@@ -1228,6 +1244,7 @@ static struct xtables_match conntrack_mt_reg[] = {
 		.x6_fcheck     = conntrack_mt_check,
 		.print         = conntrack3_mt_print,
 		.save          = conntrack3_mt_save,
+		.alias	       = conntrack_print_name_alias,
 		.x6_options    = conntrack3_mt_opts,
 	},
 	{
@@ -1242,6 +1259,7 @@ static struct xtables_match conntrack_mt_reg[] = {
 		.x6_fcheck     = conntrack_mt_check,
 		.print         = conntrack3_mt6_print,
 		.save          = conntrack3_mt6_save,
+		.alias	       = conntrack_print_name_alias,
 		.x6_options    = conntrack3_mt_opts,
 	},
 	{
@@ -1249,6 +1267,7 @@ static struct xtables_match conntrack_mt_reg[] = {
 		.name          = "state",
 		.real_name     = "conntrack",
 		.revision      = 1,
+		.ext_flags     = XTABLES_EXT_ALIAS,
 		.version       = XTABLES_VERSION,
 		.size          = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo1)),
 		.userspacesize = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo1)),
@@ -1261,6 +1280,7 @@ static struct xtables_match conntrack_mt_reg[] = {
 		.name          = "state",
 		.real_name     = "conntrack",
 		.revision      = 2,
+		.ext_flags     = XTABLES_EXT_ALIAS,
 		.version       = XTABLES_VERSION,
 		.size          = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo2)),
 		.userspacesize = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo2)),
@@ -1273,6 +1293,7 @@ static struct xtables_match conntrack_mt_reg[] = {
 		.name          = "state",
 		.real_name     = "conntrack",
 		.revision      = 3,
+		.ext_flags     = XTABLES_EXT_ALIAS,
 		.version       = XTABLES_VERSION,
 		.size          = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo3)),
 		.userspacesize = XT_ALIGN(sizeof(struct xt_conntrack_mtinfo3)),
