@@ -991,7 +991,8 @@ static int print_match_save(const struct xt_entry_match *e,
 		xtables_find_match(e->u.user.name, XTF_TRY_LOAD, NULL);
 
 	if (match) {
-		printf(" -m %s", e->u.user.name);
+		printf(" -m %s",
+			match->alias ? match->alias(e) : e->u.user.name);
 
 		/* some matches don't provide a save function */
 		if (match->save)
@@ -1080,16 +1081,8 @@ void print_rule4(const struct ipt_entry *e,
 	if (counters < 0)
 		printf(" -c %llu %llu", (unsigned long long)e->counters.pcnt, (unsigned long long)e->counters.bcnt);
 
-	/* Print target name */
+	/* Print target name and targinfo part */
 	target_name = iptc_get_target(e, h);
-	if (target_name && (*target_name != '\0'))
-#ifdef IPT_F_GOTO
-		printf(" -%c %s", e->ip.flags & IPT_F_GOTO ? 'g' : 'j', target_name);
-#else
-		printf(" -j %s", target_name);
-#endif
-
-	/* Print targinfo part */
 	t = ipt_get_target((struct ipt_entry *)e);
 	if (t->u.user.name[0]) {
 		const struct xtables_target *target =
@@ -1101,6 +1094,7 @@ void print_rule4(const struct ipt_entry *e,
 			exit(1);
 		}
 
+		printf(" -j %s", target->alias ? target->alias(t) : target_name);
 		if (target->save)
 			target->save(&e->ip, t);
 		else {
@@ -1115,7 +1109,13 @@ void print_rule4(const struct ipt_entry *e,
 				exit(1);
 			}
 		}
-	}
+	} else if (target_name && (*target_name != '\0'))
+#ifdef IPT_F_GOTO
+		printf(" -%c %s", e->ip.flags & IPT_F_GOTO ? 'g' : 'j', target_name);
+#else
+		printf(" -j %s", target_name);
+#endif
+
 	printf("\n");
 }
 
@@ -1222,9 +1222,10 @@ static void command_jump(struct iptables_command_state *cs)
 	} else {
 		/* Alias support for userspace side */
 		strcpy(cs->target->t->u.user.name, cs->target->real_name);
-		fprintf(stderr, "WARNING: The %s target is obsolete. "
-		        "Use %s instead.\n",
-		        cs->jumpto, cs->target->real_name);
+		if (!(cs->target->ext_flags & XTABLES_EXT_ALIAS))
+			fprintf(stderr, "Notice: The %s target is converted into %s target "
+			        "in rule listing and saving.\n",
+			        cs->jumpto, cs->target->real_name);
 	}
 	cs->target->t->u.user.revision = cs->target->revision;
 
@@ -1259,8 +1260,9 @@ static void command_match(struct iptables_command_state *cs)
 		strcpy(m->m->u.user.name, m->name);
 	} else {
 		strcpy(m->m->u.user.name, m->real_name);
-		fprintf(stderr, "WARNING: The %s match is obsolete. "
-		        "Use %s instead.\n", m->name, m->real_name);
+		if (!(m->ext_flags & XTABLES_EXT_ALIAS))
+			fprintf(stderr, "Notice: the %s match is converted into %s match "
+			        "in rule listing and saving.\n", m->name, m->real_name);
 	}
 	m->m->u.user.revision = m->revision;
 

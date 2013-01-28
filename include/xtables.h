@@ -201,6 +201,10 @@ struct xtables_lmap {
 	struct xtables_lmap *next;
 };
 
+enum xtables_ext_flags {
+	XTABLES_EXT_ALIAS = 1 << 0,
+};
+
 /* Include file for additions: new matches and targets. */
 struct xtables_match
 {
@@ -217,6 +221,9 @@ struct xtables_match
 
 	/* Revision of match (0 by default). */
 	u_int8_t revision;
+
+	/* Extension flags */
+	u_int8_t ext_flags;
 
 	u_int16_t family;
 
@@ -250,6 +257,9 @@ struct xtables_match
 	/* Saves the match info in parsable form to stdout. */
 	/* ip is struct ipt_ip * for example */
 	void (*save)(const void *ip, const struct xt_entry_match *match);
+
+	/* Print match name or alias */
+	const char *(*alias)(const struct xt_entry_match *match);
 
 	/* Pointer to list of extra command-line options */
 	const struct option *extra_opts;
@@ -289,6 +299,9 @@ struct xtables_target
 	/* Revision of target (0 by default). */
 	u_int8_t revision;
 
+	/* Extension flags */
+	u_int8_t ext_flags;
+
 	u_int16_t family;
 
 
@@ -321,6 +334,9 @@ struct xtables_target
 	/* Saves the targinfo in parsable form to stdout. */
 	void (*save)(const void *ip,
 		     const struct xt_entry_target *target);
+
+	/* Print target name or alias */
+	const char *(*alias)(const struct xt_entry_target *target);
 
 	/* Pointer to list of extra command-line options */
 	const struct option *extra_opts;
