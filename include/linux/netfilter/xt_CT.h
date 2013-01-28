@@ -3,7 +3,10 @@
 
 #include <linux/types.h>
 
-#define XT_CT_NOTRACK	0x1
+enum {
+	XT_CT_NOTRACK		= 1 << 0,
+	XT_CT_NOTRACK_ALIAS	= 1 << 1,
+};
 
 struct xt_ct_target_info {
 	__u16 flags;

@@ -195,6 +195,10 @@ ct_print_v1(const void *ip, const struct xt_entry_target *target, int numeric)
 	const struct xt_ct_target_info_v1 *info =
 		(const struct xt_ct_target_info_v1 *)target->data;
 
+	if (info->flags & XT_CT_NOTRACK_ALIAS) {
+		printf (" NOTRACK");
+		return;
+	}
 	printf(" CT");
 	if (info->flags & XT_CT_NOTRACK)
 		printf(" notrack");
@@ -217,6 +221,8 @@ static void ct_save(const void *ip, const struct xt_entry_target *target)
 	const struct xt_ct_target_info *info =
 		(const struct xt_ct_target_info *)target->data;
 
+	if (info->flags & XT_CT_NOTRACK_ALIAS)
+		return;
 	if (info->flags & XT_CT_NOTRACK)
 		printf(" --notrack");
 	if (info->helper[0])
@@ -236,6 +242,8 @@ static void ct_save_v1(const void *ip, const struct xt_entry_target *target)
 	const struct xt_ct_target_info_v1 *info =
 		(const struct xt_ct_target_info_v1 *)target->data;
 
+	if (info->flags & XT_CT_NOTRACK_ALIAS)
+		return;
 	if (info->flags & XT_CT_NOTRACK)
 		printf(" --notrack");
 	if (info->helper[0])
@@ -252,6 +260,14 @@ static void ct_save_v1(const void *ip, const struct xt_entry_target *target)
 		printf(" --zone %u", info->zone);
 }
 
+static const char *
+ct_print_name_alias(const struct xt_entry_target *target)
+{
+	struct xt_ct_target_info *info = (void *)target->data;
+
+	return info->flags & XT_CT_NOTRACK_ALIAS ? "NOTRACK" : "CT";
+}
+
 static void notrack_ct0_tg_init(struct xt_entry_target *target)
 {
 	struct xt_ct_target_info *info = (void *)target->data;
@@ -264,6 +280,13 @@ static void notrack_ct1_tg_init(struct xt_entry_target *target)
 	struct xt_ct_target_info_v1 *info = (void *)target->data;
 
 	info->flags = XT_CT_NOTRACK;
+}
+
+static void notrack_ct2_tg_init(struct xt_entry_target *target)
+{
+	struct xt_ct_target_info_v1 *info = (void *)target->data;
+
+	info->flags = XT_CT_NOTRACK | XT_CT_NOTRACK_ALIAS;
 }
 
 static struct xtables_target ct_target_reg[] = {
@@ -293,6 +316,20 @@ static struct xtables_target ct_target_reg[] = {
 		.x6_options	= ct_opts_v1,
 	},
 	{
+		.family		= NFPROTO_UNSPEC,
+		.name		= "CT",
+		.revision	= 2,
+		.version	= XTABLES_VERSION,
+		.size		= XT_ALIGN(sizeof(struct xt_ct_target_info_v1)),
+		.userspacesize	= offsetof(struct xt_ct_target_info_v1, ct),
+		.help		= ct_help_v1,
+		.print		= ct_print_v1,
+		.save		= ct_save_v1,
+		.alias		= ct_print_name_alias,
+		.x6_parse	= ct_parse_v1,
+		.x6_options	= ct_opts_v1,
+	},
+	{
 		.family        = NFPROTO_UNSPEC,
 		.name          = "NOTRACK",
 		.real_name     = "CT",
@@ -311,6 +348,17 @@ static struct xtables_target ct_target_reg[] = {
 		.size          = XT_ALIGN(sizeof(struct xt_ct_target_info_v1)),
 		.userspacesize = offsetof(struct xt_ct_target_info_v1, ct),
 		.init          = notrack_ct1_tg_init,
+	},
+	{
+		.family        = NFPROTO_UNSPEC,
+		.name          = "NOTRACK",
+		.real_name     = "CT",
+		.revision      = 2,
+		.ext_flags     = XTABLES_EXT_ALIAS,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_ct_target_info_v1)),
+		.userspacesize = offsetof(struct xt_ct_target_info_v1, ct),
+		.init          = notrack_ct2_tg_init,
 	},
 	{
 		.family        = NFPROTO_UNSPEC,
