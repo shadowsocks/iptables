@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <xtables.h>
 #include <linux/netfilter_ipv6/ip6_tables.h>
 #include <linux/netfilter_ipv6/ip6t_NPT.h>
@@ -53,6 +54,23 @@ static void SNPT_print(const void *ip, const struct xt_entry_target *target,
 				 npt->dst_pfx_len);
 }
 
+static void SNPT_save(const void *ip, const struct xt_entry_target *target)
+{
+	static const struct in6_addr zero_addr;
+	const struct ip6t_npt_tginfo *info = (const void *)target->data;
+
+	if (memcmp(&info->src_pfx.in6, &zero_addr, sizeof(zero_addr)) != 0 ||
+	    info->src_pfx_len != 0)
+		printf("--src-pfx %s/%u ",
+		       xtables_ip6addr_to_numeric(&info->src_pfx.in6),
+		       info->src_pfx_len);
+	if (memcmp(&info->dst_pfx.in6, &zero_addr, sizeof(zero_addr)) != 0 ||
+	    info->dst_pfx_len != 0)
+		printf("--dst-pfx %s/%u ",
+		       xtables_ip6addr_to_numeric(&info->dst_pfx.in6),
+		       info->dst_pfx_len);
+}
+
 static struct xtables_target snpt_tg_reg = {
 	.name		= "SNPT",
 	.version	= XTABLES_VERSION,
@@ -62,6 +80,7 @@ static struct xtables_target snpt_tg_reg = {
 	.help		= SNPT_help,
 	.x6_parse	= SNPT_parse,
 	.print		= SNPT_print,
+	.save		= SNPT_save,
 	.x6_options	= SNPT_options,
 };
 
