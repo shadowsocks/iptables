@@ -2349,6 +2349,7 @@ nft_parse_payload_ipv6(uint32_t offset, struct nft_rule_expr_iter *iter,
 		break;
 	case offsetof(struct ip6_hdr, ip6_nxt):
 		get_cmp_data(iter, &proto, sizeof(proto), &inv);
+		cs->fw6.ipv6.flags |= IP6T_F_PROTO;
 		cs->fw6.ipv6.proto = proto;
 		if (inv)
 			cs->fw6.ipv6.invflags |= IPT_INV_PROTO;
