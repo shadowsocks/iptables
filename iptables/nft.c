@@ -2352,6 +2352,7 @@ nft_parse_payload_ipv6(uint32_t offset, struct nft_rule_expr_iter *iter,
 		cs->fw6.ipv6.proto = proto;
 		if (inv)
 			cs->fw6.ipv6.invflags |= IPT_INV_PROTO;
+		break;
 	default:
 		DEBUGP("unknown payload offset %d\n", offset);
 		break;
