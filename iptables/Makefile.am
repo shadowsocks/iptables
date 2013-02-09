@@ -31,7 +31,7 @@ if HAVE_LIBNFTABLES
 xtables_multi_SOURCES += xtables-save.c xtables-restore.c \
 			 xtables-standalone.c xtables.c nft.c \
 			 xtables-config-parser.y xtables-config-syntax.l \
-			 xtables-config.c
+			 xtables-config.c xtables-events.c
 xtables_multi_LDADD   += -lmnl -lnftables
 xtables_multi_CFLAGS  += -DENABLE_NFTABLES
 # yacc and lex generate dirty code
@@ -55,7 +55,8 @@ if ENABLE_IPV6
 v6_sbin_links  = ip6tables ip6tables-restore ip6tables-save
 endif
 if ENABLE_NFTABLES
-x_sbin_links  = xtables xtables-restore xtables-save xtables-config
+x_sbin_links  = xtables xtables-restore xtables-save xtables-config \
+		xtables-events
 endif
 
 iptables-extensions.8: iptables-extensions.8.tmpl ../extensions/matches.man ../extensions/targets.man

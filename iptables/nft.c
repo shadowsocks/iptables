@@ -1385,13 +1385,22 @@ nft_print_counters(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 	}
 }
 
-static void nft_rule_print_save(struct nft_rule *r, bool counters)
+void
+nft_rule_print_save(struct nft_rule *r, enum nft_rule_print type, bool counters)
 {
 	struct nft_rule_expr_iter *iter;
 	struct nft_rule_expr *expr;
+	const char *chain = nft_rule_attr_get_str(r, NFT_RULE_ATTR_CHAIN);
 
 	/* print chain name */
-	printf("-A %s ", nft_rule_attr_get_str(r, NFT_RULE_ATTR_CHAIN));
+	switch(type) {
+	case NFT_RULE_APPEND:
+		printf("-A %s ", chain);
+		break;
+	case NFT_RULE_DEL:
+		printf("-D %s ", chain);
+		break;
+	}
 
 	iter = nft_rule_expr_iter_create(r);
 	if (iter == NULL)
@@ -1614,7 +1623,7 @@ int nft_rule_save(struct nft_handle *h, const char *table, bool counters)
 		if (strcmp(table, rule_table) != 0)
 			goto next;
 
-		nft_rule_print_save(r, counters);
+		nft_rule_print_save(r, NFT_RULE_APPEND, counters);
 
 next:
 		r = nft_rule_list_iter_next(iter);
@@ -2714,7 +2723,7 @@ nft_rule_find(struct nft_rule_list *list, const char *chain, const char *table,
 			/* Delete by matching rule case */
 			DEBUGP("comparing with... ");
 #ifdef DEBUG_DEL
-			nft_rule_print_save(r, 0);
+			nft_rule_print_save(r, NFT_RULE_APPEND, 0);
 #endif
 
 			nft_rule_to_iptables_command_state(r, &this);
@@ -3378,7 +3387,7 @@ static void
 list_save(const struct iptables_command_state *cs, struct nft_rule *r,
 	  unsigned int num, unsigned int format)
 {
-	nft_rule_print_save(r, !(format & FMT_NOCOUNTS));
+	nft_rule_print_save(r, NFT_RULE_APPEND, !(format & FMT_NOCOUNTS));
 }
 
 static int

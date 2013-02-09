@@ -56,6 +56,13 @@ int nft_rule_list_save(struct nft_handle *h, const char *chain, const char *tabl
 int nft_rule_save(struct nft_handle *h, const char *table, bool counters);
 int nft_rule_flush(struct nft_handle *h, const char *chain, const char *table);
 
+enum nft_rule_print {
+	NFT_RULE_APPEND,
+	NFT_RULE_DEL,
+};
+
+void nft_rule_print_save(struct nft_rule *r, enum nft_rule_print type, bool counters);
+
 /*
  * global commit and abort
  */
