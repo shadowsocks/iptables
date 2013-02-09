@@ -1214,10 +1214,6 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 		cs.fw6.ipv6.invflags = invflags;
 		cs.fw6.ipv6.flags = flags;
 
-		if (flags & IPT_F_FRAG)
-			xtables_error(PARAMETER_PROBLEM,
-				      "-f is not valid on IPv6");
-
 		if (is_exthdr(cs.fw6.ipv6.proto)
 		    && (cs.fw6.ipv6.invflags & XT_INV_PROTO) == 0)
 			fprintf(stderr,
