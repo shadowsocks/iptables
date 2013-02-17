@@ -86,7 +86,7 @@ or a rule in a built-in chain with target \fBRETURN\fP
 is matched, the target specified by the chain policy determines the
 fate of the packet.
 .SH TABLES
-There are currently three independent tables (which tables are present
+There are currently five independent tables (which tables are present
 at any time depends on the kernel configuration options and which
 modules are present).
 .TP
