@@ -17,6 +17,7 @@ Also use the packets' nfmark value when performing the reverse path route lookup
 \fB\-\-accept\-local\fP
 This will permit packets arriving from the network with a source address that is also
 assigned to the local machine.
+.TP
 \fB\-\-invert\fP
 This will invert the sense of the match.  Instead of matching packets that passed the
 reverse path filter test, match those that have failed it.
