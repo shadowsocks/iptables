@@ -40,6 +40,7 @@
 #include <xtables.h>
 #include <fcntl.h>
 #include "xshared.h"
+#include "nft-shared.h"
 #include "nft.h"
 
 #ifndef TRUE
@@ -48,21 +49,6 @@
 #ifndef FALSE
 #define FALSE 0
 #endif
-
-#define FMT_NUMERIC	0x0001
-#define FMT_NOCOUNTS	0x0002
-#define FMT_KILOMEGAGIGA 0x0004
-#define FMT_OPTIONS	0x0008
-#define FMT_NOTABLE	0x0010
-#define FMT_NOTARGET	0x0020
-#define FMT_VIA		0x0040
-#define FMT_NONEWLINE	0x0080
-#define FMT_LINENUMBERS 0x0100
-
-#define FMT_PRINT_RULE (FMT_NOCOUNTS | FMT_OPTIONS | FMT_VIA \
-			| FMT_NUMERIC | FMT_NOTABLE)
-#define FMT(tab,notab) ((format) & FMT_NOTABLE ? (notab) : (tab))
-
 
 #define CMD_NONE		0x0000U
 #define CMD_INSERT		0x0001U
@@ -1262,6 +1248,9 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 	}
 
 	h->family = family;
+	h->ops = nft_family_ops_lookup(family);
+	if (h->ops == NULL)
+		xtables_error(PARAMETER_PROBLEM, "Unknown family");
 
 	if (command == CMD_REPLACE && (s.naddrs != 1 || d.naddrs != 1))
 		xtables_error(PARAMETER_PROBLEM, "Replacement rule does not "

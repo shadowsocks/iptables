@@ -30,6 +30,7 @@ if HAVE_LIBMNL
 if HAVE_LIBNFTABLES
 xtables_multi_SOURCES += xtables-save.c xtables-restore.c \
 			 xtables-standalone.c xtables.c nft.c \
+			 nft-shared.c nft-ipv4.c nft-ipv6.c \
 			 xtables-config-parser.y xtables-config-syntax.l \
 			 xtables-config.c xtables-events.c
 xtables_multi_LDADD   += -lmnl -lnftables

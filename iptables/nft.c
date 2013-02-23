@@ -9,14 +9,6 @@
  * This code has been sponsored by Sophos Astaro <http://www.sophos.com>
  */
 
-#if 0
-#define DEBUGP(x, args...) fprintf(stdout, x, ## args)
-#define NLDEBUG
-#define DEBUG_DEL
-#else
-#define DEBUGP(x, args...)
-#endif
-
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -54,6 +46,7 @@
 
 #include "nft.h"
 #include "xshared.h" /* proto_to_name */
+#include "nft-shared.h"
 
 static void *nft_fn;
 
@@ -655,80 +648,6 @@ static void nft_rule_print_debug(struct nft_rule *r, struct nlmsghdr *nlh)
 #endif
 }
 
-static void add_meta(struct nft_rule *r, uint32_t key)
-{
-	struct nft_rule_expr *expr;
-
-	expr = nft_rule_expr_alloc("meta");
-	if (expr == NULL)
-		return;
-
-	nft_rule_expr_set_u32(expr, NFT_EXPR_META_KEY, key);
-	nft_rule_expr_set_u32(expr, NFT_EXPR_META_DREG, NFT_REG_1);
-
-	nft_rule_add_expr(r, expr);
-}
-
-static void add_payload(struct nft_rule *r, int offset, int len)
-{
-	struct nft_rule_expr *expr;
-
-	expr = nft_rule_expr_alloc("payload");
-	if (expr == NULL)
-		return;
-
-	nft_rule_expr_set_u32(expr, NFT_EXPR_PAYLOAD_BASE,
-				NFT_PAYLOAD_NETWORK_HEADER);
-	nft_rule_expr_set_u32(expr, NFT_EXPR_PAYLOAD_DREG, NFT_REG_1);
-	nft_rule_expr_set_u32(expr, NFT_EXPR_PAYLOAD_OFFSET, offset);
-	nft_rule_expr_set_u32(expr, NFT_EXPR_PAYLOAD_LEN, len);
-
-	nft_rule_add_expr(r, expr);
-}
-
-/* bitwise operation is = sreg & mask ^ xor */
-static void add_bitwise_u16(struct nft_rule *r, int mask, int xor)
-{
-	struct nft_rule_expr *expr;
-
-	expr = nft_rule_expr_alloc("bitwise");
-	if (expr == NULL)
-		return;
-
-	nft_rule_expr_set_u32(expr, NFT_EXPR_BITWISE_SREG, NFT_REG_1);
-	nft_rule_expr_set_u32(expr, NFT_EXPR_BITWISE_DREG, NFT_REG_1);
-	nft_rule_expr_set_u32(expr, NFT_EXPR_BITWISE_LEN, sizeof(uint16_t));
-	nft_rule_expr_set(expr, NFT_EXPR_BITWISE_MASK, &mask, sizeof(uint16_t));
-	nft_rule_expr_set(expr, NFT_EXPR_BITWISE_XOR, &xor, sizeof(uint16_t));
-
-	nft_rule_add_expr(r, expr);
-}
-
-static void add_cmp_ptr(struct nft_rule *r, uint32_t op, void *data, size_t len)
-{
-	struct nft_rule_expr *expr;
-
-	expr = nft_rule_expr_alloc("cmp");
-	if (expr == NULL)
-		return;
-
-	nft_rule_expr_set_u8(expr, NFT_EXPR_CMP_SREG, NFT_REG_1);
-	nft_rule_expr_set_u8(expr, NFT_EXPR_CMP_OP, op);
-	nft_rule_expr_set(expr, NFT_EXPR_CMP_DATA, data, len);
-
-	nft_rule_add_expr(r, expr);
-}
-
-static void add_cmp_u16(struct nft_rule *r, uint16_t val, uint32_t op)
-{
-	add_cmp_ptr(r, op, &val, sizeof(val));
-}
-
-static void add_cmp_u32(struct nft_rule *r, uint32_t val, uint32_t op)
-{
-	add_cmp_ptr(r, op, &val, sizeof(val));
-}
-
 static void add_counters(struct nft_rule *r, uint64_t packets, uint64_t bytes)
 {
 	struct nft_rule_expr *expr;
@@ -743,84 +662,11 @@ static void add_counters(struct nft_rule *r, uint64_t packets, uint64_t bytes)
 	nft_rule_add_expr(r, expr);
 }
 
-static void add_iniface(struct nft_rule *r, char *iface, int invflags)
-{
-	int iface_len;
-	uint32_t op;
-
-	iface_len = strlen(iface);
-
-	if (invflags & IPT_INV_VIA_IN)
-		op = NFT_CMP_NEQ;
-	else
-		op = NFT_CMP_EQ;
-
-	if (iface[iface_len - 1] == '+') {
-		add_meta(r, NFT_META_IIFNAME);
-		add_cmp_ptr(r, op, iface, iface_len - 1);
-	} else {
-		add_meta(r, NFT_META_IIF);
-		add_cmp_u32(r, if_nametoindex(iface), op);
-	}
-}
-
-static void add_outiface(struct nft_rule *r, char *iface, int invflags)
-{
-	int iface_len;
-	uint32_t op;
-
-	iface_len = strlen(iface);
-
-	if (invflags & IPT_INV_VIA_OUT)
-		op = NFT_CMP_NEQ;
-	else
-		op = NFT_CMP_EQ;
-
-	if (iface[iface_len - 1] == '+') {
-		add_meta(r, NFT_META_OIFNAME);
-		add_cmp_ptr(r, op, iface, iface_len - 1);
-	} else {
-		add_meta(r, NFT_META_OIF);
-		add_cmp_u32(r, if_nametoindex(iface), op);
-	}
-}
-
-static void add_addr(struct nft_rule *r, int offset,
-			void *data, size_t len, int invflags)
-{
-	uint32_t op;
-
-	add_payload(r, offset, len);
-
-	if (invflags & IPT_INV_SRCIP || invflags & IPT_INV_DSTIP)
-		op = NFT_CMP_NEQ;
-	else
-		op = NFT_CMP_EQ;
-
-	add_cmp_ptr(r, op, data, len);
-}
-
 static void add_compat(struct nft_rule *r, uint32_t proto, bool inv)
 {
 	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_COMPAT_PROTO, proto);
 	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_COMPAT_FLAGS,
 			      inv ? NFT_RULE_COMPAT_F_INV : 0);
-}
-
-static void add_proto(struct nft_rule *r, int offset, size_t len,
-		      uint32_t proto, int invflags)
-{
-	uint32_t op;
-
-	add_payload(r, offset, len);
-
-	if (invflags & XT_INV_PROTO)
-		op = NFT_CMP_NEQ;
-	else
-		op = NFT_CMP_EQ;
-
-	add_cmp_u32(r, proto, op);
-	add_compat(r, proto, invflags & XT_INV_PROTO);
 }
 
 int
@@ -833,7 +679,6 @@ nft_rule_add(struct nft_handle *h, const char *chain, const char *table,
 	struct xtables_rule_match *matchp;
 	struct nft_rule *r;
 	int ret = 1;
-	uint32_t op;
 	int flags = append ? NLM_F_APPEND : 0;
 	int ip_flags = 0;
 
@@ -851,73 +696,7 @@ nft_rule_add(struct nft_handle *h, const char *chain, const char *table,
 	nft_rule_attr_set(r, NFT_RULE_ATTR_TABLE, (char *)table);
 	nft_rule_attr_set(r, NFT_RULE_ATTR_CHAIN, (char *)chain);
 
-	switch (h->family) {
-	case AF_INET:
-		if (cs->fw.ip.iniface[0] != '\0')
-			add_iniface(r, cs->fw.ip.iniface, cs->fw.ip.invflags);
-
-		if (cs->fw.ip.outiface[0] != '\0')
-			add_outiface(r, cs->fw.ip.outiface,
-				     cs->fw.ip.invflags);
-
-		if (cs->fw.ip.src.s_addr != 0)
-			add_addr(r, offsetof(struct iphdr, saddr),
-				 &cs->fw.ip.src.s_addr, 4,
-				 cs->fw.ip.invflags);
-
-		if (cs->fw.ip.dst.s_addr != 0)
-			add_addr(r, offsetof(struct iphdr, daddr),
-				 &cs->fw.ip.dst.s_addr, 4,
-				 cs->fw.ip.invflags);
-
-		if (cs->fw.ip.proto != 0)
-			add_proto(r, offsetof(struct iphdr, protocol), 1,
-				  cs->fw.ip.proto, cs->fw.ip.invflags);
-
-		if (cs->fw.ip.flags & IPT_F_FRAG) {
-			add_payload(r, offsetof(struct iphdr, frag_off), 2);
-			/* get the 13 bits that contain the fragment offset */
-			add_bitwise_u16(r, 0x1fff, !0x1fff);
-
-			/* if offset is non-zero, this is a fragment */
-			if (cs->fw.ip.invflags & IPT_INV_FRAG)
-				op = NFT_CMP_EQ;
-			else
-				op = NFT_CMP_NEQ;
-
-			add_cmp_u16(r, 0, op);
-		}
-
-		ip_flags = cs->fw.ip.flags;
-
-		break;
-	case AF_INET6:
-		if (cs->fw6.ipv6.iniface[0] != '\0')
-			add_iniface(r, cs->fw6.ipv6.iniface,
-				    cs->fw6.ipv6.invflags);
-
-		if (cs->fw6.ipv6.outiface[0] != '\0')
-			add_outiface(r, cs->fw6.ipv6.outiface,
-				    cs->fw6.ipv6.invflags);
-
-		if (!IN6_IS_ADDR_UNSPECIFIED(&cs->fw6.ipv6.src))
-			add_addr(r, offsetof(struct ip6_hdr, ip6_src),
-				 &cs->fw6.ipv6.src, 16,
-				 cs->fw6.ipv6.invflags);
-
-		if (!IN6_IS_ADDR_UNSPECIFIED(&cs->fw6.ipv6.dst))
-			add_addr(r, offsetof(struct ip6_hdr, ip6_dst),
-				 &cs->fw6.ipv6.dst, 16,
-				 cs->fw6.ipv6.invflags);
-
-		if (cs->fw6.ipv6.proto != 0)
-			add_proto(r, offsetof(struct ip6_hdr, ip6_nxt), 1,
-				  cs->fw6.ipv6.proto, cs->fw6.ipv6.invflags);
-
-		ip_flags = cs->fw6.ipv6.flags;
-
-		break;
-	}
+	ip_flags = h->ops->add(r, cs);
 
 	for (matchp = cs->matches; matchp; matchp = matchp->next)
 		add_match(r, matchp->match->m);
@@ -1178,203 +957,6 @@ nft_print_meta(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter)
 }
 
 static void
-get_cmp_data(struct nft_rule_expr_iter *iter, void *data, size_t dlen, bool *inv)
-{
-	struct nft_rule_expr *e;
-	const char *name;
-	size_t len;
-	uint8_t op;
-
-	e = nft_rule_expr_iter_next(iter);
-	if (e == NULL)
-		return;
-
-	name = nft_rule_expr_get_str(e, NFT_RULE_EXPR_ATTR_NAME);
-	if (strcmp(name, "cmp") != 0) {
-		DEBUGP("skipping no cmp after meta\n");
-		return;
-	}
-
-	memcpy(data, nft_rule_expr_get(e, NFT_EXPR_CMP_DATA, &len), dlen);
-	op = nft_rule_expr_get_u8(e, NFT_EXPR_CMP_OP);
-	if (op == NFT_CMP_NEQ)
-		*inv = true;
-	else
-		*inv = false;
-}
-
-static void get_frag(struct nft_rule_expr_iter *iter, bool *inv)
-{
-	struct nft_rule_expr *e;
-	const char *name;
-	uint8_t op;
-
-	e = nft_rule_expr_iter_next(iter);
-	if (e == NULL)
-		return;
-
-	/* we assume correct mask and xor */
-	name = nft_rule_expr_get_str(e, NFT_RULE_EXPR_ATTR_NAME);
-	if (strcmp(name, "bitwise") != 0) {
-		DEBUGP("skipping no bitwise after payload\n");
-		return;
-	}
-
-	/* Now check for cmp */
-	e = nft_rule_expr_iter_next(iter);
-	if (e == NULL)
-		return;
-
-	/* we assume correct data */
-	name = nft_rule_expr_get_str(e, NFT_RULE_EXPR_ATTR_NAME);
-	if (strcmp(name, "cmp") != 0) {
-		DEBUGP("skipping no cmp after payload\n");
-		return;
-	}
-
-	op = nft_rule_expr_get_u8(e, NFT_EXPR_CMP_OP);
-	if (op == NFT_CMP_EQ)
-		*inv = true;
-	else
-		*inv = false;
-}
-
-static void print_frag(bool inv)
-{
-	if (inv)
-		printf("! -f ");
-	else
-		printf("-f ");
-}
-
-static void print_proto(uint16_t proto, int invert)
-{
-	const struct protoent *pent = getprotobynumber(proto);
-
-	if (invert)
-		printf("! ");
-
-	if (pent) {
-		printf("-p %s ", pent->p_name);
-		return;
-	}
-
-	printf("-p %u ", proto);
-}
-
-static const char *mask_to_str(uint32_t mask)
-{
-	static char mask_str[sizeof("255.255.255.255")];
-	uint32_t bits, hmask = ntohl(mask);
-	struct in_addr mask_addr = {
-		.s_addr = mask,
-	};
-	int i;
-
-	if (mask == 0xFFFFFFFFU) {
-		sprintf(mask_str, "32");
-		return mask_str;
-	}
-
-	i    = 32;
-	bits = 0xFFFFFFFEU;
-	while (--i >= 0 && hmask != bits)
-		bits <<= 1;
-	if (i >= 0)
-		sprintf(mask_str, "%u", i);
-	else
-		sprintf(mask_str, "%s", inet_ntoa(mask_addr));
-
-	return mask_str;
-}
-
-static void
-nft_print_payload_ipv4(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter)
-{
-	uint32_t offset;
-	bool inv;
-
-	offset = nft_rule_expr_get_u32(e, NFT_EXPR_PAYLOAD_OFFSET);
-
-	switch(offset) {
-	struct in_addr addr;
-	uint8_t proto;
-
-	case offsetof(struct iphdr, saddr):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
-		if (inv)
-			printf("! -s %s/%s ", inet_ntoa(addr),
-						mask_to_str(0xffffffff));
-		else
-			printf("-s %s/%s ", inet_ntoa(addr),
-						mask_to_str(0xffffffff));
-		break;
-	case offsetof(struct iphdr, daddr):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
-		if (inv)
-			printf("! -d %s/%s ", inet_ntoa(addr),
-						mask_to_str(0xffffffff));
-		else
-			printf("-d %s/%s ", inet_ntoa(addr),
-						mask_to_str(0xffffffff));
-		break;
-	case offsetof(struct iphdr, protocol):
-		get_cmp_data(iter, &proto, sizeof(proto), &inv);
-		print_proto(proto, inv);
-		break;
-	case offsetof(struct iphdr, frag_off):
-		get_frag(iter, &inv);
-		print_frag(inv);
-		break;
-	default:
-		DEBUGP("unknown payload offset %d\n", offset);
-		break;
-	}
-}
-
-static void
-nft_print_payload_ipv6(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter)
-{
-	uint32_t offset;
-	bool inv;
-
-	offset = nft_rule_expr_get_u32(e, NFT_EXPR_PAYLOAD_OFFSET);
-
-	switch (offset) {
-	char addr_str[INET6_ADDRSTRLEN];
-	struct in6_addr addr;
-	uint8_t proto;
-	case offsetof(struct ip6_hdr, ip6_src):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
-		inet_ntop(AF_INET6, &addr, addr_str, INET6_ADDRSTRLEN);
-
-		if (inv)
-			printf("! -s %s ", addr_str);
-		else
-			printf("-s %s ", addr_str);
-
-		break;
-	case offsetof(struct ip6_hdr, ip6_dst):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
-		inet_ntop(AF_INET6, &addr, addr_str, INET6_ADDRSTRLEN);
-
-		if (inv)
-			printf("! -d %s ", addr_str);
-		else
-			printf("-d %s ", addr_str);
-
-		break;
-	case offsetof(struct ip6_hdr, ip6_nxt):
-		get_cmp_data(iter, &proto, sizeof(proto), &inv);
-		print_proto(proto, inv);
-		break;
-	default:
-		DEBUGP("unknown payload offset %d\n", offset);
-		break;
-	}
-}
-
-static void
 nft_print_counters(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 		   bool counters)
 {
@@ -1414,10 +996,9 @@ nft_rule_print_save(struct nft_rule *r, enum nft_rule_print type, bool counters)
 		if (strcmp(name, "counter") == 0) {
 			nft_print_counters(expr, iter, counters);
 		} else if (strcmp(name, "payload") == 0) {
-			if (nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY) == AF_INET)
-				nft_print_payload_ipv4(expr, iter);
-			else
-				nft_print_payload_ipv6(expr, iter);
+			struct nft_family_ops *ops = nft_family_ops_lookup(
+				nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY));
+			ops->print_payload(expr, iter);
 		} else if (strcmp(name, "meta") == 0) {
 			nft_print_meta(expr, iter);
 		} else if (strcmp(name, "match") == 0) {
@@ -2106,107 +1687,13 @@ match_different(const struct xt_entry_match *a,
 	return 0;
 }
 
-static bool
-is_same(int family, const struct iptables_command_state *a,
-	const struct iptables_command_state *b)
-{
-	unsigned int i;
-	const char *a_outiface, *a_iniface;
-	unsigned const char *a_iniface_mask, *a_outiface_mask;
-	const char *b_outiface, *b_iniface;
-	unsigned const char *b_iniface_mask, *b_outiface_mask;
-
-	/* Always compare head structures: ignore mask here. */
-	switch (family) {
-	case AF_INET:
-		if (a->fw.ip.src.s_addr != b->fw.ip.src.s_addr
-		    || a->fw.ip.dst.s_addr != b->fw.ip.dst.s_addr
-		    || a->fw.ip.smsk.s_addr != b->fw.ip.smsk.s_addr
-		    || a->fw.ip.dmsk.s_addr != b->fw.ip.dmsk.s_addr
-		    || a->fw.ip.proto != b->fw.ip.proto
-		    || a->fw.ip.flags != b->fw.ip.flags
-		    || a->fw.ip.invflags != b->fw.ip.invflags) {
-			DEBUGP("different src/dst/proto/flags/invflags\n");
-			return false;
-		}
-
-		a_iniface_mask = a->fw.ip.iniface_mask;
-		a_iniface = a->fw.ip.iniface;
-		a_outiface_mask = a->fw.ip.outiface_mask;
-		a_outiface = a->fw.ip.outiface;
-
-		b_iniface_mask = b->fw.ip.iniface_mask;
-		b_iniface = b->fw.ip.iniface;
-		b_outiface_mask = b->fw.ip.outiface_mask;
-		b_outiface = b->fw.ip.outiface;
-
-		break;
-	case AF_INET6:
-		if (memcmp(a->fw6.ipv6.src.s6_addr,
-			   b->fw6.ipv6.src.s6_addr,
-			   sizeof(struct in6_addr)) != 0	||
-		    memcmp(a->fw6.ipv6.dst.s6_addr,
-			   b->fw6.ipv6.dst.s6_addr,
-			   sizeof(struct in6_addr)) != 0	||
-		    a->fw6.ipv6.proto != b->fw6.ipv6.proto	||
-		    a->fw6.ipv6.flags != b->fw6.ipv6.flags	||
-		    a->fw6.ipv6.invflags != b->fw6.ipv6.invflags) {
-			DEBUGP("different src/dst/proto/flags/invflags\n");
-			return false;
-		}
-
-		a_iniface_mask = a->fw6.ipv6.iniface_mask;
-		a_iniface = a->fw6.ipv6.iniface;
-		a_outiface_mask = a->fw6.ipv6.outiface_mask;
-		a_outiface = a->fw6.ipv6.outiface;
-
-		b_iniface_mask = b->fw6.ipv6.iniface_mask;
-		b_iniface = b->fw6.ipv6.iniface;
-		b_outiface_mask = b->fw6.ipv6.outiface_mask;
-		b_outiface = b->fw6.ipv6.outiface;
-
-		break;
-	default:
-		return false;
-	}
-
-	for (i = 0; i < IFNAMSIZ; i++) {
-		if (a_iniface_mask[i] != b_iniface_mask[i]) {
-			DEBUGP("different iniface mask %x, %x (%d)\n",
-			a_iniface_mask[i] & 0xff, b_iniface_mask[i] & 0xff, i);
-			return false;
-		}
-		if ((a_iniface[i] & a_iniface_mask[i])
-		    != (b_iniface[i] & b_iniface_mask[i])) {
-			DEBUGP("different iniface\n");
-			return false;
-		}
-		if (a_outiface_mask[i] != b_outiface_mask[i]) {
-			DEBUGP("different outiface mask\n");
-			return false;
-		}
-		if ((a_outiface[i] & a_outiface_mask[i])
-		    != (b_outiface[i] & b_outiface_mask[i])) {
-			DEBUGP("different outiface\n");
-			return false;
-		}
-	}
-
-	return true;
-}
-
 static void
 nft_parse_meta(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 	       int family, struct iptables_command_state *cs)
 {
 	uint8_t key = nft_rule_expr_get_u8(e, NFT_EXPR_META_KEY);
-	uint32_t value;
+	struct nft_family_ops *ops = nft_family_ops_lookup(family);
 	const char *name;
-	const void *ifname;
-	char *iniface, *outiface;
-	unsigned char *iniface_mask, *outiface_mask;
-	size_t len;
-	uint8_t *invflags;
 
 	e = nft_rule_expr_iter_next(iter);
 	if (e == NULL)
@@ -2218,173 +1705,19 @@ nft_parse_meta(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 		return;
 	}
 
-	switch (family) {
-	case AF_INET:
-		iniface = cs->fw.ip.iniface;
-		outiface = cs->fw.ip.outiface;
-		iniface_mask = cs->fw.ip.iniface_mask;
-		outiface_mask = cs->fw.ip.outiface_mask;
-		invflags = &cs->fw.ip.invflags;
-		break;
-	case AF_INET6:
-		iniface = cs->fw6.ipv6.iniface;
-		outiface = cs->fw6.ipv6.outiface;
-		iniface_mask = cs->fw6.ipv6.iniface_mask;
-		outiface_mask = cs->fw6.ipv6.outiface_mask;
-		invflags = &cs->fw6.ipv6.invflags;
-		break;
-	default:
-		return;
-	}
-
-	switch(key) {
-	case NFT_META_IIF:
-		value = nft_rule_expr_get_u32(e, NFT_EXPR_CMP_DATA);
-		if (nft_rule_expr_get_u8(e, NFT_EXPR_CMP_OP) == NFT_CMP_NEQ)
-			*invflags |= IPT_INV_VIA_IN;
-
-		if_indextoname(value, iniface);
-
-		memset(iniface_mask, 0xff, strlen(iniface)+1);
-		break;
-	case NFT_META_OIF:
-		value = nft_rule_expr_get_u32(e, NFT_EXPR_CMP_DATA);
-		if (nft_rule_expr_get_u8(e, NFT_EXPR_CMP_OP) == NFT_CMP_NEQ)
-			*invflags |= IPT_INV_VIA_OUT;
-
-		if_indextoname(value, outiface);
-
-		memset(outiface_mask, 0xff, strlen(outiface)+1);
-		break;
-	case NFT_META_IIFNAME:
-		ifname = nft_rule_expr_get(e, NFT_EXPR_CMP_DATA, &len);
-		if (nft_rule_expr_get_u8(e, NFT_EXPR_CMP_OP) == NFT_CMP_NEQ)
-			*invflags |= IPT_INV_VIA_IN;
-
-		memcpy(iniface, ifname, len);
-		iniface[len] = '\0';
-
-		/* If zero, then this is an interface mask */
-		if (if_nametoindex(iniface) == 0) {
-			iniface[len] = '+';
-			iniface[len+1] = '\0';
-		}
-
-		memset(iniface_mask, 0xff, len);
-		break;
-	case NFT_META_OIFNAME:
-		ifname = nft_rule_expr_get(e, NFT_EXPR_CMP_DATA, &len);
-		if (nft_rule_expr_get_u8(e, NFT_EXPR_CMP_OP) == NFT_CMP_NEQ)
-			*invflags |= IPT_INV_VIA_OUT;
-
-		memcpy(outiface, ifname, len);
-		outiface[len] = '\0';
-
-		/* If zero, then this is an interface mask */
-		if (if_nametoindex(outiface) == 0) {
-			outiface[len] = '+';
-			outiface[len+1] = '\0';
-		}
-
-		memset(outiface_mask, 0xff, len);
-		break;
-	default:
-		DEBUGP("unknown meta key %d\n", key);
-		break;
-	}
-}
-
-static void
-nft_parse_payload_ipv4(uint32_t offset, struct nft_rule_expr_iter *iter,
-		       struct iptables_command_state *cs)
-{
-	switch(offset) {
-	struct in_addr addr;
-	uint8_t proto;
-	bool inv;
-
-	case offsetof(struct iphdr, saddr):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
-		cs->fw.ip.src.s_addr = addr.s_addr;
-		cs->fw.ip.smsk.s_addr = 0xffffffff;
-		if (inv)
-			cs->fw.ip.invflags |= IPT_INV_SRCIP;
-		break;
-	case offsetof(struct iphdr, daddr):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
-		cs->fw.ip.dst.s_addr = addr.s_addr;
-		cs->fw.ip.dmsk.s_addr = 0xffffffff;
-		if (inv)
-			cs->fw.ip.invflags |= IPT_INV_DSTIP;
-		break;
-	case offsetof(struct iphdr, protocol):
-		get_cmp_data(iter, &proto, sizeof(proto), &inv);
-		cs->fw.ip.proto = proto;
-		if (inv)
-			cs->fw.ip.invflags |= IPT_INV_PROTO;
-		break;
-	case offsetof(struct iphdr, frag_off):
-		cs->fw.ip.flags |= IPT_F_FRAG;
-		get_frag(iter, &inv);
-		if (inv)
-			cs->fw.ip.invflags |= IPT_INV_FRAG;
-		break;
-	default:
-		DEBUGP("unknown payload offset %d\n", offset);
-		break;
-	}
-}
-
-static void
-nft_parse_payload_ipv6(uint32_t offset, struct nft_rule_expr_iter *iter,
-		       struct iptables_command_state *cs)
-{
-	switch (offset) {
-	struct in6_addr addr;
-	uint8_t proto;
-	bool inv;
-
-	case offsetof(struct ip6_hdr, ip6_src):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
-		memcpy(cs->fw6.ipv6.src.s6_addr, &addr, sizeof(addr));
-		if (inv)
-			cs->fw6.ipv6.invflags |= IPT_INV_SRCIP;
-		break;
-	case offsetof(struct ip6_hdr, ip6_dst):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
-		memcpy(cs->fw6.ipv6.dst.s6_addr, &addr, sizeof(addr));
-		if (inv)
-			cs->fw6.ipv6.invflags |= IPT_INV_DSTIP;
-		break;
-	case offsetof(struct ip6_hdr, ip6_nxt):
-		get_cmp_data(iter, &proto, sizeof(proto), &inv);
-		cs->fw6.ipv6.flags |= IP6T_F_PROTO;
-		cs->fw6.ipv6.proto = proto;
-		if (inv)
-			cs->fw6.ipv6.invflags |= IPT_INV_PROTO;
-		break;
-	default:
-		DEBUGP("unknown payload offset %d\n", offset);
-		break;
-	}
+	ops->parse_meta(e, key, cs);
 }
 
 static void
 nft_parse_payload(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 		  int family, struct iptables_command_state *cs)
 {
+	struct nft_family_ops *ops = nft_family_ops_lookup(family);
 	uint32_t offset;
 
 	offset = nft_rule_expr_get_u32(e, NFT_EXPR_PAYLOAD_OFFSET);
 
-	switch (family) {
-	case AF_INET:
-		nft_parse_payload_ipv4(offset, iter, cs);
-		break;
-	case AF_INET6:
-		nft_parse_payload_ipv6(offset, iter, cs);
-		break;
-	}
+	ops->parse_payload(iter, cs, offset);
 }
 
 static void
@@ -2401,6 +1734,7 @@ nft_parse_immediate(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 {
 	int verdict = nft_rule_expr_get_u32(e, NFT_EXPR_IMM_VERDICT);
 	const char *chain = nft_rule_expr_get_str(e, NFT_EXPR_IMM_CHAIN);
+	struct nft_family_ops *ops;
 
 	/* Standard target? */
 	switch(verdict) {
@@ -2414,10 +1748,8 @@ nft_parse_immediate(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 		cs->jumpto = "RETURN";
 		return;
 	case NFT_GOTO:
-		if (family == AF_INET)
-			cs->fw.ip.flags |= IPT_F_GOTO;
-		else
-			cs->fw6.ipv6.flags |= IPT_F_GOTO;
+		ops = nft_family_ops_lookup(family);
+		ops->parse_immediate(cs);
 	case NFT_JUMP:
 		cs->jumpto = chain;
 		return;
@@ -2705,6 +2037,8 @@ nft_rule_find(struct nft_rule_list *list, const char *chain, const char *table,
 			nft_rule_attr_get_str(r, NFT_RULE_ATTR_TABLE);
 		const char *rule_chain =
 			nft_rule_attr_get_str(r, NFT_RULE_ATTR_CHAIN);
+		const struct nft_family_ops *ops = nft_family_ops_lookup(
+				nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY));
 		struct iptables_command_state this = {};
 
 		if (strcmp(table, rule_table) != 0 ||
@@ -2728,7 +2062,7 @@ nft_rule_find(struct nft_rule_list *list, const char *chain, const char *table,
 
 			nft_rule_to_iptables_command_state(r, &this);
 
-			if (!is_same(nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY), cs, &this))
+			if (!ops->is_same(cs, &this))
 				goto next;
 
 			if (!find_matches(cs->matches, r)) {
@@ -2887,49 +2221,6 @@ int nft_rule_replace(struct nft_handle *h, const char *chain,
 	return ret;
 }
 
-/*
- * iptables print output emulation
- */
-
-#define FMT_NUMERIC	0x0001
-#define FMT_NOCOUNTS	0x0002
-#define FMT_KILOMEGAGIGA 0x0004
-#define FMT_OPTIONS	0x0008
-#define FMT_NOTABLE	0x0010
-#define FMT_NOTARGET	0x0020
-#define FMT_VIA		0x0040
-#define FMT_NONEWLINE	0x0080
-#define FMT_LINENUMBERS 0x0100
-
-#define FMT_PRINT_RULE (FMT_NOCOUNTS | FMT_OPTIONS | FMT_VIA \
-			| FMT_NUMERIC | FMT_NOTABLE)
-#define FMT(tab,notab) ((format) & FMT_NOTABLE ? (notab) : (tab))
-
-static void
-print_num(uint64_t number, unsigned int format)
-{
-	if (format & FMT_KILOMEGAGIGA) {
-		if (number > 99999) {
-			number = (number + 500) / 1000;
-			if (number > 9999) {
-				number = (number + 500) / 1000;
-				if (number > 9999) {
-					number = (number + 500) / 1000;
-					if (number > 9999) {
-						number = (number + 500) / 1000;
-						printf(FMT("%4lluT ","%lluT "), (unsigned long long)number);
-					}
-					else printf(FMT("%4lluG ","%lluG "), (unsigned long long)number);
-				}
-				else printf(FMT("%4lluM ","%lluM "), (unsigned long long)number);
-			} else
-				printf(FMT("%4lluK ","%lluK "), (unsigned long long)number);
-		} else
-			printf(FMT("%5llu ","%llu "), (unsigned long long)number);
-	} else
-		printf(FMT("%8llu ","%llu "), (unsigned long long)number);
-}
-
 static void
 print_header(unsigned int format, const char *chain, const char *pol,
 	     const struct xt_counters *counters, bool basechain, uint32_t refs)
@@ -3003,73 +2294,6 @@ print_match(struct nft_rule_expr *expr, int numeric)
 }
 
 static void
-print_ipv4_addr(const struct iptables_command_state *cs, unsigned int format)
-{
-	char buf[BUFSIZ];
-
-	fputc(cs->fw.ip.invflags & IPT_INV_SRCIP ? '!' : ' ', stdout);
-	if (cs->fw.ip.smsk.s_addr == 0L && !(format & FMT_NUMERIC))
-		printf(FMT("%-19s ","%s "), "anywhere");
-	else {
-		if (format & FMT_NUMERIC)
-			strcpy(buf, xtables_ipaddr_to_numeric(&cs->fw.ip.src));
-		else
-			strcpy(buf, xtables_ipaddr_to_anyname(&cs->fw.ip.src));
-		strcat(buf, xtables_ipmask_to_numeric(&cs->fw.ip.smsk));
-		printf(FMT("%-19s ","%s "), buf);
-	}
-
-	fputc(cs->fw.ip.invflags & IPT_INV_DSTIP ? '!' : ' ', stdout);
-	if (cs->fw.ip.dmsk.s_addr == 0L && !(format & FMT_NUMERIC))
-		printf(FMT("%-19s ","-> %s"), "anywhere");
-	else {
-		if (format & FMT_NUMERIC)
-			strcpy(buf, xtables_ipaddr_to_numeric(&cs->fw.ip.dst));
-		else
-			strcpy(buf, xtables_ipaddr_to_anyname(&cs->fw.ip.dst));
-		strcat(buf, xtables_ipmask_to_numeric(&cs->fw.ip.dmsk));
-		printf(FMT("%-19s ","-> %s"), buf);
-	}
-}
-
-static void
-print_ipv6_addr(const struct iptables_command_state *cs, unsigned int format)
-{
-	char buf[BUFSIZ];
-
-	fputc(cs->fw6.ipv6.invflags & IPT_INV_SRCIP ? '!' : ' ', stdout);
-	if (IN6_IS_ADDR_UNSPECIFIED(&cs->fw6.ipv6.src)
-	    && !(format & FMT_NUMERIC))
-		printf(FMT("%-19s ","%s "), "anywhere");
-	else {
-		if (format & FMT_NUMERIC)
-			strcpy(buf,
-			       xtables_ip6addr_to_numeric(&cs->fw6.ipv6.src));
-		else
-			strcpy(buf,
-			       xtables_ip6addr_to_anyname(&cs->fw6.ipv6.src));
-		strcat(buf, xtables_ip6mask_to_numeric(&cs->fw6.ipv6.smsk));
-		printf(FMT("%-19s ","%s "), buf);
-	}
-
-
-	fputc(cs->fw6.ipv6.invflags & IPT_INV_DSTIP ? '!' : ' ', stdout);
-	if (IN6_IS_ADDR_UNSPECIFIED(&cs->fw6.ipv6.dst)
-	    && !(format & FMT_NUMERIC))
-		printf(FMT("%-19s ","-> %s"), "anywhere");
-	else {
-		if (format & FMT_NUMERIC)
-			strcpy(buf,
-			       xtables_ip6addr_to_numeric(&cs->fw6.ipv6.dst));
-		else
-			strcpy(buf,
-			       xtables_ip6addr_to_anyname(&cs->fw6.ipv6.dst));
-		strcat(buf, xtables_ip6mask_to_numeric(&cs->fw6.ipv6.dmsk));
-		printf(FMT("%-19s ","-> %s"), buf);
-	}
-}
-
-static void
 print_firewall(const struct iptables_command_state *cs, struct nft_rule *r,
 	       unsigned int num, unsigned int format)
 {
@@ -3077,10 +2301,8 @@ print_firewall(const struct iptables_command_state *cs, struct nft_rule *r,
 	const char *targname = NULL;
 	const void *targinfo = NULL;
 	int family;
+	struct nft_family_ops *ops;
 	uint8_t flags = 0;
-	uint8_t invflags = 0;
-	uint8_t proto = 0;
-	const char *iniface = NULL, *outiface = NULL;
 	struct nft_rule_expr_iter *iter;
 	struct nft_rule_expr *expr;
 	struct xt_entry_target *t;
@@ -3132,91 +2354,9 @@ print_firewall(const struct iptables_command_state *cs, struct nft_rule *r,
 	nft_rule_expr_iter_destroy(iter);
 
 	family = nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY);
+	ops = nft_family_ops_lookup(family);
 
-	switch (family) {
-	case AF_INET:
-		flags = cs->fw.ip.flags;
-		invflags = flags = cs->fw.ip.invflags;
-		proto = cs->fw.ip.proto;
-		iniface = cs->fw.ip.iniface;
-		outiface = cs->fw.ip.outiface;
-		break;
-	case AF_INET6:
-		flags = cs->fw6.ipv6.flags;
-		invflags = cs->fw6.ipv6.invflags;
-		proto = cs->fw6.ipv6.proto;
-		iniface = cs->fw6.ipv6.iniface;
-		outiface = cs->fw6.ipv6.outiface;
-		break;
-	}
-
-	if (format & FMT_LINENUMBERS)
-		printf(FMT("%-4u ", "%u "), num);
-
-	if (!(format & FMT_NOCOUNTS)) {
-		print_num(cs->counters.pcnt, format);
-		print_num(cs->counters.bcnt, format);
-	}
-
-	if (!(format & FMT_NOTARGET))
-		printf(FMT("%-9s ", "%s "), targname ? targname : "");
-
-	fputc(invflags & XT_INV_PROTO ? '!' : ' ', stdout);
-	{
-		const char *pname =
-			proto_to_name(proto, format&FMT_NUMERIC);
-		if (pname)
-			printf(FMT("%-5s", "%s "), pname);
-		else
-			printf(FMT("%-5hu", "%hu "), proto);
-	}
-
-	if (format & FMT_OPTIONS) {
-		if (format & FMT_NOTABLE)
-			fputs("opt ", stdout);
-		fputc(invflags & IPT_INV_FRAG ? '!' : '-', stdout);
-		fputc(flags & IPT_F_FRAG ? 'f' : '-', stdout);
-		fputc(' ', stdout);
-	}
-
-	if (format & FMT_VIA) {
-		char iface[IFNAMSIZ+2];
-		if (invflags & IPT_INV_VIA_IN) {
-			iface[0] = '!';
-			iface[1] = '\0';
-		}
-		else iface[0] = '\0';
-
-		if (iniface[0] != '\0') {
-			strcat(iface, iniface);
-		}
-		else if (format & FMT_NUMERIC) strcat(iface, "*");
-		else strcat(iface, "any");
-		printf(FMT(" %-6s ","in %s "), iface);
-
-		if (invflags & IPT_INV_VIA_OUT) {
-			iface[0] = '!';
-			iface[1] = '\0';
-		}
-		else iface[0] = '\0';
-
-		if (outiface[0] != '\0') {
-			strcat(iface, outiface);
-		}
-		else if (format & FMT_NUMERIC) strcat(iface, "*");
-		else strcat(iface, "any");
-		printf(FMT("%-6s ","out %s "), iface);
-	}
-
-
-	switch (family) {
-	case AF_INET:
-		print_ipv4_addr(cs, format);
-		break;
-	case AF_INET6:
-		print_ipv6_addr(cs, format);
-		break;
-	}
+	flags = ops->print_firewall(cs, targname, num, format);
 
 	if (format & FMT_NOTABLE)
 		fputs("  ", stdout);

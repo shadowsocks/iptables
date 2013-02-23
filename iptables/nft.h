@@ -2,6 +2,7 @@
 #define _NFT_H_
 
 #include "xshared.h"
+#include "nft-shared.h"
 
 struct nft_handle {
 	int			family;
@@ -9,6 +10,7 @@ struct nft_handle {
 	uint32_t		portid;
 	uint32_t		seq;
 	bool			commit;
+	struct nft_family_ops	*ops;
 };
 
 int nft_init(struct nft_handle *h);
