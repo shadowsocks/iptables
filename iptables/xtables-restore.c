@@ -36,6 +36,8 @@ static const struct option options[] = {
 	{.name = "noflush",  .has_arg = false, .val = 'n'},
 	{.name = "modprobe", .has_arg = true,  .val = 'M'},
 	{.name = "table",    .has_arg = true,  .val = 'T'},
+	{.name = "ipv4",     .has_arg = false, .val = '4'},
+	{.name = "ipv6",     .has_arg = false, .val = '6'},
 	{NULL},
 };
 
@@ -193,7 +195,7 @@ xtables_restore_main(int argc, char *argv[])
 
 	nft_init(&h);
 
-	while ((c = getopt_long(argc, argv, "bcvthnM:T:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "bcvthnM:T:46", options, NULL)) != -1) {
 		switch (c) {
 			case 'b':
 				binary = 1;
@@ -219,6 +221,12 @@ xtables_restore_main(int argc, char *argv[])
 				break;
 			case 'T':
 				tablename = optarg;
+				break;
+			case '4':
+				h.family = AF_INET;
+				break;
+			case '6':
+				h.family = AF_INET6;
 				break;
 		}
 	}

@@ -2630,7 +2630,7 @@ static int nft_action(struct nft_handle *h, int type)
 	nlh->nlmsg_seq = seq = time(NULL);
 
 	struct nfgenmsg *nfg = mnl_nlmsg_put_extra_header(nlh, sizeof(*nfg));
-	nfg->nfgen_family = AF_INET;
+	nfg->nfgen_family = h->family;
 	nfg->version = NFNETLINK_V0;
 	nfg->res_id = 0;
 
