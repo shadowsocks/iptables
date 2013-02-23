@@ -32,6 +32,8 @@ static const struct option options[] = {
 	{.name = "dump",     .has_arg = false, .val = 'd'},
 	{.name = "table",    .has_arg = true,  .val = 't'},
 	{.name = "modprobe", .has_arg = true,  .val = 'M'},
+	{.name = "ipv4",     .has_arg = false, .val = '4'},
+	{.name = "ipv6",     .has_arg = false, .val = '6'},
 	{NULL},
 };
 
@@ -96,7 +98,7 @@ xtables_save_main(int argc, char *argv[])
 #endif
 	nft_init(&h);
 
-	while ((c = getopt_long(argc, argv, "bcdt:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "bcdt:46", options, NULL)) != -1) {
 		switch (c) {
 		case 'c':
 			show_counters = true;
@@ -112,6 +114,12 @@ xtables_save_main(int argc, char *argv[])
 		case 'd':
 			do_output(&h, tablename, show_counters);
 			exit(0);
+		case '4':
+			h.family = AF_INET;
+			break;
+		case '6':
+			h.family = AF_INET6;
+			break;
 		}
 	}
 
