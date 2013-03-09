@@ -48,12 +48,12 @@ xtables_main(int argc, char *argv[])
 
 	memset(&h, 0, sizeof(h));
 
-	iptables_globals.program_name = "xtables";
+	xtables_globals.program_name = "xtables";
 	ret = xtables_init_all(&xtables_globals, NFPROTO_IPV4);
 	if (ret < 0) {
 		fprintf(stderr, "%s/%s Failed to initialize xtables\n",
-				iptables_globals.program_name,
-				iptables_globals.program_version);
+				xtables_globals.program_name,
+				xtables_globals.program_version);
 				exit(1);
 	}
 #if defined(ALL_INCLUSIVE) || defined(NO_SHARED_LIBS)
