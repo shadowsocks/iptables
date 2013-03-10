@@ -69,7 +69,7 @@ static inline void stack_put_i32(void *data, int value)
 
 static inline void stack_put_str(void *data, const char *str)
 {
-	memcpy(data, str, strlen(str)+1);
+	memcpy(data, str, strlen(str));
 }
 
 static void stack_free(struct stack_elem *e)
@@ -108,7 +108,7 @@ line		: family
 
 family		: T_FAMILY T_STRING '{' tables '}'
 		{
-			void *data = stack_push(T_FAMILY, strlen($2));
+			void *data = stack_push(T_FAMILY, strlen($2)+1);
 			stack_put_str(data, $2);
 		}
 		;
@@ -120,7 +120,7 @@ tables		: table
 table		: T_TABLE T_STRING '{' chains '}'
 		{
 			/* added in reverse order to pop it in order */
-			void *data = stack_push(T_TABLE, strlen($2));
+			void *data = stack_push(T_TABLE, strlen($2)+1);
 			stack_put_str(data, $2);
 		}
 		;
@@ -134,9 +134,9 @@ chain		: T_CHAIN T_STRING T_HOOK T_STRING T_PRIO T_INTEGER
 			/* added in reverse order to pop it in order */
 			void *data = stack_push(T_PRIO, sizeof(int32_t));
 			stack_put_i32(data, $6);
-			data = stack_push(T_HOOK, strlen($4));
+			data = stack_push(T_HOOK, strlen($4)+1);
 			stack_put_str(data, $4);
-			data = stack_push(T_CHAIN, strlen($2));
+			data = stack_push(T_CHAIN, strlen($2)+1);
 			stack_put_str(data, $2);
 		}
 		;
