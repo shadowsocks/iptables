@@ -17,6 +17,7 @@
 #include <errno.h>
 #include <netdb.h>	/* getprotobynumber */
 #include <time.h>
+#include <stdarg.h>
 
 #include <xtables.h>
 #include <libiptc/libxtc.h>
@@ -47,6 +48,7 @@
 #include "nft.h"
 #include "xshared.h" /* proto_to_name */
 #include "nft-shared.h"
+#include "xtables-config-parser.h"
 
 static void *nft_fn;
 
@@ -683,7 +685,8 @@ nft_rule_add(struct nft_handle *h, const char *chain, const char *table,
 	int ip_flags = 0;
 
 	/* If built-in chains don't exist for this table, create them */
-	nft_chain_builtin_init(h, table, chain, NF_ACCEPT);
+	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0)
+		nft_chain_builtin_init(h, table, chain, NF_ACCEPT);
 
 	nft_fn = nft_rule_add;
 
@@ -1302,7 +1305,8 @@ int nft_chain_user_add(struct nft_handle *h, const char *chain, const char *tabl
 	int ret;
 
 	/* If built-in chains don't exist for this table, create them */
-	nft_chain_builtin_init(h, table, NULL, NF_ACCEPT);
+	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0)
+		nft_chain_builtin_init(h, table, NULL, NF_ACCEPT);
 
 	c = nft_chain_alloc();
 	if (c == NULL) {
@@ -1469,7 +1473,8 @@ int nft_chain_user_rename(struct nft_handle *h,const char *chain,
 	int ret;
 
 	/* If built-in chains don't exist for this table, create them */
-	nft_chain_builtin_init(h, table, NULL, NF_ACCEPT);
+	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0)
+		nft_chain_builtin_init(h, table, NULL, NF_ACCEPT);
 
 	/* Find the old chain to be renamed */
 	c = nft_chain_find(h, table, chain);
@@ -2759,4 +2764,89 @@ const char *nft_strerror(int err)
 	}
 
 	return strerror(err);
+}
+
+static void xtables_config_perror(uint32_t flags, const char *fmt, ...)
+{
+	va_list args;
+
+	va_start(args, fmt);
+
+	if (flags & NFT_LOAD_VERBOSE)
+		vfprintf(stderr, fmt, args);
+
+	va_end(args);
+}
+
+int nft_xtables_config_load(struct nft_handle *h, const char *filename,
+			    uint32_t flags)
+{
+	struct nft_table_list *table_list = nft_table_list_alloc();
+	struct nft_chain_list *chain_list = nft_chain_list_alloc();
+	struct nft_table_list_iter *titer;
+	struct nft_chain_list_iter *citer;
+	struct nft_table *table;
+	struct nft_chain *chain;
+
+	if (xtables_config_parse(filename, table_list, chain_list) < 0) {
+		if (errno == ENOENT) {
+			xtables_config_perror(flags,
+				"configuration file `%s' does not exists\n",
+				filename);
+		} else {
+			xtables_config_perror(flags,
+				"Fatal error parsing config file: %s\n",
+				 strerror(errno));
+		}
+		return -1;
+	}
+
+	nft_init(h);
+
+	/* Stage 1) create tables */
+	titer = nft_table_list_iter_create(table_list);
+	while ((table = nft_table_list_iter_next(titer)) != NULL) {
+		if (nft_table_add(h, table) < 0) {
+			if (errno == EEXIST) {
+				xtables_config_perror(flags,
+					"table `%s' already exists, skipping\n",
+					(char *)nft_table_attr_get(table, NFT_TABLE_ATTR_NAME));
+			} else {
+				xtables_config_perror(flags,
+					"table `%s' cannot be create, reason `%s'. Exitting\n",
+					(char *)nft_table_attr_get(table, NFT_TABLE_ATTR_NAME),
+					strerror(errno));
+				return -1;
+			}
+			continue;
+		}
+		xtables_config_perror(flags, "table `%s' has been created\n",
+			(char *)nft_table_attr_get(table, NFT_TABLE_ATTR_NAME));
+	}
+
+	/* Stage 2) create chains */
+	citer = nft_chain_list_iter_create(chain_list);
+	while ((chain = nft_chain_list_iter_next(citer)) != NULL) {
+		if (nft_chain_add(h, chain) < 0) {
+			if (errno == EEXIST) {
+				xtables_config_perror(flags,
+					"chain `%s' already exists in table `%s', skipping\n",
+					(char *)nft_chain_attr_get(chain, NFT_CHAIN_ATTR_NAME),
+					(char *)nft_chain_attr_get(chain, NFT_CHAIN_ATTR_TABLE));
+			} else {
+				xtables_config_perror(flags,
+					"chain `%s' cannot be create, reason `%s'. Exitting\n",
+					(char *)nft_chain_attr_get(chain, NFT_CHAIN_ATTR_NAME),
+					strerror(errno));
+				return -1;
+			}
+			continue;
+		}
+
+		xtables_config_perror(flags,
+			"chain `%s' in table `%s' has been created\n",
+			(char *)nft_chain_attr_get(chain, NFT_CHAIN_ATTR_NAME),
+			(char *)nft_chain_attr_get(chain, NFT_CHAIN_ATTR_TABLE));
+	}
+	return 0;
 }

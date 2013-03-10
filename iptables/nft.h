@@ -84,4 +84,20 @@ const char *nft_strerror(int err);
 /* For xtables.c */
 int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table);
 
+/*
+ * Parse config for tables and chain helper functions
+ */
+#define XTABLES_CONFIG_DEFAULT  "/etc/xtables.conf"
+
+struct nft_table_list;
+struct nft_chain_list;
+
+extern int xtables_config_parse(const char *filename, struct nft_table_list *table_list, struct nft_chain_list *chain_list);
+
+enum {
+	NFT_LOAD_VERBOSE = (1 << 0),
+};
+
+int nft_xtables_config_load(struct nft_handle *h, const char *filename, uint32_t flags);
+
 #endif
