@@ -28,6 +28,7 @@ integer		[\-\+]?[0-9]+
 string		[a-zA-Z][a-zA-Z0-9\.\-\_]*
 
 %%
+"family"		{ return T_FAMILY; }
 "table"			{ return T_TABLE; }
 "chain"			{ return T_CHAIN; }
 "hook"			{ return T_HOOK; }

@@ -84,6 +84,7 @@ static void stack_free(struct stack_elem *e)
 	char	*string;
 }
 
+%token T_FAMILY
 %token T_TABLE
 %token T_CHAIN
 %token T_HOOK
@@ -102,7 +103,18 @@ lines		: line
 		| lines line
 		;
 
-line		: table
+line		: family
+		;
+
+family		: T_FAMILY T_STRING '{' tables '}'
+		{
+			void *data = stack_push(T_FAMILY, strlen($2));
+			stack_put_str(data, $2);
+		}
+		;
+
+tables		: table
+		| tables table
 		;
 
 table		: T_TABLE T_STRING '{' chains '}'
@@ -155,6 +167,16 @@ static int hooknametonum(const char *hookname)
 	return -1;
 }
 
+static int32_t familytonumber(const char *family)
+{
+	if (strcmp(family, "ipv4") == 0)
+		return AF_INET;
+	else if (strcmp(family, "ipv6") == 0)
+		return AF_INET6;
+
+	return -1;
+}
+
 int xtables_config_parse(char *filename, struct nft_table_list *table_list,
 			 struct nft_chain_list *chain_list)
 {
@@ -163,6 +185,7 @@ int xtables_config_parse(char *filename, struct nft_table_list *table_list,
 	struct nft_table *table = NULL;
 	struct nft_chain *chain = NULL;
 	int prio = 0;
+	int32_t family = 0;
 
 	fp = fopen(filename, "r");
 	if (!fp)
@@ -174,12 +197,18 @@ int xtables_config_parse(char *filename, struct nft_table_list *table_list,
 
 	for (e = stack_pop(); e != NULL; e = stack_pop()) {
 		switch(e->token) {
+		case T_FAMILY:
+			family = familytonumber(e->data);
+			if (family == -1)
+				return -1;
+			break;
 		case T_TABLE:
 			table = nft_table_alloc();
 			if (table == NULL) {
 				perror("nft_table_alloc");
 				return -1;
 			}
+			nft_table_attr_set_u32(table, NFT_TABLE_ATTR_FAMILY, family);
 			nft_table_attr_set(table, NFT_TABLE_ATTR_NAME, e->data);
 			nft_table_list_add(table, table_list);
 			break;
@@ -194,6 +223,7 @@ int xtables_config_parse(char *filename, struct nft_table_list *table_list,
 			}
 			nft_chain_attr_set(chain, NFT_CHAIN_ATTR_TABLE,
 				(char *)nft_table_attr_get(table, NFT_TABLE_ATTR_NAME));
+			nft_table_attr_set_u32(table, NFT_CHAIN_ATTR_FAMILY, family);
 			nft_chain_attr_set_s32(chain, NFT_CHAIN_ATTR_PRIO, prio);
 			nft_chain_attr_set(chain, NFT_CHAIN_ATTR_NAME, e->data);
 			nft_chain_list_add(chain, chain_list);
