@@ -39,7 +39,9 @@ int xtables_config_main(int argc, char *argv[])
 	struct nft_table *table;
 	struct nft_chain *chain;
 	const char *filename = NULL;
-	struct nft_handle h;
+	struct nft_handle h = {
+		.family = AF_INET,
+	};
 
 	if (argc > 2) {
 		fprintf(stderr, "Usage: %s [<config_file>]\n", argv[0]);

@@ -105,12 +105,10 @@ lines		: line
 line		: table
 		;
 
-table		: T_TABLE T_STRING T_PRIO T_INTEGER '{' chains '}'
+table		: T_TABLE T_STRING '{' chains '}'
 		{
 			/* added in reverse order to pop it in order */
-			void *data = stack_push(T_PRIO, sizeof(int32_t));
-			stack_put_i32(data, $4);
-			data = stack_push(T_TABLE, strlen($2));
+			void *data = stack_push(T_TABLE, strlen($2));
 			stack_put_str(data, $2);
 		}
 		;
@@ -119,10 +117,12 @@ chains		: chain
 		| chains chain
 		;
 
-chain		: T_CHAIN T_STRING T_HOOK T_STRING
+chain		: T_CHAIN T_STRING T_HOOK T_STRING T_PRIO T_INTEGER
 		{
 			/* added in reverse order to pop it in order */
-			void *data = stack_push(T_HOOK, strlen($4));
+			void *data = stack_push(T_PRIO, sizeof(int32_t));
+			stack_put_i32(data, $6);
+			data = stack_push(T_HOOK, strlen($4));
 			stack_put_str(data, $4);
 			data = stack_push(T_CHAIN, strlen($2));
 			stack_put_str(data, $2);
@@ -194,13 +194,13 @@ int xtables_config_parse(char *filename, struct nft_table_list *table_list,
 			}
 			nft_chain_attr_set(chain, NFT_CHAIN_ATTR_TABLE,
 				(char *)nft_table_attr_get(table, NFT_TABLE_ATTR_NAME));
+			nft_chain_attr_set_s32(chain, NFT_CHAIN_ATTR_PRIO, prio);
 			nft_chain_attr_set(chain, NFT_CHAIN_ATTR_NAME, e->data);
 			nft_chain_list_add(chain, chain_list);
 			break;
 		case T_HOOK:
 			nft_chain_attr_set_u32(chain, NFT_CHAIN_ATTR_HOOKNUM,
 						hooknametonum(e->data));
-			nft_chain_attr_set_s32(chain, NFT_CHAIN_ATTR_PRIO, prio);
 			break;
 		default:
 			printf("unknown token type %d\n", e->token);
