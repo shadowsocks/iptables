@@ -10,9 +10,7 @@ endif
 if ENABLE_LIBIPQ
 SUBDIRS         += libipq
 endif
-if HAVE_LIBNFNETLINK
 SUBDIRS         += utils
-endif
 # Depends on libxtables:
 SUBDIRS         += extensions
 # Depends on extensions/libext.a:
