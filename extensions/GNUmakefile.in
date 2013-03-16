@@ -105,7 +105,6 @@ libxt_state.so: libxt_conntrack.so
 	${AM_VERBOSE_GEN} ln -fs $< $@
 
 # Need the LIBADDs in iptables/Makefile.am too for libxtables_la_LIBADD
-ip6t_NETMAP_LIBADD  = ../libiptc/libip6tc.la
 xt_RATEEST_LIBADD   = -lm
 xt_statistic_LIBADD = -lm
 

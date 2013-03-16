@@ -154,9 +154,6 @@ int ip6tc_get_raw_socket(void);
 /* Translates errno numbers into more human-readable form than strerror. */
 const char *ip6tc_strerror(int err);
 
-/* Return prefix length, or -1 if not contiguous */
-int ipv6_prefix_length(const struct in6_addr *a);
-
 extern void dump_entries6(struct xtc_handle *const);
 
 extern const struct xtc_ops ip6tc_ops;

@@ -61,7 +61,7 @@ static void NETMAP_print(const void *ip, const struct xt_entry_target *target,
 	printf("%s", xtables_ip6addr_to_numeric(&a));
 	for (i = 0; i < 4; i++)
 		a.s6_addr32[i] = ~(r->min_addr.ip6[i] ^ r->max_addr.ip6[i]);
-	bits = ipv6_prefix_length(&a);
+	bits = xtables_ip6mask_to_cidr(&a);
 	if (bits < 0)
 		printf("/%s", xtables_ip6addr_to_numeric(&a));
 	else

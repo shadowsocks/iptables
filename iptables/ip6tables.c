@@ -1022,7 +1022,7 @@ static void print_ip(const char *prefix, const struct in6_addr *ip,
 		     const struct in6_addr *mask, int invert)
 {
 	char buf[51];
-	int l = ipv6_prefix_length(mask);
+	int l = xtables_ip6mask_to_cidr(mask);
 
 	if (l == 0 && !invert)
 		return;

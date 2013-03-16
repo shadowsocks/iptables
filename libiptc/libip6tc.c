@@ -113,7 +113,7 @@ typedef unsigned int socklen_t;
 #define BIT6(a, l) \
  ((ntohl(a->s6_addr32[(l) / 32]) >> (31 - ((l) & 31))) & 1)
 
-int
+static int
 ipv6_prefix_length(const struct in6_addr *a)
 {
 	int l, i;
