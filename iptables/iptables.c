@@ -231,7 +231,7 @@ exit_printhelp(const struct xtables_rule_match *matches)
 "Options:\n"
 "    --ipv4	-4		Nothing (line is ignored by ip6tables-restore)\n"
 "    --ipv6	-6		Error (line is ignored by iptables-restore)\n"
-"[!] --proto	-p proto	protocol: by number or name, eg. `tcp'\n"
+"[!] --protocol	-p proto	protocol: by number or name, eg. `tcp'\n"
 "[!] --source	-s address[/mask][...]\n"
 "				source specification\n"
 "[!] --destination -d address[/mask][...]\n"
