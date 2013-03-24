@@ -63,6 +63,7 @@ void add_addr(struct nft_rule *r, int offset,
 	      void *data, size_t len, int invflags);
 void add_proto(struct nft_rule *r, int offset, size_t len,
 	       uint32_t proto, int invflags);
+void add_compat(struct nft_rule *r, uint32_t proto, bool inv);
 
 bool is_same_interfaces(const char *a_iniface, const char *a_outiface,
 			unsigned const char *a_iniface_mask,

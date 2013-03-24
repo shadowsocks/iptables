@@ -60,6 +60,8 @@ static int nft_ipv4_add(struct nft_rule *r, struct iptables_command_state *cs)
 		add_cmp_u16(r, 0, op);
 	}
 
+	add_compat(r, cs->fw.ip.proto, cs->fw.ip.invflags);
+
 	return cs->fw.ip.flags;
 }
 

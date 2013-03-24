@@ -42,6 +42,8 @@ static int nft_ipv6_add(struct nft_rule *r, struct iptables_command_state *cs)
 		add_proto(r, offsetof(struct ip6_hdr, ip6_nxt), 1,
 			  cs->fw6.ipv6.proto, cs->fw6.ipv6.invflags);
 
+	add_compat(r, cs->fw6.ipv6.proto, cs->fw6.ipv6.invflags);
+
 	return cs->fw6.ipv6.flags;
 }
 

@@ -664,7 +664,7 @@ static void add_counters(struct nft_rule *r, uint64_t packets, uint64_t bytes)
 	nft_rule_add_expr(r, expr);
 }
 
-static void add_compat(struct nft_rule *r, uint32_t proto, bool inv)
+void add_compat(struct nft_rule *r, uint32_t proto, bool inv)
 {
 	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_COMPAT_PROTO, proto);
 	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_COMPAT_FLAGS,
