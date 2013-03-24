@@ -92,7 +92,10 @@ static void osf_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_osf_info *info = (const struct xt_osf_info*) match->data;
 
-	printf(" --genre %s%s", (info->flags & XT_OSF_INVERT) ? "! ": "", info->genre);
+	if (info->flags & XT_OSF_INVERT)
+		printf(" !");
+
+	printf(" --genre %s", info->genre);
 	if (info->flags & XT_OSF_TTL)
 		printf(" --ttl %u", info->ttl);
 	if (info->flags & XT_OSF_LOG)
