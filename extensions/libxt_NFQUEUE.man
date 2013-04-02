@@ -23,3 +23,10 @@ Packets belonging to the same connection are put into the same nfqueue.
 By default, if no userspace program is listening on an NFQUEUE, then all packets that are to be queued
 are dropped.  When this option is used, the NFQUEUE rule behaves like ACCEPT instead, and the packet
 will move on to the next table.
+.PP
+.TP
+\fB\-\-queue\-cpu-fanout\fP
+Available starting Linux kernel 3.10. When used together with
+\fB--queue-balance\fP this will use the CPU ID as an index to map packets to
+the queues. The idea is that you can improve performance if there's a queue
+per CPU. This requires \fB--queue-balance\fP to be specified.
