@@ -7,4 +7,4 @@ AM_CPPFLAGS = ${regular_CPPFLAGS} -I${top_builddir}/include \
 sbin_PROGRAMS = nfnl_osf
 pkgdata_DATA = pf.os
 
-nfnl_osf_LDADD = -lnfnetlink
+nfnl_osf_LDADD = ${libnfnetlink_LIBS}
