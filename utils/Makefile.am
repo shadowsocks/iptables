@@ -11,7 +11,7 @@ if HAVE_LIBNFNETLINK
 sbin_PROGRAMS += nfnl_osf
 pkgdata_DATA += pf.os
 
-nfnl_osf_LDADD = -lnfnetlink
+nfnl_osf_LDADD = ${libnfnetlink_LIBS}
 endif
 
 if ENABLE_BPFC
