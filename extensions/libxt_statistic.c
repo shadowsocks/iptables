@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2006-2013 Patrick McHardy <kaber@trash.net>
+ */
+
 #include <math.h>
 #include <stdio.h>
 #include <string.h>

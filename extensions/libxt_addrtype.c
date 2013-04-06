@@ -1,4 +1,6 @@
 /* Shared library add-on to iptables to add addrtype matching support 
+ *
+ * Copyright (c) 2003-2013 Patrick McHardy <kaber@trash.net>
  * 
  * This program is released under the terms of GNU GPL */
 #include <stdio.h>

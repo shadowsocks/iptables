@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2005-2013 Patrick McHardy <kaber@trash.net>
+ */
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>

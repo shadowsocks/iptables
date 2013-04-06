@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2003-2013 Patrick McHardy <kaber@trash.net>
+ */
+
 #include <stdio.h>
 #include <xtables.h>
 #include <linux/netfilter/xt_CLASSIFY.h>

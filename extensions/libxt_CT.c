@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2010-2013 Patrick McHardy <kaber@trash.net>
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <xtables.h>
