@@ -1,9 +1,8 @@
 This module matches a set of source or destination ports.  Up to 15
 ports can be specified.  A port range (port:port) counts as two
-ports.  It can only be used in conjunction with
-\fB\-p tcp\fP
-or
-\fB\-p udp\fP.
+ports.  It can only be used in conjunction with one of the
+following protocols:
+\fBtcp\fP, \fBudp\fP, \fBudplite\fP, \fBdccp\fP and \fBsctp\fP.
 .TP
 [\fB!\fP] \fB\-\-source\-ports\fP,\fB\-\-sports\fP \fIport\fP[\fB,\fP\fIport\fP|\fB,\fP\fIport\fP\fB:\fP\fIport\fP]...
 Match if the source port is one of the given ports.  The flag
