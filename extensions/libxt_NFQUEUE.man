@@ -21,5 +21,5 @@ Packets belonging to the same connection are put into the same nfqueue.
 .TP
 \fB\-\-queue\-bypass\fP
 By default, if no userspace program is listening on an NFQUEUE, then all packets that are to be queued
-are dropped.  When this option is used, the NFQUEUE rule is silently bypassed instead. The packet
-will move on to the next rule.
+are dropped.  When this option is used, the NFQUEUE rule behaves like ACCEPT instead, and the packet
+will move on to the next table.
