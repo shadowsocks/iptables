@@ -213,7 +213,7 @@ int xtables_config_parse(char *filename, struct nft_table_list *table_list,
 			nft_table_list_add(table, table_list);
 			break;
 		case T_PRIO:
-			prio = *((int32_t *)e->data);
+			memcpy(&prio, e->data, sizeof(int32_t));
 			break;
 		case T_CHAIN:
 			chain = nft_chain_alloc();
