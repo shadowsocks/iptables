@@ -11,5 +11,8 @@
 /iptables-static
 /iptables-xml
 /xtables-multi
+/xtables-config-parser.c
+/xtables-config-parser.h
+/xtables-config-syntax.c
 
 /xtables.pc
