@@ -1037,15 +1037,15 @@ static unsigned int
 state_parse_state(const char *state, size_t len)
 {
 	if (strncasecmp(state, "INVALID", len) == 0)
-		return XT_STATE_INVALID;
+		return XT_CONNTRACK_STATE_INVALID;
 	else if (strncasecmp(state, "NEW", len) == 0)
-		return XT_STATE_BIT(IP_CT_NEW);
+		return XT_CONNTRACK_STATE_BIT(IP_CT_NEW);
 	else if (strncasecmp(state, "ESTABLISHED", len) == 0)
-		return XT_STATE_BIT(IP_CT_ESTABLISHED);
+		return XT_CONNTRACK_STATE_BIT(IP_CT_ESTABLISHED);
 	else if (strncasecmp(state, "RELATED", len) == 0)
-		return XT_STATE_BIT(IP_CT_RELATED);
+		return XT_CONNTRACK_STATE_BIT(IP_CT_RELATED);
 	else if (strncasecmp(state, "UNTRACKED", len) == 0)
-		return XT_STATE_UNTRACKED;
+		return XT_CONNTRACK_STATE_UNTRACKED;
 	return 0;
 }
 
@@ -1115,23 +1115,23 @@ static void state_print_state(unsigned int statemask)
 {
 	const char *sep = "";
 
-	if (statemask & XT_STATE_INVALID) {
+	if (statemask & XT_CONNTRACK_STATE_INVALID) {
 		printf("%sINVALID", sep);
 		sep = ",";
 	}
-	if (statemask & XT_STATE_BIT(IP_CT_NEW)) {
+	if (statemask & XT_CONNTRACK_STATE_BIT(IP_CT_NEW)) {
 		printf("%sNEW", sep);
 		sep = ",";
 	}
-	if (statemask & XT_STATE_BIT(IP_CT_RELATED)) {
+	if (statemask & XT_CONNTRACK_STATE_BIT(IP_CT_RELATED)) {
 		printf("%sRELATED", sep);
 		sep = ",";
 	}
-	if (statemask & XT_STATE_BIT(IP_CT_ESTABLISHED)) {
+	if (statemask & XT_CONNTRACK_STATE_BIT(IP_CT_ESTABLISHED)) {
 		printf("%sESTABLISHED", sep);
 		sep = ",";
 	}
-	if (statemask & XT_STATE_UNTRACKED) {
+	if (statemask & XT_CONNTRACK_STATE_UNTRACKED) {
 		printf("%sUNTRACKED", sep);
 		sep = ",";
 	}
