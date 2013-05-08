@@ -667,6 +667,33 @@ static void xtopt_parse_mport(struct xt_option_call *cb)
 	free(lo_arg);
 }
 
+static int xtopt_parse_mask(struct xt_option_call *cb)
+{
+	struct addrinfo hints = {.ai_family = afinfo->family,
+				 .ai_flags = AI_NUMERICHOST };
+	struct addrinfo *res;
+	int ret;
+
+	ret = getaddrinfo(cb->arg, NULL, &hints, &res);
+	if (ret < 0)
+		return 0;
+
+	memcpy(&cb->val.hmask, xtables_sa_host(res->ai_addr, res->ai_family),
+	       xtables_sa_hostlen(res->ai_family));
+
+	switch(afinfo->family) {
+	case AF_INET:
+		cb->val.hlen = xtables_ipmask_to_cidr(&cb->val.hmask.in);
+		break;
+	case AF_INET6:
+		cb->val.hlen = xtables_ip6mask_to_cidr(&cb->val.hmask.in6);
+		break;
+	}
+
+	freeaddrinfo(res);
+	return 1;
+}
+
 /**
  * Parse an integer and ensure it is within the address family's prefix length
  * limits. The result is stored in @cb->val.hlen.
@@ -677,12 +704,17 @@ static void xtopt_parse_plen(struct xt_option_call *cb)
 	unsigned int prefix_len = 128; /* happiness is a warm gcc */
 
 	cb->val.hlen = (afinfo->family == NFPROTO_IPV4) ? 32 : 128;
-	if (!xtables_strtoui(cb->arg, NULL, &prefix_len, 0, cb->val.hlen))
+	if (!xtables_strtoui(cb->arg, NULL, &prefix_len, 0, cb->val.hlen)) {
+		/* Is this mask expressed in full format? e.g. 255.255.255.0 */
+		if (xtopt_parse_mask(cb))
+			return;
+
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"%s: bad value for option \"--%s\", "
-			"or out of range (%u-%u).\n",
+			"neither a valid network mask "
+			"nor valid CIDR (%u-%u).\n",
 			cb->ext_name, entry->name, 0, cb->val.hlen);
-
+	}
 	cb->val.hlen = prefix_len;
 }
 
