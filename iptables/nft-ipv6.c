@@ -208,6 +208,72 @@ static uint8_t nft_ipv6_print_firewall(const struct iptables_command_state *cs,
 	return cs->fw6.ipv6.flags;
 }
 
+/* These are invalid numbers as upper layer protocol */
+static int is_exthdr(uint16_t proto)
+{
+	return (proto == IPPROTO_ROUTING ||
+		proto == IPPROTO_FRAGMENT ||
+		proto == IPPROTO_AH ||
+		proto == IPPROTO_DSTOPTS);
+}
+
+static void nft_ipv6_post_parse(int command, struct iptables_command_state *cs,
+				struct xtables_args *args)
+{
+	if (args->proto != 0)
+		args->flags |= IP6T_F_PROTO;
+
+	cs->fw6.ipv6.proto = args->proto;
+	cs->fw6.ipv6.invflags = args->invflags;
+	cs->fw6.ipv6.flags = args->flags;
+
+	if (is_exthdr(cs->fw6.ipv6.proto)
+	    && (cs->fw6.ipv6.invflags & XT_INV_PROTO) == 0)
+		fprintf(stderr,
+			"Warning: never matched protocol: %s. "
+			"use extension match instead.\n",
+			cs->protocol);
+
+	strncpy(cs->fw6.ipv6.iniface, args->iniface, IFNAMSIZ);
+	memcpy(cs->fw6.ipv6.iniface_mask,
+	       args->iniface_mask, IFNAMSIZ*sizeof(unsigned char));
+
+	strncpy(cs->fw6.ipv6.outiface, args->outiface, IFNAMSIZ);
+	memcpy(cs->fw6.ipv6.outiface_mask,
+	       args->outiface_mask, IFNAMSIZ*sizeof(unsigned char));
+
+	if (args->goto_set)
+		cs->fw6.ipv6.flags |= IP6T_F_GOTO;
+
+	cs->fw6.counters.pcnt = args->pcnt_cnt;
+	cs->fw6.counters.bcnt = args->bcnt_cnt;
+
+	if (command & (CMD_REPLACE | CMD_INSERT |
+			CMD_DELETE | CMD_APPEND | CMD_CHECK)) {
+		if (!(cs->options & OPT_DESTINATION))
+			args->dhostnetworkmask = "::0/0";
+		if (!(cs->options & OPT_SOURCE))
+			args->shostnetworkmask = "::0/0";
+	}
+
+	if (args->shostnetworkmask)
+		xtables_ip6parse_multiple(args->shostnetworkmask,
+					  &args->s.addr.v6,
+					  &args->s.mask.v6,
+					  &args->s.naddrs);
+	if (args->dhostnetworkmask)
+		xtables_ip6parse_multiple(args->dhostnetworkmask,
+					  &args->d.addr.v6,
+					  &args->d.mask.v6,
+					  &args->d.naddrs);
+
+	if ((args->s.naddrs > 1 || args->d.naddrs > 1) &&
+	    (cs->fw6.ipv6.invflags & (IP6T_INV_SRCIP | IP6T_INV_DSTIP)))
+		xtables_error(PARAMETER_PROBLEM,
+			      "! not allowed with multiple"
+			      " source or destination IP addresses");
+}
+
 struct nft_family_ops nft_family_ops_ipv6 = {
 	.add			= nft_ipv6_add,
 	.is_same		= nft_ipv6_is_same,
@@ -216,4 +282,5 @@ struct nft_family_ops nft_family_ops_ipv6 = {
 	.parse_payload		= nft_ipv6_parse_payload,
 	.parse_immediate	= nft_ipv6_parse_immediate,
 	.print_firewall		= nft_ipv6_print_firewall,
+	.post_parse		= nft_ipv6_post_parse,
 };

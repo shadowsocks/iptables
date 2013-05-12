@@ -298,12 +298,59 @@ static uint8_t nft_ipv4_print_firewall(const struct iptables_command_state *cs,
 	return cs->fw.ip.flags;
 }
 
+static void nft_ipv4_post_parse(int command,
+				struct iptables_command_state *cs,
+				struct xtables_args *args)
+{
+	cs->fw.ip.proto = args->proto;
+	cs->fw.ip.invflags = args->invflags;
+	cs->fw.ip.flags = args->flags;
+
+	strncpy(cs->fw.ip.iniface, args->iniface, IFNAMSIZ);
+	memcpy(cs->fw.ip.iniface_mask,
+	       args->iniface_mask, IFNAMSIZ*sizeof(unsigned char));
+
+	strncpy(cs->fw.ip.outiface, args->outiface, IFNAMSIZ);
+	memcpy(cs->fw.ip.outiface_mask,
+	       args->outiface_mask, IFNAMSIZ*sizeof(unsigned char));
+
+	if (args->goto_set)
+		cs->fw.ip.flags |= IPT_F_GOTO;
+
+	cs->counters.pcnt = args->pcnt_cnt;
+	cs->counters.bcnt = args->bcnt_cnt;
+
+	if (command & (CMD_REPLACE | CMD_INSERT |
+			CMD_DELETE | CMD_APPEND | CMD_CHECK)) {
+		if (!(cs->options & OPT_DESTINATION))
+			args->dhostnetworkmask = "0.0.0.0/0";
+		if (!(cs->options & OPT_SOURCE))
+			args->shostnetworkmask = "0.0.0.0/0";
+	}
+
+	if (args->shostnetworkmask)
+		xtables_ipparse_multiple(args->shostnetworkmask,
+					 &args->s.addr.v4, &args->s.mask.v4,
+					 &args->s.naddrs);
+	if (args->dhostnetworkmask)
+		xtables_ipparse_multiple(args->dhostnetworkmask,
+					 &args->d.addr.v4, &args->d.mask.v4,
+					 &args->d.naddrs);
+
+	if ((args->s.naddrs > 1 || args->d.naddrs > 1) &&
+	    (cs->fw.ip.invflags & (IPT_INV_SRCIP | IPT_INV_DSTIP)))
+		xtables_error(PARAMETER_PROBLEM,
+			      "! not allowed with multiple"
+			      " source or destination IP addresses");
+}
+
 struct nft_family_ops nft_family_ops_ipv4 = {
 	.add			= nft_ipv4_add,
 	.is_same		= nft_ipv4_is_same,
 	.print_payload		= nft_ipv4_print_payload,
 	.parse_meta		= nft_ipv4_parse_meta,
 	.parse_payload		= nft_ipv4_parse_payload,
-	.parse_immediate 	= nft_ipv4_parse_immediate,
-	.print_firewall 	= nft_ipv4_print_firewall,
+	.parse_immediate	= nft_ipv4_parse_immediate,
+	.print_firewall		= nft_ipv4_print_firewall,
+	.post_parse		= nft_ipv4_post_parse,
 };

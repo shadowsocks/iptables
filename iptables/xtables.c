@@ -50,22 +50,6 @@
 #define FALSE 0
 #endif
 
-#define CMD_NONE		0x0000U
-#define CMD_INSERT		0x0001U
-#define CMD_DELETE		0x0002U
-#define CMD_DELETE_NUM		0x0004U
-#define CMD_REPLACE		0x0008U
-#define CMD_APPEND		0x0010U
-#define CMD_LIST		0x0020U
-#define CMD_FLUSH		0x0040U
-#define CMD_ZERO		0x0080U
-#define CMD_NEW_CHAIN		0x0100U
-#define CMD_DELETE_CHAIN	0x0200U
-#define CMD_SET_POLICY		0x0400U
-#define CMD_RENAME_CHAIN	0x0800U
-#define CMD_LIST_RULES		0x1000U
-#define CMD_ZERO_NUM		0x2000U
-#define CMD_CHECK		0x4000U
 #define NUMBER_OF_CMD	16
 static const char cmdflags[] = { 'I', 'D', 'D', 'R', 'A', 'L', 'F', 'Z',
 				 'N', 'X', 'P', 'E', 'S', 'Z', 'C' };
@@ -375,15 +359,6 @@ add_command(unsigned int *cmd, const int newcmd, const int othercmds,
  *	"host_to_addr", "parse_hostnetwork", and "parse_hostnetworkmask"
  *	return global static data.
 */
-
-/* These are invalid numbers as upper layer protocol */
-static int is_exthdr(uint16_t proto)
-{
-	return (proto == IPPROTO_ROUTING ||
-		proto == IPPROTO_FRAGMENT ||
-		proto == IPPROTO_AH ||
-		proto == IPPROTO_DSTOPTS);
-}
 
 /* Christophe Burki wants `-p 6' to imply `-m tcp'.  */
 /* Can't be zero. */
@@ -1141,110 +1116,6 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 		xtables_error(PARAMETER_PROBLEM,
 			   "nothing appropriate following !");
 
-	switch (args.family) {
-	case AF_INET:
-		cs.fw.ip.proto = args.proto;
-		cs.fw.ip.invflags = args.invflags;
-		cs.fw.ip.flags = args.flags;
-
-		strncpy(cs.fw.ip.iniface, args.iniface, IFNAMSIZ);
-		memcpy(cs.fw.ip.iniface_mask,
-		       args.iniface_mask, IFNAMSIZ*sizeof(unsigned char));
-
-		strncpy(cs.fw.ip.outiface, args.outiface, IFNAMSIZ);
-		memcpy(cs.fw.ip.outiface_mask,
-		       args.outiface_mask, IFNAMSIZ*sizeof(unsigned char));
-
-		if (args.goto_set)
-			cs.fw.ip.flags |= IPT_F_GOTO;
-
-		cs.counters.pcnt = args.pcnt_cnt;
-		cs.counters.bcnt = args.bcnt_cnt;
-
-		if (command & (CMD_REPLACE | CMD_INSERT |
-				CMD_DELETE | CMD_APPEND | CMD_CHECK)) {
-			if (!(cs.options & OPT_DESTINATION))
-				args.dhostnetworkmask = "0.0.0.0/0";
-			if (!(cs.options & OPT_SOURCE))
-				args.shostnetworkmask = "0.0.0.0/0";
-		}
-
-		if (args.shostnetworkmask)
-			xtables_ipparse_multiple(args.shostnetworkmask,
-						 &args.s.addr.v4,
-						 &args.s.mask.v4,
-						 &args.s.naddrs);
-		if (args.dhostnetworkmask)
-			xtables_ipparse_multiple(args.dhostnetworkmask,
-						 &args.d.addr.v4,
-						 &args.d.mask.v4,
-						 &args.d.naddrs);
-
-		if ((args.s.naddrs > 1 || args.d.naddrs > 1) &&
-		    (cs.fw.ip.invflags & (IPT_INV_SRCIP | IPT_INV_DSTIP)))
-			xtables_error(PARAMETER_PROBLEM,
-				      "! not allowed with multiple"
-				      " source or destination IP addresses");
-		break;
-	case AF_INET6:
-		if (args.proto != 0)
-			args.flags |= IP6T_F_PROTO;
-
-		cs.fw6.ipv6.proto = args.proto;
-		cs.fw6.ipv6.invflags = args.invflags;
-		cs.fw6.ipv6.flags = args.flags;
-
-		if (is_exthdr(cs.fw6.ipv6.proto)
-		    && (cs.fw6.ipv6.invflags & XT_INV_PROTO) == 0)
-			fprintf(stderr,
-				"Warning: never matched protocol: %s. "
-				"use extension match instead.\n",
-				cs.protocol);
-
-		strncpy(cs.fw6.ipv6.iniface, args.iniface, IFNAMSIZ);
-		memcpy(cs.fw6.ipv6.iniface_mask,
-		       args.iniface_mask, IFNAMSIZ*sizeof(unsigned char));
-
-		strncpy(cs.fw6.ipv6.outiface, args.outiface, IFNAMSIZ);
-		memcpy(cs.fw6.ipv6.outiface_mask,
-		       args.outiface_mask, IFNAMSIZ*sizeof(unsigned char));
-
-		if (args.goto_set)
-			cs.fw6.ipv6.flags |= IP6T_F_GOTO;
-
-		cs.fw6.counters.pcnt = args.pcnt_cnt;
-		cs.fw6.counters.bcnt = args.bcnt_cnt;
-
-		if (command & (CMD_REPLACE | CMD_INSERT |
-				CMD_DELETE | CMD_APPEND | CMD_CHECK)) {
-			if (!(cs.options & OPT_DESTINATION))
-				args.dhostnetworkmask = "::0/0";
-			if (!(cs.options & OPT_SOURCE))
-				args.shostnetworkmask = "::0/0";
-		}
-
-		if (args.shostnetworkmask)
-			xtables_ip6parse_multiple(args.shostnetworkmask,
-						  &args.s.addr.v6,
-						  &args.s.mask.v6,
-						  &args.s.naddrs);
-		if (args.dhostnetworkmask)
-			xtables_ip6parse_multiple(args.dhostnetworkmask,
-						  &args.d.addr.v6,
-						  &args.d.mask.v6,
-						  &args.d.naddrs);
-
-		if ((args.s.naddrs > 1 || args.d.naddrs > 1) &&
-		    (cs.fw6.ipv6.invflags & (IP6T_INV_SRCIP | IP6T_INV_DSTIP)))
-			xtables_error(PARAMETER_PROBLEM,
-				      "! not allowed with multiple"
-				      " source or destination IP addresses");
-		break;
-	default:
-		exit_tryhelp(2);
-		break;
-	}
-
 	/* Set only if required, needed by xtables-restore */
 	if (h->family == AF_UNSPEC)
 		h->family = args.family;
@@ -1252,6 +1123,8 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 	h->ops = nft_family_ops_lookup(args.family);
 	if (h->ops == NULL)
 		xtables_error(PARAMETER_PROBLEM, "Unknown family");
+
+	h->ops->post_parse(command, &cs, &args);
 
 	if (command == CMD_REPLACE &&
 	    (args.s.naddrs != 1 || args.d.naddrs != 1))
