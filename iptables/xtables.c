@@ -190,20 +190,6 @@ enum {
 	IPT_DOTTED_MASK
 };
 
-struct addr_mask {
-	union {
-		struct in_addr	*v4;
-		struct in6_addr *v6;
-	} addr;
-
-	unsigned int naddrs;
-
-	union {
-		struct in_addr	*v4;
-		struct in6_addr *v6;
-	} mask;
-};
-
 static void __attribute__((noreturn))
 exit_tryhelp(int status)
 {
@@ -752,34 +738,17 @@ static void command_match(struct iptables_command_state *cs)
 int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 {
 	struct iptables_command_state cs;
-	struct addr_mask s;
-	struct addr_mask d;
-
 	int verbose = 0;
 	const char *chain = NULL;
-	const char *shostnetworkmask = NULL, *dhostnetworkmask = NULL;
 	const char *policy = NULL, *newname = NULL;
 	unsigned int rulenum = 0, command = 0;
-	const char *pcnt = NULL, *bcnt = NULL;
 	int ret = 1;
 	struct xtables_match *m;
 	struct xtables_rule_match *matchp;
 	struct xtables_target *t;
-	unsigned long long pcnt_cnt = 0, bcnt_cnt = 0;
-
-	int family = AF_INET;
-	u_int16_t proto = 0;
-	u_int8_t flags = 0, invflags = 0;
-	char iniface[IFNAMSIZ], outiface[IFNAMSIZ];
-	unsigned char iniface_mask[IFNAMSIZ], outiface_mask[IFNAMSIZ];
-	bool goto_set = false;
-
-	memset(&s, 0, sizeof(s));
-	memset(&d, 0, sizeof(d));
-	memset(iniface, 0, sizeof(iniface));
-	memset(outiface, 0, sizeof(outiface));
-	memset(iniface_mask, 0, sizeof(iniface_mask));
-	memset(outiface_mask, 0, sizeof(outiface_mask));
+	struct xtables_args args = {
+		.family	= AF_INET,
+	};
 
 	memset(&cs, 0, sizeof(cs));
 	cs.jumpto = "";
@@ -969,7 +938,7 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 			 * Option selection
 			 */
 		case 'p':
-			set_option(&cs.options, OPT_PROTOCOL, &invflags,
+			set_option(&cs.options, OPT_PROTOCOL, &args.invflags,
 				   cs.invert);
 
 			/* Canonicalize into lower case */
@@ -977,30 +946,30 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 				*cs.protocol = tolower(*cs.protocol);
 
 			cs.protocol = optarg;
-			proto = xtables_parse_protocol(cs.protocol);
+			args.proto = xtables_parse_protocol(cs.protocol);
 
-			if (proto == 0 && (invflags & XT_INV_PROTO))
+			if (args.proto == 0 && (args.invflags & XT_INV_PROTO))
 				xtables_error(PARAMETER_PROBLEM,
 					   "rule would never match protocol");
 			break;
 
 		case 's':
-			set_option(&cs.options, OPT_SOURCE, &invflags,
+			set_option(&cs.options, OPT_SOURCE, &args.invflags,
 				   cs.invert);
-			shostnetworkmask = optarg;
+			args.shostnetworkmask = optarg;
 			break;
 
 		case 'd':
-			set_option(&cs.options, OPT_DESTINATION, &invflags,
-				   cs.invert);
-			dhostnetworkmask = optarg;
+			set_option(&cs.options, OPT_DESTINATION,
+				   &args.invflags, cs.invert);
+			args.dhostnetworkmask = optarg;
 			break;
 
 #ifdef IPT_F_GOTO
 		case 'g':
-			set_option(&cs.options, OPT_JUMP, &invflags,
+			set_option(&cs.options, OPT_JUMP, &args.invflags,
 				   cs.invert);
-			goto_set = true;
+			args.goto_set = true;
 			cs.jumpto = parse_target(optarg);
 			break;
 #endif
@@ -1015,11 +984,11 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 				xtables_error(PARAMETER_PROBLEM,
 					"Empty interface is likely to be "
 					"undesired");
-			set_option(&cs.options, OPT_VIANAMEIN, &invflags,
+			set_option(&cs.options, OPT_VIANAMEIN, &args.invflags,
 				   cs.invert);
 			xtables_parse_interface(optarg,
-						iniface,
-						iniface_mask);
+						args.iniface,
+						args.iniface_mask);
 			break;
 
 		case 'o':
@@ -1027,28 +996,28 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 				xtables_error(PARAMETER_PROBLEM,
 					"Empty interface is likely to be "
 					"undesired");
-			set_option(&cs.options, OPT_VIANAMEOUT, &invflags,
+			set_option(&cs.options, OPT_VIANAMEOUT, &args.invflags,
 				   cs.invert);
 			xtables_parse_interface(optarg,
-						outiface,
-						outiface_mask);
+						args.outiface,
+						args.outiface_mask);
 			break;
 
 		case 'f':
-			if (family == AF_INET6) {
+			if (args.family == AF_INET6) {
 				xtables_error(PARAMETER_PROBLEM,
 					"`-f' is not supported in IPv6, "
 					"use -m frag instead");
 			}
-			set_option(&cs.options, OPT_FRAGMENT, &invflags,
+			set_option(&cs.options, OPT_FRAGMENT, &args.invflags,
 				   cs.invert);
-			flags |= IPT_F_FRAG;
+			args.flags |= IPT_F_FRAG;
 			break;
 
 		case 'v':
 			if (!verbose)
 				set_option(&cs.options, OPT_VERBOSE,
-					   &invflags, cs.invert);
+					   &args.invflags, cs.invert);
 			verbose++;
 			break;
 
@@ -1057,7 +1026,7 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 			break;
 
 		case 'n':
-			set_option(&cs.options, OPT_NUMERIC, &invflags,
+			set_option(&cs.options, OPT_NUMERIC, &args.invflags,
 				   cs.invert);
 			break;
 
@@ -1069,7 +1038,7 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 			break;
 
 		case 'x':
-			set_option(&cs.options, OPT_EXPANDED, &invflags,
+			set_option(&cs.options, OPT_EXPANDED, &args.invflags,
 				   cs.invert);
 			break;
 
@@ -1082,8 +1051,8 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 			exit(0);
 
 		case '0':
-			set_option(&cs.options, OPT_LINENUMBERS, &invflags,
-				   cs.invert);
+			set_option(&cs.options, OPT_LINENUMBERS,
+				   &args.invflags, cs.invert);
 			break;
 
 		case 'M':
@@ -1092,38 +1061,39 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 
 		case 'c':
 
-			set_option(&cs.options, OPT_COUNTERS, &invflags,
+			set_option(&cs.options, OPT_COUNTERS, &args.invflags,
 				   cs.invert);
-			pcnt = optarg;
-			bcnt = strchr(pcnt + 1, ',');
-			if (bcnt)
-			    bcnt++;
-			if (!bcnt && optind < argc && argv[optind][0] != '-'
-			    && argv[optind][0] != '!')
-				bcnt = argv[optind++];
-			if (!bcnt)
+			args.pcnt = optarg;
+			args.bcnt = strchr(args.pcnt + 1, ',');
+			if (args.bcnt)
+			    args.bcnt++;
+			if (!args.bcnt && optind < argc &&
+			    argv[optind][0] != '-' &&
+			    argv[optind][0] != '!')
+				args.bcnt = argv[optind++];
+			if (!args.bcnt)
 				xtables_error(PARAMETER_PROBLEM,
 					"-%c requires packet and byte counter",
 					opt2char(OPT_COUNTERS));
 
-			if (sscanf(pcnt, "%llu", &pcnt_cnt) != 1)
+			if (sscanf(args.pcnt, "%llu", &args.pcnt_cnt) != 1)
 				xtables_error(PARAMETER_PROBLEM,
 					"-%c packet counter not numeric",
 					opt2char(OPT_COUNTERS));
 
-			if (sscanf(bcnt, "%llu", &bcnt_cnt) != 1)
+			if (sscanf(args.bcnt, "%llu", &args.bcnt_cnt) != 1)
 				xtables_error(PARAMETER_PROBLEM,
 					"-%c byte counter not numeric",
 					opt2char(OPT_COUNTERS));
 			break;
 
 		case '4':
-			if (family != AF_INET)
+			if (args.family != AF_INET)
 				exit_tryhelp(2);
 			break;
 
 		case '6':
-			family = AF_INET6;
+			args.family = AF_INET6;
 			break;
 
 		case 1: /* non option */
@@ -1171,54 +1141,58 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 		xtables_error(PARAMETER_PROBLEM,
 			   "nothing appropriate following !");
 
-	switch (family) {
+	switch (args.family) {
 	case AF_INET:
-		cs.fw.ip.proto = proto;
-		cs.fw.ip.invflags = invflags;
-		cs.fw.ip.flags = flags;
+		cs.fw.ip.proto = args.proto;
+		cs.fw.ip.invflags = args.invflags;
+		cs.fw.ip.flags = args.flags;
 
-		strncpy(cs.fw.ip.iniface, iniface, IFNAMSIZ);
+		strncpy(cs.fw.ip.iniface, args.iniface, IFNAMSIZ);
 		memcpy(cs.fw.ip.iniface_mask,
-		       iniface_mask, IFNAMSIZ*sizeof(unsigned char));
+		       args.iniface_mask, IFNAMSIZ*sizeof(unsigned char));
 
-		strncpy(cs.fw.ip.outiface, outiface, IFNAMSIZ);
+		strncpy(cs.fw.ip.outiface, args.outiface, IFNAMSIZ);
 		memcpy(cs.fw.ip.outiface_mask,
-		       outiface_mask, IFNAMSIZ*sizeof(unsigned char));
+		       args.outiface_mask, IFNAMSIZ*sizeof(unsigned char));
 
-		if (goto_set)
+		if (args.goto_set)
 			cs.fw.ip.flags |= IPT_F_GOTO;
 
-		cs.counters.pcnt = pcnt_cnt;
-		cs.counters.bcnt = bcnt_cnt;
+		cs.counters.pcnt = args.pcnt_cnt;
+		cs.counters.bcnt = args.bcnt_cnt;
 
 		if (command & (CMD_REPLACE | CMD_INSERT |
 				CMD_DELETE | CMD_APPEND | CMD_CHECK)) {
 			if (!(cs.options & OPT_DESTINATION))
-				dhostnetworkmask = "0.0.0.0/0";
+				args.dhostnetworkmask = "0.0.0.0/0";
 			if (!(cs.options & OPT_SOURCE))
-				shostnetworkmask = "0.0.0.0/0";
+				args.shostnetworkmask = "0.0.0.0/0";
 		}
 
-		if (shostnetworkmask)
-			xtables_ipparse_multiple(shostnetworkmask, &s.addr.v4,
-						 &s.mask.v4, &s.naddrs);
-		if (dhostnetworkmask)
-			xtables_ipparse_multiple(dhostnetworkmask, &d.addr.v4,
-						 &d.mask.v4, &d.naddrs);
+		if (args.shostnetworkmask)
+			xtables_ipparse_multiple(args.shostnetworkmask,
+						 &args.s.addr.v4,
+						 &args.s.mask.v4,
+						 &args.s.naddrs);
+		if (args.dhostnetworkmask)
+			xtables_ipparse_multiple(args.dhostnetworkmask,
+						 &args.d.addr.v4,
+						 &args.d.mask.v4,
+						 &args.d.naddrs);
 
-		if ((s.naddrs > 1 || d.naddrs > 1) &&
+		if ((args.s.naddrs > 1 || args.d.naddrs > 1) &&
 		    (cs.fw.ip.invflags & (IPT_INV_SRCIP | IPT_INV_DSTIP)))
 			xtables_error(PARAMETER_PROBLEM,
 				      "! not allowed with multiple"
 				      " source or destination IP addresses");
 		break;
 	case AF_INET6:
-		if (proto != 0)
-			flags |= IP6T_F_PROTO;
+		if (args.proto != 0)
+			args.flags |= IP6T_F_PROTO;
 
-		cs.fw6.ipv6.proto = proto;
-		cs.fw6.ipv6.invflags = invflags;
-		cs.fw6.ipv6.flags = flags;
+		cs.fw6.ipv6.proto = args.proto;
+		cs.fw6.ipv6.invflags = args.invflags;
+		cs.fw6.ipv6.flags = args.flags;
 
 		if (is_exthdr(cs.fw6.ipv6.proto)
 		    && (cs.fw6.ipv6.invflags & XT_INV_PROTO) == 0)
@@ -1227,36 +1201,40 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 				"use extension match instead.\n",
 				cs.protocol);
 
-		strncpy(cs.fw6.ipv6.iniface, iniface, IFNAMSIZ);
+		strncpy(cs.fw6.ipv6.iniface, args.iniface, IFNAMSIZ);
 		memcpy(cs.fw6.ipv6.iniface_mask,
-		       iniface_mask, IFNAMSIZ*sizeof(unsigned char));
+		       args.iniface_mask, IFNAMSIZ*sizeof(unsigned char));
 
-		strncpy(cs.fw6.ipv6.outiface, outiface, IFNAMSIZ);
+		strncpy(cs.fw6.ipv6.outiface, args.outiface, IFNAMSIZ);
 		memcpy(cs.fw6.ipv6.outiface_mask,
-		       outiface_mask, IFNAMSIZ*sizeof(unsigned char));
+		       args.outiface_mask, IFNAMSIZ*sizeof(unsigned char));
 
-		if (goto_set)
+		if (args.goto_set)
 			cs.fw6.ipv6.flags |= IP6T_F_GOTO;
 
-		cs.fw6.counters.pcnt = pcnt_cnt;
-		cs.fw6.counters.bcnt = bcnt_cnt;
+		cs.fw6.counters.pcnt = args.pcnt_cnt;
+		cs.fw6.counters.bcnt = args.bcnt_cnt;
 
 		if (command & (CMD_REPLACE | CMD_INSERT |
 				CMD_DELETE | CMD_APPEND | CMD_CHECK)) {
 			if (!(cs.options & OPT_DESTINATION))
-				dhostnetworkmask = "::0/0";
+				args.dhostnetworkmask = "::0/0";
 			if (!(cs.options & OPT_SOURCE))
-				shostnetworkmask = "::0/0";
+				args.shostnetworkmask = "::0/0";
 		}
 
-		if (shostnetworkmask)
-			xtables_ip6parse_multiple(shostnetworkmask, &s.addr.v6,
-						  &s.mask.v6, &s.naddrs);
-		if (dhostnetworkmask)
-			xtables_ip6parse_multiple(dhostnetworkmask, &d.addr.v6,
-						  &d.mask.v6, &d.naddrs);
+		if (args.shostnetworkmask)
+			xtables_ip6parse_multiple(args.shostnetworkmask,
+						  &args.s.addr.v6,
+						  &args.s.mask.v6,
+						  &args.s.naddrs);
+		if (args.dhostnetworkmask)
+			xtables_ip6parse_multiple(args.dhostnetworkmask,
+						  &args.d.addr.v6,
+						  &args.d.mask.v6,
+						  &args.d.naddrs);
 
-		if ((s.naddrs > 1 || d.naddrs > 1) &&
+		if ((args.s.naddrs > 1 || args.d.naddrs > 1) &&
 		    (cs.fw6.ipv6.invflags & (IP6T_INV_SRCIP | IP6T_INV_DSTIP)))
 			xtables_error(PARAMETER_PROBLEM,
 				      "! not allowed with multiple"
@@ -1269,13 +1247,14 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 
 	/* Set only if required, needed by xtables-restore */
 	if (h->family == AF_UNSPEC)
-		h->family = family;
+		h->family = args.family;
 
-	h->ops = nft_family_ops_lookup(family);
+	h->ops = nft_family_ops_lookup(args.family);
 	if (h->ops == NULL)
 		xtables_error(PARAMETER_PROBLEM, "Unknown family");
 
-	if (command == CMD_REPLACE && (s.naddrs != 1 || d.naddrs != 1))
+	if (command == CMD_REPLACE &&
+	    (args.s.naddrs != 1 || args.d.naddrs != 1))
 		xtables_error(PARAMETER_PROBLEM, "Replacement rule does not "
 			   "specify a unique address");
 
@@ -1320,30 +1299,32 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 
 	switch (command) {
 	case CMD_APPEND:
-		ret = add_entry(chain, *table, &cs, family,
-				s, d, cs.options&OPT_VERBOSE,
+		ret = add_entry(chain, *table, &cs, h->family,
+				args.s, args.d, cs.options&OPT_VERBOSE,
 				h, true);
 		break;
 	case CMD_DELETE:
-		ret = delete_entry(chain, *table, &cs, family,
-				   s, d, cs.options&OPT_VERBOSE, h);
+		ret = delete_entry(chain, *table, &cs, h->family,
+				   args.s, args.d, cs.options&OPT_VERBOSE, h);
 		break;
 	case CMD_DELETE_NUM:
 		ret = nft_rule_delete_num(h, chain, *table, rulenum - 1, verbose);
 		break;
 	case CMD_CHECK:
-		ret = check_entry(chain, *table, &cs, family,
-				   s, d, cs.options&OPT_VERBOSE, h);
+		ret = check_entry(chain, *table, &cs, h->family,
+				   args.s, args.d, cs.options&OPT_VERBOSE, h);
 		break;
 	case CMD_REPLACE:
 		/* FIXME replace at rulenum */
 		ret = replace_entry(chain, *table, &cs, rulenum - 1,
-				    family, s, d, cs.options&OPT_VERBOSE, h);
+				    h->family, args.s, args.d,
+				    cs.options&OPT_VERBOSE, h);
 		break;
 	case CMD_INSERT:
 		/* FIXME insert at rulenum */
-		ret = add_entry(chain, *table, &cs, family,
-				s, d, cs.options&OPT_VERBOSE, h, false);
+		ret = add_entry(chain, *table, &cs, h->family,
+				args.s, args.d, cs.options&OPT_VERBOSE, h,
+				false);
 		break;
 	case CMD_FLUSH:
 		ret = nft_rule_flush(h, chain, *table);
@@ -1409,16 +1390,16 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 
 	clear_rule_matches(&cs.matches);
 
-	if (family == AF_INET) {
-		free(s.addr.v4);
-		free(s.mask.v4);
-		free(d.addr.v4);
-		free(d.mask.v4);
-	} else if (family == AF_INET6) {
-		free(s.addr.v6);
-		free(s.mask.v6);
-		free(d.addr.v6);
-		free(d.mask.v6);
+	if (h->family == AF_INET) {
+		free(args.s.addr.v4);
+		free(args.s.mask.v4);
+		free(args.d.addr.v4);
+		free(args.d.mask.v4);
+	} else if (h->family == AF_INET6) {
+		free(args.s.addr.v6);
+		free(args.s.mask.v6);
+		free(args.d.addr.v6);
+		free(args.d.mask.v6);
 	}
 	xtables_free_opts(1);
 

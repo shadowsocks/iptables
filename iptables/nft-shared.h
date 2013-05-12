@@ -88,4 +88,32 @@ void print_firewall_details(const struct iptables_command_state *cs,
 
 struct nft_family_ops *nft_family_ops_lookup(int family);
 
+struct addr_mask {
+	union {
+		struct in_addr	*v4;
+		struct in6_addr *v6;
+	} addr;
+
+	unsigned int naddrs;
+
+	union {
+		struct in_addr	*v4;
+		struct in6_addr *v6;
+	} mask;
+};
+
+struct xtables_args {
+	int		family;
+	uint16_t	proto;
+	uint8_t		flags;
+	uint8_t		invflags;
+	char		iniface[IFNAMSIZ], outiface[IFNAMSIZ];
+	unsigned char	iniface_mask[IFNAMSIZ], outiface_mask[IFNAMSIZ];
+	bool		goto_set;
+	const char	*shostnetworkmask, *dhostnetworkmask;
+	const char	*pcnt, *bcnt;
+	struct addr_mask s, d;
+	unsigned long long pcnt_cnt, bcnt_cnt;
+};
+
 #endif
