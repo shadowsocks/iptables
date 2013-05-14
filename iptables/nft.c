@@ -2483,6 +2483,10 @@ int nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 	struct nft_chain_list_iter *iter;
 	struct nft_chain *c;
 
+	/* If built-in chains don't exist for this table, create them */
+	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0)
+		nft_chain_builtin_init(h, table, NULL, NF_ACCEPT);
+
 	list = nft_chain_dump(h);
 
 	iter = nft_chain_list_iter_create(list);
