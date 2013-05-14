@@ -503,16 +503,9 @@ __nft_chain_set(struct nft_handle *h, const char *table,
 		c = nft_chain_builtin_alloc(_t, _c, policy);
 		if (c == NULL)
 			return -1;
-
 	} else {
-		/* This is a custom chain */
-		c = nft_chain_alloc();
-		if (c == NULL)
-			return -1;
-
-		nft_chain_attr_set(c, NFT_CHAIN_ATTR_TABLE, (char *)table);
-		nft_chain_attr_set(c, NFT_CHAIN_ATTR_NAME, (char *)chain);
-		nft_chain_attr_set_u32(c, NFT_CHAIN_ATTR_POLICY, policy);
+		errno = ENOENT;
+		return -1;
 	}
 
 	if (counters) {
