@@ -28,9 +28,5 @@ install-data-hook:
 	@mkdir -p -m 755 $(DESTDIR)/etc/xtables/ || :
 	@test -f /etc/xtables/connlabel.conf || $(INSTALL) -m 644 etc/xtables/connlabel.conf $(DESTDIR)/etc/xtables/connlabel.conf || :
 
-install-data-hook:
-	@mkdir -p -m 755 $(DESTDIR)/etc/xtables/ || :
-	@test -f /etc/xtables/connlabel.conf || $(INSTALL) -m 644 etc/xtables/connlabel.conf $(DESTDIR)/etc/xtables/connlabel.conf || :
-
 config.status: extensions/GNUmakefile.in \
 	include/xtables-version.h.in include/iptables/internal.h.in
