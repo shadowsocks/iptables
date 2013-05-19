@@ -1,4 +1,4 @@
-.TH IPTABLES 8 "" "@PACKAGE_AND_VERSION@" "@PACKAGE_AND_VERSION@"
+.TH IPTABLES 8 "" "@PACKAGE_STRING@" "@PACKAGE_STRING@"
 .\"
 .\" Man page written by Herve Eychenne <rv@wallfire.org> (May 1999)
 .\" It is based on ipchains page.

@@ -1,4 +1,4 @@
-.TH iptables-extensions 8 "" "@PACKAGE_AND_VERSION@" "@PACKAGE_AND_VERSION@"
+.TH iptables-extensions 8 "" "@PACKAGE_STRING@" "@PACKAGE_STRING@"
 .SH NAME
 iptables-extensions \(em list of extensions in the standard iptables distribution
 .SH SYNOPSIS
