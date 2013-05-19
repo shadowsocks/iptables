@@ -2,7 +2,10 @@ This target is only valid in the
 .B nat
 table, in the
 .B POSTROUTING
-chain.  It specifies that the source address of the packet should be
+and
+.B INPUT
+chains, and user-defined chains which are only called from those
+chains.  It specifies that the source address of the packet should be
 modified (and all future packets in this connection will also be
 mangled), and rules should cease being examined.  It takes one type
 of option:
@@ -35,3 +38,9 @@ is used then port mapping will be randomized (kernel >= 2.6.21).
 Gives a client the same source-/destination-address for each connection.
 This supersedes the SAME target. Support for persistent mappings is available
 from 2.6.29-rc2.
+.PP
+Kernels prior to 2.6.36-rc1 don't have the ability to
+.B SNAT
+in the
+.B INPUT
+chain.
