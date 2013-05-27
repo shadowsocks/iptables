@@ -305,8 +305,8 @@ static char *get_modprobe(void)
 {
 	int procfile;
 	char *ret;
+	int count;
 
-#define PROCFILE_BUFSIZ	1024
 	procfile = open(PROC_SYS_MODPROBE, O_RDONLY);
 	if (procfile < 0)
 		return NULL;
@@ -316,19 +316,19 @@ static char *get_modprobe(void)
 		exit(1);
 	}
 
-	ret = malloc(PROCFILE_BUFSIZ);
+	ret = malloc(PATH_MAX);
 	if (ret) {
-		memset(ret, 0, PROCFILE_BUFSIZ);
-		switch (read(procfile, ret, PROCFILE_BUFSIZ)) {
-		case -1: goto fail;
-		case PROCFILE_BUFSIZ: goto fail; /* Partial read.  Wierd */
+		count = read(procfile, ret, PATH_MAX);
+		if (count > 0 && count < PATH_MAX)
+		{
+			if (ret[count - 1] == '\n')
+				ret[count - 1] = '\0';
+			else
+				ret[count] = '\0';
+			close(procfile);
+			return ret;
 		}
-		if (ret[strlen(ret)-1]=='\n') 
-			ret[strlen(ret)-1]=0;
-		close(procfile);
-		return ret;
 	}
- fail:
 	free(ret);
 	close(procfile);
 	return NULL;
