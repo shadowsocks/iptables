@@ -49,7 +49,6 @@ static void LED_help(void)
 static void LED_parse(struct xt_option_call *cb)
 {
 	struct xt_led_info *led = cb->data;
-	unsigned int delay;
 
 	xtables_option_parse(cb);
 	switch (cb->entry->id) {
@@ -60,7 +59,7 @@ static void LED_parse(struct xt_option_call *cb)
 	case O_LED_DELAY:
 		if (strncasecmp(cb->arg, "inf", 3) == 0)
 			led->delay = -1;
-		else if (!xtables_strtoui(cb->arg, NULL, &delay, 0, UINT32_MAX))
+		else if (!xtables_strtoui(cb->arg, NULL, &led->delay, 0, UINT32_MAX))
 			xtables_error(PARAMETER_PROBLEM,
 				"Delay value must be within range 0..%u",
 				UINT32_MAX);
