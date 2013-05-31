@@ -2641,7 +2641,7 @@ static int nft_action(struct nft_handle *h, int type)
 		if (errno != EEXIST)
 			perror("mnl-talk:nft_commit");
 	}
-	return ret;
+	return ret == 0 ? 1 : 0;
 }
 
 int nft_commit(struct nft_handle *h)

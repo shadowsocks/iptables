@@ -266,22 +266,11 @@ xtables_restore_main(int argc, char *argv[])
 				 * global commit at once, stick by now to
 				 * the existing behaviour.
 				 */
-				if (nft_commit(&h)) {
-					fprintf(stderr, "Failed to commit "
-							"table %s\n",
-							curtable);
-				}
 				DEBUGP("Calling commit\n");
-				ret = 1;
+				ret = nft_commit(&h);
 			} else {
-				if (nft_abort(&h)) {
-					xtables_error(OTHER_PROBLEM,
-						      "Failed to abort "
-						      "commit in table %s\n",
-						      curtable);
-				}
 				DEBUGP("Not calling commit, testing\n");
-				ret = 1;
+				ret = nft_abort(&h);
 			}
 			in_table = 0;
 
