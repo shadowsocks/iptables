@@ -2,6 +2,7 @@
 #define IPTABLES_XSHARED_H 1
 
 #include <limits.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <netinet/in.h>
 #include <net/if.h>
@@ -83,6 +84,7 @@ extern struct xtables_match *load_proto(struct iptables_command_state *);
 extern int subcmd_main(int, char **, const struct subcommand *);
 extern void xs_init_target(struct xtables_target *);
 extern void xs_init_match(struct xtables_match *);
+extern bool xtables_lock(bool wait);
 
 extern const struct xtables_afinfo *afinfo;
 
