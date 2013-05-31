@@ -2798,8 +2798,6 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 		return -1;
 	}
 
-	nft_init(h);
-
 	/* Stage 1) create tables */
 	titer = nft_table_list_iter_create(table_list);
 	while ((table = nft_table_list_iter_next(titer)) != NULL) {

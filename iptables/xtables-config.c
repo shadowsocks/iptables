@@ -35,6 +35,8 @@ int xtables_config_main(int argc, char *argv[])
 	else
 		filename = argv[1];
 
+	nft_init(&h);
+
 	return nft_xtables_config_load(&h, filename, NFT_LOAD_VERBOSE) == 0 ?
 						    EXIT_SUCCESS : EXIT_FAILURE;
 }
