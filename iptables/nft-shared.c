@@ -91,6 +91,11 @@ void add_cmp_ptr(struct nft_rule *r, uint32_t op, void *data, size_t len)
 	nft_rule_add_expr(r, expr);
 }
 
+void add_cmp_u8(struct nft_rule *r, uint8_t val, uint32_t op)
+{
+	add_cmp_ptr(r, op, &val, sizeof(val));
+}
+
 void add_cmp_u16(struct nft_rule *r, uint16_t val, uint32_t op)
 {
 	add_cmp_ptr(r, op, &val, sizeof(val));
@@ -159,7 +164,7 @@ void add_addr(struct nft_rule *r, int offset,
 }
 
 void add_proto(struct nft_rule *r, int offset, size_t len,
-	       uint32_t proto, int invflags)
+	       uint8_t proto, int invflags)
 {
 	uint32_t op;
 
@@ -170,7 +175,7 @@ void add_proto(struct nft_rule *r, int offset, size_t len,
 	else
 		op = NFT_CMP_EQ;
 
-	add_cmp_u32(r, proto, op);
+	add_cmp_u8(r, proto, op);
 }
 
 bool is_same_interfaces(const char *a_iniface, const char *a_outiface,
