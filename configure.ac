@@ -49,10 +49,11 @@ AC_ARG_ENABLE([devel],
 	[Install Xtables development headers]),
 	[enable_devel="$enableval"], [enable_devel="yes"])
 AC_ARG_ENABLE([libipq],
-	AS_HELP_STRING([--enable-libipq], [Build and install libipq]))
+	AS_HELP_STRING([--enable-libipq], [Build and install libipq]),
+	[enable_libipq="$enableval"], [enable_libipq="no"])
 AC_ARG_ENABLE([bpf-compiler],
 	AS_HELP_STRING([--enable-bpf-compiler], [Build bpf compiler]),
-	[enable_bpfc="yes"])
+	[enable_bpfc="yes"], [enable_bpfc="no"])
 AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
 	[Path to the pkgconfig directory [[LIBDIR/pkgconfig]]]),
 	[pkgconfigdir="$withval"], [pkgconfigdir='${libdir}/pkgconfig'])
@@ -111,6 +112,20 @@ if [[ -n "$ksourcedir" ]]; then
 fi;
 pkgdatadir='${datadir}/xtables';
 
+define([EXPAND_VARIABLE],
+[$2=[$]$1
+if test $prefix = 'NONE'; then
+	prefix="/usr/local"
+fi
+while true; do
+  case "[$]$2" in
+    *\[$]* ) eval "$2=[$]$2" ;;
+    *) break ;;
+  esac
+done
+eval "$2=[$]$2"
+])dnl EXPAND_VARIABLE
+
 AC_SUBST([regular_CFLAGS])
 AC_SUBST([regular_CPPFLAGS])
 AC_SUBST([noundef_LDFLAGS])
@@ -135,3 +150,33 @@ AC_CONFIG_FILES([Makefile extensions/GNUmakefile include/Makefile
 	libxtables/Makefile utils/Makefile
 	include/xtables-version.h include/iptables/internal.h])
 AC_OUTPUT
+
+
+EXPAND_VARIABLE(xtlibdir, e_xtlibdir)
+EXPAND_VARIABLE(pkgconfigdir, e_pkgconfigdir)
+
+echo "
+Iptables Configuration:
+  IPv4 support:				${enable_ipv4}
+  IPv6 support:				${enable_ipv6}
+  Devel support:			${enable_devel}
+  IPQ support:				${enable_libipq}
+  Large file support:			${enable_largefile}
+  BPF utils support:			${enable_bpfc}
+
+Build parameters:
+  Put plugins into executable (static):	${enable_static}
+  Support plugins via dlopen (shared):	${enable_shared}
+  Installation prefix (--prefix):	${prefix}
+  Xtables extension directory:		${e_xtlibdir}
+  Pkg-config directory:			${e_pkgconfigdir}"
+
+if [[ -n "$ksourcedir" ]]; then
+	echo "  Kernel source directory:		${ksourcedir}"
+fi;
+if [[ -n "$kbuilddir" ]]; then
+	echo "  Kernel build directory:		${kbuilddir}"
+fi;
+
+echo "  Host:					${host}
+  GCC binary:				${CC}"
