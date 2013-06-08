@@ -2524,6 +2524,7 @@ next:
 		c = nft_chain_list_iter_next(iter);
 	}
 
+	nft_chain_list_iter_destroy(iter);
 	nft_chain_list_free(list);
 
 	return 1;
