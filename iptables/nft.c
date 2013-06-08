@@ -1118,6 +1118,7 @@ next:
 		c = nft_chain_list_iter_next(iter);
 	}
 
+	nft_chain_list_iter_destroy(iter);
 	nft_chain_list_free(list);
 
 	return 1;
@@ -1206,6 +1207,7 @@ next:
 		r = nft_rule_list_iter_next(iter);
 	}
 
+	nft_rule_list_iter_destroy(iter);
 	nft_rule_list_free(list);
 
 	/* the core expects 1 for success and 0 for error */
@@ -1283,6 +1285,7 @@ next:
 		c = nft_chain_list_iter_next(iter);
 	}
 
+	nft_chain_list_iter_destroy(iter);
 err:
 	nft_chain_list_free(list);
 
@@ -1396,6 +1399,7 @@ next:
 		c = nft_chain_list_iter_next(iter);
 	}
 
+	nft_chain_list_iter_destroy(iter);
 err:
 	nft_chain_list_free(list);
 
