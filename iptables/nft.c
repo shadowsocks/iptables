@@ -2816,6 +2816,8 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 					"table `%s' cannot be create, reason `%s'. Exitting\n",
 					(char *)nft_table_attr_get(table, NFT_TABLE_ATTR_NAME),
 					strerror(errno));
+				nft_table_list_iter_destroy(titer);
+				nft_table_list_free(table_list);
 				return -1;
 			}
 			continue;
@@ -2823,6 +2825,8 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 		xtables_config_perror(flags, "table `%s' has been created\n",
 			(char *)nft_table_attr_get(table, NFT_TABLE_ATTR_NAME));
 	}
+	nft_table_list_iter_destroy(titer);
+	nft_table_list_free(table_list);
 
 	/* Stage 2) create chains */
 	citer = nft_chain_list_iter_create(chain_list);
@@ -2838,6 +2842,8 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 					"chain `%s' cannot be create, reason `%s'. Exitting\n",
 					(char *)nft_chain_attr_get(chain, NFT_CHAIN_ATTR_NAME),
 					strerror(errno));
+				nft_chain_list_iter_destroy(citer);
+				nft_chain_list_free(chain_list);
 				return -1;
 			}
 			continue;
@@ -2848,5 +2854,8 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 			(char *)nft_chain_attr_get(chain, NFT_CHAIN_ATTR_NAME),
 			(char *)nft_chain_attr_get(chain, NFT_CHAIN_ATTR_TABLE));
 	}
+	nft_chain_list_iter_destroy(citer);
+	nft_chain_list_free(chain_list);
+
 	return 0;
 }
