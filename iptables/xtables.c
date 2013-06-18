@@ -1217,7 +1217,6 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 		ret = nft_chain_user_del(h, chain, *table);
 		break;
 	case CMD_RENAME_CHAIN:
-		/* XXX iptables allows renaming an used chain, we don't */
 		ret = nft_chain_user_rename(h, chain, *table, newname);
 		break;
 	case CMD_SET_POLICY:
