@@ -1045,8 +1045,8 @@ static struct nft_chain_list *nft_chain_list_get(struct nft_handle *h)
 
 	list = nft_chain_list_alloc();
 	if (list == NULL) {
-		DEBUGP("cannot allocate rule list\n");
-		return 0;
+		errno = ENOMEM;
+		return NULL;
 	}
 
 	nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, h->family,
@@ -1096,10 +1096,8 @@ int nft_chain_save(struct nft_handle *h, struct nft_chain_list *list,
 	struct nft_chain *c;
 
 	iter = nft_chain_list_iter_create(list);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
+	if (iter == NULL)
 		return 0;
-	}
 
 	c = nft_chain_list_iter_next(iter);
 	while (c != NULL) {
@@ -1157,10 +1155,8 @@ static struct nft_rule_list *nft_rule_list_get(struct nft_handle *h)
 	int ret;
 
 	list = nft_rule_list_alloc();
-	if (list == NULL) {
-		DEBUGP("cannot allocate rule list\n");
+	if (list == NULL)
 		return 0;
-	}
 
 	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_GETRULE, h->family,
 					NLM_F_DUMP, h->seq);
@@ -1182,16 +1178,12 @@ int nft_rule_save(struct nft_handle *h, const char *table, bool counters)
 	struct nft_rule *r;
 
 	list = nft_rule_list_get(h);
-	if (list == NULL) {
-		DEBUGP("cannot retrieve rule list from kernel\n");
+	if (list == NULL)
 		return 0;
-	}
 
 	iter = nft_rule_list_iter_create(list);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
+	if (iter == NULL)
 		return 0;
-	}
 
 	r = nft_rule_list_iter_next(iter);
 	while (r != NULL) {
@@ -1261,10 +1253,8 @@ int nft_rule_flush(struct nft_handle *h, const char *chain, const char *table)
 	}
 
 	iter = nft_chain_list_iter_create(list);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
-		return 0;
-	}
+	if (iter == NULL)
+		goto err;
 
 	c = nft_chain_list_iter_next(iter);
 	while (c != NULL) {
@@ -1305,10 +1295,8 @@ int nft_chain_user_add(struct nft_handle *h, const char *chain, const char *tabl
 		nft_chain_builtin_init(h, table, NULL, NF_ACCEPT);
 
 	c = nft_chain_alloc();
-	if (c == NULL) {
-		DEBUGP("cannot allocate chain\n");
-		return -1;
-	}
+	if (c == NULL)
+		return 0;
 
 	nft_chain_attr_set(c, NFT_CHAIN_ATTR_TABLE, (char *)table);
 	nft_chain_attr_set(c, NFT_CHAIN_ATTR_NAME, (char *)chain);
@@ -1368,10 +1356,8 @@ int nft_chain_user_del(struct nft_handle *h, const char *chain, const char *tabl
 		goto err;
 
 	iter = nft_chain_list_iter_create(list);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
-		return 0;
-	}
+	if (iter == NULL)
+		goto err;
 
 	c = nft_chain_list_iter_next(iter);
 	while (c != NULL) {
@@ -1419,10 +1405,8 @@ nft_chain_list_find(struct nft_handle *h, struct nft_chain_list *list,
 	struct nft_chain *c;
 
 	iter = nft_chain_list_iter_create(list);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
+	if (iter == NULL)
 		return NULL;
-	}
 
 	c = nft_chain_list_iter_next(iter);
 	while (c != NULL) {
@@ -1452,10 +1436,8 @@ nft_chain_find(struct nft_handle *h, const char *table, const char *chain)
 	struct nft_chain_list *list;
 
 	list = nft_chain_list_get(h);
-	if (list == NULL) {
-		DEBUGP("cannot allocate chain list\n");
+	if (list == NULL)
 		return NULL;
-	}
 
 	return nft_chain_list_find(h, list, table, chain);
 }
@@ -1483,10 +1465,8 @@ int nft_chain_user_rename(struct nft_handle *h,const char *chain,
 
 	/* Now prepare the new name for the chain */
 	c = nft_chain_alloc();
-	if (c == NULL) {
-		DEBUGP("cannot allocate chain\n");
+	if (c == NULL)
 		return -1;
-	}
 
 	nft_chain_attr_set(c, NFT_CHAIN_ATTR_TABLE, (char *)table);
 	nft_chain_attr_set(c, NFT_CHAIN_ATTR_NAME, (char *)newname);
@@ -1540,10 +1520,8 @@ static struct nft_table_list *nft_table_list_get(struct nft_handle *h)
 	struct nft_table_list *list;
 
 	list = nft_table_list_alloc();
-	if (list == NULL) {
-		DEBUGP("cannot allocate table list\n");
+	if (list == NULL)
 		return 0;
-	}
 
 	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, h->family,
 					NLM_F_DUMP, h->seq);
@@ -1567,10 +1545,8 @@ bool nft_table_find(struct nft_handle *h, const char *tablename)
 		goto err;
 
 	iter = nft_table_list_iter_create(list);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
+	if (iter == NULL)
 		goto err;
-	}
 
 	t = nft_table_list_iter_next(iter);
 	while (t != NULL) {
@@ -1605,10 +1581,8 @@ int nft_for_each_table(struct nft_handle *h,
 	}
 
 	iter = nft_table_list_iter_create(list);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
+	if (iter == NULL)
 		return 0;
-	}
 
 	t = nft_table_list_iter_next(iter);
 	while (t != NULL) {
@@ -1634,10 +1608,8 @@ int nft_table_purge_chains(struct nft_handle *h, const char *this_table,
 	struct nft_chain *chain_obj;
 
 	iter = nft_chain_list_iter_create(chain_list);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
+	if (iter == NULL)
 		return 0;
-	}
 
 	chain_obj = nft_chain_list_iter_next(iter);
 	while (chain_obj != NULL) {
@@ -1837,10 +1809,8 @@ static bool find_matches(struct xtables_rule_match *matches, struct nft_rule *r)
 	int kernel_matches = 0;
 
 	iter = nft_rule_expr_iter_create(r);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
+	if (iter == NULL)
 		return false;
-	}
 
 	expr = nft_rule_expr_iter_next(iter);
 	while (expr != NULL) {
@@ -1901,10 +1871,8 @@ find_target(struct xtables_target *target, struct nft_rule *r)
 		return true;
 
 	iter = nft_rule_expr_iter_create(r);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
+	if (iter == NULL)
 		return false;
-	}
 
 	expr = nft_rule_expr_iter_next(iter);
 	while (expr != NULL) {
@@ -1939,10 +1907,8 @@ find_immediate(struct nft_rule *r, const char *jumpto)
 	struct nft_rule_expr *expr;
 
 	iter = nft_rule_expr_iter_create(r);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
+	if (iter == NULL)
 		return false;
-	}
 
 	expr = nft_rule_expr_iter_next(iter);
 	while (expr != NULL) {
@@ -2002,15 +1968,7 @@ __nft_rule_del(struct nft_handle *h, struct nft_rule *r)
 
 static struct nft_rule_list *nft_rule_list_create(struct nft_handle *h)
 {
-	struct nft_rule_list *list;
-
-	list = nft_rule_list_get(h);
-	if (list == NULL) {
-		DEBUGP("cannot retrieve rule list from kernel\n");
-		return NULL;
-	}
-
-	return list;
+	return nft_rule_list_get(h);
 }
 
 static void nft_rule_list_destroy(struct nft_rule_list *list)
@@ -2028,10 +1986,8 @@ nft_rule_find(struct nft_rule_list *list, const char *chain, const char *table,
 	bool found = false;
 
 	iter = nft_rule_list_iter_create(list);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
+	if (iter == NULL)
 		return 0;
-	}
 
 	r = nft_rule_list_iter_next(iter);
 	while (r != NULL) {
@@ -2105,10 +2061,8 @@ int nft_rule_check(struct nft_handle *h, const char *chain,
 	nft_fn = nft_rule_check;
 
 	list = nft_rule_list_create(h);
-	if (list == NULL) {
-		DEBUGP("cannot allocate rule list\n");
+	if (list == NULL)
 		return 0;
-	}
 
 	ret = nft_rule_find(list, chain, table, e, -1) ? 1 : 0;
 	if (ret == 0)
@@ -2130,10 +2084,8 @@ int nft_rule_delete(struct nft_handle *h, const char *chain,
 	nft_fn = nft_rule_delete;
 
 	list = nft_rule_list_create(h);
-	if (list == NULL) {
-		DEBUGP("cannot allocate rule list\n");
+	if (list == NULL)
 		return 0;
-	}
 
 	r = nft_rule_find(list, chain, table, cs, -1);
 	if (r != NULL) {
@@ -2163,10 +2115,8 @@ int nft_rule_delete_num(struct nft_handle *h, const char *chain,
 	nft_fn = nft_rule_delete_num;
 
 	list = nft_rule_list_create(h);
-	if (list == NULL) {
-		DEBUGP("cannot allocate rule list\n");
+	if (list == NULL)
 		return 0;
-	}
 
 	r = nft_rule_find(list, chain, table, NULL, rulenum);
 	if (r != NULL) {
@@ -2197,10 +2147,8 @@ int nft_rule_replace(struct nft_handle *h, const char *chain,
 	nft_fn = nft_rule_replace;
 
 	list = nft_rule_list_create(h);
-	if (list == NULL) {
-		DEBUGP("cannot allocate rule list\n");
+	if (list == NULL)
 		return 0;
-	}
 
 	r = nft_rule_find(list, chain, table, cs, rulenum);
 	if (r != NULL) {
@@ -2311,10 +2259,8 @@ print_firewall(const struct iptables_command_state *cs, struct nft_rule *r,
 	size_t target_len = 0;
 
 	iter = nft_rule_expr_iter_create(r);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
+	if (iter == NULL)
 		return;
-	}
 
 	expr = nft_rule_expr_iter_next(iter);
 	while (expr != NULL) {
@@ -2369,10 +2315,8 @@ print_firewall(const struct iptables_command_state *cs, struct nft_rule *r,
 #endif
 
 	iter = nft_rule_expr_iter_create(r);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
+	if (iter == NULL)
 		return;
-	}
 
 	expr = nft_rule_expr_iter_next(iter);
 	while (expr != NULL) {
@@ -2423,16 +2367,12 @@ __nft_rule_list(struct nft_handle *h, struct nft_chain *c, const char *table,
 	const char *chain = nft_chain_attr_get_str(c, NFT_CHAIN_ATTR_NAME);
 
 	list = nft_rule_list_get(h);
-	if (list == NULL) {
-		DEBUGP("cannot retrieve rule list from kernel\n");
+	if (list == NULL)
 		return 0;
-	}
 
 	iter = nft_rule_list_iter_create(list);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
-		return 0;
-	}
+	if (iter == NULL)
+		goto err;
 
 	r = nft_rule_list_iter_next(iter);
 	while (r != NULL) {
@@ -2465,6 +2405,7 @@ next:
 	}
 
 	nft_rule_list_iter_destroy(iter);
+err:
 	nft_rule_list_free(list);
 
 	if (ret == 0)
@@ -2487,10 +2428,8 @@ int nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 	list = nft_chain_dump(h);
 
 	iter = nft_chain_list_iter_create(list);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
-		return 0;
-	}
+	if (iter == NULL)
+		goto err;
 
 	c = nft_chain_list_iter_next(iter);
 	while (c != NULL) {
@@ -2525,6 +2464,7 @@ next:
 	}
 
 	nft_chain_list_iter_destroy(iter);
+err:
 	nft_chain_list_free(list);
 
 	return 1;
@@ -2545,10 +2485,8 @@ nft_rule_list_chain_save(struct nft_handle *h, const char *table,
 	struct nft_chain *c;
 
 	iter = nft_chain_list_iter_create(list);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
+	if (iter == NULL)
 		return 0;
-	}
 
 	c = nft_chain_list_iter_next(iter);
 	while (c != NULL) {
@@ -2596,10 +2534,8 @@ int nft_rule_list_save(struct nft_handle *h, const char *chain,
 
 	/* Now dump out rules in this table */
 	iter = nft_chain_list_iter_create(list);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
-		return 0;
-	}
+	if (iter == NULL)
+		goto err;
 
 	c = nft_chain_list_iter_next(iter);
 	while (c != NULL) {
@@ -2618,7 +2554,7 @@ int nft_rule_list_save(struct nft_handle *h, const char *chain,
 next:
 		c = nft_chain_list_iter_next(iter);
 	}
-
+err:
 	nft_chain_list_free(list);
 
 	return 1;
@@ -2875,10 +2811,8 @@ int nft_chain_zero_counters(struct nft_handle *h, const char *chain,
 		goto err;
 
 	iter = nft_chain_list_iter_create(list);
-	if (iter == NULL) {
-		DEBUGP("cannot allocate rule list iterator\n");
-		return 0;
-	}
+	if (iter == NULL)
+		goto err;
 
 	c = nft_chain_list_iter_next(iter);
 	while (c != NULL) {
