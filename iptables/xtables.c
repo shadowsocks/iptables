@@ -549,14 +549,6 @@ check_entry(const char *chain, const char *table,
 }
 
 static int
-zero_entries(const xt_chainlabel chain, int verbose,
-	     struct xtc_handle *handle)
-{
-	/* XXX iterate over chains and reset counters */
-	return 1;
-}
-
-static int
 list_entries(struct nft_handle *h, const char *chain, const char *table,
 	     int rulenum, int verbose, int numeric, int expanded,
 	     int linenumbers)
@@ -1187,8 +1179,7 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 		ret = nft_rule_flush(h, chain, *table);
 		break;
 	case CMD_ZERO:
-		/* FIXME */
-//		ret = zero_entries(chain, cs.options&OPT_VERBOSE, *handle);
+		ret = nft_chain_zero_counters(h, chain, *table);
 		break;
 	case CMD_ZERO_NUM:
 		/* FIXME */
@@ -1197,28 +1188,26 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 	case CMD_LIST:
 	case CMD_LIST|CMD_ZERO:
 	case CMD_LIST|CMD_ZERO_NUM:
-		/* FIXME */
 		ret = list_entries(h, chain, *table,
 				   rulenum,
 				   cs.options&OPT_VERBOSE,
 				   cs.options&OPT_NUMERIC,
 				   cs.options&OPT_EXPANDED,
 				   cs.options&OPT_LINENUMBERS);
-/*		if (ret && (command & CMD_ZERO))
-			ret = zero_entries(chain,
-					   cs.options&OPT_VERBOSE, *handle);
-		if (ret && (command & CMD_ZERO_NUM))
+		if (ret && (command & CMD_ZERO))
+			ret = nft_chain_zero_counters(h, chain, *table);
+		/* FIXME */
+/*		if (ret && (command & CMD_ZERO_NUM))
 			ret = iptc_zero_counter(chain, rulenum, *handle); */
 		break;
 	case CMD_LIST_RULES:
 	case CMD_LIST_RULES|CMD_ZERO:
 	case CMD_LIST_RULES|CMD_ZERO_NUM:
-		/* FIXME */
 		ret = list_rules(h, chain, *table, rulenum, cs.options&OPT_VERBOSE);
-/*		if (ret && (command & CMD_ZERO))
-			ret = zero_entries(chain,
-					   cs.options&OPT_VERBOSE, *handle);
-		if (ret && (command & CMD_ZERO_NUM))
+		if (ret && (command & CMD_ZERO))
+			ret = nft_chain_zero_counters(h, chain, *table);
+		/* FIXME */
+/*		if (ret && (command & CMD_ZERO_NUM))
 			ret = iptc_zero_counter(chain, rulenum, *handle); */
 		break;
 	case CMD_NEW_CHAIN:

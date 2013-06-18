@@ -2859,3 +2859,64 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 
 	return 0;
 }
+
+int nft_chain_zero_counters(struct nft_handle *h, const char *chain, 
+			    const char *table)
+{
+	struct nft_chain_list *list;
+	struct nft_chain_list_iter *iter;
+	struct nft_chain *c;
+	struct nlmsghdr *nlh;
+	char buf[MNL_SOCKET_BUFFER_SIZE];
+	int ret = 0;
+
+	list = nft_chain_list_get(h);
+	if (list == NULL)
+		goto err;
+
+	iter = nft_chain_list_iter_create(list);
+	if (iter == NULL) {
+		DEBUGP("cannot allocate rule list iterator\n");
+		return 0;
+	}
+
+	c = nft_chain_list_iter_next(iter);
+	while (c != NULL) {
+		const char *chain_name =
+			nft_chain_attr_get(c, NFT_CHAIN_ATTR_NAME);
+		const char *chain_table =
+			nft_chain_attr_get(c, NFT_CHAIN_ATTR_TABLE);
+
+		if (strcmp(table, chain_table) != 0)
+			goto next;
+
+		if (chain != NULL && strcmp(chain, chain_name) != 0)
+			goto next;
+
+		nft_chain_attr_set_u64(c, NFT_CHAIN_ATTR_PACKETS, 0);
+		nft_chain_attr_set_u64(c, NFT_CHAIN_ATTR_BYTES, 0);
+
+		nft_chain_attr_unset(c, NFT_CHAIN_ATTR_HANDLE);
+
+		nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_NEWCHAIN,
+						h->family, NLM_F_ACK, h->seq);
+
+		nft_chain_nlmsg_build_payload(nlh, c);
+
+		ret = mnl_talk(h, nlh, NULL, NULL);
+		if (ret < 0)
+			perror("mnl_talk:nft_chain_zero_counters");
+
+next:
+		c = nft_chain_list_iter_next(iter);
+	}
+
+	nft_chain_list_iter_destroy(iter);
+
+err:
+	nft_chain_list_free(list);
+
+	/* the core expects 1 for success and 0 for error */
+	return ret == 0 ? 1 : 0;
+}
+
