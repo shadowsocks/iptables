@@ -1271,6 +1271,8 @@ int nft_rule_flush(struct nft_handle *h, const char *chain, const char *table)
 
 		__nft_rule_flush(h, table_name, chain_name);
 
+		if (chain != NULL)
+			break;
 next:
 		c = nft_chain_list_iter_next(iter);
 	}
@@ -1381,6 +1383,9 @@ int nft_chain_user_del(struct nft_handle *h, const char *chain, const char *tabl
 			break;
 
 		deleted_ctr++;
+
+		if (chain != NULL)
+			break;
 next:
 		c = nft_chain_list_iter_next(iter);
 	}
@@ -2841,6 +2846,8 @@ int nft_chain_zero_counters(struct nft_handle *h, const char *chain,
 		if (ret < 0)
 			perror("mnl_talk:nft_chain_zero_counters");
 
+		if (chain != NULL)
+			break;
 next:
 		c = nft_chain_list_iter_next(iter);
 	}
