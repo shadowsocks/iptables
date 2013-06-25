@@ -35,7 +35,11 @@ int xtables_config_main(int argc, char *argv[])
 	else
 		filename = argv[1];
 
-	nft_init(&h);
+	if (nft_init(&h) < 0) {
+                fprintf(stderr, "Failed to initialize nft: %s\n",
+			strerror(errno));
+		return EXIT_FAILURE;
+	}
 
 	return nft_xtables_config_load(&h, filename, NFT_LOAD_VERBOSE) == 0 ?
 						    EXIT_SUCCESS : EXIT_FAILURE;

@@ -193,7 +193,13 @@ xtables_restore_main(int argc, char *argv[])
 	init_extensions4();
 #endif
 
-	nft_init(&h);
+	if (nft_init(&h) < 0) {
+		fprintf(stderr, "%s/%s Failed to initialize nft: %s\n",
+				xtables_globals.program_name,
+				xtables_globals.program_version,
+				strerror(errno));
+		exit(EXIT_FAILURE);
+	}
 
 	while ((c = getopt_long(argc, argv, "bcvthnM:T:46", options, NULL)) != -1) {
 		switch (c) {
