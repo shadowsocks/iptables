@@ -18,6 +18,7 @@
 #include <netdb.h>	/* getprotobynumber */
 #include <time.h>
 #include <stdarg.h>
+#include <inttypes.h>
 
 #include <xtables.h>
 #include <libiptc/libxtc.h>
@@ -957,7 +958,7 @@ nft_print_counters(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 		   bool counters)
 {
 	if (counters) {
-		printf("-c %lu %lu ",
+		printf("-c %"PRIu64" %"PRIu64" ",
 			nft_rule_expr_get_u64(e, NFT_EXPR_CTR_PACKETS),
 			nft_rule_expr_get_u64(e, NFT_EXPR_CTR_BYTES));
 	}
@@ -1083,10 +1084,10 @@ static void nft_chain_print_save(struct nft_chain *c, bool basechain)
 		if (nft_chain_attr_get(c, NFT_CHAIN_ATTR_POLICY))
 			pol = nft_chain_attr_get_u32(c, NFT_CHAIN_ATTR_POLICY);
 
-		printf(":%s %s [%lu:%lu]\n", chain, policy_name[pol],
+		printf(":%s %s [%"PRIu64":%"PRIu64"]\n", chain, policy_name[pol],
 					     pkts, bytes);
 	} else
-		printf(":%s - [%lu:%lu]\n", chain, pkts, bytes);
+		printf(":%s - [%"PRIu64":%"PRIu64"]\n", chain, pkts, bytes);
 }
 
 int nft_chain_save(struct nft_handle *h, struct nft_chain_list *list,
@@ -2425,6 +2426,7 @@ int nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 	struct nft_chain_list *list;
 	struct nft_chain_list_iter *iter;
 	struct nft_chain *c;
+	bool found = false;
 
 	/* If built-in chains don't exist for this table, create them */
 	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0)
@@ -2460,10 +2462,16 @@ int nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 		if (chain && strcmp(chain, chain_name) != 0)
 			goto next;
 
+		if (found)
+			printf("\n");
+
 		print_header(format, chain_name, policy_name[policy], &ctrs,
 			     basechain, refs);
 
 		__nft_rule_list(h, c, table, rulenum, format, print_firewall);
+
+		found = true;
+
 next:
 		c = nft_chain_list_iter_next(iter);
 	}
@@ -2510,7 +2518,7 @@ nft_rule_list_chain_save(struct nft_handle *h, const char *table,
 			printf("-P %s %s", chain_name, policy_name[policy]);
 
 			if (counters) {
-				printf(" -c %lu %lu\n",
+				printf(" -c %"PRIu64" %"PRIu64"\n",
 					nft_chain_attr_get_u64(c, NFT_CHAIN_ATTR_PACKETS),
 					nft_chain_attr_get_u64(c, NFT_CHAIN_ATTR_BYTES));
 			} else
