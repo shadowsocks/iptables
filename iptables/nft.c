@@ -1144,6 +1144,7 @@ static int nft_rule_list_cb(const struct nlmsghdr *nlh, void *data)
 	return MNL_CB_OK;
 out:
 	nft_rule_free(r);
+	nft_rule_list_free(list);
 err:
 	return MNL_CB_OK;
 }
