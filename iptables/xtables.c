@@ -1045,6 +1045,7 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 
 		case '6':
 			args.family = AF_INET6;
+			xtables_set_nfproto(AF_INET6);
 			break;
 
 		case 1: /* non option */

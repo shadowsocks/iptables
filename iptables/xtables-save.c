@@ -125,6 +125,7 @@ xtables_save_main(int argc, char *argv[])
 			break;
 		case '6':
 			h.family = AF_INET6;
+			xtables_set_nfproto(AF_INET6);
 			break;
 		}
 	}
