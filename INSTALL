@@ -70,6 +70,8 @@ If you want to enable debugging, use
 (-O0 is used to turn off instruction reordering, which makes debugging
 much easier.)
 
+To show debug traces you can add -DDEBUG to CFLAGS option
+
 
 Other notes
 ===========
