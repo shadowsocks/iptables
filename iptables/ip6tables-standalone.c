@@ -58,7 +58,7 @@ ip6tables_main(int argc, char *argv[])
 	init_extensions6();
 #endif
 
-	ret = do_command6(argc, argv, &table, &handle);
+	ret = do_command6(argc, argv, &table, &handle, false);
 	if (ret) {
 		ret = ip6tc_commit(handle);
 		ip6tc_free(handle);

@@ -438,7 +438,7 @@ iptables_restore_main(int argc, char *argv[])
 				DEBUGP("argv[%u]: %s\n", a, newargv[a]);
 
 			ret = do_command4(newargc, newargv,
-					 &newargv[2], &handle);
+					 &newargv[2], &handle, true);
 
 			free_argv();
 			fflush(stdout);

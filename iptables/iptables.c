@@ -1282,7 +1282,8 @@ static void command_match(struct iptables_command_state *cs)
 		xtables_error(OTHER_PROBLEM, "can't alloc memory!");
 }
 
-int do_command4(int argc, char *argv[], char **table, struct xtc_handle **handle)
+int do_command4(int argc, char *argv[], char **table,
+		struct xtc_handle **handle, bool restore)
 {
 	struct iptables_command_state cs;
 	struct ipt_entry *e = NULL;
@@ -1571,6 +1572,11 @@ int do_command4(int argc, char *argv[], char **table, struct xtc_handle **handle
 			break;
 
 		case 'w':
+			if (restore) {
+				xtables_error(PARAMETER_PROBLEM,
+					      "You cannot use `-w' from "
+					      "iptables-restore");
+			}
 			wait = true;
 			break;
 
@@ -1729,7 +1735,7 @@ int do_command4(int argc, char *argv[], char **table, struct xtc_handle **handle
 			   chain, XT_EXTENSION_MAXNAMELEN);
 
 	/* Attempt to acquire the xtables lock */
-	if (!xtables_lock(wait)) {
+	if (!restore && !xtables_lock(wait)) {
 		fprintf(stderr, "Another app is currently holding the xtables lock. "
 			"Perhaps you want to use the -w option?\n");
 		xtables_free_opts(1);
