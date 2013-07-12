@@ -64,21 +64,14 @@ a `target', which may be a jump to a user-defined chain in the same
 table.
 .SH TARGETS
 A firewall rule specifies criteria for a packet and a target.  If the
-packet does not match, the next rule in the chain is the examined; if
+packet does not match, the next rule in the chain is examined; if
 it does match, then the next rule is specified by the value of the
-target, which can be the name of a user-defined chain or one of the
-special values \fBACCEPT\fP, \fBDROP\fP, \fBQUEUE\fP or \fBRETURN\fP.
+target, which can be the name of a user-defined chain, one of the targets
+described in \fBiptables\-extensions\fP(8), or one of the
+special values \fBACCEPT\fP, \fBDROP\fP or \fBRETURN\fP.
 .PP
 \fBACCEPT\fP means to let the packet through.
 \fBDROP\fP means to drop the packet on the floor.
-\fBQUEUE\fP means to pass the packet to userspace.
-(How the packet can be received
-by a userspace process differs by the particular queue handler.  2.4.x
-and 2.6.x kernels up to 2.6.13 include the \fBip_queue\fP
-queue handler.  Kernels 2.6.14 and later additionally include the
-\fBnfnetlink_queue\fP queue handler.  Packets with a target of QUEUE will be
-sent to queue number '0' in this case. Please also see the \fBNFQUEUE\fP
-target as described later in this man page.)
 \fBRETURN\fP means stop traversing this chain and resume at the next
 rule in the
 previous (calling) chain.  If the end of a built-in chain is reached
@@ -422,8 +415,7 @@ There are several other changes in iptables.
 \fBiptables\-extensions\fP(8),
 \fBip6tables\fP(8),
 \fBip6tables\-save\fP(8),
-\fBip6tables\-restore\fP(8),
-\fBlibipq\fP(3).
+\fBip6tables\-restore\fP(8).
 .PP
 The packet-filtering-HOWTO details iptables usage for
 packet filtering, the NAT-HOWTO details NAT,

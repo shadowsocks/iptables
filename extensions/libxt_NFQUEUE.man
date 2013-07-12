@@ -1,11 +1,12 @@
-This target is an extension of the QUEUE target. As opposed to QUEUE, it allows
-you to put a packet into any specific queue, identified by its 16-bit queue
-number.
-It can only be used with Kernel versions 2.6.14 or later, since it requires
-the
+This target passes the packet to userspace using the
+\fBnfnetlink_queue\fP handler.  The packet is put into the queue
+identified by its 16-bit queue number.  Userspace can inspect
+and modify the packet if desired. Userspace must then drop or
+reinject the packet into the kernel.  Please see libnetfilter_queue
+for details.
 .B
 nfnetlink_queue
-kernel support. The \fBqueue-balance\fP option was added in Linux 2.6.31,
+was added in Linux 2.6.14. The \fBqueue-balance\fP option was added in Linux 2.6.31,
 \fBqueue-bypass\fP in 2.6.39.
 .TP
 \fB\-\-queue\-num\fP \fIvalue\fP
