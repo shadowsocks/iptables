@@ -2394,19 +2394,21 @@ __nft_rule_list(struct nft_handle *h, struct nft_chain *c, const char *table,
 		    strcmp(chain, rule_chain) != 0)
 			goto next;
 
-		if (rulenum > 0) {
+		if (rulenum > 0 && rule_ctr != rulenum) {
 			/* List by rule number case */
-			if (rule_ctr != rulenum) {
-				rule_ctr++;
-				goto next;
-			}
-		} else {
-			struct iptables_command_state cs = {};
-			/* Show all rules case */
-			nft_rule_to_iptables_command_state(r, &cs);
-
-			cb(&cs, r, rule_ctr, format);
+			goto next;
 		}
+
+		struct iptables_command_state cs = {};
+		/* Show all rules case */
+		nft_rule_to_iptables_command_state(r, &cs);
+
+		cb(&cs, r, rule_ctr, format);
+		if (rulenum > 0 && rule_ctr == rulenum) {
+			ret = 1;
+			break;
+		}
+
 next:
 		r = nft_rule_list_iter_next(iter);
 	}
@@ -2466,9 +2468,10 @@ int nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 		if (found)
 			printf("\n");
 
-		print_header(format, chain_name, policy_name[policy], &ctrs,
-			     basechain, refs);
-
+		if (!rulenum) {
+			print_header(format, chain_name, policy_name[policy],
+				     &ctrs, basechain, refs);
+		}
 		__nft_rule_list(h, c, table, rulenum, format, print_firewall);
 
 		found = true;

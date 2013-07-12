@@ -570,7 +570,6 @@ list_entries(struct nft_handle *h, const char *chain, const char *table,
 	if (linenumbers)
 		format |= FMT_LINENUMBERS;
 
-	/* FIXME should return found or not, and errno = ENOENT in such case */
 	return nft_rule_list(h, chain, table, rulenum, format);
 }
 
