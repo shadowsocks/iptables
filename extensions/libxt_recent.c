@@ -63,6 +63,8 @@ static const struct xt_option_entry recent_opts_v1[] = {
 	 .excl = F_ANY_OP, .flags = XTOPT_INVERT},
 	{.name = "seconds", .id = O_SECONDS, .type = XTTYPE_UINT32,
 	 .flags = XTOPT_PUT, XTOPT_POINTER(s, seconds)},
+	{.name = "reap", .id = O_REAP, .type = XTTYPE_NONE,
+	 .also = F_SECONDS },
 	{.name = "hitcount", .id = O_HITCOUNT, .type = XTTYPE_UINT32,
 	 .flags = XTOPT_PUT, XTOPT_POINTER(s, hit_count)},
 	{.name = "rttl", .id = O_RTTL, .type = XTTYPE_NONE,
