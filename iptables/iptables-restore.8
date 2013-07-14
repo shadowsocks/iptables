@@ -20,13 +20,19 @@
 .\"
 .SH NAME
 iptables-restore \(em Restore IP Tables
+.P
+ip6tables-restore \(em Restore IPv6 Tables
 .SH SYNOPSIS
 \fBiptables\-restore\fP [\fB\-chntv\fP] [\fB\-M\fP \fImodprobe\fP]
+.P
+\fBip6tables\-restore\fP [\fB\-chntv\fP] [\fB\-M\fP \fImodprobe\fP]
 [\fB\-T\fP \fIname\fP]
 .SH DESCRIPTION
 .PP
 .B iptables-restore
-is used to restore IP Tables from data specified on STDIN. Use 
+and
+.B ip6tables-restore
+are used to restore IP and IPv6 Tables from data specified on STDIN. Use
 I/O redirection provided by your shell to read from a file
 .TP
 \fB\-c\fR, \fB\-\-counters\fR
@@ -35,10 +41,9 @@ restore the values of all packet and byte counters
 \fB\-h\fP, \fB\-\-help\fP
 Print a short option summary.
 .TP
-\fB\-n\fR, \fB\-\-noflush\fR 
-don't flush the previous contents of the table. If not specified, 
-.B iptables-restore
-flushes (deletes) all previous contents of the respective table.
+\fB\-n\fR, \fB\-\-noflush\fR
+don't flush the previous contents of the table. If not specified,
+both commands flush (delete) all previous contents of the respective table.
 .TP
 \fB\-t\fP, \fB\-\-test\fP
 Only parse and construct the ruleset, but do not commit it.
@@ -54,8 +59,11 @@ inspect /proc/sys/kernel/modprobe to determine the executable's path.
 Restore only the named table even if the input stream contains other ones.
 .SH BUGS
 None known as of iptables-1.2.1 release
-.SH AUTHOR
-Harald Welte <laforge@gnumonks.org>
+.SH AUTHORS
+Harald Welte <laforge@gnumonks.org> wrote iptables-restore based on code
+from Rusty Russell.
+.br
+Andras Kis-Szabo <kisza@sch.bme.hu> contributed ip6tables-restore.
 .SH SEE ALSO
 \fBiptables\-save\fP(8), \fBiptables\fP(8)
 .PP

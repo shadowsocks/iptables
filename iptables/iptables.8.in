@@ -23,10 +23,13 @@
 .\"
 .\"
 .SH NAME
-iptables \(em administration tool for IPv4 packet filtering and NAT
+iptables/ip6tables \(em administration tool for IPv4/IPv6 packet filtering and NAT
 .SH SYNOPSIS
 \fBiptables\fP [\fB\-t\fP \fItable\fP] {\fB\-A\fP|\fB\-C\fP|\fB\-D\fP}
 \fIchain\fP \fIrule-specification\fP
+.P
+\fBip6tables\fP [\fB\-t\fP \fItable\fP] {\fB\-A\fP|\fB\-C\fP|\fB\-D\fP}
+\fIchain rule-specification\fP
 .PP
 \fBiptables\fP [\fB\-t\fP \fItable\fP] \fB\-I\fP \fIchain\fP [\fIrulenum\fP] \fIrule-specification\fP
 .PP
@@ -52,8 +55,8 @@ match = \fB\-m\fP \fImatchname\fP [\fIper-match-options\fP]
 .PP
 target = \fB\-j\fP \fItargetname\fP [\fIper\-target\-options\fP]
 .SH DESCRIPTION
-\fBIptables\fP is used to set up, maintain, and inspect the
-tables of IPv4 packet
+\fBIptables\fP and \fBip6tables\fP are used to set up, maintain, and inspect the
+tables of IPv4 and IPv6 packet
 filter rules in the Linux kernel.  Several different tables
 may be defined.  Each table contains a number of built-in
 chains and may also contain user-defined chains.
@@ -104,6 +107,7 @@ connection is encountered.  It consists of three built-ins: \fBPREROUTING\fP
 (for altering packets as soon as they come in), \fBOUTPUT\fP
 (for altering locally-generated packets before routing), and \fBPOSTROUTING\fP
 (for altering packets as they are about to go out).
+IPv6 NAT support is available since kernel 3.7.
 .TP
 \fBmangle\fP:
 This table is used for specialized packet alteration.  Until kernel
@@ -136,7 +140,7 @@ before MAC rules.  This table provides the following built-in chains:
 .RE
 .SH OPTIONS
 The options that are recognized by
-\fBiptables\fP can be divided into several different groups.
+\fBiptables\fP and \fBip6tables\fP can be divided into several different groups.
 .SS COMMANDS
 These options specify the desired action to perform. Only one of them
 can be specified on the command line unless otherwise stated
@@ -238,23 +242,35 @@ add, delete, insert, replace and append commands).
 .TP
 \fB\-4\fP, \fB\-\-ipv4\fP
 This option has no effect in iptables and iptables-restore.
+If a rule using the \fB\-4\fP option is inserted with (and only with)
+ip6tables-restore, it will be silently ignored. Any other uses will throw an
+error. This option allows to put both IPv4 and IPv6 rules in a single rule file
+for use with both iptables-restore and ip6tables-restore.
 .TP
 \fB\-6\fP, \fB\-\-ipv6\fP
 If a rule using the \fB\-6\fP option is inserted with (and only with)
 iptables-restore, it will be silently ignored. Any other uses will throw an
 error. This option allows to put both IPv4 and IPv6 rules in a single rule file
 for use with both iptables-restore and ip6tables-restore.
+This option has no effect in ip6tables and ip6tables-restore.
 .TP
 [\fB!\fP] \fB\-p\fP, \fB\-\-protocol\fP \fIprotocol\fP
 The protocol of the rule or of the packet to check.
 The specified protocol can be one of \fBtcp\fP, \fBudp\fP, \fBudplite\fP,
-\fBicmp\fP, \fBesp\fP, \fBah\fP, \fBsctp\fP or the special keyword "\fBall\fP",
+\fBicmp\fP, \fBicmpv6\fP,\fBesp\fP, \fBah\fP, \fBsctp\fP, \fBmh\fP or the special keyword "\fBall\fP",
 or it can be a numeric value, representing one of these protocols or a
 different one.  A protocol name from /etc/protocols is also allowed.
 A "!" argument before the protocol inverts the
 test.  The number zero is equivalent to \fBall\fP. "\fBall\fP"
 will match with all protocols and is taken as default when this
 option is omitted.
+Note that, in ip6tables, IPv6 extension headers except \fBesp\fP are not allowed.
+\fBesp\fP and \fBipv6\-nonext\fP
+can be used with Kernel version 2.6.11 or later.
+The number zero is equivalent to \fBall\fP, which means that you cannot
+test the protocol field for the value 0 directly. To match on a HBH header,
+even if it were the last, you cannot use \fB\-p 0\fP, but always need
+\fB\-m hbh\fP.
 .TP
 [\fB!\fP] \fB\-s\fP, \fB\-\-source\fP \fIaddress\fP[\fB/\fP\fImask\fP][\fB,\fP\fI...\fP]
 Source specification. \fIAddress\fP
@@ -264,9 +280,9 @@ be resolved once only, before the rule is submitted to the kernel.
 Please note that specifying any name to be resolved with a remote query such as
 DNS is a really bad idea.
 The \fImask\fP
-can be either a network mask or a plain number,
+can be either an ipv4 network mask (for iptables) or a plain number,
 specifying the number of 1's at the left side of the network mask.
-Thus, a mask of \fI24\fP is equivalent to \fI255.255.255.0\fP.
+Thus, an iptables mask of \fI24\fP is equivalent to \fI255.255.255.0\fP.
 A "!" argument before the address specification inverts the sense of
 the address. The flag \fB\-\-src\fP is an alias for this option.
 Multiple addresses can be specified, but this will \fBexpand to multiple
@@ -320,12 +336,13 @@ interface which begins with this name will match.  If this option is
 omitted, any interface name will match.
 .TP
 [\fB!\fP] \fB\-f\fP, \fB\-\-fragment\fP
-This means that the rule only refers to second and further fragments
+This means that the rule only refers to second and further IPv4 fragments
 of fragmented packets.  Since there is no way to tell the source or
 destination ports of such a packet (or ICMP type), such a packet will
 not match any rules which specify them.  When the "!" argument
 precedes the "\-f" flag, the rule will only match head fragments, or
-unfragmented packets.
+unfragmented packets. This option is IPv4 specific, it is not available
+in ip6tables.
 .TP
 \fB\-c\fP, \fB\-\-set\-counters\fP \fIpackets bytes\fP
 This enables the administrator to initialize the packet and byte
@@ -413,9 +430,6 @@ There are several other changes in iptables.
 \fBiptables\-save\fP(8),
 \fBiptables\-restore\fP(8),
 \fBiptables\-extensions\fP(8),
-\fBip6tables\fP(8),
-\fBip6tables\-save\fP(8),
-\fBip6tables\-restore\fP(8).
 .PP
 The packet-filtering-HOWTO details iptables usage for
 packet filtering, the NAT-HOWTO details NAT,
@@ -450,4 +464,4 @@ Man page originally written by Herve Eychenne <rv@wallfire.org>.
 .\" .. and most of all, modest ..
 .SH VERSION
 .PP
-This manual page applies to iptables @PACKAGE_VERSION@.
+This manual page applies to iptables/ip6tables @PACKAGE_AND_VERSION@.

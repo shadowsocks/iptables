@@ -20,13 +20,20 @@
 .\"
 .SH NAME
 iptables-save \(em dump iptables rules to stdout
+.P
+ip6tables-save \(em dump iptables rules to stdout
 .SH SYNOPSIS
 \fBiptables\-save\fP [\fB\-M\fP \fImodprobe\fP] [\fB\-c\fP]
 [\fB\-t\fP \fItable\fP]
+.P
+\fBip6tables\-save\fP [\fB\-M\fP \fImodprobe\fP] [\fB\-c\fP]
+[\fB\-t\fP \fItable\fP
 .SH DESCRIPTION
 .PP
 .B iptables-save
-is used to dump the contents of an IP Table in easily parseable format
+and
+.B ip6tables-save
+are used to dump the contents of IP or IPv6 Table in easily parseable format
 to STDOUT. Use I/O-redirection provided by your shell to write to a file.
 .TP
 \fB\-M\fP \fImodprobe_program\fP
@@ -41,8 +48,12 @@ restrict output to only one table. If not specified, output includes all
 available tables.
 .SH BUGS
 None known as of iptables-1.2.1 release
-.SH AUTHOR
+.SH AUTHORS
 Harald Welte <laforge@gnumonks.org>
+.br
+Rusty Russell <rusty@rustcorp.com.au>
+.br
+Andras Kis-Szabo <kisza@sch.bme.hu> contributed ip6tables-save.
 .SH SEE ALSO
 \fBiptables\-restore\fP(8), \fBiptables\fP(8)
 .PP

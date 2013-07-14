@@ -28,7 +28,7 @@ sbin_PROGRAMS    = xtables-multi
 man_MANS         = iptables.8 iptables-restore.8 iptables-save.8 \
                    iptables-xml.1 ip6tables.8 ip6tables-restore.8 \
                    ip6tables-save.8 iptables-extensions.8
-CLEANFILES       = iptables.8 ip6tables.8
+CLEANFILES       = iptables.8
 
 vx_bin_links   = iptables-xml
 if ENABLE_IPV4
