@@ -2543,11 +2543,13 @@ int nft_rule_list_save(struct nft_handle *h, const char *chain,
 	struct nft_chain_list *list;
 	struct nft_chain_list_iter *iter;
 	struct nft_chain *c;
+	int ret = 1;
 
 	list = nft_chain_dump(h);
 
 	/* Dump policies and custom chains first */
-	nft_rule_list_chain_save(h, table, list, counters);
+	if (!rulenum)
+		nft_rule_list_chain_save(h, table, list, counters);
 
 	/* Now dump out rules in this table */
 	iter = nft_chain_list_iter_create(list);
@@ -2566,15 +2568,15 @@ int nft_rule_list_save(struct nft_handle *h, const char *chain,
 		if (chain && strcmp(chain, chain_name) != 0)
 			goto next;
 
-		__nft_rule_list(h, c, table, rulenum,
-				counters ? 0 : FMT_NOCOUNTS, list_save);
+		ret = __nft_rule_list(h, c, table, rulenum,
+				      counters ? 0 : FMT_NOCOUNTS, list_save);
 next:
 		c = nft_chain_list_iter_next(iter);
 	}
 err:
 	nft_chain_list_free(list);
 
-	return 1;
+	return ret;
 }
 
 static int nft_action(struct nft_handle *h, int type)

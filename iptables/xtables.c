@@ -582,7 +582,7 @@ list_rules(struct nft_handle *h, const char *chain, const char *table,
 
 	nft_rule_list_save(h, chain, table, rulenum, counters);
 
-	/* FIXME found */
+	/* iptables does not return error if rule number not found */
 	return 1;
 }
 
