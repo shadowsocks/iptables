@@ -5,13 +5,14 @@
 #include <stdint.h>
 #include <xtables.h>
 #include <linux/netfilter/xt_connlabel.h>
+#include <libnetfilter_conntrack/libnetfilter_conntrack.h>
 
 enum {
 	O_LABEL = 0,
 	O_SET = 1,
 };
 
-#define CONNLABEL_CFG "/etc/xtables/connlabel.conf"
+static struct nfct_labelmap *map;
 
 static void connlabel_mt_help(void)
 {
@@ -28,107 +29,6 @@ static const struct xt_option_entry connlabel_mt_opts[] = {
 	XTOPT_TABLEEND,
 };
 
-static int
-xtables_parse_connlabel_numerical(const char *s, char **end)
-{
-	uintmax_t value;
-
-	if (!xtables_strtoul(s, end, &value, 0, XT_CONNLABEL_MAXBIT))
-		return -1;
-	return value;
-}
-
-static bool is_space_posix(int c)
-{
-	return c == ' ' || c == '\f' || c == '\r' || c == '\t' || c == '\v';
-}
-
-static char * trim_label(char *label)
-{
-	char *end;
-
-	while (is_space_posix(*label))
-		label++;
-	end = strchr(label, '\n');
-	if (end)
-		*end = 0;
-	else
-		end = strchr(label, '\0');
-	end--;
-
-	while (is_space_posix(*end) && end > label) {
-		*end = 0;
-		end--;
-	}
-
-	return *label ? label : NULL;
-}
-
-static void
-xtables_get_connlabel(uint16_t bit, char *buf, size_t len)
-{
-	FILE *fp = fopen(CONNLABEL_CFG, "r");
-	char label[1024];
-	char *end;
-
-	if (!fp)
-		goto error;
-
-	while (fgets(label, sizeof(label), fp)) {
-		int tmp;
-
-		if (label[0] == '#')
-			continue;
-		tmp = xtables_parse_connlabel_numerical(label, &end);
-		if (tmp < 0 || tmp < (int) bit)
-			continue;
-		if (tmp > (int) bit)
-			break;
-
-		end = trim_label(end);
-		if (!end)
-			continue;
-		snprintf(buf, len, "%s", end);
-		fclose(fp);
-		return;
-	}
-	fclose(fp);
- error:
-	snprintf(buf, len, "%u", (unsigned int) bit);
-}
-
-
-static uint16_t xtables_parse_connlabel(const char *s)
-{
-	FILE *fp = fopen(CONNLABEL_CFG, "r");
-	char label[1024];
-	char *end;
-	int bit;
-
-	if (!fp)
-		xtables_error(PARAMETER_PROBLEM, "label '%s': could not open '%s': %s",
-						s, CONNLABEL_CFG, strerror(errno));
-
-	while (fgets(label, sizeof(label), fp)) {
-		if (label[0] == '#' || !strstr(label, s))
-			continue;
-		bit = xtables_parse_connlabel_numerical(label, &end);
-		if (bit < 0)
-			continue;
-
-		end = trim_label(end);
-		if (!end)
-			continue;
-		if (strcmp(end, s) == 0) {
-			fclose(fp);
-			return bit;
-		}
-	}
-	fclose(fp);
-	xtables_error(PARAMETER_PROBLEM, "label '%s' not found in config file %s",
-					s, CONNLABEL_CFG);
-}
-
 static void connlabel_mt_parse(struct xt_option_call *cb)
 {
 	struct xt_connlabel_mtinfo *info = cb->data;
@@ -138,9 +38,10 @@ static void connlabel_mt_parse(struct xt_option_call *cb)
 
 	switch (cb->entry->id) {
 	case O_LABEL:
-		tmp = xtables_parse_connlabel_numerical(cb->arg, NULL);
-		info->bit = tmp < 0 ? xtables_parse_connlabel(cb->arg) : tmp;
-
+		tmp = nfct_labelmap_get_bit(map, cb->arg);
+		if (tmp < 0)
+			xtables_error(PARAMETER_PROBLEM, "label '%s' not found", cb->arg);
+		info->bit = tmp;
 		if (cb->invert)
 			info->options |= XT_CONNLABEL_OP_INVERT;
 		break;
@@ -149,6 +50,14 @@ static void connlabel_mt_parse(struct xt_option_call *cb)
 		break;
 	}
 
+}
+
+static const char *connlabel_get_name(int b)
+{
+	const char *name = nfct_labelmap_get_name(map, b);
+	if (name && strcmp(name, ""))
+		return name;
+	return NULL;
 }
 
 static void
@@ -162,16 +71,15 @@ static void
 connlabel_mt_print(const void *ip, const struct xt_entry_match *match, int numeric)
 {
 	const struct xt_connlabel_mtinfo *info = (const void *)match->data;
-	char buf[1024];
+	const char *name = connlabel_get_name(info->bit);
 
 	printf(" connlabel");
 	if (info->options & XT_CONNLABEL_OP_INVERT)
 		printf(" !");
-	if (numeric) {
+	if (numeric || name == NULL) {
 		printf(" %u", info->bit);
 	} else {
-		xtables_get_connlabel(info->bit, buf, sizeof(buf));
-		printf(" '%s'", buf);
+		printf(" '%s'", name);
 	}
 	connlabel_mt_print_op(info, "");
 }
@@ -180,14 +88,14 @@ static void
 connlabel_mt_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_connlabel_mtinfo *info = (const void *)match->data;
-	char buf[1024];
+	const char *name = connlabel_get_name(info->bit);
 
 	if (info->options & XT_CONNLABEL_OP_INVERT)
 		printf(" !");
-
-	xtables_get_connlabel(info->bit, buf, sizeof(buf));
-	printf(" --label \"%s\"", buf);
-
+	if (name)
+		printf(" --label \"%s\"", name);
+	else
+		printf(" --label \"%u\"", info->bit);
 	connlabel_mt_print_op(info, "--");
 }
 
@@ -206,5 +114,11 @@ static struct xtables_match connlabel_mt_reg = {
 
 void _init(void)
 {
+	map = nfct_labelmap_new(NULL);
+	if (!map) {
+		fprintf(stderr, "cannot open connlabel.conf, not registering '%s' match: %s\n",
+			connlabel_mt_reg.name, strerror(errno));
+		return;
+	}
 	xtables_register_match(&connlabel_mt_reg);
 }

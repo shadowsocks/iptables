@@ -82,6 +82,15 @@ if test "$ac_cv_header_linux_ip_vs_h" != "yes"; then
 	blacklist_modules="$blacklist_modules ipvs";
 fi;
 
+PKG_CHECK_MODULES([libnetfilter_conntrack], [libnetfilter_conntrack >= 1.0.4],
+	[nfconntrack=1], [nfconntrack=0])
+AM_CONDITIONAL([HAVE_LIBNETFILTER_CONNTRACK], [test "$nfconntrack" = 1])
+
+if test "$nfconntrack" -ne 1; then
+	blacklist_modules="$blacklist_modules connlabel";
+	echo "WARNING: libnetfilter_conntrack not found, connlabel match will not be built";
+fi;
+
 AC_SUBST([blacklist_modules])
 AC_CHECK_SIZEOF([struct ip6_hdr], [], [#include <netinet/ip6.h>])
 
@@ -180,3 +189,6 @@ fi;
 
 echo "  Host:					${host}
   GCC binary:				${CC}"
+
+test x"$blacklist_modules" = "x" || echo "
+Iptables modules that will not be built: $blacklist_modules"

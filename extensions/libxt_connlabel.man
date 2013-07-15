@@ -17,6 +17,7 @@ the time the connection is created.
 In this case, the match will fail (or succeed, in case \fB\-\-label\fP
 option was negated).
 .PP
+This match depends on libnetfilter_conntrack 1.0.4 or later.
 Label translation is done via the \fB/etc/xtables/connlabel.conf\fP configuration file.
 .PP
 Example:
