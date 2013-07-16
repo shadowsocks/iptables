@@ -1065,7 +1065,7 @@ static int nft_chain_list_cb(const struct nlmsghdr *nlh, void *data)
 		goto out;
 	}
 
-	nft_chain_list_add(c, list);
+	nft_chain_list_add_tail(c, list);
 
 	return MNL_CB_OK;
 out:
@@ -1174,7 +1174,7 @@ static int nft_rule_list_cb(const struct nlmsghdr *nlh, void *data)
 		goto out;
 	}
 
-	nft_rule_list_add(r, list);
+	nft_rule_list_add_tail(r, list);
 
 	return MNL_CB_OK;
 out:
@@ -1537,7 +1537,7 @@ static int nft_table_list_cb(const struct nlmsghdr *nlh, void *data)
 		goto out;
 	}
 
-	nft_table_list_add(t, list);
+	nft_table_list_add_tail(t, list);
 
 	return MNL_CB_OK;
 out:

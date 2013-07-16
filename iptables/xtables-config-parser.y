@@ -210,6 +210,11 @@ int xtables_config_parse(char *filename, struct nft_table_list *table_list,
 			}
 			nft_table_attr_set_u32(table, NFT_TABLE_ATTR_FAMILY, family);
 			nft_table_attr_set(table, NFT_TABLE_ATTR_NAME, e->data);
+			/* This is intentionally prepending, instead of
+			 * appending, since the elements in the stack are in
+			 * the reverse order that chains appear in the
+			 * configuration file.
+			 */
 			nft_table_list_add(table, table_list);
 			break;
 		case T_PRIO:
@@ -226,6 +231,7 @@ int xtables_config_parse(char *filename, struct nft_table_list *table_list,
 			nft_table_attr_set_u32(table, NFT_CHAIN_ATTR_FAMILY, family);
 			nft_chain_attr_set_s32(chain, NFT_CHAIN_ATTR_PRIO, prio);
 			nft_chain_attr_set(chain, NFT_CHAIN_ATTR_NAME, e->data);
+			/* Intentionally prepending, instead of appending */
 			nft_chain_list_add(chain, chain_list);
 			break;
 		case T_HOOK:
