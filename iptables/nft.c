@@ -381,6 +381,14 @@ out:
 	return ret;
 }
 
+static bool nft_chain_builtin(struct nft_chain *c)
+{
+	/* Check if this chain has hook number, in that case is built-in.
+	 * Should we better export the flags to user-space via nf_tables?
+	 */
+	return nft_chain_attr_get(c, NFT_CHAIN_ATTR_HOOKNUM) != NULL;
+}
+
 int nft_init(struct nft_handle *h)
 {
 	h->nl = mnl_socket_open(NETLINK_NETFILTER);
@@ -1138,9 +1146,7 @@ int nft_chain_save(struct nft_handle *h, struct nft_chain_list *list,
 		if (strcmp(table, chain_table) != 0)
 			goto next;
 
-		if (nft_chain_attr_get(c, NFT_CHAIN_ATTR_HOOKNUM))
-			basechain = true;
-
+		basechain = nft_chain_builtin(c);
 		nft_chain_print_save(c, basechain);
 next:
 		c = nft_chain_list_iter_next(iter);
@@ -1366,14 +1372,6 @@ static int __nft_chain_del(struct nft_handle *h, struct nft_chain *c)
 	}
 
 	return ret;
-}
-
-static bool nft_chain_builtin(struct nft_chain *c)
-{
-	/* Check if this chain has hook number, in that case is built-in.
-	 * Should we better export the flags to user-space via nf_tables?
-	 */
-	return nft_chain_attr_get(c, NFT_CHAIN_ATTR_HOOKNUM) != NULL;
 }
 
 int nft_chain_user_del(struct nft_handle *h, const char *chain, const char *table)
@@ -2547,7 +2545,7 @@ nft_rule_list_chain_save(struct nft_handle *h, const char *table,
 			goto next;
 
 		/* this is a base chain */
-		if (nft_chain_attr_get(c, NFT_CHAIN_ATTR_HOOKNUM)) {
+		if (nft_chain_builtin(c)) {
 			printf("-P %s %s", chain_name, policy_name[policy]);
 
 			if (counters) {
