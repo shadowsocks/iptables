@@ -200,10 +200,10 @@ static struct builtin_table {
 		.name	= "nat",
 		.chains = {
 			{
-				.name	= "OUTPUT",
+				.name	= "PREROUTING",
 				.type	= "nat",
 				.prio	= -100, /* NF_IP_PRI_NAT_DST */
-				.hook	= NF_INET_LOCAL_OUT,
+				.hook	= NF_INET_PRE_ROUTING,
 			},
 			{
 				.name	= "INPUT",
@@ -212,16 +212,16 @@ static struct builtin_table {
 				.hook	= NF_INET_LOCAL_IN,
 			},
 			{
-				.name	= "PREROUTING",
-				.type	= "nat",
-				.prio	= -100, /* NF_IP_PRI_NAT_DST */
-				.hook	= NF_INET_PRE_ROUTING,
-			},
-			{
 				.name	= "POSTROUTING",
 				.type	= "nat",
 				.prio	= 100, /* NF_IP_PRI_NAT_SRC */
 				.hook	= NF_INET_POST_ROUTING,
+			},
+			{
+				.name	= "OUTPUT",
+				.type	= "nat",
+				.prio	= -100, /* NF_IP_PRI_NAT_DST */
+				.hook	= NF_INET_LOCAL_OUT,
 			},
 		},
 	},
