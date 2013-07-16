@@ -2561,6 +2561,8 @@ next:
 		c = nft_chain_list_iter_next(iter);
 	}
 
+	nft_chain_list_iter_destroy(iter);
+
 	return 1;
 }
 
@@ -2600,6 +2602,8 @@ int nft_rule_list_save(struct nft_handle *h, const char *chain,
 next:
 		c = nft_chain_list_iter_next(iter);
 	}
+
+	nft_chain_list_iter_destroy(iter);
 err:
 	nft_chain_list_free(list);
 
