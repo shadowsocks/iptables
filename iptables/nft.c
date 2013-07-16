@@ -1434,7 +1434,7 @@ err:
 }
 
 struct nft_chain *
-nft_chain_list_find(struct nft_handle *h, struct nft_chain_list *list,
+nft_chain_list_find(struct nft_chain_list *list,
 		    const char *table, const char *chain)
 {
 	struct nft_chain_list_iter *iter;
@@ -1475,7 +1475,7 @@ nft_chain_find(struct nft_handle *h, const char *table, const char *chain)
 	if (list == NULL)
 		return NULL;
 
-	return nft_chain_list_find(h, list, table, chain);
+	return nft_chain_list_find(list, table, chain);
 }
 
 int nft_chain_user_rename(struct nft_handle *h,const char *chain,

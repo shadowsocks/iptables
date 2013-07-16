@@ -326,7 +326,7 @@ xtables_restore_main(int argc, char *argv[])
 				exit(1);
 			}
 
-			chain_obj = nft_chain_list_find(&h, chain_list,
+			chain_obj = nft_chain_list_find(chain_list,
 							curtable, chain);
 			/* This chain has been found, delete from list. Later
 			 * on, unvisited chains will be purged out.
