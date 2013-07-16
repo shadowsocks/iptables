@@ -690,6 +690,7 @@ nft_rule_add(struct nft_handle *h, const char *chain, const char *table,
 		goto err;
 	}
 
+	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FAMILY, h->family);
 	nft_rule_attr_set(r, NFT_RULE_ATTR_TABLE, (char *)table);
 	nft_rule_attr_set(r, NFT_RULE_ATTR_CHAIN, (char *)chain);
 
