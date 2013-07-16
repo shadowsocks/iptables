@@ -172,11 +172,15 @@ int xtables_events_main(int argc, char *argv[])
 	init_extensions4();
 #endif
 
+	opterr = 0;
 	while ((c = getopt_long(argc, argv, "c", options, NULL)) != -1) {
 		switch (c) {
 	        case 'c':
 			counters = true;
 			break;
+		default:
+			print_usage(argv[0], XTABLES_VERSION);
+			exit(EXIT_FAILURE);
 		}
 	}
 
