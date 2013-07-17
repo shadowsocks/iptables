@@ -2526,8 +2526,9 @@ list_save(const struct iptables_command_state *cs, struct nft_rule *r,
 }
 
 static int
-nft_rule_list_chain_save(struct nft_handle *h, const char *table,
-			 struct nft_chain_list *list, int counters)
+nft_rule_list_chain_save(struct nft_handle *h, const char *chain,
+			 const char *table, struct nft_chain_list *list,
+			 int counters)
 {
 	struct nft_chain_list_iter *iter;
 	struct nft_chain *c;
@@ -2545,7 +2546,8 @@ nft_rule_list_chain_save(struct nft_handle *h, const char *table,
 		uint32_t policy =
 			nft_chain_attr_get_u32(c, NFT_CHAIN_ATTR_POLICY);
 
-		if (strcmp(table, chain_table) != 0)
+		if (strcmp(table, chain_table) != 0 ||
+		    (chain && strcmp(chain, chain_name) != 0))
 			goto next;
 
 		/* this is a base chain */
@@ -2582,7 +2584,7 @@ int nft_rule_list_save(struct nft_handle *h, const char *chain,
 
 	/* Dump policies and custom chains first */
 	if (!rulenum)
-		nft_rule_list_chain_save(h, table, list, counters);
+		nft_rule_list_chain_save(h, chain, table, list, counters);
 
 	/* Now dump out rules in this table */
 	iter = nft_chain_list_iter_create(list);
