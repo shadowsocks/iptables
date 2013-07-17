@@ -2501,6 +2501,10 @@ int nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 		}
 		__nft_rule_list(h, c, table, rulenum, format, print_firewall);
 
+		/* we printed the chain we wanted, stop processing. */
+		if (chain)
+			break;
+
 		found = true;
 
 next:
@@ -2599,6 +2603,10 @@ int nft_rule_list_save(struct nft_handle *h, const char *chain,
 
 		ret = __nft_rule_list(h, c, table, rulenum,
 				      counters ? 0 : FMT_NOCOUNTS, list_save);
+
+		/* we printed the chain we wanted, stop processing. */
+		if (chain)
+			break;
 next:
 		c = nft_chain_list_iter_next(iter);
 	}
