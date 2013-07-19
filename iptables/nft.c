@@ -689,30 +689,17 @@ void add_compat(struct nft_rule *r, uint32_t proto, bool inv)
 			      inv ? NFT_RULE_COMPAT_F_INV : 0);
 }
 
-int
-nft_rule_add(struct nft_handle *h, const char *chain, const char *table,
-	     struct iptables_command_state *cs,
-	     bool append, uint64_t handle, bool verbose)
+static struct nft_rule *
+nft_rule_new(struct nft_handle *h, const char *chain, const char *table,
+	     struct iptables_command_state *cs)
 {
-	char buf[MNL_SOCKET_BUFFER_SIZE];
-	struct nlmsghdr *nlh;
-	struct xtables_rule_match *matchp;
 	struct nft_rule *r;
-	int ret = 1;
-	int flags = append ? NLM_F_APPEND : 0;
-	int ip_flags = 0;
-
-	/* If built-in chains don't exist for this table, create them */
-	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0)
-		nft_chain_builtin_init(h, table, chain, NF_ACCEPT);
-
-	nft_fn = nft_rule_add;
+	int ret = 0, ip_flags = 0;
+	struct xtables_rule_match *matchp;
 
 	r = nft_rule_alloc();
-	if (r == NULL) {
-		ret = 0;
-		goto err;
-	}
+	if (r == NULL)
+		return NULL;
 
 	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FAMILY, h->family);
 	nft_rule_attr_set(r, NFT_RULE_ATTR_TABLE, (char *)table);
@@ -721,19 +708,15 @@ nft_rule_add(struct nft_handle *h, const char *chain, const char *table,
 	ip_flags = h->ops->add(r, cs);
 
 	for (matchp = cs->matches; matchp; matchp = matchp->next) {
-		if (add_match(r, matchp->match->m) < 0) {
-			ret = 0;
+		if (add_match(r, matchp->match->m) < 0)
 			goto err;
-		}
 	}
 
 	/* Counters need to me added before the target, otherwise they are
 	 * increased for each rule because of the way nf_tables works.
 	 */
-	if (add_counters(r, cs->counters.pcnt, cs->counters.bcnt) < 0) {
-		ret = 0;
+	if (add_counters(r, cs->counters.pcnt, cs->counters.bcnt) < 0)
 		goto err;
-	}
 
 	/* If no target at all, add nothing (default to continue) */
 	if (cs->target != NULL) {
@@ -754,25 +737,50 @@ nft_rule_add(struct nft_handle *h, const char *chain, const char *table,
 			ret = add_jumpto(r, cs->jumpto, NFT_JUMP);
 	}
 
-	if (ret < 0) {
+	if (ret < 0)
+		goto err;
+
+	return r;
+err:
+	nft_rule_free(r);
+	return NULL;
+}
+
+int
+nft_rule_append(struct nft_handle *h, const char *chain, const char *table,
+		struct iptables_command_state *cs, uint64_t handle,
+		bool verbose)
+{
+	char buf[MNL_SOCKET_BUFFER_SIZE];
+	struct nlmsghdr *nlh;
+	struct nft_rule *r;
+	uint16_t flags = NLM_F_ACK|NLM_F_CREATE;
+	int ret = 1;
+
+	/* If built-in chains don't exist for this table, create them */
+	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0)
+		nft_chain_builtin_init(h, table, chain, NF_ACCEPT);
+
+	nft_fn = nft_rule_append;
+
+	r = nft_rule_new(h, chain, table, cs);
+	if (r == NULL) {
 		ret = 0;
 		goto err;
 	}
 
-	/* NLM_F_CREATE autoloads the built-in table if it does not exists */
-	flags |= NLM_F_ACK|NLM_F_CREATE;
-
 	if (handle > 0) {
 		nft_rule_attr_set(r, NFT_RULE_ATTR_HANDLE, &handle);
 		flags |= NLM_F_REPLACE;
-	}
+	} else
+		flags |= NLM_F_APPEND;
 
 	if (h->commit) {
 		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS,
 				      NFT_RULE_F_COMMIT);
 	}
-	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE,
-				       h->family, flags, h->seq);
+	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE, h->family,
+				       flags, h->seq);
 
 	nft_rule_nlmsg_build_payload(nlh, r);
 
@@ -782,7 +790,7 @@ nft_rule_add(struct nft_handle *h, const char *chain, const char *table,
 
 	ret = mnl_talk(h, nlh, NULL, NULL);
 	if (ret < 0)
-		perror("mnl_talk:nft_rule_add");
+		perror("mnl_talk:nft_rule_append");
 
 err:
 	/* the core expects 1 for success and 0 for error */
@@ -2139,6 +2147,82 @@ int nft_rule_delete(struct nft_handle *h, const char *chain,
 	return ret;
 }
 
+static int
+nft_rule_add(struct nft_handle *h, const char *chain,
+	     const char *table, struct iptables_command_state *cs,
+	     uint64_t handle, bool verbose)
+{
+	char buf[MNL_SOCKET_BUFFER_SIZE];
+	struct nlmsghdr *nlh;
+	struct nft_rule *r;
+	int ret = 1;
+
+	r = nft_rule_new(h, chain, table, cs);
+	if (r == NULL) {
+		ret = 0;
+		goto err;
+	}
+	nft_rule_attr_set_u64(r, NFT_RULE_ATTR_POSITION, handle);
+
+	if (h->commit) {
+		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS,
+				      NFT_RULE_F_COMMIT);
+	}
+	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE, h->family,
+				       NLM_F_ACK|NLM_F_CREATE, h->seq);
+	nft_rule_nlmsg_build_payload(nlh, r);
+	nft_rule_print_debug(r, nlh);
+	nft_rule_free(r);
+
+	ret = mnl_talk(h, nlh, NULL, NULL);
+	if (ret < 0)
+		perror("mnl_talk:nft_rule_add_num");
+
+err:
+	/* the core expects 1 for success and 0 for error */
+	return ret == 0 ? 1 : 0;
+}
+
+int nft_rule_insert(struct nft_handle *h, const char *chain,
+		    const char *table, struct iptables_command_state *cs,
+		    int rulenum, bool verbose)
+{
+	struct nft_rule_list *list;
+	struct nft_rule *r;
+	uint64_t handle;
+
+	/* If built-in chains don't exist for this table, create them */
+	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0)
+		nft_chain_builtin_init(h, table, chain, NF_ACCEPT);
+
+	nft_fn = nft_rule_insert;
+
+	list = nft_rule_list_create(h);
+	if (list == NULL)
+		goto err;
+
+	r = nft_rule_find(list, chain, table, cs, rulenum);
+	if (r == NULL) {
+		errno = ENOENT;
+		goto err;
+	}
+
+	handle = nft_rule_attr_get_u64(r, NFT_RULE_ATTR_HANDLE);
+	DEBUGP("adding after rule handle %"PRIu64"\n", handle);
+
+	if (h->commit) {
+		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS,
+				      NFT_RULE_F_COMMIT);
+	}
+
+	nft_rule_list_destroy(list);
+
+	return nft_rule_add(h, chain, table, cs, handle, verbose);
+err:
+	nft_rule_list_destroy(list);
+	return 0;
+}
+
 int nft_rule_delete_num(struct nft_handle *h, const char *chain,
 			const char *table, int rulenum, bool verbose)
 {
@@ -2194,9 +2278,9 @@ int nft_rule_replace(struct nft_handle *h, const char *chain,
 			nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS,
 						 NFT_RULE_F_COMMIT);
 		}
-		ret = nft_rule_add(h, chain, table, cs, true,
-				   nft_rule_attr_get_u64(r, NFT_RULE_ATTR_HANDLE),
-				   verbose);
+		ret = nft_rule_append(h, chain, table, cs,
+				      nft_rule_attr_get_u64(r, NFT_RULE_ATTR_HANDLE),
+				      verbose);
 	} else
 		errno = ENOENT;
 

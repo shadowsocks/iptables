@@ -49,7 +49,8 @@ int nft_chain_zero_counters(struct nft_handle *h, const char *chain, const char 
  */
 struct nft_rule;
 
-int nft_rule_add(struct nft_handle *h, const char *chain, const char *table, struct iptables_command_state *cmd, bool append, uint64_t handle, bool verbose);
+int nft_rule_append(struct nft_handle *h, const char *chain, const char *table, struct iptables_command_state *cmd, uint64_t handle, bool verbose);
+int nft_rule_insert(struct nft_handle *h, const char *chain, const char *table, struct iptables_command_state *cmd, int rulenum, bool verbose);
 int nft_rule_check(struct nft_handle *h, const char *chain, const char *table, struct iptables_command_state *cmd, bool verbose);
 int nft_rule_delete(struct nft_handle *h, const char *chain, const char *table, struct iptables_command_state *cmd, bool verbose);
 int nft_rule_delete_num(struct nft_handle *h, const char *chain, const char *table, int rulenum, bool verbose);

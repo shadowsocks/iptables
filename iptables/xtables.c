@@ -404,7 +404,7 @@ static int
 add_entry(const char *chain,
 	  const char *table,
 	  struct iptables_command_state *cs,
-	  int family,
+	  int rulenum, int family,
 	  const struct addr_mask s,
 	  const struct addr_mask d,
 	  bool verbose, struct nft_handle *h, bool append)
@@ -420,8 +420,15 @@ add_entry(const char *chain,
 				cs->fw.ip.dst.s_addr = d.addr.v4[j].s_addr;
 				cs->fw.ip.dmsk.s_addr = d.mask.v4[j].s_addr;
 
-				ret = nft_rule_add(h, chain, table,
-						   cs, append, 0, verbose);
+				if (append) {
+					ret = nft_rule_append(h, chain, table,
+							      cs, 0,
+							      verbose);
+				} else {
+					ret = nft_rule_insert(h, chain, table,
+							      cs, rulenum,
+							      verbose);
+				}
 			}
 		} else if (family == AF_INET6) {
 			memcpy(&cs->fw6.ipv6.src,
@@ -433,8 +440,15 @@ add_entry(const char *chain,
 				       &d.addr.v6[j], sizeof(struct in6_addr));
 				memcpy(&cs->fw6.ipv6.dmsk,
 				       &d.mask.v6[j], sizeof(struct in6_addr));
-				ret = nft_rule_add(h, chain, table,
-						   cs, append, 0, verbose);
+				if (append) {
+					ret = nft_rule_append(h, chain, table,
+							      cs, append,
+							      verbose);
+				} else {
+					ret = nft_rule_insert(h, chain, table,
+							      cs, rulenum,
+							      verbose);
+				}
 			}
 		}
 	}
@@ -1148,7 +1162,7 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 
 	switch (command) {
 	case CMD_APPEND:
-		ret = add_entry(chain, *table, &cs, h->family,
+		ret = add_entry(chain, *table, &cs, 0, h->family,
 				args.s, args.d, cs.options&OPT_VERBOSE,
 				h, true);
 		break;
@@ -1170,8 +1184,7 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 				    cs.options&OPT_VERBOSE, h);
 		break;
 	case CMD_INSERT:
-		/* FIXME insert at rulenum */
-		ret = add_entry(chain, *table, &cs, h->family,
+		ret = add_entry(chain, *table, &cs, rulenum - 1, h->family,
 				args.s, args.d, cs.options&OPT_VERBOSE, h,
 				false);
 		break;
