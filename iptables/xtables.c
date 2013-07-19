@@ -1178,7 +1178,6 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 				   args.s, args.d, cs.options&OPT_VERBOSE, h);
 		break;
 	case CMD_REPLACE:
-		/* FIXME replace at rulenum */
 		ret = replace_entry(chain, *table, &cs, rulenum - 1,
 				    h->family, args.s, args.d,
 				    cs.options&OPT_VERBOSE, h);
