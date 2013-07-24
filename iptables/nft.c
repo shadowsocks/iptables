@@ -2162,7 +2162,8 @@ nft_rule_add(struct nft_handle *h, const char *chain,
 		ret = 0;
 		goto err;
 	}
-	nft_rule_attr_set_u64(r, NFT_RULE_ATTR_POSITION, handle);
+	if (handle > 0)
+		nft_rule_attr_set_u64(r, NFT_RULE_ATTR_POSITION, handle);
 
 	if (h->commit) {
 		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS,
@@ -2189,7 +2190,7 @@ int nft_rule_insert(struct nft_handle *h, const char *chain,
 {
 	struct nft_rule_list *list;
 	struct nft_rule *r;
-	uint64_t handle;
+	uint64_t handle = 0;
 
 	/* If built-in chains don't exist for this table, create them */
 	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0)
@@ -2197,25 +2198,22 @@ int nft_rule_insert(struct nft_handle *h, const char *chain,
 
 	nft_fn = nft_rule_insert;
 
-	list = nft_rule_list_create(h);
-	if (list == NULL)
-		goto err;
+	if (rulenum > 0) {
+		list = nft_rule_list_create(h);
+		if (list == NULL)
+			goto err;
 
-	r = nft_rule_find(list, chain, table, cs, rulenum);
-	if (r == NULL) {
-		errno = ENOENT;
-		goto err;
+		r = nft_rule_find(list, chain, table, cs, rulenum);
+		if (r == NULL) {
+			errno = ENOENT;
+			goto err;
+		}
+
+		handle = nft_rule_attr_get_u64(r, NFT_RULE_ATTR_HANDLE);
+		DEBUGP("adding after rule handle %"PRIu64"\n", handle);
+
+		nft_rule_list_destroy(list);
 	}
-
-	handle = nft_rule_attr_get_u64(r, NFT_RULE_ATTR_HANDLE);
-	DEBUGP("adding after rule handle %"PRIu64"\n", handle);
-
-	if (h->commit) {
-		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS,
-				      NFT_RULE_F_COMMIT);
-	}
-
-	nft_rule_list_destroy(list);
 
 	return nft_rule_add(h, chain, table, cs, handle, verbose);
 err:
