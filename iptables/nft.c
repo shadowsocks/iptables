@@ -1661,33 +1661,6 @@ next:
 	return 0;
 }
 
-static inline int
-match_different(const struct xt_entry_match *a,
-		const unsigned char *a_elems,
-		const unsigned char *b_elems,
-		unsigned char **maskptr)
-{
-	const struct xt_entry_match *b;
-	unsigned int i;
-
-	/* Offset of b is the same as a. */
-	b = (void *)b_elems + ((unsigned char *)a - a_elems);
-
-	if (a->u.match_size != b->u.match_size)
-		return 1;
-
-	if (strcmp(a->u.user.name, b->u.user.name) != 0)
-		return 1;
-
-	*maskptr += XT_ALIGN(sizeof(*a));
-
-	for (i = 0; i < a->u.match_size - XT_ALIGN(sizeof(*a)); i++)
-		if (((a->data[i] ^ b->data[i]) & (*maskptr)[i]) != 0)
-			return 1;
-	*maskptr += i;
-	return 0;
-}
-
 static void
 nft_parse_meta(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 	       int family, struct iptables_command_state *cs)
