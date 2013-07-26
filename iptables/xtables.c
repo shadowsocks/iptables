@@ -1110,7 +1110,7 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 	if (h->family == AF_UNSPEC)
 		h->family = args.family;
 
-	h->ops = nft_family_ops_lookup(args.family);
+	h->ops = nft_family_ops_lookup(h->family);
 	if (h->ops == NULL)
 		xtables_error(PARAMETER_PROBLEM, "Unknown family");
 
