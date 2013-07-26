@@ -193,7 +193,7 @@ xtables_restore_main(int argc, char *argv[])
 	init_extensions4();
 #endif
 
-	if (nft_init(&h) < 0) {
+	if (nft_init(&h, xtables_ipv4) < 0) {
 		fprintf(stderr, "%s/%s Failed to initialize nft: %s\n",
 				xtables_globals.program_name,
 				xtables_globals.program_version,

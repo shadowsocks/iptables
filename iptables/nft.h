@@ -4,6 +4,25 @@
 #include "xshared.h"
 #include "nft-shared.h"
 
+#define FILTER         0
+#define MANGLE         1
+#define RAW            2
+#define SECURITY       3
+#define NAT            4
+#define TABLES_MAX     5
+
+struct builtin_chain {
+	const char *name;
+	const char *type;
+	uint32_t prio;
+	uint32_t hook;
+};
+
+struct builtin_table {
+	const char *name;
+	struct builtin_chain chains[NF_INET_NUMHOOKS];
+};
+
 struct nft_handle {
 	int			family;
 	struct mnl_socket	*nl;
@@ -11,9 +30,12 @@ struct nft_handle {
 	uint32_t		seq;
 	bool			commit;
 	struct nft_family_ops	*ops;
+	struct builtin_table	*tables;
 };
 
-int nft_init(struct nft_handle *h);
+extern struct builtin_table xtables_ipv4[TABLES_MAX];
+
+int nft_init(struct nft_handle *h, struct builtin_table *t);
 void nft_fini(struct nft_handle *h);
 
 /*

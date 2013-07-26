@@ -35,7 +35,7 @@ int xtables_config_main(int argc, char *argv[])
 	else
 		filename = argv[1];
 
-	if (nft_init(&h) < 0) {
+	if (nft_init(&h, xtables_ipv4) < 0) {
                 fprintf(stderr, "Failed to initialize nft: %s\n",
 			strerror(errno));
 		return EXIT_FAILURE;

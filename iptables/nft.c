@@ -80,24 +80,7 @@ static int mnl_talk(struct nft_handle *h, struct nlmsghdr *nlh,
 	return 0;
 }
 
-#define FILTER		0
-#define MANGLE		1
-#define RAW		2
-#define SECURITY	3
-#define NAT		4
-#define TABLES_MAX	5
-
-struct builtin_chain {
-	const char *name;
-	const char *type;
-	uint32_t prio;
-	uint32_t hook;
-};
-
-static struct builtin_table {
-	const char *name;
-	struct builtin_chain chains[NF_INET_NUMHOOKS];
-} tables[TABLES_MAX] = {
+struct builtin_table xtables_ipv4[TABLES_MAX] = {
 	[RAW] = {
 		.name	= "raw",
 		.chains = {
@@ -305,20 +288,21 @@ nft_chain_builtin_add(struct nft_handle *h, struct builtin_table *table,
 }
 
 /* find if built-in table already exists */
-static struct builtin_table *nft_table_builtin_find(const char *table)
+static struct builtin_table
+*nft_table_builtin_find(struct nft_handle *h, const char *table)
 {
 	int i;
 	bool found = false;
 
 	for (i=0; i<TABLES_MAX; i++) {
-		if (strcmp(tables[i].name, table) != 0)
+		if (strcmp(h->tables[i].name, table) != 0)
 			continue;
 
 		found = true;
 		break;
 	}
 
-	return found ? &tables[i] : NULL;
+	return found ? &h->tables[i] : NULL;
 }
 
 /* find if built-in chain already exists */
@@ -366,7 +350,7 @@ nft_chain_builtin_init(struct nft_handle *h, const char *table,
 	int ret = 0;
 	struct builtin_table *t;
 
-	t = nft_table_builtin_find(table);
+	t = nft_table_builtin_find(h, table);
 	if (t == NULL) {
 		ret = -1;
 		goto out;
@@ -389,7 +373,7 @@ static bool nft_chain_builtin(struct nft_chain *c)
 	return nft_chain_attr_get(c, NFT_CHAIN_ATTR_HOOKNUM) != NULL;
 }
 
-int nft_init(struct nft_handle *h)
+int nft_init(struct nft_handle *h, struct builtin_table *t)
 {
 	h->nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (h->nl == NULL) {
@@ -402,6 +386,7 @@ int nft_init(struct nft_handle *h)
 		return -1;
 	}
 	h->portid = mnl_socket_get_portid(h->nl);
+	h->tables = t;
 
 	return 0;
 }
@@ -440,7 +425,7 @@ int nft_table_set_dormant(struct nft_handle *h, const char *table)
 	int ret = 0, i;
 	struct builtin_table *t;
 
-	t = nft_table_builtin_find(table);
+	t = nft_table_builtin_find(h, table);
 	if (t == NULL) {
 		ret = -1;
 		goto out;
@@ -501,7 +486,7 @@ __nft_chain_set(struct nft_handle *h, const char *table,
 	struct builtin_chain *_c;
 	int ret;
 
-	_t = nft_table_builtin_find(table);
+	_t = nft_table_builtin_find(h, table);
 	/* if this built-in table does not exists, create it */
 	if (_t != NULL)
 		nft_table_builtin_add(h, _t, false);
