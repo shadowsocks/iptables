@@ -740,6 +740,7 @@ iptables_xml_main(int argc, char *argv[])
 			/* the parser */
 			char *param_start, *curchar;
 			int quote_open, quoted;
+			char param_buffer[1024];
 
 			/* reset the newargv */
 			newargc = 0;
@@ -799,7 +800,6 @@ iptables_xml_main(int argc, char *argv[])
 				}
 				if (*curchar == ' '
 				    || *curchar == '\t' || *curchar == '\n') {
-					char param_buffer[1024];
 					int param_len = curchar - param_start;
 
 					if (quote_open)
