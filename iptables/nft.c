@@ -2730,7 +2730,8 @@ int nft_compatible_revision(const char *name, uint8_t rev, int opt)
 	uint32_t portid, seq, type;
 	int ret = 0;
 
-	if (opt == IPT_SO_GET_REVISION_MATCH)
+	if (opt == IPT_SO_GET_REVISION_MATCH ||
+	    opt == IP6T_SO_GET_REVISION_MATCH)
 		type = 0;
 	else
 		type = 1;
