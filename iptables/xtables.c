@@ -442,7 +442,7 @@ add_entry(const char *chain,
 				       &d.mask.v6[j], sizeof(struct in6_addr));
 				if (append) {
 					ret = nft_rule_append(h, chain, table,
-							      cs, append,
+							      cs, 0,
 							      verbose);
 				} else {
 					ret = nft_rule_insert(h, chain, table,
