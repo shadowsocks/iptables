@@ -2853,6 +2853,8 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 	struct nft_chain_list_iter *citer;
 	struct nft_table *table;
 	struct nft_chain *chain;
+	uint32_t table_family, chain_family;
+	bool found = false;
 
 	if (xtables_config_parse(filename, table_list, chain_list) < 0) {
 		if (errno == ENOENT) {
@@ -2870,6 +2872,13 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 	/* Stage 1) create tables */
 	titer = nft_table_list_iter_create(table_list);
 	while ((table = nft_table_list_iter_next(titer)) != NULL) {
+		table_family = nft_table_attr_get_u32(table,
+						      NFT_TABLE_ATTR_FAMILY);
+		if (h->family != table_family)
+			continue;
+
+		found = true;
+
 		if (nft_table_add(h, table) < 0) {
 			if (errno == EEXIST) {
 				xtables_config_perror(flags,
@@ -2892,9 +2901,17 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 	nft_table_list_iter_destroy(titer);
 	nft_table_list_free(table_list);
 
+	if (!found)
+		return -1;
+
 	/* Stage 2) create chains */
 	citer = nft_chain_list_iter_create(chain_list);
 	while ((chain = nft_chain_list_iter_next(citer)) != NULL) {
+		chain_family = nft_chain_attr_get_u32(chain,
+						      NFT_CHAIN_ATTR_TABLE);
+		if (h->family != chain_family)
+			continue;
+
 		if (nft_chain_add(h, chain) < 0) {
 			if (errno == EEXIST) {
 				xtables_config_perror(flags,

@@ -228,7 +228,8 @@ int xtables_config_parse(char *filename, struct nft_table_list *table_list,
 			}
 			nft_chain_attr_set(chain, NFT_CHAIN_ATTR_TABLE,
 				(char *)nft_table_attr_get(table, NFT_TABLE_ATTR_NAME));
-			nft_table_attr_set_u32(table, NFT_CHAIN_ATTR_FAMILY, family);
+			nft_chain_attr_set_u32(chain, NFT_CHAIN_ATTR_FAMILY,
+				nft_table_attr_get_u32(table, NFT_TABLE_ATTR_FAMILY));
 			nft_chain_attr_set_s32(chain, NFT_CHAIN_ATTR_PRIO, prio);
 			nft_chain_attr_set(chain, NFT_CHAIN_ATTR_NAME, e->data);
 			/* Intentionally prepending, instead of appending */
