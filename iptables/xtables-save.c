@@ -78,6 +78,7 @@ int
 xtables_save_main(int argc, char *argv[])
 {
 	const char *tablename = NULL;
+	bool dump = false;
 	struct nft_handle h = {
 		.family	= AF_INET,	/* default to AF_INET */
 	};
@@ -118,8 +119,8 @@ xtables_save_main(int argc, char *argv[])
 			xtables_modprobe_program = optarg;
 			break;
 		case 'd':
-			do_output(&h, tablename, show_counters);
-			exit(0);
+			dump = true;
+			break;
 		case '4':
 			h.family = AF_INET;
 			break;
@@ -133,6 +134,11 @@ xtables_save_main(int argc, char *argv[])
 	if (optind < argc) {
 		fprintf(stderr, "Unknown arguments found on commandline\n");
 		exit(1);
+	}
+
+	if (dump) {
+		do_output(&h, tablename, show_counters);
+		exit(0);
 	}
 
 	return !do_output(&h, tablename, show_counters);
