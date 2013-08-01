@@ -2318,9 +2318,9 @@ print_match(struct nft_rule_expr *expr, int numeric)
 }
 
 static void
-print_firewall(const struct iptables_command_state *cs, struct nft_rule *r,
-	       unsigned int num, unsigned int format)
+print_firewall(struct nft_rule *r, unsigned int num, unsigned int format)
 {
+	struct iptables_command_state cs = {};
 	const struct xtables_target *target = NULL;
 	const char *targname = NULL;
 	const void *targinfo = NULL;
@@ -2331,6 +2331,8 @@ print_firewall(const struct iptables_command_state *cs, struct nft_rule *r,
 	struct nft_rule_expr *expr;
 	struct xt_entry_target *t;
 	size_t target_len = 0;
+
+	nft_rule_to_iptables_command_state(r, &cs);
 
 	iter = nft_rule_expr_iter_create(r);
 	if (iter == NULL)
@@ -2378,7 +2380,7 @@ print_firewall(const struct iptables_command_state *cs, struct nft_rule *r,
 	family = nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY);
 	ops = nft_family_ops_lookup(family);
 
-	flags = ops->print_firewall(cs, targname, num, format);
+	flags = ops->print_firewall(&cs, targname, num, format);
 
 	if (format & FMT_NOTABLE)
 		fputs("  ", stdout);
@@ -2430,8 +2432,7 @@ print_firewall(const struct iptables_command_state *cs, struct nft_rule *r,
 static int
 __nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 		int rulenum, unsigned int format,
-		void (*cb)(const struct iptables_command_state *cs,
-			   struct nft_rule *r, unsigned int num,
+		void (*cb)(struct nft_rule *r, unsigned int num,
 			   unsigned int format))
 {
 	struct nft_rule_list *list;
@@ -2465,11 +2466,7 @@ __nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 			goto next;
 		}
 
-		struct iptables_command_state cs = {};
-		/* Show all rules case */
-		nft_rule_to_iptables_command_state(r, &cs);
-
-		cb(&cs, r, rule_ctr, format);
+		cb(r, rule_ctr, format);
 		if (rulenum > 0 && rule_ctr == rulenum) {
 			ret = 1;
 			break;
@@ -2565,8 +2562,7 @@ err:
 }
 
 static void
-list_save(const struct iptables_command_state *cs, struct nft_rule *r,
-	  unsigned int num, unsigned int format)
+list_save(struct nft_rule *r, unsigned int num, unsigned int format)
 {
 	nft_rule_print_save(r, NFT_RULE_APPEND, !(format & FMT_NOCOUNTS));
 }
