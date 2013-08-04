@@ -230,7 +230,7 @@ struct xtables_match
 	/* Size of match data. */
 	size_t size;
 
-	/* Size of match data relevent for userspace comparison purposes */
+	/* Size of match data relevant for userspace comparison purposes */
 	size_t userspacesize;
 
 	/* Function which prints out usage message. */
@@ -308,7 +308,7 @@ struct xtables_target
 	/* Size of target data. */
 	size_t size;
 
-	/* Size of target data relevent for userspace comparison purposes */
+	/* Size of target data relevant for userspace comparison purposes */
 	size_t userspacesize;
 
 	/* Function which prints out usage message. */
