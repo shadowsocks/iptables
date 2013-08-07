@@ -2537,10 +2537,9 @@ int nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 		if (found)
 			printf("\n");
 
-		if (!rulenum) {
-			print_header(format, chain_name, policy_name[policy],
+		print_header(format, chain_name, policy_name[policy],
 				     &ctrs, basechain, refs);
-		}
+
 		__nft_rule_list(h, chain_name, table,
 				rulenum, format, print_firewall);
 
