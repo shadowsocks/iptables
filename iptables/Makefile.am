@@ -38,7 +38,7 @@ if ENABLE_IPV6
 v6_sbin_links  = ip6tables ip6tables-restore ip6tables-save
 endif
 
-iptables-extensions.8: ${srcdir}/iptables-extensions.8.tmpl ../extensions/matches.man ../extensions/targets.man
+iptables-extensions.8: iptables-extensions.8.tmpl ../extensions/matches.man ../extensions/targets.man
 	${AM_VERBOSE_GEN} sed \
 		-e '/@MATCH@/ r ../extensions/matches.man' \
 		-e '/@TARGET@/ r ../extensions/targets.man' $< >$@;
