@@ -549,7 +549,7 @@ int print_target(const char *targname, const void *targinfo,
 		if (target->print)
 			/* FIXME missing first parameter */
 			target->print(NULL, t, format & FMT_NUMERIC);
-	} else
+	} else if (target_len > 0)
 		printf("[%ld bytes of unknown target data] ", target_len);
 
 	free(t);
