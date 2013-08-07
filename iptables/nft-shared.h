@@ -48,9 +48,8 @@ struct nft_family_ops {
 			      struct iptables_command_state *cs,
 			      uint32_t offset);
 	void (*parse_immediate)(struct iptables_command_state *cs);
-	uint8_t (*print_firewall)(const struct iptables_command_state *cs,
-				  const char *targname, unsigned int num,
-				  unsigned int format);
+	void (*print_firewall)(struct nft_rule *r, unsigned int num,
+			       unsigned int format);
 	void (*post_parse)(int command, struct iptables_command_state *cs,
 			   struct xtables_args *args);
 };
@@ -80,10 +79,16 @@ bool is_same_interfaces(const char *a_iniface, const char *a_outiface,
 void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 		unsigned char *iniface_mask, char *outiface,
 		unsigned char *outiface_mask, uint8_t *invflags);
-
+const char *nft_parse_target(struct nft_rule *r, const void **targinfo,
+			     size_t *target_len);
 void print_proto(uint16_t proto, int invert);
 void get_cmp_data(struct nft_rule_expr_iter *iter,
 		  void *data, size_t dlen, bool *inv);
+void nft_rule_to_iptables_command_state(struct nft_rule *r,
+					struct iptables_command_state *cs);
+int print_matches(struct nft_rule *r, int format);
+int print_target(const char *targname, const void *targinfo,
+		 size_t target_len, int format);
 void print_num(uint64_t number, unsigned int format);
 void print_firewall_details(const struct iptables_command_state *cs,
 			    const char *targname, uint8_t flags,

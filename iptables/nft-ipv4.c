@@ -284,18 +284,41 @@ static void print_ipv4_addr(const struct iptables_command_state *cs,
 }
 
 
-static uint8_t nft_ipv4_print_firewall(const struct iptables_command_state *cs,
-				       const char *targname, unsigned int num,
-				       unsigned int format)
+static void nft_ipv4_print_firewall(struct nft_rule *r, unsigned int num,
+				    unsigned int format)
 {
-	print_firewall_details(cs, targname, cs->fw.ip.flags,
-			       cs->fw.ip.invflags, cs->fw.ip.proto,
-			       cs->fw.ip.iniface, cs->fw.ip.outiface,
+	struct iptables_command_state cs = {};
+	const char *targname = NULL;
+	const void *targinfo = NULL;
+	size_t target_len = 0;
+
+	nft_rule_to_iptables_command_state(r, &cs);
+
+	targname = nft_parse_target(r, &targinfo, &target_len);
+
+	print_firewall_details(&cs, targname, cs.fw.ip.flags,
+			       cs.fw.ip.invflags, cs.fw.ip.proto,
+			       cs.fw.ip.iniface, cs.fw.ip.outiface,
 			       num, format);
 
-	print_ipv4_addr(cs, format);
+	print_ipv4_addr(&cs, format);
 
-	return cs->fw.ip.flags;
+	if (format & FMT_NOTABLE)
+		fputs("  ", stdout);
+
+#ifdef IPT_F_GOTO
+	if (cs.fw.ip.flags & IPT_F_GOTO)
+		printf("[goto] ");
+#endif
+
+	if (print_matches(r, format) != 0)
+		return;
+
+	if (print_target(targname, targinfo, target_len, format) != 0)
+		return;
+
+	if (!(format & FMT_NONEWLINE))
+		fputc('\n', stdout);
 }
 
 static void nft_ipv4_post_parse(int command,

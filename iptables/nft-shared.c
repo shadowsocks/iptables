@@ -12,8 +12,12 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <netdb.h>
+#include <errno.h>
+
+#include <xtables.h>
 
 #include <linux/netfilter/nf_tables.h>
 
@@ -277,6 +281,59 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 	}
 }
 
+const char *nft_parse_target(struct nft_rule *r, const void **targinfo,
+			     size_t *target_len)
+{
+	struct nft_rule_expr_iter *iter;
+	struct nft_rule_expr *expr;
+	const char *targname = NULL;
+
+	iter = nft_rule_expr_iter_create(r);
+	if (iter == NULL)
+		return NULL;
+
+	expr = nft_rule_expr_iter_next(iter);
+	while (expr != NULL) {
+		const char *name =
+			nft_rule_expr_get_str(expr, NFT_RULE_EXPR_ATTR_NAME);
+
+		if (strcmp(name, "target") == 0) {
+			targname = nft_rule_expr_get_str(expr,
+							NFT_EXPR_TG_NAME);
+			*targinfo = nft_rule_expr_get(expr, NFT_EXPR_TG_INFO,
+								target_len);
+			break;
+		} else if (strcmp(name, "immediate") == 0) {
+			uint32_t verdict =
+			nft_rule_expr_get_u32(expr, NFT_EXPR_IMM_VERDICT);
+
+			switch(verdict) {
+			case NF_ACCEPT:
+				targname = "ACCEPT";
+				break;
+			case NF_DROP:
+				targname = "DROP";
+				break;
+			case NFT_RETURN:
+				targname = "RETURN";
+				break;
+			case NFT_GOTO:
+				targname = nft_rule_expr_get_str(expr,
+							NFT_EXPR_IMM_CHAIN);
+				break;
+			case NFT_JUMP:
+				targname = nft_rule_expr_get_str(expr,
+							NFT_EXPR_IMM_CHAIN);
+			break;
+			}
+		}
+		expr = nft_rule_expr_iter_next(iter);
+	}
+	nft_rule_expr_iter_destroy(iter);
+
+	return targname;
+}
+
 void print_proto(uint16_t proto, int invert)
 {
 	const struct protoent *pent = getprotobynumber(proto);
@@ -316,6 +373,188 @@ void get_cmp_data(struct nft_rule_expr_iter *iter,
 		*inv = true;
 	else
 		*inv = false;
+}
+
+static void
+nft_parse_meta(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
+	       int family, struct iptables_command_state *cs)
+{
+	uint8_t key = nft_rule_expr_get_u8(e, NFT_EXPR_META_KEY);
+	struct nft_family_ops *ops = nft_family_ops_lookup(family);
+	const char *name;
+
+	e = nft_rule_expr_iter_next(iter);
+	if (e == NULL)
+		return;
+
+	name = nft_rule_expr_get_str(e, NFT_RULE_EXPR_ATTR_NAME);
+	if (strcmp(name, "cmp") != 0) {
+		DEBUGP("skipping no cmp after meta\n");
+		return;
+	}
+
+	ops->parse_meta(e, key, cs);
+}
+
+static void
+nft_parse_payload(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
+		  int family, struct iptables_command_state *cs)
+{
+	struct nft_family_ops *ops = nft_family_ops_lookup(family);
+	uint32_t offset;
+
+	offset = nft_rule_expr_get_u32(e, NFT_EXPR_PAYLOAD_OFFSET);
+
+	ops->parse_payload(iter, cs, offset);
+}
+
+static void
+nft_parse_counter(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
+		  struct xt_counters *counters)
+{
+	counters->pcnt = nft_rule_expr_get_u64(e, NFT_EXPR_CTR_PACKETS);
+	counters->bcnt = nft_rule_expr_get_u64(e, NFT_EXPR_CTR_BYTES);
+}
+
+static void
+nft_parse_immediate(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
+		    int family, struct iptables_command_state *cs)
+{
+	int verdict = nft_rule_expr_get_u32(e, NFT_EXPR_IMM_VERDICT);
+	const char *chain = nft_rule_expr_get_str(e, NFT_EXPR_IMM_CHAIN);
+	struct nft_family_ops *ops;
+
+	/* Standard target? */
+	switch(verdict) {
+	case NF_ACCEPT:
+		cs->jumpto = "ACCEPT";
+		return;
+	case NF_DROP:
+		cs->jumpto = "DROP";
+		return;
+	case NFT_RETURN:
+		cs->jumpto = "RETURN";
+		return;
+	case NFT_GOTO:
+		ops = nft_family_ops_lookup(family);
+		ops->parse_immediate(cs);
+	case NFT_JUMP:
+		cs->jumpto = chain;
+		return;
+	}
+}
+
+void nft_rule_to_iptables_command_state(struct nft_rule *r,
+					struct iptables_command_state *cs)
+{
+	struct nft_rule_expr_iter *iter;
+	struct nft_rule_expr *expr;
+	int family = nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY);
+
+	iter = nft_rule_expr_iter_create(r);
+	if (iter == NULL)
+		return;
+
+	expr = nft_rule_expr_iter_next(iter);
+	while (expr != NULL) {
+		const char *name =
+			nft_rule_expr_get_str(expr, NFT_RULE_EXPR_ATTR_NAME);
+
+		if (strcmp(name, "counter") == 0) {
+			nft_parse_counter(expr, iter, &cs->counters);
+		} else if (strcmp(name, "payload") == 0) {
+			nft_parse_payload(expr, iter, family, cs);
+		} else if (strcmp(name, "meta") == 0) {
+			nft_parse_meta(expr, iter, family, cs);
+		} else if (strcmp(name, "immediate") == 0) {
+			nft_parse_immediate(expr, iter, family, cs);
+		}
+
+		expr = nft_rule_expr_iter_next(iter);
+	}
+
+	nft_rule_expr_iter_destroy(iter);
+}
+
+static void
+print_match(struct nft_rule_expr *expr, int numeric)
+{
+	size_t len;
+	const char *match_name = nft_rule_expr_get_str(expr, NFT_EXPR_MT_NAME);
+	const void *match_info = nft_rule_expr_get(expr, NFT_EXPR_MT_INFO, &len);
+	const struct xtables_match *match =
+		xtables_find_match(match_name, XTF_TRY_LOAD, NULL);
+	struct xt_entry_match *m =
+		calloc(1, sizeof(struct xt_entry_match) + len);
+
+	/* emulate struct xt_entry_match since ->print needs it */
+	memcpy((void *)&m->data, match_info, len);
+
+	if (match) {
+		if (match->print)
+			/* FIXME missing first parameter */
+			match->print(NULL, m, numeric);
+		else
+			printf("%s ", match_name);
+	} else {
+		if (match_name[0])
+			printf("UNKNOWN match `%s' ", match_name);
+	}
+
+	free(m);
+}
+
+int print_matches(struct nft_rule *r, int format)
+{
+	struct nft_rule_expr_iter *iter;
+	struct nft_rule_expr *expr;
+
+	iter = nft_rule_expr_iter_create(r);
+	if (iter == NULL)
+		return -ENOMEM;
+
+	expr = nft_rule_expr_iter_next(iter);
+	while (expr != NULL) {
+		const char *name =
+			nft_rule_expr_get_str(expr, NFT_RULE_EXPR_ATTR_NAME);
+
+		if (strcmp(name, "match") == 0)
+			print_match(expr, format & FMT_NUMERIC);
+
+		expr = nft_rule_expr_iter_next(iter);
+	}
+	nft_rule_expr_iter_destroy(iter);
+
+	return 0;
+}
+
+int print_target(const char *targname, const void *targinfo,
+		 size_t target_len, int format)
+{
+	struct xtables_target *target;
+	struct xt_entry_target *t;
+
+	if (targname == NULL)
+		return 0;
+
+	t = calloc(1, sizeof(struct xt_entry_target) + target_len);
+	if (t == NULL)
+		return -ENOMEM;
+
+	/* emulate struct xt_entry_target since ->print needs it */
+	memcpy((void *)&t->data, targinfo, target_len);
+
+	target = xtables_find_target(targname, XTF_TRY_LOAD);
+	if (target) {
+		if (target->print)
+			/* FIXME missing first parameter */
+			target->print(NULL, t, format & FMT_NUMERIC);
+	} else
+		printf("[%ld bytes of unknown target data] ", target_len);
+
+	free(t);
+
+	return 0;
 }
 
 void print_num(uint64_t number, unsigned int format)
