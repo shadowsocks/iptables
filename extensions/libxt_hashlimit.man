@@ -65,7 +65,7 @@ matching on source port
 matching on subnet
 "10000 packets per minute for every /28 subnet (groups of 8 addresses)
 in 10.0.0.0/8" =>
-\-s 10.0.0.8 \-\-hashlimit\-mask 28 \-\-hashlimit\-upto 10000/min
+\-s 10.0.0.0/8 \-\-hashlimit\-mask 28 \-\-hashlimit\-upto 10000/min
 .TP
 matching bytes per second
 "flows exceeding 512kbyte/s" =>
