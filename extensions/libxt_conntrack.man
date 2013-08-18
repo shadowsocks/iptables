@@ -45,7 +45,7 @@ States for \fB\-\-ctstate\fP:
 The packet is associated with no known connection.
 .TP
 \fBNEW\fP
-The packet has started a new connection, or otherwise associated
+The packet has started a new connection or otherwise associated
 with a connection which has not seen packets in both directions.
 .TP
 \fBESTABLISHED\fP
@@ -54,7 +54,7 @@ in both directions.
 .TP
 \fBRELATED\fP
 The packet is starting a new connection, but is associated with an
-existing connection, such as an FTP data transfer, or an ICMP error.
+existing connection, such as an FTP data transfer or an ICMP error.
 .TP
 \fBUNTRACKED\fP
 The packet is not tracked at all, which happens if you explicitly untrack it
