@@ -69,48 +69,6 @@ static bool nft_ipv6_is_same(const struct iptables_command_state *a,
 				  b->fw6.ipv6.outiface_mask);
 }
 
-static void nft_ipv6_print_payload(struct nft_rule_expr *e,
-				   struct nft_rule_expr_iter *iter)
-{
-	uint32_t offset;
-	bool inv;
-
-	offset = nft_rule_expr_get_u32(e, NFT_EXPR_PAYLOAD_OFFSET);
-
-	switch (offset) {
-	char addr_str[INET6_ADDRSTRLEN];
-	struct in6_addr addr;
-	uint8_t proto;
-	case offsetof(struct ip6_hdr, ip6_src):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
-		inet_ntop(AF_INET6, &addr, addr_str, INET6_ADDRSTRLEN);
-
-		if (inv)
-			printf("! -s %s ", addr_str);
-		else
-			printf("-s %s ", addr_str);
-
-		break;
-	case offsetof(struct ip6_hdr, ip6_dst):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
-		inet_ntop(AF_INET6, &addr, addr_str, INET6_ADDRSTRLEN);
-
-		if (inv)
-			printf("! -d %s ", addr_str);
-		else
-			printf("-d %s ", addr_str);
-
-		break;
-	case offsetof(struct ip6_hdr, ip6_nxt):
-		get_cmp_data(iter, &proto, sizeof(proto), &inv);
-		print_proto(proto, inv);
-		break;
-	default:
-		DEBUGP("unknown payload offset %d\n", offset);
-		break;
-	}
-}
-
 static void nft_ipv6_parse_meta(struct nft_rule_expr *e, uint8_t key,
 				struct iptables_command_state *cs)
 {
@@ -198,15 +156,10 @@ static void nft_ipv6_print_firewall(struct nft_rule *r, unsigned int num,
 				    unsigned int format)
 {
 	struct iptables_command_state cs = {};
-	const char *targname = NULL;
-	const void *targinfo = NULL;
-	size_t target_len = 0;
 
 	nft_rule_to_iptables_command_state(r, &cs);
 
-	targname = nft_parse_target(r, &targinfo, &target_len);
-
-	print_firewall_details(&cs, targname, cs.fw6.ipv6.flags,
+	print_firewall_details(&cs, cs.jumpto, cs.fw6.ipv6.flags,
 			       cs.fw6.ipv6.invflags, cs.fw6.ipv6.proto,
 			       cs.fw6.ipv6.iniface, cs.fw6.ipv6.outiface,
 			       num, format);
@@ -221,14 +174,38 @@ static void nft_ipv6_print_firewall(struct nft_rule *r, unsigned int num,
 		printf("[goto] ");
 #endif
 
-	if (print_matches(r, format) != 0)
-		return;
-
-	if (print_target(targname, targinfo, target_len, format) != 0)
-		return;
+	print_matches_and_target(&cs, format);
 
 	if (!(format & FMT_NONEWLINE))
 		fputc('\n', stdout);
+}
+
+static void save_ipv6_addr(char letter, const struct in6_addr *addr,
+			   int invert)
+{
+	char addr_str[INET6_ADDRSTRLEN];
+
+	if (!invert && IN6_IS_ADDR_UNSPECIFIED(addr))
+		return;
+
+	inet_ntop(AF_INET6, addr, addr_str, INET6_ADDRSTRLEN);
+	printf("%s-%c %s ", invert ? "! " : "", letter, addr_str);
+}
+
+static uint8_t nft_ipv6_save_firewall(const struct iptables_command_state *cs,
+				      unsigned int format)
+{
+	save_firewall_details(cs, cs->fw6.ipv6.invflags, cs->fw6.ipv6.proto,
+			      cs->fw6.ipv6.iniface, cs->fw6.ipv6.iniface_mask,
+			      cs->fw6.ipv6.outiface, cs->fw6.ipv6.outiface_mask,
+			      format);
+
+	save_ipv6_addr('s', &cs->fw6.ipv6.src,
+		       cs->fw6.ipv6.invflags & IPT_INV_SRCIP);
+	save_ipv6_addr('d', &cs->fw6.ipv6.dst,
+		       cs->fw6.ipv6.invflags & IPT_INV_DSTIP);
+
+	return cs->fw6.ipv6.flags;
 }
 
 /* These are invalid numbers as upper layer protocol */
@@ -300,10 +277,10 @@ static void nft_ipv6_post_parse(int command, struct iptables_command_state *cs,
 struct nft_family_ops nft_family_ops_ipv6 = {
 	.add			= nft_ipv6_add,
 	.is_same		= nft_ipv6_is_same,
-	.print_payload		= nft_ipv6_print_payload,
 	.parse_meta		= nft_ipv6_parse_meta,
 	.parse_payload		= nft_ipv6_parse_payload,
 	.parse_immediate	= nft_ipv6_parse_immediate,
 	.print_firewall		= nft_ipv6_print_firewall,
+	.save_firewall		= nft_ipv6_save_firewall,
 	.post_parse		= nft_ipv6_post_parse,
 };

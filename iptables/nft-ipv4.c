@@ -121,14 +121,6 @@ static void get_frag(struct nft_rule_expr_iter *iter, bool *inv)
 		*inv = false;
 }
 
-static void print_frag(bool inv)
-{
-	if (inv)
-		printf("! -f ");
-	else
-		printf("-f ");
-}
-
 static const char *mask_to_str(uint32_t mask)
 {
 	static char mask_str[sizeof("255.255.255.255")];
@@ -153,50 +145,6 @@ static const char *mask_to_str(uint32_t mask)
 		sprintf(mask_str, "%s", inet_ntoa(mask_addr));
 
 	return mask_str;
-}
-
-static void nft_ipv4_print_payload(struct nft_rule_expr *e,
-				  struct nft_rule_expr_iter *iter)
-{
-	uint32_t offset;
-	bool inv;
-
-	offset = nft_rule_expr_get_u32(e, NFT_EXPR_PAYLOAD_OFFSET);
-
-	switch(offset) {
-	struct in_addr addr;
-	uint8_t proto;
-
-	case offsetof(struct iphdr, saddr):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
-		if (inv)
-			printf("! -s %s/%s ", inet_ntoa(addr),
-						mask_to_str(0xffffffff));
-		else
-			printf("-s %s/%s ", inet_ntoa(addr),
-						mask_to_str(0xffffffff));
-		break;
-	case offsetof(struct iphdr, daddr):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
-		if (inv)
-			printf("! -d %s/%s ", inet_ntoa(addr),
-						mask_to_str(0xffffffff));
-		else
-			printf("-d %s/%s ", inet_ntoa(addr),
-						mask_to_str(0xffffffff));
-		break;
-	case offsetof(struct iphdr, protocol):
-		get_cmp_data(iter, &proto, sizeof(proto), &inv);
-		print_proto(proto, inv);
-		break;
-	case offsetof(struct iphdr, frag_off):
-		get_frag(iter, &inv);
-		print_frag(inv);
-		break;
-	default:
-		DEBUGP("unknown payload offset %d\n", offset);
-		break;
-	}
 }
 
 static void nft_ipv4_parse_meta(struct nft_rule_expr *e, uint8_t key,
@@ -288,15 +236,10 @@ static void nft_ipv4_print_firewall(struct nft_rule *r, unsigned int num,
 				    unsigned int format)
 {
 	struct iptables_command_state cs = {};
-	const char *targname = NULL;
-	const void *targinfo = NULL;
-	size_t target_len = 0;
 
 	nft_rule_to_iptables_command_state(r, &cs);
 
-	targname = nft_parse_target(r, &targinfo, &target_len);
-
-	print_firewall_details(&cs, targname, cs.fw.ip.flags,
+	print_firewall_details(&cs, cs.jumpto, cs.fw.ip.flags,
 			       cs.fw.ip.invflags, cs.fw.ip.proto,
 			       cs.fw.ip.iniface, cs.fw.ip.outiface,
 			       num, format);
@@ -311,14 +254,42 @@ static void nft_ipv4_print_firewall(struct nft_rule *r, unsigned int num,
 		printf("[goto] ");
 #endif
 
-	if (print_matches(r, format) != 0)
-		return;
-
-	if (print_target(targname, targinfo, target_len, format) != 0)
-		return;
+	print_matches_and_target(&cs, format);
 
 	if (!(format & FMT_NONEWLINE))
 		fputc('\n', stdout);
+}
+
+static void save_ipv4_addr(char letter, const struct in_addr *addr,
+			   uint32_t mask, int invert)
+{
+	if (!mask && !invert && !addr->s_addr)
+		return;
+
+	printf("%s-%c %s/%s ", invert ? "! " : "", letter, inet_ntoa(*addr),
+	       mask_to_str(mask));
+}
+
+static uint8_t nft_ipv4_save_firewall(const struct iptables_command_state *cs,
+				      unsigned int format)
+{
+	save_firewall_details(cs, cs->fw.ip.invflags, cs->fw.ip.proto,
+			      cs->fw.ip.iniface, cs->fw.ip.iniface_mask,
+			      cs->fw.ip.outiface, cs->fw.ip.outiface_mask,
+			      format);
+
+	if (cs->fw.ip.flags & IPT_F_FRAG) {
+		if (cs->fw.ip.invflags & IPT_INV_FRAG)
+			printf("! ");
+		printf("-f ");
+	}
+
+	save_ipv4_addr('s', &cs->fw.ip.src, cs->fw.ip.smsk.s_addr,
+		       cs->fw.ip.invflags & IPT_INV_SRCIP);
+	save_ipv4_addr('d', &cs->fw.ip.dst, cs->fw.ip.dmsk.s_addr,
+		       cs->fw.ip.invflags & IPT_INV_DSTIP);
+
+	return cs->fw.ip.flags;
 }
 
 static void nft_ipv4_post_parse(int command,
@@ -370,10 +341,10 @@ static void nft_ipv4_post_parse(int command,
 struct nft_family_ops nft_family_ops_ipv4 = {
 	.add			= nft_ipv4_add,
 	.is_same		= nft_ipv4_is_same,
-	.print_payload		= nft_ipv4_print_payload,
 	.parse_meta		= nft_ipv4_parse_meta,
 	.parse_payload		= nft_ipv4_parse_payload,
 	.parse_immediate	= nft_ipv4_parse_immediate,
 	.print_firewall		= nft_ipv4_print_firewall,
+	.save_firewall		= nft_ipv4_save_firewall,
 	.post_parse		= nft_ipv4_post_parse,
 };

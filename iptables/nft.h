@@ -87,7 +87,9 @@ enum nft_rule_print {
 	NFT_RULE_DEL,
 };
 
-void nft_rule_print_save(struct nft_rule *r, enum nft_rule_print type, bool counters);
+void nft_rule_print_save(const struct iptables_command_state *cs,
+			 struct nft_rule *r, enum nft_rule_print type,
+			 unsigned int format);
 
 /*
  * global commit and abort

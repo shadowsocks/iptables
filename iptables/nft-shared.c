@@ -281,57 +281,60 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 	}
 }
 
-const char *nft_parse_target(struct nft_rule *r, const void **targinfo,
-			     size_t *target_len)
+static void
+nft_parse_target(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
+		 struct iptables_command_state *cs)
 {
-	struct nft_rule_expr_iter *iter;
-	struct nft_rule_expr *expr;
-	const char *targname = NULL;
+	size_t tg_len;
+	const char *targname = nft_rule_expr_get_str(e, NFT_EXPR_TG_NAME);
+	const void *targinfo = nft_rule_expr_get(e, NFT_EXPR_TG_INFO, &tg_len);
+	struct xtables_target *target;
+	struct xt_entry_target *t;
 
-	iter = nft_rule_expr_iter_create(r);
-	if (iter == NULL)
-		return NULL;
+	target = xtables_find_target(targname, XTF_TRY_LOAD);
+	if (target == NULL)
+		return;
 
-	expr = nft_rule_expr_iter_next(iter);
-	while (expr != NULL) {
-		const char *name =
-			nft_rule_expr_get_str(expr, NFT_RULE_EXPR_ATTR_NAME);
-
-		if (strcmp(name, "target") == 0) {
-			targname = nft_rule_expr_get_str(expr,
-							NFT_EXPR_TG_NAME);
-			*targinfo = nft_rule_expr_get(expr, NFT_EXPR_TG_INFO,
-								target_len);
-			break;
-		} else if (strcmp(name, "immediate") == 0) {
-			uint32_t verdict =
-			nft_rule_expr_get_u32(expr, NFT_EXPR_IMM_VERDICT);
-
-			switch(verdict) {
-			case NF_ACCEPT:
-				targname = "ACCEPT";
-				break;
-			case NF_DROP:
-				targname = "DROP";
-				break;
-			case NFT_RETURN:
-				targname = "RETURN";
-				break;
-			case NFT_GOTO:
-				targname = nft_rule_expr_get_str(expr,
-							NFT_EXPR_IMM_CHAIN);
-				break;
-			case NFT_JUMP:
-				targname = nft_rule_expr_get_str(expr,
-							NFT_EXPR_IMM_CHAIN);
-			break;
-			}
-		}
-		expr = nft_rule_expr_iter_next(iter);
+	t = calloc(1, sizeof(struct xt_entry_target) + tg_len);
+	if (t == NULL) {
+		fprintf(stderr, "OOM");
+		exit(EXIT_FAILURE);
 	}
-	nft_rule_expr_iter_destroy(iter);
+	memcpy(&t->data, targinfo, tg_len);
+	t->u.target_size = tg_len + XT_ALIGN(sizeof(struct xt_entry_target));
+	t->u.user.revision = nft_rule_expr_get_u32(e, NFT_EXPR_TG_REV);
+	strcpy(t->u.user.name, target->name);
 
-	return targname;
+	target->t = t;
+	cs->target = target;
+}
+
+static void
+nft_parse_match(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
+		struct iptables_command_state *cs)
+{
+	size_t mt_len;
+	const char *mt_name = nft_rule_expr_get_str(e, NFT_EXPR_MT_NAME);
+	const void *mt_info = nft_rule_expr_get(e, NFT_EXPR_MT_INFO, &mt_len);
+	struct xtables_match *match;
+	struct xt_entry_match *m;
+
+	match = xtables_find_match(mt_name, XTF_TRY_LOAD, &cs->matches);
+	if (match == NULL)
+		return;
+
+	m = calloc(1, sizeof(struct xt_entry_match) + mt_len);
+	if (m == NULL) {
+		fprintf(stderr, "OOM");
+		exit(EXIT_FAILURE);
+	}
+
+	memcpy(&m->data, mt_info, mt_len);
+	m->u.match_size = mt_len + XT_ALIGN(sizeof(struct xt_entry_match));
+	m->u.user.revision = nft_rule_expr_get_u32(e, NFT_EXPR_TG_REV);
+	strcpy(m->u.user.name, match->name);
+
+	match->m = m;
 }
 
 void print_proto(uint16_t proto, int invert)
@@ -460,101 +463,30 @@ void nft_rule_to_iptables_command_state(struct nft_rule *r,
 		const char *name =
 			nft_rule_expr_get_str(expr, NFT_RULE_EXPR_ATTR_NAME);
 
-		if (strcmp(name, "counter") == 0) {
+		if (strcmp(name, "counter") == 0)
 			nft_parse_counter(expr, iter, &cs->counters);
-		} else if (strcmp(name, "payload") == 0) {
+		else if (strcmp(name, "payload") == 0)
 			nft_parse_payload(expr, iter, family, cs);
-		} else if (strcmp(name, "meta") == 0) {
+		else if (strcmp(name, "meta") == 0)
 			nft_parse_meta(expr, iter, family, cs);
-		} else if (strcmp(name, "immediate") == 0) {
+		else if (strcmp(name, "immediate") == 0)
 			nft_parse_immediate(expr, iter, family, cs);
-		}
+		else if (strcmp(name, "match") == 0)
+			nft_parse_match(expr, iter, cs);
+		else if (strcmp(name, "target") == 0)
+			nft_parse_target(expr, iter, cs);
 
 		expr = nft_rule_expr_iter_next(iter);
 	}
 
 	nft_rule_expr_iter_destroy(iter);
-}
 
-static void
-print_match(struct nft_rule_expr *expr, int numeric)
-{
-	size_t len;
-	const char *match_name = nft_rule_expr_get_str(expr, NFT_EXPR_MT_NAME);
-	const void *match_info = nft_rule_expr_get(expr, NFT_EXPR_MT_INFO, &len);
-	const struct xtables_match *match =
-		xtables_find_match(match_name, XTF_TRY_LOAD, NULL);
-	struct xt_entry_match *m =
-		calloc(1, sizeof(struct xt_entry_match) + len);
-
-	/* emulate struct xt_entry_match since ->print needs it */
-	memcpy((void *)&m->data, match_info, len);
-
-	if (match) {
-		if (match->print)
-			/* FIXME missing first parameter */
-			match->print(NULL, m, numeric);
-		else
-			printf("%s ", match_name);
-	} else {
-		if (match_name[0])
-			printf("UNKNOWN match `%s' ", match_name);
-	}
-
-	free(m);
-}
-
-int print_matches(struct nft_rule *r, int format)
-{
-	struct nft_rule_expr_iter *iter;
-	struct nft_rule_expr *expr;
-
-	iter = nft_rule_expr_iter_create(r);
-	if (iter == NULL)
-		return -ENOMEM;
-
-	expr = nft_rule_expr_iter_next(iter);
-	while (expr != NULL) {
-		const char *name =
-			nft_rule_expr_get_str(expr, NFT_RULE_EXPR_ATTR_NAME);
-
-		if (strcmp(name, "match") == 0)
-			print_match(expr, format & FMT_NUMERIC);
-
-		expr = nft_rule_expr_iter_next(iter);
-	}
-	nft_rule_expr_iter_destroy(iter);
-
-	return 0;
-}
-
-int print_target(const char *targname, const void *targinfo,
-		 size_t target_len, int format)
-{
-	struct xtables_target *target;
-	struct xt_entry_target *t;
-
-	if (targname == NULL)
-		return 0;
-
-	t = calloc(1, sizeof(struct xt_entry_target) + target_len);
-	if (t == NULL)
-		return -ENOMEM;
-
-	/* emulate struct xt_entry_target since ->print needs it */
-	memcpy((void *)&t->data, targinfo, target_len);
-
-	target = xtables_find_target(targname, XTF_TRY_LOAD);
-	if (target) {
-		if (target->print)
-			/* FIXME missing first parameter */
-			target->print(NULL, t, format & FMT_NUMERIC);
-	} else if (target_len > 0)
-		printf("[%ld bytes of unknown target data] ", target_len);
-
-	free(t);
-
-	return 0;
+	if (cs->target != NULL)
+		cs->jumpto = cs->target->name;
+	else if (cs->jumpto != NULL)
+		cs->target = xtables_find_target(cs->jumpto, XTF_TRY_LOAD);
+	else
+		cs->jumpto = "";
 }
 
 void print_num(uint64_t number, unsigned int format)
@@ -643,6 +575,86 @@ void print_firewall_details(const struct iptables_command_state *cs,
 		else if (format & FMT_NUMERIC) strcat(iface, "*");
 		else strcat(iface, "any");
 		printf(FMT("%-6s ","out %s "), iface);
+	}
+}
+
+static void
+print_iface(char letter, const char *iface, const unsigned char *mask, int inv)
+{
+	unsigned int i;
+
+	if (mask[0] == 0)
+		return;
+
+	printf("%s-%c ", inv ? "! " : "", letter);
+
+	for (i = 0; i < IFNAMSIZ; i++) {
+		if (mask[i] != 0) {
+			if (iface[i] != '\0')
+				printf("%c", iface[i]);
+			} else {
+				if (iface[i-1] != '\0')
+					printf("+");
+				break;
+		}
+	}
+
+	printf(" ");
+}
+
+void save_firewall_details(const struct iptables_command_state *cs,
+			   uint8_t invflags, uint16_t proto,
+			   const char *iniface,
+			   unsigned const char *iniface_mask,
+			   const char *outiface,
+			   unsigned const char *outiface_mask,
+			   unsigned int format)
+{
+	if (!(format & FMT_NOCOUNTS)) {
+		printf("-c ");
+		print_num(cs->counters.pcnt, format);
+		print_num(cs->counters.bcnt, format);
+	}
+
+	if (iniface != NULL) {
+		print_iface('i', iniface, iniface_mask,
+			    invflags & IPT_INV_VIA_IN);
+	}
+	if (outiface != NULL) {
+		print_iface('o', outiface, outiface_mask,
+			    invflags & IPT_INV_VIA_OUT);
+	}
+
+	if (proto > 0) {
+		const struct protoent *pent = getprotobynumber(proto);
+
+		if (invflags & XT_INV_PROTO)
+			printf("! ");
+
+		if (pent)
+			printf("-p %s ", pent->p_name);
+		else
+			printf("-p %u ", proto);
+	}
+}
+
+void print_matches_and_target(struct iptables_command_state *cs,
+			      unsigned int format)
+{
+	struct xtables_rule_match *matchp;
+
+	for (matchp = cs->matches; matchp; matchp = matchp->next) {
+		if (matchp->match->print != NULL) {
+			matchp->match->print(NULL, matchp->match->m,
+					     format & FMT_NUMERIC);
+		}
+	}
+
+	if (cs->target != NULL) {
+		if (cs->target->print != NULL) {
+			cs->target->print(NULL, cs->target->t,
+					  format & FMT_NUMERIC);
+		}
 	}
 }
 
