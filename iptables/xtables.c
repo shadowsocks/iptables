@@ -1173,8 +1173,7 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 		ret = nft_chain_zero_counters(h, chain, *table);
 		break;
 	case CMD_ZERO_NUM:
-		/* FIXME */
-//		ret = iptc_zero_counter(chain, rulenum, *handle);
+		ret = nft_rule_zero_counters(h, chain, *table, rulenum - 1);
 		break;
 	case CMD_LIST:
 	case CMD_LIST|CMD_ZERO:
@@ -1187,9 +1186,9 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 				   cs.options&OPT_LINENUMBERS);
 		if (ret && (command & CMD_ZERO))
 			ret = nft_chain_zero_counters(h, chain, *table);
-		/* FIXME */
-/*		if (ret && (command & CMD_ZERO_NUM))
-			ret = iptc_zero_counter(chain, rulenum, *handle); */
+		if (ret && (command & CMD_ZERO_NUM))
+			ret = nft_rule_zero_counters(h, chain, *table,
+						     rulenum - 1);
 		break;
 	case CMD_LIST_RULES:
 	case CMD_LIST_RULES|CMD_ZERO:
@@ -1197,9 +1196,9 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 		ret = list_rules(h, chain, *table, rulenum, cs.options&OPT_VERBOSE);
 		if (ret && (command & CMD_ZERO))
 			ret = nft_chain_zero_counters(h, chain, *table);
-		/* FIXME */
-/*		if (ret && (command & CMD_ZERO_NUM))
-			ret = iptc_zero_counter(chain, rulenum, *handle); */
+		if (ret && (command & CMD_ZERO_NUM))
+			ret = nft_rule_zero_counters(h, chain, *table,
+						     rulenum - 1);
 		break;
 	case CMD_NEW_CHAIN:
 		ret = nft_chain_user_add(h, chain, *table);

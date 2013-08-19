@@ -81,6 +81,7 @@ int nft_rule_list(struct nft_handle *h, const char *chain, const char *table, in
 int nft_rule_list_save(struct nft_handle *h, const char *chain, const char *table, int rulenum, int counters);
 int nft_rule_save(struct nft_handle *h, const char *table, bool counters);
 int nft_rule_flush(struct nft_handle *h, const char *chain, const char *table);
+int nft_rule_zero_counters(struct nft_handle *h, const char *chain, const char *table, int rulenum);
 
 enum nft_rule_print {
 	NFT_RULE_APPEND,

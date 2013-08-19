@@ -2091,6 +2091,41 @@ err:
 	return ret;
 }
 
+int nft_rule_zero_counters(struct nft_handle *h, const char *chain,
+			   const char *table, int rulenum)
+{
+	struct iptables_command_state cs = {};
+	struct nft_rule_list *list;
+	struct nft_rule *r;
+	int ret = 0;
+
+	nft_fn = nft_rule_delete;
+
+	list = nft_rule_list_create(h);
+	if (list == NULL)
+		return 0;
+
+	r = nft_rule_find(list, chain, table, NULL, rulenum);
+	if (r == NULL) {
+		errno = ENOENT;
+		ret = 1;
+		goto error;
+	}
+
+	nft_rule_to_iptables_command_state(r, &cs);
+
+	cs.counters.pcnt = cs.counters.bcnt = 0;
+
+	ret =  nft_rule_append(h, chain, table, &cs,
+			       nft_rule_attr_get_u64(r, NFT_RULE_ATTR_HANDLE),
+			       false);
+
+error:
+	nft_rule_list_destroy(list);
+
+	return ret;
+}
+
 static int nft_action(struct nft_handle *h, int type)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
