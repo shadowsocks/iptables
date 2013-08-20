@@ -489,30 +489,6 @@ void nft_rule_to_iptables_command_state(struct nft_rule *r,
 		cs->jumpto = "";
 }
 
-void print_num(uint64_t number, unsigned int format)
-{
-	if (format & FMT_KILOMEGAGIGA) {
-		if (number > 99999) {
-			number = (number + 500) / 1000;
-			if (number > 9999) {
-				number = (number + 500) / 1000;
-				if (number > 9999) {
-					number = (number + 500) / 1000;
-					if (number > 9999) {
-						number = (number + 500) / 1000;
-						printf(FMT("%4lluT ","%lluT "), (unsigned long long)number);
-					}
-					else printf(FMT("%4lluG ","%lluG "), (unsigned long long)number);
-				}
-				else printf(FMT("%4lluM ","%lluM "), (unsigned long long)number);
-			} else
-				printf(FMT("%4lluK ","%lluK "), (unsigned long long)number);
-		} else
-			printf(FMT("%5llu ","%llu "), (unsigned long long)number);
-	} else
-		printf(FMT("%8llu ","%llu "), (unsigned long long)number);
-}
-
 void print_firewall_details(const struct iptables_command_state *cs,
 			    const char *targname, uint8_t flags,
 			    uint8_t invflags, uint8_t proto,
@@ -522,8 +498,8 @@ void print_firewall_details(const struct iptables_command_state *cs,
 		printf(FMT("%-4u ", "%u "), num);
 
 	if (!(format & FMT_NOCOUNTS)) {
-		print_num(cs->counters.pcnt, format);
-		print_num(cs->counters.bcnt, format);
+		xtables_print_num(cs->counters.pcnt, format);
+		xtables_print_num(cs->counters.bcnt, format);
 	}
 
 	if (!(format & FMT_NOTARGET))
@@ -613,8 +589,8 @@ void save_firewall_details(const struct iptables_command_state *cs,
 {
 	if (!(format & FMT_NOCOUNTS)) {
 		printf("-c ");
-		print_num(cs->counters.pcnt, format);
-		print_num(cs->counters.bcnt, format);
+		xtables_print_num(cs->counters.pcnt, format);
+		xtables_print_num(cs->counters.bcnt, format);
 	}
 
 	if (iniface != NULL) {

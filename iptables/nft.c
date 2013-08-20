@@ -1817,9 +1817,9 @@ print_header(unsigned int format, const char *chain, const char *pol,
 		printf(" (policy %s", pol);
 		if (!(format & FMT_NOCOUNTS)) {
 			fputc(' ', stdout);
-			print_num(counters->pcnt, (format|FMT_NOTABLE));
+			xtables_print_num(counters->pcnt, (format|FMT_NOTABLE));
 			fputs("packets, ", stdout);
-			print_num(counters->bcnt, (format|FMT_NOTABLE));
+			xtables_print_num(counters->bcnt, (format|FMT_NOTABLE));
 			fputs("bytes", stdout);
 		}
 		printf(")\n");
