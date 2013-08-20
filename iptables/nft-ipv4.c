@@ -231,6 +231,18 @@ static void print_ipv4_addr(const struct iptables_command_state *cs,
 	}
 }
 
+static void print_fragment(unsigned int flags, unsigned int invflags,
+			   unsigned int format)
+{
+	if (!(format & FMT_OPTIONS))
+		return;
+
+	if (format & FMT_NOTABLE)
+		fputs("opt ", stdout);
+	fputc(invflags & IPT_INV_FRAG ? '!' : '-', stdout);
+	fputc(flags & IPT_F_FRAG ? 'f' : '-', stdout);
+	fputc(' ', stdout);
+}
 
 static void nft_ipv4_print_firewall(struct nft_rule *r, unsigned int num,
 				    unsigned int format)
@@ -241,9 +253,10 @@ static void nft_ipv4_print_firewall(struct nft_rule *r, unsigned int num,
 
 	print_firewall_details(&cs, cs.jumpto, cs.fw.ip.flags,
 			       cs.fw.ip.invflags, cs.fw.ip.proto,
-			       cs.fw.ip.iniface, cs.fw.ip.outiface,
 			       num, format);
-
+	print_fragment(cs.fw.ip.flags, cs.fw.ip.invflags, format);
+	print_ifaces(cs.fw.ip.iniface, cs.fw.ip.outiface, cs.fw.ip.invflags,
+		     format);
 	print_ipv4_addr(&cs, format);
 
 	if (format & FMT_NOTABLE)

@@ -90,8 +90,9 @@ void print_num(uint64_t number, unsigned int format);
 void print_firewall_details(const struct iptables_command_state *cs,
 			    const char *targname, uint8_t flags,
 			    uint8_t invflags, uint8_t proto,
-			    const char *iniface, const char *outiface,
 			    unsigned int num, unsigned int format);
+void print_ifaces(const char *iniface, const char *outiface, uint8_t invflags,
+		  unsigned int format);
 void print_matches_and_target(struct iptables_command_state *cs,
 			      unsigned int format);
 void save_firewall_details(const struct iptables_command_state *cs,

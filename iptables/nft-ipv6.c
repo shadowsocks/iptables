@@ -161,9 +161,9 @@ static void nft_ipv6_print_firewall(struct nft_rule *r, unsigned int num,
 
 	print_firewall_details(&cs, cs.jumpto, cs.fw6.ipv6.flags,
 			       cs.fw6.ipv6.invflags, cs.fw6.ipv6.proto,
-			       cs.fw6.ipv6.iniface, cs.fw6.ipv6.outiface,
 			       num, format);
-
+	print_ifaces(cs.fw6.ipv6.iniface, cs.fw6.ipv6.outiface,
+		     cs.fw6.ipv6.invflags, format);
 	print_ipv6_addr(&cs, format);
 
 	if (format & FMT_NOTABLE)

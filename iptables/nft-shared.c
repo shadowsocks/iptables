@@ -516,7 +516,6 @@ void print_num(uint64_t number, unsigned int format)
 void print_firewall_details(const struct iptables_command_state *cs,
 			    const char *targname, uint8_t flags,
 			    uint8_t invflags, uint8_t proto,
-			    const char *iniface, const char *outiface,
 			    unsigned int num, unsigned int format)
 {
 	if (format & FMT_LINENUMBERS)
@@ -539,43 +538,45 @@ void print_firewall_details(const struct iptables_command_state *cs,
 		else
 			printf(FMT("%-5hu", "%hu "), proto);
 	}
+}
 
-	if (format & FMT_OPTIONS) {
-		if (format & FMT_NOTABLE)
-			fputs("opt ", stdout);
-		fputc(invflags & IPT_INV_FRAG ? '!' : '-', stdout);
-		fputc(flags & IPT_F_FRAG ? 'f' : '-', stdout);
-		fputc(' ', stdout);
-	}
+void print_ifaces(const char *iniface, const char *outiface, uint8_t invflags,
+		  unsigned int format)
+{
+	char iface[IFNAMSIZ+2];
 
-	if (format & FMT_VIA) {
-		char iface[IFNAMSIZ+2];
-		if (invflags & IPT_INV_VIA_IN) {
-			iface[0] = '!';
-			iface[1] = '\0';
-		}
-		else iface[0] = '\0';
+	if (!(format & FMT_VIA))
+		return;
 
-		if (iniface[0] != '\0') {
-			strcat(iface, iniface);
-		}
-		else if (format & FMT_NUMERIC) strcat(iface, "*");
-		else strcat(iface, "any");
-		printf(FMT(" %-6s ","in %s "), iface);
+	if (invflags & IPT_INV_VIA_IN) {
+		iface[0] = '!';
+		iface[1] = '\0';
+	} else
+		iface[0] = '\0';
 
-		if (invflags & IPT_INV_VIA_OUT) {
-			iface[0] = '!';
-			iface[1] = '\0';
-		}
-		else iface[0] = '\0';
+	if (iniface[0] != '\0')
+		strcat(iface, iniface);
+	else if (format & FMT_NUMERIC)
+		strcat(iface, "*");
+	else
+		strcat(iface, "any");
 
-		if (outiface[0] != '\0') {
-			strcat(iface, outiface);
-		}
-		else if (format & FMT_NUMERIC) strcat(iface, "*");
-		else strcat(iface, "any");
-		printf(FMT("%-6s ","out %s "), iface);
-	}
+	printf(FMT(" %-6s ","in %s "), iface);
+
+	if (invflags & IPT_INV_VIA_OUT) {
+		iface[0] = '!';
+		iface[1] = '\0';
+	} else
+		iface[0] = '\0';
+
+	if (outiface[0] != '\0')
+		strcat(iface, outiface);
+	else if (format & FMT_NUMERIC)
+		strcat(iface, "*");
+	else
+		strcat(iface, "any");
+
+	printf(FMT("%-6s ","out %s "), iface);
 }
 
 static void
