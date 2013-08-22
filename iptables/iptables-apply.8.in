@@ -2,7 +2,7 @@
 .\"    Author: Martin F. Krafft
 .\"      Date: Jun 04, 2006
 .\"
-.TH iptables\-apply 8 2006-06-04
+.TH IPTABLES\-APPLY 8 "" "@PACKAGE_STRING@" "@PACKAGE_STRING@"
 .\" disable hyphenation
 .nh
 .SH NAME

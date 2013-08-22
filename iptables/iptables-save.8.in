@@ -1,4 +1,4 @@
-.TH IPTABLES-SAVE 8 "Jan 04, 2001" "" ""
+.TH IPTABLES-SAVE 8 "" "@PACKAGE_STRING@" "@PACKAGE_STRING@"
 .\"
 .\" Man page written by Harald Welte <laforge@gnumonks.org>
 .\" It is based on the iptables man page.

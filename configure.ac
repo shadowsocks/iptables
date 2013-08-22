@@ -156,6 +156,8 @@ AC_SUBST([libxtables_vmajor])
 AC_CONFIG_FILES([Makefile extensions/GNUmakefile include/Makefile
 	iptables/Makefile iptables/xtables.pc
 	iptables/iptables.8 iptables/iptables-extensions.8.tmpl
+	iptables/iptables-save.8 iptables/iptables-restore.8
+	iptables/iptables-apply.8 iptables/iptables-xml.1
 	libipq/Makefile libipq/libipq.pc
 	libiptc/Makefile libiptc/libiptc.pc
 	libiptc/libip4tc.pc libiptc/libip6tc.pc
