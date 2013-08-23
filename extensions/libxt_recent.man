@@ -73,9 +73,6 @@ iptables \-A FORWARD \-m recent \-\-name badguy \-\-rcheck \-\-seconds 60 \-j DR
 .IP
 iptables \-A FORWARD \-p tcp \-i eth0 \-\-dport 139 \-m recent \-\-name badguy \-\-set \-j DROP
 .PP
-Steve's ipt_recent website (http://snowman.net/projects/ipt_recent/) also has
-some examples of usage.
-.PP
 \fB/proc/net/xt_recent/*\fP are the current lists of addresses and information
 about each entry of each list.
 .PP

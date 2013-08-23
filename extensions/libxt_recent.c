@@ -104,7 +104,7 @@ static void recent_help(void)
 "    --rsource                   Match/Save the source address of each packet in the recent list table (default).\n"
 "    --rdest                     Match/Save the destination address of each packet in the recent list table.\n"
 "    --mask netmask              Netmask that will be applied to this recent list.\n"
-"xt_recent by: Stephen Frost <sfrost@snowman.net>.  http://snowman.net/projects/ipt_recent/\n");
+"xt_recent by: Stephen Frost <sfrost@snowman.net>.\n");
 }
 
 enum {
