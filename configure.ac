@@ -54,6 +54,9 @@ AC_ARG_ENABLE([libipq],
 AC_ARG_ENABLE([bpf-compiler],
 	AS_HELP_STRING([--enable-bpf-compiler], [Build bpf compiler]),
 	[enable_bpfc="yes"], [enable_bpfc="no"])
+AC_ARG_ENABLE([nfsynproxy],
+	AS_HELP_STRING([--enable-nfsynproxy], [Build SYNPROXY configuration tool]),
+	[enable_nfsynproxy="yes"], [enable_nfsynproxy="no"])
 AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
 	[Path to the pkgconfig directory [[LIBDIR/pkgconfig]]]),
 	[pkgconfigdir="$withval"], [pkgconfigdir='${libdir}/pkgconfig'])
@@ -102,9 +105,10 @@ AM_CONDITIONAL([ENABLE_LARGEFILE], [test "$enable_largefile" = "yes"])
 AM_CONDITIONAL([ENABLE_DEVEL], [test "$enable_devel" = "yes"])
 AM_CONDITIONAL([ENABLE_LIBIPQ], [test "$enable_libipq" = "yes"])
 AM_CONDITIONAL([ENABLE_BPFC], [test "$enable_bpfc" = "yes"])
+AM_CONDITIONAL([ENABLE_SYNCONF], [test "$enable_nfsynproxy" = "yes"])
 
-if test "x$enable_bpfc" = "xyes"; then
-	AC_CHECK_LIB(pcap, pcap_compile,, AC_MSG_ERROR(missing libpcap library required by bpf compiler))
+if test "x$enable_bpfc" = "xyes" || test "x$enable_nfsynproxy" = "xyes"; then
+	AC_CHECK_LIB(pcap, pcap_compile,, AC_MSG_ERROR(missing libpcap library required by bpf compiler or nfsynproxy tool))
 fi
 
 PKG_CHECK_MODULES([libnfnetlink], [libnfnetlink >= 1.0],
@@ -177,6 +181,7 @@ Iptables Configuration:
   IPQ support:				${enable_libipq}
   Large file support:			${enable_largefile}
   BPF utils support:			${enable_bpfc}
+  nfsynproxy util support:		${enable_nfsynproxy}
 
 Build parameters:
   Put plugins into executable (static):	${enable_static}

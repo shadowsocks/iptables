@@ -18,3 +18,8 @@ if ENABLE_BPFC
 sbin_PROGRAMS += nfbpf_compile
 nfbpf_compile_LDADD = -lpcap
 endif
+
+if ENABLE_SYNCONF
+sbin_PROGRAMS += nfsynproxy
+nfsynproxy_LDADD = -lpcap
+endif
