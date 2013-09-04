@@ -70,17 +70,19 @@ static bool nft_ipv6_is_same(const struct iptables_command_state *a,
 }
 
 static void nft_ipv6_parse_meta(struct nft_rule_expr *e, uint8_t key,
-				struct iptables_command_state *cs)
+				void *data)
 {
+	struct iptables_command_state *cs = data;
+
 	parse_meta(e, key, cs->fw6.ipv6.iniface,
 		   cs->fw6.ipv6.iniface_mask, cs->fw6.ipv6.outiface,
 		   cs->fw6.ipv6.outiface_mask, &cs->fw6.ipv6.invflags);
 }
 
 static void nft_ipv6_parse_payload(struct nft_rule_expr_iter *iter,
-				   struct iptables_command_state *cs,
-				   uint32_t offset)
+				   uint32_t offset, void *data)
 {
+	struct iptables_command_state *cs = data;
 	switch (offset) {
 	struct in6_addr addr;
 	uint8_t proto;
@@ -110,9 +112,15 @@ static void nft_ipv6_parse_payload(struct nft_rule_expr_iter *iter,
 	}
 }
 
-static void nft_ipv6_parse_immediate(struct iptables_command_state *cs)
+static void nft_ipv6_parse_immediate(const char *jumpto, bool nft_goto,
+				     void *data)
 {
-	cs->fw6.ipv6.flags |= IPT_F_GOTO;
+	struct iptables_command_state *cs = data;
+
+	cs->jumpto = jumpto;
+
+	if (nft_goto)
+		cs->fw6.ipv6.flags |= IPT_F_GOTO;
 }
 
 static void print_ipv6_addr(const struct iptables_command_state *cs,
@@ -274,6 +282,13 @@ static void nft_ipv6_post_parse(int command, struct iptables_command_state *cs,
 			      " source or destination IP addresses");
 }
 
+static void nft_ipv6_parse_target(struct xtables_target *t, void *data)
+{
+	struct iptables_command_state *cs = data;
+
+	cs->target = t;
+}
+
 struct nft_family_ops nft_family_ops_ipv6 = {
 	.add			= nft_ipv6_add,
 	.is_same		= nft_ipv6_is_same,
@@ -283,4 +298,5 @@ struct nft_family_ops nft_family_ops_ipv6 = {
 	.print_firewall		= nft_ipv6_print_firewall,
 	.save_firewall		= nft_ipv6_save_firewall,
 	.post_parse		= nft_ipv6_post_parse,
+	.parse_target		= nft_ipv6_parse_target,
 };

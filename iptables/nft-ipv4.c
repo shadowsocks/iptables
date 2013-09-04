@@ -148,17 +148,20 @@ static const char *mask_to_str(uint32_t mask)
 }
 
 static void nft_ipv4_parse_meta(struct nft_rule_expr *e, uint8_t key,
-				struct iptables_command_state *cs)
+				void *data)
 {
+	struct iptables_command_state *cs = data;
+
 	parse_meta(e, key, cs->fw.ip.iniface, cs->fw.ip.iniface_mask,
 		   cs->fw.ip.outiface, cs->fw.ip.outiface_mask,
 		   &cs->fw.ip.invflags);
 }
 
 static void nft_ipv4_parse_payload(struct nft_rule_expr_iter *iter,
-				   struct iptables_command_state *cs,
-				   uint32_t offset)
+				   uint32_t offset, void *data)
 {
+	struct iptables_command_state *cs = data;
+
 	switch(offset) {
 	struct in_addr addr;
 	uint8_t proto;
@@ -196,9 +199,15 @@ static void nft_ipv4_parse_payload(struct nft_rule_expr_iter *iter,
 	}
 }
 
-static void nft_ipv4_parse_immediate(struct iptables_command_state *cs)
+static void nft_ipv4_parse_immediate(const char *jumpto, bool nft_goto,
+				     void *data)
 {
-	cs->fw.ip.flags |= IPT_F_GOTO;
+	struct iptables_command_state *cs = data;
+
+	cs->jumpto = jumpto;
+
+	if (nft_goto)
+		cs->fw.ip.flags |= IPT_F_GOTO;
 }
 
 static void print_ipv4_addr(const struct iptables_command_state *cs,
@@ -351,6 +360,13 @@ static void nft_ipv4_post_parse(int command,
 			      " source or destination IP addresses");
 }
 
+static void nft_ipv4_parse_target(struct xtables_target *t, void *data)
+{
+	struct iptables_command_state *cs = data;
+
+	cs->target = t;
+}
+
 struct nft_family_ops nft_family_ops_ipv4 = {
 	.add			= nft_ipv4_add,
 	.is_same		= nft_ipv4_is_same,
@@ -360,4 +376,5 @@ struct nft_family_ops nft_family_ops_ipv4 = {
 	.print_firewall		= nft_ipv4_print_firewall,
 	.save_firewall		= nft_ipv4_save_firewall,
 	.post_parse		= nft_ipv4_post_parse,
+	.parse_target		= nft_ipv4_parse_target,
 };

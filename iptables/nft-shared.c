@@ -283,13 +283,14 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 
 static void
 nft_parse_target(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
-		 struct iptables_command_state *cs)
+		 int family, void *data)
 {
 	size_t tg_len;
 	const char *targname = nft_rule_expr_get_str(e, NFT_EXPR_TG_NAME);
 	const void *targinfo = nft_rule_expr_get(e, NFT_EXPR_TG_INFO, &tg_len);
 	struct xtables_target *target;
 	struct xt_entry_target *t;
+	struct nft_family_ops *ops;
 
 	target = xtables_find_target(targname, XTF_TRY_LOAD);
 	if (target == NULL)
@@ -306,7 +307,9 @@ nft_parse_target(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 	strcpy(t->u.user.name, target->name);
 
 	target->t = t;
-	cs->target = target;
+
+	ops = nft_family_ops_lookup(family);
+	ops->parse_target(target, data);
 }
 
 static void
@@ -380,7 +383,7 @@ void get_cmp_data(struct nft_rule_expr_iter *iter,
 
 static void
 nft_parse_meta(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
-	       int family, struct iptables_command_state *cs)
+	       int family, void *data)
 {
 	uint8_t key = nft_rule_expr_get_u8(e, NFT_EXPR_META_KEY);
 	struct nft_family_ops *ops = nft_family_ops_lookup(family);
@@ -396,19 +399,19 @@ nft_parse_meta(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 		return;
 	}
 
-	ops->parse_meta(e, key, cs);
+	ops->parse_meta(e, key, data);
 }
 
 static void
 nft_parse_payload(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
-		  int family, struct iptables_command_state *cs)
+		  int family, void *data)
 {
 	struct nft_family_ops *ops = nft_family_ops_lookup(family);
 	uint32_t offset;
 
 	offset = nft_rule_expr_get_u32(e, NFT_EXPR_PAYLOAD_OFFSET);
 
-	ops->parse_payload(iter, cs, offset);
+	ops->parse_payload(iter, offset, data);
 }
 
 static void
@@ -421,30 +424,34 @@ nft_parse_counter(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 
 static void
 nft_parse_immediate(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
-		    int family, struct iptables_command_state *cs)
+		    int family, void *data)
 {
 	int verdict = nft_rule_expr_get_u32(e, NFT_EXPR_IMM_VERDICT);
 	const char *chain = nft_rule_expr_get_str(e, NFT_EXPR_IMM_CHAIN);
 	struct nft_family_ops *ops;
+	const char *jumpto;
+	bool nft_goto = false;
 
 	/* Standard target? */
 	switch(verdict) {
 	case NF_ACCEPT:
-		cs->jumpto = "ACCEPT";
-		return;
+		jumpto = "ACCEPT";
+		break;
 	case NF_DROP:
-		cs->jumpto = "DROP";
-		return;
+		jumpto = "DROP";
+		break;
 	case NFT_RETURN:
-		cs->jumpto = "RETURN";
-		return;
+		jumpto = "RETURN";
+		break;;
 	case NFT_GOTO:
-		ops = nft_family_ops_lookup(family);
-		ops->parse_immediate(cs);
+		nft_goto = true;
 	case NFT_JUMP:
-		cs->jumpto = chain;
-		return;
+		jumpto = chain;
+		break;
 	}
+
+	ops = nft_family_ops_lookup(family);
+	ops->parse_immediate(jumpto, nft_goto, data);
 }
 
 void nft_rule_to_iptables_command_state(struct nft_rule *r,
@@ -474,7 +481,7 @@ void nft_rule_to_iptables_command_state(struct nft_rule *r,
 		else if (strcmp(name, "match") == 0)
 			nft_parse_match(expr, iter, cs);
 		else if (strcmp(name, "target") == 0)
-			nft_parse_target(expr, iter, cs);
+			nft_parse_target(expr, iter, family, cs);
 
 		expr = nft_rule_expr_iter_next(iter);
 	}

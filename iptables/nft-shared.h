@@ -43,17 +43,17 @@ struct nft_family_ops {
 	void (*print_payload)(struct nft_rule_expr *e,
 			      struct nft_rule_expr_iter *iter);
 	void (*parse_meta)(struct nft_rule_expr *e, uint8_t key,
-			   struct iptables_command_state *cs);
+			   void *data);
 	void (*parse_payload)(struct nft_rule_expr_iter *iter,
-			      struct iptables_command_state *cs,
-			      uint32_t offset);
-	void (*parse_immediate)(struct iptables_command_state *cs);
+			      uint32_t offset, void *data);
+	void (*parse_immediate)(const char *jumpto, bool nft_goto, void *data);
 	void (*print_firewall)(struct nft_rule *r, unsigned int num,
 			       unsigned int format);
 	uint8_t (*save_firewall)(const struct iptables_command_state *cs,
 				 unsigned int format);
 	void (*post_parse)(int command, struct iptables_command_state *cs,
 			   struct xtables_args *args);
+	void (*parse_target)(struct xtables_target *t, void *data);
 };
 
 void add_meta(struct nft_rule *r, uint32_t key);
