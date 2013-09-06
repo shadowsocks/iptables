@@ -429,7 +429,7 @@ nft_parse_immediate(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 	int verdict = nft_rule_expr_get_u32(e, NFT_EXPR_IMM_VERDICT);
 	const char *chain = nft_rule_expr_get_str(e, NFT_EXPR_IMM_CHAIN);
 	struct nft_family_ops *ops;
-	const char *jumpto;
+	const char *jumpto = NULL;
 	bool nft_goto = false;
 
 	/* Standard target? */
