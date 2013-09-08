@@ -24,8 +24,9 @@
 
 #include "nft-shared.h"
 
-static int nft_ipv4_add(struct nft_rule *r, struct iptables_command_state *cs)
+static int nft_ipv4_add(struct nft_rule *r, void *data)
 {
+	struct iptables_command_state *cs = data;
 	uint32_t op;
 
 	if (cs->fw.ip.iniface[0] != '\0')

@@ -37,7 +37,7 @@
 struct xtables_args;
 
 struct nft_family_ops {
-	int (*add)(struct nft_rule *r, struct iptables_command_state *cs);
+	int (*add)(struct nft_rule *r, void *data);
 	bool (*is_same)(const struct iptables_command_state *a,
 			const struct iptables_command_state *b);
 	void (*print_payload)(struct nft_rule_expr *e,

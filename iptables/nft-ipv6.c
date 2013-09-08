@@ -22,8 +22,10 @@
 
 #include "nft-shared.h"
 
-static int nft_ipv6_add(struct nft_rule *r, struct iptables_command_state *cs)
+static int nft_ipv6_add(struct nft_rule *r, void *data)
 {
+	struct iptables_command_state *cs = data;
+
 	if (cs->fw6.ipv6.iniface[0] != '\0')
 		add_iniface(r, cs->fw6.ipv6.iniface, cs->fw6.ipv6.invflags);
 
