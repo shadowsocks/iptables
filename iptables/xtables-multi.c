@@ -42,6 +42,7 @@ static const struct subcommand multi_subcommands[] = {
 	{"xtables-restore",     xtables_restore_main},
 	{"xtables-config",      xtables_config_main},
 	{"xtables-events",      xtables_events_main},
+	{"xtables-arp",		xtables_arp_main},
 #endif
 	{NULL},
 };

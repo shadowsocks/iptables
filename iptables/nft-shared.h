@@ -84,6 +84,19 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 void print_proto(uint16_t proto, int invert);
 void get_cmp_data(struct nft_rule_expr_iter *iter,
 		  void *data, size_t dlen, bool *inv);
+void nft_parse_target(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
+		      int family, void *data);
+void nft_parse_meta(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
+		    int family, void *data);
+void nft_parse_payload(struct nft_rule_expr *e,
+		       struct nft_rule_expr_iter *iter,
+		       int family, void *data);
+void nft_parse_counter(struct nft_rule_expr *e,
+		       struct nft_rule_expr_iter *iter,
+		       struct xt_counters *counters);
+void nft_parse_immediate(struct nft_rule_expr *e,
+			 struct nft_rule_expr_iter *iter,
+			 int family, void *data);
 void nft_rule_to_iptables_command_state(struct nft_rule *r,
 					struct iptables_command_state *cs);
 void print_firewall_details(const struct iptables_command_state *cs,
@@ -148,5 +161,22 @@ struct xtables_args {
 #define CMD_LIST_RULES		0x1000U
 #define CMD_ZERO_NUM		0x2000U
 #define CMD_CHECK		0x4000U
+
+/*
+ * ARP
+ */
+extern char *opcodes[];
+#define NUMOPCODES 9
+
+#include <linux/netfilter_arp/arp_tables.h>
+
+static inline struct xt_entry_target *nft_arp_get_target(struct arpt_entry *fw) 
+{
+	struct xt_entry_target **target;
+
+	target = (void *) fw + fw->target_offset;
+
+	return *target;
+}
 
 #endif

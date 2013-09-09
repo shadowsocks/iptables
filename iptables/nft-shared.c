@@ -30,6 +30,7 @@
 
 extern struct nft_family_ops nft_family_ops_ipv4;
 extern struct nft_family_ops nft_family_ops_ipv6;
+extern struct nft_family_ops nft_family_ops_arp;
 
 void add_meta(struct nft_rule *r, uint32_t key)
 {
@@ -281,8 +282,7 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 	}
 }
 
-static void
-nft_parse_target(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
+void nft_parse_target(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 		 int family, void *data)
 {
 	size_t tg_len;
@@ -381,7 +381,7 @@ void get_cmp_data(struct nft_rule_expr_iter *iter,
 		*inv = false;
 }
 
-static void
+void
 nft_parse_meta(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 	       int family, void *data)
 {
@@ -402,7 +402,7 @@ nft_parse_meta(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 	ops->parse_meta(e, key, data);
 }
 
-static void
+void
 nft_parse_payload(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 		  int family, void *data)
 {
@@ -414,7 +414,7 @@ nft_parse_payload(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 	ops->parse_payload(iter, offset, data);
 }
 
-static void
+void
 nft_parse_counter(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 		  struct xt_counters *counters)
 {
@@ -422,7 +422,7 @@ nft_parse_counter(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 	counters->bcnt = nft_rule_expr_get_u64(e, NFT_EXPR_CTR_BYTES);
 }
 
-static void
+void
 nft_parse_immediate(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 		    int family, void *data)
 {
@@ -649,6 +649,8 @@ struct nft_family_ops *nft_family_ops_lookup(int family)
 		return &nft_family_ops_ipv4;
 	case AF_INET6:
 		return &nft_family_ops_ipv6;
+	case NFPROTO_ARP:
+		return &nft_family_ops_arp;
 	default:
 		break;
 	}
