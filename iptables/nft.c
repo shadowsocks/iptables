@@ -295,6 +295,9 @@ static struct builtin_table
 	bool found = false;
 
 	for (i=0; i<TABLES_MAX; i++) {
+		if (h->tables[i].name == NULL)
+			break;
+
 		if (strcmp(h->tables[i].name, table) != 0)
 			continue;
 
