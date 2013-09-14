@@ -287,22 +287,22 @@ static void nft_arp_parse_payload(struct nft_rule_expr_iter *iter,
 	switch (offset) {
 	case offsetof(struct arphdr, ar_hrd):
 		get_cmp_data(iter, &ar_hrd, sizeof(ar_hrd), &inv);
-		fw->arp.arhrd = htons(ar_hrd);
-		fw->arp.arhrd_mask = htons(0xffff);
+		fw->arp.arhrd = ar_hrd;
+		fw->arp.arhrd_mask = 0xffff;
 		if (inv)
 			fw->arp.invflags |= ARPT_INV_ARPHRD;
 		break;
 	case offsetof(struct arphdr, ar_pro):
 		get_cmp_data(iter, &ar_pro, sizeof(ar_pro), &inv);
-		fw->arp.arpro = htons(ar_pro);
-		fw->arp.arpro_mask = htons(0xffff);
+		fw->arp.arpro = ar_pro;
+		fw->arp.arpro_mask = 0xffff;
 		if (inv)
 			fw->arp.invflags |= ARPT_INV_ARPPRO;
 		break;
 	case offsetof(struct arphdr, ar_op):
 		get_cmp_data(iter, &ar_op, sizeof(ar_op), &inv);
-		fw->arp.arpop = htons(ar_op);
-		fw->arp.arpop_mask = htons(0xffff);
+		fw->arp.arpop = ar_op;
+		fw->arp.arpop_mask = 0xffff;
 		if (inv)
 			fw->arp.invflags |= ARPT_INV_ARPOP;
 		break;
