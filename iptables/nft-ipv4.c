@@ -66,9 +66,12 @@ static int nft_ipv4_add(struct nft_rule *r, void *data)
 	return cs->fw.ip.flags;
 }
 
-static bool nft_ipv4_is_same(const struct iptables_command_state *a,
-			     const struct iptables_command_state *b)
+static bool nft_ipv4_is_same(const void *data_a,
+			     const void *data_b)
 {
+	const struct iptables_command_state *a = data_a;
+	const struct iptables_command_state *b = data_b;
+
 	if (a->fw.ip.src.s_addr != b->fw.ip.src.s_addr
 	    || a->fw.ip.dst.s_addr != b->fw.ip.dst.s_addr
 	    || a->fw.ip.smsk.s_addr != b->fw.ip.smsk.s_addr

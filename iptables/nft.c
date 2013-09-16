@@ -2660,10 +2660,41 @@ nft_arp_rule_find(struct nft_rule_list *list, const char *chain,
 			found = true;
 			break;
 		} else {
+			struct xt_entry_target *t_fw, *t_this;
+			char *targname_fw, *targname_this;
+			struct xtables_target *target_fw, *target_this;
+
 			/* Delete by matching rule case */
 			nft_rule_to_arpt_entry(r, &this);
 
 			DEBUGP("comparing with... ");
+#ifdef DEBUG_DEL
+			nft_rule_print_save(&this, r, NFT_RULE_APPEND, 0);
+#endif
+
+			if (!ops->is_same(fw, &this))
+				goto next;
+
+			t_fw = nft_arp_get_target(fw);
+			t_this = nft_arp_get_target(&this);
+
+			targname_fw = t_fw->u.user.name;
+			targname_this = t_this->u.user.name;
+
+			target_fw = xtables_find_target(targname_fw, XTF_TRY_LOAD);
+			target_this = xtables_find_target(targname_this, XTF_TRY_LOAD);
+
+			if (target_fw != NULL && target_this != NULL) {
+				if (!compare_targets(target_fw, target_this)) {
+					DEBUGP("Different target\n");
+					goto next;
+				}
+			} else {
+				if (strcmp(targname_fw, targname_this) != 0) {
+					DEBUGP("Different verdict\n");
+					goto next;
+				}
+			}
 
 			found = true;
 			break;

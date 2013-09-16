@@ -49,9 +49,12 @@ static int nft_ipv6_add(struct nft_rule *r, void *data)
 	return cs->fw6.ipv6.flags;
 }
 
-static bool nft_ipv6_is_same(const struct iptables_command_state *a,
-			     const struct iptables_command_state *b)
+static bool nft_ipv6_is_same(const void *data_a,
+			     const void *data_b)
 {
+	const struct iptables_command_state *a = data_a;
+	const struct iptables_command_state *b = data_b;
+
 	if (memcmp(a->fw6.ipv6.src.s6_addr, b->fw6.ipv6.src.s6_addr,
 		   sizeof(struct in6_addr)) != 0
 	    || memcmp(a->fw6.ipv6.dst.s6_addr, b->fw6.ipv6.dst.s6_addr,

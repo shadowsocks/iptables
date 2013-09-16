@@ -15,12 +15,13 @@
 
 #include <xtables.h>
 #include <net/if_arp.h>
-#include <if_ether.h>
+#include <netinet/if_ether.h>
 
 #include <linux/netfilter_arp/arp_tables.h>
 #include <linux/netfilter/nf_tables.h>
 
 #include "nft-shared.h"
+#include "nft.h"
 
 /* a few names */
 char *opcodes[] =
@@ -334,7 +335,7 @@ static void nft_arp_parse_payload(struct nft_rule_expr_iter *iter,
 	}
 }
 
-static void nft_rule_to_arpt_entry(struct nft_rule *r, struct arpt_entry *fw)
+void nft_rule_to_arpt_entry(struct nft_rule *r, struct arpt_entry *fw)
 {
 	struct nft_rule_expr_iter *iter;
 	struct nft_rule_expr *expr;
@@ -537,9 +538,35 @@ after_devdst:
 		fputc('\n', stdout);
 }
 
+static bool nft_arp_is_same(const void *data_a,
+			    const void *data_b)
+{
+	const struct arpt_entry *a = data_a;
+	const struct arpt_entry *b = data_b;
+
+	if (a->arp.src.s_addr != b->arp.src.s_addr
+	    || a->arp.tgt.s_addr != b->arp.tgt.s_addr
+	    || a->arp.smsk.s_addr != b->arp.tmsk.s_addr
+	    || a->arp.arpro != b->arp.arpro
+	    || a->arp.flags != b->arp.flags
+	    || a->arp.invflags != b->arp.invflags) {
+		DEBUGP("different src/dst/proto/flags/invflags\n");
+		return false;
+	}
+
+	return is_same_interfaces(a->arp.src_devaddr.addr,
+				  a->arp.tgt_devaddr.addr,
+				  (unsigned char*)a->arp.src_devaddr.mask,
+				  (unsigned char*)a->arp.tgt_devaddr.mask,
+				  b->arp.src_devaddr.addr,
+				  a->arp.tgt_devaddr.addr,
+				  (unsigned char*)b->arp.src_devaddr.mask,
+				  (unsigned char*)b->arp.tgt_devaddr.mask);
+}
+
 struct nft_family_ops nft_family_ops_arp = {
 	.add			= nft_arp_add,
-	.is_same		= NULL,
+	.is_same		= nft_arp_is_same,
 	.print_payload		= NULL,
 	.parse_meta		= nft_arp_parse_meta,
 	.parse_payload		= nft_arp_parse_payload,

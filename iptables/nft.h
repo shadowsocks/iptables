@@ -162,4 +162,6 @@ int nft_arp_rule_insert(struct nft_handle *h, const char *chain,
 			const char *table, struct arpt_entry *fw,
 			int rulenum, bool verbose);
 
+void nft_rule_to_arpt_entry(struct nft_rule *r, struct arpt_entry *fw);
+
 #endif

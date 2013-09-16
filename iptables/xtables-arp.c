@@ -1402,7 +1402,7 @@ int do_commandarp(struct nft_handle *h, int argc, char *argv[], char **table)
 					handle);*/
 		break;
 	case CMD_INSERT:
-		ret = append_entry(h, chain, *table, e, rulenum,
+		ret = append_entry(h, chain, *table, e, rulenum - 1,
 				   nsaddrs, saddrs, ndaddrs, daddrs,
 				   options&OPT_VERBOSE, false);
 		break;

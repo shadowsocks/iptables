@@ -38,8 +38,8 @@ struct xtables_args;
 
 struct nft_family_ops {
 	int (*add)(struct nft_rule *r, void *data);
-	bool (*is_same)(const struct iptables_command_state *a,
-			const struct iptables_command_state *b);
+	bool (*is_same)(const void *data_a,
+			const void *data_b);
 	void (*print_payload)(struct nft_rule_expr *e,
 			      struct nft_rule_expr_iter *iter);
 	void (*parse_meta)(struct nft_rule_expr *e, uint8_t key,
