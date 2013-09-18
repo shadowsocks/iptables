@@ -20,11 +20,13 @@
 
 #include <xtables.h>
 
+#include "nft.h"
 #include "nft-shared.h"
 
 static int nft_ipv6_add(struct nft_rule *r, void *data)
 {
 	struct iptables_command_state *cs = data;
+	struct xtables_rule_match *matchp;
 
 	if (cs->fw6.ipv6.iniface[0] != '\0')
 		add_iniface(r, cs->fw6.ipv6.iniface, cs->fw6.ipv6.invflags);
@@ -46,7 +48,18 @@ static int nft_ipv6_add(struct nft_rule *r, void *data)
 
 	add_compat(r, cs->fw6.ipv6.proto, cs->fw6.ipv6.invflags);
 
-	return cs->fw6.ipv6.flags;
+	for (matchp = cs->matches; matchp; matchp = matchp->next) {
+		if (add_match(r, matchp->match->m) < 0)
+			break;
+	}
+
+	/* Counters need to me added before the target, otherwise they are
+	 * increased for each rule because of the way nf_tables works.
+	 */
+	if (add_counters(r, cs->counters.pcnt, cs->counters.bcnt) < 0)
+		return -1;
+
+	return add_action(r, cs, cs->fw6.ipv6.flags);
 }
 
 static bool nft_ipv6_is_same(const void *data_a,

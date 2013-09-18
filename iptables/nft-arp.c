@@ -1,10 +1,13 @@
 /*
+ * (C) 2013 by Pablo Neira Ayuso <pablo@netfilter.org>
  * (C) 2013 by Giuseppe Longo <giuseppelng@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
+ *
+ * This code has been sponsored by Sophos Astaro <http://www.sophos.com>
  */
 
 #include <stdio.h>
@@ -14,6 +17,7 @@
 #include <net/if_arp.h>
 
 #include <xtables.h>
+#include <libiptc/libxtc.h>
 #include <net/if_arp.h>
 #include <netinet/if_ether.h>
 
@@ -161,6 +165,9 @@ static int nft_arp_add(struct nft_rule *r, void *data)
 {
 	struct arpt_entry *fw = data;
 	uint8_t flags = arpt_to_ipt_flags(fw->arp.invflags);
+	struct xt_entry_target *t;
+	char *targname;
+	int ret;
 
 	if (fw->arp.iniface[0] != '\0')
 		add_iniface(r, fw->arp.iniface, flags);
@@ -207,7 +214,28 @@ static int nft_arp_add(struct nft_rule *r, void *data)
 		add_addr(r, sizeof(struct arphdr) + fw->arp.arhln + sizeof(struct in_addr),
 			 &fw->arp.tgt.s_addr, 4, flags);
 
-	return 0;
+	/* Counters need to me added before the target, otherwise they are
+	 * increased for each rule because of the way nf_tables works.
+	 */
+	if (add_counters(r, fw->counters.pcnt, fw->counters.bcnt) < 0)
+		return -1;
+
+	t = nft_arp_get_target(fw);
+	targname = t->u.user.name;
+
+	/* Standard target? */
+	if (strcmp(targname, XTC_LABEL_ACCEPT) == 0)
+		ret = add_verdict(r, NF_ACCEPT);
+	else if (strcmp(targname, XTC_LABEL_DROP) == 0)
+		ret = add_verdict(r, NF_DROP);
+	else if (strcmp(targname, XTC_LABEL_RETURN) == 0)
+		ret = add_verdict(r, NFT_RETURN);
+	else if (xtables_find_target(targname, XTF_TRY_LOAD) != NULL)
+		ret = add_target(r, t);
+	else
+		ret = add_jumpto(r, targname, NFT_JUMP);
+
+	return ret;
 }
 
 static uint16_t ipt_to_arpt_flags(uint8_t invflags)

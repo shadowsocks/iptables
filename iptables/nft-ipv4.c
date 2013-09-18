@@ -22,11 +22,13 @@
 
 #include <linux/netfilter/nf_tables.h>
 
+#include "nft.h"
 #include "nft-shared.h"
 
 static int nft_ipv4_add(struct nft_rule *r, void *data)
 {
 	struct iptables_command_state *cs = data;
+	struct xtables_rule_match *matchp;
 	uint32_t op;
 
 	if (cs->fw.ip.iniface[0] != '\0')
@@ -63,7 +65,18 @@ static int nft_ipv4_add(struct nft_rule *r, void *data)
 
 	add_compat(r, cs->fw.ip.proto, cs->fw.ip.invflags);
 
-	return cs->fw.ip.flags;
+	for (matchp = cs->matches; matchp; matchp = matchp->next) {
+		if (add_match(r, matchp->match->m) < 0)
+			break;
+	}
+
+	/* Counters need to me added before the target, otherwise they are
+	 * increased for each rule because of the way nf_tables works.
+	 */
+	if (add_counters(r, cs->counters.pcnt, cs->counters.bcnt) < 0)
+		return -1;
+
+	return add_action(r, cs, cs->fw.ip.flags);
 }
 
 static bool nft_ipv4_is_same(const void *data_a,

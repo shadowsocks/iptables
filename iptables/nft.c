@@ -589,7 +589,7 @@ static int __add_match(struct nft_rule_expr *e, struct xt_entry_match *m)
 	return 0;
 }
 
-static int add_match(struct nft_rule *r, struct xt_entry_match *m)
+int add_match(struct nft_rule *r, struct xt_entry_match *m)
 {
 	struct nft_rule_expr *expr;
 	int ret;
@@ -671,6 +671,32 @@ int add_verdict(struct nft_rule *r, int verdict)
 	return 0;
 }
 
+int add_action(struct nft_rule *r, struct iptables_command_state *cs,
+	      int ip_flags)
+{
+       int ret = 0;
+
+       /* If no target at all, add nothing (default to continue) */
+       if (cs->target != NULL) {
+	       /* Standard target? */
+	       if (strcmp(cs->jumpto, XTC_LABEL_ACCEPT) == 0)
+		       ret = add_verdict(r, NF_ACCEPT);
+	       else if (strcmp(cs->jumpto, XTC_LABEL_DROP) == 0)
+		       ret = add_verdict(r, NF_DROP);
+	       else if (strcmp(cs->jumpto, XTC_LABEL_RETURN) == 0)
+		       ret = add_verdict(r, NFT_RETURN);
+	       else
+		       ret = add_target(r, cs->target->t);
+       } else if (strlen(cs->jumpto) > 0) {
+	       /* Not standard, then it's a go / jump to chain */
+	       if (ip_flags & IPT_F_GOTO)
+		       ret = add_jumpto(r, cs->jumpto, NFT_GOTO);
+	       else
+		       ret = add_jumpto(r, cs->jumpto, NFT_JUMP);
+       }
+       return ret;
+}
+
 static void nft_rule_print_debug(struct nft_rule *r, struct nlmsghdr *nlh)
 {
 #ifdef NLDEBUG
@@ -707,11 +733,9 @@ void add_compat(struct nft_rule *r, uint32_t proto, bool inv)
 
 static struct nft_rule *
 nft_rule_new(struct nft_handle *h, const char *chain, const char *table,
-	     struct iptables_command_state *cs)
+	     void *data)
 {
 	struct nft_rule *r;
-	int ret = 0, ip_flags = 0;
-	struct xtables_rule_match *matchp;
 
 	r = nft_rule_alloc();
 	if (r == NULL)
@@ -721,39 +745,7 @@ nft_rule_new(struct nft_handle *h, const char *chain, const char *table,
 	nft_rule_attr_set(r, NFT_RULE_ATTR_TABLE, (char *)table);
 	nft_rule_attr_set(r, NFT_RULE_ATTR_CHAIN, (char *)chain);
 
-	ip_flags = h->ops->add(r, cs);
-
-	for (matchp = cs->matches; matchp; matchp = matchp->next) {
-		if (add_match(r, matchp->match->m) < 0)
-			goto err;
-	}
-
-	/* Counters need to me added before the target, otherwise they are
-	 * increased for each rule because of the way nf_tables works.
-	 */
-	if (add_counters(r, cs->counters.pcnt, cs->counters.bcnt) < 0)
-		goto err;
-
-	/* If no target at all, add nothing (default to continue) */
-	if (cs->target != NULL) {
-		/* Standard target? */
-		if (strcmp(cs->jumpto, XTC_LABEL_ACCEPT) == 0)
-			ret = add_verdict(r, NF_ACCEPT);
-		else if (strcmp(cs->jumpto, XTC_LABEL_DROP) == 0)
-			ret = add_verdict(r, NF_DROP);
-		else if (strcmp(cs->jumpto, XTC_LABEL_RETURN) == 0)
-			ret = add_verdict(r, NFT_RETURN);
-		else
-			ret = add_target(r, cs->target->t);
-	} else if (strlen(cs->jumpto) > 0) {
-		/* Not standard, then it's a go / jump to chain */
-		if (ip_flags & IPT_F_GOTO)
-			ret = add_jumpto(r, cs->jumpto, NFT_GOTO);
-		else
-			ret = add_jumpto(r, cs->jumpto, NFT_JUMP);
-	}
-
-	if (ret < 0)
+	if (h->ops->add(r, data) < 0)
 		goto err;
 
 	return r;
@@ -2393,56 +2385,6 @@ err:
  * to ARP. These functions should go away with some refactoring of the
  * existing infrastructure.
  */
-static struct nft_rule *
-nft_arp_rule_new(struct nft_handle *h, const char *chain, const char *table,
-	     struct arpt_entry *fw)
-{
-	struct xt_entry_target *t;
-	char *targname;
-	struct nft_rule *r;
-	int ret = 0;
-
-	t = nft_arp_get_target(fw);
-	targname = t->u.user.name;
-
-	r = nft_rule_alloc();
-	if (r == NULL)
-		return NULL;
-
-	nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FAMILY, h->family);
-	nft_rule_attr_set(r, NFT_RULE_ATTR_TABLE, (char *)table);
-	nft_rule_attr_set(r, NFT_RULE_ATTR_CHAIN, (char *)chain);
-
-	h->ops->add(r, fw);
-
-	/* Counters need to me added before the target, otherwise they are
-	 * increased for each rule because of the way nf_tables works.
-	 */
-	if (add_counters(r, fw->counters.pcnt, fw->counters.bcnt) < 0)
-		goto err;
-
-	/* Standard target? */
-	if (strcmp(targname, XTC_LABEL_ACCEPT) == 0)
-		ret = add_verdict(r, NF_ACCEPT);
-	else if (strcmp(targname, XTC_LABEL_DROP) == 0)
-		ret = add_verdict(r, NF_DROP);
-	else if (strcmp(targname, XTC_LABEL_RETURN) == 0)
-		ret = add_verdict(r, NFT_RETURN);
-	else if (xtables_find_target(targname, XTF_TRY_LOAD) != NULL)
-		ret = add_target(r, t);
-	else
-		ret = add_jumpto(r, targname, NFT_JUMP);
-
-	if (ret < 0)
-		goto err;
-
-	return r;
-err:
-	nft_rule_free(r);
-	return NULL;
-
-}
-
 static void
 nft_arp_rule_print_debug(struct nft_rule *r, struct nlmsghdr *nlh) {
 #ifdef NLDEBUG
@@ -2464,7 +2406,7 @@ nft_arp_rule_add(struct nft_handle *h, const char *chain,
 	struct nft_rule *r;
 	int ret = 1;
 
-	r = nft_arp_rule_new(h, chain, table, fw);
+	r = nft_rule_new(h, chain, table, fw);
 	if (r == NULL) {
 		ret = 0;
 		goto err;
@@ -2507,7 +2449,7 @@ int nft_arp_rule_append(struct nft_handle *h, const char *chain,
 
 	nft_fn = nft_arp_rule_append;
 
-	r = nft_arp_rule_new(h, chain, table, fw);
+	r = nft_rule_new(h, chain, table, fw);
 	if (r == NULL) {
 		ret = 0;
 		goto err;
