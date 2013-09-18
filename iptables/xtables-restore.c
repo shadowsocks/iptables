@@ -166,7 +166,6 @@ xtables_restore_main(int argc, char *argv[])
 {
 	struct nft_handle h = {
 		.family = AF_INET,	/* default to IPv4 */
-		.commit	= true,
 	};
 	char buffer[10240];
 	int c;

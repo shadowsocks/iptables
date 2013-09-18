@@ -81,6 +81,8 @@ int xtables_arp_main(int argc, char *argv[])
 #endif
 
 	ret = do_commandarp(&h, argc, argv, &table);
+	if (ret)
+		ret = nft_commit(&h);
 
 	exit(!ret);
 }

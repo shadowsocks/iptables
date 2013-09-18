@@ -3,6 +3,7 @@
 
 #include "xshared.h"
 #include "nft-shared.h"
+#include <libiptc/linux_list.h>
 
 #define FILTER         0
 #define MANGLE         1
@@ -28,7 +29,9 @@ struct nft_handle {
 	struct mnl_socket	*nl;
 	uint32_t		portid;
 	uint32_t		seq;
-	bool			commit;
+	struct list_head	rule_list;
+	int			rule_list_num;
+	struct mnl_nlmsg_batch	*batch;
 	struct nft_family_ops	*ops;
 	struct builtin_table	*tables;
 };

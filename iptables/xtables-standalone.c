@@ -70,6 +70,9 @@ xtables_main(int argc, char *argv[])
 	}
 
 	ret = do_commandx(&h, argc, argv, &table);
+	if (ret)
+		ret = nft_commit(&h);
+
 	if (!ret) {
 		if (errno == EINVAL) {
 			fprintf(stderr, "iptables: %s. "
