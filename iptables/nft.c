@@ -1487,62 +1487,6 @@ next:
 	return 0;
 }
 
-static bool
-compare_matches(struct xtables_rule_match *mt1, struct xtables_rule_match *mt2)
-{
-	struct xtables_rule_match *mp1;
-	struct xtables_rule_match *mp2;
-
-	for (mp1 = mt1, mp2 = mt2; mp1 && mp2; mp1 = mp1->next, mp2 = mp2->next) {
-		struct xt_entry_match *m1 = mp1->match->m;
-		struct xt_entry_match *m2 = mp2->match->m;
-
-		if (strcmp(m1->u.user.name, m2->u.user.name) != 0) {
-			DEBUGP("mismatching match name\n");
-			return false;
-		}
-
-		if (m1->u.user.match_size != m2->u.user.match_size) {
-			DEBUGP("mismatching match size\n");
-			return false;
-		}
-
-		if (memcmp(m1->data, m2->data,
-			   m1->u.user.match_size - sizeof(*m1)) != 0) {
-			DEBUGP("mismatch match data\n");
-			return false;
-		}
-	}
-
-	/* Both cursors should be NULL */
-	if (mp1 != mp2) {
-		DEBUGP("mismatch matches amount\n");
-		return false;
-	}
-
-	return true;
-}
-
-static bool
-compare_targets(struct xtables_target *tg1, struct xtables_target *tg2)
-{
-	if (tg1 == NULL && tg2 == NULL)
-		return true;
-
-	if ((tg1 == NULL && tg2 != NULL) || (tg1 != NULL && tg2 == NULL))
-		return false;
-
-	if (strcmp(tg1->t->u.user.name, tg2->t->u.user.name) != 0)
-		return false;
-
-	if (memcmp(tg1->t->data, tg2->t->data,
-		   tg1->t->u.user.target_size - sizeof(*tg1->t)) != 0) {
-		return false;
-	}
-
-	return true;
-}
-
 static void
 __nft_rule_del(struct nft_handle *h, struct nft_rule *r)
 {
@@ -1572,8 +1516,8 @@ void nft_rule_list_destroy(struct nft_rule_list *list)
 }
 
 static struct nft_rule *
-nft_rule_find(struct nft_rule_list *list, const char *chain, const char *table,
-	      struct iptables_command_state *cs, int rulenum)
+nft_rule_find(struct nft_handle *h, struct nft_rule_list *list,
+	      const char *chain, const char *table, void *data, int rulenum)
 {
 	struct nft_rule *r;
 	struct nft_rule_list_iter *iter;
@@ -1590,9 +1534,6 @@ nft_rule_find(struct nft_rule_list *list, const char *chain, const char *table,
 			nft_rule_attr_get_str(r, NFT_RULE_ATTR_TABLE);
 		const char *rule_chain =
 			nft_rule_attr_get_str(r, NFT_RULE_ATTR_CHAIN);
-		const struct nft_family_ops *ops = nft_family_ops_lookup(
-				nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY));
-		struct iptables_command_state this = {};
 
 		if (strcmp(table, rule_table) != 0 ||
 		    strcmp(chain, rule_chain) != 0) {
@@ -1607,33 +1548,9 @@ nft_rule_find(struct nft_rule_list *list, const char *chain, const char *table,
 			found = true;
 			break;
 		} else {
-			/* Delete by matching rule case */
-			nft_rule_to_iptables_command_state(r, &this);
-
-			DEBUGP("comparing with... ");
-#ifdef DEBUG_DEL
-			nft_rule_print_save(&this, r, NFT_RULE_APPEND, 0);
-#endif
-			if (!ops->is_same(cs, &this))
-				goto next;
-
-			if (!compare_matches(cs->matches, this.matches)) {
-				DEBUGP("Different matches\n");
-				goto next;
-			}
-
-			if (!compare_targets(cs->target, this.target)) {
-				DEBUGP("Different target\n");
-				goto next;
-			}
-
-			if (strcmp(cs->jumpto, this.jumpto) != 0) {
-				DEBUGP("Different verdict\n");
-				goto next;
-			}
-
-			found = true;
-			break;
+			found = h->ops->rule_find(h->ops, r, data);
+			if (found)
+				break;
 		}
 next:
 		rule_ctr++;
@@ -1658,7 +1575,7 @@ int nft_rule_check(struct nft_handle *h, const char *chain,
 	if (list == NULL)
 		return 0;
 
-	ret = nft_rule_find(list, chain, table, e, -1) ? 1 : 0;
+	ret = nft_rule_find(h, list, chain, table, e, -1) ? 1 : 0;
 	if (ret == 0)
 		errno = ENOENT;
 
@@ -1681,7 +1598,7 @@ int nft_rule_delete(struct nft_handle *h, const char *chain,
 	if (list == NULL)
 		return 0;
 
-	r = nft_rule_find(list, chain, table, cs, -1);
+	r = nft_rule_find(h, list, chain, table, cs, -1);
 	if (r != NULL) {
 		ret = 1;
 
@@ -1755,7 +1672,7 @@ int nft_rule_insert(struct nft_handle *h, const char *chain,
 		if (list == NULL)
 			goto err;
 
-		r = nft_rule_find(list, chain, table, cs, rulenum);
+		r = nft_rule_find(h, list, chain, table, cs, rulenum);
 		if (r == NULL) {
 			errno = ENOENT;
 			goto err;
@@ -1786,7 +1703,7 @@ int nft_rule_delete_num(struct nft_handle *h, const char *chain,
 	if (list == NULL)
 		return 0;
 
-	r = nft_rule_find(list, chain, table, NULL, rulenum);
+	r = nft_rule_find(h, list, chain, table, NULL, rulenum);
 	if (r != NULL) {
 		ret = 1;
 
@@ -1818,7 +1735,7 @@ int nft_rule_replace(struct nft_handle *h, const char *chain,
 	if (list == NULL)
 		return 0;
 
-	r = nft_rule_find(list, chain, table, cs, rulenum);
+	r = nft_rule_find(h, list, chain, table, cs, rulenum);
 	if (r != NULL) {
 		DEBUGP("replacing rule with handle=%llu\n",
 			(unsigned long long)
@@ -2136,7 +2053,7 @@ int nft_rule_zero_counters(struct nft_handle *h, const char *chain,
 	if (list == NULL)
 		return 0;
 
-	r = nft_rule_find(list, chain, table, NULL, rulenum);
+	r = nft_rule_find(h, list, chain, table, NULL, rulenum);
 	if (r == NULL) {
 		errno = ENOENT;
 		ret = 1;
@@ -2624,91 +2541,6 @@ err:
 	return ret == 0 ? 1 : 0;
 }
 
-static struct nft_rule *
-nft_arp_rule_find(struct nft_rule_list *list, const char *chain,
-		  const char *table, struct arpt_entry *fw, int rulenum)
-{
-	struct nft_rule *r;
-	struct nft_rule_list_iter *iter;
-	int rule_ctr = 0;
-	bool found = false;
-
-	iter = nft_rule_list_iter_create(list);
-	if (iter == NULL)
-		return 0;
-
-	r = nft_rule_list_iter_next(iter);
-	while (r != NULL) {
-		const char *rule_table =
-			nft_rule_attr_get_str(r, NFT_RULE_ATTR_TABLE);
-		const char *rule_chain =
-			nft_rule_attr_get_str(r, NFT_RULE_ATTR_CHAIN);
-		const struct nft_family_ops *ops = nft_family_ops_lookup(
-				nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY));
-		struct arpt_entry this = {};
-
-		if (strcmp(table, rule_table) != 0 ||
-		    strcmp(chain, rule_chain) != 0) {
-			DEBUGP("different chain / table\n");
-			goto next;
-		}
-
-		if (rulenum >= 0) {
-			/* Delete by rule number case */
-			if (rule_ctr != rulenum)
-				goto next;
-			found = true;
-			break;
-		} else {
-			struct xt_entry_target *t_fw, *t_this;
-			char *targname_fw, *targname_this;
-			struct xtables_target *target_fw, *target_this;
-
-			/* Delete by matching rule case */
-			nft_rule_to_arpt_entry(r, &this);
-
-			DEBUGP("comparing with... ");
-#ifdef DEBUG_DEL
-			nft_rule_print_save(&this, r, NFT_RULE_APPEND, 0);
-#endif
-
-			if (!ops->is_same(fw, &this))
-				goto next;
-
-			t_fw = nft_arp_get_target(fw);
-			t_this = nft_arp_get_target(&this);
-
-			targname_fw = t_fw->u.user.name;
-			targname_this = t_this->u.user.name;
-
-			target_fw = xtables_find_target(targname_fw, XTF_TRY_LOAD);
-			target_this = xtables_find_target(targname_this, XTF_TRY_LOAD);
-
-			if (target_fw != NULL && target_this != NULL) {
-				if (!compare_targets(target_fw, target_this)) {
-					DEBUGP("Different target\n");
-					goto next;
-				}
-			} else {
-				if (strcmp(targname_fw, targname_this) != 0) {
-					DEBUGP("Different verdict\n");
-					goto next;
-				}
-			}
-
-			found = true;
-			break;
-		}
-next:
-		rule_ctr++;
-		r = nft_rule_list_iter_next(iter);
-	}
-
-	nft_rule_list_iter_destroy(iter);
-
-	return found ? r : NULL;
-}
-
 int nft_arp_rule_insert(struct nft_handle *h, const char *chain,
 			const char *table, struct arpt_entry *fw,
 			int rulenum, bool verbose)
@@ -2728,7 +2560,7 @@ int nft_arp_rule_insert(struct nft_handle *h, const char *chain,
 		if (list == NULL)
 			goto err;
 
-		r = nft_arp_rule_find(list, chain, table, fw, rulenum);
+		r = nft_rule_find(h, list, chain, table, fw, rulenum);
 		if (r == NULL) {
 			errno = ENOENT;
 			goto err;

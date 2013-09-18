@@ -658,3 +658,89 @@ struct nft_family_ops *nft_family_ops_lookup(int family)
 	return NULL;
 }
 
+static bool
+compare_matches(struct xtables_rule_match *mt1, struct xtables_rule_match *mt2)
+{
+	struct xtables_rule_match *mp1;
+	struct xtables_rule_match *mp2;
+
+	for (mp1 = mt1, mp2 = mt2; mp1 && mp2; mp1 = mp1->next, mp2 = mp2->next) {
+		struct xt_entry_match *m1 = mp1->match->m;
+		struct xt_entry_match *m2 = mp2->match->m;
+
+		if (strcmp(m1->u.user.name, m2->u.user.name) != 0) {
+			DEBUGP("mismatching match name\n");
+			return false;
+		}
+
+		if (m1->u.user.match_size != m2->u.user.match_size) {
+			DEBUGP("mismatching match size\n");
+			return false;
+		}
+
+		if (memcmp(m1->data, m2->data,
+			   m1->u.user.match_size - sizeof(*m1)) != 0) {
+			DEBUGP("mismatch match data\n");
+			return false;
+		}
+	}
+
+	/* Both cursors should be NULL */
+	if (mp1 != mp2) {
+		DEBUGP("mismatch matches amount\n");
+		return false;
+	}
+
+	return true;
+}
+
+bool compare_targets(struct xtables_target *tg1, struct xtables_target *tg2)
+{
+	if (tg1 == NULL && tg2 == NULL)
+		return true;
+
+	if ((tg1 == NULL && tg2 != NULL) || (tg1 != NULL && tg2 == NULL))
+		return false;
+
+	if (strcmp(tg1->t->u.user.name, tg2->t->u.user.name) != 0)
+		return false;
+
+	if (memcmp(tg1->t->data, tg2->t->data,
+		   tg1->t->u.user.target_size - sizeof(*tg1->t)) != 0) {
+		return false;
+	}
+
+	return true;
+}
+
+bool nft_ipv46_rule_find(struct nft_family_ops *ops,
+			 struct nft_rule *r, struct iptables_command_state *cs)
+{
+	struct iptables_command_state this = {};
+
+	nft_rule_to_iptables_command_state(r, &this);
+
+	DEBUGP("comparing with... ");
+#ifdef DEBUG_DEL
+	nft_rule_print_save(&this, r, NFT_RULE_APPEND, 0);
+#endif
+	if (!ops->is_same(cs, &this))
+		return false;
+
+	if (!compare_matches(cs->matches, this.matches)) {
+		DEBUGP("Different matches\n");
+		return false;
+	}
+
+	if (!compare_targets(cs->target, this.target)) {
+		DEBUGP("Different target\n");
+		return false;
+	}
+
+	if (strcmp(cs->jumpto, this.jumpto) != 0) {
+		DEBUGP("Different verdict\n");
+		return false;
+	}
+
+	return true;
+}

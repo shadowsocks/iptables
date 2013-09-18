@@ -564,6 +564,49 @@ static bool nft_arp_is_same(const void *data_a,
 				  (unsigned char*)b->arp.tgt_devaddr.mask);
 }
 
+static bool nft_arp_rule_find(struct nft_family_ops *ops, struct nft_rule *r,
+			      void *data)
+{
+	struct arpt_entry *fw = data;
+	struct xt_entry_target *t_fw, *t_this;
+	char *targname_fw, *targname_this;
+	struct xtables_target *target_fw, *target_this;
+	struct arpt_entry this = {};
+
+	/* Delete by matching rule case */
+	nft_rule_to_arpt_entry(r, &this);
+
+	DEBUGP("comparing with... ");
+
+/*	nft_rule_print_save(&this, r, NFT_RULE_APPEND, 0); */
+
+	if (!ops->is_same(fw, &this))
+		return false;
+
+	t_fw = nft_arp_get_target(fw);
+	t_this = nft_arp_get_target(&this);
+
+	targname_fw = t_fw->u.user.name;
+	targname_this = t_this->u.user.name;
+
+	target_fw = xtables_find_target(targname_fw, XTF_TRY_LOAD);
+	target_this = xtables_find_target(targname_this, XTF_TRY_LOAD);
+
+	if (target_fw != NULL && target_this != NULL) {
+		if (!compare_targets(target_fw, target_this)) {
+			DEBUGP("Different target\n");
+			return false;
+		}
+	} else {
+		if (strcmp(targname_fw, targname_this) != 0) {
+			DEBUGP("Different verdict\n");
+			return false;
+		}
+	}
+
+	return true;
+}
+
 struct nft_family_ops nft_family_ops_arp = {
 	.add			= nft_arp_add,
 	.is_same		= nft_arp_is_same,
@@ -573,4 +616,5 @@ struct nft_family_ops nft_family_ops_arp = {
 	.parse_immediate	= nft_arp_parse_immediate,
 	.print_firewall		= nft_arp_print_firewall,
 	.post_parse		= NULL,
+	.rule_find		= nft_arp_rule_find,
 };

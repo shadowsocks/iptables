@@ -54,6 +54,8 @@ struct nft_family_ops {
 	void (*post_parse)(int command, struct iptables_command_state *cs,
 			   struct xtables_args *args);
 	void (*parse_target)(struct xtables_target *t, void *data);
+	bool (*rule_find)(struct nft_family_ops *ops, struct nft_rule *r,
+			  void *data);
 };
 
 void add_meta(struct nft_rule *r, uint32_t key);
@@ -116,6 +118,12 @@ void save_firewall_details(const struct iptables_command_state *cs,
 			   unsigned int format);
 
 struct nft_family_ops *nft_family_ops_lookup(int family);
+
+struct nft_handle;
+bool nft_ipv46_rule_find(struct nft_family_ops *ops, struct nft_rule *r,
+			 struct iptables_command_state *cs);
+
+bool compare_targets(struct xtables_target *tg1, struct xtables_target *tg2);
 
 struct addr_mask {
 	union {

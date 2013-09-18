@@ -371,6 +371,14 @@ static void nft_ipv4_parse_target(struct xtables_target *t, void *data)
 	cs->target = t;
 }
 
+static bool nft_ipv4_rule_find(struct nft_family_ops *ops,
+			       struct nft_rule *r, void *data)
+{
+	struct iptables_command_state *cs = data;
+
+	return nft_ipv46_rule_find(ops, r, cs);
+}
+
 struct nft_family_ops nft_family_ops_ipv4 = {
 	.add			= nft_ipv4_add,
 	.is_same		= nft_ipv4_is_same,
@@ -381,4 +389,5 @@ struct nft_family_ops nft_family_ops_ipv4 = {
 	.save_firewall		= nft_ipv4_save_firewall,
 	.post_parse		= nft_ipv4_post_parse,
 	.parse_target		= nft_ipv4_parse_target,
+	.rule_find		= nft_ipv4_rule_find,
 };
