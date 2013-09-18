@@ -734,7 +734,7 @@ parse_rulenumber(const char *rule)
 {
 	unsigned int rulenum;
 
-	if (string_to_number(rule, 1, INT_MAX, &rulenum) == -1)
+	if (!xtables_strtoui(rule, NULL, &rulenum, 1, INT_MAX))
 		xtables_error(PARAMETER_PROBLEM,
 			      "Invalid rule number `%s'", rule);
 
@@ -894,6 +894,21 @@ append_entry(struct nft_handle *h,
 	}
 
 	return ret;
+}
+
+static int
+replace_entry(const char *chain,
+	      const char *table,
+	      struct arpt_entry *fw,
+	      unsigned int rulenum,
+	      const struct in_addr *saddr,
+	      const struct in_addr *daddr,
+	      bool verbose, struct nft_handle *h)
+{
+	fw->arp.src.s_addr = saddr->s_addr;
+	fw->arp.tgt.s_addr = daddr->s_addr;
+
+	return nft_rule_replace(h, chain, table, fw, rulenum, verbose);
 }
 
 int do_commandarp(struct nft_handle *h, int argc, char *argv[], char **table)
@@ -1396,9 +1411,8 @@ int do_commandarp(struct nft_handle *h, int argc, char *argv[], char **table)
 		/*ret = arptc_delete_num_entry(chain, rulenum - 1, handle);*/
 		break;
 	case CMD_REPLACE:
-		/*ret = replace_entry(chain, e, rulenum - 1,
-					saddrs, daddrs, options&OPT_VERBOSE,
-					handle);*/
+		ret = replace_entry(chain, *table, e, rulenum - 1,
+				    saddrs, daddrs, options&OPT_VERBOSE, h);
 		break;
 	case CMD_INSERT:
 		ret = append_entry(h, chain, *table, e, rulenum - 1,
