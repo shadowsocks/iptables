@@ -756,8 +756,7 @@ err:
 
 int
 nft_rule_append(struct nft_handle *h, const char *chain, const char *table,
-		struct iptables_command_state *cs, uint64_t handle,
-		bool verbose)
+		void *data, uint64_t handle, bool verbose)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
@@ -771,7 +770,7 @@ nft_rule_append(struct nft_handle *h, const char *chain, const char *table,
 
 	nft_fn = nft_rule_append;
 
-	r = nft_rule_new(h, chain, table, cs);
+	r = nft_rule_new(h, chain, table, data);
 	if (r == NULL) {
 		ret = 0;
 		goto err;
@@ -1555,8 +1554,7 @@ next:
 }
 
 int nft_rule_check(struct nft_handle *h, const char *chain,
-		   const char *table, struct iptables_command_state *e,
-		   bool verbose)
+		   const char *table, void *data, bool verbose)
 {
 	struct nft_rule_list *list;
 	int ret;
@@ -1567,7 +1565,7 @@ int nft_rule_check(struct nft_handle *h, const char *chain,
 	if (list == NULL)
 		return 0;
 
-	ret = nft_rule_find(h, list, chain, table, e, -1) ? 1 : 0;
+	ret = nft_rule_find(h, list, chain, table, data, -1) ? 1 : 0;
 	if (ret == 0)
 		errno = ENOENT;
 
@@ -1577,8 +1575,7 @@ int nft_rule_check(struct nft_handle *h, const char *chain,
 }
 
 int nft_rule_delete(struct nft_handle *h, const char *chain,
-		    const char *table, struct iptables_command_state *cs,
-		    bool verbose)
+		    const char *table, void *data, bool verbose)
 {
 	int ret = 0;
 	struct nft_rule *r;
@@ -1590,7 +1587,7 @@ int nft_rule_delete(struct nft_handle *h, const char *chain,
 	if (list == NULL)
 		return 0;
 
-	r = nft_rule_find(h, list, chain, table, cs, -1);
+	r = nft_rule_find(h, list, chain, table, data, -1);
 	if (r != NULL) {
 		ret = 1;
 
@@ -1646,8 +1643,7 @@ err:
 }
 
 int nft_rule_insert(struct nft_handle *h, const char *chain,
-		    const char *table, struct iptables_command_state *cs,
-		    int rulenum, bool verbose)
+		    const char *table, void *data, int rulenum, bool verbose)
 {
 	struct nft_rule_list *list;
 	struct nft_rule *r;
@@ -1664,7 +1660,7 @@ int nft_rule_insert(struct nft_handle *h, const char *chain,
 		if (list == NULL)
 			goto err;
 
-		r = nft_rule_find(h, list, chain, table, cs, rulenum);
+		r = nft_rule_find(h, list, chain, table, data, rulenum);
 		if (r == NULL) {
 			errno = ENOENT;
 			goto err;
@@ -1676,7 +1672,7 @@ int nft_rule_insert(struct nft_handle *h, const char *chain,
 		nft_rule_list_destroy(list);
 	}
 
-	return nft_rule_add(h, chain, table, cs, handle, verbose);
+	return nft_rule_add(h, chain, table, data, handle, verbose);
 err:
 	nft_rule_list_destroy(list);
 	return 0;
@@ -1714,8 +1710,7 @@ int nft_rule_delete_num(struct nft_handle *h, const char *chain,
 }
 
 int nft_rule_replace(struct nft_handle *h, const char *chain,
-		     const char *table, struct iptables_command_state *cs,
-		     int rulenum, bool verbose)
+		     const char *table, void *data, int rulenum, bool verbose)
 {
 	int ret = 0;
 	struct nft_rule *r;
@@ -1727,7 +1722,7 @@ int nft_rule_replace(struct nft_handle *h, const char *chain,
 	if (list == NULL)
 		return 0;
 
-	r = nft_rule_find(h, list, chain, table, cs, rulenum);
+	r = nft_rule_find(h, list, chain, table, data, rulenum);
 	if (r != NULL) {
 		DEBUGP("replacing rule with handle=%llu\n",
 			(unsigned long long)
@@ -1737,7 +1732,7 @@ int nft_rule_replace(struct nft_handle *h, const char *chain,
 			nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS,
 						 NFT_RULE_F_COMMIT);
 		}
-		ret = nft_rule_append(h, chain, table, cs,
+		ret = nft_rule_append(h, chain, table, data,
 				      nft_rule_attr_get_u64(r, NFT_RULE_ATTR_HANDLE),
 				      verbose);
 	} else
@@ -2378,144 +2373,4 @@ err:
 
 	/* the core expects 1 for success and 0 for error */
 	return ret == 0 ? 1 : 0;
-}
-
-/*
- * XXX These are almost copy and paste of the original functions, but adapted
- * to ARP. These functions should go away with some refactoring of the
- * existing infrastructure.
- */
-static void
-nft_arp_rule_print_debug(struct nft_rule *r, struct nlmsghdr *nlh) {
-#ifdef NLDEBUG
-	char tmp[1024];
-
-	nft_rule_snprintf(tmp, sizeof(tmp), r, 0, 0);
-	printf("DEBUG: rule: %s", tmp);
-	mnl_nlmsg_fprintf(stdout, nlh, nlh->nlmsg_len, sizeof(struct nfgenmsg));
-#endif
-}
-
-static int
-nft_arp_rule_add(struct nft_handle *h, const char *chain,
-		 const char *table, struct arpt_entry *fw,
-		 uint64_t handle, bool verbose)
-{
-	char buf[MNL_SOCKET_BUFFER_SIZE];
-	struct nlmsghdr *nlh;
-	struct nft_rule *r;
-	int ret = 1;
-
-	r = nft_rule_new(h, chain, table, fw);
-	if (r == NULL) {
-		ret = 0;
-		goto err;
-	}
-	if (handle > 0)
-			nft_rule_attr_set_u64(r, NFT_RULE_ATTR_POSITION, handle);
-
-	if (h->commit) {
-		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS,
-				      NFT_RULE_F_COMMIT);
-	}
-
-	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE, h->family,
-				       NLM_F_ACK|NLM_F_CREATE, h->seq);
-	nft_rule_nlmsg_build_payload(nlh, r);
-	nft_arp_rule_print_debug(r, nlh);
-	nft_rule_free(r);
-
-	ret = mnl_talk(h, nlh, NULL, NULL);
-	if (ret < 0)
-		perror("mnl_talk:nft_arp_rule_add");
-
-err:
-	/* the core expects 1 for success and 0 for error */
-	return ret == 0 ? 1 : 0;
-}
-
-int nft_arp_rule_append(struct nft_handle *h, const char *chain,
-			const char *table, struct arpt_entry *fw, bool verbose)
-{
-	char buf[MNL_SOCKET_BUFFER_SIZE];
-	struct nlmsghdr *nlh;
-	struct nft_rule *r;
-	uint16_t flags = NLM_F_ACK|NLM_F_CREATE;
-	int ret = 1;
-
-	/* If built-in chains don't exist for this table, create them */
-	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0)
-		nft_chain_builtin_init(h, table, chain, NF_ACCEPT);
-
-	nft_fn = nft_arp_rule_append;
-
-	r = nft_rule_new(h, chain, table, fw);
-	if (r == NULL) {
-		ret = 0;
-		goto err;
-	}
-
-	/*if (handle > 0) {
-		nft_rule_attr_set(r, NFT_RULE_ATTR_HANDLE, &handle);
-		flags |= NLM_F_REPLACE;
-	} else
-		flags |= NLM_F_APPEND;*/
-
-	flags |= NLM_F_APPEND;
-
-	if (h->commit) {
-		nft_rule_attr_set_u32(r, NFT_RULE_ATTR_FLAGS,
-				      NFT_RULE_F_COMMIT);
-	}
-
-	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_NEWRULE, h->family,
-				       flags, h->seq);
-	nft_rule_nlmsg_build_payload(nlh, r);
-	nft_arp_rule_print_debug(r, nlh);
-	nft_rule_free(r);
-
-	ret = mnl_talk(h, nlh, NULL, NULL);
-	if (ret < 0)
-		perror("mnl_talk:nft_arp_rule_append");
-
-err:
-	/* the core expects 1 for success and 0 for error */
-	return ret == 0 ? 1 : 0;
-}
-
-int nft_arp_rule_insert(struct nft_handle *h, const char *chain,
-			const char *table, struct arpt_entry *fw,
-			int rulenum, bool verbose)
-{
-	struct nft_rule_list *list;
-	struct nft_rule *r;
-	uint64_t handle = 0;
-
-	/* If built-in chains don't exist for this table, create them */
-	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0)
-		nft_chain_builtin_init(h, table, chain, NF_ACCEPT);
-
-	nft_fn = nft_arp_rule_insert;
-
-	if (rulenum > 0) {
-		list = nft_rule_list_create(h);
-		if (list == NULL)
-			goto err;
-
-		r = nft_rule_find(h, list, chain, table, fw, rulenum);
-		if (r == NULL) {
-			errno = ENOENT;
-			goto err;
-		}
-
-		handle = nft_rule_attr_get_u64(r, NFT_RULE_ATTR_HANDLE);
-		DEBUGP("adding after rule handle %"PRIu64"\n", handle);
-
-		nft_rule_list_destroy(list);
-	}
-
-	return nft_arp_rule_add(h, chain, table, fw, handle, verbose);
-err:
-	nft_rule_list_destroy(list);
-	return 0;
 }

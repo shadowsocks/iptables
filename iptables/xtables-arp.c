@@ -884,12 +884,11 @@ append_entry(struct nft_handle *h,
 		for (j = 0; j < ndaddrs; j++) {
 			fw->arp.tgt.s_addr = daddrs[j].s_addr;
 			if (append) {
-				ret = nft_arp_rule_append(h, chain, table,
-							  fw, verbose);
+				ret = nft_rule_append(h, chain, table, fw, 0,
+						      verbose);
 			} else {
-				ret = nft_arp_rule_insert(h, chain, table,
-							  fw, rulenum,
-							  verbose);
+				ret = nft_rule_insert(h, chain, table, fw,
+						      rulenum, verbose);
 			}
 		}
 	}
