@@ -223,7 +223,7 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 {
 	uint32_t value;
 	const void *ifname;
-	size_t len;
+	uint32_t len;
 
 	switch(key) {
 	case NFT_META_IIF:
@@ -285,7 +285,7 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 void nft_parse_target(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 		 int family, void *data)
 {
-	size_t tg_len;
+	uint32_t tg_len;
 	const char *targname = nft_rule_expr_get_str(e, NFT_EXPR_TG_NAME);
 	const void *targinfo = nft_rule_expr_get(e, NFT_EXPR_TG_INFO, &tg_len);
 	struct xtables_target *target;
@@ -316,7 +316,7 @@ static void
 nft_parse_match(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 		struct iptables_command_state *cs)
 {
-	size_t mt_len;
+	uint32_t mt_len;
 	const char *mt_name = nft_rule_expr_get_str(e, NFT_EXPR_MT_NAME);
 	const void *mt_info = nft_rule_expr_get(e, NFT_EXPR_MT_INFO, &mt_len);
 	struct xtables_match *match;
@@ -360,7 +360,7 @@ void get_cmp_data(struct nft_rule_expr_iter *iter,
 {
 	struct nft_rule_expr *e;
 	const char *name;
-	size_t len;
+	uint32_t len;
 	uint8_t op;
 
 	e = nft_rule_expr_iter_next(iter);
