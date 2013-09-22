@@ -911,6 +911,30 @@ replace_entry(const char *chain,
 	return nft_rule_replace(h, chain, table, fw, rulenum, verbose);
 }
 
+static int
+delete_entry(const char *chain,
+	     const char *table,
+	     struct arpt_entry *fw,
+	     unsigned int nsaddrs,
+	     const struct in_addr saddrs[],
+	     unsigned int ndaddrs,
+	     const struct in_addr daddrs[],
+	     bool verbose, struct nft_handle *h)
+{
+	unsigned int i, j;
+	int ret = 1;
+
+	for (i = 0; i < nsaddrs; i++) {
+		fw->arp.src.s_addr = saddrs[i].s_addr;
+		for (j = 0; j < ndaddrs; j++) {
+			fw->arp.tgt.s_addr = daddrs[j].s_addr;
+			ret = nft_rule_delete(h, chain, table, fw, verbose);
+		}
+	}
+
+	return ret;
+}
+
 int do_commandarp(struct nft_handle *h, int argc, char *argv[], char **table)
 {
 	struct arpt_entry fw, *e = NULL;
@@ -1402,13 +1426,12 @@ int do_commandarp(struct nft_handle *h, int argc, char *argv[], char **table)
 				   options&OPT_VERBOSE, true);
 		break;
 	case CMD_DELETE:
-		/*ret = delete_entry(chain, e,
-					nsaddrs, saddrs, ndaddrs, daddrs,
-					options&OPT_VERBOSE,
-					handle);*/
+		ret = delete_entry(chain, *table, e,
+				   nsaddrs, saddrs, ndaddrs, daddrs,
+				   options&OPT_VERBOSE, h);
 		break;
 	case CMD_DELETE_NUM:
-		/*ret = arptc_delete_num_entry(chain, rulenum - 1, handle);*/
+		ret = nft_rule_delete_num(h, chain, *table, rulenum - 1, verbose);
 		break;
 	case CMD_REPLACE:
 		ret = replace_entry(chain, *table, e, rulenum - 1,
