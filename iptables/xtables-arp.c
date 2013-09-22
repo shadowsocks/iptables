@@ -1462,9 +1462,8 @@ int do_commandarp(struct nft_handle *h, int argc, char *argv[], char **table)
 				   options&OPT_NUMERIC,
 				   /*options&OPT_EXPANDED*/0,
 				   options&OPT_LINENUMBERS);
-		/*if (ret)
-			ret = zero_entries(chain,
-						options&OPT_VERBOSE, handle);*/
+		if (ret)
+			ret = nft_chain_zero_counters(h, chain, *table);
 		break;
 	case CMD_NEW_CHAIN:
 		ret = nft_chain_user_add(h, chain, *table);
