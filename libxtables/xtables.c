@@ -1243,7 +1243,7 @@ const char *xtables_ipmask_to_numeric(const struct in_addr *mask)
 	uint32_t cidr;
 
 	cidr = xtables_ipmask_to_cidr(mask);
-	if (cidr < 0) {
+	if (cidr == (unsigned int)-1) {
 		/* mask was not a decent combination of 1's and 0's */
 		sprintf(buf, "/%s", xtables_ipaddr_to_numeric(mask));
 		return buf;
