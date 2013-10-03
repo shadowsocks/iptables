@@ -819,12 +819,12 @@ generate_entry(const struct arpt_entry *fw,
 
 	size = sizeof(struct arpt_entry);
 
-	e = xtables_malloc(size + target->u.target_size);
+	e = xtables_malloc(size);
 	*e = *fw;
-	e->target_offset = size;
-	e->next_offset = size + target->u.target_size;
+	e->target_offset = offsetof(struct arpt_entry, elems);
+	e->next_offset = e->target_offset + target->u.target_size;
 
-	t = (void *) e + e->target_offset;
+	t = (void *) &e->elems;
 	*t = target;
 
 	return e;

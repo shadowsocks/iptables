@@ -276,17 +276,16 @@ static void nft_arp_parse_meta(struct nft_rule_expr *e, uint8_t key,
 	fw->arp.invflags |= ipt_to_arpt_flags(flags);
 }
 
-static void nft_arp_parse_target(struct xtables_target *t, void *data)
+static void nft_arp_parse_target(struct xtables_target *target, void *data)
 {
 	struct arpt_entry *fw = data;
-	size_t size = sizeof(struct arpt_entry);
-	struct xt_entry_target **target;
+	struct xt_entry_target **t;
 
-	fw->target_offset = size;
-	fw->next_offset = size + t->t->u.target_size;
+	fw->target_offset = offsetof(struct arpt_entry, elems);
+	fw->next_offset = fw->target_offset + target->t->u.target_size;
 
-	target = (void *) fw + fw->target_offset;
-	*target = t->t;
+	t = (void *) &fw->elems;
+	*t = target->t;
 }
 
 static void nft_arp_parse_immediate(const char *jumpto, bool nft_goto,
@@ -297,10 +296,13 @@ static void nft_arp_parse_immediate(const char *jumpto, bool nft_goto,
 
 	target = xtables_find_target(XT_STANDARD_TARGET,
 				     XTF_LOAD_MUST_SUCCEED);
-	size = sizeof(struct xt_entry_target) + target->size;
+
+	size = XT_ALIGN(sizeof(struct xt_entry_target)) + target->size;
+
 	target->t = xtables_calloc(1, size);
 	target->t->u.target_size = size;
 	strcpy(target->t->u.user.name, jumpto);
+	target->t->u.user.revision = target->revision;
 
 	nft_arp_parse_target(target, data);
 }
@@ -598,15 +600,10 @@ static bool nft_arp_rule_find(struct nft_family_ops *ops, struct nft_rule *r,
 	struct arpt_entry *fw = data;
 	struct xt_entry_target *t_fw, *t_this;
 	char *targname_fw, *targname_this;
-	struct xtables_target *target_fw, *target_this;
 	struct arpt_entry this = {};
 
 	/* Delete by matching rule case */
 	nft_rule_to_arpt_entry(r, &this);
-
-	DEBUGP("comparing with... ");
-
-/*	nft_rule_print_save(&this, r, NFT_RULE_APPEND, 0); */
 
 	if (!ops->is_same(fw, &this))
 		return false;
@@ -617,19 +614,20 @@ static bool nft_arp_rule_find(struct nft_family_ops *ops, struct nft_rule *r,
 	targname_fw = t_fw->u.user.name;
 	targname_this = t_this->u.user.name;
 
-	target_fw = xtables_find_target(targname_fw, XTF_TRY_LOAD);
-	target_this = xtables_find_target(targname_this, XTF_TRY_LOAD);
-
-	if (target_fw != NULL && target_this != NULL) {
-		if (!compare_targets(target_fw, target_this)) {
+	if (!strcmp(targname_fw, targname_this) &&
+	    (!strcmp(targname_fw, "mangle") ||
+	    !strcmp(targname_fw, "CLASSIFY"))) {
+		if (memcmp(t_fw->data, t_this->data,
+		    t_fw->u.user.target_size - sizeof(*t_fw)) != 0) {
 			DEBUGP("Different target\n");
 			return false;
 		}
-	} else {
-		if (strcmp(targname_fw, targname_this) != 0) {
-			DEBUGP("Different verdict\n");
-			return false;
-		}
+		return true;
+	}
+
+	if (strcmp(targname_fw, targname_this) != 0) {
+		DEBUGP("Different verdict\n");
+		return false;
 	}
 
 	return true;

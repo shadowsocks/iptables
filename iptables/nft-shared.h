@@ -178,11 +178,11 @@ extern char *opcodes[];
 
 #include <linux/netfilter_arp/arp_tables.h>
 
-static inline struct xt_entry_target *nft_arp_get_target(struct arpt_entry *fw) 
+static inline struct xt_entry_target *nft_arp_get_target(struct arpt_entry *fw)
 {
 	struct xt_entry_target **target;
 
-	target = (void *) fw + fw->target_offset;
+	target = (void *) &fw->elems;
 
 	return *target;
 }
