@@ -1317,6 +1317,10 @@ int do_commandarp(struct nft_handle *h, int argc, char *argv[], char **table)
 			exit_tryhelp(2);
 
 		default:
+			if (target) {
+				xtables_option_tpcall(c, argv,
+						      invert, target, &fw);
+			}
 			break;
 		}
 		invert = FALSE;
@@ -1324,8 +1328,6 @@ int do_commandarp(struct nft_handle *h, int argc, char *argv[], char **table)
 
 	if (target)
 		xtables_option_tfcall(target);
-
-	/* Fix me: must put inverse options checking here --MN */
 
 	if (optind < argc)
 		xtables_error(PARAMETER_PROBLEM,
