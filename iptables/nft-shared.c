@@ -27,6 +27,7 @@
 
 #include "nft-shared.h"
 #include "xshared.h"
+#include "nft.h"
 
 extern struct nft_family_ops nft_family_ops_ipv4;
 extern struct nft_family_ops nft_family_ops_ipv6;
