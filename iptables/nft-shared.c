@@ -292,18 +292,21 @@ void nft_parse_target(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 	struct xtables_target *target;
 	struct xt_entry_target *t;
 	struct nft_family_ops *ops;
+	size_t size;
 
 	target = xtables_find_target(targname, XTF_TRY_LOAD);
 	if (target == NULL)
 		return;
 
-	t = calloc(1, sizeof(struct xt_entry_target) + tg_len);
+	size = XT_ALIGN(sizeof(struct xt_entry_target)) + tg_len;
+
+	t = calloc(1, size);
 	if (t == NULL) {
 		fprintf(stderr, "OOM");
 		exit(EXIT_FAILURE);
 	}
 	memcpy(&t->data, targinfo, tg_len);
-	t->u.target_size = tg_len + XT_ALIGN(sizeof(struct xt_entry_target));
+	t->u.target_size = size;
 	t->u.user.revision = nft_rule_expr_get_u32(e, NFT_EXPR_TG_REV);
 	strcpy(t->u.user.name, target->name);
 
