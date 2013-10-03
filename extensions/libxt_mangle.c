@@ -33,22 +33,21 @@ static void mangle_help(void)
 	);
 }
 
-#define MANGLE_IPS    '1'
-#define MANGLE_IPT    '2'
-#define MANGLE_DEVS   '3'
-#define MANGLE_DEVT   '4'
-#define MANGLE_TARGET '5'
+enum {
+	MANGLE_IPS    = 0,
+	MANGLE_IPT    = 1,
+	MANGLE_DEVS   = 2,
+	MANGLE_DEVT   = 3,
+	MANGLE_TARGET = 4,
+};
+
 static const struct xt_option_entry mangle_opts[] = {
-	{ .name = "mangle-ip-s", .id = MANGLE_IPS, .type = XTTYPE_STRING,
-	  .flags = XTOPT_MAND },
-	{ .name = "mangle-ip-d", .id = MANGLE_IPT, .type = XTTYPE_STRING,
-	  .flags = XTOPT_MAND },
-	{ .name = "mangle-mac-s", .id = MANGLE_DEVS, .type = XTTYPE_STRING,
-	  .flags = XTOPT_MAND },
-	{ .name = "mangle-mac-d", .id = MANGLE_DEVT, .type = XTTYPE_STRING,
-	  .flags = XTOPT_MAND },
-	{ .name = "mangle-target", .id = MANGLE_TARGET, .type = XTTYPE_STRING,
-	  .flags = XTOPT_MAND },
+	{ .name = "mangle-ip-s", .id = MANGLE_IPS, .type = XTTYPE_STRING },
+	{ .name = "mangle-ip-d", .id = MANGLE_IPT, .type = XTTYPE_STRING },
+	{ .name = "mangle-mac-s", .id = MANGLE_DEVS, .type = XTTYPE_STRING },
+	{ .name = "mangle-mac-d", .id = MANGLE_DEVT, .type = XTTYPE_STRING },
+	{ .name = "mangle-target", .id = MANGLE_TARGET,
+	  .type = XTTYPE_STRING },
 	XTOPT_TABLEEND,
 };
 
