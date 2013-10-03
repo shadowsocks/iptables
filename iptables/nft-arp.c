@@ -267,7 +267,7 @@ static void nft_arp_parse_meta(struct nft_rule_expr *e, uint8_t key,
 			       void *data)
 {
 	struct arpt_entry *fw = data;
-	uint8_t flags;
+	uint8_t flags = 0;
 
 	parse_meta(e, key, fw->arp.iniface, fw->arp.iniface_mask,
 		   fw->arp.outiface, fw->arp.outiface_mask,
