@@ -387,6 +387,32 @@ parse_rulenumber(const char *rule)
 	return rulenum;
 }
 
+static void
+parse_chain(const char *chainname)
+{
+	const char *ptr;
+
+	if (strlen(chainname) >= XT_EXTENSION_MAXNAMELEN)
+		xtables_error(PARAMETER_PROBLEM,
+			   "chain name `%s' too long (must be under %u chars)",
+			   chainname, XT_EXTENSION_MAXNAMELEN);
+
+	if (*chainname == '-' || *chainname == '!')
+		xtables_error(PARAMETER_PROBLEM,
+			   "chain name not allowed to start "
+			   "with `%c'\n", *chainname);
+
+	if (xtables_find_target(chainname, XTF_TRY_LOAD))
+		xtables_error(PARAMETER_PROBLEM,
+			   "chain name may not clash "
+			   "with target name\n");
+
+	for (ptr = chainname; *ptr; ptr++)
+		if (isspace(*ptr))
+			xtables_error(PARAMETER_PROBLEM,
+				   "Invalid chain name `%s'", chainname);
+}
+
 static const char *
 parse_target(const char *targetname)
 {
@@ -1432,14 +1458,7 @@ int do_command6(int argc, char *argv[], char **table,
 			break;
 
 		case 'N':
-			if (optarg && (*optarg == '-' || *optarg == '!'))
-				xtables_error(PARAMETER_PROBLEM,
-					   "chain name not allowed to start "
-					   "with `%c'\n", *optarg);
-			if (xtables_find_target(optarg, XTF_TRY_LOAD))
-				xtables_error(PARAMETER_PROBLEM,
-					   "chain name may not clash "
-					   "with target name\n");
+			parse_chain(optarg);
 			add_command(&command, CMD_NEW_CHAIN, CMD_NONE,
 				    cs.invert);
 			chain = optarg;
@@ -1731,11 +1750,6 @@ int do_command6(int argc, char *argv[], char **table,
 			   "specify a unique address");
 
 	generic_opt_check(command, cs.options);
-
-	if (chain != NULL && strlen(chain) >= XT_EXTENSION_MAXNAMELEN)
-		xtables_error(PARAMETER_PROBLEM,
-			   "chain name `%s' too long (must be under %u chars)",
-			   chain, XT_EXTENSION_MAXNAMELEN);
 
 	/* Attempt to acquire the xtables lock */
 	if (!restore && !xtables_lock(wait)) {
