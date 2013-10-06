@@ -643,4 +643,5 @@ struct nft_family_ops nft_family_ops_arp = {
 	.print_firewall		= nft_arp_print_firewall,
 	.post_parse		= NULL,
 	.rule_find		= nft_arp_rule_find,
+	.parse_target		= nft_arp_parse_target,
 };
