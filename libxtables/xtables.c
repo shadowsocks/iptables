@@ -578,8 +578,6 @@ static void *load_extension(const char *search_path, const char *af_prefix,
 			if (ptr != NULL)
 				return ptr;
 
-			fprintf(stderr, "%s: no \"%s\" extension found for "
-				"this protocol\n", path, name);
 			errno = ENOENT;
 			return NULL;
 		}
