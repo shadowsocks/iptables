@@ -243,15 +243,11 @@ static int is_exthdr(uint16_t proto)
 		proto == IPPROTO_DSTOPTS);
 }
 
-static void nft_ipv6_post_parse(int command, struct iptables_command_state *cs,
-				struct xtables_args *args)
+static void nft_ipv6_proto_parse(struct iptables_command_state *cs,
+				 struct xtables_args *args)
 {
-	if (args->proto != 0)
-		args->flags |= IP6T_F_PROTO;
-
 	cs->fw6.ipv6.proto = args->proto;
 	cs->fw6.ipv6.invflags = args->invflags;
-	cs->fw6.ipv6.flags = args->flags;
 
 	if (is_exthdr(cs->fw6.ipv6.proto)
 	    && (cs->fw6.ipv6.invflags & XT_INV_PROTO) == 0)
@@ -259,6 +255,15 @@ static void nft_ipv6_post_parse(int command, struct iptables_command_state *cs,
 			"Warning: never matched protocol: %s. "
 			"use extension match instead.\n",
 			cs->protocol);
+}
+
+static void nft_ipv6_post_parse(int command, struct iptables_command_state *cs,
+				struct xtables_args *args)
+{
+	if (args->proto != 0)
+		args->flags |= IP6T_F_PROTO;
+
+	cs->fw6.ipv6.flags = args->flags;
 
 	strncpy(cs->fw6.ipv6.iniface, args->iniface, IFNAMSIZ);
 	memcpy(cs->fw6.ipv6.iniface_mask,
@@ -323,6 +328,7 @@ struct nft_family_ops nft_family_ops_ipv6 = {
 	.parse_immediate	= nft_ipv6_parse_immediate,
 	.print_firewall		= nft_ipv6_print_firewall,
 	.save_firewall		= nft_ipv6_save_firewall,
+	.proto_parse		= nft_ipv6_proto_parse,
 	.post_parse		= nft_ipv6_post_parse,
 	.parse_target		= nft_ipv6_parse_target,
 	.rule_find		= nft_ipv6_rule_find,

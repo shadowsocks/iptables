@@ -51,6 +51,8 @@ struct nft_family_ops {
 			       unsigned int format);
 	uint8_t (*save_firewall)(const struct iptables_command_state *cs,
 				 unsigned int format);
+	void (*proto_parse)(struct iptables_command_state *cs,
+			    struct xtables_args *args);
 	void (*post_parse)(int command, struct iptables_command_state *cs,
 			   struct xtables_args *args);
 	void (*parse_target)(struct xtables_target *t, void *data);

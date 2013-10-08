@@ -331,12 +331,17 @@ static uint8_t nft_ipv4_save_firewall(const struct iptables_command_state *cs,
 	return cs->fw.ip.flags;
 }
 
+static void nft_ipv4_proto_parse(struct iptables_command_state *cs,
+				 struct xtables_args *args)
+{
+	cs->fw.ip.proto = args->proto;
+	cs->fw.ip.invflags = args->invflags;
+}
+
 static void nft_ipv4_post_parse(int command,
 				struct iptables_command_state *cs,
 				struct xtables_args *args)
 {
-	cs->fw.ip.proto = args->proto;
-	cs->fw.ip.invflags = args->invflags;
 	cs->fw.ip.flags = args->flags;
 
 	strncpy(cs->fw.ip.iniface, args->iniface, IFNAMSIZ);
@@ -400,6 +405,7 @@ struct nft_family_ops nft_family_ops_ipv4 = {
 	.parse_immediate	= nft_ipv4_parse_immediate,
 	.print_firewall		= nft_ipv4_print_firewall,
 	.save_firewall		= nft_ipv4_save_firewall,
+	.proto_parse		= nft_ipv4_proto_parse,
 	.post_parse		= nft_ipv4_post_parse,
 	.parse_target		= nft_ipv4_parse_target,
 	.rule_find		= nft_ipv4_rule_find,

@@ -715,6 +715,11 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 	   demand-load a protocol. */
 	opterr = 0;
 
+	/* Default on AF_INET */
+	h->ops = nft_family_ops_lookup(AF_INET);
+	if (h->ops == NULL)
+		xtables_error(PARAMETER_PROBLEM, "Unknown family");
+
 	opts = xt_params->orig_opts;
 	while ((cs.c = getopt_long(argc, argv,
 	   "-:A:C:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:fbvnt:m:xc:g:46",
@@ -894,6 +899,9 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 			if (args.proto == 0 && (args.invflags & XT_INV_PROTO))
 				xtables_error(PARAMETER_PROBLEM,
 					   "rule would never match protocol");
+
+			/* This needs to happen here to parse extensions */
+			h->ops->proto_parse(&cs, &args);
 			break;
 
 		case 's':
@@ -1033,11 +1041,18 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 		case '4':
 			if (args.family != AF_INET)
 				exit_tryhelp(2);
+
+			h->ops = nft_family_ops_lookup(args.family);
 			break;
 
 		case '6':
 			args.family = AF_INET6;
 			xtables_set_nfproto(AF_INET6);
+
+			h->ops = nft_family_ops_lookup(args.family);
+			if (h->ops == NULL)
+				xtables_error(PARAMETER_PROBLEM,
+					      "Unknown family");
 			break;
 
 		case 1: /* non option */
@@ -1088,10 +1103,6 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 	/* Set only if required, needed by xtables-restore */
 	if (h->family == AF_UNSPEC)
 		h->family = args.family;
-
-	h->ops = nft_family_ops_lookup(h->family);
-	if (h->ops == NULL)
-		xtables_error(PARAMETER_PROBLEM, "Unknown family");
 
 	h->ops->post_parse(command, &cs, &args);
 
