@@ -683,7 +683,7 @@ compare_matches(struct xtables_rule_match *mt1, struct xtables_rule_match *mt2)
 		}
 
 		if (memcmp(m1->data, m2->data,
-			   m1->u.user.match_size - sizeof(*m1)) != 0) {
+			   mp1->match->userspacesize) != 0) {
 			DEBUGP("mismatch match data\n");
 			return false;
 		}
@@ -709,10 +709,8 @@ bool compare_targets(struct xtables_target *tg1, struct xtables_target *tg2)
 	if (strcmp(tg1->t->u.user.name, tg2->t->u.user.name) != 0)
 		return false;
 
-	if (memcmp(tg1->t->data, tg2->t->data,
-		   tg1->t->u.user.target_size - sizeof(*tg1->t)) != 0) {
+	if (memcmp(tg1->t->data, tg2->t->data, tg1->userspacesize) != 0)
 		return false;
-	}
 
 	return true;
 }
