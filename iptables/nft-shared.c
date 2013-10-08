@@ -633,14 +633,14 @@ void print_matches_and_target(struct iptables_command_state *cs,
 
 	for (matchp = cs->matches; matchp; matchp = matchp->next) {
 		if (matchp->match->print != NULL) {
-			matchp->match->print(NULL, matchp->match->m,
+			matchp->match->print(&cs->fw, matchp->match->m,
 					     format & FMT_NUMERIC);
 		}
 	}
 
 	if (cs->target != NULL) {
 		if (cs->target->print != NULL) {
-			cs->target->print(NULL, cs->target->t,
+			cs->target->print(&cs->fw, cs->target->t,
 					  format & FMT_NUMERIC);
 		}
 	}

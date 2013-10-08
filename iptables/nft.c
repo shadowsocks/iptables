@@ -1040,8 +1040,10 @@ nft_rule_print_save(const struct iptables_command_state *cs,
 		} else
 			printf("-m %s", matchp->match->name);
 
-		if (matchp->match->save != NULL)
-			matchp->match->save(NULL, matchp->match->m);
+		if (matchp->match->save != NULL) {
+			/* cs->fw union makes the trick */
+			matchp->match->save(&cs->fw, matchp->match->m);
+		}
 		printf(" ");
 	}
 
@@ -1052,7 +1054,7 @@ nft_rule_print_save(const struct iptables_command_state *cs,
 			printf("-j %s", cs->jumpto);
 
 		if (cs->target->save != NULL)
-			cs->target->save(NULL, cs->target->t);
+			cs->target->save(&cs->fw, cs->target->t);
 	} else if (strlen(cs->jumpto) > 0)
 		printf("-%c %s", ip_flags & IPT_F_GOTO ? 'g' : 'j',
 								cs->jumpto);
