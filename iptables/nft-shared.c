@@ -124,13 +124,11 @@ void add_iniface(struct nft_rule *r, char *iface, int invflags)
 	else
 		op = NFT_CMP_EQ;
 
-	if (iface[iface_len - 1] == '+') {
-		add_meta(r, NFT_META_IIFNAME);
+	add_meta(r, NFT_META_IIFNAME);
+	if (iface[iface_len - 1] == '+')
 		add_cmp_ptr(r, op, iface, iface_len - 1);
-	} else {
-		add_meta(r, NFT_META_IIF);
-		add_cmp_u32(r, if_nametoindex(iface), op);
-	}
+	else
+		add_cmp_ptr(r, op, iface, iface_len + 1);
 }
 
 void add_outiface(struct nft_rule *r, char *iface, int invflags)
@@ -145,13 +143,11 @@ void add_outiface(struct nft_rule *r, char *iface, int invflags)
 	else
 		op = NFT_CMP_EQ;
 
-	if (iface[iface_len - 1] == '+') {
-		add_meta(r, NFT_META_OIFNAME);
+	add_meta(r, NFT_META_OIFNAME);
+	if (iface[iface_len - 1] == '+')
 		add_cmp_ptr(r, op, iface, iface_len - 1);
-	} else {
-		add_meta(r, NFT_META_OIF);
-		add_cmp_u32(r, if_nametoindex(iface), op);
-	}
+	else
+		add_cmp_ptr(r, op, iface, iface_len + 1);
 }
 
 void add_addr(struct nft_rule *r, int offset,
@@ -251,15 +247,14 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 			*invflags |= IPT_INV_VIA_IN;
 
 		memcpy(iniface, ifname, len);
-		iniface[len] = '\0';
 
-		/* If zero, then this is an interface mask */
-		if (if_nametoindex(iniface) == 0) {
+		if (iniface[len] == '\0')
+			memset(iniface_mask, 0xff, len);
+		else {
 			iniface[len] = '+';
 			iniface[len+1] = '\0';
+			memset(iniface_mask, 0xff, len + 1);
 		}
-
-		memset(iniface_mask, 0xff, len);
 		break;
 	case NFT_META_OIFNAME:
 		ifname = nft_rule_expr_get(e, NFT_EXPR_CMP_DATA, &len);
@@ -267,15 +262,14 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 			*invflags |= IPT_INV_VIA_OUT;
 
 		memcpy(outiface, ifname, len);
-		outiface[len] = '\0';
 
-		/* If zero, then this is an interface mask */
-		if (if_nametoindex(outiface) == 0) {
+		if (outiface[len] == '\0')
+			memset(outiface_mask, 0xff, len);
+		else {
 			outiface[len] = '+';
 			outiface[len+1] = '\0';
+			memset(outiface_mask, 0xff, len + 1);
 		}
-
-		memset(outiface_mask, 0xff, len);
 		break;
 	default:
 		DEBUGP("unknown meta key %d\n", key);
