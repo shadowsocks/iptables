@@ -459,7 +459,8 @@ nft_arp_print_firewall(struct nft_rule *r, unsigned int num,
 			sprintf(buf, "%s", addr_to_dotted(&(fw.arp.src)));
 		else
 			sprintf(buf, "%s", addr_to_anyname(&(fw.arp.src)));
-		strcat(buf, mask_to_dotted(&(fw.arp.smsk)));
+		strncat(buf, mask_to_dotted(&(fw.arp.smsk)),
+			sizeof(buf) - strlen(buf) - 1);
 		printf("-s %s ", buf);
 	}
 
@@ -483,7 +484,8 @@ after_devsrc:
 			sprintf(buf, "%s", addr_to_dotted(&(fw.arp.tgt)));
 		else
 			sprintf(buf, "%s", addr_to_anyname(&(fw.arp.tgt)));
-		strcat(buf, mask_to_dotted(&(fw.arp.tmsk)));
+		strncat(buf, mask_to_dotted(&(fw.arp.tmsk)),
+			sizeof(buf) - strlen(buf) - 1);
 		printf("-d %s ", buf);
 	}
 
