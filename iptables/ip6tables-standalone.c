@@ -73,6 +73,8 @@ ip6tables_main(int argc, char *argv[])
 			fprintf(stderr, "ip6tables: %s.\n",
 				ip6tc_strerror(errno));
 		}
+		if (errno == EAGAIN)
+			exit(RESOURCE_PROBLEM);
 	}
 
 	exit(!ret);
