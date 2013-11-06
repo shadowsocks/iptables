@@ -557,16 +557,16 @@ add_command(unsigned int *cmd, const int newcmd, const unsigned int othercmds, i
 }
 
 static int
-check_inverse(const char option[], int *invert, int *optind, int argc)
+check_inverse(const char option[], int *invert, int *optidx, int argc)
 {
 	if (option && strcmp(option, "!") == 0) {
 		if (*invert)
 			xtables_error(PARAMETER_PROBLEM,
 				      "Multiple `!' flags not allowed");
 		*invert = TRUE;
-		if (optind) {
-			*optind = *optind+1;
-			if (argc && *optind > argc)
+		if (optidx) {
+			*optidx = *optidx+1;
+			if (argc && *optidx > argc)
 				xtables_error(PARAMETER_PROBLEM,
 					      "no argument following `!'");
 		}
