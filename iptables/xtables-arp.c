@@ -1145,6 +1145,13 @@ int do_commandarp(struct nft_handle *h, int argc, char *argv[], char **table)
 				   invert);
 			getlength_and_mask(argv[optind - 1], &fw.arp.arhln,
 					   &fw.arp.arhln_mask);
+
+			if (fw.arp.arhln != 6) {
+				xtables_error(PARAMETER_PROBLEM,
+					      "Only harware address length of"
+					      " 6 is supported currently.");
+			}
+
 			break;
 
 		case 8:/* protocol length */
