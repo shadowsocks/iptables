@@ -109,20 +109,20 @@ static void probe_host(const char *host)
 		goto err2;
 	}
 
-	if (pcap_compile(ph, &fp, "src host 127.0.0.1 and tcp and src port 80",
-			 1, PCAP_NETMASK_UNKNOWN) == -1) {
-		pcap_perror(ph, "pcap_compile");
-		goto err2;
-	}
-
 	if (pcap_setfilter(ph, &fp) == -1) {
 		pcap_perror(ph, "pcap_setfilter");
-		goto err3;
+		goto err2;
 	}
 
 	if (pcap_activate(ph) != 0) {
 		pcap_perror(ph, "pcap_activate");
-		goto err3;
+		goto err2;
+	}
+
+	if (pcap_compile(ph, &fp, "src host 127.0.0.1 and tcp and src port 80",
+			 1, PCAP_NETMASK_UNKNOWN) == -1) {
+		pcap_perror(ph, "pcap_compile");
+		goto err2;
 	}
 
 	fd = socket(AF_INET, SOCK_STREAM, 0);
