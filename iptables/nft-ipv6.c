@@ -264,6 +264,10 @@ static void nft_ipv6_post_parse(int command, struct iptables_command_state *cs,
 		args->flags |= IP6T_F_PROTO;
 
 	cs->fw6.ipv6.flags = args->flags;
+	/* We already set invflags in proto_parse, but we need to refresh it
+	 * to include new parsed options.
+	 */
+	cs->fw6.ipv6.invflags = args->invflags;
 
 	strncpy(cs->fw6.ipv6.iniface, args->iniface, IFNAMSIZ);
 	memcpy(cs->fw6.ipv6.iniface_mask,

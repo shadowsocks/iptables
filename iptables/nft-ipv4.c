@@ -343,6 +343,10 @@ static void nft_ipv4_post_parse(int command,
 				struct xtables_args *args)
 {
 	cs->fw.ip.flags = args->flags;
+	/* We already set invflags in proto_parse, but we need to refresh it
+	 * to include new parsed options.
+	 */
+	cs->fw.ip.invflags = args->invflags;
 
 	strncpy(cs->fw.ip.iniface, args->iniface, IFNAMSIZ);
 	memcpy(cs->fw.ip.iniface_mask,
