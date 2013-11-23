@@ -10,7 +10,7 @@ libxtables_la_LIBADD  =
 if ENABLE_STATIC
 # With --enable-static, shipped extensions are linked into the main executable,
 # so we need all the LIBADDs here too
-libxtables_la_LIBADD += -lm
+libxtables_la_LIBADD += -lm ${libnetfilter_conntrack_LIBS}
 endif
 if ENABLE_SHARED
 libxtables_la_CFLAGS  = ${AM_CFLAGS}
