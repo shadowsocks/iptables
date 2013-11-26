@@ -776,7 +776,7 @@ static int __add_match(struct nft_rule_expr *e, struct xt_entry_match *m)
 	if (info == NULL)
 		return -ENOMEM;
 
-	memcpy(info, m->data, m->u.match_size);
+	memcpy(info, m->data, m->u.match_size - sizeof(*m));
 	nft_rule_expr_set(e, NFT_EXPR_MT_INFO, info, m->u.match_size - sizeof(*m));
 
 	return 0;
@@ -799,20 +799,17 @@ int add_match(struct nft_rule *r, struct xt_entry_match *m)
 
 static int __add_target(struct nft_rule_expr *e, struct xt_entry_target *t)
 {
-	void *info = NULL;
+	void *info;
 
 	nft_rule_expr_set(e, NFT_EXPR_TG_NAME, t->u.user.name,
 			  strlen(t->u.user.name));
 	nft_rule_expr_set_u32(e, NFT_EXPR_TG_REV, t->u.user.revision);
 
-	if (info == NULL) {
-		info = calloc(1, t->u.target_size);
-		if (info == NULL)
-			return -ENOMEM;
+	info = calloc(1, t->u.target_size);
+	if (info == NULL)
+		return -ENOMEM;
 
-		memcpy(info, t->data, t->u.target_size);
-	}
-
+	memcpy(info, t->data, t->u.target_size - sizeof(*t));
 	nft_rule_expr_set(e, NFT_EXPR_TG_INFO, info, t->u.target_size - sizeof(*t));
 
 	return 0;
