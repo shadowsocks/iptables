@@ -18,10 +18,6 @@
 #include "ip6tables.h"
 #include "ip6tables-multi.h"
 
-#ifndef NO_SHARED_LIBS
-#include <dlfcn.h>
-#endif
-
 static int show_counters = 0;
 
 static const struct option options[] = {

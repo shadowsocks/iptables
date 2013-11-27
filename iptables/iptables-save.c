@@ -17,10 +17,6 @@
 #include "iptables.h"
 #include "iptables-multi.h"
 
-#ifndef NO_SHARED_LIBS
-#include <dlfcn.h>
-#endif
-
 static int show_counters = 0;
 
 static const struct option options[] = {
