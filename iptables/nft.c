@@ -2423,8 +2423,8 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 {
 	struct nft_table_list *table_list = nft_table_list_alloc();
 	struct nft_chain_list *chain_list = nft_chain_list_alloc();
-	struct nft_table_list_iter *titer;
-	struct nft_chain_list_iter *citer;
+	struct nft_table_list_iter *titer = NULL;
+	struct nft_chain_list_iter *citer = NULL;
 	struct nft_table *table;
 	struct nft_chain *chain;
 	uint32_t table_family, chain_family;
@@ -2440,7 +2440,7 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 				"Fatal error parsing config file: %s\n",
 				 strerror(errno));
 		}
-		return -1;
+		goto err;
 	}
 
 	/* Stage 1) create tables */
@@ -2463,9 +2463,7 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 					"table `%s' cannot be create, reason `%s'. Exitting\n",
 					(char *)nft_table_attr_get(table, NFT_TABLE_ATTR_NAME),
 					strerror(errno));
-				nft_table_list_iter_destroy(titer);
-				nft_table_list_free(table_list);
-				return -1;
+				goto err;
 			}
 			continue;
 		}
@@ -2476,7 +2474,7 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 	nft_table_list_free(table_list);
 
 	if (!found)
-		return -1;
+		goto err;
 
 	/* Stage 2) create chains */
 	citer = nft_chain_list_iter_create(chain_list);
@@ -2497,9 +2495,7 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 					"chain `%s' cannot be create, reason `%s'. Exitting\n",
 					(char *)nft_chain_attr_get(chain, NFT_CHAIN_ATTR_NAME),
 					strerror(errno));
-				nft_chain_list_iter_destroy(citer);
-				nft_chain_list_free(chain_list);
-				return -1;
+				goto err;
 			}
 			continue;
 		}
@@ -2513,6 +2509,17 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 	nft_chain_list_free(chain_list);
 
 	return 0;
+
+err:
+	nft_table_list_free(table_list);
+	nft_chain_list_free(chain_list);
+
+	if (titer != NULL)
+		nft_table_list_iter_destroy(titer);
+	if (citer != NULL)
+		nft_table_list_iter_destroy(citer);
+
+	return -1;
 }
 
 int nft_chain_zero_counters(struct nft_handle *h, const char *chain, 
