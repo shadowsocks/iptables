@@ -618,6 +618,8 @@ int nft_init(struct nft_handle *h, struct builtin_table *t)
 void nft_fini(struct nft_handle *h)
 {
 	mnl_socket_close(h->nl);
+	free(mnl_nlmsg_batch_head(h->batch));
+	mnl_nlmsg_batch_stop(h->batch);
 }
 
 int nft_table_add(struct nft_handle *h, const struct nft_table *t)
