@@ -66,12 +66,15 @@ xtables_main(int argc, char *argv[])
 				xtables_globals.program_name,
 				xtables_globals.program_version,
 				strerror(errno));
+		nft_fini(&h);
 		exit(EXIT_FAILURE);
 	}
 
 	ret = do_commandx(&h, argc, argv, &table);
 	if (ret)
 		ret = nft_commit(&h);
+
+	nft_fini(&h);
 
 	if (!ret) {
 		if (errno == EINVAL) {
