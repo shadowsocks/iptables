@@ -2519,7 +2519,7 @@ err:
 	if (titer != NULL)
 		nft_table_list_iter_destroy(titer);
 	if (citer != NULL)
-		nft_table_list_iter_destroy(citer);
+		nft_chain_list_iter_destroy(citer);
 
 	return -1;
 }
