@@ -29,7 +29,12 @@ anymore.
 \fB\-\-random\fP
 If option
 \fB\-\-random\fP
-is used then port mapping will be randomized (kernel >= 2.6.21).
+is used then port mapping will be randomized through a hash-based algorithm (kernel >= 2.6.21).
+.TP
+\fB\-\-random-fully\fP
+If option
+\fB\-\-random-fully\fP
+is used then port mapping will be fully randomized through a PRNG (kernel >= 3.14).
 .TP
 \fB\-\-persistent\fP
 Gives a client the same source-/destination-address for each connection.
