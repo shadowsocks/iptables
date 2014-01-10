@@ -131,7 +131,7 @@ static void get_frag(struct nft_rule_expr_iter *iter, bool *inv)
 		return;
 	}
 
-	op = nft_rule_expr_get_u8(e, NFT_EXPR_CMP_OP);
+	op = nft_rule_expr_get_u32(e, NFT_EXPR_CMP_OP);
 	if (op == NFT_CMP_EQ)
 		*inv = true;
 	else

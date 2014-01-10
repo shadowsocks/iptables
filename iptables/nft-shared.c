@@ -90,8 +90,8 @@ void add_cmp_ptr(struct nft_rule *r, uint32_t op, void *data, size_t len)
 	if (expr == NULL)
 		return;
 
-	nft_rule_expr_set_u8(expr, NFT_EXPR_CMP_SREG, NFT_REG_1);
-	nft_rule_expr_set_u8(expr, NFT_EXPR_CMP_OP, op);
+	nft_rule_expr_set_u32(expr, NFT_EXPR_CMP_SREG, NFT_REG_1);
+	nft_rule_expr_set_u32(expr, NFT_EXPR_CMP_OP, op);
 	nft_rule_expr_set(expr, NFT_EXPR_CMP_DATA, data, len);
 
 	nft_rule_add_expr(r, expr);
@@ -225,7 +225,7 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 	switch(key) {
 	case NFT_META_IIF:
 		value = nft_rule_expr_get_u32(e, NFT_EXPR_CMP_DATA);
-		if (nft_rule_expr_get_u8(e, NFT_EXPR_CMP_OP) == NFT_CMP_NEQ)
+		if (nft_rule_expr_get_u32(e, NFT_EXPR_CMP_OP) == NFT_CMP_NEQ)
 			*invflags |= IPT_INV_VIA_IN;
 
 		if_indextoname(value, iniface);
@@ -234,7 +234,7 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 		break;
 	case NFT_META_OIF:
 		value = nft_rule_expr_get_u32(e, NFT_EXPR_CMP_DATA);
-		if (nft_rule_expr_get_u8(e, NFT_EXPR_CMP_OP) == NFT_CMP_NEQ)
+		if (nft_rule_expr_get_u32(e, NFT_EXPR_CMP_OP) == NFT_CMP_NEQ)
 			*invflags |= IPT_INV_VIA_OUT;
 
 		if_indextoname(value, outiface);
@@ -243,7 +243,7 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 		break;
 	case NFT_META_IIFNAME:
 		ifname = nft_rule_expr_get(e, NFT_EXPR_CMP_DATA, &len);
-		if (nft_rule_expr_get_u8(e, NFT_EXPR_CMP_OP) == NFT_CMP_NEQ)
+		if (nft_rule_expr_get_u32(e, NFT_EXPR_CMP_OP) == NFT_CMP_NEQ)
 			*invflags |= IPT_INV_VIA_IN;
 
 		memcpy(iniface, ifname, len);
@@ -258,7 +258,7 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 		break;
 	case NFT_META_OIFNAME:
 		ifname = nft_rule_expr_get(e, NFT_EXPR_CMP_DATA, &len);
-		if (nft_rule_expr_get_u8(e, NFT_EXPR_CMP_OP) == NFT_CMP_NEQ)
+		if (nft_rule_expr_get_u32(e, NFT_EXPR_CMP_OP) == NFT_CMP_NEQ)
 			*invflags |= IPT_INV_VIA_OUT;
 
 		memcpy(outiface, ifname, len);
@@ -372,7 +372,7 @@ void get_cmp_data(struct nft_rule_expr_iter *iter,
 	}
 
 	memcpy(data, nft_rule_expr_get(e, NFT_EXPR_CMP_DATA, &len), dlen);
-	op = nft_rule_expr_get_u8(e, NFT_EXPR_CMP_OP);
+	op = nft_rule_expr_get_u32(e, NFT_EXPR_CMP_OP);
 	if (op == NFT_CMP_NEQ)
 		*inv = true;
 	else
@@ -383,7 +383,7 @@ void
 nft_parse_meta(struct nft_rule_expr *e, struct nft_rule_expr_iter *iter,
 	       int family, void *data)
 {
-	uint8_t key = nft_rule_expr_get_u8(e, NFT_EXPR_META_KEY);
+	uint8_t key = nft_rule_expr_get_u32(e, NFT_EXPR_META_KEY);
 	struct nft_family_ops *ops = nft_family_ops_lookup(family);
 	const char *name;
 
