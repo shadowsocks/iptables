@@ -123,9 +123,9 @@ PKG_CHECK_MODULES([libmnl], [libmnl >= 1.0],
 	[mnl=1], [mnl=0])
 AM_CONDITIONAL([HAVE_LIBMNL], [test "$mnl" = 1])
 
-PKG_CHECK_MODULES([libnftables], [libnftables >= 1.0],
+PKG_CHECK_MODULES([libnftnl], [libnftnl >= 1.0],
 	[nftables=1], [nftables=0])
-AM_CONDITIONAL([HAVE_LIBNFTABLES], [test "$nftables" = 1])
+AM_CONDITIONAL([HAVE_LIBNFTNL], [test "$nftables" = 1])
 
 AM_PROG_LEX
 AC_PROG_YACC

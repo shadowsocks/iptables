@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 
-#include <libnftables/rule.h>
-#include <libnftables/expr.h>
+#include <libnftnl/rule.h>
+#include <libnftnl/expr.h>
 
 #include "xshared.h"
 

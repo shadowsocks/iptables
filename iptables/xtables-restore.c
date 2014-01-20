@@ -16,7 +16,7 @@
 #include "libiptc/libiptc.h"
 #include "xtables-multi.h"
 #include "nft.h"
-#include <libnftables/chain.h>
+#include <libnftnl/chain.h>
 
 #ifdef DEBUG
 #define DEBUGP(x, args...) fprintf(stderr, x, ## args)

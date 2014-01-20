@@ -17,8 +17,8 @@
 #include <errno.h>
 #include <stdarg.h>
 #include <libiptc/linux_list.h>
-#include <libnftables/table.h>
-#include <libnftables/chain.h>
+#include <libnftnl/table.h>
+#include <libnftnl/chain.h>
 
 #include <netinet/in.h>
 #include <linux/netfilter.h>

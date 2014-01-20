@@ -19,7 +19,7 @@
 #include "xtables-multi.h"
 #include "nft.h"
 
-#include <libnftables/chain.h>
+#include <libnftnl/chain.h>
 
 #ifndef NO_SHARED_LIBS
 #include <dlfcn.h>

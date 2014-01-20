@@ -1,7 +1,7 @@
 # -*- Makefile -*-
 
 AM_CFLAGS        = ${regular_CFLAGS}
-AM_CPPFLAGS      = ${regular_CPPFLAGS} -I${top_builddir}/include -I${top_srcdir}/include ${kinclude_CPPFLAGS} ${libmnl_CFLAGS} ${libnftables_CFLAGS}
+AM_CPPFLAGS      = ${regular_CPPFLAGS} -I${top_builddir}/include -I${top_srcdir}/include ${kinclude_CPPFLAGS} ${libmnl_CFLAGS} ${libnftnl_CFLAGS}
 AM_YFLAGS = -d
 
 xtables_multi_SOURCES  = xtables-multi.c iptables-xml.c
@@ -27,14 +27,14 @@ xtables_multi_LDADD   += ../libxtables/libxtables.la -lm
 
 if ENABLE_NFTABLES
 if HAVE_LIBMNL
-if HAVE_LIBNFTABLES
+if HAVE_LIBNFTNL
 xtables_multi_SOURCES += xtables-config-parser.y xtables-config-syntax.l
 xtables_multi_SOURCES += xtables-save.c xtables-restore.c \
 			 xtables-standalone.c xtables.c nft.c \
 			 nft-shared.c nft-ipv4.c nft-ipv6.c nft-arp.c \
 			 xtables-config.c xtables-events.c \
 			 xtables-arp-standalone.c xtables-arp.c
-xtables_multi_LDADD   += -lmnl -lnftables ${libmnl_LIBS} ${libnftables_LIBS}
+xtables_multi_LDADD   += ${libmnl_LIBS} ${libnftnl_LIBS}
 xtables_multi_CFLAGS  += -DENABLE_NFTABLES
 # yacc and lex generate dirty code
 xtables_multi-xtables-config-parser.o xtables_multi-xtables-config-syntax.o: AM_CFLAGS += -Wno-missing-prototypes -Wno-missing-declarations -Wno-implicit-function-declaration -Wno-nested-externs -Wno-undef -Wno-redundant-decls

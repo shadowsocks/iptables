@@ -38,10 +38,10 @@
 #include <linux/netfilter/nf_tables_compat.h>
 
 #include <libmnl/libmnl.h>
-#include <libnftables/table.h>
-#include <libnftables/chain.h>
-#include <libnftables/rule.h>
-#include <libnftables/expr.h>
+#include <libnftnl/table.h>
+#include <libnftnl/chain.h>
+#include <libnftnl/rule.h>
+#include <libnftnl/expr.h>
 
 #include <netinet/in.h>	/* inet_ntoa */
 #include <arpa/inet.h>
