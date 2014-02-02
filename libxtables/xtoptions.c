@@ -802,7 +802,7 @@ static void xtopt_parse_ethermac(struct xt_option_call *cb)
 		       sizeof(cb->val.ethermac));
 	return;
  out:
-	xt_params->exit_err(PARAMETER_PROBLEM, "ether");
+	xt_params->exit_err(PARAMETER_PROBLEM, "Invalid MAC address specified.");
 }
 
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
