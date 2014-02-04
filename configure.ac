@@ -154,8 +154,8 @@ if test "$flex_major" -eq "2" && test "$flex_minor" -eq "5" && test "$flex_rev" 
 else
 	AC_MSG_WARN([flex version $flex_version found.
 	Version 2.5.33 or greater is required. You may experience problems
-	while compilating the conntrack-tools. Please, consider to upgrade
-	flex.])
+	while compilating the nftables compatibility layer for iptables.
+	Please, consider to upgrade flex.])
 fi
 
 regular_CFLAGS="-Wall -Waggregate-return -Wmissing-declarations \
