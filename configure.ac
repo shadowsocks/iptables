@@ -119,44 +119,45 @@ PKG_CHECK_MODULES([libnfnetlink], [libnfnetlink >= 1.0],
 	[nfnetlink=1], [nfnetlink=0])
 AM_CONDITIONAL([HAVE_LIBNFNETLINK], [test "$nfnetlink" = 1])
 
-PKG_CHECK_MODULES([libmnl], [libmnl >= 1.0],
-	[mnl=1], [mnl=0])
+if test "x$enable_nftables" = "xyes"; then
+	PKG_CHECK_MODULES([libmnl], [libmnl >= 1.0], [mnl=1], [mnl=0])
+
+	PKG_CHECK_MODULES([libnftnl], [libnftnl >= 1.0], [nftables=1], [nftables=0])
+
+	AM_PROG_LEX
+	AC_PROG_YACC
+
+	if test -z "$ac_cv_prog_YACC"
+	then
+		echo "*** Error: No suitable bison/yacc found. ***"
+		echo "    Please install the 'bison' package."
+		exit 1
+	fi
+	if test -z "$ac_cv_prog_LEX"
+	then
+	        echo "*** Error: No suitable flex/lex found. ***"
+	        echo "    Please install the 'flex' package."
+	        exit 1
+	fi
+
+	AC_MSG_CHECKING(flex version)
+	flex_version=`$ac_cv_prog_LEX --version | sed 's/version//g' | awk '/flex/ {print $2}'`
+	flex_major=`echo $flex_version| cut -d . -f 1`
+	flex_minor=`echo $flex_version| cut -d . -f 2`
+	flex_rev=`echo $flex_version| cut -d . -f 3`
+
+	if test "$flex_major" -eq "2" && test "$flex_minor" -eq "5" && test "$flex_rev" -ge "33"; then
+		AC_MSG_RESULT([$flex_version. OK])
+	else
+		AC_MSG_WARN([flex version $flex_version found.
+		Version 2.5.33 or greater is required. You may experience problems
+		while compilating the nftables compatibility layer for iptables.
+		Please, consider to upgrade flex.])
+	fi
+fi
+
 AM_CONDITIONAL([HAVE_LIBMNL], [test "$mnl" = 1])
-
-PKG_CHECK_MODULES([libnftnl], [libnftnl >= 1.0],
-	[nftables=1], [nftables=0])
 AM_CONDITIONAL([HAVE_LIBNFTNL], [test "$nftables" = 1])
-
-AM_PROG_LEX
-AC_PROG_YACC
-
-if test -z "$ac_cv_prog_YACC"
-then
-	echo "*** Error: No suitable bison/yacc found. ***"
-	echo "    Please install the 'bison' package."
-	exit 1
-fi
-if test -z "$ac_cv_prog_LEX"
-then
-        echo "*** Error: No suitable flex/lex found. ***"
-        echo "    Please install the 'flex' package."
-        exit 1
-fi
-
-AC_MSG_CHECKING(flex version)
-flex_version=`$ac_cv_prog_LEX --version | sed 's/version//g' | awk '/flex/ {print $2}'`
-flex_major=`echo $flex_version| cut -d . -f 1`
-flex_minor=`echo $flex_version| cut -d . -f 2`
-flex_rev=`echo $flex_version| cut -d . -f 3`
-
-if test "$flex_major" -eq "2" && test "$flex_minor" -eq "5" && test "$flex_rev" -ge "33"; then
-	AC_MSG_RESULT([$flex_version. OK])
-else
-	AC_MSG_WARN([flex version $flex_version found.
-	Version 2.5.33 or greater is required. You may experience problems
-	while compilating the nftables compatibility layer for iptables.
-	Please, consider to upgrade flex.])
-fi
 
 regular_CFLAGS="-Wall -Waggregate-return -Wmissing-declarations \
 	-Wmissing-prototypes -Wredundant-decls -Wshadow -Wstrict-prototypes \
