@@ -202,7 +202,7 @@ static int inverse_for_options[NUMBER_OF_OPT] =
 };
 
 const char *program_version = XTABLES_VERSION;
-const char *program_name = "xtables-arp";
+const char *program_name = "arptables";
 
 /* A few hardcoded protocols for 'all' and in case the user has no
    /etc/protocols */

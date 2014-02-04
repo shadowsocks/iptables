@@ -74,17 +74,17 @@ do_output(struct nft_handle *h, const char *tablename, bool counters)
  * :Chain name POLICY packets bytes
  * rule
  */
-int
-xtables_save_main(int argc, char *argv[])
+static int
+xtables_save_main(int family, const char *progname, int argc, char *argv[])
 {
 	const char *tablename = NULL;
 	bool dump = false;
 	struct nft_handle h = {
-		.family	= AF_INET,	/* default to AF_INET */
+		.family	= family,
 	};
 	int c;
 
-	xtables_globals.program_name = "xtables-save";
+	xtables_globals.program_name = progname;
 	/* XXX xtables_init_all does several things we don't want */
 	c = xtables_init_all(&xtables_globals, NFPROTO_IPV4);
 	if (c < 0) {
@@ -142,4 +142,14 @@ xtables_save_main(int argc, char *argv[])
 	}
 
 	return !do_output(&h, tablename, show_counters);
+}
+
+int xtables_ip4_save_main(int argc, char *argv[])
+{
+	return xtables_save_main(NFPROTO_IPV4, "iptables-save", argc, argv);
+}
+
+int xtables_ip6_save_main(int argc, char *argv[])
+{
+	return xtables_save_main(NFPROTO_IPV6, "ip6tables-save", argc, argv);
 }

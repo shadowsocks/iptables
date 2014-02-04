@@ -39,17 +39,17 @@
 #include "xtables-multi.h"
 #include "nft.h"
 
-int
-xtables_main(int argc, char *argv[])
+static int
+xtables_main(int family, const char *progname, int argc, char *argv[])
 {
 	int ret;
 	char *table = "filter";
-	struct nft_handle h;
+	struct nft_handle h = {
+		.family = family,
+	};
 
-	memset(&h, 0, sizeof(h));
-
-	xtables_globals.program_name = "xtables";
-	ret = xtables_init_all(&xtables_globals, NFPROTO_IPV4);
+	xtables_globals.program_name = progname;
+	ret = xtables_init_all(&xtables_globals, family);
 	if (ret < 0) {
 		fprintf(stderr, "%s/%s Failed to initialize xtables\n",
 				xtables_globals.program_name,
@@ -91,4 +91,14 @@ xtables_main(int argc, char *argv[])
 	}
 
 	exit(!ret);
+}
+
+int xtables_ip4_main(int argc, char *argv[])
+{
+	return xtables_main(NFPROTO_IPV4, "iptables", argc, argv);
+}
+
+int xtables_ip6_main(int argc, char *argv[])
+{
+	return xtables_main(NFPROTO_IPV6, "ip6tables", argc, argv);
 }

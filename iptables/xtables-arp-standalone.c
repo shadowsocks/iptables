@@ -62,7 +62,7 @@ int xtables_arp_main(int argc, char *argv[])
 		.family = NFPROTO_ARP,
 	};
 
-	xtables_globals.program_name = "xtables-arp";
+	xtables_globals.program_name = "arptables";
 	/* This code below could be replaced by xtables_init_all, which
 	 * doesn't support NFPROTO_ARP yet.
 	 */

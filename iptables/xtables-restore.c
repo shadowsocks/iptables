@@ -165,11 +165,11 @@ static const struct xtc_ops xtc_ops = {
 	.strerror	= nft_strerror,
 };
 
-int
-xtables_restore_main(int argc, char *argv[])
+static int
+xtables_restore_main(int family, const char *progname, int argc, char *argv[])
 {
 	struct nft_handle h = {
-		.family = AF_INET,	/* default to IPv4 */
+		.family = family,
 	};
 	char buffer[10240];
 	int c;
@@ -183,8 +183,8 @@ xtables_restore_main(int argc, char *argv[])
 
 	line = 0;
 
-	xtables_globals.program_name = "xtables-restore";
-	c = xtables_init_all(&xtables_globals, NFPROTO_IPV4);
+	xtables_globals.program_name = progname;
+	c = xtables_init_all(&xtables_globals, family);
 	if (c < 0) {
 		fprintf(stderr, "%s/%s Failed to initialize xtables\n",
 				xtables_globals.program_name,
@@ -471,4 +471,16 @@ xtables_restore_main(int argc, char *argv[])
 
 	fclose(in);
 	return 0;
+}
+
+int xtables_ip4_restore_main(int argc, char *argv[])
+{
+	return xtables_restore_main(NFPROTO_IPV4, "iptables-restore",
+				    argc, argv);
+}
+
+int xtables_ip6_restore_main(int argc, char *argv[])
+{
+	return xtables_restore_main(NFPROTO_IPV6, "ip6tables-restore",
+				    argc, argv);
 }
