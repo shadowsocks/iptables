@@ -161,6 +161,10 @@ static void add_param_to_argv(char *parsestart)
 	}
 }
 
+static const struct xtc_ops xtc_ops = {
+	.strerror	= nft_strerror,
+};
+
 int
 xtables_restore_main(int argc, char *argv[])
 {
@@ -173,7 +177,7 @@ xtables_restore_main(int argc, char *argv[])
 	FILE *in;
 	int in_table = 0, testing = 0;
 	const char *tablename = NULL;
-	const struct xtc_ops *ops = &iptc_ops;
+	const struct xtc_ops *ops = &xtc_ops;
 	struct nft_chain_list *chain_list;
 	struct nft_chain *chain_obj;
 
