@@ -620,6 +620,40 @@ void save_firewall_details(const struct iptables_command_state *cs,
 	}
 }
 
+void save_matches_and_target(struct xtables_rule_match *m,
+			     struct xtables_target *target,
+			     const char *jumpto, uint8_t flags, const void *fw)
+{
+	struct xtables_rule_match *matchp;
+
+	for (matchp = m; matchp; matchp = matchp->next) {
+		if (matchp->match->alias) {
+			printf("-m %s",
+			       matchp->match->alias(matchp->match->m));
+		} else
+			printf("-m %s", matchp->match->name);
+
+		if (matchp->match->save != NULL) {
+			/* cs->fw union makes the trick */
+			matchp->match->save(fw, matchp->match->m);
+		}
+		printf(" ");
+	}
+
+	if (target != NULL) {
+		if (target->alias) {
+			printf("-j %s", target->alias(target->t));
+		} else
+			printf("-j %s", jumpto);
+
+		if (target->save != NULL)
+			target->save(fw, target->t);
+	} else if (strlen(jumpto) > 0)
+		printf("-%c %s", flags & IPT_F_GOTO ? 'g' : 'j', jumpto);
+
+	printf("\n");
+}
+
 void print_matches_and_target(struct iptables_command_state *cs,
 			      unsigned int format)
 {

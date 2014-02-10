@@ -309,9 +309,10 @@ static void save_ipv4_addr(char letter, const struct in_addr *addr,
 	       mask_to_str(mask));
 }
 
-static uint8_t nft_ipv4_save_firewall(const struct iptables_command_state *cs,
-				      unsigned int format)
+static void nft_ipv4_save_firewall(const void *data, unsigned int format)
 {
+	const struct iptables_command_state *cs = data;
+
 	save_firewall_details(cs, cs->fw.ip.invflags, cs->fw.ip.proto,
 			      cs->fw.ip.iniface, cs->fw.ip.iniface_mask,
 			      cs->fw.ip.outiface, cs->fw.ip.outiface_mask,
@@ -328,7 +329,8 @@ static uint8_t nft_ipv4_save_firewall(const struct iptables_command_state *cs,
 	save_ipv4_addr('d', &cs->fw.ip.dst, cs->fw.ip.dmsk.s_addr,
 		       cs->fw.ip.invflags & IPT_INV_DSTIP);
 
-	return cs->fw.ip.flags;
+	save_matches_and_target(cs->matches, cs->target,
+				cs->jumpto, cs->fw.ip.flags, &cs->fw);
 }
 
 static void nft_ipv4_proto_parse(struct iptables_command_state *cs,

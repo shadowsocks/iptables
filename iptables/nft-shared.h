@@ -49,8 +49,7 @@ struct nft_family_ops {
 	void (*parse_immediate)(const char *jumpto, bool nft_goto, void *data);
 	void (*print_firewall)(struct nft_rule *r, unsigned int num,
 			       unsigned int format);
-	uint8_t (*save_firewall)(const struct iptables_command_state *cs,
-				 unsigned int format);
+	void (*save_firewall)(const void *data, unsigned int format);
 	void (*proto_parse)(struct iptables_command_state *cs,
 			    struct xtables_args *args);
 	void (*post_parse)(int command, struct iptables_command_state *cs,
@@ -118,6 +117,10 @@ void save_firewall_details(const struct iptables_command_state *cs,
 			   const char *outiface,
 			   unsigned const char *outiface_mask,
 			   unsigned int format);
+void save_matches_and_target(struct xtables_rule_match *m,
+			     struct xtables_target *target,
+			     const char *jumpto,
+			     uint8_t flags, const void *fw);
 
 struct nft_family_ops *nft_family_ops_lookup(int family);
 

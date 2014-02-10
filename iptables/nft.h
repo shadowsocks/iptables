@@ -114,7 +114,7 @@ enum nft_rule_print {
 	NFT_RULE_DEL,
 };
 
-void nft_rule_print_save(const struct iptables_command_state *cs,
+void nft_rule_print_save(const void *data,
 			 struct nft_rule *r, enum nft_rule_print type,
 			 unsigned int format);
 

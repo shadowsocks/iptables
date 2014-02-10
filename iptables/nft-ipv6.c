@@ -218,9 +218,10 @@ static void save_ipv6_addr(char letter, const struct in6_addr *addr,
 	printf("%s-%c %s ", invert ? "! " : "", letter, addr_str);
 }
 
-static uint8_t nft_ipv6_save_firewall(const struct iptables_command_state *cs,
-				      unsigned int format)
+static void nft_ipv6_save_firewall(const void *data, unsigned int format)
 {
+	const struct iptables_command_state *cs = data;
+
 	save_firewall_details(cs, cs->fw6.ipv6.invflags, cs->fw6.ipv6.proto,
 			      cs->fw6.ipv6.iniface, cs->fw6.ipv6.iniface_mask,
 			      cs->fw6.ipv6.outiface, cs->fw6.ipv6.outiface_mask,
@@ -231,7 +232,8 @@ static uint8_t nft_ipv6_save_firewall(const struct iptables_command_state *cs,
 	save_ipv6_addr('d', &cs->fw6.ipv6.dst,
 		       cs->fw6.ipv6.invflags & IPT_INV_DSTIP);
 
-	return cs->fw6.ipv6.flags;
+	save_matches_and_target(cs->matches, cs->target,
+				cs->jumpto, cs->fw6.ipv6.flags, &cs->fw6);
 }
 
 /* These are invalid numbers as upper layer protocol */

@@ -1009,15 +1009,13 @@ nft_rule_append(struct nft_handle *h, const char *chain, const char *table,
 }
 
 void
-nft_rule_print_save(const struct iptables_command_state *cs,
+nft_rule_print_save(const void *data,
 		    struct nft_rule *r, enum nft_rule_print type,
 		    unsigned int format)
 {
 	const char *chain = nft_rule_attr_get_str(r, NFT_RULE_ATTR_CHAIN);
 	int family = nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY);
-	struct xtables_rule_match *matchp;
 	struct nft_family_ops *ops;
-	int ip_flags = 0;
 
 	/* print chain name */
 	switch(type) {
@@ -1030,35 +1028,10 @@ nft_rule_print_save(const struct iptables_command_state *cs,
 	}
 
 	ops = nft_family_ops_lookup(family);
-	ip_flags = ops->save_firewall(cs, format);
 
-	for (matchp = cs->matches; matchp; matchp = matchp->next) {
-		if (matchp->match->alias) {
-			printf("-m %s",
-			       matchp->match->alias(matchp->match->m));
-		} else
-			printf("-m %s", matchp->match->name);
+	if (ops->save_firewall)
+		ops->save_firewall(data, format);
 
-		if (matchp->match->save != NULL) {
-			/* cs->fw union makes the trick */
-			matchp->match->save(&cs->fw, matchp->match->m);
-		}
-		printf(" ");
-	}
-
-	if (cs->target != NULL) {
-		if (cs->target->alias) {
-			printf("-j %s", cs->target->alias(cs->target->t));
-		} else
-			printf("-j %s", cs->jumpto);
-
-		if (cs->target->save != NULL)
-			cs->target->save(&cs->fw, cs->target->t);
-	} else if (strlen(cs->jumpto) > 0)
-		printf("-%c %s", ip_flags & IPT_F_GOTO ? 'g' : 'j',
-								cs->jumpto);
-
-	printf("\n");
 }
 
 static int nft_chain_list_cb(const struct nlmsghdr *nlh, void *data)
