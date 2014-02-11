@@ -458,7 +458,7 @@ nft_table_builtin_add(struct nft_handle *h, struct builtin_table *_t,
 	char tmp[1024];
 
 	nft_table_snprintf(tmp, sizeof(tmp), t, 0, 0);
-	printf("DEBUG: table: %s", tmp);
+	printf("DEBUG: table: %s\n", tmp);
 	mnl_nlmsg_fprintf(stdout, nlh, nlh->nlmsg_len, sizeof(struct nfgenmsg));
 #endif
 
@@ -702,7 +702,7 @@ static void nft_chain_print_debug(struct nft_chain *c, struct nlmsghdr *nlh)
 	char tmp[1024];
 
 	nft_chain_snprintf(tmp, sizeof(tmp), c, 0, 0);
-	printf("DEBUG: chain: %s", tmp);
+	printf("DEBUG: chain: %s\n", tmp);
 	mnl_nlmsg_fprintf(stdout, nlh, nlh->nlmsg_len, sizeof(struct nfgenmsg));
 #endif
 }
@@ -898,7 +898,7 @@ static void nft_rule_print_debug(struct nft_rule *r, struct nlmsghdr *nlh)
 	char tmp[1024];
 
 	nft_rule_snprintf(tmp, sizeof(tmp), r, 0, 0);
-	printf("DEBUG: rule: %s", tmp);
+	printf("DEBUG: rule: %s\n", tmp);
 	mnl_nlmsg_fprintf(stdout, nlh, nlh->nlmsg_len, sizeof(struct nfgenmsg));
 #endif
 }
