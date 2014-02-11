@@ -451,6 +451,14 @@ nft_table_builtin_add(struct nft_handle *h, struct builtin_table *_t,
 	nft_table_nlmsg_build_payload(nlh, t);
 	nft_table_free(t);
 
+#ifdef NLDEBUG
+	char tmp[1024];
+
+	nft_table_snprintf(tmp, sizeof(tmp), t, 0, 0);
+	printf("DEBUG: table: %s", tmp);
+	mnl_nlmsg_fprintf(stdout, nlh, nlh->nlmsg_len, sizeof(struct nfgenmsg));
+#endif
+
 	ret = mnl_talk(h, nlh, NULL, NULL);
 	if (ret < 0) {
 		if (errno != EEXIST)
