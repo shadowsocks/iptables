@@ -59,7 +59,7 @@ static int nft_ipv6_add(struct nft_rule *r, void *data)
 	if (add_counters(r, cs->counters.pcnt, cs->counters.bcnt) < 0)
 		return -1;
 
-	return add_action(r, cs, cs->fw6.ipv6.flags);
+	return add_action(r, cs, !!(cs->fw6.ipv6.flags & IP6T_F_GOTO));
 }
 
 static bool nft_ipv6_is_same(const void *data_a,
@@ -138,7 +138,7 @@ static void nft_ipv6_parse_immediate(const char *jumpto, bool nft_goto,
 	cs->jumpto = jumpto;
 
 	if (nft_goto)
-		cs->fw6.ipv6.flags |= IPT_F_GOTO;
+		cs->fw6.ipv6.flags |= IP6T_F_GOTO;
 }
 
 static void print_ipv6_addr(const struct iptables_command_state *cs,
@@ -195,10 +195,8 @@ static void nft_ipv6_print_firewall(struct nft_rule *r, unsigned int num,
 	if (format & FMT_NOTABLE)
 		fputs("  ", stdout);
 
-#ifdef IPT_F_GOTO
-	if (cs.fw6.ipv6.flags & IPT_F_GOTO)
+	if (cs.fw6.ipv6.flags & IP6T_F_GOTO)
 		printf("[goto] ");
-#endif
 
 	print_matches_and_target(&cs, format);
 
@@ -234,6 +232,12 @@ static void nft_ipv6_save_firewall(const void *data, unsigned int format)
 
 	save_matches_and_target(cs->matches, cs->target,
 				cs->jumpto, cs->fw6.ipv6.flags, &cs->fw6);
+
+	if (cs->target == NULL && strlen(cs->jumpto) > 0) {
+		printf("-%c %s", cs->fw6.ipv6.flags & IP6T_F_GOTO ? 'g' : 'j',
+		       cs->jumpto);
+	}
+	printf("\n");
 }
 
 /* These are invalid numbers as upper layer protocol */

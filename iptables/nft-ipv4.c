@@ -76,7 +76,7 @@ static int nft_ipv4_add(struct nft_rule *r, void *data)
 	if (add_counters(r, cs->counters.pcnt, cs->counters.bcnt) < 0)
 		return -1;
 
-	return add_action(r, cs, cs->fw.ip.flags);
+	return add_action(r, cs, !!(cs->fw.ip.flags & IPT_F_GOTO));
 }
 
 static bool nft_ipv4_is_same(const void *data_a,
@@ -331,6 +331,12 @@ static void nft_ipv4_save_firewall(const void *data, unsigned int format)
 
 	save_matches_and_target(cs->matches, cs->target,
 				cs->jumpto, cs->fw.ip.flags, &cs->fw);
+
+	if (cs->target == NULL && strlen(cs->jumpto) > 0) {
+		printf("-%c %s", cs->fw.ip.flags & IPT_F_GOTO ? 'g' : 'j',
+		       cs->jumpto);
+	}
+	printf("\n");
 }
 
 static void nft_ipv4_proto_parse(struct iptables_command_state *cs,

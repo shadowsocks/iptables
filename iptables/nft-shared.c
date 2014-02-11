@@ -648,10 +648,7 @@ void save_matches_and_target(struct xtables_rule_match *m,
 
 		if (target->save != NULL)
 			target->save(fw, target->t);
-	} else if (strlen(jumpto) > 0)
-		printf("-%c %s", flags & IPT_F_GOTO ? 'g' : 'j', jumpto);
-
-	printf("\n");
+	}
 }
 
 void print_matches_and_target(struct iptables_command_state *cs,

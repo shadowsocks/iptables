@@ -107,7 +107,7 @@ int add_verdict(struct nft_rule *r, int verdict);
 int add_match(struct nft_rule *r, struct xt_entry_match *m);
 int add_target(struct nft_rule *r, struct xt_entry_target *t);
 int add_jumpto(struct nft_rule *r, const char *name, int verdict);
-int add_action(struct nft_rule *r, struct iptables_command_state *cs, int ip_flags);
+int add_action(struct nft_rule *r, struct iptables_command_state *cs, bool goto_set);
 
 enum nft_rule_print {
 	NFT_RULE_APPEND,

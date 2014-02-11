@@ -864,7 +864,7 @@ int add_verdict(struct nft_rule *r, int verdict)
 }
 
 int add_action(struct nft_rule *r, struct iptables_command_state *cs,
-	      int ip_flags)
+	       bool goto_set)
 {
        int ret = 0;
 
@@ -881,7 +881,7 @@ int add_action(struct nft_rule *r, struct iptables_command_state *cs,
 		       ret = add_target(r, cs->target->t);
        } else if (strlen(cs->jumpto) > 0) {
 	       /* Not standard, then it's a go / jump to chain */
-	       if (ip_flags & IPT_F_GOTO)
+	       if (goto_set)
 		       ret = add_jumpto(r, cs->jumpto, NFT_GOTO);
 	       else
 		       ret = add_jumpto(r, cs->jumpto, NFT_JUMP);
