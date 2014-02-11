@@ -678,7 +678,8 @@ static void command_match(struct iptables_command_state *cs)
 		xtables_error(OTHER_PROBLEM, "can't alloc memory!");
 }
 
-int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
+int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table,
+		bool restore)
 {
 	struct iptables_command_state cs;
 	int verbose = 0;
@@ -1000,6 +1001,14 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table)
 				printf("%s v%s\n",
 				       prog_name, prog_vers);
 			exit(0);
+
+		case 'w':
+			if (restore) {
+				xtables_error(PARAMETER_PROBLEM,
+					      "You cannot use `-w' from "
+					      "iptables-restore");
+			}
+			break;
 
 		case '0':
 			set_option(&cs.options, OPT_LINENUMBERS,

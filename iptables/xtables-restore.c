@@ -442,7 +442,8 @@ xtables_restore_main(int family, const char *progname, int argc, char *argv[])
 			for (a = 0; a < newargc; a++)
 				DEBUGP("argv[%u]: %s\n", a, newargv[a]);
 
-			ret = do_commandx(&h, newargc, newargv, &newargv[2]);
+			ret = do_commandx(&h, newargc, newargv,
+					  &newargv[2], true);
 			if (ret < 0) {
 				ret = nft_abort(&h);
 				if (ret < 0) {

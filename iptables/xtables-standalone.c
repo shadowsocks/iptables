@@ -70,7 +70,7 @@ xtables_main(int family, const char *progname, int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	ret = do_commandx(&h, argc, argv, &table);
+	ret = do_commandx(&h, argc, argv, &table, false);
 	if (ret)
 		ret = nft_commit(&h);
 
