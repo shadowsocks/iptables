@@ -691,7 +691,7 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table,
 	struct xtables_rule_match *matchp;
 	struct xtables_target *t;
 	struct xtables_args args = {
-		.family	= AF_INET,
+		.family	= h->family,
 	};
 
 	memset(&cs, 0, sizeof(cs));
@@ -716,8 +716,7 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table,
 	   demand-load a protocol. */
 	opterr = 0;
 
-	/* Default on AF_INET */
-	h->ops = nft_family_ops_lookup(AF_INET);
+	h->ops = nft_family_ops_lookup(h->family);
 	if (h->ops == NULL)
 		xtables_error(PARAMETER_PROBLEM, "Unknown family");
 

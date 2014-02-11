@@ -85,8 +85,7 @@ xtables_save_main(int family, const char *progname, int argc, char *argv[])
 	int c;
 
 	xtables_globals.program_name = progname;
-	/* XXX xtables_init_all does several things we don't want */
-	c = xtables_init_all(&xtables_globals, NFPROTO_IPV4);
+	c = xtables_init_all(&xtables_globals, family);
 	if (c < 0) {
 		fprintf(stderr, "%s/%s Failed to initialize xtables\n",
 				xtables_globals.program_name,
