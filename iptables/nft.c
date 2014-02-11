@@ -463,11 +463,6 @@ nft_table_builtin_add(struct nft_handle *h, struct builtin_table *_t,
 #endif
 
 	ret = mnl_talk(h, nlh, NULL, NULL);
-	if (ret < 0) {
-		if (errno != EEXIST)
-			perror("mnl-talk:nft_table_init_one");
-	}
-
 	if (ret == 0 || errno == EEXIST)
 		_t->initialized = true;
 
@@ -513,10 +508,7 @@ nft_chain_builtin_add(struct nft_handle *h, struct builtin_table *table,
 	nft_chain_nlmsg_build_payload(nlh, c);
 	nft_chain_free(c);
 
-	if (mnl_talk(h, nlh, NULL, NULL) < 0) {
-		if (errno != EEXIST)
-			perror("mnl_talk:nft_chain_builtin_add");
-	}
+	mnl_talk(h, nlh, NULL, NULL);
 }
 
 /* find if built-in table already exists */
@@ -725,7 +717,6 @@ __nft_chain_set(struct nft_handle *h, const char *table,
 	struct nft_chain *c;
 	struct builtin_table *_t;
 	struct builtin_chain *_c;
-	int ret;
 
 	_t = nft_table_builtin_find(h, table);
 	/* if this built-in table does not exists, create it */
@@ -759,11 +750,7 @@ __nft_chain_set(struct nft_handle *h, const char *table,
 
 	nft_chain_free(c);
 
-	ret = mnl_talk(h, nlh, NULL, NULL);
-	if (ret < 0)
-		perror("mnl_talk:__nft_chain_policy");
-
-	return ret;
+	return mnl_talk(h, nlh, NULL, NULL);
 }
 
 int nft_chain_set(struct nft_handle *h, const char *table,
@@ -1079,7 +1066,6 @@ static struct nft_chain_list *nft_chain_list_get(struct nft_handle *h)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	int ret;
 	struct nft_chain_list *list;
 
 	list = nft_chain_list_alloc();
@@ -1091,9 +1077,7 @@ static struct nft_chain_list *nft_chain_list_get(struct nft_handle *h)
 	nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_GETCHAIN, h->family,
 					NLM_F_DUMP, h->seq);
 
-	ret = mnl_talk(h, nlh, nft_chain_list_cb, list);
-	if (ret < 0)
-		perror("mnl_talk:nft_chain_list_get");
+	mnl_talk(h, nlh, nft_chain_list_cb, list);
 
 	return list;
 }
@@ -1201,7 +1185,6 @@ static struct nft_rule_list *nft_rule_list_get(struct nft_handle *h)
 
 	ret = mnl_talk(h, nlh, nft_rule_list_cb, list);
 	if (ret < 0) {
-		perror("mnl_talk:nft_rule_save");
 		nft_rule_list_free(list);
 		return NULL;
 	}
@@ -1336,10 +1319,6 @@ int nft_chain_user_add(struct nft_handle *h, const char *chain, const char *tabl
 	nft_chain_free(c);
 
 	ret = mnl_talk(h, nlh, NULL, NULL);
-	if (ret < 0) {
-		if (errno != EEXIST)
-			perror("mnl_talk:nft_chain_add");
-	}
 
 	/* the core expects 1 for success and 0 for error */
 	return ret == 0 ? 1 : 0;
@@ -1349,19 +1328,12 @@ static int __nft_chain_del(struct nft_handle *h, struct nft_chain *c)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	int ret;
 
 	nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_DELCHAIN, h->family,
 					NLM_F_ACK, h->seq);
 	nft_chain_nlmsg_build_payload(nlh, c);
 
-	ret = mnl_talk(h, nlh, NULL, NULL);
-	if (ret < 0) {
-		if (errno != EEXIST && errno != ENOENT)
-			perror("mnl_talk:__nft_chain_del");
-	}
-
-	return ret;
+	return mnl_talk(h, nlh, NULL, NULL);
 }
 
 int nft_chain_user_del(struct nft_handle *h, const char *chain, const char *table)
@@ -1502,10 +1474,6 @@ int nft_chain_user_rename(struct nft_handle *h,const char *chain,
 	nft_chain_free(c);
 
 	ret = mnl_talk(h, nlh, NULL, NULL);
-	if (ret < 0) {
-		if (errno != EEXIST)
-			perror("mnl_talk:nft_chain_rename");
-	}
 
 	/* the core expects 1 for success and 0 for error */
 	return ret == 0 ? 1 : 0;
@@ -1540,7 +1508,6 @@ static struct nft_table_list *nft_table_list_get(struct nft_handle *h)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
 	struct nlmsghdr *nlh;
-	int ret;
 	struct nft_table_list *list;
 
 	list = nft_table_list_alloc();
@@ -1550,9 +1517,7 @@ static struct nft_table_list *nft_table_list_get(struct nft_handle *h)
 	nlh = nft_rule_nlmsg_build_hdr(buf, NFT_MSG_GETTABLE, h->family,
 					NLM_F_DUMP, h->seq);
 
-	ret = mnl_talk(h, nlh, nft_table_list_cb, list);
-	if (ret < 0)
-		perror("mnl_talk:nft_table_list_get");
+	mnl_talk(h, nlh, nft_table_list_cb, list);
 
 	return list;
 }
