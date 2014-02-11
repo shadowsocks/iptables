@@ -436,6 +436,9 @@ nft_table_builtin_add(struct nft_handle *h, struct builtin_table *_t,
 	struct nft_table *t;
 	int ret;
 
+	if (_t->initialized)
+		return 0;
+
 	t = nft_table_alloc();
 	if (t == NULL)
 		return -1;
@@ -464,6 +467,10 @@ nft_table_builtin_add(struct nft_handle *h, struct builtin_table *_t,
 		if (errno != EEXIST)
 			perror("mnl-talk:nft_table_init_one");
 	}
+
+	if (ret == 0 || errno == EEXIST)
+		_t->initialized = true;
+
 	return ret;
 }
 
@@ -2413,6 +2420,9 @@ int nft_xtables_config_load(struct nft_handle *h, const char *filename,
 	struct nft_chain *chain;
 	uint32_t table_family, chain_family;
 	bool found = false;
+
+	if (h->restore)
+		return 0;
 
 	if (xtables_config_parse(filename, table_list, chain_list) < 0) {
 		if (errno == ENOENT) {

@@ -22,6 +22,7 @@ struct builtin_chain {
 struct builtin_table {
 	const char *name;
 	struct builtin_chain chains[NF_INET_NUMHOOKS];
+	bool initialized;
 };
 
 struct nft_handle {
