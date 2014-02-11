@@ -170,6 +170,7 @@ xtables_restore_main(int family, const char *progname, int argc, char *argv[])
 {
 	struct nft_handle h = {
 		.family = family,
+		.restore = true,
 	};
 	char buffer[10240];
 	int c;

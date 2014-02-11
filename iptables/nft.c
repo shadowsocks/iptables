@@ -744,6 +744,7 @@ __nft_chain_set(struct nft_handle *h, const char *table,
 	}
 
 	nlh = nft_chain_nlmsg_build_hdr(buf, NFT_MSG_NEWCHAIN, h->family,
+					h->restore ? NLM_F_ACK|NLM_F_CREATE :
 					NLM_F_ACK, h->seq);
 	nft_chain_nlmsg_build_payload(nlh, c);
 

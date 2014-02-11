@@ -34,6 +34,7 @@ struct nft_handle {
 	struct mnl_nlmsg_batch	*batch;
 	struct nft_family_ops	*ops;
 	struct builtin_table	*tables;
+	bool			restore;
 };
 
 extern struct builtin_table xtables_ipv4[TABLES_MAX];
