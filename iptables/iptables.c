@@ -120,6 +120,7 @@ struct xtables_globals iptables_globals = {
 	.program_version = IPTABLES_VERSION,
 	.orig_opts = original_opts,
 	.exit_err = iptables_exit_error,
+	.compat_rev = xtables_compatible_revision,
 };
 
 /* Table of legal combinations of commands and options.  If any of the

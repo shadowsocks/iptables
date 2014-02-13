@@ -20,4 +20,6 @@ extern void print_rule4(const struct ipt_entry *e,
 
 extern struct xtables_globals iptables_globals;
 
+extern struct xtables_globals xtables_globals;
+
 #endif /*_IPTABLES_USER_H*/
