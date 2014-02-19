@@ -59,7 +59,10 @@ static bool counters;
 static int rule_cb(const struct nlmsghdr *nlh, int type)
 {
 	struct iptables_command_state cs = {};
+	struct arpt_entry fw_arp = {};
 	struct nft_rule *r;
+	void *fw = NULL;
+	uint8_t family;
 
 	r = nft_rule_alloc();
 	if (r == NULL) {
@@ -72,21 +75,25 @@ static int rule_cb(const struct nlmsghdr *nlh, int type)
 		goto err_free;
 	}
 
-	nft_rule_to_iptables_command_state(r, &cs);
-
-	switch(nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY)) {
+	family = nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY);
+	switch (family) {
 	case AF_INET:
-		printf("-4 ");
-		break;
 	case AF_INET6:
-		printf("-6 ");
+		printf("-%c ", family == AF_INET ? '4' : '6');
+		nft_rule_to_iptables_command_state(r, &cs);
+		fw = &cs;
+		break;
+	case NFPROTO_ARP:
+		printf("-0 ");
+		nft_rule_to_arpt_entry(r, &fw_arp);
+		fw = &fw_arp;
 		break;
 	default:
-		break;
+		goto err_free;
 	}
 
 
-	nft_rule_print_save(&cs, r,
+	nft_rule_print_save(fw, r,
 			    type == NFT_MSG_NEWRULE ? NFT_RULE_APPEND :
 						      NFT_RULE_DEL,
 			    counters ? 0 : FMT_NOCOUNTS);
