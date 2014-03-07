@@ -631,14 +631,14 @@ static bool nft_arp_is_same(const void *data_a,
 		return false;
 	}
 
-	return is_same_interfaces(a->arp.src_devaddr.addr,
-				  a->arp.tgt_devaddr.addr,
-				  (unsigned char*)a->arp.src_devaddr.mask,
-				  (unsigned char*)a->arp.tgt_devaddr.mask,
-				  b->arp.src_devaddr.addr,
-				  a->arp.tgt_devaddr.addr,
-				  (unsigned char*)b->arp.src_devaddr.mask,
-				  (unsigned char*)b->arp.tgt_devaddr.mask);
+	return is_same_interfaces(a->arp.iniface,
+				  a->arp.outiface,
+				  (unsigned char *)a->arp.iniface_mask,
+				  (unsigned char *)a->arp.outiface_mask,
+				  b->arp.iniface,
+				  b->arp.outiface,
+				  (unsigned char *)b->arp.iniface_mask,
+				  (unsigned char *)b->arp.outiface_mask);
 }
 
 static bool nft_arp_rule_find(struct nft_family_ops *ops, struct nft_rule *r,
