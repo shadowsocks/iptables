@@ -345,7 +345,7 @@ static void nft_arp_parse_payload(struct nft_rule_expr_iter *iter,
 			fw->arp.invflags |= ARPT_INV_ARPOP;
 		break;
 	default:
-		if (!fw->arp.arhln)
+		if (fw->arp.arhln < 0)
 			break;
 
 		if (offset == sizeof(struct arphdr) + fw->arp.arhln) {
