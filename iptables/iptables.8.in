@@ -464,4 +464,4 @@ Man page originally written by Herve Eychenne <rv@wallfire.org>.
 .\" .. and most of all, modest ..
 .SH VERSION
 .PP
-This manual page applies to iptables/ip6tables @PACKAGE_AND_VERSION@.
+This manual page applies to iptables/ip6tables @PACKAGE_VERSION@.
