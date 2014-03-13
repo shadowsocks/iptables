@@ -27,7 +27,7 @@ ip6tables-save \(em dump iptables rules to stdout
 [\fB\-t\fP \fItable\fP]
 .P
 \fBip6tables\-save\fP [\fB\-M\fP \fImodprobe\fP] [\fB\-c\fP]
-[\fB\-t\fP \fItable\fP
+[\fB\-t\fP \fItable\fP]
 .SH DESCRIPTION
 .PP
 .B iptables-save
