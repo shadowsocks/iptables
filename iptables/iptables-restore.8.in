@@ -24,17 +24,18 @@ iptables-restore \(em Restore IP Tables
 ip6tables-restore \(em Restore IPv6 Tables
 .SH SYNOPSIS
 \fBiptables\-restore\fP [\fB\-chntv\fP] [\fB\-M\fP \fImodprobe\fP]
-[\fB\-T\fP \fIname\fP]
+[\fB\-T\fP \fIname\fP] [\fBfile\fP]
 .P
 \fBip6tables\-restore\fP [\fB\-chntv\fP] [\fB\-M\fP \fImodprobe\fP]
-[\fB\-T\fP \fIname\fP]
+[\fB\-T\fP \fIname\fP] [\fBfile\fP]
 .SH DESCRIPTION
 .PP
 .B iptables-restore
 and
 .B ip6tables-restore
-are used to restore IP and IPv6 Tables from data specified on STDIN. Use
-I/O redirection provided by your shell to read from a file
+are used to restore IP and IPv6 Tables from data specified on STDIN or in
+\fIfile\fP. Use I/O redirection provided by your shell to read from a file or
+specify \fIfile\fP as an argument.
 .TP
 \fB\-c\fR, \fB\-\-counters\fR
 restore the values of all packet and byte counters
