@@ -104,7 +104,7 @@ xtables_save_main(int family, const char *progname, int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	while ((c = getopt_long(argc, argv, "bcdt:46", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "bcdt:M:46", options, NULL)) != -1) {
 		switch (c) {
 		case 'b':
 			fprintf(stderr, "-b/--binary option is not implemented\n");
