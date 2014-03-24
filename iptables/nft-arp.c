@@ -369,7 +369,7 @@ void nft_rule_to_arpt_entry(struct nft_rule *r, struct arpt_entry *fw)
 {
 	struct nft_rule_expr_iter *iter;
 	struct nft_rule_expr *expr;
-	int family = nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY);
+	int family = nft_rule_attr_get_u32(r, NFT_RULE_ATTR_FAMILY);
 
 	iter = nft_rule_expr_iter_create(r);
 	if (iter == NULL)

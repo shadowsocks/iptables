@@ -75,7 +75,7 @@ static int rule_cb(const struct nlmsghdr *nlh, int type)
 		goto err_free;
 	}
 
-	family = nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY);
+	family = nft_rule_attr_get_u32(r, NFT_RULE_ATTR_FAMILY);
 	switch (family) {
 	case AF_INET:
 	case AF_INET6:

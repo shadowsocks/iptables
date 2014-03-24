@@ -1017,7 +1017,7 @@ nft_rule_print_save(const void *data,
 		    unsigned int format)
 {
 	const char *chain = nft_rule_attr_get_str(r, NFT_RULE_ATTR_CHAIN);
-	int family = nft_rule_attr_get_u8(r, NFT_RULE_ATTR_FAMILY);
+	int family = nft_rule_attr_get_u32(r, NFT_RULE_ATTR_FAMILY);
 	struct nft_family_ops *ops;
 
 	/* print chain name */
