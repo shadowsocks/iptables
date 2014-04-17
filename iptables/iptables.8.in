@@ -224,10 +224,8 @@ any rules.  If no argument is given, it will attempt to delete every
 non-builtin chain in the table.
 .TP
 \fB\-P\fP, \fB\-\-policy\fP \fIchain target\fP
-Set the policy for the chain to the given target.  See the section \fBTARGETS\fP
-for the legal targets.  Only built-in (non-user-defined) chains can have
-policies, and neither built-in nor user-defined chains can be policy
-targets.
+Set the policy for the built-in (non-user-defined) chain to the given target.
+The policy target must be either \fBACCEPT\fP or \fBDROP\fP.
 .TP
 \fB\-E\fP, \fB\-\-rename\-chain\fP \fIold\-chain new\-chain\fP
 Rename the user specified chain to the user supplied name.  This is
