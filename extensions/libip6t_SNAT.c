@@ -18,11 +18,13 @@
 enum {
 	O_TO_SRC = 0,
 	O_RANDOM,
+	O_RANDOM_FULLY,
 	O_PERSISTENT,
 	O_X_TO_SRC,
-	F_TO_SRC   = 1 << O_TO_SRC,
-	F_RANDOM   = 1 << O_RANDOM,
-	F_X_TO_SRC = 1 << O_X_TO_SRC,
+	F_TO_SRC       = 1 << O_TO_SRC,
+	F_RANDOM       = 1 << O_RANDOM,
+	F_RANDOM_FULLY = 1 << O_RANDOM_FULLY,
+	F_X_TO_SRC     = 1 << O_X_TO_SRC,
 };
 
 static void SNAT_help(void)
@@ -31,13 +33,14 @@ static void SNAT_help(void)
 "SNAT target options:\n"
 " --to-source [<ipaddr>[-<ipaddr>]][:port[-port]]\n"
 "				Address to map source to.\n"
-"[--random] [--persistent]\n");
+"[--random] [--random-fully] [--persistent]\n");
 }
 
 static const struct xt_option_entry SNAT_opts[] = {
 	{.name = "to-source", .id = O_TO_SRC, .type = XTTYPE_STRING,
 	 .flags = XTOPT_MAND | XTOPT_MULTI},
 	{.name = "random", .id = O_RANDOM, .type = XTTYPE_NONE},
+	{.name = "random-fully", .id = O_RANDOM_FULLY, .type = XTTYPE_NONE},
 	{.name = "persistent", .id = O_PERSISTENT, .type = XTTYPE_NONE},
 	XTOPT_TABLEEND,
 };
@@ -180,10 +183,13 @@ static void SNAT_parse(struct xt_option_call *cb)
 static void SNAT_fcheck(struct xt_fcheck_call *cb)
 {
 	static const unsigned int f = F_TO_SRC | F_RANDOM;
+	static const unsigned int r = F_TO_SRC | F_RANDOM_FULLY;
 	struct nf_nat_range *range = cb->data;
 
 	if ((cb->xflags & f) == f)
 		range->flags |= NF_NAT_RANGE_PROTO_RANDOM;
+	if ((cb->xflags & r) == r)
+		range->flags |= NF_NAT_RANGE_PROTO_RANDOM_FULLY;
 }
 
 static void print_range(const struct nf_nat_range *range)
@@ -215,6 +221,8 @@ static void SNAT_print(const void *ip, const struct xt_entry_target *target,
 	print_range(range);
 	if (range->flags & NF_NAT_RANGE_PROTO_RANDOM)
 		printf(" random");
+	if (range->flags & NF_NAT_RANGE_PROTO_RANDOM_FULLY)
+		printf(" random-fully");
 	if (range->flags & NF_NAT_RANGE_PERSISTENT)
 		printf(" persistent");
 }
@@ -227,6 +235,8 @@ static void SNAT_save(const void *ip, const struct xt_entry_target *target)
 	print_range(range);
 	if (range->flags & NF_NAT_RANGE_PROTO_RANDOM)
 		printf(" --random");
+	if (range->flags & NF_NAT_RANGE_PROTO_RANDOM_FULLY)
+		printf(" --random-fully");
 	if (range->flags & NF_NAT_RANGE_PERSISTENT)
 		printf(" --persistent");
 }
