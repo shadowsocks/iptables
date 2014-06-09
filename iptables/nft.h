@@ -53,13 +53,10 @@ void nft_fini(struct nft_handle *h);
 struct nft_table;
 struct nft_chain_list;
 
-int nft_table_builtin_add(struct nft_handle *h, struct builtin_table *_t, bool dormant);
 struct builtin_table *nft_table_builtin_find(struct nft_handle *h, const char *table);
 int nft_table_add(struct nft_handle *h, const struct nft_table *t);
 int nft_for_each_table(struct nft_handle *h, int (*func)(struct nft_handle *h, const char *tablename, bool counters), bool counters);
 bool nft_table_find(struct nft_handle *h, const char *tablename);
-int nft_table_set_dormant(struct nft_handle *h, const char *table);
-int nft_table_wake_dormant(struct nft_handle *h, const char *table);
 int nft_table_purge_chains(struct nft_handle *h, const char *table, struct nft_chain_list *list);
 
 /*
