@@ -36,6 +36,7 @@ struct nft_handle {
 	struct nft_family_ops	*ops;
 	struct builtin_table	*tables;
 	bool			restore;
+	bool			batch_support;
 };
 
 extern struct builtin_table xtables_ipv4[TABLES_MAX];
@@ -54,7 +55,7 @@ struct nft_table;
 struct nft_chain_list;
 
 struct builtin_table *nft_table_builtin_find(struct nft_handle *h, const char *table);
-int nft_table_add(struct nft_handle *h, const struct nft_table *t);
+int nft_table_add(struct nft_handle *h, struct nft_table *t, uint16_t flags);
 int nft_for_each_table(struct nft_handle *h, int (*func)(struct nft_handle *h, const char *tablename, bool counters), bool counters);
 bool nft_table_find(struct nft_handle *h, const char *tablename);
 int nft_table_purge_chains(struct nft_handle *h, const char *table, struct nft_chain_list *list);
@@ -68,7 +69,7 @@ struct nft_chain *nft_chain_builtin_alloc(struct builtin_table *table, struct bu
 void nft_chain_builtin_add(struct nft_handle *h, struct builtin_table *table, struct builtin_chain *chain, int policy);
 struct builtin_chain *nft_chain_builtin_find(struct builtin_table *t, const char *chain);
 int nft_chain_builtin_init(struct nft_handle *h, const char *table, const char *chain, int policy);
-int nft_chain_add(struct nft_handle *h, const struct nft_chain *c);
+int nft_chain_add(struct nft_handle *h, struct nft_chain *c, uint16_t flags);
 int nft_chain_set(struct nft_handle *h, const char *table, const char *chain, const char *policy, const struct xt_counters *counters);
 struct nft_chain_list *nft_chain_dump(struct nft_handle *h);
 struct nft_chain *nft_chain_list_find(struct nft_chain_list *list, const char *table, const char *chain);
