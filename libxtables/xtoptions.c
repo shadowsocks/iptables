@@ -519,7 +519,7 @@ static void xtopt_parse_host(struct xt_option_call *cb)
 	int ret;
 
 	ret = getaddrinfo(cb->arg, NULL, &hints, &res);
-	if (ret < 0)
+	if (ret != 0)
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"getaddrinfo: %s\n", gai_strerror(ret));
 
@@ -562,7 +562,7 @@ static int xtables_getportbyname(const char *name)
 	int ret;
 
 	ret = getaddrinfo(NULL, name, NULL, &res);
-	if (ret < 0)
+	if (ret != 0)
 		return -1;
 	ret = -1;
 	for (p = res; p != NULL; p = p->ai_next) {
@@ -675,7 +675,7 @@ static int xtopt_parse_mask(struct xt_option_call *cb)
 	int ret;
 
 	ret = getaddrinfo(cb->arg, NULL, &hints, &res);
-	if (ret < 0)
+	if (ret != 0)
 		return 0;
 
 	memcpy(&cb->val.hmask, xtables_sa_host(res->ai_addr, res->ai_family),
