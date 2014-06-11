@@ -589,15 +589,8 @@ void save_firewall_details(const struct iptables_command_state *cs,
 			   const char *iniface,
 			   unsigned const char *iniface_mask,
 			   const char *outiface,
-			   unsigned const char *outiface_mask,
-			   unsigned int format)
+			   unsigned const char *outiface_mask)
 {
-	if (!(format & FMT_NOCOUNTS)) {
-		printf("-c ");
-		xtables_print_num(cs->counters.pcnt, format);
-		xtables_print_num(cs->counters.bcnt, format);
-	}
-
 	if (iniface != NULL) {
 		print_iface('i', iniface, iniface_mask,
 			    invflags & IPT_INV_VIA_IN);
@@ -618,6 +611,12 @@ void save_firewall_details(const struct iptables_command_state *cs,
 		else
 			printf("-p %u ", proto);
 	}
+}
+
+void save_counters(uint64_t pcnt, uint64_t bcnt)
+{
+	printf("[%llu:%llu] ", (unsigned long long)pcnt,
+			       (unsigned long long)bcnt);
 }
 
 void save_matches_and_target(struct xtables_rule_match *m,

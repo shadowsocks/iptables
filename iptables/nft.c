@@ -972,8 +972,8 @@ int add_counters(struct nft_rule *r, uint64_t packets, uint64_t bytes)
 	if (expr == NULL)
 		return -ENOMEM;
 
-	nft_rule_expr_set_u64(expr, NFT_EXPR_CTR_BYTES, packets);
-	nft_rule_expr_set_u64(expr, NFT_EXPR_CTR_PACKETS, bytes);
+	nft_rule_expr_set_u64(expr, NFT_EXPR_CTR_PACKETS, packets);
+	nft_rule_expr_set_u64(expr, NFT_EXPR_CTR_BYTES, bytes);
 
 	nft_rule_add_expr(r, expr);
 
@@ -1048,6 +1048,11 @@ nft_rule_print_save(const void *data,
 	int family = nft_rule_attr_get_u32(r, NFT_RULE_ATTR_FAMILY);
 	struct nft_family_ops *ops;
 
+	ops = nft_family_ops_lookup(family);
+
+	if (!(format & FMT_NOCOUNTS) && ops->save_counters)
+		ops->save_counters(data);
+
 	/* print chain name */
 	switch(type) {
 	case NFT_RULE_APPEND:
@@ -1057,8 +1062,6 @@ nft_rule_print_save(const void *data,
 		printf("-D %s ", chain);
 		break;
 	}
-
-	ops = nft_family_ops_lookup(family);
 
 	if (ops->save_firewall)
 		ops->save_firewall(data, format);

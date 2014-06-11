@@ -222,8 +222,8 @@ static void nft_ipv6_save_firewall(const void *data, unsigned int format)
 
 	save_firewall_details(cs, cs->fw6.ipv6.invflags, cs->fw6.ipv6.proto,
 			      cs->fw6.ipv6.iniface, cs->fw6.ipv6.iniface_mask,
-			      cs->fw6.ipv6.outiface, cs->fw6.ipv6.outiface_mask,
-			      format);
+			      cs->fw6.ipv6.outiface,
+			      cs->fw6.ipv6.outiface_mask);
 
 	save_ipv6_addr('s', &cs->fw6.ipv6.src,
 		       cs->fw6.ipv6.invflags & IPT_INV_SRCIP);
@@ -330,6 +330,13 @@ static bool nft_ipv6_rule_find(struct nft_family_ops *ops,
 	return nft_ipv46_rule_find(ops, r, cs);
 }
 
+static void nft_ipv6_save_counters(const void *data)
+{
+	const struct iptables_command_state *cs = data;
+
+	save_counters(cs->counters.pcnt, cs->counters.bcnt);
+}
+
 struct nft_family_ops nft_family_ops_ipv6 = {
 	.add			= nft_ipv6_add,
 	.is_same		= nft_ipv6_is_same,
@@ -338,6 +345,7 @@ struct nft_family_ops nft_family_ops_ipv6 = {
 	.parse_immediate	= nft_ipv6_parse_immediate,
 	.print_firewall		= nft_ipv6_print_firewall,
 	.save_firewall		= nft_ipv6_save_firewall,
+	.save_counters		= nft_ipv6_save_counters,
 	.proto_parse		= nft_ipv6_proto_parse,
 	.post_parse		= nft_ipv6_post_parse,
 	.parse_target		= nft_ipv6_parse_target,

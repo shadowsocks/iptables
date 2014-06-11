@@ -315,8 +315,7 @@ static void nft_ipv4_save_firewall(const void *data, unsigned int format)
 
 	save_firewall_details(cs, cs->fw.ip.invflags, cs->fw.ip.proto,
 			      cs->fw.ip.iniface, cs->fw.ip.iniface_mask,
-			      cs->fw.ip.outiface, cs->fw.ip.outiface_mask,
-			      format);
+			      cs->fw.ip.outiface, cs->fw.ip.outiface_mask);
 
 	if (cs->fw.ip.flags & IPT_F_FRAG) {
 		if (cs->fw.ip.invflags & IPT_INV_FRAG)
@@ -409,6 +408,13 @@ static bool nft_ipv4_rule_find(struct nft_family_ops *ops,
 	return nft_ipv46_rule_find(ops, r, cs);
 }
 
+static void nft_ipv4_save_counters(const void *data)
+{
+	const struct iptables_command_state *cs = data;
+
+	save_counters(cs->counters.pcnt, cs->counters.bcnt);
+}
+
 struct nft_family_ops nft_family_ops_ipv4 = {
 	.add			= nft_ipv4_add,
 	.is_same		= nft_ipv4_is_same,
@@ -417,6 +423,7 @@ struct nft_family_ops nft_family_ops_ipv4 = {
 	.parse_immediate	= nft_ipv4_parse_immediate,
 	.print_firewall		= nft_ipv4_print_firewall,
 	.save_firewall		= nft_ipv4_save_firewall,
+	.save_counters		= nft_ipv4_save_counters,
 	.proto_parse		= nft_ipv4_proto_parse,
 	.post_parse		= nft_ipv4_post_parse,
 	.parse_target		= nft_ipv4_parse_target,

@@ -599,12 +599,6 @@ static void nft_arp_save_firewall(const void *data,
 
 	print_fw_details((struct arpt_entry *)fw, format);
 
-	if (!(format & FMT_NOCOUNTS)) {
-		printf("-c ");
-		xtables_print_num(fw->counters.pcnt, format);
-		xtables_print_num(fw->counters.bcnt, format);
-	}
-
 	target = get_target((struct arpt_entry *)fw, format);
 
 	if (target) {
@@ -680,6 +674,13 @@ static bool nft_arp_rule_find(struct nft_family_ops *ops, struct nft_rule *r,
 	return true;
 }
 
+static void nft_arp_save_counters(const void *data)
+{
+	const struct arpt_entry *fw = data;
+
+	save_counters(fw->counters.pcnt, fw->counters.bcnt);
+}
+
 struct nft_family_ops nft_family_ops_arp = {
 	.add			= nft_arp_add,
 	.is_same		= nft_arp_is_same,
@@ -689,6 +690,7 @@ struct nft_family_ops nft_family_ops_arp = {
 	.parse_immediate	= nft_arp_parse_immediate,
 	.print_firewall		= nft_arp_print_firewall,
 	.save_firewall		= nft_arp_save_firewall,
+	.save_counters		= nft_arp_save_counters,
 	.post_parse		= NULL,
 	.rule_find		= nft_arp_rule_find,
 	.parse_target		= nft_arp_parse_target,
