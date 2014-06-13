@@ -40,7 +40,7 @@ xtables_compat_multi_SOURCES += xtables-save.c xtables-restore.c \
 				nft-shared.c nft-ipv4.c nft-ipv6.c nft-arp.c \
 				xtables-config.c xtables-events.c \
 				xtables-arp-standalone.c xtables-arp.c
-xtables_compat_multi_LDADD   += ${libmnl_LIBS} ${libnftnl_LIBS}
+xtables_compat_multi_LDADD   += ${libmnl_LIBS} ${libnftnl_LIBS} ../extensions/libext4.a ../extensions/libext6.a
 # yacc and lex generate dirty code
 xtables_compat_multi-xtables-config-parser.o xtables_compat_multi-xtables-config-syntax.o: AM_CFLAGS += -Wno-missing-prototypes -Wno-missing-declarations -Wno-implicit-function-declaration -Wno-nested-externs -Wno-undef -Wno-redundant-decls
 xtables_compat_multi_SOURCES += xshared.c
