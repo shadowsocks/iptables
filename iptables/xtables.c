@@ -85,6 +85,7 @@ static struct option original_opts[] = {
 	{.name = "numeric",	  .has_arg = 0, .val = 'n'},
 	{.name = "out-interface", .has_arg = 1, .val = 'o'},
 	{.name = "verbose",	  .has_arg = 0, .val = 'v'},
+	{.name = "wait",	  .has_arg = 2, .val = 'w'},
 	{.name = "exact",	  .has_arg = 0, .val = 'x'},
 	{.name = "fragments",	  .has_arg = 0, .val = 'f'},
 	{.name = "version",	  .has_arg = 0, .val = 'V'},
@@ -683,6 +684,7 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table,
 {
 	struct iptables_command_state cs;
 	int verbose = 0;
+	int wait = 0;
 	const char *chain = NULL;
 	const char *policy = NULL, *newname = NULL;
 	unsigned int rulenum = 0, command = 0;
@@ -722,7 +724,7 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table,
 
 	opts = xt_params->orig_opts;
 	while ((cs.c = getopt_long(argc, argv,
-	   "-:A:C:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:fbvnt:m:xc:g:46",
+	   "-:A:C:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:fbvw::nt:m:xc:g:46",
 					   opts, NULL)) != -1) {
 		switch (cs.c) {
 			/*
@@ -1007,6 +1009,15 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table,
 					      "You cannot use `-w' from "
 					      "iptables-restore");
 			}
+			if (optarg) {
+				if (sscanf(optarg, "%i", &wait) != 1)
+					xtables_error(PARAMETER_PROBLEM,
+						      "wait seconds not numeric");
+			} else if (optind < argc && argv[optind][0] != '-'
+				   && argv[optind][0] != '!')
+				if (sscanf(argv[optind++], "%i", &wait) != 1)
+					xtables_error(PARAMETER_PROBLEM,
+						      "wait seconds not numeric");
 			break;
 
 		case '0':
