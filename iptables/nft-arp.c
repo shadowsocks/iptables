@@ -155,9 +155,6 @@ static uint8_t arpt_to_ipt_flags(uint16_t invflags)
 	if (invflags & ARPT_INV_ARPPRO)
 		result |= IPT_INV_PROTO;
 
-	if (invflags & ARPT_INV_MASK)
-		result |= IPT_INV_MASK;
-
 	return result;
 }
 
@@ -256,9 +253,6 @@ static uint16_t ipt_to_arpt_flags(uint8_t invflags)
 
 	if (invflags & IPT_INV_PROTO)
 		result |= ARPT_INV_ARPPRO;
-
-	if (invflags & IPT_INV_MASK)
-		result |= ARPT_INV_MASK;
 
 	return result;
 }
