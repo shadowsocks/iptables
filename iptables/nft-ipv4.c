@@ -37,6 +37,10 @@ static int nft_ipv4_add(struct nft_rule *r, void *data)
 	if (cs->fw.ip.outiface[0] != '\0')
 		add_outiface(r, cs->fw.ip.outiface, cs->fw.ip.invflags);
 
+	if (cs->fw.ip.proto != 0)
+		add_proto(r, offsetof(struct iphdr, protocol), 1,
+			  cs->fw.ip.proto, cs->fw.ip.invflags);
+
 	if (cs->fw.ip.src.s_addr != 0)
 		add_addr(r, offsetof(struct iphdr, saddr),
 			 &cs->fw.ip.src.s_addr, 4, cs->fw.ip.invflags);
@@ -44,10 +48,6 @@ static int nft_ipv4_add(struct nft_rule *r, void *data)
 	if (cs->fw.ip.dst.s_addr != 0)
 		add_addr(r, offsetof(struct iphdr, daddr),
 			 &cs->fw.ip.dst.s_addr, 4, cs->fw.ip.invflags);
-
-	if (cs->fw.ip.proto != 0)
-		add_proto(r, offsetof(struct iphdr, protocol), 1,
-			  cs->fw.ip.proto, cs->fw.ip.invflags);
 
 	if (cs->fw.ip.flags & IPT_F_FRAG) {
 		add_payload(r, offsetof(struct iphdr, frag_off), 2);
