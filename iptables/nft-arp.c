@@ -364,26 +364,31 @@ void nft_rule_to_arpt_entry(struct nft_rule *r, struct arpt_entry *fw)
 	struct nft_rule_expr_iter *iter;
 	struct nft_rule_expr *expr;
 	int family = nft_rule_attr_get_u32(r, NFT_RULE_ATTR_FAMILY);
+	struct nft_xt_ctx ctx = {
+		.state.fw = fw,
+		.family = family,
+	};
 
 	iter = nft_rule_expr_iter_create(r);
 	if (iter == NULL)
 		return;
 
+	ctx.iter = iter;
 	expr = nft_rule_expr_iter_next(iter);
 	while (expr != NULL) {
 		const char *name =
 			nft_rule_expr_get_str(expr, NFT_RULE_EXPR_ATTR_NAME);
 
 		if (strcmp(name, "counter") == 0)
-			nft_parse_counter(expr, iter, &fw->counters);
+			nft_parse_counter(expr, &ctx.state.fw->counters);
 		else if (strcmp(name, "payload") == 0)
-			nft_parse_payload(expr, iter, family, fw);
+			nft_parse_payload(&ctx, expr);
 		else if (strcmp(name, "meta") == 0)
-			nft_parse_meta(expr, iter, family, fw);
+			nft_parse_meta(&ctx, expr);
 		else if (strcmp(name, "immediate") == 0)
-			nft_parse_immediate(expr, iter, family, fw);
+			nft_parse_immediate(&ctx, expr);
 		else if (strcmp(name, "target") == 0)
-			nft_parse_target(expr, iter, family, fw);
+			nft_parse_target(&ctx, expr);
 
 		expr = nft_rule_expr_iter_next(iter);
 	}
