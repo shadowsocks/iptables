@@ -82,6 +82,24 @@ void add_bitwise_u16(struct nft_rule *r, int mask, int xor)
 	nft_rule_add_expr(r, expr);
 }
 
+static void add_bitwise(struct nft_rule *r, uint8_t *mask, size_t len)
+{
+	struct nft_rule_expr *expr;
+	uint32_t xor[4] = { 0 };
+
+	expr = nft_rule_expr_alloc("bitwise");
+	if (expr == NULL)
+		return;
+
+	nft_rule_expr_set_u32(expr, NFT_EXPR_BITWISE_SREG, NFT_REG_1);
+	nft_rule_expr_set_u32(expr, NFT_EXPR_BITWISE_DREG, NFT_REG_1);
+	nft_rule_expr_set_u32(expr, NFT_EXPR_BITWISE_LEN, len);
+	nft_rule_expr_set(expr, NFT_EXPR_BITWISE_MASK, mask, len);
+	nft_rule_expr_set(expr, NFT_EXPR_BITWISE_XOR, &xor, len);
+
+	nft_rule_add_expr(r, expr);
+}
+
 void add_cmp_ptr(struct nft_rule *r, uint32_t op, void *data, size_t len)
 {
 	struct nft_rule_expr *expr;
@@ -151,11 +169,12 @@ void add_outiface(struct nft_rule *r, char *iface, int invflags)
 }
 
 void add_addr(struct nft_rule *r, int offset,
-	      void *data, size_t len, int invflags)
+	      void *data, void *mask, size_t len, int invflags)
 {
 	uint32_t op;
 
 	add_payload(r, offset, len);
+	add_bitwise(r, mask, len);
 
 	if (invflags & IPT_INV_SRCIP || invflags & IPT_INV_DSTIP)
 		op = NFT_CMP_NEQ;
@@ -298,8 +317,8 @@ void nft_parse_target(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
 	const void *targinfo = nft_rule_expr_get(e, NFT_EXPR_TG_INFO, &tg_len);
 	struct xtables_target *target;
 	struct xt_entry_target *t;
-	struct nft_family_ops *ops;
 	size_t size;
+	struct nft_family_ops *ops;
 	void *data = nft_get_data(ctx);
 
 	target = xtables_find_target(targname, XTF_TRY_LOAD);
@@ -365,23 +384,10 @@ void print_proto(uint16_t proto, int invert)
 	printf("-p %u ", proto);
 }
 
-void get_cmp_data(struct nft_rule_expr_iter *iter,
-		  void *data, size_t dlen, bool *inv)
+void get_cmp_data(struct nft_rule_expr *e, void *data, size_t dlen, bool *inv)
 {
-	struct nft_rule_expr *e;
-	const char *name;
 	uint32_t len;
 	uint8_t op;
-
-	e = nft_rule_expr_iter_next(iter);
-	if (e == NULL)
-		return;
-
-	name = nft_rule_expr_get_str(e, NFT_RULE_EXPR_ATTR_NAME);
-	if (strcmp(name, "cmp") != 0) {
-		DEBUGP("skipping no cmp after meta\n");
-		return;
-	}
 
 	memcpy(data, nft_rule_expr_get(e, NFT_EXPR_CMP_DATA, &len), dlen);
 	op = nft_rule_expr_get_u32(e, NFT_EXPR_CMP_OP);
@@ -393,33 +399,49 @@ void get_cmp_data(struct nft_rule_expr_iter *iter,
 
 void nft_parse_meta(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
 {
-	uint8_t key = nft_rule_expr_get_u32(e, NFT_EXPR_META_KEY);
-	struct nft_family_ops *ops = nft_family_ops_lookup(ctx->family);
-	const char *name;
-	void *data = nft_get_data(ctx);
-
-	e = nft_rule_expr_iter_next(ctx->iter);
-	if (e == NULL)
-		return;
-
-	name = nft_rule_expr_get_str(e, NFT_RULE_EXPR_ATTR_NAME);
-	if (strcmp(name, "cmp") != 0) {
-		DEBUGP("skipping no cmp after meta\n");
-		return;
-	}
-
-	ops->parse_meta(e, key, data);
+	ctx->reg = nft_rule_expr_get_u32(e, NFT_EXPR_META_DREG);
+	ctx->meta.key = nft_rule_expr_get_u32(e, NFT_EXPR_META_KEY);
+	ctx->flags |= NFT_XT_CTX_META;
 }
 
 void nft_parse_payload(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
 {
+	ctx->reg = nft_rule_expr_get_u32(e, NFT_EXPR_META_DREG);
+	ctx->payload.offset = nft_rule_expr_get_u32(e, NFT_EXPR_PAYLOAD_OFFSET);
+	ctx->flags |= NFT_XT_CTX_PAYLOAD;
+}
+
+void nft_parse_bitwise(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
+{
+	uint32_t reg, len;
+	const void *data;
+
+	reg = nft_rule_expr_get_u32(e, NFT_EXPR_BITWISE_SREG);
+	if (ctx->reg && reg != ctx->reg)
+		return;
+
+	data = nft_rule_expr_get(e, NFT_EXPR_BITWISE_XOR, &len);
+	memcpy(ctx->bitwise.xor, data, len);
+	data = nft_rule_expr_get(e, NFT_EXPR_BITWISE_MASK, &len);
+	memcpy(ctx->bitwise.mask, data, len);
+	ctx->flags |= NFT_XT_CTX_BITWISE;
+}
+
+void nft_parse_cmp(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
+{
 	struct nft_family_ops *ops = nft_family_ops_lookup(ctx->family);
-	uint32_t offset;
 	void *data = nft_get_data(ctx);
+	uint32_t reg;
 
-	offset = nft_rule_expr_get_u32(e, NFT_EXPR_PAYLOAD_OFFSET);
+	reg = nft_rule_expr_get_u32(e, NFT_EXPR_CMP_SREG);
+	if (ctx->reg && reg != ctx->reg)
+		return;
 
-	ops->parse_payload(ctx->iter, offset, data);
+	if (ctx->flags & NFT_XT_CTX_META)
+		ops->parse_meta(ctx, e, data);
+	/* bitwise context is interpreted from payload */
+	if (ctx->flags & NFT_XT_CTX_PAYLOAD);
+		ops->parse_payload(ctx, e, data);
 }
 
 void nft_parse_counter(struct nft_rule_expr *e, struct xt_counters *counters)
@@ -486,6 +508,10 @@ void nft_rule_to_iptables_command_state(struct nft_rule *r,
 			nft_parse_payload(&ctx, expr);
 		else if (strcmp(name, "meta") == 0)
 			nft_parse_meta(&ctx, expr);
+		else if (strcmp(name, "bitwise") == 0)
+			nft_parse_bitwise(&ctx, expr);
+		else if (strcmp(name, "cmp") == 0)
+			nft_parse_cmp(&ctx, expr);
 		else if (strcmp(name, "immediate") == 0)
 			nft_parse_immediate(&ctx, expr);
 		else if (strcmp(name, "match") == 0)

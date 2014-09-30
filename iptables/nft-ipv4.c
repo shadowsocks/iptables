@@ -41,14 +41,16 @@ static int nft_ipv4_add(struct nft_rule *r, void *data)
 		add_proto(r, offsetof(struct iphdr, protocol), 1,
 			  cs->fw.ip.proto, cs->fw.ip.invflags);
 
-	if (cs->fw.ip.src.s_addr != 0)
+	if (cs->fw.ip.src.s_addr != 0) {
 		add_addr(r, offsetof(struct iphdr, saddr),
-			 &cs->fw.ip.src.s_addr, 4, cs->fw.ip.invflags);
-
-	if (cs->fw.ip.dst.s_addr != 0)
+			 &cs->fw.ip.src.s_addr, &cs->fw.ip.smsk.s_addr,
+			 sizeof(struct in_addr), cs->fw.ip.invflags);
+	}
+	if (cs->fw.ip.dst.s_addr != 0) {
 		add_addr(r, offsetof(struct iphdr, daddr),
-			 &cs->fw.ip.dst.s_addr, 4, cs->fw.ip.invflags);
-
+			 &cs->fw.ip.dst.s_addr, &cs->fw.ip.dmsk.s_addr,
+			 sizeof(struct in_addr), cs->fw.ip.invflags);
+	}
 	if (cs->fw.ip.flags & IPT_F_FRAG) {
 		add_payload(r, offsetof(struct iphdr, frag_off), 2);
 		/* get the 13 bits that contain the fragment offset */
@@ -102,35 +104,15 @@ static bool nft_ipv4_is_same(const void *data_a,
 				  b->fw.ip.iniface_mask, b->fw.ip.outiface_mask);
 }
 
-static void get_frag(struct nft_rule_expr_iter *iter, bool *inv)
+static void get_frag(struct nft_xt_ctx *ctx, struct nft_rule_expr *e, bool *inv)
 {
-	struct nft_rule_expr *e;
-	const char *name;
 	uint8_t op;
 
-	e = nft_rule_expr_iter_next(iter);
-	if (e == NULL)
-		return;
-
 	/* we assume correct mask and xor */
-	name = nft_rule_expr_get_str(e, NFT_RULE_EXPR_ATTR_NAME);
-	if (strcmp(name, "bitwise") != 0) {
-		DEBUGP("skipping no bitwise after payload\n");
-		return;
-	}
-
-	/* Now check for cmp */
-	e = nft_rule_expr_iter_next(iter);
-	if (e == NULL)
+	if (!(ctx->flags & NFT_XT_CTX_BITWISE))
 		return;
 
 	/* we assume correct data */
-	name = nft_rule_expr_get_str(e, NFT_RULE_EXPR_ATTR_NAME);
-	if (strcmp(name, "cmp") != 0) {
-		DEBUGP("skipping no cmp after payload\n");
-		return;
-	}
-
 	op = nft_rule_expr_get_u32(e, NFT_EXPR_CMP_OP);
 	if (op == NFT_CMP_EQ)
 		*inv = true;
@@ -164,49 +146,61 @@ static const char *mask_to_str(uint32_t mask)
 	return mask_str;
 }
 
-static void nft_ipv4_parse_meta(struct nft_rule_expr *e, uint8_t key,
+static void nft_ipv4_parse_meta(struct nft_xt_ctx *ctx, struct nft_rule_expr *e,
 				void *data)
 {
 	struct iptables_command_state *cs = data;
 
-	parse_meta(e, key, cs->fw.ip.iniface, cs->fw.ip.iniface_mask,
+	parse_meta(e, ctx->meta.key, cs->fw.ip.iniface, cs->fw.ip.iniface_mask,
 		   cs->fw.ip.outiface, cs->fw.ip.outiface_mask,
 		   &cs->fw.ip.invflags);
 }
 
-static void nft_ipv4_parse_payload(struct nft_rule_expr_iter *iter,
-				   uint32_t offset, void *data)
+static void parse_mask_ipv4(struct nft_xt_ctx *ctx, struct in_addr *mask)
+{
+	mask->s_addr = ctx->bitwise.mask[0];
+}
+
+static void nft_ipv4_parse_payload(struct nft_xt_ctx *ctx,
+				   struct nft_rule_expr *e, void *data)
 {
 	struct iptables_command_state *cs = data;
-
-	switch(offset) {
 	struct in_addr addr;
 	uint8_t proto;
 	bool inv;
 
+	switch(ctx->payload.offset) {
 	case offsetof(struct iphdr, saddr):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
+		get_cmp_data(e, &addr, sizeof(addr), &inv);
 		cs->fw.ip.src.s_addr = addr.s_addr;
-		cs->fw.ip.smsk.s_addr = 0xffffffff;
+		if (ctx->flags & NFT_XT_CTX_BITWISE)
+			parse_mask_ipv4(ctx, &cs->fw.ip.smsk);
+		else
+			cs->fw.ip.smsk.s_addr = 0xffffffff;
+
 		if (inv)
 			cs->fw.ip.invflags |= IPT_INV_SRCIP;
 		break;
 	case offsetof(struct iphdr, daddr):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
+		get_cmp_data(e, &addr, sizeof(addr), &inv);
 		cs->fw.ip.dst.s_addr = addr.s_addr;
-		cs->fw.ip.dmsk.s_addr = 0xffffffff;
+		if (ctx->flags & NFT_XT_CTX_BITWISE)
+			parse_mask_ipv4(ctx, &cs->fw.ip.dmsk);
+		else
+			cs->fw.ip.dmsk.s_addr = 0xffffffff;
+
 		if (inv)
 			cs->fw.ip.invflags |= IPT_INV_DSTIP;
 		break;
 	case offsetof(struct iphdr, protocol):
-		get_cmp_data(iter, &proto, sizeof(proto), &inv);
+		get_cmp_data(e, &proto, sizeof(proto), &inv);
 		cs->fw.ip.proto = proto;
 		if (inv)
 			cs->fw.ip.invflags |= IPT_INV_PROTO;
 		break;
 	case offsetof(struct iphdr, frag_off):
 		cs->fw.ip.flags |= IPT_F_FRAG;
-		get_frag(iter, &inv);
+		get_frag(ctx, e, &inv);
 		if (inv)
 			cs->fw.ip.invflags |= IPT_INV_FRAG;
 		break;

@@ -38,6 +38,12 @@
 
 struct xtables_args;
 
+enum {
+	NFT_XT_CTX_PAYLOAD	= (1 << 0),
+	NFT_XT_CTX_META		= (1 << 1),
+	NFT_XT_CTX_BITWISE	= (1 << 2),
+};
+
 struct nft_xt_ctx {
 	union {
 		struct iptables_command_state *cs;
@@ -46,6 +52,19 @@ struct nft_xt_ctx {
 	struct nft_rule_expr_iter *iter;
 	int family;
 	uint32_t flags;
+
+	uint32_t reg;
+	struct {
+		uint32_t offset;
+		uint32_t len;
+	} payload;
+	struct {
+		uint32_t key;
+	} meta;
+	struct {
+		uint32_t mask[4];
+		uint32_t xor[4];
+	} bitwise;
 };
 
 struct nft_family_ops {
@@ -54,10 +73,14 @@ struct nft_family_ops {
 			const void *data_b);
 	void (*print_payload)(struct nft_rule_expr *e,
 			      struct nft_rule_expr_iter *iter);
-	void (*parse_meta)(struct nft_rule_expr *e, uint8_t key,
+	void (*parse_meta)(struct nft_xt_ctx *ctx, struct nft_rule_expr *e,
 			   void *data);
-	void (*parse_payload)(struct nft_rule_expr_iter *iter,
-			      uint32_t offset, void *data);
+	void (*parse_payload)(struct nft_xt_ctx *ctx, struct nft_rule_expr *e,
+			      void *data);
+	void (*parse_bitwise)(struct nft_xt_ctx *ctx, struct nft_rule_expr *e,
+			      void *data);
+	void (*parse_cmp)(struct nft_xt_ctx *ctx, struct nft_rule_expr *e,
+			  void *data);
 	void (*parse_immediate)(const char *jumpto, bool nft_goto, void *data);
 	void (*print_firewall)(struct nft_rule *r, unsigned int num,
 			       unsigned int format);
@@ -82,7 +105,7 @@ void add_cmp_u32(struct nft_rule *r, uint32_t val, uint32_t op);
 void add_iniface(struct nft_rule *r, char *iface, int invflags);
 void add_outiface(struct nft_rule *r, char *iface, int invflags);
 void add_addr(struct nft_rule *r, int offset,
-	      void *data, size_t len, int invflags);
+	      void *data, void *mask, size_t len, int invflags);
 void add_proto(struct nft_rule *r, int offset, size_t len,
 	       uint8_t proto, int invflags);
 void add_compat(struct nft_rule *r, uint32_t proto, bool inv);
@@ -98,8 +121,9 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 		unsigned char *iniface_mask, char *outiface,
 		unsigned char *outiface_mask, uint8_t *invflags);
 void print_proto(uint16_t proto, int invert);
-void get_cmp_data(struct nft_rule_expr_iter *iter,
-		  void *data, size_t dlen, bool *inv);
+void get_cmp_data(struct nft_rule_expr *e, void *data, size_t dlen, bool *inv);
+void nft_parse_bitwise(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
+void nft_parse_cmp(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
 void nft_parse_target(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
 void nft_parse_meta(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
 void nft_parse_payload(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);

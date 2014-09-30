@@ -198,18 +198,22 @@ static int nft_arp_add(struct nft_rule *r, void *data)
 		add_cmp_ptr(r, NFT_CMP_EQ, fw->arp.src_devaddr.addr, fw->arp.arhln);
 	}
 
-	if (fw->arp.src.s_addr != 0)
+	if (fw->arp.src.s_addr != 0) {
 		add_addr(r, sizeof(struct arphdr) + fw->arp.arhln,
-			 &fw->arp.src.s_addr, 4, flags);
+			 &fw->arp.src.s_addr, &fw->arp.smsk.s_addr,
+			 sizeof(struct in_addr), flags);
+	}
 
 	if (fw->arp.tgt_devaddr.addr[0] != '\0') {
 		add_payload(r, sizeof(struct arphdr) + fw->arp.arhln + 4, fw->arp.arhln);
 		add_cmp_ptr(r, NFT_CMP_EQ, fw->arp.tgt_devaddr.addr, fw->arp.arhln);
 	}
 
-	if (fw->arp.tgt.s_addr != 0)
+	if (fw->arp.tgt.s_addr != 0) {
 		add_addr(r, sizeof(struct arphdr) + fw->arp.arhln + sizeof(struct in_addr),
-			 &fw->arp.tgt.s_addr, 4, flags);
+			 &fw->arp.tgt.s_addr, &fw->arp.tmsk.s_addr,
+			 sizeof(struct in_addr), flags);
+	}
 
 	/* Counters need to me added before the target, otherwise they are
 	 * increased for each rule because of the way nf_tables works.
@@ -257,13 +261,13 @@ static uint16_t ipt_to_arpt_flags(uint8_t invflags)
 	return result;
 }
 
-static void nft_arp_parse_meta(struct nft_rule_expr *e, uint8_t key,
+static void nft_arp_parse_meta(struct nft_xt_ctx *ctx, struct nft_rule_expr *e,
 			       void *data)
 {
 	struct arpt_entry *fw = data;
 	uint8_t flags = 0;
 
-	parse_meta(e, key, fw->arp.iniface, fw->arp.iniface_mask,
+	parse_meta(e, ctx->meta.key, fw->arp.iniface, fw->arp.iniface_mask,
 		   fw->arp.outiface, fw->arp.outiface_mask,
 		   &flags);
 
@@ -301,38 +305,43 @@ static void nft_arp_parse_immediate(const char *jumpto, bool nft_goto,
 	nft_arp_parse_target(target, data);
 }
 
-static void nft_arp_parse_payload(struct nft_rule_expr_iter *iter,
-				  uint32_t offset, void *data)
+static void parse_mask_ipv4(struct nft_xt_ctx *ctx, struct in_addr *mask)
+{
+	mask->s_addr = ctx->bitwise.mask[0];
+}
+
+static void nft_arp_parse_payload(struct nft_xt_ctx *ctx,
+				  struct nft_rule_expr *e, void *data)
 {
 	struct arpt_entry *fw = data;
 	struct in_addr addr;
 	unsigned short int ar_hrd, ar_pro, ar_op, ar_hln;
 	bool inv;
 
-	switch (offset) {
+	switch (ctx->payload.offset) {
 	case offsetof(struct arphdr, ar_hrd):
-		get_cmp_data(iter, &ar_hrd, sizeof(ar_hrd), &inv);
+		get_cmp_data(e, &ar_hrd, sizeof(ar_hrd), &inv);
 		fw->arp.arhrd = ar_hrd;
 		fw->arp.arhrd_mask = 0xffff;
 		if (inv)
 			fw->arp.invflags |= ARPT_INV_ARPHRD;
 		break;
 	case offsetof(struct arphdr, ar_pro):
-		get_cmp_data(iter, &ar_pro, sizeof(ar_pro), &inv);
+		get_cmp_data(e, &ar_pro, sizeof(ar_pro), &inv);
 		fw->arp.arpro = ar_pro;
 		fw->arp.arpro_mask = 0xffff;
 		if (inv)
 			fw->arp.invflags |= ARPT_INV_ARPPRO;
 		break;
 	case offsetof(struct arphdr, ar_op):
-		get_cmp_data(iter, &ar_op, sizeof(ar_op), &inv);
+		get_cmp_data(e, &ar_op, sizeof(ar_op), &inv);
 		fw->arp.arpop = ar_op;
 		fw->arp.arpop_mask = 0xffff;
 		if (inv)
 			fw->arp.invflags |= ARPT_INV_ARPOP;
 		break;
 	case offsetof(struct arphdr, ar_hln):
-		get_cmp_data(iter, &ar_hln, sizeof(ar_op), &inv);
+		get_cmp_data(e, &ar_hln, sizeof(ar_op), &inv);
 		fw->arp.arhln = ar_hln;
 		fw->arp.arhln_mask = 0xff;
 		if (inv)
@@ -342,16 +351,27 @@ static void nft_arp_parse_payload(struct nft_rule_expr_iter *iter,
 		if (fw->arp.arhln < 0)
 			break;
 
-		if (offset == sizeof(struct arphdr) + fw->arp.arhln) {
-			get_cmp_data(iter, &addr, sizeof(addr), &inv);
+		if (ctx->payload.offset == sizeof(struct arphdr) +
+					   fw->arp.arhln) {
+			get_cmp_data(e, &addr, sizeof(addr), &inv);
 			fw->arp.src.s_addr = addr.s_addr;
-			fw->arp.smsk.s_addr = 0xffffffff;
+			if (ctx->flags & NFT_XT_CTX_BITWISE)
+				parse_mask_ipv4(ctx, &fw->arp.smsk);
+			else
+				fw->arp.smsk.s_addr = 0xffffffff;
+
 			if (inv)
 				fw->arp.invflags |= ARPT_INV_SRCIP;
-		} else if (offset == sizeof(struct arphdr) + fw->arp.arhln + sizeof(struct in_addr)) {
-			get_cmp_data(iter, &addr, sizeof(addr), &inv);
+		} else if (ctx->payload.offset == sizeof(struct arphdr) +
+						  fw->arp.arhln +
+						  sizeof(struct in_addr)) {
+			get_cmp_data(e, &addr, sizeof(addr), &inv);
 			fw->arp.tgt.s_addr = addr.s_addr;
-			fw->arp.tmsk.s_addr = 0xffffffff;
+			if (ctx->flags & NFT_XT_CTX_BITWISE)
+				parse_mask_ipv4(ctx, &fw->arp.tmsk);
+			else
+				fw->arp.tmsk.s_addr = 0xffffffff;
+
 			if (inv)
 				fw->arp.invflags |= ARPT_INV_TGTIP;
 		}
@@ -385,6 +405,10 @@ void nft_rule_to_arpt_entry(struct nft_rule *r, struct arpt_entry *fw)
 			nft_parse_payload(&ctx, expr);
 		else if (strcmp(name, "meta") == 0)
 			nft_parse_meta(&ctx, expr);
+		else if (strcmp(name, "bitwise") == 0)
+			nft_parse_bitwise(&ctx, expr);
+		else if (strcmp(name, "cmp") == 0)
+			nft_parse_cmp(&ctx, expr);
 		else if (strcmp(name, "immediate") == 0)
 			nft_parse_immediate(&ctx, expr);
 		else if (strcmp(name, "target") == 0)

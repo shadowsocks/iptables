@@ -38,14 +38,16 @@ static int nft_ipv6_add(struct nft_rule *r, void *data)
 		add_proto(r, offsetof(struct ip6_hdr, ip6_nxt), 1,
 			  cs->fw6.ipv6.proto, cs->fw6.ipv6.invflags);
 
-	if (!IN6_IS_ADDR_UNSPECIFIED(&cs->fw6.ipv6.src))
+	if (!IN6_IS_ADDR_UNSPECIFIED(&cs->fw6.ipv6.src)) {
 		add_addr(r, offsetof(struct ip6_hdr, ip6_src),
-			 &cs->fw6.ipv6.src, 16, cs->fw6.ipv6.invflags);
-
-	if (!IN6_IS_ADDR_UNSPECIFIED(&cs->fw6.ipv6.dst))
+			 &cs->fw6.ipv6.src, &cs->fw6.ipv6.smsk,
+			 sizeof(struct in6_addr), cs->fw6.ipv6.invflags);
+	}
+	if (!IN6_IS_ADDR_UNSPECIFIED(&cs->fw6.ipv6.dst)) {
 		add_addr(r, offsetof(struct ip6_hdr, ip6_dst),
-			 &cs->fw6.ipv6.dst, 16, cs->fw6.ipv6.invflags);
-
+			 &cs->fw6.ipv6.dst, &cs->fw6.ipv6.dmsk,
+			 sizeof(struct in6_addr), cs->fw6.ipv6.invflags);
+	}
 	add_compat(r, cs->fw6.ipv6.proto, cs->fw6.ipv6.invflags);
 
 	for (matchp = cs->matches; matchp; matchp = matchp->next) {
@@ -87,39 +89,54 @@ static bool nft_ipv6_is_same(const void *data_a,
 				  b->fw6.ipv6.outiface_mask);
 }
 
-static void nft_ipv6_parse_meta(struct nft_rule_expr *e, uint8_t key,
+static void nft_ipv6_parse_meta(struct nft_xt_ctx *ctx, struct nft_rule_expr *e,
 				void *data)
 {
 	struct iptables_command_state *cs = data;
 
-	parse_meta(e, key, cs->fw6.ipv6.iniface,
+	parse_meta(e, ctx->meta.key, cs->fw6.ipv6.iniface,
 		   cs->fw6.ipv6.iniface_mask, cs->fw6.ipv6.outiface,
 		   cs->fw6.ipv6.outiface_mask, &cs->fw6.ipv6.invflags);
 }
 
-static void nft_ipv6_parse_payload(struct nft_rule_expr_iter *iter,
-				   uint32_t offset, void *data)
+static void parse_mask_ipv6(struct nft_xt_ctx *ctx, struct in6_addr *mask)
+{
+	memcpy(mask, ctx->bitwise.mask, sizeof(struct in6_addr));
+}
+
+static void nft_ipv6_parse_payload(struct nft_xt_ctx *ctx,
+				   struct nft_rule_expr *e, void *data)
 {
 	struct iptables_command_state *cs = data;
-	switch (offset) {
 	struct in6_addr addr;
 	uint8_t proto;
 	bool inv;
 
+	switch (ctx->payload.offset) {
 	case offsetof(struct ip6_hdr, ip6_src):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
+		get_cmp_data(e, &addr, sizeof(addr), &inv);
 		memcpy(cs->fw6.ipv6.src.s6_addr, &addr, sizeof(addr));
+                if (ctx->flags & NFT_XT_CTX_BITWISE)
+                        parse_mask_ipv6(ctx, &cs->fw6.ipv6.smsk);
+                else
+                        memset(&cs->fw.ip.smsk, 0xff, sizeof(struct in6_addr));
+
 		if (inv)
 			cs->fw6.ipv6.invflags |= IPT_INV_SRCIP;
 		break;
 	case offsetof(struct ip6_hdr, ip6_dst):
-		get_cmp_data(iter, &addr, sizeof(addr), &inv);
+		get_cmp_data(e, &addr, sizeof(addr), &inv);
 		memcpy(cs->fw6.ipv6.dst.s6_addr, &addr, sizeof(addr));
+                if (ctx->flags & NFT_XT_CTX_BITWISE)
+                        parse_mask_ipv6(ctx, &cs->fw6.ipv6.dmsk);
+                else
+                        memset(&cs->fw.ip.dmsk, 0xff, sizeof(struct in6_addr));
+
 		if (inv)
 			cs->fw6.ipv6.invflags |= IPT_INV_DSTIP;
 		break;
 	case offsetof(struct ip6_hdr, ip6_nxt):
-		get_cmp_data(iter, &proto, sizeof(proto), &inv);
+		get_cmp_data(e, &proto, sizeof(proto), &inv);
 		cs->fw6.ipv6.flags |= IP6T_F_PROTO;
 		cs->fw6.ipv6.proto = proto;
 		if (inv)
