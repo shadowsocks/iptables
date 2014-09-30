@@ -240,34 +240,18 @@ static int mnl_nft_batch_talk(struct nft_handle *h)
 	return err ? -1 : 0;
 }
 
-static void mnl_nft_batch_put(struct mnl_nlmsg_batch *batch, int type,
-			      uint32_t seq)
+static void mnl_nft_batch_begin(struct mnl_nlmsg_batch *batch, uint32_t seq)
 {
-	struct nlmsghdr *nlh;
-	struct nfgenmsg *nfg;
-
-	nlh = mnl_nlmsg_put_header(mnl_nlmsg_batch_current(batch));
-	nlh->nlmsg_type = type;
-	nlh->nlmsg_flags = NLM_F_REQUEST;
-	nlh->nlmsg_seq = seq;
-
-	nfg = mnl_nlmsg_put_extra_header(nlh, sizeof(*nfg));
-	nfg->nfgen_family = AF_INET;
-	nfg->version = NFNETLINK_V0;
-	nfg->res_id = NFNL_SUBSYS_NFTABLES;
-
+	nft_batch_begin(mnl_nlmsg_batch_current(batch), seq);
 	if (!mnl_nlmsg_batch_next(batch))
 		mnl_nft_batch_page_add(batch);
 }
 
-static void mnl_nft_batch_begin(struct mnl_nlmsg_batch *batch, uint32_t seq)
-{
-	mnl_nft_batch_put(batch, NFNL_MSG_BATCH_BEGIN, seq);
-}
-
 static void mnl_nft_batch_end(struct mnl_nlmsg_batch *batch, uint32_t seq)
 {
-	mnl_nft_batch_put(batch, NFNL_MSG_BATCH_END, seq);
+	nft_batch_end(mnl_nlmsg_batch_current(batch), seq);
+	if (!mnl_nlmsg_batch_next(batch))
+		mnl_nft_batch_page_add(batch);
 }
 
 enum obj_update_type {
