@@ -204,10 +204,9 @@ int xtables_config_parse(char *filename, struct nft_table_list *table_list,
 			break;
 		case T_TABLE:
 			table = nft_table_alloc();
-			if (table == NULL) {
-				perror("nft_table_alloc");
+			if (table == NULL)
 				return -1;
-			}
+
 			nft_table_attr_set_u32(table, NFT_TABLE_ATTR_FAMILY, family);
 			nft_table_attr_set(table, NFT_TABLE_ATTR_NAME, e->data);
 			/* This is intentionally prepending, instead of
@@ -222,10 +221,9 @@ int xtables_config_parse(char *filename, struct nft_table_list *table_list,
 			break;
 		case T_CHAIN:
 			chain = nft_chain_alloc();
-			if (chain == NULL) {
-				perror("nft_chain_alloc");
+			if (chain == NULL)
 				return -1;
-			}
+
 			nft_chain_attr_set(chain, NFT_CHAIN_ATTR_TABLE,
 				(char *)nft_table_attr_get(table, NFT_TABLE_ATTR_NAME));
 			nft_chain_attr_set_u32(chain, NFT_CHAIN_ATTR_FAMILY,
