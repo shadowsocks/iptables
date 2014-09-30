@@ -142,6 +142,18 @@ static void mnl_nft_set_sndbuffer(const struct mnl_socket *nl)
 	nlbuffsiz = newbuffsiz;
 }
 
+static void mnl_nft_batch_reset(void)
+{
+	struct batch_page *batch_page, *next;
+
+	list_for_each_entry_safe(batch_page, next, &batch_page_list, head) {
+		list_del(&batch_page->head);
+		free(batch_page->batch);
+		free(batch_page);
+		batch_num_pages--;
+	}
+}
+
 static ssize_t mnl_nft_socket_sendmsg(const struct mnl_socket *nl)
 {
 	static const struct sockaddr_nl snl = {
@@ -154,12 +166,12 @@ static ssize_t mnl_nft_socket_sendmsg(const struct mnl_socket *nl)
 		.msg_iov	= iov,
 		.msg_iovlen	= batch_num_pages,
 	};
-	struct batch_page *batch_page, *next;
-	int i = 0;
+	struct batch_page *batch_page;
+	int i = 0, ret;
 
 	mnl_nft_set_sndbuffer(nl);
 
-	list_for_each_entry_safe(batch_page, next, &batch_page_list, head) {
+	list_for_each_entry(batch_page, &batch_page_list, head) {
 		iov[i].iov_base = mnl_nlmsg_batch_head(batch_page->batch);
 		iov[i].iov_len = mnl_nlmsg_batch_size(batch_page->batch);
 		i++;
@@ -169,13 +181,12 @@ static ssize_t mnl_nft_socket_sendmsg(const struct mnl_socket *nl)
 				  mnl_nlmsg_batch_size(batch_page->batch),
 				  sizeof(struct nfgenmsg));
 #endif
-		list_del(&batch_page->head);
-		free(batch_page->batch);
-		free(batch_page);
-		batch_num_pages--;
 	}
 
-	return sendmsg(mnl_socket_get_fd(nl), &msg, 0);
+	ret = sendmsg(mnl_socket_get_fd(nl), &msg, 0);
+	mnl_nft_batch_reset();
+
+	return ret;
 }
 
 static int cb_err(const struct nlmsghdr *nlh, void *data)
