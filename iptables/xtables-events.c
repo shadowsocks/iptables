@@ -27,6 +27,7 @@
 #include "iptables.h" /* for xtables_globals */
 #include "xtables-multi.h"
 #include "nft.h"
+#include "nft-arp.h"
 
 static int table_cb(const struct nlmsghdr *nlh, int type)
 {
@@ -55,7 +56,7 @@ static bool counters;
 static int rule_cb(const struct nlmsghdr *nlh, int type)
 {
 	struct iptables_command_state cs = {};
-	struct arpt_entry fw_arp = {};
+	struct arptables_command_state cs_arp = {};
 	struct nft_rule *r;
 	void *fw = NULL;
 	uint8_t family;
@@ -77,8 +78,8 @@ static int rule_cb(const struct nlmsghdr *nlh, int type)
 		break;
 	case NFPROTO_ARP:
 		printf("-0 ");
-		nft_rule_to_arpt_entry(r, &fw_arp);
-		fw = &fw_arp;
+		nft_rule_to_arptables_command_state(r, &cs_arp);
+		fw = &cs_arp;
 		break;
 	default:
 		goto err_free;

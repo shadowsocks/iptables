@@ -25,6 +25,7 @@
 #include <linux/netfilter/nf_tables.h>
 
 #include "nft-shared.h"
+#include "nft-arp.h"
 #include "nft.h"
 
 /* a few names */
@@ -160,11 +161,10 @@ static uint8_t arpt_to_ipt_flags(uint16_t invflags)
 
 static int nft_arp_add(struct nft_rule *r, void *data)
 {
-	struct arpt_entry *fw = data;
+	struct arptables_command_state *cs = data;
+	struct arpt_entry *fw = &cs->fw;
 	uint8_t flags = arpt_to_ipt_flags(fw->arp.invflags);
-	struct xt_entry_target *t;
-	char *targname;
-	int ret;
+	int ret = 0;
 
 	if (fw->arp.iniface[0] != '\0')
 		add_iniface(r, fw->arp.iniface, flags);
@@ -221,20 +221,20 @@ static int nft_arp_add(struct nft_rule *r, void *data)
 	if (add_counters(r, fw->counters.pcnt, fw->counters.bcnt) < 0)
 		return -1;
 
-	t = nft_arp_get_target(fw);
-	targname = t->u.user.name;
-
-	/* Standard target? */
-	if (strcmp(targname, XTC_LABEL_ACCEPT) == 0)
-		ret = add_verdict(r, NF_ACCEPT);
-	else if (strcmp(targname, XTC_LABEL_DROP) == 0)
-		ret = add_verdict(r, NF_DROP);
-	else if (strcmp(targname, XTC_LABEL_RETURN) == 0)
-		ret = add_verdict(r, NFT_RETURN);
-	else if (xtables_find_target(targname, XTF_TRY_LOAD) != NULL)
-		ret = add_target(r, t);
-	else
-		ret = add_jumpto(r, targname, NFT_JUMP);
+	if (cs->target != NULL) {
+		/* Standard target? */
+		if (strcmp(cs->jumpto, XTC_LABEL_ACCEPT) == 0)
+			ret = add_verdict(r, NF_ACCEPT);
+		else if (strcmp(cs->jumpto, XTC_LABEL_DROP) == 0)
+			ret = add_verdict(r, NF_DROP);
+		else if (strcmp(cs->jumpto, XTC_LABEL_RETURN) == 0)
+			ret = add_verdict(r, NFT_RETURN);
+		else
+			ret = add_target(r, cs->target->t);
+	} else if (strlen(cs->jumpto) > 0) {
+		/* No goto in arptables */
+		ret = add_jumpto(r, cs->jumpto, NFT_JUMP);
+	}
 
 	return ret;
 }
@@ -264,7 +264,8 @@ static uint16_t ipt_to_arpt_flags(uint8_t invflags)
 static void nft_arp_parse_meta(struct nft_xt_ctx *ctx, struct nft_rule_expr *e,
 			       void *data)
 {
-	struct arpt_entry *fw = data;
+	struct arptables_command_state *cs = data;
+	struct arpt_entry *fw = &cs->fw;
 	uint8_t flags = 0;
 
 	parse_meta(e, ctx->meta.key, fw->arp.iniface, fw->arp.iniface_mask,
@@ -276,33 +277,17 @@ static void nft_arp_parse_meta(struct nft_xt_ctx *ctx, struct nft_rule_expr *e,
 
 static void nft_arp_parse_target(struct xtables_target *target, void *data)
 {
-	struct arpt_entry *fw = data;
-	struct xt_entry_target **t;
+	struct arptables_command_state *cs = data;
 
-	fw->target_offset = offsetof(struct arpt_entry, elems);
-	fw->next_offset = fw->target_offset + target->t->u.target_size;
-
-	t = (void *) &fw->elems;
-	*t = target->t;
+	cs->target = target;
 }
 
 static void nft_arp_parse_immediate(const char *jumpto, bool nft_goto,
 				    void *data)
 {
-	struct xtables_target *target;
-	size_t size;
+	struct arptables_command_state *cs = data;
 
-	target = xtables_find_target(XT_STANDARD_TARGET,
-				     XTF_LOAD_MUST_SUCCEED);
-
-	size = XT_ALIGN(sizeof(struct xt_entry_target)) + target->size;
-
-	target->t = xtables_calloc(1, size);
-	target->t->u.target_size = size;
-	strcpy(target->t->u.user.name, jumpto);
-	target->t->u.user.revision = target->revision;
-
-	nft_arp_parse_target(target, data);
+	cs->jumpto = jumpto;
 }
 
 static void parse_mask_ipv4(struct nft_xt_ctx *ctx, struct in_addr *mask)
@@ -313,7 +298,8 @@ static void parse_mask_ipv4(struct nft_xt_ctx *ctx, struct in_addr *mask)
 static void nft_arp_parse_payload(struct nft_xt_ctx *ctx,
 				  struct nft_rule_expr *e, void *data)
 {
-	struct arpt_entry *fw = data;
+	struct arptables_command_state *cs = data;
+	struct arpt_entry *fw = &cs->fw;
 	struct in_addr addr;
 	unsigned short int ar_hrd, ar_pro, ar_op, ar_hln;
 	bool inv;
@@ -379,13 +365,14 @@ static void nft_arp_parse_payload(struct nft_xt_ctx *ctx,
 	}
 }
 
-void nft_rule_to_arpt_entry(struct nft_rule *r, struct arpt_entry *fw)
+void nft_rule_to_arptables_command_state(struct nft_rule *r,
+					 struct arptables_command_state *cs)
 {
 	struct nft_rule_expr_iter *iter;
 	struct nft_rule_expr *expr;
 	int family = nft_rule_attr_get_u32(r, NFT_RULE_ATTR_FAMILY);
 	struct nft_xt_ctx ctx = {
-		.state.fw = fw,
+		.state.cs_arp = cs,
 		.family = family,
 	};
 
@@ -400,7 +387,7 @@ void nft_rule_to_arpt_entry(struct nft_rule *r, struct arpt_entry *fw)
 			nft_rule_expr_get_str(expr, NFT_RULE_EXPR_ATTR_NAME);
 
 		if (strcmp(name, "counter") == 0)
-			nft_parse_counter(expr, &ctx.state.fw->counters);
+			nft_parse_counter(expr, &ctx.state.cs_arp->fw.counters);
 		else if (strcmp(name, "payload") == 0)
 			nft_parse_payload(&ctx, expr);
 		else if (strcmp(name, "meta") == 0)
@@ -418,25 +405,13 @@ void nft_rule_to_arpt_entry(struct nft_rule *r, struct arpt_entry *fw)
 	}
 
 	nft_rule_expr_iter_destroy(iter);
-}
 
-static struct xtables_target
-*get_target(struct arpt_entry *fw, unsigned int format)
-{
-	const char *targname;
-	struct xtables_target *target = NULL;
-	const struct xt_entry_target *t;
-
-	if (!fw->target_offset)
-		return NULL;
-
-	t = nft_arp_get_target(fw);
-	targname = t->u.user.name;
-	target = xtables_find_target(targname, XTF_TRY_LOAD);
-	if (!(format & FMT_NOTARGET))
-		printf("-j %s ", targname);
-
-	return target;
+	if (cs->target != NULL)
+		cs->jumpto = cs->target->name;
+	else if (cs->jumpto != NULL)
+		cs->target = xtables_find_target(cs->jumpto, XTF_TRY_LOAD);
+	else
+		cs->jumpto = "";
 }
 
 static void print_fw_details(struct arpt_entry *fw, unsigned int format)
@@ -584,29 +559,29 @@ static void
 nft_arp_print_firewall(struct nft_rule *r, unsigned int num,
 		       unsigned int format)
 {
-	struct arpt_entry fw = {};
-	struct xtables_target *target = NULL;
-	const struct xt_entry_target *t = NULL;
+	struct arptables_command_state cs = {};
 
-	nft_rule_to_arpt_entry(r, &fw);
+	nft_rule_to_arptables_command_state(r, &cs);
 
 	if (format & FMT_LINENUMBERS)
 		printf("%u ", num);
 
-	target = get_target(&fw, format);
-	print_fw_details(&fw, format);
+	print_fw_details(&cs.fw, format);
 
-	if (target) {
-		if (target->print)
+	if (strlen(cs.jumpto) > 0) {
+		printf("-j %s\n", cs.jumpto);
+	} else if (cs.target) {
+		if (cs.target->print)
 			/* Print the target information. */
-			target->print(&fw.arp, t, format & FMT_NUMERIC);
+			cs.target->print(&cs.fw, cs.target->t,
+					 format & FMT_NUMERIC);
 	}
 
 	if (!(format & FMT_NOCOUNTS)) {
 		printf(", pcnt=");
-		xtables_print_num(fw.counters.pcnt, format);
+		xtables_print_num(cs.fw.counters.pcnt, format);
 		printf("-- bcnt=");
-		xtables_print_num(fw.counters.bcnt, format);
+		xtables_print_num(cs.fw.counters.bcnt, format);
 	}
 
 	if (!(format & FMT_NONEWLINE))
@@ -616,18 +591,18 @@ nft_arp_print_firewall(struct nft_rule *r, unsigned int num,
 static void nft_arp_save_firewall(const void *data,
 				  unsigned int format)
 {
-	const struct arpt_entry *fw = data;
-	struct xtables_target *target = NULL;
-	const struct xt_entry_target *t = NULL;
+	const struct arptables_command_state *cs = data;
+	const struct arpt_entry *fw = &cs->fw;
 
 	print_fw_details((struct arpt_entry *)fw, format);
 
-	target = get_target((struct arpt_entry *)fw, format);
-
-	if (target) {
-		if (target->print)
+	if (cs->target) {
+		if (cs->target->print)
 			/* Print the target information. */
-			target->print(&fw->arp, t, format & FMT_NUMERIC);
+			cs->target->print(&fw->arp, cs->target->t,
+					  format & FMT_NUMERIC);
+	} else if (strlen(cs->jumpto) > 0) {
+		printf("-j %s", cs->jumpto);
 	}
 	printf("\n");
 }
@@ -661,45 +636,28 @@ static bool nft_arp_is_same(const void *data_a,
 static bool nft_arp_rule_find(struct nft_family_ops *ops, struct nft_rule *r,
 			      void *data)
 {
-	struct arpt_entry *fw = data;
-	struct xt_entry_target *t_fw, *t_this;
-	char *targname_fw, *targname_this;
-	struct arpt_entry this = {};
+	const struct arptables_command_state *cs = data;
+	struct arptables_command_state this = {};
 
 	/* Delete by matching rule case */
-	nft_rule_to_arpt_entry(r, &this);
+	nft_rule_to_arptables_command_state(r, &this);
 
-	if (!ops->is_same(fw, &this))
+	if (!nft_arp_is_same(cs, &this))
 		return false;
 
-	t_fw = nft_arp_get_target(fw);
-	t_this = nft_arp_get_target(&this);
-
-	targname_fw = t_fw->u.user.name;
-	targname_this = t_this->u.user.name;
-
-	if (!strcmp(targname_fw, targname_this) &&
-	    (!strcmp(targname_fw, "mangle") ||
-	    !strcmp(targname_fw, "CLASSIFY"))) {
-		if (memcmp(t_fw->data, t_this->data,
-		    t_fw->u.user.target_size - sizeof(*t_fw)) != 0) {
-			DEBUGP("Different target\n");
-			return false;
-		}
-		return true;
-	}
-
-	if (strcmp(targname_fw, targname_this) != 0) {
-		DEBUGP("Different verdict\n");
+	if (!compare_targets(cs->target, this.target))
 		return false;
-	}
+
+	if (strcmp(cs->jumpto, this.jumpto) != 0)
+		return false;
 
 	return true;
 }
 
 static void nft_arp_save_counters(const void *data)
 {
-	const struct arpt_entry *fw = data;
+	const struct arptables_command_state *cs = data;
+	const struct arpt_entry *fw = &cs->fw;
 
 	save_counters(fw->counters.pcnt, fw->counters.bcnt);
 }

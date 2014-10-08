@@ -303,7 +303,7 @@ static void *nft_get_data(struct nft_xt_ctx *ctx)
 	case NFPROTO_IPV6:
 		return ctx->state.cs;
 	case NFPROTO_ARP:
-		return ctx->state.fw;
+		return ctx->state.cs_arp;
 	default:
 		/* Should not happen */
 		return NULL;

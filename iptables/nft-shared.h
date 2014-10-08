@@ -47,7 +47,7 @@ enum {
 struct nft_xt_ctx {
 	union {
 		struct iptables_command_state *cs;
-		struct arpt_entry *fw;
+		struct arptables_command_state *cs_arp;
 	} state;
 	struct nft_rule_expr_iter *iter;
 	int family;
@@ -203,20 +203,5 @@ struct xtables_args {
 #define CMD_LIST_RULES		0x1000U
 #define CMD_ZERO_NUM		0x2000U
 #define CMD_CHECK		0x4000U
-
-/*
- * ARP
- */
-extern char *opcodes[];
-#define NUMOPCODES 9
-
-static inline struct xt_entry_target *nft_arp_get_target(struct arpt_entry *fw)
-{
-	struct xt_entry_target **target;
-
-	target = (void *) &fw->elems;
-
-	return *target;
-}
 
 #endif
