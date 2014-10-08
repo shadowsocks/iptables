@@ -187,17 +187,6 @@ static ssize_t mnl_nft_socket_sendmsg(const struct mnl_socket *nl)
 	return ret;
 }
 
-static int cb_err(const struct nlmsghdr *nlh, void *data)
-{
-	/* We can provide better error reporting than iptables-restore */
-	errno = EINVAL;
-	return MNL_CB_ERROR;
-}
-
-static mnl_cb_t cb_ctl_array[NLMSG_MIN_TYPE] = {
-	[NLMSG_ERROR] = cb_err,
-};
-
 static int mnl_nft_batch_talk(struct nft_handle *h)
 {
 	int ret, fd = mnl_socket_get_fd(h->nl);
@@ -226,11 +215,11 @@ static int mnl_nft_batch_talk(struct nft_handle *h)
 		if (ret == -1)
 			return -1;
 
-		ret = mnl_cb_run2(rcv_buf, ret, 0, h->portid,
-				  NULL, NULL, cb_ctl_array,
-				  MNL_ARRAY_SIZE(cb_ctl_array));
-		/* Continue on error, make sure we get all acknoledgments */
-		if (ret == -1)
+		ret = mnl_cb_run(rcv_buf, ret, 0, h->portid, NULL, NULL);
+		/* Annotate first error and continue, make sure we get all
+		 * acknoledgments.
+		 */
+		if (!err && ret == -1)
 			err = errno;
 
 		ret = select(fd+1, &readfds, NULL, NULL, &tv);
@@ -240,6 +229,7 @@ static int mnl_nft_batch_talk(struct nft_handle *h)
 		FD_ZERO(&readfds);
 		FD_SET(fd, &readfds);
 	}
+	errno = err;
 	return err ? -1 : 0;
 }
 
