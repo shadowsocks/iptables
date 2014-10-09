@@ -170,13 +170,4 @@ int nft_arp_rule_insert(struct nft_handle *h, const char *chain,
 
 void nft_rule_to_arpt_entry(struct nft_rule *r, struct arpt_entry *fw);
 
-/*
- * BRIDGE
- */
-
-#include "xtables-ebtables.h"
-
-struct xtables_ebt_entry;
-
-void nft_rule_to_xtables_ebt_entry(struct nft_rule *r, struct xtables_ebt_entry *fw);
 #endif

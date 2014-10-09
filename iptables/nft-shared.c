@@ -280,7 +280,7 @@ static void *nft_get_data(struct nft_xt_ctx *ctx)
 	case NFPROTO_ARP:
 		return ctx->state.cs_arp;
 	case NFPROTO_BRIDGE:
-		return ctx->state.ebfw;
+		return ctx->state.cs_eb;
 	default:
 		/* Should not happen */
 		return NULL;
@@ -320,7 +320,7 @@ void nft_parse_target(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
 	ops->parse_target(target, data);
 }
 
-static void nft_parse_match(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
+void nft_parse_match(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
 {
 	uint32_t mt_len;
 	const char *mt_name = nft_rule_expr_get_str(e, NFT_EXPR_MT_NAME);

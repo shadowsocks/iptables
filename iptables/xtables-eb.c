@@ -31,9 +31,11 @@
 #include <netinet/ether.h>
 #include <xtables.h>
 
+#include <linux/netfilter_bridge.h>
 #include <ebtables/ethernetdb.h>
 #include "xshared.h"
 #include "nft.h"
+#include "nft-bridge.h"
 
 extern struct xtables_globals xtables_globals;
 #define prog_name xtables_globals.program_name
@@ -213,16 +215,16 @@ static int
 append_entry(struct nft_handle *h,
 	     const char *chain,
 	     const char *table,
-	     struct xtables_ebt_entry *fw,
+	     struct ebtables_command_state *cs,
 	     int rule_nr,
 	     bool verbose, bool append)
 {
 	int ret = 1;
 
 	if (append)
-		ret = nft_rule_append(h, chain, table, fw, 0, verbose);
+		ret = nft_rule_append(h, chain, table, cs, 0, verbose);
 	else
-		ret = nft_rule_insert(h, chain, table, fw, rule_nr, verbose);
+		ret = nft_rule_insert(h, chain, table, cs, rule_nr, verbose);
 
 	return ret;
 }
@@ -231,7 +233,7 @@ static int
 delete_entry(struct nft_handle *h,
 	     const char *chain,
 	     const char *table,
-	     struct xtables_ebt_entry *fw,
+	     struct ebtables_command_state *cs,
 	     int rule_nr,
 	     int rule_nr_end,
 	     bool verbose)
@@ -239,7 +241,7 @@ delete_entry(struct nft_handle *h,
 	int ret = 1;
 
 	if (rule_nr == -1)
-		ret = nft_rule_delete(h, chain, table, fw, verbose);
+		ret = nft_rule_delete(h, chain, table, cs, verbose);
 	else {
 		do {
 			ret = nft_rule_delete_num(h, chain, table,
@@ -342,7 +344,7 @@ static struct option *ebt_options = ebt_original_options;
 /*
  * More glue code.
  */
-static struct xtables_target *command_jump(struct xtables_ebt_entry *fw,
+static struct xtables_target *command_jump(struct ebtables_command_state *cs,
 					   const char *jumpto)
 {
 	struct xtables_target *target;
@@ -490,7 +492,7 @@ static int parse_rule_range(const char *argv, int *rule_nr, int *rule_nr_end)
 /* Incrementing or decrementing rules in daemon mode is not supported as the
  * involved code overload is not worth it (too annoying to take the increased
  * counters in the kernel into account). */
-static int parse_change_counters_rule(int argc, char **argv, int *rule_nr, int *rule_nr_end, int exec_style, struct xtables_ebt_entry *fw)
+static int parse_change_counters_rule(int argc, char **argv, int *rule_nr, int *rule_nr_end, int exec_style, struct ebtables_command_state *cs)
 {
 	char *buffer;
 	int ret = 0;
@@ -515,16 +517,16 @@ daemon_incr:
 			xtables_error(PARAMETER_PROBLEM,
 				      "Incrementing rule counters (%s) not allowed in daemon mode", argv[optind]);
 		ret += 1;
-		fw->counters.pcnt = strtoull(argv[optind] + 1, &buffer, 10);
+		cs->counters.pcnt = strtoull(argv[optind] + 1, &buffer, 10);
 	} else if (argv[optind][0] == '-') {
 		if (exec_style == EXEC_STYLE_DAEMON)
 daemon_decr:
 			xtables_error(PARAMETER_PROBLEM,
 				      "Decrementing rule counters (%s) not allowed in daemon mode", argv[optind]);
 		ret += 2;
-		fw->counters.pcnt = strtoull(argv[optind] + 1, &buffer, 10);
+		cs->counters.pcnt = strtoull(argv[optind] + 1, &buffer, 10);
 	} else
-		fw->counters.pcnt = strtoull(argv[optind], &buffer, 10);
+		cs->counters.pcnt = strtoull(argv[optind], &buffer, 10);
 
 	if (*buffer != '\0')
 		goto invalid;
@@ -533,14 +535,14 @@ daemon_decr:
 		if (exec_style == EXEC_STYLE_DAEMON)
 			goto daemon_incr;
 		ret += 3;
-		fw->counters.bcnt = strtoull(argv[optind] + 1, &buffer, 10);
+		cs->counters.bcnt = strtoull(argv[optind] + 1, &buffer, 10);
 	} else if (argv[optind][0] == '-') {
 		if (exec_style == EXEC_STYLE_DAEMON)
 			goto daemon_decr;
 		ret += 6;
-		fw->counters.bcnt = strtoull(argv[optind] + 1, &buffer, 10);
+		cs->counters.bcnt = strtoull(argv[optind] + 1, &buffer, 10);
 	} else
-		fw->counters.bcnt = strtoull(argv[optind], &buffer, 10);
+		cs->counters.bcnt = strtoull(argv[optind], &buffer, 10);
 
 	if (*buffer != '\0')
 		goto invalid;
@@ -577,7 +579,7 @@ int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table)
 	int ret = 0;
 	unsigned int flags = 0;
 	struct xtables_target *t;
-	struct xtables_ebt_entry fw;
+	struct ebtables_command_state cs;
 	char command = 'h';
 	const char *chain = NULL;
 	const char *newname = NULL;
@@ -585,7 +587,7 @@ int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table)
 	int exec_style = EXEC_STYLE_PRG;
 	int selected_chain = -1;
 
-	memset(&fw, 0, sizeof(fw));
+	memset(&cs, 0, sizeof(cs));
 
 	if (nft_init(h, xtables_bridge) < 0)
 		xtables_error(OTHER_PROBLEM,
@@ -651,7 +653,7 @@ int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table)
 							 "Problem with the specified rule number(s) '%s'", argv[optind]);
 				optind++;
 			} else if (c == 'C') {
-				if ((chcounter = parse_change_counters_rule(argc, argv, &rule_nr, &rule_nr_end, exec_style, &fw)) == -1)
+				if ((chcounter = parse_change_counters_rule(argc, argv, &rule_nr, &rule_nr_end, exec_style, &cs)) == -1)
 					return -1;
 			} else if (c == 'I') {
 				if (optind >= argc || (argv[optind][0] == '-' && (argv[optind][1] < '0' || argv[optind][1] > '9')))
@@ -748,7 +750,7 @@ print_zero:
 				struct ebt_u_watcher *w;*/
 
 				if (!strcasecmp("list_extensions", argv[optind])) {
-					ebt_list_extensions(xtables_targets, fw.matches);
+					ebt_list_extensions(xtables_targets, cs.matches);
 					exit(0);
 				}
 				/*if ((m = ebt_find_match(argv[optind])))
@@ -761,7 +763,7 @@ print_zero:
 					if (flags & OPT_JUMP)
 						xtables_error(PARAMETER_PROBLEM,"Sorry, you can only see help for one target extension at a time");
 					flags |= OPT_JUMP;
-					fw.target = t;
+					cs.target = t;
 				//}
 				optind++;
 			}
@@ -798,14 +800,14 @@ print_zero:
 					xtables_error(PARAMETER_PROBLEM,
 						      "Use -i only in INPUT, FORWARD, PREROUTING and BROUTING chains");
 				if (ebt_check_inverse2(optarg, argc, argv))
-					fw.invflags |= EBT_IIN;
+					cs.fw.invflags |= EBT_IIN;
 
 				if (strlen(optarg) >= IFNAMSIZ)
 big_iface_length:
 					xtables_error(PARAMETER_PROBLEM,
 						      "Interface name length cannot exceed %d characters",
 						      IFNAMSIZ - 1);
-				xtables_parse_interface(optarg, fw.in, fw.in_mask);
+				xtables_parse_interface(optarg, cs.fw.in, cs.fw.in_mask);
 				break;
 			} else if (c == 2) {
 				ebt_check_option2(&flags, OPT_LOGICALIN);
@@ -813,12 +815,12 @@ big_iface_length:
 					xtables_error(PARAMETER_PROBLEM,
 						      "Use --logical-in only in INPUT, FORWARD, PREROUTING and BROUTING chains");
 				if (ebt_check_inverse2(optarg, argc, argv))
-					fw.invflags |= EBT_ILOGICALIN;
+					cs.fw.invflags |= EBT_ILOGICALIN;
 
 				if (strlen(optarg) >= IFNAMSIZ)
 					goto big_iface_length;
-				strcpy(fw.logical_in, optarg);
-				if (parse_iface(fw.logical_in, "--logical-in"))
+				strcpy(cs.fw.logical_in, optarg);
+				if (parse_iface(cs.fw.logical_in, "--logical-in"))
 					return -1;
 				break;
 			} else if (c == 'o') {
@@ -827,12 +829,12 @@ big_iface_length:
 					xtables_error(PARAMETER_PROBLEM,
 						      "Use -o only in OUTPUT, FORWARD and POSTROUTING chains");
 				if (ebt_check_inverse2(optarg, argc, argv))
-					fw.invflags |= EBT_IOUT;
+					cs.fw.invflags |= EBT_IOUT;
 
 				if (strlen(optarg) >= IFNAMSIZ)
 					goto big_iface_length;
 
-				xtables_parse_interface(optarg, fw.out, fw.out_mask);
+				xtables_parse_interface(optarg, cs.fw.out, cs.fw.out_mask);
 				break;
 			} else if (c == 3) {
 				ebt_check_option2(&flags, OPT_LOGICALOUT);
@@ -840,36 +842,36 @@ big_iface_length:
 					xtables_error(PARAMETER_PROBLEM,
 						      "Use --logical-out only in OUTPUT, FORWARD and POSTROUTING chains");
 				if (ebt_check_inverse2(optarg, argc, argv))
-					fw.invflags |= EBT_ILOGICALOUT;
+					cs.fw.invflags |= EBT_ILOGICALOUT;
 
 				if (strlen(optarg) >= IFNAMSIZ)
 					goto big_iface_length;
-				strcpy(fw.logical_out, optarg);
-				if (parse_iface(fw.logical_out, "--logical-out"))
+				strcpy(cs.fw.logical_out, optarg);
+				if (parse_iface(cs.fw.logical_out, "--logical-out"))
 					return -1;
 				break;
 			} else if (c == 'j') {
 				ebt_check_option2(&flags, OPT_JUMP);
-				fw.jumpto = parse_target(optarg);
-				fw.target = command_jump(&fw, fw.jumpto);
+				cs.jumpto = parse_target(optarg);
+				cs.target = command_jump(&cs, cs.jumpto);
 				break;
 			} else if (c == 's') {
 				ebt_check_option2(&flags, OPT_SOURCE);
 				if (ebt_check_inverse2(optarg, argc, argv))
-					fw.invflags |= EBT_ISOURCE;
+					cs.fw.invflags |= EBT_ISOURCE;
 
-				if (ebt_get_mac_and_mask(optarg, fw.sourcemac, fw.sourcemsk))
+				if (ebt_get_mac_and_mask(optarg, cs.fw.sourcemac, cs.fw.sourcemsk))
 					xtables_error(PARAMETER_PROBLEM, "Problem with specified source mac '%s'", optarg);
-				fw.bitmask |= EBT_SOURCEMAC;
+				cs.fw.bitmask |= EBT_SOURCEMAC;
 				break;
 			} else if (c == 'd') {
 				ebt_check_option2(&flags, OPT_DEST);
 				if (ebt_check_inverse2(optarg, argc, argv))
-					fw.invflags |= EBT_IDEST;
+					cs.fw.invflags |= EBT_IDEST;
 
-				if (ebt_get_mac_and_mask(optarg, fw.destmac, fw.destmsk))
+				if (ebt_get_mac_and_mask(optarg, cs.fw.destmac, cs.fw.destmsk))
 					xtables_error(PARAMETER_PROBLEM, "Problem with specified destination mac '%s'", optarg);
-				fw.bitmask |= EBT_DESTMAC;
+				cs.fw.bitmask |= EBT_DESTMAC;
 				break;
 			} else if (c == 'c') {
 				ebt_check_option2(&flags, OPT_COUNT);
@@ -880,12 +882,12 @@ big_iface_length:
 					xtables_error(PARAMETER_PROBLEM,
 						      "Option -c needs 2 arguments");
 
-				fw.counters.pcnt = strtoull(optarg, &buffer, 10);
+				cs.counters.pcnt = strtoull(optarg, &buffer, 10);
 				if (*buffer != '\0')
 					xtables_error(PARAMETER_PROBLEM,
 						      "Packet counter '%s' invalid",
 						      optarg);
-				fw.counters.bcnt = strtoull(argv[optind], &buffer, 10);
+				cs.counters.bcnt = strtoull(argv[optind], &buffer, 10);
 				if (*buffer != '\0')
 					xtables_error(PARAMETER_PROBLEM,
 						      "Packet counter '%s' invalid",
@@ -895,9 +897,9 @@ big_iface_length:
 			}
 			ebt_check_option2(&flags, OPT_PROTOCOL);
 			if (ebt_check_inverse2(optarg, argc, argv))
-				fw.invflags |= EBT_IPROTO;
+				cs.fw.invflags |= EBT_IPROTO;
 
-			fw.bitmask &= ~((unsigned int)EBT_NOPROTO);
+			cs.fw.bitmask &= ~((unsigned int)EBT_NOPROTO);
 			i = strtol(optarg, &buffer, 16);
 			if (*buffer == '\0' && (i < 0 || i > 0xFFFF))
 				xtables_error(PARAMETER_PROBLEM,
@@ -906,18 +908,18 @@ big_iface_length:
 				struct ethertypeent *ent;
 
 				if (!strcasecmp(optarg, "LENGTH")) {
-					fw.bitmask |= EBT_802_3;
+					cs.fw.bitmask |= EBT_802_3;
 					break;
 				}
 				ent = getethertypebyname(optarg);
 				if (!ent)
 					xtables_error(PARAMETER_PROBLEM,
 						      "Problem with the specified Ethernet protocol '%s', perhaps "_PATH_ETHERTYPES " is missing", optarg);
-				fw.ethproto = ent->e_ethertype;
+				cs.fw.ethproto = ent->e_ethertype;
 			} else
-				fw.ethproto = i;
+				cs.fw.ethproto = i;
 
-			if (fw.ethproto < 0x0600)
+			if (cs.fw.ethproto < 0x0600)
 				xtables_error(PARAMETER_PROBLEM,
 					      "Sorry, protocols have values above or equal to 0x0600");
 			break;
@@ -1103,7 +1105,7 @@ check_extension: */
 		ebt_print_error2("Bad table name");*/
 
 	if (command == 'h' && !(flags & OPT_ZERO)) {
-		print_help(fw.target, fw.matches, *table);
+		print_help(cs.target, cs.matches, *table);
 		if (exec_style == EXEC_STYLE_PRG)
 			exit(0);
 	}
@@ -1142,7 +1144,7 @@ check_extension: */
 	}*/
 	/* So, the extensions can work with the host endian.
 	 * The kernel does not have to do this of course */
-	fw.ethproto = htons(fw.ethproto);
+	cs.fw.ethproto = htons(cs.fw.ethproto);
 
 	if (command == 'P') {
 		if (selected_chain < NF_BR_NUMHOOKS && strcmp(policy, "RETURN")==0)
@@ -1166,13 +1168,13 @@ check_extension: */
 	} else if (command == 'F') {
 		ret = nft_rule_flush(h, chain, *table);
 	} else if (command == 'A') {
-		ret = append_entry(h, chain, *table, &fw, 0,
+		ret = append_entry(h, chain, *table, &cs, 0,
 				   flags&OPT_VERBOSE, true);
 	} else if (command == 'I') {
-		ret = append_entry(h, chain, *table, &fw, rule_nr - 1,
+		ret = append_entry(h, chain, *table, &cs, rule_nr - 1,
 				   flags&OPT_VERBOSE, false);
 	} else if (command == 'D') {
-		ret = delete_entry(h, chain, *table, &fw, rule_nr - 1,
+		ret = delete_entry(h, chain, *table, &cs, rule_nr - 1,
 				   rule_nr_end, flags&OPT_VERBOSE);
 	} /*else if (replace->command == 'C') {
 		ebt_change_counters(replace, new_entry, rule_nr, rule_nr_end, &(new_entry->cnt_surplus), chcounter);

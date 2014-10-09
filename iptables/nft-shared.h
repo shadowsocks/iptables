@@ -48,7 +48,7 @@ struct nft_xt_ctx {
 	union {
 		struct iptables_command_state *cs;
 		struct arptables_command_state *cs_arp;
-		struct xtables_ebt_entry *ebfw;
+		struct ebtables_command_state *cs_eb;
 	} state;
 	struct nft_rule_expr_iter *iter;
 	int family;
@@ -130,6 +130,7 @@ void print_proto(uint16_t proto, int invert);
 void get_cmp_data(struct nft_rule_expr *e, void *data, size_t dlen, bool *inv);
 void nft_parse_bitwise(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
 void nft_parse_cmp(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
+void nft_parse_match(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
 void nft_parse_target(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
 void nft_parse_meta(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
 void nft_parse_payload(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);

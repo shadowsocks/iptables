@@ -83,5 +83,8 @@ int xtables_eb_main(int argc, char *argv[])
 	if (ret)
 		ret = nft_commit(&h);
 
+	if (!ret)
+		fprintf(stderr, "%s\n", nft_strerror(errno));
+
 	exit(!ret);
 }

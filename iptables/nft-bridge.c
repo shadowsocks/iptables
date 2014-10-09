@@ -18,11 +18,13 @@
 #include <ebtables/ethernetdb.h>
 
 #include "nft-shared.h"
+#include "nft-bridge.h"
 #include "nft.h"
 
 /* 0: default, print only 2 digits if necessary
  * 2: always print 2 digits, a printed mac address
- * then always has the same length */
+ * then always has the same length
+ */
 int ebt_printstyle_mac;
 
 static void ebt_print_mac(const unsigned char *mac)
@@ -132,31 +134,36 @@ static void add_logical_outiface(struct nft_rule *r, char *iface, int invflags)
 		add_cmp_ptr(r, op, iface, iface_len + 1);
 }
 
-static int _add_action(struct nft_rule *r, struct xtables_ebt_entry *fw)
+/* TODO: Use generic add_action() once we convert this to use
+ * iptables_command_state.
+ */
+static int _add_action(struct nft_rule *r, struct ebtables_command_state *cs)
 {
 	int ret = 0;
 
-       /* If no target at all, add nothing (default to continue) */
-       if (fw->target != NULL) {
-	       /* Standard target? */
-	       if (strcmp(fw->jumpto, XTC_LABEL_ACCEPT) == 0)
-		       ret = add_verdict(r, NF_ACCEPT);
-	       else if (strcmp(fw->jumpto, XTC_LABEL_DROP) == 0)
-		       ret = add_verdict(r, NF_DROP);
-	       else if (strcmp(fw->jumpto, XTC_LABEL_RETURN) == 0)
-		       ret = add_verdict(r, NFT_RETURN);
-	       else
-		       ret = add_target(r, fw->target->t);
-       } else if (strlen(fw->jumpto) > 0)
+	/* If no target at all, add nothing (default to continue) */
+	if (cs->target != NULL) {
+		/* Standard target? */
+		if (strcmp(cs->jumpto, XTC_LABEL_ACCEPT) == 0)
+			ret = add_verdict(r, NF_ACCEPT);
+		else if (strcmp(cs->jumpto, XTC_LABEL_DROP) == 0)
+			ret = add_verdict(r, NF_DROP);
+		else if (strcmp(cs->jumpto, XTC_LABEL_RETURN) == 0)
+			ret = add_verdict(r, NFT_RETURN);
+		else
+			ret = add_target(r, cs->target->t);
+	} else if (strlen(cs->jumpto) > 0) {
 		/* Not standard, then it's a jump to chain */
-		ret = add_jumpto(r, fw->jumpto, NFT_JUMP);
+		ret = add_jumpto(r, cs->jumpto, NFT_JUMP);
+	}
 
-       return ret;
+	return ret;
 }
 
 static int nft_bridge_add(struct nft_rule *r, void *data)
 {
-	struct xtables_ebt_entry *fw = data;
+	struct ebtables_command_state *cs = data;
+	struct ebt_entry *fw = &cs->fw;
 	uint8_t flags = ebt_to_ipt_flags(fw->invflags);
 	char *addr;
 
@@ -189,13 +196,14 @@ static int nft_bridge_add(struct nft_rule *r, void *data)
 		add_cmp_u16(r, fw->ethproto, NFT_CMP_EQ);
 	}
 
-	return _add_action(r, fw);
+	return _add_action(r, cs);
 }
 
 static void nft_bridge_parse_meta(struct nft_xt_ctx *ctx,
 				  struct nft_rule_expr *e, void *data)
 {
-	struct xtables_ebt_entry *fw = data;
+	struct ebtables_command_state *cs = data;
+	struct ebt_entry *fw = &cs->fw;
 	uint8_t flags = 0;
 	int iface = 0;
 	const void *ifname;
@@ -214,7 +222,7 @@ static void nft_bridge_parse_meta(struct nft_xt_ctx *ctx,
 
 		memcpy(fw->logical_in, ifname, len);
 
-		if (fw->logical_in[len] == '\0') 
+		if (fw->logical_in[len] == '\0')
 			memset(fw->in_mask, 0xff, len);
 		else {
 			fw->logical_in[len] = '+';
@@ -248,7 +256,8 @@ out:
 static void nft_bridge_parse_payload(struct nft_xt_ctx *ctx,
 				     struct nft_rule_expr *e, void *data)
 {
-	struct xtables_ebt_entry *fw = data;
+	struct ebtables_command_state *cs = data;
+	struct ebt_entry *fw = &cs->fw;
 	unsigned char addr[ETH_ALEN];
 	unsigned short int ethproto;
 	bool inv;
@@ -271,28 +280,30 @@ static void nft_bridge_parse_payload(struct nft_xt_ctx *ctx,
 		break;
 	}
 }
+
 static void nft_bridge_parse_immediate(const char *jumpto, bool nft_goto,
 				       void *data)
 {
-	struct xtables_ebt_entry *fw = data;
+	struct ebtables_command_state *cs = data;
 
-	fw->jumpto = jumpto;
+	cs->jumpto = jumpto;
 }
 
 static void nft_bridge_parse_target(struct xtables_target *t, void *data)
 {
-	struct xtables_ebt_entry *fw = data;
+	struct ebtables_command_state *cs = data;
 
-	fw->target = t;
+	cs->target = t;
 }
 
-void nft_rule_to_xtables_ebt_entry(struct nft_rule *r, struct xtables_ebt_entry *fw)
+void nft_rule_to_ebtables_command_state(struct nft_rule *r,
+					struct ebtables_command_state *cs)
 {
 	struct nft_rule_expr_iter *iter;
 	struct nft_rule_expr *expr;
 	int family = nft_rule_attr_get_u32(r, NFT_RULE_ATTR_FAMILY);
 	struct nft_xt_ctx ctx = {
-		.state.ebfw = fw,
+		.state.cs_eb = cs,
 		.family = family,
 	};
 
@@ -306,15 +317,19 @@ void nft_rule_to_xtables_ebt_entry(struct nft_rule *r, struct xtables_ebt_entry 
 			nft_rule_expr_get_str(expr, NFT_RULE_EXPR_ATTR_NAME);
 
 		if (strcmp(name, "counter") == 0)
-			nft_parse_counter(expr, &fw->counters);
+			nft_parse_counter(expr, &cs->counters);
 		else if (strcmp(name, "payload") == 0)
 			nft_parse_payload(&ctx, expr);
 		else if (strcmp(name, "meta") == 0)
 			nft_parse_meta(&ctx, expr);
+                else if (strcmp(name, "bitwise") == 0)
+                        nft_parse_bitwise(&ctx, expr);
 		else if (strcmp(name, "cmp") == 0)
 			nft_parse_cmp(&ctx, expr);
 		else if (strcmp(name, "immediate") == 0)
 			nft_parse_immediate(&ctx, expr);
+		else if (strcmp(name, "match") == 0)
+			nft_parse_match(&ctx, expr);
 		else if (strcmp(name, "target") == 0)
 			nft_parse_target(&ctx, expr);
 
@@ -323,12 +338,12 @@ void nft_rule_to_xtables_ebt_entry(struct nft_rule *r, struct xtables_ebt_entry 
 
 	nft_rule_expr_iter_destroy(iter);
 
-	if (fw->target != NULL)
-		fw->jumpto = fw->target->name;
-	else if (fw->jumpto != NULL)
-		fw->target = xtables_find_target(fw->jumpto, XTF_TRY_LOAD);
+	if (cs->target != NULL)
+		cs->jumpto = cs->target->name;
+	else if (cs->jumpto != NULL)
+		cs->target = xtables_find_target(cs->jumpto, XTF_TRY_LOAD);
 	else
-		fw->jumpto = "";
+		cs->jumpto = "";
 }
 
 static void print_iface(const char *iface)
@@ -351,81 +366,80 @@ static void nft_bridge_print_header(unsigned int format, const char *chain,
 	print_header(format, chain, pol, counters, basechain, refs);
 }
 
-static void
-nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
-		       unsigned int format)
+static void nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
+				      unsigned int format)
 {
-	struct xtables_ebt_entry fw = {};
+	struct ebtables_command_state cs = {};
 	char *addr;
 
-	nft_rule_to_xtables_ebt_entry(r, &fw);
+	nft_rule_to_ebtables_command_state(r, &cs);
 
 	if (format & FMT_LINENUMBERS)
 		printf("%d ", num);
 
 	/* Dont print anything about the protocol if no protocol was
 	 * specified, obviously this means any protocol will do. */
-	if (fw.ethproto != 0) {
+	if (cs.fw.ethproto != 0) {
 		printf("-p ");
-		if (fw.invflags & EBT_IPROTO)
+		if (cs.fw.invflags & EBT_IPROTO)
 			printf("! ");
-		if (fw.bitmask & EBT_802_3)
+		if (cs.fw.bitmask & EBT_802_3)
 			printf("Length ");
 		else {
 			struct ethertypeent *ent;
 
-			ent = getethertypebynumber(ntohs(fw.ethproto));
+			ent = getethertypebynumber(ntohs(cs.fw.ethproto));
 			if (!ent)
-				printf("0x%x ", ntohs(fw.ethproto));
+				printf("0x%x ", ntohs(cs.fw.ethproto));
 			else
 				printf("%s ", ent->e_name);
 		}
 	}
 
-	addr = ether_ntoa((struct ether_addr *) fw.sourcemac);
+	addr = ether_ntoa((struct ether_addr *) cs.fw.sourcemac);
 	if (strcmp(addr, "0:0:0:0:0:0") != 0) {
 		printf("-s ");
-		if (fw.invflags & EBT_ISOURCE)
+		if (cs.fw.invflags & EBT_ISOURCE)
 			printf("! ");
-		ebt_print_mac_and_mask(fw.sourcemac, fw.sourcemsk);
+		ebt_print_mac_and_mask(cs.fw.sourcemac, cs.fw.sourcemsk);
 		printf(" ");
 	}
 
-	addr = ether_ntoa((struct ether_addr *) fw.destmac);
+	addr = ether_ntoa((struct ether_addr *) cs.fw.destmac);
 	if (strcmp(addr, "0:0:0:0:0:0") != 0) {
 		printf("-d ");
-		if (fw.invflags & EBT_IDEST)
+		if (cs.fw.invflags & EBT_IDEST)
 			printf("! ");
-		ebt_print_mac_and_mask(fw.destmac, fw.destmsk);
+		ebt_print_mac_and_mask(cs.fw.destmac, cs.fw.destmsk);
 		printf(" ");
 	}
 
-	if (fw.in[0] != '\0') {
+	if (cs.fw.in[0] != '\0') {
 		printf("-i ");
-		if (fw.invflags & EBT_IIN)
+		if (cs.fw.invflags & EBT_IIN)
 			printf("! ");
-		print_iface(fw.in);
+		print_iface(cs.fw.in);
 	}
 
-	if (fw.logical_in[0] != '\0') {
+	if (cs.fw.logical_in[0] != '\0') {
 		printf("--logical-in ");
-		if (fw.invflags & EBT_ILOGICALIN)
+		if (cs.fw.invflags & EBT_ILOGICALIN)
 			printf("! ");
-		print_iface(fw.logical_in);
+		print_iface(cs.fw.logical_in);
 	}
 
-	if (fw.logical_out[0] != '\0') {
+	if (cs.fw.logical_out[0] != '\0') {
 		printf("--logical-out ");
-		if (fw.invflags & EBT_ILOGICALOUT)
+		if (cs.fw.invflags & EBT_ILOGICALOUT)
 			printf("! ");
-		print_iface(fw.logical_out);
+		print_iface(cs.fw.logical_out);
 	}
 
-	if (fw.out[0] != '\0') {
+	if (cs.fw.out[0] != '\0') {
 		printf("-o ");
-		if (fw.invflags & EBT_IOUT)
+		if (cs.fw.invflags & EBT_IOUT)
 			printf("! ");
-		print_iface(fw.out);
+		print_iface(cs.fw.out);
 	}
 
 	/* old code to adapt
@@ -447,12 +461,12 @@ nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
 	}*/
 	printf("-j ");
 	if (!(format & FMT_NOTARGET))
-		printf("%s", fw.jumpto);
+		printf("%s", cs.jumpto);
 
-	if (fw.target != NULL) {
-		if (fw.target->print != NULL) {
-			fw.target->print(&fw, fw.target->t,
-					 format & FMT_NUMERIC);
+	if (cs.target != NULL) {
+		if (cs.target->print != NULL) {
+			cs.target->print(&cs.fw, cs.target->t,
+					    format & FMT_NUMERIC);
 		}
 	}
 
@@ -460,16 +474,15 @@ nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
 		fputc('\n', stdout);
 }
 
-static bool nft_bridge_is_same(const void *data_a,
-			       const void *data_b)
+static bool nft_bridge_is_same(const void *data_a, const void *data_b)
 {
-	const struct xtables_ebt_entry *a = data_a;
-	const struct xtables_ebt_entry *b = data_b;
+	const struct ebt_entry *a = data_a;
+	const struct ebt_entry *b = data_b;
 	int i;
 
-	if (a->ethproto != b->ethproto
-	    /*|| a->flags != b->flags*/
-	    || a->invflags != b->invflags) {
+	if (a->ethproto != b->ethproto ||
+	    /* FIXME: a->flags != b->flags || */
+	    a->invflags != b->invflags) {
 		DEBUGP("different proto/flags/invflags\n");
 		return false;
 	}
@@ -515,27 +528,27 @@ static bool nft_bridge_is_same(const void *data_a,
 static bool nft_bridge_rule_find(struct nft_family_ops *ops, struct nft_rule *r,
 				 void *data)
 {
-	struct xtables_ebt_entry *fw = data;
-	struct xtables_ebt_entry this = {};
+	struct ebtables_command_state *cs = data;
+	struct ebtables_command_state this = {};
 
-	nft_rule_to_xtables_ebt_entry(r, &this);
+	nft_rule_to_ebtables_command_state(r, &this);
 
 	DEBUGP("comparing with... ");
 
-	if (!ops->is_same(fw, &this))
+	if (!nft_bridge_is_same(cs, &this))
 		return false;
 
-	if (!compare_matches(fw->matches, this.matches)) {
+	if (!compare_matches(cs->matches, this.matches)) {
 		DEBUGP("Different matches\n");
 		return false;
 	}
 
-	if (!compare_targets(fw->target, this.target)) {
+	if (!compare_targets(cs->target, this.target)) {
 		DEBUGP("Different target\n");
 		return false;
 	}
 
-	if (strcmp(fw->jumpto, this.jumpto) != 0) {
+	if (strcmp(cs->jumpto, this.jumpto) != 0) {
 		DEBUGP("Different verdict\n");
 		return false;
 	}
@@ -550,9 +563,11 @@ struct nft_family_ops nft_family_ops_bridge = {
 	.parse_meta		= nft_bridge_parse_meta,
 	.parse_payload		= nft_bridge_parse_payload,
 	.parse_immediate	= nft_bridge_parse_immediate,
+	.parse_target		= nft_bridge_parse_target,
 	.print_header		= nft_bridge_print_header,
 	.print_firewall		= nft_bridge_print_firewall,
+	.save_firewall		= NULL,
+	.save_counters		= NULL,
 	.post_parse		= NULL,
 	.rule_find		= nft_bridge_rule_find,
-	.parse_target		= nft_bridge_parse_target,
 };
