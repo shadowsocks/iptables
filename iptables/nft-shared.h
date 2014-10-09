@@ -48,6 +48,7 @@ struct nft_xt_ctx {
 	union {
 		struct iptables_command_state *cs;
 		struct arptables_command_state *cs_arp;
+		struct xtables_ebt_entry *ebfw;
 	} state;
 	struct nft_rule_expr_iter *iter;
 	int family;
@@ -122,7 +123,7 @@ bool is_same_interfaces(const char *a_iniface, const char *a_outiface,
 			unsigned const char *b_iniface_mask,
 			unsigned const char *b_outiface_mask);
 
-void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
+int parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 		unsigned char *iniface_mask, char *outiface,
 		unsigned char *outiface_mask, uint8_t *invflags);
 void print_proto(uint16_t proto, int invert);
@@ -165,6 +166,7 @@ struct nft_handle;
 bool nft_ipv46_rule_find(struct nft_family_ops *ops, struct nft_rule *r,
 			 struct iptables_command_state *cs);
 
+bool compare_matches(struct xtables_rule_match *mt1, struct xtables_rule_match *mt2);
 bool compare_targets(struct xtables_target *tg1, struct xtables_target *tg2);
 
 struct addr_mask {
