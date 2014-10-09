@@ -82,6 +82,11 @@ struct nft_family_ops {
 	void (*parse_cmp)(struct nft_xt_ctx *ctx, struct nft_rule_expr *e,
 			  void *data);
 	void (*parse_immediate)(const char *jumpto, bool nft_goto, void *data);
+
+	void (*print_header)(unsigned int format, const char *chain,
+			     const char *pol,
+			     const struct xt_counters *counters, bool basechain,
+			     uint32_t refs);
 	void (*print_firewall)(struct nft_rule *r, unsigned int num,
 			       unsigned int format);
 	void (*save_firewall)(const void *data, unsigned int format);
@@ -131,6 +136,9 @@ void nft_parse_counter(struct nft_rule_expr *e, struct xt_counters *counters);
 void nft_parse_immediate(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
 void nft_rule_to_iptables_command_state(struct nft_rule *r,
 					struct iptables_command_state *cs);
+void print_header(unsigned int format, const char *chain, const char *pol,
+		  const struct xt_counters *counters, bool basechain,
+		  uint32_t refs);
 void print_firewall_details(const struct iptables_command_state *cs,
 			    const char *targname, uint8_t flags,
 			    uint8_t invflags, uint8_t proto,

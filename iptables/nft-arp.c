@@ -414,6 +414,27 @@ void nft_rule_to_arptables_command_state(struct nft_rule *r,
 		cs->jumpto = "";
 }
 
+static void nft_arp_print_header(unsigned int format, const char *chain,
+				 const char *pol,
+				 const struct xt_counters *counters,
+				 bool basechain, uint32_t refs)
+{
+	printf("Chain %s", chain);
+	if (pol) {
+		printf(" (policy %s", pol);
+		if (!(format & FMT_NOCOUNTS)) {
+			fputc(' ', stdout);
+			xtables_print_num(counters->pcnt, (format|FMT_NOTABLE));
+			fputs("packets, ", stdout);
+			xtables_print_num(counters->bcnt, (format|FMT_NOTABLE));
+			fputs("bytes", stdout);
+		}
+		printf(")\n");
+	} else {
+		printf(" (%u references)\n", refs);
+	}
+}
+
 static void print_fw_details(struct arpt_entry *fw, unsigned int format)
 {
 	char buf[BUFSIZ];
@@ -669,6 +690,7 @@ struct nft_family_ops nft_family_ops_arp = {
 	.parse_meta		= nft_arp_parse_meta,
 	.parse_payload		= nft_arp_parse_payload,
 	.parse_immediate	= nft_arp_parse_immediate,
+	.print_header		= nft_arp_print_header,
 	.print_firewall		= nft_arp_print_firewall,
 	.save_firewall		= nft_arp_save_firewall,
 	.save_counters		= nft_arp_save_counters,

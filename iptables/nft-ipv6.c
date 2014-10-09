@@ -158,6 +158,14 @@ static void nft_ipv6_parse_immediate(const char *jumpto, bool nft_goto,
 		cs->fw6.ipv6.flags |= IP6T_F_GOTO;
 }
 
+static void nft_ipv6_print_header(unsigned int format, const char *chain,
+				  const char *pol,
+				  const struct xt_counters *counters,
+				  bool basechain, uint32_t refs)
+{
+	print_header(format, chain, pol, counters, basechain, refs);
+}
+
 static void print_ipv6_addr(const struct iptables_command_state *cs,
 			    unsigned int format)
 {
@@ -360,6 +368,7 @@ struct nft_family_ops nft_family_ops_ipv6 = {
 	.parse_meta		= nft_ipv6_parse_meta,
 	.parse_payload		= nft_ipv6_parse_payload,
 	.parse_immediate	= nft_ipv6_parse_immediate,
+	.print_header		= nft_ipv6_print_header,
 	.print_firewall		= nft_ipv6_print_firewall,
 	.save_firewall		= nft_ipv6_save_firewall,
 	.save_counters		= nft_ipv6_save_counters,

@@ -1871,50 +1871,6 @@ int nft_rule_replace(struct nft_handle *h, const char *chain,
 	return ret;
 }
 
-static void
-print_header(unsigned int format, const char *chain, const char *pol,
-	     const struct xt_counters *counters, bool basechain, uint32_t refs)
-{
-	printf("Chain %s", chain);
-	if (basechain) {
-		printf(" (policy %s", pol);
-		if (!(format & FMT_NOCOUNTS)) {
-			fputc(' ', stdout);
-			xtables_print_num(counters->pcnt, (format|FMT_NOTABLE));
-			fputs("packets, ", stdout);
-			xtables_print_num(counters->bcnt, (format|FMT_NOTABLE));
-			fputs("bytes", stdout);
-		}
-		printf(")\n");
-	} else {
-		printf(" (%u references)\n", refs);
-	}
-
-	if (format & FMT_LINENUMBERS)
-		printf(FMT("%-4s ", "%s "), "num");
-	if (!(format & FMT_NOCOUNTS)) {
-		if (format & FMT_KILOMEGAGIGA) {
-			printf(FMT("%5s ","%s "), "pkts");
-			printf(FMT("%5s ","%s "), "bytes");
-		} else {
-			printf(FMT("%8s ","%s "), "pkts");
-			printf(FMT("%10s ","%s "), "bytes");
-		}
-	}
-	if (!(format & FMT_NOTARGET))
-		printf(FMT("%-9s ","%s "), "target");
-	fputs(" prot ", stdout);
-	if (format & FMT_OPTIONS)
-		fputs("opt", stdout);
-	if (format & FMT_VIA) {
-		printf(FMT(" %-6s ","%s "), "in");
-		printf(FMT("%-6s ","%s "), "out");
-	}
-	printf(FMT(" %-19s ","%s "), "source");
-	printf(FMT(" %-19s "," %s "), "destination");
-	printf("\n");
-}
-
 static int
 __nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 		int rulenum, unsigned int format,
@@ -2026,8 +1982,8 @@ int nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 		if (found)
 			printf("\n");
 
-		print_header(format, chain_name, policy_name[policy],
-				     &ctrs, basechain, refs);
+		ops->print_header(format, chain_name, policy_name[policy],
+				  &ctrs, basechain, refs);
 
 		__nft_rule_list(h, chain_name, table,
 				rulenum, format, ops->print_firewall);

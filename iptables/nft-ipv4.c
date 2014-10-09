@@ -221,6 +221,14 @@ static void nft_ipv4_parse_immediate(const char *jumpto, bool nft_goto,
 		cs->fw.ip.flags |= IPT_F_GOTO;
 }
 
+static void nft_ipv4_print_header(unsigned int format, const char *chain,
+				  const char *pol,
+				  const struct xt_counters *counters,
+				  bool basechain, uint32_t refs)
+{
+	print_header(format, chain, pol, counters, basechain, refs);
+}
+
 static void print_ipv4_addr(const struct iptables_command_state *cs,
 			    unsigned int format)
 {
@@ -415,6 +423,7 @@ struct nft_family_ops nft_family_ops_ipv4 = {
 	.parse_meta		= nft_ipv4_parse_meta,
 	.parse_payload		= nft_ipv4_parse_payload,
 	.parse_immediate	= nft_ipv4_parse_immediate,
+	.print_header		= nft_ipv4_print_header,
 	.print_firewall		= nft_ipv4_print_firewall,
 	.save_firewall		= nft_ipv4_save_firewall,
 	.save_counters		= nft_ipv4_save_counters,
