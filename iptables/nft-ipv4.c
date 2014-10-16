@@ -205,7 +205,7 @@ static void nft_ipv4_parse_payload(struct nft_xt_ctx *ctx,
 			cs->fw.ip.invflags |= IPT_INV_FRAG;
 		break;
 	default:
-		DEBUGP("unknown payload offset %d\n", offset);
+		DEBUGP("unknown payload offset %d\n", ctx->payload.offset);
 		break;
 	}
 }

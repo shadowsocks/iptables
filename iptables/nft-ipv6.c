@@ -142,7 +142,7 @@ static void nft_ipv6_parse_payload(struct nft_xt_ctx *ctx,
 		if (inv)
 			cs->fw6.ipv6.invflags |= IPT_INV_PROTO;
 	default:
-		DEBUGP("unknown payload offset %d\n", offset);
+		DEBUGP("unknown payload offset %d\n", ctx->payload.offset);
 		break;
 	}
 }
