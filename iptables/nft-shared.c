@@ -440,7 +440,7 @@ void nft_parse_cmp(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
 	if (ctx->flags & NFT_XT_CTX_META)
 		ops->parse_meta(ctx, e, data);
 	/* bitwise context is interpreted from payload */
-	if (ctx->flags & NFT_XT_CTX_PAYLOAD);
+	if (ctx->flags & NFT_XT_CTX_PAYLOAD)
 		ops->parse_payload(ctx, e, data);
 }
 
