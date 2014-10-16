@@ -84,6 +84,7 @@ struct nft_family_ops {
 			  void *data);
 	void (*parse_immediate)(const char *jumpto, bool nft_goto, void *data);
 
+	void (*print_table_header)(const char *tablename);
 	void (*print_header)(unsigned int format, const char *chain,
 			     const char *pol,
 			     const struct xt_counters *counters, bool basechain,

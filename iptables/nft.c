@@ -2019,6 +2019,9 @@ int nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 	if (iter == NULL)
 		goto err;
 
+	if (ops->print_table_header)
+		ops->print_table_header(table);
+
 	c = nft_chain_list_iter_next(iter);
 	while (c != NULL) {
 		const char *chain_table =

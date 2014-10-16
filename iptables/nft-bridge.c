@@ -357,13 +357,17 @@ static void print_iface(const char *iface)
 		*c = IF_WILDCARD;
 }
 
+static void nft_bridge_print_table_header(const char *tablename)
+{
+	printf("Bridge table: %s\n\n", tablename);
+}
+
 static void nft_bridge_print_header(unsigned int format, const char *chain,
 				    const char *pol,
 				    const struct xt_counters *counters,
 				    bool basechain, uint32_t refs)
 {
-	/* FIXME: Giuseppe replace this with ebtables format */
-	print_header(format, chain, pol, counters, basechain, refs);
+	printf("Bridge chain: %s, entries: %u, policy: %s\n", chain, refs, pol);
 }
 
 static void nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
@@ -564,6 +568,7 @@ struct nft_family_ops nft_family_ops_bridge = {
 	.parse_payload		= nft_bridge_parse_payload,
 	.parse_immediate	= nft_bridge_parse_immediate,
 	.parse_target		= nft_bridge_parse_target,
+	.print_table_header	= nft_bridge_print_table_header,
 	.print_header		= nft_bridge_print_header,
 	.print_firewall		= nft_bridge_print_firewall,
 	.save_firewall		= NULL,
