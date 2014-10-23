@@ -620,11 +620,17 @@ __nft_chain_builtin_init(struct nft_handle *h,
 			 int policy)
 {
 	int i, default_policy;
+	struct nft_chain_list *list = nft_chain_dump(h);
+	struct nft_chain *c;
 
-	/* Initialize all built-in chains. Exception, for e one received as
-	 * parameter, set the default policy as requested.
-	 */
+	/* Initialize built-in chains if they don't exist yet */
 	for (i=0; i<NF_IP_NUMHOOKS && table->chains[i].name != NULL; i++) {
+
+		c = nft_chain_list_find(list, table->name,
+					table->chains[i].name);
+		if (c != NULL)
+			continue;
+
 		if (chain && strcmp(table->chains[i].name, chain) == 0)
 			default_policy = policy;
 		else
@@ -633,6 +639,8 @@ __nft_chain_builtin_init(struct nft_handle *h,
 		nft_chain_builtin_add(h, table, &table->chains[i],
 					default_policy);
 	}
+
+	nft_chain_list_free(list);
 }
 
 int
