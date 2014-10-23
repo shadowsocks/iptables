@@ -518,7 +518,7 @@ static int nft_table_builtin_add(struct nft_handle *h,
 	return ret;
 }
 
-struct nft_chain *
+static struct nft_chain *
 nft_chain_builtin_alloc(struct builtin_table *table,
 			struct builtin_chain *chain, int policy)
 {
@@ -561,8 +561,9 @@ int nft_chain_add(struct nft_handle *h, struct nft_chain *c, uint16_t flags)
 	return mnl_talk(h, nlh, NULL, NULL);
 }
 
-void nft_chain_builtin_add(struct nft_handle *h, struct builtin_table *table,
-			   struct builtin_chain *chain, int policy)
+static void nft_chain_builtin_add(struct nft_handle *h,
+				  struct builtin_table *table,
+				  struct builtin_chain *chain, int policy)
 {
 	struct nft_chain *c;
 
@@ -577,7 +578,7 @@ void nft_chain_builtin_add(struct nft_handle *h, struct builtin_table *table,
 }
 
 /* find if built-in table already exists */
-struct builtin_table *
+static struct builtin_table *
 nft_table_builtin_find(struct nft_handle *h, const char *table)
 {
 	int i;
@@ -598,7 +599,7 @@ nft_table_builtin_find(struct nft_handle *h, const char *table)
 }
 
 /* find if built-in chain already exists */
-struct builtin_chain *
+static struct builtin_chain *
 nft_chain_builtin_find(struct builtin_table *t, const char *chain)
 {
 	int i;
@@ -643,9 +644,8 @@ __nft_chain_builtin_init(struct nft_handle *h,
 	nft_chain_list_free(list);
 }
 
-int
-nft_chain_builtin_init(struct nft_handle *h, const char *table,
-		       const char *chain, int policy)
+static int nft_chain_builtin_init(struct nft_handle *h, const char *table,
+				  const char *chain, int policy)
 {
 	int ret = 0;
 	struct builtin_table *t;
