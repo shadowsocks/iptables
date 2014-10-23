@@ -1937,8 +1937,14 @@ int nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 	bool found = false;
 
 	/* If built-in chains don't exist for this table, create them */
-	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0)
+	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0) {
 		nft_xt_builtin_init(h, table);
+		/* Force table and chain creation, otherwise first iptables -L
+		 * lists no table/chains.
+		 */
+		if (!list_empty(&h->obj_list))
+			nft_commit(h);
+	}
 
 	ops = nft_family_ops_lookup(h->family);
 
