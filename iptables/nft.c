@@ -1298,6 +1298,8 @@ int nft_chain_user_add(struct nft_handle *h, const char *chain, const char *tabl
 	struct nft_chain *c;
 	int ret;
 
+	nft_fn = nft_chain_user_add;
+
 	/* If built-in chains don't exist for this table, create them */
 	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0)
 		nft_xt_builtin_init(h, table);
@@ -2350,10 +2352,12 @@ const char *nft_strerror(int err)
 	  {
 	    { nft_chain_user_del, ENOTEMPTY, "Chain is not empty" },
 	    { nft_chain_user_del, EINVAL, "Can't delete built-in chain" },
+	    { nft_chain_user_del, EBUSY, "Directory not empty" },
 	    { nft_chain_user_del, EMLINK,
 	      "Can't delete chain with references left" },
 	    { nft_chain_user_add, EEXIST, "Chain already exists" },
 	    { nft_rule_add, E2BIG, "Index of insertion too big" },
+	    { nft_rule_check, ENOENT, "Bad rule (does a matching rule exist in that chain?)" },
 	    { nft_rule_replace, E2BIG, "Index of replacement too big" },
 	    { nft_rule_delete_num, E2BIG, "Index of deletion too big" },
 /*	    { TC_READ_COUNTER, E2BIG, "Index of counter too big" },
