@@ -124,7 +124,7 @@ static void devgroup_show(const char *pfx, const struct xt_devgroup_info *info,
 		if (info->flags & XT_DEVGROUP_INVERT_DST)
 			printf(" !");
 		printf(" %sdst-group ", pfx);
-		print_devgroup(info->src_group, info->src_mask, numeric);
+		print_devgroup(info->dst_group, info->dst_mask, numeric);
 	}
 }
 
