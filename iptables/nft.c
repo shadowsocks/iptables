@@ -2358,7 +2358,7 @@ const char *nft_strerror(int err)
 	    { nft_chain_user_add, EEXIST, "Chain already exists" },
 	    { nft_rule_add, E2BIG, "Index of insertion too big" },
 	    { nft_rule_check, ENOENT, "Bad rule (does a matching rule exist in that chain?)" },
-	    { nft_rule_replace, E2BIG, "Index of replacement too big" },
+	    { nft_rule_replace, ENOENT, "Index of replacement too big" },
 	    { nft_rule_delete_num, E2BIG, "Index of deletion too big" },
 /*	    { TC_READ_COUNTER, E2BIG, "Index of counter too big" },
 	    { TC_ZERO_COUNTER, E2BIG, "Index of counter too big" }, */
