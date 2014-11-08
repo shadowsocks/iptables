@@ -268,15 +268,21 @@ static void nft_bridge_parse_payload(struct nft_xt_ctx *ctx,
 		get_cmp_data(e, addr, sizeof(addr), &inv);
 		for (i = 0; i < ETH_ALEN; i++)
 			fw->destmac[i] = addr[i];
+		if (inv)
+			fw->invflags |= EBT_IDEST;
 		break;
 	case offsetof(struct ethhdr, h_source):
 		get_cmp_data(e, addr, sizeof(addr), &inv);
 		for (i = 0; i < ETH_ALEN; i++)
 			fw->sourcemac[i] = addr[i];
+		if (inv)
+			fw->invflags |= EBT_ISOURCE;
 		break;
 	case offsetof(struct ethhdr, h_proto):
 		get_cmp_data(e, &ethproto, sizeof(ethproto), &inv);
 		fw->ethproto = ethproto;
+		if (inv)
+			fw->invflags |= EBT_IPROTO;
 		break;
 	}
 }
