@@ -20,6 +20,7 @@
 
 #include <xtables.h>
 
+#include <linux/netfilter/nf_tables.h>
 #include "nft.h"
 #include "nft-shared.h"
 
@@ -27,26 +28,35 @@ static int nft_ipv6_add(struct nft_rule *r, void *data)
 {
 	struct iptables_command_state *cs = data;
 	struct xtables_rule_match *matchp;
+	uint32_t op;
 
-	if (cs->fw6.ipv6.iniface[0] != '\0')
-		add_iniface(r, cs->fw6.ipv6.iniface, cs->fw6.ipv6.invflags);
+	if (cs->fw6.ipv6.iniface[0] != '\0') {
+		op = nft_invflags2cmp(cs->fw6.ipv6.invflags, IPT_INV_VIA_IN);
+		add_iniface(r, cs->fw6.ipv6.iniface, op);
+	}
 
-	if (cs->fw6.ipv6.outiface[0] != '\0')
-		add_outiface(r, cs->fw6.ipv6.outiface, cs->fw6.ipv6.invflags);
+	if (cs->fw6.ipv6.outiface[0] != '\0') {
+		op = nft_invflags2cmp(cs->fw6.ipv6.invflags, IPT_INV_VIA_OUT);
+		add_outiface(r, cs->fw6.ipv6.outiface, op);
+	}
 
-	if (cs->fw6.ipv6.proto != 0)
+	if (cs->fw6.ipv6.proto != 0) {
+		op = nft_invflags2cmp(cs->fw6.ipv6.invflags, XT_INV_PROTO);
 		add_proto(r, offsetof(struct ip6_hdr, ip6_nxt), 1,
-			  cs->fw6.ipv6.proto, cs->fw6.ipv6.invflags);
+			  cs->fw6.ipv6.proto, op);
+	}
 
 	if (!IN6_IS_ADDR_UNSPECIFIED(&cs->fw6.ipv6.src)) {
+		op = nft_invflags2cmp(cs->fw6.ipv6.invflags, IPT_INV_SRCIP);
 		add_addr(r, offsetof(struct ip6_hdr, ip6_src),
 			 &cs->fw6.ipv6.src, &cs->fw6.ipv6.smsk,
-			 sizeof(struct in6_addr), cs->fw6.ipv6.invflags);
+			 sizeof(struct in6_addr), op);
 	}
 	if (!IN6_IS_ADDR_UNSPECIFIED(&cs->fw6.ipv6.dst)) {
+		op = nft_invflags2cmp(cs->fw6.ipv6.invflags, IPT_INV_DSTIP);
 		add_addr(r, offsetof(struct ip6_hdr, ip6_dst),
 			 &cs->fw6.ipv6.dst, &cs->fw6.ipv6.dmsk,
-			 sizeof(struct in6_addr), cs->fw6.ipv6.invflags);
+			 sizeof(struct in6_addr), op);
 	}
 	add_compat(r, cs->fw6.ipv6.proto, cs->fw6.ipv6.invflags);
 

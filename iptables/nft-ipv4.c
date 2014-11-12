@@ -31,25 +31,33 @@ static int nft_ipv4_add(struct nft_rule *r, void *data)
 	struct xtables_rule_match *matchp;
 	uint32_t op;
 
-	if (cs->fw.ip.iniface[0] != '\0')
-		add_iniface(r, cs->fw.ip.iniface, cs->fw.ip.invflags);
+	if (cs->fw.ip.iniface[0] != '\0') {
+		op = nft_invflags2cmp(cs->fw.ip.invflags, IPT_INV_VIA_IN);
+		add_iniface(r, cs->fw.ip.iniface, op);
+	}
 
-	if (cs->fw.ip.outiface[0] != '\0')
-		add_outiface(r, cs->fw.ip.outiface, cs->fw.ip.invflags);
+	if (cs->fw.ip.outiface[0] != '\0') {
+		op = nft_invflags2cmp(cs->fw.ip.invflags, IPT_INV_VIA_OUT);
+		add_outiface(r, cs->fw.ip.outiface, op);
+	}
 
-	if (cs->fw.ip.proto != 0)
+	if (cs->fw.ip.proto != 0) {
+		op = nft_invflags2cmp(cs->fw.ip.invflags, XT_INV_PROTO);
 		add_proto(r, offsetof(struct iphdr, protocol), 1,
-			  cs->fw.ip.proto, cs->fw.ip.invflags);
+			  cs->fw.ip.proto, op);
+	}
 
 	if (cs->fw.ip.src.s_addr != 0) {
+		op = nft_invflags2cmp(cs->fw.ip.invflags, IPT_INV_SRCIP);
 		add_addr(r, offsetof(struct iphdr, saddr),
 			 &cs->fw.ip.src.s_addr, &cs->fw.ip.smsk.s_addr,
-			 sizeof(struct in_addr), cs->fw.ip.invflags);
+			 sizeof(struct in_addr), op);
 	}
 	if (cs->fw.ip.dst.s_addr != 0) {
+		op = nft_invflags2cmp(cs->fw.ip.invflags, IPT_INV_DSTIP);
 		add_addr(r, offsetof(struct iphdr, daddr),
 			 &cs->fw.ip.dst.s_addr, &cs->fw.ip.dmsk.s_addr,
-			 sizeof(struct in_addr), cs->fw.ip.invflags);
+			 sizeof(struct in_addr), op);
 	}
 	if (cs->fw.ip.flags & IPT_F_FRAG) {
 		add_payload(r, offsetof(struct iphdr, frag_off), 2);
@@ -57,11 +65,7 @@ static int nft_ipv4_add(struct nft_rule *r, void *data)
 		add_bitwise_u16(r, 0x1fff, !0x1fff);
 
 		/* if offset is non-zero, this is a fragment */
-		if (cs->fw.ip.invflags & IPT_INV_FRAG)
-			op = NFT_CMP_EQ;
-		else
-			op = NFT_CMP_NEQ;
-
+		op = nft_invflags2cmp(cs->fw.ip.invflags, IPT_INV_FRAG);
 		add_cmp_u16(r, 0, op);
 	}
 

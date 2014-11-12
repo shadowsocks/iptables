@@ -137,82 +137,73 @@ static void print_mac_and_mask(const unsigned char *mac, const unsigned char *ma
 	print_mac(mask, l);
 }
 
-static uint8_t arpt_to_ipt_flags(uint16_t invflags)
-{
-	uint8_t result = 0;
-
-	if (invflags & ARPT_INV_VIA_IN)
-		result |= IPT_INV_VIA_IN;
-
-	if (invflags & ARPT_INV_VIA_OUT)
-		result |= IPT_INV_VIA_OUT;
-
-	if (invflags & ARPT_INV_SRCIP)
-		result |= IPT_INV_SRCIP;
-
-	if (invflags & ARPT_INV_TGTIP)
-		result |= IPT_INV_DSTIP;
-
-	if (invflags & ARPT_INV_ARPPRO)
-		result |= IPT_INV_PROTO;
-
-	return result;
-}
-
 static int nft_arp_add(struct nft_rule *r, void *data)
 {
 	struct arptables_command_state *cs = data;
 	struct arpt_entry *fw = &cs->fw;
-	uint8_t flags = arpt_to_ipt_flags(fw->arp.invflags);
+	uint32_t op;
 	int ret = 0;
 
-	if (fw->arp.iniface[0] != '\0')
-		add_iniface(r, fw->arp.iniface, flags);
+	if (fw->arp.iniface[0] != '\0') {
+		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_VIA_IN);
+		add_iniface(r, fw->arp.iniface, op);
+	}
 
-	if (fw->arp.outiface[0] != '\0')
-		add_outiface(r, fw->arp.outiface, flags);
+	if (fw->arp.outiface[0] != '\0') {
+		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_VIA_OUT);
+		add_outiface(r, fw->arp.outiface, op);
+	}
 
 	if (fw->arp.arhrd != 0) {
+		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_ARPHRD);
 		add_payload(r, offsetof(struct arphdr, ar_hrd), 2);
-		add_cmp_u16(r, fw->arp.arhrd, NFT_CMP_EQ);
+		add_cmp_u16(r, fw->arp.arhrd, op);
 	}
 
 	if (fw->arp.arpro != 0) {
+		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_ARPPRO);
 	        add_payload(r, offsetof(struct arphdr, ar_pro), 2);
-		add_cmp_u16(r, fw->arp.arpro, NFT_CMP_EQ);
+		add_cmp_u16(r, fw->arp.arpro, op);
 	}
 
-	if (fw->arp.arhln != 0)
+	if (fw->arp.arhln != 0) {
+		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_ARPHLN);
 		add_proto(r, offsetof(struct arphdr, ar_hln), 1,
-			  fw->arp.arhln, flags);
+			  fw->arp.arhln, op);
+	}
 
-	add_proto(r, offsetof(struct arphdr, ar_pln), 1, 4, 0);
+	add_proto(r, offsetof(struct arphdr, ar_pln), 1, 4, NFT_CMP_EQ);
 
 	if (fw->arp.arpop != 0) {
+		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_ARPOP);
 		add_payload(r, offsetof(struct arphdr, ar_op), 2);
-		add_cmp_u16(r, fw->arp.arpop, NFT_CMP_EQ);
+		add_cmp_u16(r, fw->arp.arpop, op);
 	}
 
 	if (fw->arp.src_devaddr.addr[0] != '\0') {
+		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_SRCDEVADDR);
 		add_payload(r, sizeof(struct arphdr), fw->arp.arhln);
-		add_cmp_ptr(r, NFT_CMP_EQ, fw->arp.src_devaddr.addr, fw->arp.arhln);
+		add_cmp_ptr(r, op, fw->arp.src_devaddr.addr, fw->arp.arhln);
 	}
 
 	if (fw->arp.src.s_addr != 0) {
+		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_SRCIP);
 		add_addr(r, sizeof(struct arphdr) + fw->arp.arhln,
 			 &fw->arp.src.s_addr, &fw->arp.smsk.s_addr,
-			 sizeof(struct in_addr), flags);
+			 sizeof(struct in_addr), op);
 	}
 
 	if (fw->arp.tgt_devaddr.addr[0] != '\0') {
+		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_TGTDEVADDR);
 		add_payload(r, sizeof(struct arphdr) + fw->arp.arhln + 4, fw->arp.arhln);
-		add_cmp_ptr(r, NFT_CMP_EQ, fw->arp.tgt_devaddr.addr, fw->arp.arhln);
+		add_cmp_ptr(r, op, fw->arp.tgt_devaddr.addr, fw->arp.arhln);
 	}
 
 	if (fw->arp.tgt.s_addr != 0) {
+		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_TGTIP);
 		add_addr(r, sizeof(struct arphdr) + fw->arp.arhln + sizeof(struct in_addr),
 			 &fw->arp.tgt.s_addr, &fw->arp.tmsk.s_addr,
-			 sizeof(struct in_addr), flags);
+			 sizeof(struct in_addr), op);
 	}
 
 	/* Counters need to me added before the target, otherwise they are

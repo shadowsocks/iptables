@@ -2567,3 +2567,11 @@ err:
 	/* the core expects 1 for success and 0 for error */
 	return ret == 0 ? 1 : 0;
 }
+
+uint32_t nft_invflags2cmp(uint32_t invflags, uint32_t flag)
+{
+	if (invflags & flag)
+		return NFT_CMP_NEQ;
+
+	return NFT_CMP_EQ;
+}

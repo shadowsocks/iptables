@@ -130,17 +130,11 @@ void add_cmp_u32(struct nft_rule *r, uint32_t val, uint32_t op)
 	add_cmp_ptr(r, op, &val, sizeof(val));
 }
 
-void add_iniface(struct nft_rule *r, char *iface, int invflags)
+void add_iniface(struct nft_rule *r, char *iface, uint32_t op)
 {
 	int iface_len;
-	uint32_t op;
 
 	iface_len = strlen(iface);
-
-	if (invflags & IPT_INV_VIA_IN)
-		op = NFT_CMP_NEQ;
-	else
-		op = NFT_CMP_EQ;
 
 	add_meta(r, NFT_META_IIFNAME);
 	if (iface[iface_len - 1] == '+')
@@ -149,17 +143,11 @@ void add_iniface(struct nft_rule *r, char *iface, int invflags)
 		add_cmp_ptr(r, op, iface, iface_len + 1);
 }
 
-void add_outiface(struct nft_rule *r, char *iface, int invflags)
+void add_outiface(struct nft_rule *r, char *iface, uint32_t op)
 {
 	int iface_len;
-	uint32_t op;
 
 	iface_len = strlen(iface);
-
-	if (invflags & IPT_INV_VIA_OUT)
-		op = NFT_CMP_NEQ;
-	else
-		op = NFT_CMP_EQ;
 
 	add_meta(r, NFT_META_OIFNAME);
 	if (iface[iface_len - 1] == '+')
@@ -169,33 +157,18 @@ void add_outiface(struct nft_rule *r, char *iface, int invflags)
 }
 
 void add_addr(struct nft_rule *r, int offset,
-	      void *data, void *mask, size_t len, int invflags)
+	      void *data, void *mask, size_t len, uint32_t op)
 {
-	uint32_t op;
-
 	add_payload(r, offset, len);
 	add_bitwise(r, mask, len);
-
-	if (invflags & IPT_INV_SRCIP || invflags & IPT_INV_DSTIP)
-		op = NFT_CMP_NEQ;
-	else
-		op = NFT_CMP_EQ;
 
 	add_cmp_ptr(r, op, data, len);
 }
 
 void add_proto(struct nft_rule *r, int offset, size_t len,
-	       uint8_t proto, int invflags)
+	       uint8_t proto, uint32_t op)
 {
-	uint32_t op;
-
 	add_payload(r, offset, len);
-
-	if (invflags & XT_INV_PROTO)
-		op = NFT_CMP_NEQ;
-	else
-		op = NFT_CMP_EQ;
-
 	add_cmp_u8(r, proto, op);
 }
 

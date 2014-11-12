@@ -113,6 +113,8 @@ void nft_rule_print_save(const void *data,
 			 struct nft_rule *r, enum nft_rule_print type,
 			 unsigned int format);
 
+uint32_t nft_invflags2cmp(uint32_t invflags, uint32_t flag);
+
 /*
  * global commit and abort
  */
