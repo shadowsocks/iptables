@@ -670,7 +670,6 @@ handle_P:
 				for (i = 0; i < NUM_STANDARD_TARGETS; i++)
 					if (!strcmp(argv[optind], ebt_standard_targets[i])) {
 						policy = argv[optind];
-						printf("policy: %s\n", policy);
 						if (-i-1 == EBT_CONTINUE)
 							xtables_error(PARAMETER_PROBLEM,
 								      "Wrong policy '%s'",
