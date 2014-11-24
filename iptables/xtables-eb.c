@@ -21,6 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <errno.h>
 #include <getopt.h>
 #include <string.h>
 #include <stdio.h>
@@ -32,6 +33,7 @@
 #include <xtables.h>
 
 #include <linux/netfilter_bridge.h>
+#include <linux/netfilter/nf_tables.h>
 #include <ebtables/ethernetdb.h>
 #include "xshared.h"
 #include "nft.h"
@@ -582,7 +584,6 @@ int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table)
 	struct ebtables_command_state cs;
 	char command = 'h';
 	const char *chain = NULL;
-	const char *newname = NULL;
 	const char *policy = NULL;
 	int exec_style = EXEC_STYLE_PRG;
 	int selected_chain = -1;
@@ -643,7 +644,21 @@ int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table)
 			}
 
 			if (c == 'E') {
-				ret = nft_chain_user_rename(h, chain, *table, newname);
+				if (optind >= argc)
+					xtables_error(PARAMETER_PROBLEM, "No new chain name specified");
+				else if (optind < argc - 1)
+					xtables_error(PARAMETER_PROBLEM, "No extra options allowed with -E");
+				else if (strlen(argv[optind]) >= NFT_CHAIN_MAXNAMELEN)
+					xtables_error(PARAMETER_PROBLEM, "Chain name length can't exceed %d"" characters", NFT_CHAIN_MAXNAMELEN - 1);
+				else if (strchr(argv[optind], ' ') != NULL)
+					xtables_error(PARAMETER_PROBLEM, "Use of ' ' not allowed in chain names");
+
+				ret = nft_chain_user_rename(h, chain, *table,
+							    argv[optind]);
+				if (ret != 0 && errno == ENOENT)
+					xtables_error(PARAMETER_PROBLEM, "Chain '%s' doesn't exists", chain);
+
+				optind++;
 				break;
 			} else if (c == 'D' && optind < argc && (argv[optind][0] != '-' || (argv[optind][1] >= '0' && argv[optind][1] <= '9'))) {
 				if (optind != argc - 1)
