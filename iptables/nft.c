@@ -253,6 +253,7 @@ enum obj_update_type {
 	NFT_COMPAT_CHAIN_USER_ADD,
 	NFT_COMPAT_CHAIN_USER_DEL,
 	NFT_COMPAT_CHAIN_UPDATE,
+	NFT_COMPAT_CHAIN_RENAME,
 	NFT_COMPAT_RULE_APPEND,
 	NFT_COMPAT_RULE_INSERT,
 	NFT_COMPAT_RULE_REPLACE,
@@ -1457,9 +1458,14 @@ int nft_chain_user_rename(struct nft_handle *h,const char *chain,
 	uint64_t handle;
 	int ret;
 
+	nft_fn = nft_chain_user_add;
+
 	/* If built-in chains don't exist for this table, create them */
 	if (nft_xtables_config_load(h, XTABLES_CONFIG_DEFAULT, 0) < 0)
 		nft_xt_builtin_init(h, table);
+
+	/* Config load changed errno. Ensure genuine info for our callers. */
+	errno = 0;
 
 	/* Find the old chain to be renamed */
 	c = nft_chain_find(h, table, chain);
@@ -1479,7 +1485,7 @@ int nft_chain_user_rename(struct nft_handle *h,const char *chain,
 	nft_chain_attr_set_u64(c, NFT_CHAIN_ATTR_HANDLE, handle);
 
 	if (h->batch_support) {
-		ret = batch_chain_add(h, NFT_COMPAT_CHAIN_USER_ADD, c);
+		ret = batch_chain_add(h, NFT_COMPAT_CHAIN_RENAME, c);
 	} else {
 		char buf[MNL_SOCKET_BUFFER_SIZE];
 		struct nlmsghdr *nlh;
@@ -2223,6 +2229,10 @@ static int nft_action(struct nft_handle *h, int action)
 			nft_compat_chain_batch_add(h, NFT_MSG_NEWCHAIN,
 						   h->restore ?
 						     NLM_F_CREATE : 0,
+						   seq++, n->chain);
+			break;
+		case NFT_COMPAT_CHAIN_RENAME:
+			nft_compat_chain_batch_add(h, NFT_MSG_NEWCHAIN, 0,
 						   seq++, n->chain);
 			break;
 		case NFT_COMPAT_RULE_APPEND:
