@@ -356,7 +356,8 @@ static void nft_bridge_print_header(unsigned int format, const char *chain,
 				    const struct xt_counters *counters,
 				    bool basechain, uint32_t refs)
 {
-	printf("Bridge chain: %s, entries: %u, policy: %s\n", chain, refs, pol);
+	printf("Bridge chain: %s, entries: %u, policy: %s\n",
+	       chain, refs, basechain ? pol : "RETURN");
 }
 
 static void nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
