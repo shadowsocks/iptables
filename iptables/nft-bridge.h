@@ -90,6 +90,12 @@ struct ebtables_command_state {
 	struct xtables_rule_match *matches;
 	const char *jumpto;
 	struct xt_counters counters;
+	int invert;
+	int c;
+	char **argv;
+	int proto_used;
+	char *protocol;
+	unsigned int options;
 };
 
 void nft_rule_to_ebtables_command_state(struct nft_rule *r,

@@ -135,6 +135,7 @@ static int _add_action(struct nft_rule *r, struct ebtables_command_state *cs)
 static int nft_bridge_add(struct nft_rule *r, void *data)
 {
 	struct ebtables_command_state *cs = data;
+	struct xtables_rule_match *matchp;
 	struct ebt_entry *fw = &cs->fw;
 	uint32_t op;
 	char *addr;
@@ -177,6 +178,11 @@ static int nft_bridge_add(struct nft_rule *r, void *data)
 		op = nft_invflags2cmp(fw->invflags, EBT_IPROTO);
 		add_payload(r, offsetof(struct ethhdr, h_proto), 2);
 		add_cmp_u16(r, fw->ethproto, op);
+	}
+
+	for (matchp = cs->matches; matchp; matchp = matchp->next) {
+		if (add_match(r, matchp->match->m) < 0)
+			break;
 	}
 
 	return _add_action(r, cs);

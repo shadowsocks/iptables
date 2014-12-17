@@ -60,10 +60,10 @@ pf6_solibs    := $(patsubst %,libip6t_%.so,${pf6_build_mod})
 #
 # Building blocks
 #
-targets := libext.a libext4.a libext6.a matches.man targets.man
+targets := libext.a libext4.a libext6.a libext_ebt.a matches.man targets.man
 targets_install :=
 @ENABLE_STATIC_TRUE@ libext_objs := ${pfx_objs}
-@ENABLE_STATIC_TRUE@ libextb_objs := ${pfb_objs}
+@ENABLE_STATIC_TRUE@ libext_ebt_objs := ${pfb_objs}
 @ENABLE_STATIC_TRUE@ libext4_objs := ${pf4_objs}
 @ENABLE_STATIC_TRUE@ libext6_objs := ${pf6_objs}
 @ENABLE_STATIC_FALSE@ targets += ${pfx_solibs} ${pfb_solibs} ${pf4_solibs} ${pf6_solibs}
@@ -80,7 +80,7 @@ install: ${targets_install}
 	if test -n "${targets_install}"; then install -pm0755 $^ "${DESTDIR}${xtlibdir}/"; fi;
 
 clean:
-	rm -f *.o *.oo *.so *.a {matches,targets}.man initext.c initext4.c initext6.c;
+	rm -f *.o *.oo *.so *.a {matches,targets}.man initext.c initext4.c initext6.c initextb.c;
 	rm -f .*.d .*.dd;
 
 distclean: clean
@@ -123,7 +123,7 @@ lib%.o: ${srcdir}/lib%.c
 libext.a: initext.o ${libext_objs}
 	${AM_VERBOSE_AR} ${AR} crs $@ $^;
 
-libextb.a: initextb.o ${libextb_objs}
+libext_ebt.a: initextb.o ${libext_ebt_objs}
 	${AM_VERBOSE_AR} ${AR} crs $@ $^;
 
 libext4.a: initext4.o ${libext4_objs}
@@ -180,8 +180,8 @@ initextb.c: .initextb.dd
 	for i in ${initextb_func}; do \
 		echo "extern void lib$${i}_init(void);" >>$@; \
 	done; \
-	echo "void init_extensions(void);" >>$@; \
-	echo "void init_extensions(void)" >>$@; \
+	echo "void init_extensionsb(void);" >>$@; \
+	echo "void init_extensionsb(void)" >>$@; \
 	echo "{" >>$@; \
 	for i in ${initextb_func}; do \
 		echo  " ""lib$${i}_init();" >>$@; \

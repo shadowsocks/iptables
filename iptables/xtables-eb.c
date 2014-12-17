@@ -30,6 +30,7 @@
 #include <signal.h>
 #include <net/if.h>
 #include <netinet/ether.h>
+#include <iptables.h>
 #include <xtables.h>
 
 #include <linux/netfilter_bridge.h>
@@ -38,10 +39,6 @@
 #include "xshared.h"
 #include "nft.h"
 #include "nft-bridge.h"
-
-extern struct xtables_globals xtables_globals;
-#define prog_name xtables_globals.program_name
-#define prog_vers xtables_globals.program_version
 
 /*
  * From include/ebtables_u.h
@@ -138,44 +135,6 @@ static int ebt_check_inverse2(const char option[], int argc, char **argv)
 		return 1;
 	}
 	return ebt_invert;
-}
-
-/*
- * From libebtc.c
- */
-
-/* The four target names, from libebtc.c */
-const char* ebt_standard_targets[NUM_STANDARD_TARGETS] =
-{
-	"ACCEPT",
-	"DROP",
-	"CONTINUE",
-	"RETURN",
-};
-
-/* Prints all registered extensions */
-static void ebt_list_extensions(const struct xtables_target *t,
-				const struct xtables_rule_match *m)
-{
-	printf("%s v%s\n", prog_name, prog_vers);
-	printf("Loaded userspace extensions:\n");
-	/*printf("\nLoaded tables:\n");
-        while (tbl) {
-		printf("%s\n", tbl->name);
-                tbl = tbl->next;
-	}*/
-	printf("\nLoaded targets:\n");
-        for (t = xtables_targets; t; t = t->next) {
-		printf("%s\n", t->name);
-	}
-	printf("\nLoaded matches:\n");
-        for (; m != NULL; m = m->next)
-		printf("%s\n", m->match->name);
-	/*printf("\nLoaded watchers:\n");
-        while (w) {
-		printf("%s\n", w->name);
-                w = w->next;
-	}*/
 }
 
 /*
@@ -341,7 +300,91 @@ static struct option ebt_original_options[] =
 	{ 0 }
 };
 
+void xtables_exit_error(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
+
 static struct option *ebt_options = ebt_original_options;
+
+struct xtables_globals ebtables_globals = {
+	.option_offset 		= 0,
+	.program_version	= IPTABLES_VERSION,
+	.orig_opts		= ebt_original_options,
+	.exit_err		= xtables_exit_error,
+	.compat_rev		= nft_compatible_revision,
+};
+
+#define opts ebtables_globals.opts
+#define prog_name ebtables_globals.program_name
+#define prog_vers ebtables_globals.program_version
+
+/*
+ * From libebtc.c
+ */
+
+/* The four target names, from libebtc.c */
+const char* ebt_standard_targets[NUM_STANDARD_TARGETS] =
+{
+	"ACCEPT",
+	"DROP",
+	"CONTINUE",
+	"RETURN",
+};
+
+/* Prints all registered extensions */
+static void ebt_list_extensions(const struct xtables_target *t,
+				const struct xtables_rule_match *m)
+{
+	printf("%s v%s\n", prog_name, prog_vers);
+	printf("Loaded userspace extensions:\n");
+	/*printf("\nLoaded tables:\n");
+        while (tbl) {
+		printf("%s\n", tbl->name);
+                tbl = tbl->next;
+	}*/
+	printf("\nLoaded targets:\n");
+        for (t = xtables_targets; t; t = t->next) {
+		printf("%s\n", t->name);
+	}
+	printf("\nLoaded matches:\n");
+        for (; m != NULL; m = m->next)
+		printf("%s\n", m->match->name);
+	/*printf("\nLoaded watchers:\n");
+        while (w) {
+		printf("%s\n", w->name);
+                w = w->next;
+	}*/
+}
+
+#define OPTION_OFFSET 256
+static struct option *merge_options(struct option *oldopts,
+				    const struct option *newopts,
+				    unsigned int *options_offset)
+{
+	unsigned int num_old, num_new, i;
+	struct option *merge;
+
+	if (!newopts || !oldopts || !options_offset)
+		xtables_error(OTHER_PROBLEM, "merge wrong");
+	for (num_old = 0; oldopts[num_old].name; num_old++);
+	for (num_new = 0; newopts[num_new].name; num_new++);
+
+	ebtables_globals.option_offset += OPTION_OFFSET;
+	*options_offset = ebtables_globals.option_offset;
+
+	merge = malloc(sizeof(struct option) * (num_new + num_old + 1));
+	if (!merge)
+		return NULL;
+	memcpy(merge, oldopts, num_old * sizeof(struct option));
+	for (i = 0; i < num_new; i++) {
+		merge[num_old + i] = newopts[i];
+		merge[num_old + i].val += *options_offset;
+	}
+	memset(merge + num_old + num_new, 0, sizeof(struct option));
+	/* Only free dynamically allocated stuff */
+	if (oldopts != ebt_original_options)
+		free(oldopts);
+
+	return merge;
+}
 
 /*
  * More glue code.
@@ -370,11 +413,11 @@ static struct xtables_target *command_jump(struct ebtables_command_state *cs,
 	xs_init_target(target);
 
 	if (target->x6_options != NULL)
-		ebt_options = xtables_options_xfrm(xtables_globals.orig_opts,
+		ebt_options = xtables_options_xfrm(ebtables_globals.orig_opts,
 					    ebt_options, target->x6_options,
 					    &target->option_offset);
 	else
-		ebt_options = xtables_merge_options(xtables_globals.orig_opts,
+		ebt_options = xtables_merge_options(ebtables_globals.orig_opts,
 					     ebt_options, target->extra_opts,
 					     &target->option_offset);
 
@@ -569,6 +612,42 @@ static int parse_iface(char *iface, char *option)
 	return 0;
 }
 
+/* This code is very similar to iptables/xtables.c:command_match() */
+static void ebt_load_match(const char *name)
+{
+	struct xtables_match *m;
+	size_t size;
+	opts = ebt_original_options;
+
+	m = xtables_find_match(name, XTF_LOAD_MUST_SUCCEED, NULL);
+	if (m == NULL)
+		xtables_error(OTHER_PROBLEM, "Unable to load %s match", name);
+
+	size = XT_ALIGN(sizeof(struct xt_entry_match)) + m->size;
+	m->m = xtables_calloc(1, size);
+	m->m->u.match_size = size;
+	strcpy(m->m->u.user.name, m->name);
+	m->m->u.user.revision = m->revision;
+	xs_init_match(m);
+
+	opts = merge_options(opts, m->extra_opts, &m->option_offset);
+	if (opts == NULL)
+		xtables_error(OTHER_PROBLEM, "Can't alloc memory");
+}
+
+static void ebt_load_matches(void)
+{
+	ebt_load_match("802_3");
+}
+
+static void ebt_add_match(struct xtables_match *m,
+			  struct xtables_rule_match **rule_matches)
+{
+	if (xtables_find_match(m->name, XTF_LOAD_MUST_SUCCEED, rule_matches) == NULL)
+		xtables_error(OTHER_PROBLEM,
+			      "Unable to add match %s", m->name);
+}
+
 /* We use exec_style instead of #ifdef's because ebtables.so is a shared object. */
 int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table)
 {
@@ -581,6 +660,7 @@ int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table)
 	int ret = 0;
 	unsigned int flags = 0;
 	struct xtables_target *t;
+	struct xtables_match *m;
 	struct ebtables_command_state cs;
 	char command = 'h';
 	const char *chain = NULL;
@@ -589,6 +669,7 @@ int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table)
 	int selected_chain = -1;
 
 	memset(&cs, 0, sizeof(cs));
+	cs.argv = argv;
 
 	if (nft_init(h, xtables_bridge) < 0)
 		xtables_error(OTHER_PROBLEM,
@@ -598,14 +679,30 @@ int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table)
 	if (h->ops == NULL)
 		xtables_error(PARAMETER_PROBLEM, "Unknown family");
 
+	/* manually registering ebt matches, given the original ebtables parser
+	 * don't use '-m matchname' and the match can't loaded dinamically when
+	 * the user calls it.
+	 */
+	ebt_load_matches();
+
+	/* clear mflags in case do_commandeb gets called a second time
+	 * (we clear the global list of all matches for security)*/
+	for (m = xtables_matches; m; m = m->next)
+		m->mflags = 0;
+
 	for (t = xtables_targets; t; t = t->next) {
 		t->tflags = 0;
 		t->used = 0;
 	}
 
+	/* prevent getopt to spoil our error reporting */
+	opterr = false;
+
 	/* Getopt saves the day */
 	while ((c = getopt_long(argc, argv,
-	   "-A:D:C:I:N:E:X::L::Z::F::P:Vhi:o:j:c:p:s:d:t:M:", ebt_options, NULL)) != -1) {
+	   "-A:D:C:I:N:E:X::L::Z::F::P:Vhi:o:j:c:p:s:d:t:M:", opts, NULL)) != -1) {
+		cs.c = c;
+		cs.invert = ebt_invert;
 		switch (c) {
 
 		case 'A': /* Add a rule */
@@ -1070,19 +1167,12 @@ big_iface_length:
 			}*/
 
 			/* Is it a match_option? */
-			/*for (m = ebt_matches; m; m = m->next)
-				if (m->parse(c - m->option_offset, argv, argc, new_entry, &m->flags, &m->m))
-					break;
-
-			if (m != NULL) {
-				if (ebt_errormsg[0] != '\0')
-					return -1;
-				if (m->used == 0) {
-					ebt_add_match(new_entry, m);
-					m->used = 1;
+			for (m = xtables_matches; m; m = m->next) {
+				if (m->parse(c - m->option_offset, argv, ebt_invert, &m->mflags, NULL, &m->m)) {
+					ebt_add_match(m, &cs.matches);
+					goto check_extension;
 				}
-				goto check_extension;
-			}*/
+			}
 
 			/* Is it a watcher option? */
 			/*for (w = ebt_watchers; w; w = w->next)
@@ -1102,8 +1192,8 @@ big_iface_length:
 			if (w->used == 0) {
 				ebt_add_watcher(new_entry, w);
 				w->used = 1;
-			}
-check_extension: */
+			}*/
+check_extension:
 			if (command != 'A' && command != 'I' &&
 			    command != 'D' && command != 'C')
 				xtables_error(PARAMETER_PROBLEM,

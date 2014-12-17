@@ -36,22 +36,12 @@
 #include <errno.h>
 #include <string.h>
 #include <xtables.h>
+#include <iptables.h>
 #include "nft.h"
 
 #include "xtables-multi.h"
 
-extern struct xtables_globals xtables_globals;
-extern const char *program_version, *program_name;
-
-static const struct xtables_afinfo afinfo_bridge = {
-        .kmod          = "eb_tables",
-        .proc_exists   = "/proc/net/eb_tables_names",
-        .libprefix     = "libeb_",
-        .family        = NFPROTO_BRIDGE,
-        .ipproto       = IPPROTO_IP,
-        .so_rev_match  = -1,
-        .so_rev_target = -1,
-};
+extern struct xtables_globals ebtables_globals;
 
 int xtables_eb_main(int argc, char *argv[])
 {
@@ -61,24 +51,18 @@ int xtables_eb_main(int argc, char *argv[])
 		.family = NFPROTO_BRIDGE,
 	};
 
-	xtables_globals.program_name = "ebtables";
-	/* This code below could be replaced by xtables_init_all, which
-	 * doesn't support NFPROTO_BRIDGE yet.
-	 */
-	xtables_init();
-	afinfo = &afinfo_bridge;
-	ret = xtables_set_params(&xtables_globals);
+	ebtables_globals.program_name = "ebtables";
+	ret = xtables_init_all(&ebtables_globals, NFPROTO_BRIDGE);
 	if (ret < 0) {
-		fprintf(stderr, "%s/%s Failed to initialize xtables\n",
-				xtables_globals.program_name,
-				xtables_globals.program_version);
+		fprintf(stderr, "%s/%s Failed to initialize ebtables-compat\n",
+			ebtables_globals.program_name,
+			ebtables_globals.program_version);
 		exit(1);
 	}
 
 #if defined(ALL_INCLUSIVE) || defined(NO_SHARED_LIBS)
-	init_extensions();
+	init_extensionsb();
 #endif
-
 	ret = do_commandeb(&h, argc, argv, &table);
 	if (ret)
 		ret = nft_commit(&h);
