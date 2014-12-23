@@ -486,14 +486,12 @@ static void print_help(const struct xtables_target *t,
 /* Execute command L */
 static int list_rules(struct nft_handle *h, const char *chain, const char *table,
 		      int rule_nr, int verbose, int numeric, int expanded,
-		      int linenumbers)
+		      int linenumbers, int counters)
 {
 	unsigned int format;
 
 	format = FMT_OPTIONS;
-	if (!verbose)
-		format |= FMT_NOCOUNTS;
-	else
+	if (verbose)
 		format |= FMT_VIA;
 
 	if (numeric)
@@ -504,6 +502,9 @@ static int list_rules(struct nft_handle *h, const char *chain, const char *table
 
 	if (linenumbers)
 		format |= FMT_LINENUMBERS;
+
+	if (!counters)
+		format |= FMT_NOCOUNTS;
 
 	return nft_rule_list(h, chain, table, rule_nr, format);
 }
@@ -1269,7 +1270,8 @@ check_extension:
 				 flags&OPT_VERBOSE,
 				 flags&OPT_NUMERIC,
 				 /*flags&OPT_EXPANDED*/0,
-				 flags&LIST_N);
+				 flags&LIST_N,
+				 flags&LIST_C);
 		if (!(flags & OPT_ZERO) && exec_style == EXEC_STYLE_PRG)
 			exit(0);
 	}

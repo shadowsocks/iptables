@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <netinet/ether.h>
+#include <inttypes.h>
 
 #include <xtables.h>
 #include <libiptc/libxtc.h>
@@ -469,6 +470,10 @@ static void nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
 					    format & FMT_NUMERIC);
 		}
 	}
+
+	if (!(format & FMT_NOCOUNTS))
+		printf(" , pcnt = %"PRIu64" -- bcnt = %"PRIu64"",
+		       (uint64_t)cs.counters.pcnt, (uint64_t)cs.counters.bcnt);
 
 	if (!(format & FMT_NONEWLINE))
 		fputc('\n', stdout);
