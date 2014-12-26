@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 //#include <linux/netfilter_bridge/ebtables.h>
 #include <linux/netfilter/x_tables.h>
+#include <net/ethernet.h>
 
 /* We use replace->flags, so we can't use the following values:
  * 0x01 == OPT_COMMAND, 0x02 == OPT_TABLE, 0x100 == OPT_ZERO */

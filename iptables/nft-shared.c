@@ -26,6 +26,7 @@
 #include <libnftnl/expr.h>
 
 #include "nft-shared.h"
+#include "nft-bridge.h"
 #include "xshared.h"
 #include "nft.h"
 
@@ -326,9 +327,24 @@ void nft_parse_match(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
 	const char *mt_name = nft_rule_expr_get_str(e, NFT_EXPR_MT_NAME);
 	const void *mt_info = nft_rule_expr_get(e, NFT_EXPR_MT_INFO, &mt_len);
 	struct xtables_match *match;
+	struct xtables_rule_match **matches;
 	struct xt_entry_match *m;
 
-	match = xtables_find_match(mt_name, XTF_TRY_LOAD, &ctx->state.cs->matches);
+	switch (ctx->family) {
+	case NFPROTO_IPV4:
+	case NFPROTO_IPV6:
+		matches = &ctx->state.cs->matches;
+		break;
+	case NFPROTO_BRIDGE:
+		matches = &ctx->state.cs_eb->matches;
+		break;
+	default:
+		fprintf(stderr, "BUG: nft_parse_match() unknown family %d\n",
+			ctx->family);
+		exit(EXIT_FAILURE);
+	}
+
+	match = xtables_find_match(mt_name, XTF_TRY_LOAD, matches);
 	if (match == NULL)
 		return;
 

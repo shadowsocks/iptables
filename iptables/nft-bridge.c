@@ -370,6 +370,7 @@ static void nft_bridge_print_header(unsigned int format, const char *chain,
 static void nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
 				      unsigned int format)
 {
+	struct xtables_rule_match *matchp;
 	struct ebtables_command_state cs = {};
 	char *addr;
 
@@ -443,23 +444,13 @@ static void nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
 		print_iface(cs.fw.out);
 	}
 
-	/* old code to adapt
-	m_l = hlp->m_list;
-	while (m_l) {
-		m = ebt_find_match(m_l->m->u.name);
-		if (!m)
-			ebt_print_bug("Match not found");
-		m->print(hlp, m_l->m);
-		m_l = m_l->next;
+	for (matchp = cs.matches; matchp; matchp = matchp->next) {
+		if (matchp->match->print != NULL) {
+			matchp->match->print(&cs.fw, matchp->match->m,
+					     format & FMT_NUMERIC);
+		}
 	}
-	w_l = hlp->w_list;
-	while (w_l) {
-		w = ebt_find_watcher(w_l->w->u.name);
-		if (!w)
-			ebt_print_bug("Watcher not found");
-		w->print(hlp, w_l->w);
-		w_l = w_l->next;
-	}*/
+
 	printf("-j ");
 	if (!(format & FMT_NOTARGET))
 		printf("%s", cs.jumpto);
