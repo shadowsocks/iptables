@@ -114,6 +114,9 @@ static int _add_action(struct nft_rule *r, struct ebtables_command_state *cs)
 {
 	int ret = 0;
 
+	if (cs->jumpto == NULL || strcmp(cs->jumpto, "CONTINUE") == 0)
+		return 0;
+
 	/* If no target at all, add nothing (default to continue) */
 	if (cs->target != NULL) {
 		/* Standard target? */
@@ -452,14 +455,16 @@ static void nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
 	}
 
 	printf("-j ");
-	if (!(format & FMT_NOTARGET))
-		printf("%s", cs.jumpto);
-
 	if (cs.target != NULL) {
 		if (cs.target->print != NULL) {
 			cs.target->print(&cs.fw, cs.target->t,
 					    format & FMT_NUMERIC);
 		}
+	} else {
+		if (strcmp(cs.jumpto, "") == 0)
+			printf("CONTINUE");
+		else
+			printf("%s", cs.jumpto);
 	}
 
 	if (!(format & FMT_NOCOUNTS))
