@@ -17,6 +17,9 @@ Matches the given pattern.
 [\fB!\fP] \fB\-\-hex\-string\fP \fIpattern\fP
 Matches the given pattern in hex notation.
 .TP
+\fB\-\-icase\fP
+Ignore case when searching.
+.TP
 Examples:
 .IP
 # The string pattern can be used for simple text characters.
