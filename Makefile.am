@@ -16,6 +16,11 @@ SUBDIRS         += extensions
 # Depends on extensions/libext.a:
 SUBDIRS         += iptables
 
+if ENABLE_NFTABLES
+confdir		= $(sysconfdir)
+dist_conf_DATA	= etc/ethertypes
+endif
+
 .PHONY: tarball
 tarball:
 	rm -Rf /tmp/${PACKAGE_TARNAME}-${PACKAGE_VERSION};
