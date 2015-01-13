@@ -337,12 +337,13 @@ void nft_rule_to_ebtables_command_state(struct nft_rule *r,
 
 	nft_rule_expr_iter_destroy(iter);
 
-	if (cs->target != NULL)
-		cs->jumpto = cs->target->name;
-	else if (cs->jumpto != NULL)
-		cs->target = xtables_find_target(cs->jumpto, XTF_TRY_LOAD);
+	if (cs->jumpto != NULL)
+		return;
+
+	if (cs->target != NULL && cs->target->name != NULL)
+		cs->target = xtables_find_target(cs->target->name, XTF_TRY_LOAD);
 	else
-		cs->jumpto = "";
+		cs->jumpto = "CONTINUE";
 }
 
 static void print_iface(const char *iface)
@@ -455,17 +456,11 @@ static void nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
 	}
 
 	printf("-j ");
-	if (cs.target != NULL) {
-		if (cs.target->print != NULL) {
-			cs.target->print(&cs.fw, cs.target->t,
-					    format & FMT_NUMERIC);
-		}
-	} else {
-		if (strcmp(cs.jumpto, "") == 0)
-			printf("CONTINUE");
-		else
-			printf("%s", cs.jumpto);
-	}
+
+	if (cs.jumpto != NULL)
+		printf("%s", cs.jumpto);
+	else if (cs.target != NULL && cs.target->print != NULL)
+		cs.target->print(&cs.fw, cs.target->t, format & FMT_NUMERIC);
 
 	if (!(format & FMT_NOCOUNTS))
 		printf(" , pcnt = %"PRIu64" -- bcnt = %"PRIu64"",
