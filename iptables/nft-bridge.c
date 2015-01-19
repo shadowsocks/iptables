@@ -184,6 +184,8 @@ static int nft_bridge_add(struct nft_rule *r, void *data)
 		add_cmp_u16(r, fw->ethproto, op);
 	}
 
+	add_compat(r, fw->ethproto, fw->invflags);
+
 	for (matchp = cs->matches; matchp; matchp = matchp->next) {
 		if (add_match(r, matchp->match->m) < 0)
 			break;
