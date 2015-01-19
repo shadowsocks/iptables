@@ -644,6 +644,14 @@ static void ebt_load_matches(void)
 static void ebt_add_match(struct xtables_match *m,
 			  struct xtables_rule_match **rule_matches)
 {
+	struct xtables_rule_match *i;
+
+	/* match already in rule_matches, skip inclusion */
+	for (i = *rule_matches; i; i = i->next) {
+		if (strcmp(m->name, i->match->name) == 0)
+			return;
+	}
+
 	if (xtables_find_match(m->name, XTF_LOAD_MUST_SUCCEED, rule_matches) == NULL)
 		xtables_error(OTHER_PROBLEM,
 			      "Unable to add match %s", m->name);
