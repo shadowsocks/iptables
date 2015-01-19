@@ -618,7 +618,6 @@ static void ebt_load_match(const char *name)
 {
 	struct xtables_match *m;
 	size_t size;
-	opts = ebt_original_options;
 
 	m = xtables_find_match(name, XTF_LOAD_MUST_SUCCEED, NULL);
 	if (m == NULL)
@@ -638,6 +637,7 @@ static void ebt_load_match(const char *name)
 
 static void ebt_load_matches(void)
 {
+	opts = ebt_original_options;
 	ebt_load_match("802_3");
 }
 
