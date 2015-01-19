@@ -49,7 +49,7 @@ void add_meta(struct nft_rule *r, uint32_t key)
 	nft_rule_add_expr(r, expr);
 }
 
-void add_payload(struct nft_rule *r, int offset, int len)
+void add_payload(struct nft_rule *r, int offset, int len, uint32_t base)
 {
 	struct nft_rule_expr *expr;
 
@@ -57,8 +57,7 @@ void add_payload(struct nft_rule *r, int offset, int len)
 	if (expr == NULL)
 		return;
 
-	nft_rule_expr_set_u32(expr, NFT_EXPR_PAYLOAD_BASE,
-			      NFT_PAYLOAD_NETWORK_HEADER);
+	nft_rule_expr_set_u32(expr, NFT_EXPR_PAYLOAD_BASE, base);
 	nft_rule_expr_set_u32(expr, NFT_EXPR_PAYLOAD_DREG, NFT_REG_1);
 	nft_rule_expr_set_u32(expr, NFT_EXPR_PAYLOAD_OFFSET, offset);
 	nft_rule_expr_set_u32(expr, NFT_EXPR_PAYLOAD_LEN, len);
@@ -161,7 +160,7 @@ void add_outiface(struct nft_rule *r, char *iface, uint32_t op)
 void add_addr(struct nft_rule *r, int offset,
 	      void *data, void *mask, size_t len, uint32_t op)
 {
-	add_payload(r, offset, len);
+	add_payload(r, offset, len, NFT_PAYLOAD_NETWORK_HEADER);
 	add_bitwise(r, mask, len);
 
 	add_cmp_ptr(r, op, data, len);
@@ -170,7 +169,7 @@ void add_addr(struct nft_rule *r, int offset,
 void add_proto(struct nft_rule *r, int offset, size_t len,
 	       uint8_t proto, uint32_t op)
 {
-	add_payload(r, offset, len);
+	add_payload(r, offset, len, NFT_PAYLOAD_NETWORK_HEADER);
 	add_cmp_u8(r, proto, op);
 }
 

@@ -103,7 +103,7 @@ struct nft_family_ops {
 };
 
 void add_meta(struct nft_rule *r, uint32_t key);
-void add_payload(struct nft_rule *r, int offset, int len);
+void add_payload(struct nft_rule *r, int offset, int len, uint32_t base);
 void add_bitwise_u16(struct nft_rule *r, int mask, int xor);
 void add_cmp_ptr(struct nft_rule *r, uint32_t op, void *data, size_t len);
 void add_cmp_u8(struct nft_rule *r, uint8_t val, uint32_t op);

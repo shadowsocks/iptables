@@ -167,20 +167,23 @@ static int nft_bridge_add(struct nft_rule *r, void *data)
 	addr = ether_ntoa((struct ether_addr *) fw->sourcemac);
 	if (strcmp(addr, "0:0:0:0:0:0") != 0) {
 		op = nft_invflags2cmp(fw->invflags, EBT_ISOURCE);
-		add_payload(r, offsetof(struct ethhdr, h_source), 6);
+		add_payload(r, offsetof(struct ethhdr, h_source), 6,
+			    NFT_PAYLOAD_LL_HEADER);
 		add_cmp_ptr(r, op, fw->sourcemac, 6);
 	}
 
 	addr = ether_ntoa((struct ether_addr *) fw->destmac);
 	if (strcmp(addr, "0:0:0:0:0:0") != 0) {
 		op = nft_invflags2cmp(fw->invflags, EBT_IDEST);
-		add_payload(r, offsetof(struct ethhdr, h_dest), 6);
+		add_payload(r, offsetof(struct ethhdr, h_dest), 6,
+			    NFT_PAYLOAD_LL_HEADER);
 		add_cmp_ptr(r, op, fw->destmac, 6);
 	}
 
 	if (fw->ethproto != 0) {
 		op = nft_invflags2cmp(fw->invflags, EBT_IPROTO);
-		add_payload(r, offsetof(struct ethhdr, h_proto), 2);
+		add_payload(r, offsetof(struct ethhdr, h_proto), 2,
+			    NFT_PAYLOAD_LL_HEADER);
 		add_cmp_u16(r, fw->ethproto, op);
 	}
 
