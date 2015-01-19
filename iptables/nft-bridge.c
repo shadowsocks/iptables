@@ -191,6 +191,9 @@ static int nft_bridge_add(struct nft_rule *r, void *data)
 			break;
 	}
 
+	if (add_counters(r, cs->counters.pcnt, cs->counters.bcnt) < 0)
+		return -1;
+
 	return _add_action(r, cs);
 }
 
