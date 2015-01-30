@@ -640,6 +640,7 @@ static void ebt_load_matches(void)
 	opts = ebt_original_options;
 	ebt_load_match("802_3");
 	ebt_load_match("ip");
+	ebt_load_match("mark_m");
 }
 
 static void ebt_add_match(struct xtables_match *m,
