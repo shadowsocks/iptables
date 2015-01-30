@@ -219,22 +219,6 @@ brip_parse(int c, char **argv, int invert, unsigned int *flags,
 
 static void brip_final_check(unsigned int flags)
 {
-/*	struct ebt_ip_info *ipinfo = (struct ebt_ip_info *)match->data;
-
-	if (entry->ethproto != ETH_P_IP || entry->invflags & EBT_IPROTO) {
-		ebt_print_error("For IP filtering the protocol must be "
-		            "specified as IPv4");
-	} else if (info->bitmask & (EBT_IP_SPORT|EBT_IP_DPORT) &&
-		(!(info->bitmask & EBT_IP_PROTO) ||
-		info->invflags & EBT_IP_PROTO ||
-		(info->protocol!=IPPROTO_TCP &&
-		 info->protocol!=IPPROTO_UDP &&
-		 info->protocol!=IPPROTO_SCTP &&
-		 info->protocol!=IPPROTO_DCCP)))
-		ebt_print_error("For port filtering the IP protocol must be "
-				"either 6 (tcp), 17 (udp), 33 (dccp) or "
-				"132 (sctp)");
-*/
 	if (!flags)
 		xtables_error(PARAMETER_PROBLEM,
 			      "You must specify proper arguments");

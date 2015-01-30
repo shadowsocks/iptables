@@ -44,8 +44,6 @@ static void br802_3_init(struct xt_entry_match *match)
 	info->bitmask = 0;
 }
 
-/*static int parse(int c, char **argv, int argc, const struct ebt_u_entry *entry,
-   unsigned int *flags, struct ebt_entry_match **match)*/
 static int
 br802_3_parse(int c, char **argv, int invert, unsigned int *flags,
 	      const void *entry, struct xt_entry_match **match)
@@ -87,17 +85,11 @@ br802_3_parse(int c, char **argv, int invert, unsigned int *flags,
 static void
 br802_3_final_check(unsigned int flags)
 {
-	/*if (!(entry->bitmask & EBT_802_3))
-		ebt_print_error("For 802.3 DSAP/SSAP filtering the protocol "
-				"must be LENGTH");
-	*/
 	if (!flags)
 		xtables_error(PARAMETER_PROBLEM,
 			      "You must specify proper arguments");
 }
 
-/*static void print(const struct ebt_u_entry *entry,
-   const struct ebt_entry_match *match)*/
 static void br802_3_print(const void *ip, const struct xt_entry_match *match,
 			  int numeric)
 {
@@ -116,28 +108,7 @@ static void br802_3_print(const void *ip, const struct xt_entry_match *match,
 		printf("0x%.4x ", ntohs(info->type));
 	}
 }
-/*
-static int compare(const struct ebt_entry_match *m1,
-   const struct ebt_entry_match *m2)
-{
-	struct ebt_802_3_info *info1 = (struct ebt_802_3_info *)m1->data;
-	struct ebt_802_3_info *info2 = (struct ebt_802_3_info *)m2->data;
 
-	if (info1->bitmask != info2->bitmask)
-		return 0;
-	if (info1->invflags != info2->invflags)
-		return 0;
-	if (info1->bitmask & EBT_802_3_SAP) {
-		if (info1->sap != info2->sap)
-			return 0;
-	}
-	if (info1->bitmask & EBT_802_3_TYPE) {
-		if (info1->type != info2->type)
-			return 0;
-	}
-	return 1;
-}
-*/
 static struct xtables_match br802_3_match =
 {
 	.name		= "802_3",
