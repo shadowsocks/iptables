@@ -21,6 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <ctype.h>
 #include <errno.h>
 #include <getopt.h>
 #include <string.h>
@@ -36,6 +37,7 @@
 #include <linux/netfilter_bridge.h>
 #include <linux/netfilter/nf_tables.h>
 #include <ebtables/ethernetdb.h>
+#include <libiptc/libxtc.h>
 #include "xshared.h"
 #include "nft.h"
 #include "nft-bridge.h"
@@ -45,6 +47,8 @@
  */
 #define EXEC_STYLE_PRG    0
 #define EXEC_STYLE_DAEMON 1
+
+#define ebt_check_option2(flags, mask) EBT_CHECK_OPTION(flags, mask)
 
 /*
  * From useful_functions.c
@@ -103,19 +107,6 @@ int ebt_get_mac_and_mask(const char *from, unsigned char *to,
 	for (i = 0; i < ETH_ALEN; i++)
 		to[i] &= mask[i];
 	return 0;
-}
-
-/* This is a replacement for the ebt_check_option2() macro.
- *
- * Make sure the same option wasn't specified twice. This is used in the parse
- * functions of the extensions and ebtables.c.
- */
-static void ebt_check_option2(unsigned int *flags, unsigned int mask)
-{
-	if (*flags & mask)
-		xtables_error(PARAMETER_PROBLEM,
-			      "Multiple use of same option not allowed");
-	*flags |= mask;
 }
 
 static int ebt_check_inverse2(const char option[], int argc, char **argv)
@@ -302,8 +293,6 @@ static struct option ebt_original_options[] =
 
 void xtables_exit_error(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));
 
-static struct option *ebt_options = ebt_original_options;
-
 struct xtables_globals ebtables_globals = {
 	.option_offset 		= 0,
 	.program_version	= IPTABLES_VERSION,
@@ -319,15 +308,6 @@ struct xtables_globals ebtables_globals = {
 /*
  * From libebtc.c
  */
-
-/* The four target names, from libebtc.c */
-const char* ebt_standard_targets[NUM_STANDARD_TARGETS] =
-{
-	"ACCEPT",
-	"DROP",
-	"CONTINUE",
-	"RETURN",
-};
 
 /* Prints all registered extensions */
 static void ebt_list_extensions(const struct xtables_target *t,
@@ -363,7 +343,7 @@ static struct option *merge_options(struct option *oldopts,
 	struct option *merge;
 
 	if (!newopts || !oldopts || !options_offset)
-		xtables_error(OTHER_PROBLEM, "merge wrong");
+		return oldopts;
 	for (num_old = 0; oldopts[num_old].name; num_old++);
 	for (num_new = 0; newopts[num_new].name; num_new++);
 
@@ -412,14 +392,9 @@ static struct xtables_target *command_jump(struct ebtables_command_state *cs,
 
 	xs_init_target(target);
 
-	if (target->x6_options != NULL)
-		ebt_options = xtables_options_xfrm(ebtables_globals.orig_opts,
-					    ebt_options, target->x6_options,
-					    &target->option_offset);
-	else
-		ebt_options = xtables_merge_options(ebtables_globals.orig_opts,
-					     ebt_options, target->extra_opts,
-					     &target->option_offset);
+	opts = merge_options(opts, target->extra_opts, &target->option_offset);
+	if (opts == NULL)
+		xtables_error(OTHER_PROBLEM, "Can't alloc memory");
 
 	return target;
 }
@@ -799,7 +774,7 @@ handle_P:
 					xtables_error(PARAMETER_PROBLEM,
 						      "No policy specified");
 				for (i = 0; i < NUM_STANDARD_TARGETS; i++)
-					if (!strcmp(argv[optind], ebt_standard_targets[i])) {
+					if (!strcmp(argv[optind], nft_ebt_standard_target(i))) {
 						policy = argv[optind];
 						if (-i-1 == EBT_CONTINUE)
 							xtables_error(PARAMETER_PROBLEM,
@@ -1177,12 +1152,14 @@ big_iface_length:
 			continue;
 		default:
 			/* Is it a target option? */
-			/*t = (struct ebt_u_target *)new_entry->t;
-			if ((t->parse(c - t->option_offset, argv, argc, new_entry, &t->flags, &t->t))) {
-				if (ebt_errormsg[0] != '\0')
-					return -1;
-				goto check_extension;
-			}*/
+			if (cs.target != NULL && cs.target->parse != NULL) {
+				int opt_offset = cs.target->option_offset;
+				if (cs.target->parse(c - opt_offset,
+						     argv, ebt_invert,
+						     &cs.target->tflags,
+						     NULL, &cs.target->t))
+					goto check_extension;
+			}
 
 			/* Is it a match_option? */
 			for (m = xtables_matches; m; m = m->next) {
