@@ -79,6 +79,8 @@ br802_3_parse(int c, char **argv, int invert, unsigned int *flags,
 	default:
 		return 0;
 	}
+
+	*flags |= info->bitmask;
 	return 1;
 }
 

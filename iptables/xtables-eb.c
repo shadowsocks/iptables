@@ -647,16 +647,22 @@ static void ebt_add_match(struct xtables_match *m,
 			  struct xtables_rule_match **rule_matches)
 {
 	struct xtables_rule_match *i;
+	struct xtables_match *newm;
 
 	/* match already in rule_matches, skip inclusion */
 	for (i = *rule_matches; i; i = i->next) {
-		if (strcmp(m->name, i->match->name) == 0)
+		if (strcmp(m->name, i->match->name) == 0) {
+			i->match->mflags |= m->mflags;
 			return;
+		}
 	}
 
-	if (xtables_find_match(m->name, XTF_LOAD_MUST_SUCCEED, rule_matches) == NULL)
+	newm = xtables_find_match(m->name, XTF_LOAD_MUST_SUCCEED, rule_matches);
+	if (newm == NULL)
 		xtables_error(OTHER_PROBLEM,
 			      "Unable to add match %s", m->name);
+
+	newm->mflags = m->mflags;
 }
 
 /* We use exec_style instead of #ifdef's because ebtables.so is a shared object. */
@@ -678,6 +684,7 @@ int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table)
 	const char *policy = NULL;
 	int exec_style = EXEC_STYLE_PRG;
 	int selected_chain = -1;
+	struct xtables_rule_match *xtrm_i;
 
 	memset(&cs, 0, sizeof(cs));
 	cs.argv = argv;
@@ -1227,37 +1234,14 @@ check_extension:
 	}
 
 	/* Do the final checks */
-	/*if (replace->command == 'A' || replace->command == 'I' ||
-	   replace->command == 'D' || replace->command == 'C') {*/
-		/* This will put the hook_mask right for the chains */
-		/*ebt_check_for_loops(replace);
-		if (ebt_errormsg[0] != '\0')
-			return -1;
-		entries = ebt_to_chain(replace);
-		m_l = new_entry->m_list;
-		w_l = new_entry->w_list;
-		t = (struct ebt_u_target *)new_entry->t;
-		while (m_l) {
-			m = (struct ebt_u_match *)(m_l->m);
-			m->final_check(new_entry, m->m, replace->name,
-			   entries->hook_mask, 0);
-			if (ebt_errormsg[0] != '\0')
-				return -1;
-			m_l = m_l->next;
-		}
-		while (w_l) {
-			w = (struct ebt_u_watcher *)(w_l->w);
-			w->final_check(new_entry, w->w, replace->name,
-			   entries->hook_mask, 0);
-			if (ebt_errormsg[0] != '\0')
-				return -1;
-			w_l = w_l->next;
-		}
-		t->final_check(new_entry, t->t, replace->name,
-		   entries->hook_mask, 0);
-		if (ebt_errormsg[0] != '\0')
-			return -1;
-	}*/
+	if (command == 'A' || command == 'I' ||
+	    command == 'D' || command == 'C') {
+		for (xtrm_i = cs.matches; xtrm_i; xtrm_i = xtrm_i->next)
+			xtables_option_mfcall(xtrm_i->match);
+
+		if (cs.target != NULL)
+			xtables_option_tfcall(cs.target);
+	}
 	/* So, the extensions can work with the host endian.
 	 * The kernel does not have to do this of course */
 	cs.fw.ethproto = htons(cs.fw.ethproto);
