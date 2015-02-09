@@ -97,6 +97,7 @@ struct nft_family_ops {
 			    struct xtables_args *args);
 	void (*post_parse)(int command, struct iptables_command_state *cs,
 			   struct xtables_args *args);
+	void (*parse_match)(struct xtables_match *m, void *data);
 	void (*parse_target)(struct xtables_target *t, void *data);
 	bool (*rule_find)(struct nft_family_ops *ops, struct nft_rule *r,
 			  void *data);

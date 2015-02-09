@@ -610,19 +610,49 @@ static void ebt_load_match(const char *name)
 		xtables_error(OTHER_PROBLEM, "Can't alloc memory");
 }
 
-static void ebt_load_matches(void)
+static void ebt_load_watcher(const char *name)
+{
+	struct xtables_target *watcher;
+	size_t size;
+
+	watcher = xtables_find_target(name, XTF_LOAD_MUST_SUCCEED);
+	if (!watcher)
+		xtables_error(OTHER_PROBLEM,
+			      "Unable to load %s watcher", name);
+
+	size = XT_ALIGN(sizeof(struct xt_entry_target)) + watcher->size;
+
+	watcher->t = xtables_calloc(1, size);
+	watcher->t->u.target_size = size;
+	strncpy(watcher->t->u.user.name, name,
+		sizeof(watcher->t->u.user.name));
+	watcher->t->u.user.name[sizeof(watcher->t->u.user.name)-1] = '\0';
+	watcher->t->u.user.revision = watcher->revision;
+
+	xs_init_target(watcher);
+
+	opts = merge_options(opts, watcher->extra_opts,
+			     &watcher->option_offset);
+	if (opts == NULL)
+		xtables_error(OTHER_PROBLEM, "Can't alloc memory");
+}
+
+static void ebt_load_match_extensions(void)
 {
 	opts = ebt_original_options;
 	ebt_load_match("802_3");
 	ebt_load_match("ip");
 	ebt_load_match("mark_m");
+
+	ebt_load_watcher("log");
 }
 
 static void ebt_add_match(struct xtables_match *m,
-			  struct xtables_rule_match **rule_matches)
+			  struct ebtables_command_state *cs)
 {
-	struct xtables_rule_match *i;
+	struct xtables_rule_match *i, **rule_matches = &cs->matches;
 	struct xtables_match *newm;
+	struct ebt_match *newnode;
 
 	/* match already in rule_matches, skip inclusion */
 	for (i = *rule_matches; i; i = i->next) {
@@ -638,6 +668,45 @@ static void ebt_add_match(struct xtables_match *m,
 			      "Unable to add match %s", m->name);
 
 	newm->mflags = m->mflags;
+
+	/* glue code for watchers */
+	newnode = calloc(1, sizeof(struct ebt_match));
+	if (newnode == NULL)
+		xtables_error(OTHER_PROBLEM, "Unable to alloc memory");
+
+	newnode->ismatch = true;
+	newnode->u.match = newm;
+
+	if (cs->match_list == NULL)
+		cs->match_list = newnode;
+	else
+		cs->match_list->next = newnode;
+}
+
+static void ebt_add_watcher(struct xtables_target *watcher,
+			    struct ebtables_command_state *cs)
+{
+	struct ebt_match *i, *newnode;
+
+	for (i = cs->match_list; i; i = i->next) {
+		if (i->ismatch)
+			continue;
+		if (strcmp(i->u.watcher->name, watcher->name) == 0) {
+			i->u.watcher->tflags |= watcher->tflags;
+			return;
+		}
+	}
+
+	newnode = calloc(1, sizeof(struct ebt_match));
+	if (newnode == NULL)
+		xtables_error(OTHER_PROBLEM, "Unable to alloc memory");
+
+	newnode->u.watcher = watcher;
+
+	if (cs->match_list == NULL)
+		cs->match_list = newnode;
+	else
+		cs->match_list->next = newnode;
 }
 
 /* We use exec_style instead of #ifdef's because ebtables.so is a shared object. */
@@ -651,7 +720,7 @@ int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table)
 	int rule_nr_end = 0;
 	int ret = 0;
 	unsigned int flags = 0;
-	struct xtables_target *t;
+	struct xtables_target *t, *w;
 	struct xtables_match *m;
 	struct ebtables_command_state cs;
 	char command = 'h';
@@ -660,6 +729,7 @@ int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table)
 	int exec_style = EXEC_STYLE_PRG;
 	int selected_chain = -1;
 	struct xtables_rule_match *xtrm_i;
+	struct ebt_match *match;
 
 	memset(&cs, 0, sizeof(cs));
 	cs.argv = argv;
@@ -676,7 +746,7 @@ int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table)
 	 * don't use '-m matchname' and the match can't loaded dinamically when
 	 * the user calls it.
 	 */
-	ebt_load_matches();
+	ebt_load_match_extensions();
 
 	/* clear mflags in case do_commandeb gets called a second time
 	 * (we clear the global list of all matches for security)*/
@@ -1164,16 +1234,21 @@ big_iface_length:
 			/* Is it a match_option? */
 			for (m = xtables_matches; m; m = m->next) {
 				if (m->parse(c - m->option_offset, argv, ebt_invert, &m->mflags, NULL, &m->m)) {
-					ebt_add_match(m, &cs.matches);
+					ebt_add_match(m, &cs);
 					goto check_extension;
 				}
 			}
 
 			/* Is it a watcher option? */
-			/*for (w = ebt_watchers; w; w = w->next)
-				if (w->parse(c - w->option_offset, argv, argc, new_entry, &w->flags, &w->w))
-					break;
-
+			for (w = xtables_targets; w; w = w->next) {
+				if (w->parse(c - w->option_offset, argv,
+					     ebt_invert, &w->tflags,
+					     NULL, &w->t)) {
+					ebt_add_watcher(w, &cs);
+					goto check_extension;
+				}
+			}
+			/*
 			if (w == NULL && c == '?')
 				ebt_print_error2("Unknown argument: '%s'", argv[optind - 1], (char)optopt, (char)c);
 			else if (w == NULL) {
@@ -1215,6 +1290,13 @@ check_extension:
 	    command == 'D' || command == 'C') {
 		for (xtrm_i = cs.matches; xtrm_i; xtrm_i = xtrm_i->next)
 			xtables_option_mfcall(xtrm_i->match);
+
+		for (match = cs.match_list; match; match = match->next) {
+			if (match->ismatch)
+				continue;
+
+			xtables_option_tfcall(match->u.watcher);
+		}
 
 		if (cs.target != NULL)
 			xtables_option_tfcall(cs.target);
@@ -1278,5 +1360,7 @@ check_extension:
 
 		if (replace->nentries)
 			ebt_deliver_counters(replace);*/
+
+	ebt_cs_clean(&cs);
 	return ret;
 }

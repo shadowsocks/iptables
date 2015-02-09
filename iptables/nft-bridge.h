@@ -93,10 +93,21 @@ struct ebt_entry {
 	unsigned char out_mask[IFNAMSIZ];
 };
 
+/* trick for ebtables-compat, since watchers are targets */
+struct ebt_match {
+	struct ebt_match				*next;
+	union {
+		struct xtables_match		*match;
+		struct xtables_target		*watcher;
+	} u;
+	bool					ismatch;
+};
+
 struct ebtables_command_state {
 	struct ebt_entry fw;
 	struct xtables_target *target;
 	struct xtables_rule_match *matches;
+	struct ebt_match *match_list;
 	const char *jumpto;
 	struct xt_counters counters;
 	int invert;
@@ -154,5 +165,7 @@ static inline const char *ebt_target_name(unsigned int verdict)
 			      "option not allowed");		\
 	*flags |= mask;						\
 })								\
+
+void ebt_cs_clean(struct ebtables_command_state *cs);
 
 #endif

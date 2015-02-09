@@ -22,6 +22,21 @@
 #include "nft-bridge.h"
 #include "nft.h"
 
+void ebt_cs_clean(struct ebtables_command_state *cs)
+{
+	struct ebt_match *m, *nm;
+
+	xtables_rule_matches_free(&cs->matches);
+
+	for (m = cs->match_list; m;) {
+		nm = m->next;
+		if (!m->ismatch)
+			free(m->u.watcher->t);
+		free(m);
+		m = nm;
+	}
+}
+
 /* 0: default, print only 2 digits if necessary
  * 2: always print 2 digits, a printed mac address
  * then always has the same length
@@ -139,7 +154,7 @@ static int _add_action(struct nft_rule *r, struct ebtables_command_state *cs)
 static int nft_bridge_add(struct nft_rule *r, void *data)
 {
 	struct ebtables_command_state *cs = data;
-	struct xtables_rule_match *matchp;
+	struct ebt_match *iter;
 	struct ebt_entry *fw = &cs->fw;
 	uint32_t op;
 	char *addr;
@@ -189,9 +204,14 @@ static int nft_bridge_add(struct nft_rule *r, void *data)
 
 	add_compat(r, fw->ethproto, fw->invflags);
 
-	for (matchp = cs->matches; matchp; matchp = matchp->next) {
-		if (add_match(r, matchp->match->m) < 0)
-			break;
+	for (iter = cs->match_list; iter; iter = iter->next) {
+		if (iter->ismatch) {
+			if (add_match(r, iter->u.match->m))
+				break;
+		} else {
+			if (add_target(r, iter->u.watcher->t))
+				break;
+		}
 	}
 
 	if (add_counters(r, cs->counters.pcnt, cs->counters.bcnt) < 0)
@@ -296,9 +316,43 @@ static void nft_bridge_parse_immediate(const char *jumpto, bool nft_goto,
 	cs->jumpto = jumpto;
 }
 
+static void parse_watcher(void *object, struct ebt_match **match_list,
+			  bool ismatch)
+{
+	struct ebt_match *m;
+
+	m = calloc(1, sizeof(struct ebt_match));
+	if (m == NULL)
+		xtables_error(OTHER_PROBLEM, "Can't allocate memory");
+
+	if (ismatch)
+		m->u.match = object;
+	else
+		m->u.watcher = object;
+
+	m->ismatch = ismatch;
+	if (*match_list == NULL)
+		*match_list = m;
+	else
+		(*match_list)->next = m;
+}
+
+static void nft_bridge_parse_match(struct xtables_match *m, void *data)
+{
+	struct ebtables_command_state *cs = data;
+
+	parse_watcher(m, &cs->match_list, true);
+}
+
 static void nft_bridge_parse_target(struct xtables_target *t, void *data)
 {
 	struct ebtables_command_state *cs = data;
+
+	/* harcoded names :-( */
+	if (strcmp(t->name, "log") == 0) {
+		parse_watcher(t, &cs->match_list, false);
+		return;
+	}
 
 	cs->target = t;
 }
@@ -382,7 +436,9 @@ static void nft_bridge_print_header(unsigned int format, const char *chain,
 static void nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
 				      unsigned int format)
 {
-	struct xtables_rule_match *matchp;
+	struct xtables_match *matchp;
+	struct xtables_target *watcherp;
+	struct ebt_match *m;
 	struct ebtables_command_state cs = {};
 	char *addr;
 
@@ -456,10 +512,19 @@ static void nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
 		print_iface(cs.fw.out);
 	}
 
-	for (matchp = cs.matches; matchp; matchp = matchp->next) {
-		if (matchp->match->print != NULL) {
-			matchp->match->print(&cs.fw, matchp->match->m,
-					     format & FMT_NUMERIC);
+	for (m = cs.match_list; m; m = m->next) {
+		if (m->ismatch) {
+			matchp = m->u.match;
+			if (matchp->print != NULL) {
+				matchp->print(&cs.fw, matchp->m,
+					      format & FMT_NUMERIC);
+			}
+		} else {
+			watcherp = m->u.watcher;
+			if (watcherp->print != NULL) {
+				watcherp->print(&cs.fw, watcherp->t,
+						format & FMT_NUMERIC);
+			}
 		}
 	}
 
@@ -476,6 +541,8 @@ static void nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
 
 	if (!(format & FMT_NONEWLINE))
 		fputc('\n', stdout);
+
+	ebt_cs_clean(&cs);
 }
 
 static bool nft_bridge_is_same(const void *data_a, const void *data_b)
@@ -567,6 +634,7 @@ struct nft_family_ops nft_family_ops_bridge = {
 	.parse_meta		= nft_bridge_parse_meta,
 	.parse_payload		= nft_bridge_parse_payload,
 	.parse_immediate	= nft_bridge_parse_immediate,
+	.parse_match		= nft_bridge_parse_match,
 	.parse_target		= nft_bridge_parse_target,
 	.print_table_header	= nft_bridge_print_table_header,
 	.print_header		= nft_bridge_print_header,

@@ -328,6 +328,7 @@ void nft_parse_match(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
 	struct xtables_match *match;
 	struct xtables_rule_match **matches;
 	struct xt_entry_match *m;
+	struct nft_family_ops *ops;
 
 	switch (ctx->family) {
 	case NFPROTO_IPV4:
@@ -359,6 +360,10 @@ void nft_parse_match(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
 	strcpy(m->u.user.name, match->name);
 
 	match->m = m;
+
+	ops = nft_family_ops_lookup(ctx->family);
+	if (ops->parse_match != NULL)
+		ops->parse_match(match, nft_get_data(ctx));
 }
 
 void print_proto(uint16_t proto, int invert)
