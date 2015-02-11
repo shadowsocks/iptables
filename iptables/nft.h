@@ -41,6 +41,7 @@ struct nft_handle {
 
 extern struct builtin_table xtables_ipv4[TABLES_MAX];
 extern struct builtin_table xtables_arp[TABLES_MAX];
+extern struct builtin_table xtables_bridge[TABLES_MAX];
 
 int mnl_talk(struct nft_handle *h, struct nlmsghdr *nlh,
 	     int (*cb)(const struct nlmsghdr *nlh, void *data),
@@ -135,6 +136,8 @@ const char *nft_strerror(int err);
 int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table, bool restore);
 /* For xtables-arptables.c */
 int do_commandarp(struct nft_handle *h, int argc, char *argv[], char **table);
+/* For xtables-eb.c */
+int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table);
 
 /*
  * Parse config for tables and chain helper functions

@@ -39,16 +39,20 @@ endif
 #	Wildcard module list
 #
 pfx_build_mod := $(patsubst ${srcdir}/libxt_%.c,%,$(sort $(wildcard ${srcdir}/libxt_*.c)))
+pfb_build_mod := $(patsubst ${srcdir}/libebt_%.c,%,$(sort $(wildcard ${srcdir}/libebt_*.c)))
 pfx_symlinks  := NOTRACK state
 @ENABLE_IPV4_TRUE@ pf4_build_mod := $(patsubst ${srcdir}/libipt_%.c,%,$(sort $(wildcard ${srcdir}/libipt_*.c)))
 @ENABLE_IPV6_TRUE@ pf6_build_mod := $(patsubst ${srcdir}/libip6t_%.c,%,$(sort $(wildcard ${srcdir}/libip6t_*.c)))
 pfx_build_mod := $(filter-out @blacklist_modules@,${pfx_build_mod})
+pfb_build_mod := $(filter-out @blacklist_modules@,${pfb_build_mod})
 pf4_build_mod := $(filter-out @blacklist_modules@,${pf4_build_mod})
 pf6_build_mod := $(filter-out @blacklist_modules@,${pf6_build_mod})
 pfx_objs      := $(patsubst %,libxt_%.o,${pfx_build_mod})
+pfb_objs      := $(patsubst %,libebt_%.o,${pfb_build_mod})
 pf4_objs      := $(patsubst %,libipt_%.o,${pf4_build_mod})
 pf6_objs      := $(patsubst %,libip6t_%.o,${pf6_build_mod})
 pfx_solibs    := $(patsubst %,libxt_%.so,${pfx_build_mod} ${pfx_symlinks})
+pfb_solibs    := $(patsubst %,libebt_%.so,${pfb_build_mod})
 pf4_solibs    := $(patsubst %,libipt_%.so,${pf4_build_mod})
 pf6_solibs    := $(patsubst %,libip6t_%.so,${pf6_build_mod})
 
@@ -56,13 +60,14 @@ pf6_solibs    := $(patsubst %,libip6t_%.so,${pf6_build_mod})
 #
 # Building blocks
 #
-targets := libext.a libext4.a libext6.a matches.man targets.man
+targets := libext.a libext4.a libext6.a libext_ebt.a matches.man targets.man
 targets_install :=
 @ENABLE_STATIC_TRUE@ libext_objs := ${pfx_objs}
+@ENABLE_STATIC_TRUE@ libext_ebt_objs := ${pfb_objs}
 @ENABLE_STATIC_TRUE@ libext4_objs := ${pf4_objs}
 @ENABLE_STATIC_TRUE@ libext6_objs := ${pf6_objs}
-@ENABLE_STATIC_FALSE@ targets += ${pfx_solibs} ${pf4_solibs} ${pf6_solibs}
-@ENABLE_STATIC_FALSE@ targets_install += ${pfx_solibs} ${pf4_solibs} ${pf6_solibs}
+@ENABLE_STATIC_FALSE@ targets += ${pfx_solibs} ${pfb_solibs} ${pf4_solibs} ${pf6_solibs}
+@ENABLE_STATIC_FALSE@ targets_install += ${pfx_solibs} ${pfb_solibs} ${pf4_solibs} ${pf6_solibs}
 
 .SECONDARY:
 
@@ -75,7 +80,7 @@ install: ${targets_install}
 	if test -n "${targets_install}"; then install -pm0755 $^ "${DESTDIR}${xtlibdir}/"; fi;
 
 clean:
-	rm -f *.o *.oo *.so *.a {matches,targets}.man initext.c initext4.c initext6.c;
+	rm -f *.o *.oo *.so *.a {matches,targets}.man initext.c initext4.c initext6.c initextb.c;
 	rm -f .*.d .*.dd;
 
 distclean: clean
@@ -118,6 +123,9 @@ lib%.o: ${srcdir}/lib%.c
 libext.a: initext.o ${libext_objs}
 	${AM_VERBOSE_AR} ${AR} crs $@ $^;
 
+libext_ebt.a: initextb.o ${libext_ebt_objs}
+	${AM_VERBOSE_AR} ${AR} crs $@ $^;
+
 libext4.a: initext4.o ${libext4_objs}
 	${AM_VERBOSE_AR} ${AR} crs $@ $^;
 
@@ -125,11 +133,17 @@ libext6.a: initext6.o ${libext6_objs}
 	${AM_VERBOSE_AR} ${AR} crs $@ $^;
 
 initext_func  := $(addprefix xt_,${pfx_build_mod})
+initextb_func := $(addprefix ebt_,${pfb_build_mod})
 initext4_func := $(addprefix ipt_,${pf4_build_mod})
 initext6_func := $(addprefix ip6t_,${pf6_build_mod})
 
 .initext.dd: FORCE
 	@echo "${initext_func}" >$@.tmp; \
+	cmp -s $@ $@.tmp || mv $@.tmp $@; \
+	rm -f $@.tmp;
+
+.initextb.dd: FORCE
+	@echo "${initextb_func}" >$@.tmp; \
 	cmp -s $@ $@.tmp || mv $@.tmp $@; \
 	rm -f $@.tmp;
 
@@ -154,6 +168,22 @@ initext.c: .initext.dd
 	echo "void init_extensions(void)" >>$@; \
 	echo "{" >>$@; \
 	for i in ${initext_func}; do \
+		echo  " ""lib$${i}_init();" >>$@; \
+	done; \
+	echo "}" >>$@; \
+	);
+
+initextb.c: .initextb.dd
+	${AM_VERBOSE_GEN}
+	@( \
+	echo "" >$@; \
+	for i in ${initextb_func}; do \
+		echo "extern void lib$${i}_init(void);" >>$@; \
+	done; \
+	echo "void init_extensionsb(void);" >>$@; \
+	echo "void init_extensionsb(void)" >>$@; \
+	echo "{" >>$@; \
+	for i in ${initextb_func}; do \
 		echo  " ""lib$${i}_init();" >>$@; \
 	done; \
 	echo "}" >>$@; \
@@ -219,8 +249,8 @@ man_run    = \
 		fi; \
 	done >$@;
 
-matches.man: .initext.dd .initext4.dd .initext6.dd $(wildcard ${srcdir}/lib*.man)
-	$(call man_run,$(call ex_matches,${pfx_build_mod} ${pf4_build_mod} ${pf6_build_mod} ${pfx_symlinks}))
+matches.man: .initext.dd .initextb.dd .initext4.dd .initext6.dd $(wildcard ${srcdir}/lib*.man)
+	$(call man_run,$(call ex_matches,${pfx_build_mod} ${pfb_build_mod} ${pf4_build_mod} ${pf6_build_mod} ${pfx_symlinks}))
 
 targets.man: .initext.dd .initext4.dd .initext6.dd $(wildcard ${srcdir}/lib*.man)
-	$(call man_run,$(call ex_targets,${pfx_build_mod} ${pf4_build_mod} ${pf6_build_mod} ${pfx_symlinks}))
+	$(call man_run,$(call ex_targets,${pfx_build_mod} ${pfb_build_mod} ${pf4_build_mod} ${pf6_build_mod} ${pfx_symlinks}))

@@ -26,12 +26,14 @@
 #include <libnftnl/expr.h>
 
 #include "nft-shared.h"
+#include "nft-bridge.h"
 #include "xshared.h"
 #include "nft.h"
 
 extern struct nft_family_ops nft_family_ops_ipv4;
 extern struct nft_family_ops nft_family_ops_ipv6;
 extern struct nft_family_ops nft_family_ops_arp;
+extern struct nft_family_ops nft_family_ops_bridge;
 
 void add_meta(struct nft_rule *r, uint32_t key)
 {
@@ -47,7 +49,7 @@ void add_meta(struct nft_rule *r, uint32_t key)
 	nft_rule_add_expr(r, expr);
 }
 
-void add_payload(struct nft_rule *r, int offset, int len)
+void add_payload(struct nft_rule *r, int offset, int len, uint32_t base)
 {
 	struct nft_rule_expr *expr;
 
@@ -55,8 +57,7 @@ void add_payload(struct nft_rule *r, int offset, int len)
 	if (expr == NULL)
 		return;
 
-	nft_rule_expr_set_u32(expr, NFT_EXPR_PAYLOAD_BASE,
-			      NFT_PAYLOAD_NETWORK_HEADER);
+	nft_rule_expr_set_u32(expr, NFT_EXPR_PAYLOAD_BASE, base);
 	nft_rule_expr_set_u32(expr, NFT_EXPR_PAYLOAD_DREG, NFT_REG_1);
 	nft_rule_expr_set_u32(expr, NFT_EXPR_PAYLOAD_OFFSET, offset);
 	nft_rule_expr_set_u32(expr, NFT_EXPR_PAYLOAD_LEN, len);
@@ -159,7 +160,7 @@ void add_outiface(struct nft_rule *r, char *iface, uint32_t op)
 void add_addr(struct nft_rule *r, int offset,
 	      void *data, void *mask, size_t len, uint32_t op)
 {
-	add_payload(r, offset, len);
+	add_payload(r, offset, len, NFT_PAYLOAD_NETWORK_HEADER);
 	add_bitwise(r, mask, len);
 
 	add_cmp_ptr(r, op, data, len);
@@ -168,7 +169,7 @@ void add_addr(struct nft_rule *r, int offset,
 void add_proto(struct nft_rule *r, int offset, size_t len,
 	       uint8_t proto, uint32_t op)
 {
-	add_payload(r, offset, len);
+	add_payload(r, offset, len, NFT_PAYLOAD_NETWORK_HEADER);
 	add_cmp_u8(r, proto, op);
 }
 
@@ -206,7 +207,7 @@ bool is_same_interfaces(const char *a_iniface, const char *a_outiface,
 	return true;
 }
 
-void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
+int parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 		unsigned char *iniface_mask, char *outiface,
 		unsigned char *outiface_mask, uint8_t *invflags)
 {
@@ -264,9 +265,10 @@ void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 		}
 		break;
 	default:
-		DEBUGP("unknown meta key %d\n", key);
-		break;
+		return -1;
 	}
+
+	return 0;
 }
 
 static void *nft_get_data(struct nft_xt_ctx *ctx)
@@ -277,6 +279,8 @@ static void *nft_get_data(struct nft_xt_ctx *ctx)
 		return ctx->state.cs;
 	case NFPROTO_ARP:
 		return ctx->state.cs_arp;
+	case NFPROTO_BRIDGE:
+		return ctx->state.cs_eb;
 	default:
 		/* Should not happen */
 		return NULL;
@@ -316,15 +320,31 @@ void nft_parse_target(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
 	ops->parse_target(target, data);
 }
 
-static void nft_parse_match(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
+void nft_parse_match(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
 {
 	uint32_t mt_len;
 	const char *mt_name = nft_rule_expr_get_str(e, NFT_EXPR_MT_NAME);
 	const void *mt_info = nft_rule_expr_get(e, NFT_EXPR_MT_INFO, &mt_len);
 	struct xtables_match *match;
+	struct xtables_rule_match **matches;
 	struct xt_entry_match *m;
+	struct nft_family_ops *ops;
 
-	match = xtables_find_match(mt_name, XTF_TRY_LOAD, &ctx->state.cs->matches);
+	switch (ctx->family) {
+	case NFPROTO_IPV4:
+	case NFPROTO_IPV6:
+		matches = &ctx->state.cs->matches;
+		break;
+	case NFPROTO_BRIDGE:
+		matches = &ctx->state.cs_eb->matches;
+		break;
+	default:
+		fprintf(stderr, "BUG: nft_parse_match() unknown family %d\n",
+			ctx->family);
+		exit(EXIT_FAILURE);
+	}
+
+	match = xtables_find_match(mt_name, XTF_TRY_LOAD, matches);
 	if (match == NULL)
 		return;
 
@@ -340,6 +360,10 @@ static void nft_parse_match(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
 	strcpy(m->u.user.name, match->name);
 
 	match->m = m;
+
+	ops = nft_family_ops_lookup(ctx->family);
+	if (ops->parse_match != NULL)
+		ops->parse_match(match, nft_get_data(ctx));
 }
 
 void print_proto(uint16_t proto, int invert)
@@ -734,6 +758,8 @@ struct nft_family_ops *nft_family_ops_lookup(int family)
 		return &nft_family_ops_ipv6;
 	case NFPROTO_ARP:
 		return &nft_family_ops_arp;
+	case NFPROTO_BRIDGE:
+		return &nft_family_ops_bridge;
 	default:
 		break;
 	}
@@ -741,8 +767,8 @@ struct nft_family_ops *nft_family_ops_lookup(int family)
 	return NULL;
 }
 
-static bool
-compare_matches(struct xtables_rule_match *mt1, struct xtables_rule_match *mt2)
+bool compare_matches(struct xtables_rule_match *mt1,
+		     struct xtables_rule_match *mt2)
 {
 	struct xtables_rule_match *mp1;
 	struct xtables_rule_match *mp2;

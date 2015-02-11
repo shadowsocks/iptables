@@ -60,7 +60,8 @@ static int nft_ipv4_add(struct nft_rule *r, void *data)
 			 sizeof(struct in_addr), op);
 	}
 	if (cs->fw.ip.flags & IPT_F_FRAG) {
-		add_payload(r, offsetof(struct iphdr, frag_off), 2);
+		add_payload(r, offsetof(struct iphdr, frag_off), 2,
+			    NFT_PAYLOAD_NETWORK_HEADER);
 		/* get the 13 bits that contain the fragment offset */
 		add_bitwise_u16(r, 0x1fff, !0x1fff);
 

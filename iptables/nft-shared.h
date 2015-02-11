@@ -48,6 +48,7 @@ struct nft_xt_ctx {
 	union {
 		struct iptables_command_state *cs;
 		struct arptables_command_state *cs_arp;
+		struct ebtables_command_state *cs_eb;
 	} state;
 	struct nft_rule_expr_iter *iter;
 	int family;
@@ -83,6 +84,7 @@ struct nft_family_ops {
 			  void *data);
 	void (*parse_immediate)(const char *jumpto, bool nft_goto, void *data);
 
+	void (*print_table_header)(const char *tablename);
 	void (*print_header)(unsigned int format, const char *chain,
 			     const char *pol,
 			     const struct xt_counters *counters, bool basechain,
@@ -95,13 +97,14 @@ struct nft_family_ops {
 			    struct xtables_args *args);
 	void (*post_parse)(int command, struct iptables_command_state *cs,
 			   struct xtables_args *args);
+	void (*parse_match)(struct xtables_match *m, void *data);
 	void (*parse_target)(struct xtables_target *t, void *data);
 	bool (*rule_find)(struct nft_family_ops *ops, struct nft_rule *r,
 			  void *data);
 };
 
 void add_meta(struct nft_rule *r, uint32_t key);
-void add_payload(struct nft_rule *r, int offset, int len);
+void add_payload(struct nft_rule *r, int offset, int len, uint32_t base);
 void add_bitwise_u16(struct nft_rule *r, int mask, int xor);
 void add_cmp_ptr(struct nft_rule *r, uint32_t op, void *data, size_t len);
 void add_cmp_u8(struct nft_rule *r, uint8_t val, uint32_t op);
@@ -122,13 +125,14 @@ bool is_same_interfaces(const char *a_iniface, const char *a_outiface,
 			unsigned const char *b_iniface_mask,
 			unsigned const char *b_outiface_mask);
 
-void parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
+int parse_meta(struct nft_rule_expr *e, uint8_t key, char *iniface,
 		unsigned char *iniface_mask, char *outiface,
 		unsigned char *outiface_mask, uint8_t *invflags);
 void print_proto(uint16_t proto, int invert);
 void get_cmp_data(struct nft_rule_expr *e, void *data, size_t dlen, bool *inv);
 void nft_parse_bitwise(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
 void nft_parse_cmp(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
+void nft_parse_match(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
 void nft_parse_target(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
 void nft_parse_meta(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
 void nft_parse_payload(struct nft_xt_ctx *ctx, struct nft_rule_expr *e);
@@ -165,6 +169,7 @@ struct nft_handle;
 bool nft_ipv46_rule_find(struct nft_family_ops *ops, struct nft_rule *r,
 			 struct iptables_command_state *cs);
 
+bool compare_matches(struct xtables_rule_match *mt1, struct xtables_rule_match *mt2);
 bool compare_targets(struct xtables_target *tg1, struct xtables_target *tg2);
 
 struct addr_mask {

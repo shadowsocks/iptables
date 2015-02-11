@@ -469,6 +469,57 @@ struct builtin_table xtables_arp[TABLES_MAX] = {
 	},
 };
 
+#include <linux/netfilter_bridge.h>
+
+struct builtin_table xtables_bridge[TABLES_MAX] = {
+	[FILTER] = {
+		.name = "filter",
+		.chains = {
+			{
+				.name   = "INPUT",
+				.type   = "filter",
+				.prio   = NF_BR_PRI_FILTER_BRIDGED,
+				.hook   = NF_BR_LOCAL_IN,
+			},
+			{
+				.name   = "FORWARD",
+				.type   = "filter",
+				.prio   = NF_BR_PRI_FILTER_BRIDGED,
+				.hook   = NF_BR_FORWARD,
+			},
+			{
+				.name   = "OUTPUT",
+				.type   = "filter",
+				.prio   = NF_BR_PRI_FILTER_BRIDGED,
+				.hook   = NF_BR_LOCAL_OUT,
+			},
+		},
+	},
+	[NAT] = {
+		.name = "nat",
+		.chains = {
+			{
+				.name   = "PREROUTING",
+				.type   = "filter",
+				.prio   = NF_BR_PRI_NAT_DST_BRIDGED,
+				.hook   = NF_BR_PRE_ROUTING,
+			},
+			{
+				.name   = "OUTPUT",
+				.type   = "filter",
+				.prio   = NF_BR_PRI_NAT_DST_OTHER,
+				.hook   = NF_BR_LOCAL_OUT,
+			},
+			{
+				.name   = "POSTROUTING",
+				.type   = "filter",
+				.prio   = NF_BR_PRI_NAT_SRC,
+				.hook   = NF_BR_POST_ROUTING,
+			},
+		},
+	},
+};
+
 int nft_table_add(struct nft_handle *h, struct nft_table *t, uint16_t flags)
 {
 	char buf[MNL_SOCKET_BUFFER_SIZE];
@@ -587,7 +638,7 @@ nft_table_builtin_find(struct nft_handle *h, const char *table)
 
 	for (i=0; i<TABLES_MAX; i++) {
 		if (h->tables[i].name == NULL)
-			break;
+			continue;
 
 		if (strcmp(h->tables[i].name, table) != 0)
 			continue;
@@ -1967,6 +2018,9 @@ int nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 	iter = nft_chain_list_iter_create(list);
 	if (iter == NULL)
 		goto err;
+
+	if (ops->print_table_header)
+		ops->print_table_header(table);
 
 	c = nft_chain_list_iter_next(iter);
 	while (c != NULL) {

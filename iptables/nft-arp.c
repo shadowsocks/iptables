@@ -156,13 +156,15 @@ static int nft_arp_add(struct nft_rule *r, void *data)
 
 	if (fw->arp.arhrd != 0) {
 		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_ARPHRD);
-		add_payload(r, offsetof(struct arphdr, ar_hrd), 2);
+		add_payload(r, offsetof(struct arphdr, ar_hrd), 2,
+			    NFT_PAYLOAD_NETWORK_HEADER);
 		add_cmp_u16(r, fw->arp.arhrd, op);
 	}
 
 	if (fw->arp.arpro != 0) {
 		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_ARPPRO);
-	        add_payload(r, offsetof(struct arphdr, ar_pro), 2);
+	        add_payload(r, offsetof(struct arphdr, ar_pro), 2,
+			    NFT_PAYLOAD_NETWORK_HEADER);
 		add_cmp_u16(r, fw->arp.arpro, op);
 	}
 
@@ -176,13 +178,15 @@ static int nft_arp_add(struct nft_rule *r, void *data)
 
 	if (fw->arp.arpop != 0) {
 		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_ARPOP);
-		add_payload(r, offsetof(struct arphdr, ar_op), 2);
+		add_payload(r, offsetof(struct arphdr, ar_op), 2,
+			    NFT_PAYLOAD_NETWORK_HEADER);
 		add_cmp_u16(r, fw->arp.arpop, op);
 	}
 
 	if (fw->arp.src_devaddr.addr[0] != '\0') {
 		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_SRCDEVADDR);
-		add_payload(r, sizeof(struct arphdr), fw->arp.arhln);
+		add_payload(r, sizeof(struct arphdr), fw->arp.arhln,
+			    NFT_PAYLOAD_NETWORK_HEADER);
 		add_cmp_ptr(r, op, fw->arp.src_devaddr.addr, fw->arp.arhln);
 	}
 
@@ -195,7 +199,8 @@ static int nft_arp_add(struct nft_rule *r, void *data)
 
 	if (fw->arp.tgt_devaddr.addr[0] != '\0') {
 		op = nft_invflags2cmp(fw->arp.invflags, ARPT_INV_TGTDEVADDR);
-		add_payload(r, sizeof(struct arphdr) + fw->arp.arhln + 4, fw->arp.arhln);
+		add_payload(r, sizeof(struct arphdr) + fw->arp.arhln + 4,
+			    fw->arp.arhln, NFT_PAYLOAD_NETWORK_HEADER);
 		add_cmp_ptr(r, op, fw->arp.tgt_devaddr.addr, fw->arp.arhln);
 	}
 

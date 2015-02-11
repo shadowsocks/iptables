@@ -168,6 +168,16 @@ static const struct xtables_afinfo afinfo_ipv6 = {
 	.so_rev_target = IP6T_SO_GET_REVISION_TARGET,
 };
 
+static const struct xtables_afinfo afinfo_bridge = {
+	.kmod          = "eb_tables",
+	.proc_exists   = "/proc/net/eb_tables_names",
+	.libprefix     = "libebt_",
+	.family        = NFPROTO_BRIDGE,
+	.ipproto       = IPPROTO_IP,
+	.so_rev_match  = -1,
+	.so_rev_target = -1,
+};
+
 const struct xtables_afinfo *afinfo;
 
 /* Search path for Xtables .so files */
@@ -223,6 +233,9 @@ void xtables_set_nfproto(uint8_t nfproto)
 		break;
 	case NFPROTO_IPV6:
 		afinfo = &afinfo_ipv6;
+		break;
+	case NFPROTO_BRIDGE:
+		afinfo = &afinfo_bridge;
 		break;
 	default:
 		fprintf(stderr, "libxtables: unhandled NFPROTO in %s\n",
@@ -536,7 +549,7 @@ void xtables_parse_interface(const char *arg, char *vianame,
 static void *load_extension(const char *search_path, const char *af_prefix,
     const char *name, bool is_target)
 {
-	const char *all_prefixes[] = {"libxt_", af_prefix, NULL};
+	const char *all_prefixes[] = {af_prefix, "libxt_", NULL};
 	const char **prefix;
 	const char *dir = search_path, *next;
 	void *ptr = NULL;

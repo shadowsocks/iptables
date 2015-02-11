@@ -10,6 +10,7 @@ extern int xtables_ip6_main(int, char **);
 extern int xtables_ip6_save_main(int, char **);
 extern int xtables_ip6_restore_main(int, char **);
 extern int xtables_arp_main(int, char **);
+extern int xtables_eb_main(int, char **);
 extern int xtables_config_main(int, char **);
 extern int xtables_events_main(int, char **);
 #endif
