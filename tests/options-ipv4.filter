@@ -1,0 +1,15 @@
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:QATEST - [0:0]
+-A QATEST -m addrtype --src-type UNICAST --dst-type UNICAST --limit-iface-in
+-A QATEST -p tcp -m ecn --ecn-tcp-ece --ecn-tcp-cwr --ecn-ip-ect 0
+-A QATEST -p tcp -m ecn --ecn-tcp-ece --ecn-tcp-cwr --ecn-ip-ect 1
+-A QATEST -p icmp -m icmp --icmp-type 5/0
+-A QATEST -p icmp -m icmp --icmp-type 5/1
+-A QATEST -p icmp -m icmp --icmp-type 5
+-A QATEST -m realm --realm 0x1 -m ttl --ttl-eq  64 -m ttl --ttl-lt  64 -m ttl --ttl-gt  64
+-A QATEST -p tcp -j REJECT --reject-with tcp-reset
+-A QATEST -p udp -j REJECT --reject-with icmp-host-unreachable
+COMMIT
