@@ -178,6 +178,16 @@ static const struct xtables_afinfo afinfo_bridge = {
 	.so_rev_target = -1,
 };
 
+static const struct xtables_afinfo afinfo_arp = {
+	.kmod          = "arp_tables",
+	.proc_exists   = "/proc/net/eb_tables_names",
+	.libprefix     = "libarpt_",
+	.family        = NFPROTO_ARP,
+	.ipproto       = IPPROTO_IP,
+	.so_rev_match  = -1,
+	.so_rev_target = -1,
+};
+
 const struct xtables_afinfo *afinfo;
 
 /* Search path for Xtables .so files */
@@ -236,6 +246,9 @@ void xtables_set_nfproto(uint8_t nfproto)
 		break;
 	case NFPROTO_BRIDGE:
 		afinfo = &afinfo_bridge;
+		break;
+	case NFPROTO_ARP:
+		afinfo = &afinfo_arp;
 		break;
 	default:
 		fprintf(stderr, "libxtables: unhandled NFPROTO in %s\n",

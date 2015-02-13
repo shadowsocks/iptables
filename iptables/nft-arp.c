@@ -402,10 +402,11 @@ void nft_rule_to_arptables_command_state(struct nft_rule *r,
 
 	nft_rule_expr_iter_destroy(iter);
 
-	if (cs->target != NULL)
-		cs->jumpto = cs->target->name;
-	else if (cs->jumpto != NULL)
-		cs->target = xtables_find_target(cs->jumpto, XTF_TRY_LOAD);
+	if (cs->jumpto != NULL)
+		return;
+
+	if (cs->target != NULL && cs->target->name != NULL)
+		cs->target = xtables_find_target(cs->target->name, XTF_TRY_LOAD);
 	else
 		cs->jumpto = "";
 }
@@ -585,13 +586,11 @@ nft_arp_print_firewall(struct nft_rule *r, unsigned int num,
 
 	print_fw_details(&cs.fw, format);
 
-	if (strlen(cs.jumpto) > 0) {
-		printf("-j %s\n", cs.jumpto);
+	if (cs.jumpto != NULL && strcmp(cs.jumpto, "") != 0) {
+		printf("-j %s", cs.jumpto);
 	} else if (cs.target) {
-		if (cs.target->print)
-			/* Print the target information. */
-			cs.target->print(&cs.fw, cs.target->t,
-					 format & FMT_NUMERIC);
+		printf("-j %s ", cs.target->name);
+		cs.target->print(&cs.fw, cs.target->t, format & FMT_NUMERIC);
 	}
 
 	if (!(format & FMT_NOCOUNTS)) {

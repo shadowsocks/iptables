@@ -41,18 +41,7 @@
 
 #include "xtables-multi.h"
 
-extern struct xtables_globals xtables_globals;
-extern const char *program_version, *program_name;
-
-static const struct xtables_afinfo afinfo_arp = {
-        .kmod          = "arp_tables",
-        .proc_exists   = "/proc/net/arp_tables_names",
-        .libprefix     = "libarp_",
-        .family        = NFPROTO_ARP,
-        .ipproto       = IPPROTO_IP,
-        .so_rev_match  = -1,
-        .so_rev_target = -1,
-};
+extern struct xtables_globals arptables_globals;
 
 int xtables_arp_main(int argc, char *argv[])
 {
@@ -62,22 +51,17 @@ int xtables_arp_main(int argc, char *argv[])
 		.family = NFPROTO_ARP,
 	};
 
-	xtables_globals.program_name = "arptables";
-	/* This code below could be replaced by xtables_init_all, which
-	 * doesn't support NFPROTO_ARP yet.
-	 */
-	xtables_init();
-	afinfo = &afinfo_arp;
-	ret = xtables_set_params(&xtables_globals);
+	arptables_globals.program_name = "arptables";
+	ret = xtables_init_all(&arptables_globals, NFPROTO_ARP);
 	if (ret < 0) {
-		fprintf(stderr, "%s/%s Failed to initialize xtables\n",
-				xtables_globals.program_name,
-				xtables_globals.program_version);
+		fprintf(stderr, "%s/%s Failed to initialize arptables-compat\n",
+			arptables_globals.program_name,
+			arptables_globals.program_version);
 		exit(1);
 	}
 
 #if defined(ALL_INCLUSIVE) || defined(NO_SHARED_LIBS)
-	init_extensions();
+	init_extensionsa();
 #endif
 
 	ret = do_commandarp(&h, argc, argv, &table);
