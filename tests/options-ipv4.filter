@@ -3,6 +3,9 @@
 :FORWARD ACCEPT [0:0]
 :OUTPUT ACCEPT [0:0]
 :QATEST - [0:0]
+-A QATEST -m recent --set
+-A QATEST -m recent --rcheck --name foo --rsource --hitcount 8
+-A QATEST -m recent --rcheck --name foo --rsource --hitcount 12
 -A QATEST -m addrtype --src-type UNICAST --dst-type UNICAST --limit-iface-in
 -A QATEST -p tcp -m ecn --ecn-tcp-ece --ecn-tcp-cwr --ecn-ip-ect 0
 -A QATEST -p tcp -m ecn --ecn-tcp-ece --ecn-tcp-cwr --ecn-ip-ect 1
