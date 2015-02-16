@@ -168,24 +168,17 @@ static const struct xtables_afinfo afinfo_ipv6 = {
 	.so_rev_target = IP6T_SO_GET_REVISION_TARGET,
 };
 
+/* Dummy families for arptables-compat and ebtables-compat. Leave structure
+ * fields that we don't use unset.
+ */
 static const struct xtables_afinfo afinfo_bridge = {
-	.kmod          = "eb_tables",
-	.proc_exists   = "/proc/net/eb_tables_names",
 	.libprefix     = "libebt_",
 	.family        = NFPROTO_BRIDGE,
-	.ipproto       = IPPROTO_IP,
-	.so_rev_match  = -1,
-	.so_rev_target = -1,
 };
 
 static const struct xtables_afinfo afinfo_arp = {
-	.kmod          = "arp_tables",
-	.proc_exists   = "/proc/net/eb_tables_names",
 	.libprefix     = "libarpt_",
 	.family        = NFPROTO_ARP,
-	.ipproto       = IPPROTO_IP,
-	.so_rev_match  = -1,
-	.so_rev_target = -1,
 };
 
 const struct xtables_afinfo *afinfo;
