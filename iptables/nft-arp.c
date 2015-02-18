@@ -337,10 +337,12 @@ static void nft_arp_parse_payload(struct nft_xt_ctx *ctx,
 					   fw->arp.arhln) {
 			get_cmp_data(e, &addr, sizeof(addr), &inv);
 			fw->arp.src.s_addr = addr.s_addr;
-			if (ctx->flags & NFT_XT_CTX_BITWISE)
+			if (ctx->flags & NFT_XT_CTX_BITWISE) {
 				parse_mask_ipv4(ctx, &fw->arp.smsk);
-			else
+				ctx->flags &= ~NFT_XT_CTX_BITWISE;
+			} else {
 				fw->arp.smsk.s_addr = 0xffffffff;
+			}
 
 			if (inv)
 				fw->arp.invflags |= ARPT_INV_SRCIP;
@@ -349,10 +351,12 @@ static void nft_arp_parse_payload(struct nft_xt_ctx *ctx,
 						  sizeof(struct in_addr)) {
 			get_cmp_data(e, &addr, sizeof(addr), &inv);
 			fw->arp.tgt.s_addr = addr.s_addr;
-			if (ctx->flags & NFT_XT_CTX_BITWISE)
+			if (ctx->flags & NFT_XT_CTX_BITWISE) {
 				parse_mask_ipv4(ctx, &fw->arp.tmsk);
-			else
+				ctx->flags &= ~NFT_XT_CTX_BITWISE;
+			} else {
 				fw->arp.tmsk.s_addr = 0xffffffff;
+			}
 
 			if (inv)
 				fw->arp.invflags |= ARPT_INV_TGTIP;

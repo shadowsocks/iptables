@@ -126,10 +126,12 @@ static void nft_ipv6_parse_payload(struct nft_xt_ctx *ctx,
 	case offsetof(struct ip6_hdr, ip6_src):
 		get_cmp_data(e, &addr, sizeof(addr), &inv);
 		memcpy(cs->fw6.ipv6.src.s6_addr, &addr, sizeof(addr));
-                if (ctx->flags & NFT_XT_CTX_BITWISE)
-                        parse_mask_ipv6(ctx, &cs->fw6.ipv6.smsk);
-                else
-                        memset(&cs->fw.ip.smsk, 0xff, sizeof(struct in6_addr));
+		if (ctx->flags & NFT_XT_CTX_BITWISE) {
+			parse_mask_ipv6(ctx, &cs->fw6.ipv6.smsk);
+			ctx->flags &= ~NFT_XT_CTX_BITWISE;
+		} else {
+			memset(&cs->fw.ip.smsk, 0xff, sizeof(struct in6_addr));
+		}
 
 		if (inv)
 			cs->fw6.ipv6.invflags |= IPT_INV_SRCIP;
@@ -137,10 +139,12 @@ static void nft_ipv6_parse_payload(struct nft_xt_ctx *ctx,
 	case offsetof(struct ip6_hdr, ip6_dst):
 		get_cmp_data(e, &addr, sizeof(addr), &inv);
 		memcpy(cs->fw6.ipv6.dst.s6_addr, &addr, sizeof(addr));
-                if (ctx->flags & NFT_XT_CTX_BITWISE)
-                        parse_mask_ipv6(ctx, &cs->fw6.ipv6.dmsk);
-                else
-                        memset(&cs->fw.ip.dmsk, 0xff, sizeof(struct in6_addr));
+		if (ctx->flags & NFT_XT_CTX_BITWISE) {
+			parse_mask_ipv6(ctx, &cs->fw6.ipv6.dmsk);
+			ctx->flags &= ~NFT_XT_CTX_BITWISE;
+		} else {
+			memset(&cs->fw.ip.dmsk, 0xff, sizeof(struct in6_addr));
+		}
 
 		if (inv)
 			cs->fw6.ipv6.invflags |= IPT_INV_DSTIP;

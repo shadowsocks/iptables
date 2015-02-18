@@ -434,11 +434,15 @@ void nft_parse_cmp(struct nft_xt_ctx *ctx, struct nft_rule_expr *e)
 	if (ctx->reg && reg != ctx->reg)
 		return;
 
-	if (ctx->flags & NFT_XT_CTX_META)
+	if (ctx->flags & NFT_XT_CTX_META) {
 		ops->parse_meta(ctx, e, data);
+		ctx->flags &= ~NFT_XT_CTX_META;
+	}
 	/* bitwise context is interpreted from payload */
-	if (ctx->flags & NFT_XT_CTX_PAYLOAD)
+	if (ctx->flags & NFT_XT_CTX_PAYLOAD) {
 		ops->parse_payload(ctx, e, data);
+		ctx->flags &= ~NFT_XT_CTX_PAYLOAD;
+	}
 }
 
 void nft_parse_counter(struct nft_rule_expr *e, struct xt_counters *counters)
