@@ -52,9 +52,9 @@ static void DNPT_print(const void *ip, const struct xt_entry_target *target,
 {
 	const struct ip6t_npt_tginfo *npt = (const void *)target->data;
 
-	printf("src-pfx %s/%u ", xtables_ip6addr_to_numeric(&npt->src_pfx.in6),
+	printf(" DNPT src-pfx %s/%u", xtables_ip6addr_to_numeric(&npt->src_pfx.in6),
 				 npt->src_pfx_len);
-	printf("dst-pfx %s/%u ", xtables_ip6addr_to_numeric(&npt->dst_pfx.in6),
+	printf(" dst-pfx %s/%u", xtables_ip6addr_to_numeric(&npt->dst_pfx.in6),
 				 npt->dst_pfx_len);
 }
 
@@ -65,12 +65,12 @@ static void DNPT_save(const void *ip, const struct xt_entry_target *target)
 
 	if (memcmp(&info->src_pfx.in6, &zero_addr, sizeof(zero_addr)) != 0 ||
 	    info->src_pfx_len != 0)
-		printf("--src-pfx %s/%u ",
+		printf(" --src-pfx %s/%u",
 		       xtables_ip6addr_to_numeric(&info->src_pfx.in6),
 		       info->src_pfx_len);
 	if (memcmp(&info->dst_pfx.in6, &zero_addr, sizeof(zero_addr)) != 0 ||
 	    info->dst_pfx_len != 0)
-		printf("--dst-pfx %s/%u ",
+		printf(" --dst-pfx %s/%u",
 		       xtables_ip6addr_to_numeric(&info->dst_pfx.in6),
 		       info->dst_pfx_len);
 }
