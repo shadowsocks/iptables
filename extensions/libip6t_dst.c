@@ -112,6 +112,8 @@ static void dst_parse(struct xt_option_call *cb)
 	xtables_option_parse(cb);
 	switch (cb->entry->id) {
 	case O_DSTLEN:
+		if (cb->invert)
+			optinfo->invflags |= IP6T_OPTS_INV_LEN;
 		optinfo->flags |= IP6T_OPTS_LEN;
 		break;
 	case O_DSTOPTS:
