@@ -37,7 +37,7 @@ quota_save(const void *ip, const struct xt_entry_match *match)
 	const struct xt_quota_info *q = (const void *)match->data;
 
 	if (q->flags & XT_QUOTA_INVERT)
-		printf("! ");
+		printf(" !");
 	printf(" --quota %llu", (unsigned long long) q->quota);
 }
 
