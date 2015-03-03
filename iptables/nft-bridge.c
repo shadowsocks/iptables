@@ -349,7 +349,8 @@ static void nft_bridge_parse_target(struct xtables_target *t, void *data)
 	struct ebtables_command_state *cs = data;
 
 	/* harcoded names :-( */
-	if (strcmp(t->name, "log") == 0) {
+	if (strcmp(t->name, "log") == 0 ||
+	    strcmp(t->name, "nflog") == 0) {
 		parse_watcher(t, &cs->match_list, false);
 		return;
 	}

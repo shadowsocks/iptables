@@ -645,6 +645,7 @@ static void ebt_load_match_extensions(void)
 	ebt_load_match("mark_m");
 
 	ebt_load_watcher("log");
+	ebt_load_watcher("nflog");
 }
 
 static void ebt_add_match(struct xtables_match *m,
