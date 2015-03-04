@@ -643,6 +643,7 @@ static void ebt_load_match_extensions(void)
 	ebt_load_match("802_3");
 	ebt_load_match("ip");
 	ebt_load_match("mark_m");
+	ebt_load_match("limit");
 
 	ebt_load_watcher("log");
 	ebt_load_watcher("nflog");
