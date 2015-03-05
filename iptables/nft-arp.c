@@ -593,7 +593,7 @@ nft_arp_print_firewall(struct nft_rule *r, unsigned int num,
 	if (cs.jumpto != NULL && strcmp(cs.jumpto, "") != 0) {
 		printf("-j %s", cs.jumpto);
 	} else if (cs.target) {
-		printf("-j %s ", cs.target->name);
+		printf("-j %s", cs.target->name);
 		cs.target->print(&cs.fw, cs.target->t, format & FMT_NUMERIC);
 	}
 
