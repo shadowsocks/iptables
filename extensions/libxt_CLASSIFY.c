@@ -73,20 +73,40 @@ CLASSIFY_save(const void *ip, const struct xt_entry_target *target)
 	       TC_H_MAJ(clinfo->priority)>>16, TC_H_MIN(clinfo->priority));
 }
 
-static struct xtables_target classify_target = { 
-	.family		= NFPROTO_UNSPEC,
-	.name		= "CLASSIFY",
-	.version	= XTABLES_VERSION,
-	.size		= XT_ALIGN(sizeof(struct xt_classify_target_info)),
-	.userspacesize	= XT_ALIGN(sizeof(struct xt_classify_target_info)),
-	.help		= CLASSIFY_help,
-	.print		= CLASSIFY_print,
-	.save		= CLASSIFY_save,
-	.x6_parse	= CLASSIFY_parse,
-	.x6_options	= CLASSIFY_opts,
+static void
+arpCLASSIFY_print(const void *ip, const struct xt_entry_target *target,
+		  int numeric)
+{
+	CLASSIFY_save(ip, target);
+}
+
+static struct xtables_target classify_target[] = {
+	{
+		.family		= NFPROTO_UNSPEC,
+		.name		= "CLASSIFY",
+		.version	= XTABLES_VERSION,
+		.size		= XT_ALIGN(sizeof(struct xt_classify_target_info)),
+		.userspacesize	= XT_ALIGN(sizeof(struct xt_classify_target_info)),
+		.help		= CLASSIFY_help,
+		.print		= CLASSIFY_print,
+		.save		= CLASSIFY_save,
+		.x6_parse	= CLASSIFY_parse,
+		.x6_options	= CLASSIFY_opts,
+	},
+	{
+		.family		= NFPROTO_ARP,
+		.name		= "CLASSIFY",
+		.version	= XTABLES_VERSION,
+		.size		= XT_ALIGN(sizeof(struct xt_classify_target_info)),
+		.userspacesize	= XT_ALIGN(sizeof(struct xt_classify_target_info)),
+		.help		= CLASSIFY_help,
+		.print		= arpCLASSIFY_print,
+		.x6_parse	= CLASSIFY_parse,
+		.x6_options	= CLASSIFY_opts,
+	},
 };
 
 void _init(void)
 {
-	xtables_register_target(&classify_target);
+	xtables_register_targets(classify_target, ARRAY_SIZE(classify_target));
 }
