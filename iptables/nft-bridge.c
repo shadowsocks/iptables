@@ -620,7 +620,7 @@ static bool nft_bridge_rule_find(struct nft_family_ops *ops, struct nft_rule *r,
 		return false;
 	}
 
-	if (strcmp(cs->jumpto, this.jumpto) != 0) {
+	if (cs->jumpto != NULL && strcmp(cs->jumpto, this.jumpto) != 0) {
 		DEBUGP("Different verdict\n");
 		return false;
 	}
