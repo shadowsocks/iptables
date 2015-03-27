@@ -2,13 +2,21 @@
 [\fB!\fP] \fB\-\-cgroup\fP \fIfwid\fP
 Match corresponding cgroup for this packet.
 
-Can be used to assign particular firewall policies for aggregated
-task/jobs on the system. This allows for more fine-grained firewall
-policies that only match for a subset of the system's processes.
-fwid is the maker set through the net_cls cgroup's id.
+Can be used in the OUTPUT chain to assign particular firewall
+policies for aggregated task/jobs on the system. This allows
+for more fine-grained firewall policies that only match for a
+subset of the system's processes. fwid is the maker set through
+the net_cls cgroup's id.
+
+\fBIMPORTANT\fP: when being used in the INPUT chain, the cgroup
+matcher is currently only of limited functionality, meaning it
+will only match on packets that are processed for local sockets
+through early socket demuxing. Therefore, general usage on the
+INPUT chain is disadviced unless the implications are well
+understood.
 .PP
 Example:
-.PP
+.IP
 iptables \-A OUTPUT \-p tcp \-\-sport 80 \-m cgroup ! \-\-cgroup 1
 \-j DROP
 .PP
