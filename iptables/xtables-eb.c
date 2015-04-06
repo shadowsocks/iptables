@@ -292,7 +292,7 @@ static struct option ebt_original_options[] =
 	{ 0 }
 };
 
-static void
+static void __attribute__((__noreturn__,format(printf,2,3)))
 ebt_print_error(enum xtables_exittype status, const char *format, ...)
 {
 	va_list l;
@@ -302,7 +302,7 @@ ebt_print_error(enum xtables_exittype status, const char *format, ...)
 	fprintf(stderr, ".\n");
 	va_end(l);
 	exit(-1);
-} __attribute__((noreturn, format(printf,2,3)));
+}
 
 struct xtables_globals ebtables_globals = {
 	.option_offset 		= 0,
