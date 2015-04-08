@@ -603,6 +603,16 @@ static void *load_extension(const char *search_path, const char *af_prefix,
 }
 #endif
 
+static bool extension_cmp(const char *name1, const char *name2, uint32_t family)
+{
+	if (strcmp(name1, name2) == 0 &&
+	    (family == afinfo->family ||
+	     family == NFPROTO_UNSPEC))
+		return true;
+
+	return false;
+}
+
 struct xtables_match *
 xtables_find_match(const char *name, enum xtables_tryload tryload,
 		   struct xtables_rule_match **matches)
@@ -625,7 +635,7 @@ xtables_find_match(const char *name, enum xtables_tryload tryload,
 
 	/* Trigger delayed initialization */
 	for (dptr = &xtables_pending_matches; *dptr; ) {
-		if (strcmp(name, (*dptr)->name) == 0) {
+		if (extension_cmp(name, (*dptr)->name, (*dptr)->family)) {
 			ptr = *dptr;
 			*dptr = (*dptr)->next;
 			ptr->next = NULL;
@@ -636,7 +646,7 @@ xtables_find_match(const char *name, enum xtables_tryload tryload,
 	}
 
 	for (ptr = xtables_matches; ptr; ptr = ptr->next) {
-		if (strcmp(name, ptr->name) == 0) {
+		if (extension_cmp(name, ptr->name, ptr->family)) {
 			struct xtables_match *clone;
 
 			/* First match of this type: */
@@ -686,7 +696,8 @@ xtables_find_match(const char *name, enum xtables_tryload tryload,
 		newentry = xtables_malloc(sizeof(struct xtables_rule_match));
 
 		for (i = matches; *i; i = &(*i)->next) {
-			if (strcmp(name, (*i)->match->name) == 0)
+			if (extension_cmp(name, (*i)->match->name,
+					  (*i)->match->family))
 				(*i)->completed = true;
 		}
 		newentry->match = ptr;
@@ -714,7 +725,7 @@ xtables_find_target(const char *name, enum xtables_tryload tryload)
 
 	/* Trigger delayed initialization */
 	for (dptr = &xtables_pending_targets; *dptr; ) {
-		if (strcmp(name, (*dptr)->name) == 0) {
+		if (extension_cmp(name, (*dptr)->name, (*dptr)->family)) {
 			ptr = *dptr;
 			*dptr = (*dptr)->next;
 			ptr->next = NULL;
@@ -725,7 +736,7 @@ xtables_find_target(const char *name, enum xtables_tryload tryload)
 	}
 
 	for (ptr = xtables_targets; ptr; ptr = ptr->next) {
-		if (strcmp(name, ptr->name) == 0)
+		if (extension_cmp(name, ptr->name, ptr->family))
 			break;
 	}
 
