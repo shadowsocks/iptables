@@ -7,7 +7,7 @@
  *
  */
 #include <getopt.h>
-#include <sys/errno.h>
+#include <errno.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdlib.h>
