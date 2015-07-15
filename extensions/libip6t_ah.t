@@ -12,3 +12,4 @@
 -m ah --ahspi invalid;;FAIL
 -m ah --ahspi 0:invalid;;FAIL
 -m ah --ahspi;;FAIL
+-m ah;-m ah --ahspi 0;FAIL

@@ -4,6 +4,7 @@
 -p esp -m esp --espspi 0:4294967295;-p esp -m esp;OK
 -p esp -m esp ! --espspi 0:4294967294;=;OK
 -p esp -m esp --espspi -1;;FAIL
+-p esp -m esp;-p esp -m esp --espspi 0;FAIL
 # should fail?
 -p esp -m esp;=;OK
 -m esp;;FAIL

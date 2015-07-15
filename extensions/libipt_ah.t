@@ -10,3 +10,4 @@
 -m ah --ahspi 0;;FAIL
 -m ah --ahspi;;FAIL
 -m ah;;FAIL
+-p ah -m ah;-p ah -m ah --ahspi 0;FAIL

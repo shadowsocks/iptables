@@ -21,6 +21,13 @@ static const struct xt_option_entry ah_opts[] = {
 	XTOPT_TABLEEND,
 };
 
+static void ah_init(struct xt_entry_match *m)
+{
+	struct ipt_ah *ahinfo = (void *)m->data;
+
+	ahinfo->spis[1] = ~0U;
+}
+
 static void ah_parse(struct xt_option_call *cb)
 {
 	struct ipt_ah *ahinfo = cb->data;
@@ -92,6 +99,7 @@ static struct xtables_match ah_mt_reg = {
 	.size		= XT_ALIGN(sizeof(struct ipt_ah)),
 	.userspacesize 	= XT_ALIGN(sizeof(struct ipt_ah)),
 	.help 		= ah_help,
+	.init		= ah_init,
 	.print 		= ah_print,
 	.save 		= ah_save,
 	.x6_parse	= ah_parse,

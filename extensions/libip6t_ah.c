@@ -28,6 +28,14 @@ static const struct xt_option_entry ah_opts[] = {
 };
 #undef s
 
+static void ah_init(struct xt_entry_match *m)
+{
+	struct ip6t_ah *ahinfo = (void *)m->data;
+
+	/* Defaults for when no --ahspi is used at all */
+	ahinfo->spis[1] = ~0U;
+}
+
 static void ah_parse(struct xt_option_call *cb)
 {
 	struct ip6t_ah *ahinfo = cb->data;
@@ -127,6 +135,7 @@ static struct xtables_match ah_mt6_reg = {
 	.size          = XT_ALIGN(sizeof(struct ip6t_ah)),
 	.userspacesize = XT_ALIGN(sizeof(struct ip6t_ah)),
 	.help          = ah_help,
+	.init          = ah_init,
 	.print         = ah_print,
 	.save          = ah_save,
 	.x6_parse      = ah_parse,
