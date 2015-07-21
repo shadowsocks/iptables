@@ -1854,6 +1854,17 @@ int nft_rule_insert(struct nft_handle *h, const char *chain,
 
 		r = nft_rule_find(h, list, chain, table, data, rulenum);
 		if (r == NULL) {
+			/* special case: iptables allows to insert into
+			 * rule_count + 1 position.
+			 */
+			r = nft_rule_find(h, list, chain, table, data,
+					  rulenum - 1);
+			if (r != NULL) {
+				nft_rule_list_destroy(list);
+				return nft_rule_append(h, chain, table, data,
+						       0, verbose);
+			}
+
 			errno = ENOENT;
 			goto err;
 		}
