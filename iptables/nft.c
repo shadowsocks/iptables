@@ -1746,17 +1746,17 @@ nft_rule_find(struct nft_handle *h, struct nft_rule_list *list,
 
 		if (rulenum >= 0) {
 			/* Delete by rule number case */
-			if (rule_ctr != rulenum)
-				goto next;
-			found = true;
-			break;
+			if (rule_ctr == rulenum) {
+			    found = true;
+			    break;
+			}
 		} else {
 			found = h->ops->rule_find(h->ops, r, data);
 			if (found)
 				break;
 		}
-next:
 		rule_ctr++;
+next:
 		r = nft_rule_list_iter_next(iter);
 	}
 
@@ -1966,11 +1966,11 @@ __nft_rule_list(struct nft_handle *h, const char *chain, const char *table,
 		const char *rule_chain =
 			nft_rule_attr_get_str(r, NFT_RULE_ATTR_CHAIN);
 
-		rule_ctr++;
-
 		if (strcmp(table, rule_table) != 0 ||
 		    strcmp(chain, rule_chain) != 0)
 			goto next;
+
+		rule_ctr++;
 
 		if (rulenum > 0 && rule_ctr != rulenum) {
 			/* List by rule number case */
