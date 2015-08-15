@@ -53,10 +53,10 @@ AC_ARG_ENABLE([libipq],
 	[enable_libipq="$enableval"], [enable_libipq="no"])
 AC_ARG_ENABLE([bpf-compiler],
 	AS_HELP_STRING([--enable-bpf-compiler], [Build bpf compiler]),
-	[enable_bpfc="yes"], [enable_bpfc="no"])
+	[enable_bpfc="$enableval"], [enable_bpfc="no"])
 AC_ARG_ENABLE([nfsynproxy],
 	AS_HELP_STRING([--enable-nfsynproxy], [Build SYNPROXY configuration tool]),
-	[enable_nfsynproxy="yes"], [enable_nfsynproxy="no"])
+	[enable_nfsynproxy="$enableval"], [enable_nfsynproxy="no"])
 AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
 	[Path to the pkgconfig directory [[LIBDIR/pkgconfig]]]),
 	[pkgconfigdir="$withval"], [pkgconfigdir='${libdir}/pkgconfig'])
