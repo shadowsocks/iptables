@@ -78,7 +78,12 @@ AC_LINK_IFELSE([AC_LANG_SOURCE([int main(void) {}])],
 )
 LDFLAGS="$saved_LDFLAGS";
 
-blacklist_modules="";
+blacklist_modules=""
+blacklist_x_modules=""
+blacklist_b_modules=""
+blacklist_a_modules=""
+blacklist_4_modules=""
+blacklist_6_modules=""
 
 AC_CHECK_HEADERS([linux/dccp.h linux/ip_vs.h linux/magic.h linux/proc_fs.h])
 if test "$ac_cv_header_linux_dccp_h" != "yes"; then
@@ -97,7 +102,6 @@ if test "$nfconntrack" -ne 1; then
 	echo "WARNING: libnetfilter_conntrack not found, connlabel match will not be built";
 fi;
 
-AC_SUBST([blacklist_modules])
 AC_CHECK_SIZEOF([struct ip6_hdr], [], [#include <netinet/ip6.h>])
 
 AM_CONDITIONAL([ENABLE_STATIC], [test "$enable_static" = "yes"])
@@ -158,6 +162,18 @@ fi
 
 AM_CONDITIONAL([HAVE_LIBMNL], [test "$mnl" = 1])
 AM_CONDITIONAL([HAVE_LIBNFTNL], [test "$nftables" = 1])
+
+if test "$nftables" != 1; then
+	blacklist_b_modules="$blacklist_b_modules limit mark nflog mangle"
+	blacklist_a_modules="$blacklist_a_modules mangle"
+fi
+
+AC_SUBST([blacklist_modules])
+AC_SUBST([blacklist_x_modules])
+AC_SUBST([blacklist_b_modules])
+AC_SUBST([blacklist_a_modules])
+AC_SUBST([blacklist_4_modules])
+AC_SUBST([blacklist_6_modules])
 
 regular_CFLAGS="-Wall -Waggregate-return -Wmissing-declarations \
 	-Wmissing-prototypes -Wredundant-decls -Wshadow -Wstrict-prototypes \
