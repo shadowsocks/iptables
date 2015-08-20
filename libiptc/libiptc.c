@@ -1357,7 +1357,7 @@ retry:
 #ifdef IPTC_DEBUG2
 	{
 		int fd = open("/tmp/libiptc-so_get_entries.blob",
-				O_CREAT|O_WRONLY);
+				O_CREAT|O_WRONLY, 0644);
 		if (fd >= 0) {
 			write(fd, h->entries, tmp);
 			close(fd);
@@ -2588,7 +2588,7 @@ TC_COMMIT(struct xtc_handle *handle)
 #ifdef IPTC_DEBUG2
 	{
 		int fd = open("/tmp/libiptc-so_set_replace.blob",
-				O_CREAT|O_WRONLY);
+				O_CREAT|O_WRONLY, 0644);
 		if (fd >= 0) {
 			write(fd, repl, sizeof(*repl) + repl->size);
 			close(fd);
@@ -2664,7 +2664,7 @@ TC_COMMIT(struct xtc_handle *handle)
 #ifdef IPTC_DEBUG2
 	{
 		int fd = open("/tmp/libiptc-so_set_add_counters.blob",
-				O_CREAT|O_WRONLY);
+				O_CREAT|O_WRONLY, 0644);
 		if (fd >= 0) {
 			write(fd, newcounters, counterlen);
 			close(fd);
