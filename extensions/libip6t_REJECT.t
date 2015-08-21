@@ -5,5 +5,7 @@
 -j REJECT --reject-with icmp6-adm-prohibited;=;OK
 -j REJECT --reject-with icmp6-addr-unreachable;=;OK
 -j REJECT --reject-with icmp6-port-unreachable;=;OK
+-j REJECT --reject-with icmp6-policy-fail;=;OK
+-j REJECT --reject-with icmp6-reject-route;=;OK
 -p tcp -j REJECT --reject-with tcp-reset;=;OK
 -j REJECT --reject-with tcp-reset;;FAIL
