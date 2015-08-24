@@ -16,7 +16,9 @@ static void ct_help(void)
 " --helper name			Use conntrack helper 'name' for connection\n"
 " --ctevents event[,event...]	Generate specified conntrack events for connection\n"
 " --expevents event[,event...]	Generate specified expectation events for connection\n"
-" --zone ID			Assign/Lookup connection in zone ID\n"
+" --zone {ID|mark}		Assign/Lookup connection in zone ID/packet nfmark\n"
+" --zone-orig {ID|mark}		Same as 'zone' option, but only applies to ORIGINAL direction\n"
+" --zone-reply {ID|mark} 	Same as 'zone' option, but only applies to REPLY direction\n"
 	);
 }
 
@@ -29,7 +31,9 @@ static void ct_help_v1(void)
 " --timeout name 		Use timeout policy 'name' for connection\n"
 " --ctevents event[,event...]	Generate specified conntrack events for connection\n"
 " --expevents event[,event...]	Generate specified expectation events for connection\n"
-" --zone ID			Assign/Lookup connection in zone ID\n"
+" --zone {ID|mark}		Assign/Lookup connection in zone ID/packet nfmark\n"
+" --zone-orig {ID|mark}		Same as 'zone' option, but only applies to ORIGINAL direction\n"
+" --zone-reply {ID|mark} 	Same as 'zone' option, but only applies to REPLY direction\n"
 	);
 }
 
@@ -40,6 +44,8 @@ enum {
 	O_CTEVENTS,
 	O_EXPEVENTS,
 	O_ZONE,
+	O_ZONE_ORIG,
+	O_ZONE_REPLY,
 };
 
 #define s struct xt_ct_target_info
@@ -49,8 +55,9 @@ static const struct xt_option_entry ct_opts[] = {
 	 .flags = XTOPT_PUT, XTOPT_POINTER(s, helper)},
 	{.name = "ctevents", .id = O_CTEVENTS, .type = XTTYPE_STRING},
 	{.name = "expevents", .id = O_EXPEVENTS, .type = XTTYPE_STRING},
-	{.name = "zone", .id = O_ZONE, .type = XTTYPE_UINT16,
-	 .flags = XTOPT_PUT, XTOPT_POINTER(s, zone)},
+	{.name = "zone-orig", .id = O_ZONE_ORIG, .type = XTTYPE_STRING},
+	{.name = "zone-reply", .id = O_ZONE_REPLY, .type = XTTYPE_STRING},
+	{.name = "zone", .id = O_ZONE, .type = XTTYPE_STRING},
 	XTOPT_TABLEEND,
 };
 #undef s
@@ -64,8 +71,9 @@ static const struct xt_option_entry ct_opts_v1[] = {
 	 .flags = XTOPT_PUT, XTOPT_POINTER(s, timeout)},
 	{.name = "ctevents", .id = O_CTEVENTS, .type = XTTYPE_STRING},
 	{.name = "expevents", .id = O_EXPEVENTS, .type = XTTYPE_STRING},
-	{.name = "zone", .id = O_ZONE, .type = XTTYPE_UINT16,
-	 .flags = XTOPT_PUT, XTOPT_POINTER(s, zone)},
+	{.name = "zone-orig", .id = O_ZONE_ORIG, .type = XTTYPE_STRING},
+	{.name = "zone-reply", .id = O_ZONE_REPLY, .type = XTTYPE_STRING},
+	{.name = "zone", .id = O_ZONE, .type = XTTYPE_STRING},
 	XTOPT_TABLEEND,
 };
 #undef s
@@ -91,6 +99,45 @@ static const struct event_tbl ct_event_tbl[] = {
 static const struct event_tbl exp_event_tbl[] = {
 	{ "new",		IPEXP_NEW },
 };
+
+static void ct_parse_zone_id(const char *opt, unsigned int opt_id,
+			     uint16_t *zone_id, uint16_t *flags)
+{
+	if (opt_id == O_ZONE_ORIG)
+		*flags |= XT_CT_ZONE_DIR_ORIG;
+	if (opt_id == O_ZONE_REPLY)
+		*flags |= XT_CT_ZONE_DIR_REPL;
+
+	*zone_id = 0;
+
+	if (strcasecmp(opt, "mark") == 0) {
+		*flags |= XT_CT_ZONE_MARK;
+	} else {
+		uintmax_t val;
+
+		if (!xtables_strtoul(opt, NULL, &val, 0, UINT16_MAX))
+			xtables_error(PARAMETER_PROBLEM,
+				      "Cannot parse %s as a zone ID\n", opt);
+
+		*zone_id = (uint16_t)val;
+	}
+}
+
+static void ct_print_zone_id(const char *pfx, uint16_t zone_id, uint16_t flags)
+{
+	printf(" %s", pfx);
+
+	if ((flags & (XT_CT_ZONE_DIR_ORIG |
+		      XT_CT_ZONE_DIR_REPL)) == XT_CT_ZONE_DIR_ORIG)
+		printf("-orig");
+	if ((flags & (XT_CT_ZONE_DIR_ORIG |
+		      XT_CT_ZONE_DIR_REPL)) == XT_CT_ZONE_DIR_REPL)
+		printf("-reply");
+	if (flags & XT_CT_ZONE_MARK)
+		printf(" mark");
+	else
+		printf(" %u", zone_id);
+}
 
 static uint32_t ct_parse_events(const struct event_tbl *tbl, unsigned int size,
 				const char *events)
@@ -138,6 +185,12 @@ static void ct_parse(struct xt_option_call *cb)
 	case O_NOTRACK:
 		info->flags |= XT_CT_NOTRACK;
 		break;
+	case O_ZONE_ORIG:
+	case O_ZONE_REPLY:
+	case O_ZONE:
+		ct_parse_zone_id(cb->arg, cb->entry->id, &info->zone,
+				 &info->flags);
+		break;
 	case O_CTEVENTS:
 		info->ct_events = ct_parse_events(ct_event_tbl, ARRAY_SIZE(ct_event_tbl), cb->arg);
 		break;
@@ -155,6 +208,12 @@ static void ct_parse_v1(struct xt_option_call *cb)
 	switch (cb->entry->id) {
 	case O_NOTRACK:
 		info->flags |= XT_CT_NOTRACK;
+		break;
+	case O_ZONE_ORIG:
+	case O_ZONE_REPLY:
+	case O_ZONE:
+		ct_parse_zone_id(cb->arg, cb->entry->id, &info->zone,
+				 &info->flags);
 		break;
 	case O_CTEVENTS:
 		info->ct_events = ct_parse_events(ct_event_tbl,
@@ -185,8 +244,8 @@ static void ct_print(const void *ip, const struct xt_entry_target *target, int n
 	if (info->exp_events)
 		ct_print_events("expevents", exp_event_tbl,
 				ARRAY_SIZE(exp_event_tbl), info->exp_events);
-	if (info->zone)
-		printf("zone %u ", info->zone);
+	if (info->flags & XT_CT_ZONE_MARK || info->zone)
+		ct_print_zone_id("zone", info->zone, info->flags);
 }
 
 static void
@@ -212,8 +271,8 @@ ct_print_v1(const void *ip, const struct xt_entry_target *target, int numeric)
 	if (info->exp_events)
 		ct_print_events("expevents", exp_event_tbl,
 				ARRAY_SIZE(exp_event_tbl), info->exp_events);
-	if (info->zone)
-		printf("zone %u ", info->zone);
+	if (info->flags & XT_CT_ZONE_MARK || info->zone)
+		ct_print_zone_id("zone", info->zone, info->flags);
 }
 
 static void ct_save(const void *ip, const struct xt_entry_target *target)
@@ -233,8 +292,8 @@ static void ct_save(const void *ip, const struct xt_entry_target *target)
 	if (info->exp_events)
 		ct_print_events("--expevents", exp_event_tbl,
 				ARRAY_SIZE(exp_event_tbl), info->exp_events);
-	if (info->zone)
-		printf(" --zone %u", info->zone);
+	if (info->flags & XT_CT_ZONE_MARK || info->zone)
+		ct_print_zone_id("--zone", info->zone, info->flags);
 }
 
 static void ct_save_v1(const void *ip, const struct xt_entry_target *target)
@@ -256,8 +315,8 @@ static void ct_save_v1(const void *ip, const struct xt_entry_target *target)
 	if (info->exp_events)
 		ct_print_events("--expevents", exp_event_tbl,
 				ARRAY_SIZE(exp_event_tbl), info->exp_events);
-	if (info->zone)
-		printf(" --zone %u", info->zone);
+	if (info->flags & XT_CT_ZONE_MARK || info->zone)
+		ct_print_zone_id("--zone", info->zone, info->flags);
 }
 
 static const char *
