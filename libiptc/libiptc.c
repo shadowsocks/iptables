@@ -592,7 +592,7 @@ static int iptcc_chain_index_rebuild(struct xtc_handle *h)
  * There are different strategies, the simple and safe is to rebuild
  * the chain index every time.  The more advanced is to update the
  * array index to point to the next element, but that requires some
- * house keeping and boundry checks.  The advanced is implemented, as
+ * house keeping and boundary checks.  The advanced is implemented, as
  * the simple approach behaves badly when all chains are deleted
  * because list_for_each processing will always hit the first chain
  * index, thus causing a rebuild for every chain.

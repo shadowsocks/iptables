@@ -1137,7 +1137,7 @@ void xtables_rule_matches_free(struct xtables_rule_match **matches)
  *
  * %XTF_BAD_VALUE: bad value for option
  * @p1:		module name
- * @p2:		option with which the problem occured (e.g. "--mark")
+ * @p2:		option with which the problem occurred (e.g. "--mark")
  * @p3:		string the user passed in (e.g. "99999999999999")
  *
  * %XTF_ONE_ACTION: two mutually exclusive actions have been specified

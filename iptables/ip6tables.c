@@ -1046,7 +1046,7 @@ static int print_match_save(const struct xt_entry_match *e,
 	return 0;
 }
 
-/* print a given ip including mask if neccessary */
+/* Print a given ip including mask if necessary. */
 static void print_ip(const char *prefix, const struct in6_addr *ip,
 		     const struct in6_addr *mask, int invert)
 {
@@ -1067,8 +1067,9 @@ static void print_ip(const char *prefix, const struct in6_addr *ip,
 		printf("/%d", l);
 }
 
-/* We want this to be readable, so only print out neccessary fields.
- * Because that's the kind of world I want to live in.  */
+/* We want this to be readable, so only print out necessary fields.
+ * Because that's the kind of world I want to live in.
+ */
 void print_rule6(const struct ip6t_entry *e,
 		       struct xtc_handle *h, const char *chain, int counters)
 {
@@ -1840,10 +1841,11 @@ int do_command6(int argc, char *argv[], char **table,
 		}
 
 		if (!cs.target) {
-			/* it is no chain, and we can't load a plugin.
+			/* It is no chain, and we can't load a plugin.
 			 * We cannot know if the plugin is corrupt, non
-			 * existant OR if the user just misspelled a
-			 * chain. */
+			 * existent OR if the user just misspelled a
+			 * chain.
+			 */
 #ifdef IP6T_F_GOTO
 			if (cs.fw6.ipv6.flags & IP6T_F_GOTO)
 				xtables_error(PARAMETER_PROBLEM,

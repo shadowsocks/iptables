@@ -1037,7 +1037,7 @@ static int print_match_save(const struct xt_entry_match *e,
 	return 0;
 }
 
-/* print a given ip including mask if neccessary */
+/* Print a given ip including mask if necessary. */
 static void print_ip(const char *prefix, uint32_t ip,
 		     uint32_t mask, int invert)
 {
@@ -1067,8 +1067,9 @@ static void print_ip(const char *prefix, uint32_t ip,
 		printf("/%u.%u.%u.%u", IP_PARTS(mask));
 }
 
-/* We want this to be readable, so only print out neccessary fields.
- * Because that's the kind of world I want to live in.  */
+/* We want this to be readable, so only print out necessary fields.
+ * Because that's the kind of world I want to live in.
+ */
 void print_rule4(const struct ipt_entry *e,
 		struct xtc_handle *h, const char *chain, int counters)
 {
@@ -1838,10 +1839,11 @@ int do_command4(int argc, char *argv[], char **table,
 		}
 
 		if (!cs.target) {
-			/* it is no chain, and we can't load a plugin.
+			/* It is no chain, and we can't load a plugin.
 			 * We cannot know if the plugin is corrupt, non
-			 * existant OR if the user just misspelled a
-			 * chain. */
+			 * existent OR if the user just misspelled a
+			 * chain.
+			 */
 #ifdef IPT_F_GOTO
 			if (cs.fw.ip.flags & IPT_F_GOTO)
 				xtables_error(PARAMETER_PROBLEM,
