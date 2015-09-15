@@ -31,22 +31,22 @@
 
 static int table_cb(const struct nlmsghdr *nlh, int type)
 {
-	struct nft_table *t;
+	struct nftnl_table *t;
 	char buf[4096];
 
-	t = nft_table_alloc();
+	t = nftnl_table_alloc();
 	if (t == NULL)
 		goto err;
 
-	if (nft_table_nlmsg_parse(nlh, t) < 0)
+	if (nftnl_table_nlmsg_parse(nlh, t) < 0)
 		goto err_free;
 
-	nft_table_snprintf(buf, sizeof(buf), t, NFT_OUTPUT_DEFAULT, 0);
+	nftnl_table_snprintf(buf, sizeof(buf), t, NFTNL_OUTPUT_DEFAULT, 0);
 	/* FIXME: define syntax to represent table events */
 	printf("# [table: %s]\t%s\n", type == NFT_MSG_NEWTABLE ? "NEW" : "DEL", buf);
 
 err_free:
-	nft_table_free(t);
+	nftnl_table_free(t);
 err:
 	return MNL_CB_OK;
 }
@@ -57,18 +57,18 @@ static int rule_cb(const struct nlmsghdr *nlh, int type)
 {
 	struct iptables_command_state cs = {};
 	struct arptables_command_state cs_arp = {};
-	struct nft_rule *r;
+	struct nftnl_rule *r;
 	void *fw = NULL;
 	uint8_t family;
 
-	r = nft_rule_alloc();
+	r = nftnl_rule_alloc();
 	if (r == NULL)
 		goto err;
 
-	if (nft_rule_nlmsg_parse(nlh, r) < 0)
+	if (nftnl_rule_nlmsg_parse(nlh, r) < 0)
 		goto err_free;
 
-	family = nft_rule_attr_get_u32(r, NFT_RULE_ATTR_FAMILY);
+	family = nftnl_rule_get_u32(r, NFTNL_RULE_FAMILY);
 	switch (family) {
 	case AF_INET:
 	case AF_INET6:
@@ -91,29 +91,29 @@ static int rule_cb(const struct nlmsghdr *nlh, int type)
 						      NFT_RULE_DEL,
 			    counters ? 0 : FMT_NOCOUNTS);
 err_free:
-	nft_rule_free(r);
+	nftnl_rule_free(r);
 err:
 	return MNL_CB_OK;
 }
 
 static int chain_cb(const struct nlmsghdr *nlh, int type)
 {
-	struct nft_chain *t;
+	struct nftnl_chain *t;
 	char buf[4096];
 
-	t = nft_chain_alloc();
+	t = nftnl_chain_alloc();
 	if (t == NULL)
 		goto err;
 
-	if (nft_chain_nlmsg_parse(nlh, t) < 0)
+	if (nftnl_chain_nlmsg_parse(nlh, t) < 0)
 		goto err_free;
 
-	nft_chain_snprintf(buf, sizeof(buf), t, NFT_OUTPUT_DEFAULT, 0);
+	nftnl_chain_snprintf(buf, sizeof(buf), t, NFTNL_OUTPUT_DEFAULT, 0);
 	/* FIXME: define syntax to represent chain events */
 	printf("# [chain: %s]\t%s\n", type == NFT_MSG_NEWCHAIN ? "NEW" : "DEL", buf);
 
 err_free:
-	nft_chain_free(t);
+	nftnl_chain_free(t);
 err:
 	return MNL_CB_OK;
 }

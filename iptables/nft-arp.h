@@ -10,7 +10,7 @@ struct arptables_command_state {
 	const char *jumpto;
 };
 
-void nft_rule_to_arptables_command_state(struct nft_rule *r,
+void nft_rule_to_arptables_command_state(struct nftnl_rule *r,
 					 struct arptables_command_state *cs);
 
 #endif

@@ -177,8 +177,8 @@ xtables_restore_main(int family, const char *progname, int argc, char *argv[])
 	int in_table = 0, testing = 0;
 	const char *tablename = NULL;
 	const struct xtc_ops *ops = &xtc_ops;
-	struct nft_chain_list *chain_list;
-	struct nft_chain *chain_obj;
+	struct nftnl_chain_list *chain_list;
+	struct nftnl_chain *chain_obj;
 
 	line = 0;
 
@@ -334,7 +334,7 @@ xtables_restore_main(int family, const char *progname, int argc, char *argv[])
 			 * on, unvisited chains will be purged out.
 			 */
 			if (chain_obj != NULL)
-				nft_chain_list_del(chain_obj);
+				nftnl_chain_list_del(chain_obj);
 
 			if (strlen(chain) >= XT_EXTENSION_MAXNAMELEN)
 				xtables_error(PARAMETER_PROBLEM,

@@ -24,7 +24,7 @@
 #include "nft.h"
 #include "nft-shared.h"
 
-static int nft_ipv6_add(struct nft_rule *r, void *data)
+static int nft_ipv6_add(struct nftnl_rule *r, void *data)
 {
 	struct iptables_command_state *cs = data;
 	struct xtables_rule_match *matchp;
@@ -99,7 +99,7 @@ static bool nft_ipv6_is_same(const void *data_a,
 				  b->fw6.ipv6.outiface_mask);
 }
 
-static void nft_ipv6_parse_meta(struct nft_xt_ctx *ctx, struct nft_rule_expr *e,
+static void nft_ipv6_parse_meta(struct nft_xt_ctx *ctx, struct nftnl_expr *e,
 				void *data)
 {
 	struct iptables_command_state *cs = data;
@@ -115,7 +115,7 @@ static void parse_mask_ipv6(struct nft_xt_ctx *ctx, struct in6_addr *mask)
 }
 
 static void nft_ipv6_parse_payload(struct nft_xt_ctx *ctx,
-				   struct nft_rule_expr *e, void *data)
+				   struct nftnl_expr *e, void *data)
 {
 	struct iptables_command_state *cs = data;
 	struct in6_addr addr;
@@ -217,7 +217,7 @@ static void print_ipv6_addr(const struct iptables_command_state *cs,
 	}
 }
 
-static void nft_ipv6_print_firewall(struct nft_rule *r, unsigned int num,
+static void nft_ipv6_print_firewall(struct nftnl_rule *r, unsigned int num,
 				    unsigned int format)
 {
 	struct iptables_command_state cs = {};
@@ -362,7 +362,7 @@ static void nft_ipv6_parse_target(struct xtables_target *t, void *data)
 }
 
 static bool nft_ipv6_rule_find(struct nft_family_ops *ops,
-			       struct nft_rule *r, void *data)
+			       struct nftnl_rule *r, void *data)
 {
 	struct iptables_command_state *cs = data;
 

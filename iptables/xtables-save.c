@@ -40,7 +40,7 @@ static const struct option options[] = {
 static int
 do_output(struct nft_handle *h, const char *tablename, bool counters)
 {
-	struct nft_chain_list *chain_list;
+	struct nftnl_chain_list *chain_list;
 
 	if (!tablename)
 		return nft_for_each_table(h, do_output, counters);

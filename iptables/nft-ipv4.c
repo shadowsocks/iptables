@@ -25,7 +25,7 @@
 #include "nft.h"
 #include "nft-shared.h"
 
-static int nft_ipv4_add(struct nft_rule *r, void *data)
+static int nft_ipv4_add(struct nftnl_rule *r, void *data)
 {
 	struct iptables_command_state *cs = data;
 	struct xtables_rule_match *matchp;
@@ -109,7 +109,7 @@ static bool nft_ipv4_is_same(const void *data_a,
 				  b->fw.ip.iniface_mask, b->fw.ip.outiface_mask);
 }
 
-static void get_frag(struct nft_xt_ctx *ctx, struct nft_rule_expr *e, bool *inv)
+static void get_frag(struct nft_xt_ctx *ctx, struct nftnl_expr *e, bool *inv)
 {
 	uint8_t op;
 
@@ -118,7 +118,7 @@ static void get_frag(struct nft_xt_ctx *ctx, struct nft_rule_expr *e, bool *inv)
 		return;
 
 	/* we assume correct data */
-	op = nft_rule_expr_get_u32(e, NFT_EXPR_CMP_OP);
+	op = nftnl_expr_get_u32(e, NFTNL_EXPR_CMP_OP);
 	if (op == NFT_CMP_EQ)
 		*inv = true;
 	else
@@ -153,7 +153,7 @@ static const char *mask_to_str(uint32_t mask)
 	return mask_str;
 }
 
-static void nft_ipv4_parse_meta(struct nft_xt_ctx *ctx, struct nft_rule_expr *e,
+static void nft_ipv4_parse_meta(struct nft_xt_ctx *ctx, struct nftnl_expr *e,
 				void *data)
 {
 	struct iptables_command_state *cs = data;
@@ -169,7 +169,7 @@ static void parse_mask_ipv4(struct nft_xt_ctx *ctx, struct in_addr *mask)
 }
 
 static void nft_ipv4_parse_payload(struct nft_xt_ctx *ctx,
-				   struct nft_rule_expr *e, void *data)
+				   struct nftnl_expr *e, void *data)
 {
 	struct iptables_command_state *cs = data;
 	struct in_addr addr;
@@ -283,7 +283,7 @@ static void print_fragment(unsigned int flags, unsigned int invflags,
 	fputc(' ', stdout);
 }
 
-static void nft_ipv4_print_firewall(struct nft_rule *r, unsigned int num,
+static void nft_ipv4_print_firewall(struct nftnl_rule *r, unsigned int num,
 				    unsigned int format)
 {
 	struct iptables_command_state cs = {};
@@ -414,7 +414,7 @@ static void nft_ipv4_parse_target(struct xtables_target *t, void *data)
 }
 
 static bool nft_ipv4_rule_find(struct nft_family_ops *ops,
-			       struct nft_rule *r, void *data)
+			       struct nftnl_rule *r, void *data)
 {
 	struct iptables_command_state *cs = data;
 

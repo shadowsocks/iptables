@@ -126,7 +126,7 @@ AM_CONDITIONAL([HAVE_LIBNFNETLINK], [test "$nfnetlink" = 1])
 if test "x$enable_nftables" = "xyes"; then
 	PKG_CHECK_MODULES([libmnl], [libmnl >= 1.0], [mnl=1], [mnl=0])
 
-	PKG_CHECK_MODULES([libnftnl], [libnftnl >= 1.0], [nftables=1], [nftables=0])
+	PKG_CHECK_MODULES([libnftnl], [libnftnl >= 1.0.5], [nftables=1], [nftables=0])
 
 	AM_PROG_LEX
 	AC_PROG_YACC

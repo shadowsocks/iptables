@@ -177,13 +177,13 @@ static int32_t familytonumber(const char *family)
 	return -1;
 }
 
-int xtables_config_parse(char *filename, struct nft_table_list *table_list,
-			 struct nft_chain_list *chain_list)
+int xtables_config_parse(char *filename, struct nftnl_table_list *table_list,
+			 struct nftnl_chain_list *chain_list)
 {
 	FILE *fp;
 	struct stack_elem *e;
-	struct nft_table *table = NULL;
-	struct nft_chain *chain = NULL;
+	struct nftnl_table *table = NULL;
+	struct nftnl_chain *chain = NULL;
 	int prio = 0;
 	int32_t family = 0;
 
@@ -203,38 +203,38 @@ int xtables_config_parse(char *filename, struct nft_table_list *table_list,
 				return -1;
 			break;
 		case T_TABLE:
-			table = nft_table_alloc();
+			table = nftnl_table_alloc();
 			if (table == NULL)
 				return -1;
 
-			nft_table_attr_set_u32(table, NFT_TABLE_ATTR_FAMILY, family);
-			nft_table_attr_set(table, NFT_TABLE_ATTR_NAME, e->data);
+			nftnl_table_set_u32(table, NFTNL_TABLE_FAMILY, family);
+			nftnl_table_set(table, NFTNL_TABLE_NAME, e->data);
 			/* This is intentionally prepending, instead of
 			 * appending, since the elements in the stack are in
 			 * the reverse order that chains appear in the
 			 * configuration file.
 			 */
-			nft_table_list_add(table, table_list);
+			nftnl_table_list_add(table, table_list);
 			break;
 		case T_PRIO:
 			memcpy(&prio, e->data, sizeof(int32_t));
 			break;
 		case T_CHAIN:
-			chain = nft_chain_alloc();
+			chain = nftnl_chain_alloc();
 			if (chain == NULL)
 				return -1;
 
-			nft_chain_attr_set(chain, NFT_CHAIN_ATTR_TABLE,
-				(char *)nft_table_attr_get(table, NFT_TABLE_ATTR_NAME));
-			nft_chain_attr_set_u32(chain, NFT_CHAIN_ATTR_FAMILY,
-				nft_table_attr_get_u32(table, NFT_TABLE_ATTR_FAMILY));
-			nft_chain_attr_set_s32(chain, NFT_CHAIN_ATTR_PRIO, prio);
-			nft_chain_attr_set(chain, NFT_CHAIN_ATTR_NAME, e->data);
+			nftnl_chain_set(chain, NFTNL_CHAIN_TABLE,
+				(char *)nftnl_table_get(table, NFTNL_TABLE_NAME));
+			nftnl_chain_set_u32(chain, NFTNL_CHAIN_FAMILY,
+				nftnl_table_get_u32(table, NFTNL_TABLE_FAMILY));
+			nftnl_chain_set_s32(chain, NFTNL_CHAIN_PRIO, prio);
+			nftnl_chain_set(chain, NFTNL_CHAIN_NAME, e->data);
 			/* Intentionally prepending, instead of appending */
-			nft_chain_list_add(chain, chain_list);
+			nftnl_chain_list_add(chain, chain_list);
 			break;
 		case T_HOOK:
-			nft_chain_attr_set_u32(chain, NFT_CHAIN_ATTR_HOOKNUM,
+			nftnl_chain_set_u32(chain, NFTNL_CHAIN_HOOKNUM,
 						hooknametonum(e->data));
 			break;
 		default:

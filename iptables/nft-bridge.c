@@ -96,7 +96,7 @@ static uint16_t ipt_to_ebt_flags(uint8_t invflags)
 	return result;
 }
 
-static void add_logical_iniface(struct nft_rule *r, char *iface, uint32_t op)
+static void add_logical_iniface(struct nftnl_rule *r, char *iface, uint32_t op)
 {
 	int iface_len;
 
@@ -109,7 +109,7 @@ static void add_logical_iniface(struct nft_rule *r, char *iface, uint32_t op)
 		add_cmp_ptr(r, op, iface, iface_len + 1);
 }
 
-static void add_logical_outiface(struct nft_rule *r, char *iface, uint32_t op)
+static void add_logical_outiface(struct nftnl_rule *r, char *iface, uint32_t op)
 {
 	int iface_len;
 
@@ -125,7 +125,7 @@ static void add_logical_outiface(struct nft_rule *r, char *iface, uint32_t op)
 /* TODO: Use generic add_action() once we convert this to use
  * iptables_command_state.
  */
-static int _add_action(struct nft_rule *r, struct ebtables_command_state *cs)
+static int _add_action(struct nftnl_rule *r, struct ebtables_command_state *cs)
 {
 	int ret = 0;
 
@@ -151,7 +151,7 @@ static int _add_action(struct nft_rule *r, struct ebtables_command_state *cs)
 	return ret;
 }
 
-static int nft_bridge_add(struct nft_rule *r, void *data)
+static int nft_bridge_add(struct nftnl_rule *r, void *data)
 {
 	struct ebtables_command_state *cs = data;
 	struct ebt_match *iter;
@@ -221,7 +221,7 @@ static int nft_bridge_add(struct nft_rule *r, void *data)
 }
 
 static void nft_bridge_parse_meta(struct nft_xt_ctx *ctx,
-				  struct nft_rule_expr *e, void *data)
+				  struct nftnl_expr *e, void *data)
 {
 	struct ebtables_command_state *cs = data;
 	struct ebt_entry *fw = &cs->fw;
@@ -237,8 +237,8 @@ static void nft_bridge_parse_meta(struct nft_xt_ctx *ctx,
 
 	switch (ctx->meta.key) {
 	case NFT_META_BRI_IIFNAME:
-		ifname = nft_rule_expr_get(e, NFT_EXPR_CMP_DATA, &len);
-		if (nft_rule_expr_get_u32(e, NFT_EXPR_CMP_OP) == NFT_CMP_NEQ)
+		ifname = nftnl_expr_get(e, NFTNL_EXPR_CMP_DATA, &len);
+		if (nftnl_expr_get_u32(e, NFTNL_EXPR_CMP_OP) == NFT_CMP_NEQ)
 			flags |= IPT_INV_VIA_IN;
 
 		memcpy(fw->logical_in, ifname, len);
@@ -252,8 +252,8 @@ static void nft_bridge_parse_meta(struct nft_xt_ctx *ctx,
 		}
 		break;
 	case NFT_META_BRI_OIFNAME:
-		ifname = nft_rule_expr_get(e, NFT_EXPR_CMP_DATA, &len);
-		if (nft_rule_expr_get_u32(e, NFT_EXPR_CMP_OP) == NFT_CMP_NEQ)
+		ifname = nftnl_expr_get(e, NFTNL_EXPR_CMP_DATA, &len);
+		if (nftnl_expr_get_u32(e, NFTNL_EXPR_CMP_OP) == NFT_CMP_NEQ)
 			flags |= IPT_INV_VIA_OUT;
 
 		memcpy(fw->logical_out, ifname, len);
@@ -275,7 +275,7 @@ out:
 }
 
 static void nft_bridge_parse_payload(struct nft_xt_ctx *ctx,
-				     struct nft_rule_expr *e, void *data)
+				     struct nftnl_expr *e, void *data)
 {
 	struct ebtables_command_state *cs = data;
 	struct ebt_entry *fw = &cs->fw;
@@ -358,25 +358,25 @@ static void nft_bridge_parse_target(struct xtables_target *t, void *data)
 	cs->target = t;
 }
 
-void nft_rule_to_ebtables_command_state(struct nft_rule *r,
+void nft_rule_to_ebtables_command_state(struct nftnl_rule *r,
 					struct ebtables_command_state *cs)
 {
-	struct nft_rule_expr_iter *iter;
-	struct nft_rule_expr *expr;
-	int family = nft_rule_attr_get_u32(r, NFT_RULE_ATTR_FAMILY);
+	struct nftnl_expr_iter *iter;
+	struct nftnl_expr *expr;
+	int family = nftnl_rule_get_u32(r, NFTNL_RULE_FAMILY);
 	struct nft_xt_ctx ctx = {
 		.state.cs_eb = cs,
 		.family = family,
 	};
 
-	iter = nft_rule_expr_iter_create(r);
+	iter = nftnl_expr_iter_create(r);
 	if (iter == NULL)
 		return;
 
-	expr = nft_rule_expr_iter_next(iter);
+	expr = nftnl_expr_iter_next(iter);
 	while (expr != NULL) {
 		const char *name =
-			nft_rule_expr_get_str(expr, NFT_RULE_EXPR_ATTR_NAME);
+			nftnl_expr_get_str(expr, NFTNL_EXPR_NAME);
 
 		if (strcmp(name, "counter") == 0)
 			nft_parse_counter(expr, &cs->counters);
@@ -395,10 +395,10 @@ void nft_rule_to_ebtables_command_state(struct nft_rule *r,
 		else if (strcmp(name, "target") == 0)
 			nft_parse_target(&ctx, expr);
 
-		expr = nft_rule_expr_iter_next(iter);
+		expr = nftnl_expr_iter_next(iter);
 	}
 
-	nft_rule_expr_iter_destroy(iter);
+	nftnl_expr_iter_destroy(iter);
 
 	if (cs->jumpto != NULL)
 		return;
@@ -434,7 +434,7 @@ static void nft_bridge_print_header(unsigned int format, const char *chain,
 	       chain, refs, basechain ? pol : "RETURN");
 }
 
-static void nft_bridge_print_firewall(struct nft_rule *r, unsigned int num,
+static void nft_bridge_print_firewall(struct nftnl_rule *r, unsigned int num,
 				      unsigned int format)
 {
 	struct xtables_match *matchp;
@@ -597,7 +597,7 @@ static bool nft_bridge_is_same(const void *data_a, const void *data_b)
 				  b->out_mask);
 }
 
-static bool nft_bridge_rule_find(struct nft_family_ops *ops, struct nft_rule *r,
+static bool nft_bridge_rule_find(struct nft_family_ops *ops, struct nftnl_rule *r,
 				 void *data)
 {
 	struct ebtables_command_state *cs = data;

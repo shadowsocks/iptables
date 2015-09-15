@@ -137,7 +137,7 @@ static void print_mac_and_mask(const unsigned char *mac, const unsigned char *ma
 	print_mac(mask, l);
 }
 
-static int nft_arp_add(struct nft_rule *r, void *data)
+static int nft_arp_add(struct nftnl_rule *r, void *data)
 {
 	struct arptables_command_state *cs = data;
 	struct arpt_entry *fw = &cs->fw;
@@ -257,7 +257,7 @@ static uint16_t ipt_to_arpt_flags(uint8_t invflags)
 	return result;
 }
 
-static void nft_arp_parse_meta(struct nft_xt_ctx *ctx, struct nft_rule_expr *e,
+static void nft_arp_parse_meta(struct nft_xt_ctx *ctx, struct nftnl_expr *e,
 			       void *data)
 {
 	struct arptables_command_state *cs = data;
@@ -292,7 +292,7 @@ static void parse_mask_ipv4(struct nft_xt_ctx *ctx, struct in_addr *mask)
 }
 
 static void nft_arp_parse_payload(struct nft_xt_ctx *ctx,
-				  struct nft_rule_expr *e, void *data)
+				  struct nftnl_expr *e, void *data)
 {
 	struct arptables_command_state *cs = data;
 	struct arpt_entry *fw = &cs->fw;
@@ -365,26 +365,26 @@ static void nft_arp_parse_payload(struct nft_xt_ctx *ctx,
 	}
 }
 
-void nft_rule_to_arptables_command_state(struct nft_rule *r,
+void nft_rule_to_arptables_command_state(struct nftnl_rule *r,
 					 struct arptables_command_state *cs)
 {
-	struct nft_rule_expr_iter *iter;
-	struct nft_rule_expr *expr;
-	int family = nft_rule_attr_get_u32(r, NFT_RULE_ATTR_FAMILY);
+	struct nftnl_expr_iter *iter;
+	struct nftnl_expr *expr;
+	int family = nftnl_rule_get_u32(r, NFTNL_RULE_FAMILY);
 	struct nft_xt_ctx ctx = {
 		.state.cs_arp = cs,
 		.family = family,
 	};
 
-	iter = nft_rule_expr_iter_create(r);
+	iter = nftnl_expr_iter_create(r);
 	if (iter == NULL)
 		return;
 
 	ctx.iter = iter;
-	expr = nft_rule_expr_iter_next(iter);
+	expr = nftnl_expr_iter_next(iter);
 	while (expr != NULL) {
 		const char *name =
-			nft_rule_expr_get_str(expr, NFT_RULE_EXPR_ATTR_NAME);
+			nftnl_expr_get_str(expr, NFTNL_EXPR_NAME);
 
 		if (strcmp(name, "counter") == 0)
 			nft_parse_counter(expr, &ctx.state.cs_arp->fw.counters);
@@ -401,10 +401,10 @@ void nft_rule_to_arptables_command_state(struct nft_rule *r,
 		else if (strcmp(name, "target") == 0)
 			nft_parse_target(&ctx, expr);
 
-		expr = nft_rule_expr_iter_next(iter);
+		expr = nftnl_expr_iter_next(iter);
 	}
 
-	nft_rule_expr_iter_destroy(iter);
+	nftnl_expr_iter_destroy(iter);
 
 	if (cs->jumpto != NULL)
 		return;
@@ -578,7 +578,7 @@ after_devdst:
 }
 
 static void
-nft_arp_print_firewall(struct nft_rule *r, unsigned int num,
+nft_arp_print_firewall(struct nftnl_rule *r, unsigned int num,
 		       unsigned int format)
 {
 	struct arptables_command_state cs = {};
@@ -634,7 +634,7 @@ static bool nft_arp_is_same(const void *data_a,
 				  (unsigned char *)b->arp.outiface_mask);
 }
 
-static bool nft_arp_rule_find(struct nft_family_ops *ops, struct nft_rule *r,
+static bool nft_arp_rule_find(struct nft_family_ops *ops, struct nftnl_rule *r,
 			      void *data)
 {
 	const struct arptables_command_state *cs = data;

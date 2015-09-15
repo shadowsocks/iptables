@@ -118,7 +118,7 @@ struct ebtables_command_state {
 	unsigned int options;
 };
 
-void nft_rule_to_ebtables_command_state(struct nft_rule *r,
+void nft_rule_to_ebtables_command_state(struct nftnl_rule *r,
 					struct ebtables_command_state *cs);
 
 static const char *ebt_standard_targets[NUM_STANDARD_TARGETS] = {
