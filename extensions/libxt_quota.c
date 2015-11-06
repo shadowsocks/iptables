@@ -48,6 +48,7 @@ static void quota_parse(struct xt_option_call *cb)
 	xtables_option_parse(cb);
 	if (cb->invert)
 		info->flags |= XT_QUOTA_INVERT;
+	info->quota = cb->val.u64;
 }
 
 static struct xtables_match quota_match = {

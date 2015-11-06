@@ -18,3 +18,7 @@ This is the time in seconds that will trigger the notification.
 \fB\-\-label\fP \fIstring\fP
 This is a unique identifier for the timer.  The maximum length for the
 label string is 27 characters.
+.TP
+\fB\-\---send_nl_msg\fP \fI(0/1)\fP
+Send netlink messages in addition to sysfs notifications and show remaining
+time. Defaults to 0.

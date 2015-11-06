@@ -23,7 +23,7 @@
 #define inline
 #endif
 
-#if !defined(__GLIBC__) || (__GLIBC__ < 2)
+#if !defined(__ANDROID__) && (!defined(__GLIBC__) || (__GLIBC__ < 2))
 typedef unsigned int socklen_t;
 #endif
 

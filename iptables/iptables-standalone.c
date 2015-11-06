@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <signal.h>
 #include <string.h>
 #include <iptables.h>
 #include "iptables-multi.h"
@@ -49,6 +50,8 @@ main(int argc, char *argv[])
 	int ret;
 	char *table = "filter";
 	struct iptc_handle *handle = NULL;
+
+	signal(SIGPIPE, SIG_IGN);
 
 	iptables_globals.program_name = "iptables";
 	ret = xtables_init_all(&iptables_globals, NFPROTO_IPV4);
