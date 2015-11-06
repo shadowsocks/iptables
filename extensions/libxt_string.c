@@ -20,6 +20,7 @@
  *             updated to work with slightly modified
  *             ipt_string_info.
  */
+#define _GNU_SOURCE 1 /* strnlen for older glibcs */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -217,7 +218,7 @@ is_hex_string(const char *str, const unsigned short int len)
 		if (! isprint(str[i]))
 			return 1;  /* string contains at least one non-printable char */
 	/* use hex output if the last char is a "\" */
-	if ((unsigned char) str[len-1] == 0x5c)
+	if (str[len-1] == '\\')
 		return 1;
 	return 0;
 }
@@ -228,16 +229,11 @@ print_hex_string(const char *str, const unsigned short int len)
 {
 	unsigned int i;
 	/* start hex block */
-	printf("\"|");
-	for (i=0; i < len; i++) {
-		/* see if we need to prepend a zero */
-		if ((unsigned char) str[i] <= 0x0F)
-			printf("0%x", (unsigned char) str[i]);
-		else
-			printf("%x", (unsigned char) str[i]);
-	}
+	printf(" \"|");
+	for (i=0; i < len; i++)
+		printf("%02x", (unsigned char)str[i]);
 	/* close hex block */
-	printf("|\" ");
+	printf("|\"");
 }
 
 static void
@@ -246,8 +242,8 @@ print_string(const char *str, const unsigned short int len)
 	unsigned int i;
 	printf(" \"");
 	for (i=0; i < len; i++) {
-		if ((unsigned char) str[i] == 0x22)  /* escape any embedded quotes */
-			printf("%c", 0x5c);
+		if (str[i] == '\"' || str[i] == '\\')
+			putchar('\\');
 		printf("%c", (unsigned char) str[i]);
 	}
 	printf("\"");  /* closing quote */

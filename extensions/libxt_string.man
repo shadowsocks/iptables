@@ -16,3 +16,16 @@ Matches the given pattern.
 .TP
 [\fB!\fP] \fB\-\-hex\-string\fP \fIpattern\fP
 Matches the given pattern in hex notation.
+.TP
+\fB\-\-icase\fP
+Ignore case when searching.
+.TP
+Examples:
+.IP
+# The string pattern can be used for simple text characters.
+.br
+iptables \-A INPUT \-p tcp \-\-dport 80 \-m string \-\-algo bm \-\-string 'GET /index.html' \-j LOG
+.IP
+# The hex string pattern can be used for non-printable characters, like |0D 0A| or |0D0A|.
+.br
+iptables \-p udp \-\-dport 53 \-m string \-\-algo bm \-\-from 40 \-\-to 57 \-\-hex\-string '|03|www|09|netfilter|03|org|00|'

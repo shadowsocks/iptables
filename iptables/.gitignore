@@ -1,14 +1,21 @@
 /ip6tables
-/ip6tables.8
 /ip6tables-save
 /ip6tables-restore
 /ip6tables-static
 /iptables
 /iptables.8
+/iptables-extensions.8
+/iptables-extensions.8.tmpl
 /iptables-save
+/iptables-save.8
 /iptables-restore
+/iptables-restore.8
 /iptables-static
 /iptables-xml
+/iptables-xml.1
 /xtables-multi
+/xtables-config-parser.c
+/xtables-config-parser.h
+/xtables-config-syntax.c
 
 /xtables.pc

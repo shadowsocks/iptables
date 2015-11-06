@@ -127,7 +127,7 @@ static void ipv6header_help(void)
 	printf(
 "ipv6header match options:\n"
 "[!] --header headers     Type of header to match, by name\n"
-"                         names: hop,dst,route,frag,auth,esp,none,proto\n"
+"                         names: hop,dst,route,frag,auth,esp,none,prot\n"
 "                    long names: hop-by-hop,ipv6-opts,ipv6-route,\n"
 "                                ipv6-frag,ah,esp,ipv6-nonxt,protocol\n"
 "                       numbers: 0,60,43,44,51,50,59\n"

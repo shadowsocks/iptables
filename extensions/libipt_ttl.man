@@ -1,6 +1,6 @@
 This module matches the time to live field in the IP header.
 .TP
-\fB\-\-ttl\-eq\fP \fIttl\fP
+[\fB!\fP] \fB\-\-ttl\-eq\fP \fIttl\fP
 Matches the given TTL value.
 .TP
 \fB\-\-ttl\-gt\fP \fIttl\fP

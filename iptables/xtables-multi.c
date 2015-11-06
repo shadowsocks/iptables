@@ -13,6 +13,10 @@
 #include "ip6tables-multi.h"
 #endif
 
+#ifdef ENABLE_NFTABLES
+#include "xtables-multi.h"
+#endif
+
 static const struct subcommand multi_subcommands[] = {
 #ifdef ENABLE_IPV4
 	{"iptables",            iptables_main},
@@ -31,6 +35,15 @@ static const struct subcommand multi_subcommands[] = {
 	{"save6",               ip6tables_save_main},
 	{"ip6tables-restore",   ip6tables_restore_main},
 	{"restore6",            ip6tables_restore_main},
+#endif
+#ifdef ENABLE_NFTABLES
+	{"xtables",             xtables_main},
+	{"xtables-save",        xtables_save_main},
+	{"xtables-restore",     xtables_restore_main},
+	{"xtables-config",      xtables_config_main},
+	{"xtables-events",      xtables_events_main},
+	{"xtables-arp",		xtables_arp_main},
+	{"xtables-ebtables",	xtables_eb_main},
 #endif
 	{NULL},
 };

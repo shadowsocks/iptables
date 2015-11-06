@@ -18,9 +18,9 @@ The type given can be
 \fBicmp\-port\-unreachable\fP,
 \fBicmp\-proto\-unreachable\fP,
 \fBicmp\-net\-prohibited\fP,
-\fBicmp\-host\-prohibited\fP or
-\fBicmp\-admin\-prohibited\fP (*)
-which return the appropriate ICMP error message (\fBport\-unreachable\fP is
+\fBicmp\-host\-prohibited\fP, or
+\fBicmp\-admin\-prohibited\fP (*),
+which return the appropriate ICMP error message (\fBicmp\-port\-unreachable\fP is
 the default).  The option
 \fBtcp\-reset\fP
 can be used on rules which only match the TCP protocol: this causes a

@@ -129,7 +129,8 @@ static const struct xt_option_entry owner_mt_opts[] = {
 	 .flags = XTOPT_INVERT},
 	{.name = "gid-owner", .id = O_GROUP, .type = XTTYPE_STRING,
 	 .flags = XTOPT_INVERT},
-	{.name = "socket-exists", .id = O_SOCK_EXISTS, .type = XTTYPE_NONE},
+	{.name = "socket-exists", .id = O_SOCK_EXISTS, .type = XTTYPE_NONE,
+	 .flags = XTOPT_INVERT},
 	XTOPT_TABLEEND,
 };
 

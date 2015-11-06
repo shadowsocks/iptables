@@ -31,7 +31,7 @@ Encapsulating Security Payload header
 No Next header which matches 59 in the 'Next Header field' of IPv6 header or
 any IPv6 extension headers
 .TP
-\fBproto\fP
+\fBprot\fP
 which matches any upper layer protocol header. A protocol name from
 /etc/protocols and numeric value also allowed. The number 255 is equivalent to
-\fBproto\fP.
+\fBprot\fP.

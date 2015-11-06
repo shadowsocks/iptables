@@ -18,10 +18,9 @@ The type given can be
 \fBicmp6\-adm\-prohibited\fP,
 \fBadm\-prohibited\fP,
 \fBicmp6\-addr\-unreachable\fP,
-\fBaddr\-unreach\fP,
-\fBicmp6\-port\-unreachable\fP or
-\fBport\-unreach\fP
-which return the appropriate ICMPv6 error message (\fBport\-unreach\fP is
+\fBaddr\-unreach\fP, or
+\fBicmp6\-port\-unreachable\fP,
+which return the appropriate ICMPv6 error message (\fBicmp6\-port\-unreachable\fP is
 the default). Finally, the option
 \fBtcp\-reset\fP
 can be used on rules which only match the TCP protocol: this causes a

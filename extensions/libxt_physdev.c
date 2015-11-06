@@ -27,11 +27,12 @@ static const struct xt_option_entry physdev_opts[] = {
 	 .flags = XTOPT_INVERT | XTOPT_PUT, XTOPT_POINTER(s, physindev)},
 	{.name = "physdev-out", .id = O_PHYSDEV_OUT, .type = XTTYPE_STRING,
 	 .flags = XTOPT_INVERT | XTOPT_PUT, XTOPT_POINTER(s, physoutdev)},
-	{.name = "physdev-is-in", .id = O_PHYSDEV_IS_IN, .type = XTTYPE_NONE},
+	{.name = "physdev-is-in", .id = O_PHYSDEV_IS_IN, .type = XTTYPE_NONE,
+	 .flags = XTOPT_INVERT},
 	{.name = "physdev-is-out", .id = O_PHYSDEV_IS_OUT,
-	 .type = XTTYPE_NONE},
+	 .type = XTTYPE_NONE, .flags = XTOPT_INVERT},
 	{.name = "physdev-is-bridged", .id = O_PHYSDEV_IS_BRIDGED,
-	 .type = XTTYPE_NONE},
+	 .type = XTTYPE_NONE, .flags = XTOPT_INVERT},
 	XTOPT_TABLEEND,
 };
 #undef s

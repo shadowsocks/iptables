@@ -37,7 +37,10 @@ static void dccp_help(void)
 "[!] --source-port port[:port]                          match source port(s)\n"
 " --sport ...\n"
 "[!] --destination-port port[:port]                     match destination port(s)\n"
-" --dport ...\n");
+" --dport ...\n"
+"[!] --dccp-types type[,...]                            match when packet is one of the given types\n"
+"[!] --dccp-option option                               match if option (by number!) is set\n"
+);
 }
 
 #define s struct xt_dccp_info
@@ -50,9 +53,10 @@ static const struct xt_option_entry dccp_opts[] = {
 	 .flags = XTOPT_INVERT | XTOPT_PUT, XTOPT_POINTER(s, dpts)},
 	{.name = "dport", .id = O_DEST_PORT, .type = XTTYPE_PORTRC,
 	 .flags = XTOPT_INVERT | XTOPT_PUT, XTOPT_POINTER(s, dpts)},
-	{.name = "dccp-types", .id = O_DCCP_TYPES, .type = XTTYPE_STRING},
+	{.name = "dccp-types", .id = O_DCCP_TYPES, .type = XTTYPE_STRING,
+	 .flags = XTOPT_INVERT},
 	{.name = "dccp-option", .id = O_DCCP_OPTION, .type = XTTYPE_UINT8,
-	 .min = 1, .max = UINT8_MAX, .flags = XTOPT_PUT,
+	 .min = 1, .max = UINT8_MAX, .flags = XTOPT_INVERT | XTOPT_PUT,
 	 XTOPT_POINTER(s, option)},
 	XTOPT_TABLEEND,
 };
@@ -261,13 +265,14 @@ static void dccp_save(const void *ip, const struct xt_entry_match *match)
 	}
 
 	if (einfo->flags & XT_DCCP_TYPE) {
-		printf(" --dccp-type");
-		print_types(einfo->typemask, einfo->invflags & XT_DCCP_TYPE,0);
+		printf("%s --dccp-types",
+		       einfo->invflags & XT_DCCP_TYPE ? " !" : "");
+		print_types(einfo->typemask, false, 0);
 	}
 
 	if (einfo->flags & XT_DCCP_OPTION) {
-		printf(" --dccp-option %s%u",
-			einfo->typemask & XT_DCCP_OPTION ? "! " : "",
+		printf("%s --dccp-option %u",
+			einfo->invflags & XT_DCCP_OPTION ? " !" : "",
 			einfo->option);
 	}
 }

@@ -37,17 +37,12 @@
 #include <ip6tables.h>
 #include "ip6tables-multi.h"
 
-#ifdef IPTABLES_MULTI
 int
 ip6tables_main(int argc, char *argv[])
-#else
-int
-main(int argc, char *argv[])
-#endif
 {
 	int ret;
 	char *table = "filter";
-	struct ip6tc_handle *handle = NULL;
+	struct xtc_handle *handle = NULL;
 
 	ip6tables_globals.program_name = "ip6tables";
 	ret = xtables_init_all(&ip6tables_globals, NFPROTO_IPV6);
@@ -63,7 +58,7 @@ main(int argc, char *argv[])
 	init_extensions6();
 #endif
 
-	ret = do_command6(argc, argv, &table, &handle);
+	ret = do_command6(argc, argv, &table, &handle, false);
 	if (ret) {
 		ret = ip6tc_commit(handle);
 		ip6tc_free(handle);
@@ -78,6 +73,8 @@ main(int argc, char *argv[])
 			fprintf(stderr, "ip6tables: %s.\n",
 				ip6tc_strerror(errno));
 		}
+		if (errno == EAGAIN)
+			exit(RESOURCE_PROBLEM);
 	}
 
 	exit(!ret);

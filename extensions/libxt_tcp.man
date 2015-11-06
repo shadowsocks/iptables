@@ -7,7 +7,6 @@ name or a port number. An inclusive range can also be specified,
 using the format \fIfirst\fP\fB:\fP\fIlast\fP.
 If the first port is omitted, "0" is assumed; if the last is omitted,
 "65535" is assumed.
-If the first port is greater than the second one they will be swapped.
 The flag
 \fB\-\-sport\fP
 is a convenient alias for this option.

@@ -13,8 +13,10 @@ enum {
 	O_QUEUE_NUM = 0,
 	O_QUEUE_BALANCE,
 	O_QUEUE_BYPASS,
+	O_QUEUE_CPU_FANOUT,
 	F_QUEUE_NUM     = 1 << O_QUEUE_NUM,
 	F_QUEUE_BALANCE = 1 << O_QUEUE_BALANCE,
+	F_QUEUE_CPU_FANOUT = 1 << O_QUEUE_CPU_FANOUT,
 };
 
 static void NFQUEUE_help(void)
@@ -37,7 +39,15 @@ static void NFQUEUE_help_v2(void)
 {
 	NFQUEUE_help_v1();
 	printf(
-"  --queue-bypass		Bypass Queueing if no queue instance exists.\n");
+"  --queue-bypass		Bypass Queueing if no queue instance exists.\n"
+"  --queue-cpu-fanout	Use current CPU (no hashing)\n");
+}
+
+static void NFQUEUE_help_v3(void)
+{
+	NFQUEUE_help_v2();
+	printf(
+"  --queue-cpu-fanout	Use current CPU (no hashing)\n");
 }
 
 #define s struct xt_NFQ_info
@@ -48,6 +58,8 @@ static const struct xt_option_entry NFQUEUE_opts[] = {
 	{.name = "queue-balance", .id = O_QUEUE_BALANCE,
 	 .type = XTTYPE_UINT16RC, .excl = F_QUEUE_NUM},
 	{.name = "queue-bypass", .id = O_QUEUE_BYPASS, .type = XTTYPE_NONE},
+	{.name = "queue-cpu-fanout", .id = O_QUEUE_CPU_FANOUT,
+	 .type = XTTYPE_NONE, .also = F_QUEUE_BALANCE},
 	XTOPT_TABLEEND,
 };
 #undef s
@@ -92,6 +104,18 @@ static void NFQUEUE_parse_v2(struct xt_option_call *cb)
 	}
 }
 
+static void NFQUEUE_parse_v3(struct xt_option_call *cb)
+{
+	struct xt_NFQ_info_v3 *info = cb->data;
+
+	NFQUEUE_parse_v2(cb);
+	switch (cb->entry->id) {
+	case O_QUEUE_CPU_FANOUT:
+		info->flags |= NFQ_FLAG_CPU_FANOUT;
+		break;
+	}
+}
+
 static void NFQUEUE_print(const void *ip,
                           const struct xt_entry_target *target, int numeric)
 {
@@ -120,8 +144,18 @@ static void NFQUEUE_print_v2(const void *ip,
 	const struct xt_NFQ_info_v2 *info = (void *) target->data;
 
 	NFQUEUE_print_v1(ip, target, numeric);
-	if (info->bypass)
+	if (info->bypass & NFQ_FLAG_BYPASS)
 		printf(" bypass");
+}
+
+static void NFQUEUE_print_v3(const void *ip,
+                             const struct xt_entry_target *target, int numeric)
+{
+	const struct xt_NFQ_info_v3 *info = (void *)target->data;
+
+	NFQUEUE_print_v2(ip, target, numeric);
+	if (info->flags & NFQ_FLAG_CPU_FANOUT)
+		printf(" cpu-fanout");
 }
 
 static void NFQUEUE_save(const void *ip, const struct xt_entry_target *target)
@@ -151,8 +185,18 @@ static void NFQUEUE_save_v2(const void *ip, const struct xt_entry_target *target
 
 	NFQUEUE_save_v1(ip, target);
 
-	if (info->bypass)
-		printf("--queue-bypass ");
+	if (info->bypass & NFQ_FLAG_BYPASS)
+		printf(" --queue-bypass");
+}
+
+static void NFQUEUE_save_v3(const void *ip,
+			    const struct xt_entry_target *target)
+{
+	const struct xt_NFQ_info_v3 *info = (void *)target->data;
+
+	NFQUEUE_save_v2(ip, target);
+	if (info->flags & NFQ_FLAG_CPU_FANOUT)
+		printf(" --queue-cpu-fanout");
 }
 
 static void NFQUEUE_init_v1(struct xt_entry_target *t)
@@ -198,6 +242,19 @@ static struct xtables_target nfqueue_targets[] = {
 	.print		= NFQUEUE_print_v2,
 	.save		= NFQUEUE_save_v2,
 	.x6_parse	= NFQUEUE_parse_v2,
+	.x6_options	= NFQUEUE_opts,
+},{
+	.family		= NFPROTO_UNSPEC,
+	.revision	= 3,
+	.name		= "NFQUEUE",
+	.version	= XTABLES_VERSION,
+	.size		= XT_ALIGN(sizeof(struct xt_NFQ_info_v3)),
+	.userspacesize	= XT_ALIGN(sizeof(struct xt_NFQ_info_v3)),
+	.help		= NFQUEUE_help_v3,
+	.init		= NFQUEUE_init_v1,
+	.print		= NFQUEUE_print_v3,
+	.save		= NFQUEUE_save_v3,
+	.x6_parse	= NFQUEUE_parse_v3,
 	.x6_options	= NFQUEUE_opts,
 }
 };

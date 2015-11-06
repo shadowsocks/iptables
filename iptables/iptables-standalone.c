@@ -39,17 +39,12 @@
 #include <iptables.h>
 #include "iptables-multi.h"
 
-#ifdef IPTABLES_MULTI
 int
 iptables_main(int argc, char *argv[])
-#else
-int
-main(int argc, char *argv[])
-#endif
 {
 	int ret;
 	char *table = "filter";
-	struct iptc_handle *handle = NULL;
+	struct xtc_handle *handle = NULL;
 
 	signal(SIGPIPE, SIG_IGN);
 
@@ -66,7 +61,7 @@ main(int argc, char *argv[])
 	init_extensions4();
 #endif
 
-	ret = do_command4(argc, argv, &table, &handle);
+	ret = do_command4(argc, argv, &table, &handle, false);
 	if (ret) {
 		ret = iptc_commit(handle);
 		iptc_free(handle);

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2005-2013 Patrick McHardy <kaber@trash.net>
+ */
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -40,8 +44,7 @@ static void policy_help(void)
 }
 
 static const struct xt_option_entry policy_opts[] = {
-	{.name = "dir", .id = O_DIRECTION, .type = XTTYPE_STRING,
-	 .flags = XTOPT_INVERT},
+	{.name = "dir", .id = O_DIRECTION, .type = XTTYPE_STRING},
 	{.name = "pol", .id = O_POLICY, .type = XTTYPE_STRING},
 	{.name = "strict", .id = O_STRICT, .type = XTTYPE_NONE},
 	{.name = "reqid", .id = O_REQID, .type = XTTYPE_UINT32,

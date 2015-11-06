@@ -43,9 +43,10 @@ static void dscp_help(void)
 static const struct xt_option_entry dscp_opts[] = {
 	{.name = "dscp", .id = O_DSCP, .excl = F_DSCP_CLASS,
 	 .type = XTTYPE_UINT8, .min = 0, .max = XT_DSCP_MAX,
-	 .flags = XTOPT_PUT, XTOPT_POINTER(struct xt_dscp_info, dscp)},
+	 .flags = XTOPT_INVERT | XTOPT_PUT,
+	 XTOPT_POINTER(struct xt_dscp_info, dscp)},
 	{.name = "dscp-class", .id = O_DSCP_CLASS, .excl = F_DSCP,
-	 .type = XTTYPE_STRING},
+	 .type = XTTYPE_STRING, .flags = XTOPT_INVERT},
 	XTOPT_TABLEEND,
 };
 

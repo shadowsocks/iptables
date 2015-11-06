@@ -9,10 +9,25 @@
 
 enum {
 	O_TRANSPARENT = 0,
+	O_NOWILDCARD = 1,
+	O_RESTORESKMARK = 2,
 };
 
 static const struct xt_option_entry socket_mt_opts[] = {
 	{.name = "transparent", .id = O_TRANSPARENT, .type = XTTYPE_NONE},
+	XTOPT_TABLEEND,
+};
+
+static const struct xt_option_entry socket_mt_opts_v2[] = {
+	{.name = "transparent", .id = O_TRANSPARENT, .type = XTTYPE_NONE},
+	{.name = "nowildcard", .id = O_NOWILDCARD, .type = XTTYPE_NONE},
+	XTOPT_TABLEEND,
+};
+
+static const struct xt_option_entry socket_mt_opts_v3[] = {
+	{.name = "transparent", .id = O_TRANSPARENT, .type = XTTYPE_NONE},
+	{.name = "nowildcard", .id = O_NOWILDCARD, .type = XTTYPE_NONE},
+	{.name = "restore-skmark", .id = O_RESTORESKMARK, .type = XTTYPE_NONE},
 	XTOPT_TABLEEND,
 };
 
@@ -23,6 +38,25 @@ static void socket_mt_help(void)
 		"  --transparent    Ignore non-transparent sockets\n\n");
 }
 
+static void socket_mt_help_v2(void)
+{
+	printf(
+		"socket match options:\n"
+		"  --nowildcard     Do not ignore LISTEN sockets bound on INADDR_ANY\n"
+		"  --transparent    Ignore non-transparent sockets\n\n");
+}
+
+static void socket_mt_help_v3(void)
+{
+	printf(
+		"socket match options:\n"
+		"  --nowildcard     Do not ignore LISTEN sockets bound on INADDR_ANY\n"
+		"  --transparent    Ignore non-transparent sockets\n"
+		"  --restore-skmark Set the packet mark to the socket mark if\n"
+		"                   the socket matches and transparent / \n"
+		"                   nowildcard conditions are satisfied\n\n");
+}
+
 static void socket_mt_parse(struct xt_option_call *cb)
 {
 	struct xt_socket_mtinfo1 *info = cb->data;
@@ -31,6 +65,39 @@ static void socket_mt_parse(struct xt_option_call *cb)
 	switch (cb->entry->id) {
 	case O_TRANSPARENT:
 		info->flags |= XT_SOCKET_TRANSPARENT;
+		break;
+	}
+}
+
+static void socket_mt_parse_v2(struct xt_option_call *cb)
+{
+	struct xt_socket_mtinfo2 *info = cb->data;
+
+	xtables_option_parse(cb);
+	switch (cb->entry->id) {
+	case O_TRANSPARENT:
+		info->flags |= XT_SOCKET_TRANSPARENT;
+		break;
+	case O_NOWILDCARD:
+		info->flags |= XT_SOCKET_NOWILDCARD;
+		break;
+	}
+}
+
+static void socket_mt_parse_v3(struct xt_option_call *cb)
+{
+	struct xt_socket_mtinfo2 *info = cb->data;
+
+	xtables_option_parse(cb);
+	switch (cb->entry->id) {
+	case O_TRANSPARENT:
+		info->flags |= XT_SOCKET_TRANSPARENT;
+		break;
+	case O_NOWILDCARD:
+		info->flags |= XT_SOCKET_NOWILDCARD;
+		break;
+	case O_RESTORESKMARK:
+		info->flags |= XT_SOCKET_RESTORESKMARK;
 		break;
 	}
 }
@@ -50,6 +117,46 @@ socket_mt_print(const void *ip, const struct xt_entry_match *match,
 {
 	printf(" socket");
 	socket_mt_save(ip, match);
+}
+
+static void
+socket_mt_save_v2(const void *ip, const struct xt_entry_match *match)
+{
+	const struct xt_socket_mtinfo2 *info = (const void *)match->data;
+
+	if (info->flags & XT_SOCKET_TRANSPARENT)
+		printf(" --transparent");
+	if (info->flags & XT_SOCKET_NOWILDCARD)
+		printf(" --nowildcard");
+}
+
+static void
+socket_mt_print_v2(const void *ip, const struct xt_entry_match *match,
+		   int numeric)
+{
+	printf(" socket");
+	socket_mt_save_v2(ip, match);
+}
+
+static void
+socket_mt_save_v3(const void *ip, const struct xt_entry_match *match)
+{
+	const struct xt_socket_mtinfo3 *info = (const void *)match->data;
+
+	if (info->flags & XT_SOCKET_TRANSPARENT)
+		printf(" --transparent");
+	if (info->flags & XT_SOCKET_NOWILDCARD)
+		printf(" --nowildcard");
+	if (info->flags & XT_SOCKET_RESTORESKMARK)
+		printf(" --restore-skmark");
+}
+
+static void
+socket_mt_print_v3(const void *ip, const struct xt_entry_match *match,
+		   int numeric)
+{
+	printf(" socket");
+	socket_mt_save_v3(ip, match);
 }
 
 static struct xtables_match socket_mt_reg[] = {
@@ -73,6 +180,32 @@ static struct xtables_match socket_mt_reg[] = {
 		.save          = socket_mt_save,
 		.x6_parse      = socket_mt_parse,
 		.x6_options    = socket_mt_opts,
+	},
+	{
+		.name          = "socket",
+		.revision      = 2,
+		.family        = NFPROTO_UNSPEC,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_socket_mtinfo2)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_socket_mtinfo2)),
+		.help          = socket_mt_help_v2,
+		.print         = socket_mt_print_v2,
+		.save          = socket_mt_save_v2,
+		.x6_parse      = socket_mt_parse_v2,
+		.x6_options    = socket_mt_opts_v2,
+	},
+	{
+		.name          = "socket",
+		.revision      = 3,
+		.family        = NFPROTO_UNSPEC,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_socket_mtinfo2)),
+		.userspacesize = XT_ALIGN(sizeof(struct xt_socket_mtinfo2)),
+		.help          = socket_mt_help_v3,
+		.print         = socket_mt_print_v3,
+		.save          = socket_mt_save_v3,
+		.x6_parse      = socket_mt_parse_v3,
+		.x6_options    = socket_mt_opts_v3,
 	},
 };
 

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 /*
@@ -92,7 +92,14 @@ static void osf_save(const void *ip, const struct xt_entry_match *match)
 {
 	const struct xt_osf_info *info = (const struct xt_osf_info*) match->data;
 
-	printf(" --genre %s%s", (info->flags & XT_OSF_INVERT) ? "! ": "", info->genre);
+	if (info->flags & XT_OSF_INVERT)
+		printf(" !");
+
+	printf(" --genre %s", info->genre);
+	if (info->flags & XT_OSF_TTL)
+		printf(" --ttl %u", info->ttl);
+	if (info->flags & XT_OSF_LOG)
+		printf(" --log %u", info->loglevel);
 }
 
 static struct xtables_match osf_match = {

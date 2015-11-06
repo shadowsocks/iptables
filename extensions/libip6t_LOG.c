@@ -87,19 +87,19 @@ static void LOG_parse(struct xt_option_call *cb)
 				   "Newlines not allowed in --log-prefix");
 		break;
 	case O_LOG_TCPSEQ:
-		info->logflags = IP6T_LOG_TCPSEQ;
+		info->logflags |= IP6T_LOG_TCPSEQ;
 		break;
 	case O_LOG_TCPOPTS:
-		info->logflags = IP6T_LOG_TCPOPT;
+		info->logflags |= IP6T_LOG_TCPOPT;
 		break;
 	case O_LOG_IPOPTS:
-		info->logflags = IP6T_LOG_IPOPT;
+		info->logflags |= IP6T_LOG_IPOPT;
 		break;
 	case O_LOG_UID:
-		info->logflags = IP6T_LOG_UID;
+		info->logflags |= IP6T_LOG_UID;
 		break;
 	case O_LOG_MAC:
-		info->logflags = IP6T_LOG_MACDECODE;
+		info->logflags |= IP6T_LOG_MACDECODE;
 		break;
 	}
 }
@@ -146,8 +146,10 @@ static void LOG_save(const void *ip, const struct xt_entry_target *target)
 	const struct ip6t_log_info *loginfo
 		= (const struct ip6t_log_info *)target->data;
 
-	if (strcmp(loginfo->prefix, "") != 0)
-		printf(" --log-prefix \"%s\"", loginfo->prefix);
+	if (strcmp(loginfo->prefix, "") != 0) {
+		printf(" --log-prefix");
+		xtables_save_string(loginfo->prefix);
+	}
 
 	if (loginfo->level != LOG_DEFAULT_LEVEL)
 		printf(" --log-level %d", loginfo->level);

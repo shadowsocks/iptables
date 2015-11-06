@@ -19,8 +19,11 @@ static const struct icmpv6_names icmpv6_codes[] = {
 	{ "destination-unreachable", 1, 0, 0xFF },
 	{   "no-route", 1, 0, 0 },
 	{   "communication-prohibited", 1, 1, 1 },
+	{   "beyond-scope", 1, 2, 2 },
 	{   "address-unreachable", 1, 3, 3 },
 	{   "port-unreachable", 1, 4, 4 },
+	{   "failed-policy", 1, 5, 5 },
+	{   "reject-route", 1, 6, 6 },
 
 	{ "packet-too-big", 2, 0, 0xFF },
 

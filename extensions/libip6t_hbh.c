@@ -108,6 +108,7 @@ static void hbh_parse(struct xt_option_call *cb)
 	case O_HBH_LEN:
 		if (cb->invert)
 			optinfo->invflags |= IP6T_OPTS_INV_LEN;
+		optinfo->flags |= IP6T_OPTS_LEN;
 		break;
 	case O_HBH_OPTS:
 		optinfo->optsnr = parse_options(cb->arg, optinfo->opts);

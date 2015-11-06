@@ -55,6 +55,11 @@ arptables \-A INPUT \-i eth2 \-\-h\-length 6
 \-\-destination\-mac 01:00:5e:00:01:02
 \-j mangle \-\-mangle\-mac\-d 00:zz:yy:xx:5a:27
 .PP
+\fBNOTE\fP: the arptables commands above use mainstream syntax. If you
+are using arptables-jf included in some RedHat, CentOS and Fedora
+versions, you will hit syntax errors. Therefore, you'll have to adapt
+these to the arptables-jf syntax to get them working.
+.PP
 In the case of TCP connections, pickup facility has to be disabled
 to avoid marking TCP ACK packets coming in the reply direction as
 valid.

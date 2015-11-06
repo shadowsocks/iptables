@@ -31,7 +31,7 @@ Configuring and compiling
 --with-xtlibdir=
 
 	The path to where Xtables extensions should be installed to. It
-	defaults to ${prefix}/libexec/xtables.
+	defaults to ${libdir}/xtables.
 
 --enable-devel (or --disable-devel)
 
@@ -69,6 +69,8 @@ If you want to enable debugging, use
 
 (-O0 is used to turn off instruction reordering, which makes debugging
 much easier.)
+
+To show debug traces you can add -DDEBUG to CFLAGS option
 
 
 Other notes

@@ -15,21 +15,13 @@ interface which begins with this name will match. If the packet didn't arrive
 through a bridge device, this packet won't match this option, unless '!' is used.
 .TP
 [\fB!\fP] \fB\-\-physdev\-out\fP \fIname\fP
-Name of a bridge port via which a packet is going to be sent (for packets
+Name of a bridge port via which a packet is going to be sent (for bridged packets
 entering the
-.BR FORWARD ,
-.B OUTPUT
+.BR FORWARD
 and
 .B POSTROUTING
 chains).  If the interface name ends in a "+", then any
-interface which begins with this name will match. Note that in the
-.BR nat " and " mangle
-.B OUTPUT
-chains one cannot match on the bridge output port, however one can in the
-.B "filter OUTPUT"
-chain. If the packet won't leave by a bridge device or if it is yet unknown what
-the output device will be, then the packet won't match this option,
-unless '!' is used.
+interface which begins with this name will match.
 .TP
 [\fB!\fP] \fB\-\-physdev\-is\-in\fP
 Matches if the packet has entered through a bridge interface.

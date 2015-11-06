@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2006-2013 Patrick McHardy <kaber@trash.net>
+ */
+
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -107,7 +111,7 @@ static void print_match(const struct xt_statistic_info *info, char *prefix)
 		       (info->flags & XT_STATISTIC_INVERT) ? " !" : "",
 		       prefix,
 		       info->u.nth.every + 1);
-		if (info->u.nth.packet)
+		if (info->u.nth.packet || *prefix)
 			printf(" %spacket %u", prefix, info->u.nth.packet);
 		break;
 	}

@@ -13,7 +13,8 @@ Group hosts using the prefix length. For IPv4, this must be a number between
 maximum prefix length for the applicable protocol is used.
 .TP
 \fB\-\-connlimit\-saddr\fP
-Apply the limit onto the source group.
+Apply the limit onto the source group. This is the default if
+\-\-connlimit\-daddr is not specified.
 .TP
 \fB\-\-connlimit\-daddr\fP
 Apply the limit onto the destination group.

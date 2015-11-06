@@ -1,4 +1,5 @@
-This target provides userspace logging of matching packets.  When this
+This is the deprecated ipv4-only predecessor of the NFLOG target.
+It provides userspace logging of matching packets.  When this
 target is set for a rule, the Linux kernel will multicast this packet
 through a
 .IR netlink 

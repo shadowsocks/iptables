@@ -1,5 +1,3 @@
-This target disables connection tracking for all packets matching that rule.
-.PP
-It can only be used in the
-.B raw
-table.
+This extension disables connection tracking for all packets matching that rule.
+It is equivalent with \-j CT \-\-notrack. Like CT, NOTRACK can only be used in
+the \fBraw\fP table.

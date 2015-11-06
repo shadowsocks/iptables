@@ -41,6 +41,13 @@ static const struct xt_option_entry frag_opts[] = {
 };
 #undef s
 
+static void frag_init(struct xt_entry_match *m)
+{
+	struct ip6t_frag *fraginfo = (void *)m->data;
+
+	fraginfo->ids[1] = ~0U;
+}
+
 static void frag_parse(struct xt_option_call *cb)
 {
 	struct ip6t_frag *fraginfo = cb->data;
@@ -50,6 +57,22 @@ static void frag_parse(struct xt_option_call *cb)
 	case O_FRAGID:
 		if (cb->nvals == 1)
 			fraginfo->ids[1] = fraginfo->ids[0];
+		if (cb->invert)
+			fraginfo->invflags |= IP6T_FRAG_INV_IDS;
+		/*
+		 * Note however that IP6T_FRAG_IDS is not tested by anything,
+		 * so it is merely here for completeness.
+		 */
+		fraginfo->flags |= IP6T_FRAG_IDS;
+		break;
+	case O_FRAGLEN:
+		/*
+		 * As of Linux 3.0, the kernel does not check for
+		 * fraglen at all.
+		 */
+		if (cb->invert)
+			fraginfo->invflags |= IP6T_FRAG_INV_LEN;
+		fraginfo->flags |= IP6T_FRAG_LEN;
 		break;
 	case O_FRAGRES:
 		fraginfo->flags |= IP6T_FRAG_RES;
@@ -157,6 +180,7 @@ static struct xtables_match frag_mt6_reg = {
 	.size          = XT_ALIGN(sizeof(struct ip6t_frag)),
 	.userspacesize = XT_ALIGN(sizeof(struct ip6t_frag)),
 	.help          = frag_help,
+	.init          = frag_init,
 	.print         = frag_print,
 	.save          = frag_save,
 	.x6_parse      = frag_parse,

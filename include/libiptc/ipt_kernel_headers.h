@@ -13,15 +13,4 @@
 #include <netinet/udp.h>
 #include <net/if.h>
 #include <sys/types.h>
-#else /* libc5 */
-#include <sys/socket.h>
-#include <linux/ip.h>
-#include <linux/in.h>
-#include <linux/if.h>
-#include <linux/icmp.h>
-#include <linux/tcp.h>
-#include <linux/udp.h>
-#include <linux/types.h>
-#include <linux/in6.h>
-#endif
 #endif
